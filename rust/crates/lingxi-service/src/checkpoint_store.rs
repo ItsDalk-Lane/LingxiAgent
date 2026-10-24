@@ -19,6 +19,11 @@
 //! - base64 存档解码失败 → 显式 500（现役 Node `Buffer.from(str,
 //!   "base64")` 对非法字符静默忽略——那是静默降级形状，按仓库红线
 //!   不复刻：损坏存档必须响亮失败，不写半解码字节）。
+//! - DELETE 删除（server/routes/checkpoints.ts:46-54 → lib/checkpoint-store.ts
+//!   :110-116 `remove`：unlinkSync 全错误 catch{} 吞掉）：缺失按现役可观察
+//!   契约返回 `{ok:true}`（删除的终态已满足，幂等）；但现役把权限/目录等
+//!   真实 IO 失败也吞成成功是静默降级形状，按红线不复刻——IO 失败响亮
+//!   500，message 如实外发。
 //! - 鉴权：现役 `/api/checkpoints/*` 落到 route-security 的 `/api/`
 //!   兜底 STUDIO_OWNER；Rust 侧无 studio 面，按 auth.rs 既有口径映射
 //!   到最严格的 LocalOnly（本地属主凭证）。
@@ -150,6 +155,20 @@ impl CheckpointStore {
             .map_err(|err| CheckpointRestoreError::Io(format!("write restore target: {err}")))?;
         Ok(target.to_string())
     }
+
+    /// remove（checkpoint-store.ts:110-116）：删除 `{id}.json` 存档文件。
+    /// 缺失 → Ok(())（幂等：删除终态已满足，与现役可观察契约一致）；
+    /// 其余 IO 失败响亮返回（现役 catch{} 全吞属静默降级，不复刻）。
+    /// `remove_file` 作用于目录项本身：符号链接只解链不触目标，目录删除
+    /// 失败落到 Io → 500。
+    pub fn remove(&self, id: &str) -> Result<(), CheckpointRestoreError> {
+        std::fs::remove_file(self.dir.join(format!("{id}.json"))).map_err(|err| {
+            if err.kind() == std::io::ErrorKind::NotFound {
+                return CheckpointRestoreError::NotFound;
+            }
+            CheckpointRestoreError::Io(format!("remove checkpoint archive: {err}"))
+        })
+    }
 }
 
 /// restore 失败：每一支都响亮对调用方可见，绝不静默降级为成功。
@@ -194,6 +213,23 @@ pub async fn restore_route(
             .into_response(),
         Err(CheckpointRestoreError::NotFound) => {
             json_error(StatusCode::NOT_FOUND, "checkpoint not found")
+        }
+        Err(err) => json_error(StatusCode::INTERNAL_SERVER_ERROR, &err.to_string()),
+    }
+}
+
+/// `DELETE /lingxi/v1/checkpoints/{checkpoint_id}` — 现役
+/// `/api/checkpoints/:id`（server/routes/checkpoints.ts:46-54）的路径形状；
+/// LocalOnly（auth.rs 分类）。缺失幂等 `{ok:true}`，真实 IO 失败响亮 500
+/// （现役 remove 全吞属静默降级，不复刻——见模块头端口决策）。
+pub async fn delete_route(
+    State(state): State<ServiceState>,
+    AxumPath(checkpoint_id): AxumPath<String>,
+) -> Response {
+    let store = CheckpointStore::new(state.config().data_home.as_path());
+    match store.remove(&checkpoint_id) {
+        Ok(()) | Err(CheckpointRestoreError::NotFound) => {
+            (StatusCode::OK, Json(json!({ "ok": true }))).into_response()
         }
         Err(err) => json_error(StatusCode::INTERNAL_SERVER_ERROR, &err.to_string()),
     }

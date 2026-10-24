@@ -444,6 +444,10 @@ pub enum PermissionKind {
     ArgumentAwareGoal,
     /// 设置查询只读；实际修改必须按具体参数复核。
     ArgumentAwareSettings,
+    /// 代码内核的状态只读，执行和重启仍是执行权限。
+    ArgumentAwareRunCode,
+    /// 语言服务查询/预览只读，实际重命名写入使用执行权限。
+    ArgumentAwareLsp,
 }
 
 impl PermissionKind {
@@ -459,6 +463,8 @@ impl PermissionKind {
             PermissionKind::ArgumentAwareBrowser => "browser",
             PermissionKind::ArgumentAwareGoal => "goal",
             PermissionKind::ArgumentAwareSettings => "update-settings",
+            PermissionKind::ArgumentAwareRunCode => "run-code",
+            PermissionKind::ArgumentAwareLsp => "lsp",
         }
     }
 }
@@ -2166,6 +2172,29 @@ impl ToolRegistry {
                 PermissionKind::Review
             };
             permission.capability_base = format!("update_settings.{action}");
+        }
+        if permission.kind == PermissionKind::ArgumentAwareRunCode {
+            let action = effective.as_value()["action"].as_str().unwrap_or("run");
+            permission.kind = if action == "status" {
+                PermissionKind::Read
+            } else {
+                PermissionKind::Execute
+            };
+            permission.capability_base = format!("run_code.{action}");
+        }
+        if permission.kind == PermissionKind::ArgumentAwareLsp {
+            let action = effective.as_value()["action"].as_str().unwrap_or("status");
+            let preview = effective.as_value()["preview"].as_bool() == Some(true);
+            permission.kind = if matches!(
+                action,
+                "status" | "diagnostics" | "definition" | "references" | "hover" | "symbols"
+            ) || (action == "rename" && preview)
+            {
+                PermissionKind::Read
+            } else {
+                PermissionKind::Execute
+            };
+            permission.capability_base = format!("lsp.{action}");
         }
         let prepared = PreparedToolCall {
             target_id,

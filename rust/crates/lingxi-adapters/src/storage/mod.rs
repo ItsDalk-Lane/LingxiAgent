@@ -29,15 +29,20 @@ pub mod conversation_status;
 pub mod conversations;
 pub mod conversations_collab;
 pub mod knowledge;
+pub mod legacy_import;
 pub mod legacy_session_files;
 pub mod media;
 pub mod media_gallery;
 pub mod migrations;
 pub mod queue;
+/// R08-T06：回滚增量包——旧根冻结身份集推导 + 新根差集导出/回灌。
+pub mod rollback_delta;
 pub mod run_store;
 pub mod session_admin;
 pub mod session_files;
 pub mod session_tree;
+/// R08-T05：statvfs/GetDiskFreeSpaceExW 可用空间探测（预检磁盘空间项）。
+pub mod statfs;
 pub mod skill_library;
 pub mod subagent_threads;
 #[cfg(windows)]

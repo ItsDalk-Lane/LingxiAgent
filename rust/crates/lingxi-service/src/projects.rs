@@ -431,6 +431,27 @@ impl SessionProjectsService {
         Ok(value)
     }
 
+    /// 旧 `/api/session-projects/session-assignment`（core/engine.ts
+    /// normalizeSessionProjectAssignmentId 同语义）的项目侧校验：
+    /// null/空 = 清除归属；auto 项目 id 豁免；否则必须在目录中。
+    pub fn validate_assignment_project(
+        &self,
+        raw: Option<&str>,
+    ) -> Result<Option<String>, ProjectsError> {
+        let Some(id) = normalize_id(raw) else {
+            return Ok(None);
+        };
+        if is_auto_project_id(&id) {
+            return Ok(Some(id));
+        }
+        let file = self.read()?;
+        if file.projects.iter().any(|project| project.id == id) {
+            Ok(Some(id))
+        } else {
+            Err(ProjectsError("project not found".into()))
+        }
+    }
+
     /// 作用域内重排项目（folderId 必须存在；null = 根）。
     pub fn reorder_projects(
         &self,
@@ -680,5 +701,49 @@ pub async fn reorder_projects_route(
     {
         Ok(catalog) => Json(json!({ "ok": true, "catalog": catalog })).into_response(),
         Err(err) => err.response(),
+    }
+}
+
+/// R08-T01 会话归属分配端口：会话定位经 session_locator（native: 前缀或
+/// 旧 JSONL 路径均可），写入走 R06 v12 `set_session_project`；会话不存在
+/// 或已归档按旧 400 家族显式报错，不静默创建。
+pub async fn set_session_assignment_route(
+    State(state): State<ServiceState>,
+    body: axum::body::Bytes,
+) -> Response {
+    let payload: Value = match serde_json::from_slice(&body) {
+        Ok(value) => value,
+        Err(_) => json!({}),
+    };
+    let session_path = json_field(&payload, "sessionPath").unwrap_or("");
+    if session_path.trim().is_empty() {
+        return ProjectsError("sessionPath is required".into()).response();
+    }
+    let project = match state
+        .session_projects()
+        .validate_assignment_project(json_field(&payload, "projectId"))
+    {
+        Ok(value) => value,
+        Err(err) => return err.response(),
+    };
+    let session_id =
+        match crate::session_locator::resolve(state.storage(), None, Some(session_path)).await {
+            Ok(id) => id,
+            Err(_) => return ProjectsError("session not found".into()).response(),
+        };
+    match state
+        .session_admin()
+        .set_session_project(&session_id, project.as_deref())
+        .await
+    {
+        Ok(_) => Json(json!({
+            "ok": true,
+            "assignment": { "sessionPath": session_path, "projectId": project }
+        }))
+        .into_response(),
+        Err(crate::session_admin::SessionAdminError::WrongLifecycle { detail }) => {
+            ProjectsError(detail).response()
+        }
+        Err(_) => ProjectsError("session not found".into()).response(),
     }
 }

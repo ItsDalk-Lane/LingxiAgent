@@ -64,9 +64,10 @@ fn main() {
         };
         // 引导必须沿用锁内身份（bootstrap_with_locked_instance），
         // 令 instance.json 与 local-token.json 指向同一次启动。
-        let state = ServiceState::bootstrap_with_locked_instance(config, &layout, deps, &guard)
-            .await
-            .expect("bootstrap");
+        let state =
+            ServiceState::bootstrap_with_locked_instance(config, &layout, deps, &guard, false)
+                .await
+                .expect("bootstrap");
         // 单写锁必须存活到进程退出：publish 后放回共享槽，不得提前释放。
         let slot: Arc<Mutex<Option<instance::InstanceGuard>>> = Arc::new(Mutex::new(Some(guard)));
         let publisher = slot.clone();

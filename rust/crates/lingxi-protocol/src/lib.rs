@@ -426,6 +426,15 @@ impl ContractVersions {
         server_protocol: 1,
         data_epoch: 1,
     };
+
+    /// The versions adopted by the R08 cutover (T05): the data epoch really
+    /// advances 1 → 2 (adjudication P8); the other two axes stay at the R00
+    /// baseline. `R00_BASELINE` remains as the historical anchor.
+    pub const R08_CUTOVER: Self = Self {
+        preload_api: 1,
+        server_protocol: 1,
+        data_epoch: 2,
+    };
 }
 
 #[cfg(test)]
@@ -520,6 +529,18 @@ mod tests {
                 preload_api: 1,
                 server_protocol: 1,
                 data_epoch: 1
+            }
+        );
+    }
+
+    #[test]
+    fn r08_cutover_advances_only_the_data_epoch() {
+        assert_eq!(
+            ContractVersions::R08_CUTOVER,
+            ContractVersions {
+                preload_api: 1,
+                server_protocol: 1,
+                data_epoch: 2
             }
         );
     }

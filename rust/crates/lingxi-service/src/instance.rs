@@ -193,7 +193,7 @@ impl InstanceRecord {
             server_version: crate::server_version().to_string(),
             wire_protocol_min: lingxi_protocol::handshake::WIRE_PROTOCOL_MIN_SUPPORTED,
             wire_protocol_max: lingxi_protocol::handshake::WIRE_PROTOCOL_MAX_SUPPORTED,
-            data_epoch: lingxi_protocol::ContractVersions::R00_BASELINE.data_epoch,
+            data_epoch: lingxi_protocol::ContractVersions::R08_CUTOVER.data_epoch,
             instance_id: identity.instance_id.clone(),
             start_nonce: identity.start_nonce.clone(),
             pid: identity.pid,
@@ -225,11 +225,11 @@ impl InstanceRecord {
                 lingxi_protocol::handshake::WIRE_PROTOCOL_MAX_SUPPORTED
             ));
         }
-        if self.data_epoch != lingxi_protocol::ContractVersions::R00_BASELINE.data_epoch {
+        if self.data_epoch != lingxi_protocol::ContractVersions::R08_CUTOVER.data_epoch {
             out.push(format!(
                 "data epoch {} vs current {} (epoch policy is owned by the ADR-004 gate)",
                 self.data_epoch,
-                lingxi_protocol::ContractVersions::R00_BASELINE.data_epoch
+                lingxi_protocol::ContractVersions::R08_CUTOVER.data_epoch
             ));
         }
         if self.server_version != crate::server_version() {
@@ -705,7 +705,7 @@ mod tests {
             server_version: "0.0.0".to_string(),
             wire_protocol_min: 1,
             wire_protocol_max: 1,
-            data_epoch: 1,
+            data_epoch: 2,
             instance_id: "deadbeefdeadbeefdeadbeefdeadbeef".to_string(),
             start_nonce: "cafebabecafebabe".to_string(),
             pid: std::process::id(), // exists right now, unrelated process
@@ -857,12 +857,12 @@ mod tests {
             Path::new("/tmp/x"),
         );
         assert!(record.handshake_mismatches().is_empty());
-        record.data_epoch = 2;
+        record.data_epoch = 1;
         record.server_version = "9.9.9".to_string();
         let mismatches = record.handshake_mismatches();
         assert_eq!(mismatches.len(), 2, "mismatches: {mismatches:?}");
         assert!(
-            mismatches.iter().any(|m| m.contains("data epoch 2")),
+            mismatches.iter().any(|m| m.contains("data epoch 1")),
             "mismatches: {mismatches:?}"
         );
     }

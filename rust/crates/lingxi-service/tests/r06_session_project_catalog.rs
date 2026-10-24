@@ -335,3 +335,280 @@ async fn project_folder_catalog_roundtrip_and_rejections() {
         .expect("限时停机");
     let _ = std::fs::remove_dir_all(&server.home);
 }
+
+// R08-T01：旧 /api/session-permission-mode 端口——GET/POST 默认域、会话级
+// 写入、显式拒绝分支的真实服务证明（engine 侧 session-permission-mode.ts 语义）。
+#[tokio::test]
+async fn session_permission_mode_defaults_session_write_and_rejections() {
+    let server = boot().await;
+    let mode_url = "/lingxi/v1/session-permission-mode";
+
+    // 初始状态：无焦点会话、无偏好默认 → auto/operate/auto。
+    let (status, body) = ok(&server, "GET", mode_url, None).await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(body["mode"], json!("auto"));
+    assert_eq!(body["accessMode"], json!("operate"));
+    assert_eq!(body["defaultMode"], json!("auto"));
+
+    // 默认域写偏好默认（无 sessionPath/pending 标志）。
+    let (status, body) = ok(&server, "POST", mode_url, Some(&json!({"mode": "ask"}))).await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(body["ok"], json!(true));
+    assert_eq!(body["defaultMode"], json!("ask"));
+    let (status, body) = ok(&server, "GET", mode_url, None).await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(body["mode"], json!("ask"), "无会话时 mode 跟随默认");
+    assert_eq!(body["defaultMode"], json!("ask"));
+
+    // pendingNewSession 写默认（下一会话消费），不触碰会话级。
+    let (status, body) = ok(
+        &server,
+        "POST",
+        mode_url,
+        Some(&json!({"mode": "operate", "pendingNewSession": true})),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(body["defaultMode"], json!("operate"));
+
+    // 非法 mode 显式 400。
+    let (status, err) = ok(
+        &server,
+        "POST",
+        mode_url,
+        Some(&json!({"mode": "nonsense"})),
+    )
+    .await;
+    assert_eq!(status, 400, "{err}");
+
+    // currentSessionOnly 无活动会话显式 409，不静默写默认。
+    let (status, err) = ok(
+        &server,
+        "POST",
+        mode_url,
+        Some(&json!({"mode": "operate", "currentSessionOnly": true})),
+    )
+    .await;
+    assert_eq!(status, 409, "{err}");
+    assert_eq!(err["ok"], json!(false));
+
+    // 未知会话 sessionPath 显式 409，不静默创建。
+    let (status, err) = ok(
+        &server,
+        "POST",
+        mode_url,
+        Some(&json!({"mode": "read_only", "sessionPath": "native:missing-session"})),
+    )
+    .await;
+    assert_eq!(status, 409, "{err}");
+    assert_eq!(err["ok"], json!(false));
+
+    // 会话级 auto 显式 409（auto 只属于默认域）。
+    let (status, err) = ok(
+        &server,
+        "POST",
+        mode_url,
+        Some(&json!({"mode": "auto", "sessionPath": "native:missing-session"})),
+    )
+    .await;
+    assert_eq!(status, 409, "{err}");
+
+    // 旧 JSONL 路径不猜映射：显式 409，不静默落到默认域。
+    let (status, err) = ok(
+        &server,
+        "POST",
+        mode_url,
+        Some(&json!({"mode": "ask", "sessionPath": "/legacy/s1.jsonl"})),
+    )
+    .await;
+    assert_eq!(status, 409, "{err}");
+    let (_, state) = ok(&server, "GET", mode_url, None).await;
+    assert_eq!(state["defaultMode"], json!("operate"), "拒绝分支不得写默认");
+
+    // 真实会话（显式 sessionId，无需模型面，沿归属测试口径）。
+    let session_id = "r08-perm-session";
+    let (status, created) = ok(
+        &server,
+        "POST",
+        "/lingxi/v1/sessions",
+        Some(&json!({"sessionId": session_id, "agentId": "a", "title": "R08 权限接线"})),
+    )
+    .await;
+    assert_eq!(status, 201, "session create: {created}");
+
+    // 会话级写入：native locator 定位，默认域不变。
+    let (status, body) = ok(
+        &server,
+        "POST",
+        mode_url,
+        Some(&json!({"mode": "read_only", "sessionPath": format!("native:{session_id}")})),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(body["ok"], json!(true));
+    assert_eq!(body["mode"], json!("read_only"));
+    assert_eq!(body["accessMode"], json!("read_only"));
+    assert_eq!(body["defaultMode"], json!("operate"), "会话级写不改默认");
+
+    // 聚焦该会话后 GET 反映会话级显式值。
+    let (status, body) = ok(
+        &server,
+        "POST",
+        "/lingxi/v1/sessions/switch",
+        Some(&json!({"sessionId": session_id})),
+    )
+    .await;
+    assert_eq!(status, 200, "switch: {body}");
+    let (status, body) = ok(&server, "GET", mode_url, None).await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(body["mode"], json!("read_only"), "焦点会话显式值");
+    assert_eq!(body["accessMode"], json!("read_only"));
+    assert_eq!(body["defaultMode"], json!("operate"));
+
+    // currentSessionOnly 命中焦点会话。
+    let (status, body) = ok(
+        &server,
+        "POST",
+        mode_url,
+        Some(&json!({"mode": "ask", "currentSessionOnly": true})),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(body["mode"], json!("ask"));
+    let (status, body) = ok(&server, "GET", mode_url, None).await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(body["mode"], json!("ask"));
+
+    // 默认域写不改焦点会话显式值（engine 同语义）。
+    let (status, body) = ok(&server, "POST", mode_url, Some(&json!({"mode": "auto"}))).await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(body["defaultMode"], json!("auto"));
+    let (status, body) = ok(&server, "GET", mode_url, None).await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(body["mode"], json!("ask"), "会话显式值优先于默认");
+    assert_eq!(body["defaultMode"], json!("auto"));
+
+    // 无凭证 401（LocalOnly 路由政策）。
+    let (status, _) = http(
+        &server,
+        "POST",
+        mode_url,
+        Some(&json!({"mode": "ask"})),
+        None,
+    )
+    .await;
+    assert_eq!(status, 401);
+    let (status, _) = http(&server, "GET", mode_url, None, None).await;
+    assert_eq!(status, 401);
+
+    server.stop.send(()).expect("仍在监听");
+    let _ = tokio::time::timeout(Duration::from_secs(10), server.handle)
+        .await
+        .expect("限时停机");
+    let _ = std::fs::remove_dir_all(&server.home);
+}
+
+// R08-T01：旧 /api/session-projects/session-assignment 端口（唯一
+// MAPPED_ROUTE_MISSING 项）——分配/清除/读回/拒绝的真实服务证明。
+#[tokio::test]
+async fn session_assignment_assigns_clears_and_rejects_unknown() {
+    let server = boot().await;
+    // 准备一个真实会话（显式 sessionId，无需模型面）与项目。
+    let session_id = "r08-assign-session".to_string();
+    let (status, created) = ok(
+        &server,
+        "POST",
+        "/lingxi/v1/sessions",
+        Some(&json!({"sessionId": session_id, "agentId": "a", "title": "R08 归属验收"})),
+    )
+    .await;
+    assert_eq!(status, 201, "session create: {created}");
+    let session_path = format!("native:{session_id}");
+    let (status, project_res) = ok(
+        &server,
+        "POST",
+        "/lingxi/v1/session-projects/projects",
+        Some(&json!({"name":"R08 归属项目"})),
+    )
+    .await;
+    assert_eq!(status, 200, "{project_res}");
+    let project_id = project_res["project"]["id"]
+        .as_str()
+        .expect("project id")
+        .to_string();
+
+    let assignment = "/lingxi/v1/session-projects/session-assignment";
+    // 分配：旧契约 body {sessionPath, projectId}，native locator 定位。
+    let (status, body) = ok(
+        &server,
+        "POST",
+        assignment,
+        Some(&json!({"sessionPath": session_path, "projectId": project_id})),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(body["ok"], json!(true));
+    assert_eq!(body["assignment"]["projectId"], json!(project_id));
+    // studio-list 真实读回归属。
+    let (status, list) = ok(&server, "GET", "/lingxi/v1/sessions/studio-list", None).await;
+    assert_eq!(status, 200, "{list}");
+    let row = list["sessions"]
+        .as_array()
+        .expect("sessions 数组")
+        .iter()
+        .find(|row| row["sessionId"] == json!(session_id))
+        .expect("会话在列表中");
+    assert_eq!(row["projectId"], json!(project_id));
+    // 清除归属（projectId=null）。
+    let (status, body) = ok(
+        &server,
+        "POST",
+        assignment,
+        Some(&json!({"sessionPath": session_path, "projectId": null})),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(body["assignment"]["projectId"], json!(null));
+    let (status, list) = ok(&server, "GET", "/lingxi/v1/sessions/studio-list", None).await;
+    assert_eq!(status, 200);
+    let row = list["sessions"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["sessionId"] == json!(session_id))
+        .unwrap();
+    assert_eq!(row["projectId"], json!(null), "清除后读回为 null");
+    // 未知项目显式拒绝（engine 同语义 project not found）。
+    let (status, err) = ok(
+        &server,
+        "POST",
+        assignment,
+        Some(&json!({"sessionPath": session_path, "projectId": "no-such-project"})),
+    )
+    .await;
+    assert_eq!(status, 400, "{err}");
+    assert_eq!(err["error"], json!("project not found"));
+    // 未知会话显式拒绝，不静默创建。
+    let (status, err) = ok(
+        &server,
+        "POST",
+        assignment,
+        Some(&json!({"sessionPath": "native:missing-session", "projectId": project_id})),
+    )
+    .await;
+    assert_eq!(status, 400, "{err}");
+    assert_eq!(err["error"], json!("session not found"));
+    // 缺 sessionPath 显式拒绝。
+    let (status, err) = ok(&server, "POST", assignment, Some(&json!({}))).await;
+    assert_eq!(status, 400, "{err}");
+    assert_eq!(err["error"], json!("sessionPath is required"));
+    // 无凭证 401（沿本套件既有口径）。
+    let (status, _) = http(&server, "POST", assignment, None, None).await;
+    assert_eq!(status, 401);
+
+    server.stop.send(()).expect("仍在监听");
+    let _ = tokio::time::timeout(Duration::from_secs(10), server.handle)
+        .await
+        .expect("限时停机");
+    let _ = std::fs::remove_dir_all(&server.home);
+}

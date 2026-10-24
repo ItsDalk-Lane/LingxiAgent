@@ -629,6 +629,70 @@ impl RunDatabase {
             .await
     }
 
+    /// Fresh-database-only session seed: inserts `rows` only when the
+    /// `sessions` table is completely empty (`COUNT(*) = 0`), otherwise a
+    /// logged no-op. This is the durable form of the R02-T03 in-memory seed
+    /// parity documented at `sessions::SessionStore::seed_rows`: the seed
+    /// belongs to a *fresh* database. Seeding unconditionally on every boot
+    /// was an excess over that contract — an adopted/migrated root (R08-T05
+    /// P9, adjudicated 2026-10-23) never contained the synthetic ids in the
+    /// legacy Node stack, so inserting them there mutated imported data and
+    /// broke the self-check count invariant. The unguarded
+    /// `ensure_session_seed` remains the general store/test API and is
+    /// unchanged; production boot uses this guarded variant.
+    pub async fn ensure_session_seed_if_empty(
+        &self,
+        rows: Vec<SessionRow>,
+    ) -> Result<(), StorageError> {
+        if rows
+            .iter()
+            .any(|row| row.session_id.starts_with(MOOD_STREAM_PREFIX))
+        {
+            return Err(StorageError::InvalidRequest {
+                detail: "reserved mood stream namespace cannot be used as a session id".into(),
+            });
+        }
+        self.queue
+            .submit(move |conn| {
+                let tx = conn
+                    .unchecked_transaction()
+                    .map_err(migrations::map_rusqlite)?;
+                let session_count: i64 = tx
+                    .query_row("SELECT COUNT(*) FROM sessions", [], |row| row.get(0))
+                    .map_err(migrations::map_rusqlite)?;
+                if session_count != 0 {
+                    tracing::info!(
+                        session_count,
+                        "session seed skipped: sessions table is not empty (fresh-database-only seed)"
+                    );
+                    tx.commit().map_err(migrations::map_rusqlite)?;
+                    return Ok(());
+                }
+                for row in &rows {
+                    if super::session_operations::identity_retired(&tx,&row.session_id)? {
+                        tracing::info!(session_id=%row.session_id,"session seed skipped: durable operation identity retired");
+                        continue;
+                    }
+                    tx.execute(
+                        "INSERT OR IGNORE INTO sessions \
+                         (session_id, agent_id, owner_user_id, title, created_at_unix_ms) \
+                         VALUES (?1, ?2, ?3, ?4, ?5)",
+                        rusqlite::params![
+                            row.session_id,
+                            row.agent_id,
+                            row.owner_user_id,
+                            row.title,
+                            row.created_at_unix_ms
+                        ],
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                }
+                tx.commit().map_err(migrations::map_rusqlite)?;
+                Ok(())
+            })
+            .await
+    }
+
     /// Reads one session row.
     pub async fn get_session(&self, session_id: &str) -> Result<Option<SessionRow>, StorageError> {
         let session_id = session_id.to_string();

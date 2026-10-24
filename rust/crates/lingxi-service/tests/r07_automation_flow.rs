@@ -905,3 +905,183 @@ async fn notification_preference_updates_preserve_other_settings_and_reject_dama
     let root = h.close().await;
     std::fs::remove_dir_all(root).unwrap();
 }
+
+// F02 批次A：R00-T02-LA-095E0402EEEC 的“过期/冲突拒绝”与“拒绝时无越权或
+// 错误持久化、错误对用户可见”此前无真实证据（F02 范围审查错端点组）。
+#[tokio::test]
+async fn apply_suggestion_rejections_are_explicit_and_persist_nothing() {
+    let h = Harness::boot(None).await;
+    chat(&h,json!({"tool":"automation","args":{"action":"create","scheduleType":"every","schedule":"5","prompt":"拒绝路径","label":"拒绝路径"}})).await;
+    let result = h.provider.results.lock().unwrap().last().unwrap().clone();
+    assert_eq!(result["ok"], true, "{result}");
+    let suggestion = result["details"]["suggestionId"].as_str().unwrap();
+    // 未知建议：错误可见。
+    let (status, missing) = h
+        .request(
+            "POST",
+            "/lingxi/v1/desk/cron",
+            json!({"action":"apply_suggestion","sessionId":"scheduler-source","suggestionId":"no-such-suggestion"}),
+        )
+        .await;
+    assert_eq!(status, 400, "{missing}");
+    assert!(
+        missing["error"]
+            .to_string()
+            .contains("automation_suggestion_unavailable"),
+        "{missing}"
+    );
+    // 冲突：建议目标 Agent 不可更换。
+    let (status, agent) = h
+        .request(
+            "POST",
+            "/lingxi/v1/desk/cron",
+            json!({"action":"apply_suggestion","sessionId":"scheduler-source","suggestionId":suggestion,"jobData":{"targetAgentId":"someone-else"}}),
+        )
+        .await;
+    assert_eq!(status, 400, "{agent}");
+    assert!(
+        agent["error"]
+            .to_string()
+            .contains("suggestion target agent cannot change"),
+        "{agent}"
+    );
+    // 冲突：不支持的建议编辑字段。
+    let (status, edit) = h
+        .request(
+            "POST",
+            "/lingxi/v1/desk/cron",
+            json!({"action":"apply_suggestion","sessionId":"scheduler-source","suggestionId":suggestion,"jobData":{"unsupportedKey":true}}),
+        )
+        .await;
+    assert_eq!(status, 400, "{edit}");
+    assert!(
+        edit["error"]
+            .to_string()
+            .contains("unsupported suggestion edit"),
+        "{edit}"
+    );
+    // 会话/Studio 身份不符按不可用处理。
+    let (status, other) = h
+        .request(
+            "POST",
+            "/lingxi/v1/desk/cron",
+            json!({"action":"apply_suggestion","sessionId":"some-other-session","suggestionId":suggestion}),
+        )
+        .await;
+    assert_eq!(status, 400, "{other}");
+    assert!(
+        other["error"]
+            .to_string()
+            .contains("automation_suggestion_unavailable"),
+        "{other}"
+    );
+    // 未应用建议过期后拒绝（TTL 30 分钟，automation_tools.rs:152）。
+    h.clock.advance(31 * 60_000);
+    let (status, expired) = h
+        .request(
+            "POST",
+            "/lingxi/v1/desk/cron",
+            json!({"action":"apply_suggestion","sessionId":"scheduler-source","suggestionId":suggestion}),
+        )
+        .await;
+    assert_eq!(status, 400, "{expired}");
+    assert!(
+        expired["error"]
+            .to_string()
+            .contains("automation_suggestion_expired"),
+        "{expired}"
+    );
+    assert!(
+        store::list_jobs(h.state.storage(), None)
+            .await
+            .unwrap()
+            .is_empty(),
+        "全部拒绝路径不得创建任务"
+    );
+    let root = h.close().await;
+    std::fs::remove_dir_all(root).unwrap();
+}
+
+// F02 批次A：R00-T02-LA-5F394AA4C9A3 的“找不到建议、Studio 身份缺失或已应用
+// 时不创建重复任务”此前无真实证据。
+#[tokio::test]
+async fn slash_apply_missing_cross_session_and_repeat_never_duplicate_jobs() {
+    let h = Harness::boot(None).await;
+    chat(&h,json!({"tool":"automation","args":{"action":"create","scheduleType":"every","schedule":"2","prompt":"身份与重复","label":"身份与重复"}})).await;
+    let result = h.provider.results.lock().unwrap().last().unwrap().clone();
+    assert_eq!(result["ok"], true, "{result}");
+    let suggestion = result["details"]["suggestionId"].as_str().unwrap();
+    // 找不到建议：错误对用户可见。
+    let (status, missing) = h
+        .request(
+            "POST",
+            "/lingxi/v1/sessions/scheduler-source/slash",
+            json!({"text":"/apply no-such-suggestion"}),
+        )
+        .await;
+    assert_eq!(status, 200, "{missing}");
+    assert_eq!(missing["results"][0]["level"], "error", "{missing}");
+    assert!(
+        missing["results"][0]["text"]
+            .as_str()
+            .unwrap()
+            .contains("automation_suggestion_unavailable"),
+        "{missing}"
+    );
+    // Studio/会话身份缺失：另一会话引用本会话建议按不可用拒绝，不产生任务。
+    h.state
+        .session_admin()
+        .create_session(
+            "other-source",
+            "lingxi",
+            lingxi_kernel::LOCAL_OWNER_SUBJECT,
+            "身份边界",
+            Some("operate"),
+            &[],
+            true,
+            h.clock.now_unix_ms(),
+        )
+        .await
+        .unwrap();
+    let (status, cross) = h
+        .request(
+            "POST",
+            "/lingxi/v1/sessions/other-source/slash",
+            json!({"text":format!("/apply {suggestion}")}),
+        )
+        .await;
+    assert_eq!(status, 200, "{cross}");
+    assert_eq!(cross["results"][0]["level"], "error", "{cross}");
+    assert!(
+        cross["results"][0]["text"]
+            .as_str()
+            .unwrap()
+            .contains("automation_suggestion_unavailable"),
+        "{cross}"
+    );
+    assert!(store::list_jobs(h.state.storage(), None)
+        .await
+        .unwrap()
+        .is_empty());
+    // 已应用后重复 /apply：幂等返回，不创建重复任务。
+    for expected in ["success", "success"] {
+        let (status, applied) = h
+            .request(
+                "POST",
+                "/lingxi/v1/sessions/scheduler-source/slash",
+                json!({"text":format!("/apply {suggestion}")}),
+            )
+            .await;
+        assert_eq!(status, 200, "{applied}");
+        assert_eq!(applied["results"][0]["level"], expected, "{applied}");
+    }
+    assert_eq!(
+        store::list_jobs(h.state.storage(), None)
+            .await
+            .unwrap()
+            .len(),
+        1
+    );
+    let root = h.close().await;
+    std::fs::remove_dir_all(root).unwrap();
+}

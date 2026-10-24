@@ -87,6 +87,548 @@ use crate::session_supervisor::SteeringInbox;
 use crate::streaming_norm::{DeltaNormalizer, NormEvent};
 use crate::task_supervisor::{TaskExit, TaskSupervisor};
 
+/// 仅真实父工具驱动建立；程序实参不能指定来源、Agent、权限或工作流范围。
+#[derive(Clone)]
+struct ProgramAuthority {
+    ctx: lingxi_kernel::RunContext,
+    parent_call: ToolCallId,
+    authorization: DriveAuthorization,
+    agent_id: String,
+    phone_scoped: bool,
+    admitted_parentless_subagent: bool,
+    quota_lane: String,
+    hooks: Option<Arc<std::sync::Mutex<crate::hooks::ExtensionHooks>>>,
+}
+impl ProgramAuthority {
+    fn new(
+        ctx: lingxi_kernel::RunContext,
+        parent_call: ToolCallId,
+        authorization: DriveAuthorization,
+        agent_id: String,
+        phone_scoped: bool,
+        admitted_parentless_subagent: bool,
+        quota_lane: String,
+        hooks: Option<Arc<std::sync::Mutex<crate::hooks::ExtensionHooks>>>,
+    ) -> Self {
+        Self {
+            ctx,
+            parent_call,
+            authorization,
+            agent_id,
+            phone_scoped,
+            admitted_parentless_subagent,
+            quota_lane,
+            hooks,
+        }
+    }
+}
+tokio::task_local! { static PROGRAM_AUTHORITY: ProgramAuthority; }
+
+impl RunSupervisor {
+    /// 程序子调用沿同一受信驱动准备、批准、持久回执；不创建第二个任务终态。
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) async fn execute_program_child(
+        self: &Arc<Self>,
+        db: &Arc<lingxi_adapters::storage::RunDatabase>,
+        events: &Arc<EventService>,
+        ctx: &lingxi_kernel::RunContext,
+        parent_call: &ToolCallId,
+        seq: u64,
+        name: &str,
+        args: serde_json::Value,
+        now_ms: u64,
+    ) -> Result<ToolOutcome, String> {
+        use crate::toolgateway::{self, CallerSurface, PolicyVerdict};
+        use lingxi_kernel::toolcatalog::{PermissionKind, SchemaBudget, ToolOrigin, ToolTargetRef};
+        let authority = PROGRAM_AUTHORITY
+            .try_with(Clone::clone)
+            .map_err(|_| "PTC_TRUSTED_PARENT_REQUIRED")?;
+        if &authority.ctx != ctx || &authority.parent_call != parent_call || seq == 0 {
+            return Err("PTC_PARENT_CONTEXT_MISMATCH".into());
+        }
+        let lifetime = toolgateway::TOOL_LIFETIME
+            .try_with(Clone::clone)
+            .map_err(|_| "PTC_LIFETIME_REQUIRED")?;
+        let call = ToolCallId::new(format!("{}:ptc:{seq}", parent_call.as_str()));
+        let fail = |message: String| ToolOutcome::Failed {
+            error: ProtocolError::new(ErrorCode::Forbidden, message, false),
+        };
+        let gateway = self
+            .tool_gateway
+            .as_ref()
+            .ok_or("PTC_GATEWAY_UNAVAILABLE")?;
+        let entries = db
+            .load_invocation_journal(&ctx.run_id)
+            .await
+            .map_err(|e| e.to_string())?;
+        let parent = entries
+            .iter()
+            .find(|row| row.journal_id == parent_call.as_str())
+            .ok_or("PTC_PARENT_JOURNAL_MISSING")?;
+        if parent.target != "tool:first-party:run_tools"
+            || parent.phase != InvocationPhase::Started
+            || parent.attempt != ctx.attempt.as_str()
+            || parent.generation != ctx.generation
+            || parent.owner_kind != ctx.principal.storage_kind()
+            || parent.owner_subject != ctx.principal.storage_subject()
+            || entries.iter().any(|row| row.journal_id == call.as_str())
+        {
+            // 重复序号或重启后的已知/未知回执均不重派发副作用。
+            return Err("PTC_PARENT_INACTIVE_OR_CHILD_REPLAY".into());
+        }
+        let unresolved = ToolRequest::from_effective_arguments(
+            format!(
+                "ptc:unresolved:{}",
+                name.chars().take(256).collect::<String>()
+            ),
+            args.clone(),
+            &SchemaBudget::default(),
+        )
+        .ok_or("PTC_ARGUMENTS_INVALID")?;
+        macro_rules! refuse_child {
+            ($request:expr,$message:expr) => {{
+                let request: &ToolRequest = $request;
+                let outcome = fail($message);
+                db.record_invocation_intent(
+                    ctx,
+                    InvocationIntent {
+                        journal_id: call.clone(),
+                        target: request.target.clone(),
+                        args_digest: request.args_digest.hex.clone(),
+                        args_summary: request.args_summary.clone(),
+                        idempotency_key: Some(call.to_string()),
+                    },
+                    now_ms,
+                )
+                .await
+                .map_err(|e| e.to_string())?;
+                self.persist_tool_event(
+                    db.as_ref(),
+                    events.as_ref(),
+                    ctx,
+                    &call,
+                    request,
+                    None,
+                    now_ms,
+                )
+                .await
+                .map_err(|e| e.to_string())?;
+                self.close_program_child(db, events, ctx, &call, request, &outcome, false, now_ms)
+                    .await?;
+                return Ok(outcome);
+            }};
+        }
+        let target = match gateway
+            .registry()
+            .resolve(&ToolTargetRef::ByName { name: name.into() })
+        {
+            Ok(target) => target,
+            Err(error) => refuse_child!(&unresolved, error.to_string()),
+        };
+        let listing = match gateway.registry().describe(&target) {
+            Ok(listing) => listing,
+            Err(error) => refuse_child!(&unresolved, error.to_string()),
+        };
+        let local = listing.local_name.as_str();
+        if local == "run_tools" {
+            refuse_child!(&unresolved, "PTC_RECURSION_FORBIDDEN".into());
+        }
+        // 与直接模型入口相同：非驻留目标经目录桥，正式说明的代次不能由程序伪造。
+        let request = if gateway.has_catalog_definitions()
+            && !crate::toolcatalog_bridge::RESIDENT_NAMES.contains(&local)
+        {
+            ToolRequest::from_effective_arguments(
+                "tool:first-party:mcp_call",
+                serde_json::json!({"tool":name,"arguments":args}),
+                &SchemaBudget::default(),
+            )
+        } else {
+            ToolRequest::from_effective_arguments(
+                target.to_string(),
+                args,
+                &SchemaBudget::default(),
+            )
+        }
+        .ok_or("PTC_ARGUMENTS_INVALID")?;
+        let (request, pin) = match gateway.normalize_model_request(ctx, &request, None) {
+            Ok(result) => result,
+            Err(error) => refuse_child!(&request, error.to_string()),
+        };
+        // 每次重验可撤销来源；继承的授权只表示上限，不替代当前授权事实。
+        if let Err(reason) = self.validate_program_authority(&authority, ctx).await {
+            refuse_child!(&request, reason);
+        }
+        if lifetime.cancel.is_cancelled() {
+            refuse_child!(&request, "PTC_CANCELLED_BEFORE_PREPARE".into());
+        }
+        if let Some(hooks) = authority.hooks.as_ref() {
+            let decision = hooks
+                .lock()
+                .unwrap_or_else(|p| p.into_inner())
+                .on_tool_call(
+                    request.target.rsplit(':').next().unwrap_or(local),
+                    call.as_str(),
+                    request.arguments.as_value(),
+                );
+            if let lingxi_kernel::memory::GuardDecision::Block(reason) = decision {
+                refuse_child!(&request, format!("PTC_TOOL_CALL_GUARD: {reason}"));
+            }
+        }
+        let _tool_permit = match self
+            .acquire_or_break(
+                &QuotaResource::Tool,
+                &authority.agent_id,
+                &authority.quota_lane,
+                &ctx.run_id,
+                &lifetime.cancel,
+                None,
+            )
+            .await
+        {
+            Ok(Some(permit)) => permit,
+            Ok(None) => refuse_child!(&request, "PTC_TOOL_QUOTA_EXHAUSTED".into()),
+            Err(()) => refuse_child!(&request, "PTC_CANCELLED_DURING_QUOTA".into()),
+        };
+        let surface = if matches!(authority.authorization.grant, RunGrant::Subagent { .. }) {
+            CallerSurface::SubagentRun
+        } else {
+            CallerSurface::UserRun
+        };
+        let permission = authority
+            .authorization
+            .scoped_invocation_permission_context(authority.phone_scoped);
+        let review = tokio::select! {biased; _=lifetime.cancel.cancelled()=>None,
+        result=gateway.review_and_validate_from_request_pinned(ctx,surface,&authority.agent_id,permission,&call,&request,pin,&[],None)=>Some(result)};
+        match review {
+            None => refuse_child!(&request, "PTC_CANCELLED_DURING_REVIEW".into()),
+            Some(Err(error)) => refuse_child!(&request, error.to_string()),
+            Some(Ok(_)) => {}
+        }
+        let prepared = toolgateway::with_settings_principal(
+            authority.authorization.settings_principal.clone(),
+            || {
+                toolgateway::with_mcp_foreground(
+                    authority.authorization.foreground_mcp_session_permissions,
+                    || {
+                        toolgateway::with_workflow_scope(
+                            authority.authorization.workflow_scope.clone(),
+                            || {
+                                toolgateway::with_workspace(lifetime.workspace.clone(), || {
+                                    gateway.prepare_from_request_pinned(
+                                        ctx,
+                                        surface,
+                                        &authority.agent_id,
+                                        authority
+                                            .authorization
+                                            .scoped_invocation_permission_context(
+                                                authority.phone_scoped,
+                                            ),
+                                        &call,
+                                        &request,
+                                        pin,
+                                    )
+                                })
+                            },
+                        )
+                    },
+                )
+            },
+        );
+        let cleanup_handle = prepared
+            .as_ref()
+            .ok()
+            .map(|prepared| prepared.handle.clone());
+        let _cleanup = cleanup_handle.as_ref().map(|handle| PreparedCallCleanup {
+            gateway,
+            ctx,
+            call: &call,
+            handle,
+        });
+        db.record_invocation_intent(
+            ctx,
+            InvocationIntent {
+                journal_id: call.clone(),
+                target: request.target.clone(),
+                args_digest: request.args_digest.hex.clone(),
+                args_summary: request.args_summary.clone(),
+                idempotency_key: Some(call.to_string()),
+            },
+            now_ms,
+        )
+        .await
+        .map_err(|e| e.to_string())?;
+        self.persist_tool_event(
+            db.as_ref(),
+            events.as_ref(),
+            ctx,
+            &call,
+            &request,
+            None,
+            now_ms,
+        )
+        .await
+        .map_err(|e| e.to_string())?;
+        let outcome = match prepared {
+            Err(error) => {
+                let outcome = fail(error.to_string());
+                self.close_program_child(db, events, ctx, &call, &request, &outcome, false, now_ms)
+                    .await?;
+                return Ok(outcome);
+            }
+            Ok(prepared) => {
+                let local = prepared.local_name.as_str();
+                let mut denied = match authority.authorization.grant {
+                    RunGrant::Phone if crate::phone_settings::forbidden_tool(local) => {
+                        Some("PHONE_TOOL_FORBIDDEN".to_string())
+                    }
+                    RunGrant::Bridge { role }
+                        if role == lingxi_protocol::BridgeRole::Guest
+                            || toolgateway::bridge_forbidden_tool(local, "") =>
+                    {
+                        Some("BRIDGE_TOOL_FORBIDDEN".into())
+                    }
+                    RunGrant::Subagent { tier } => {
+                        match authorize_child_tool_with_registry_id(tier, local, &request.target) {
+                            ToolAuthorization::Denied { code, message, .. } => {
+                                Some(format!("{code}: {message}"))
+                            }
+                            _ => None,
+                        }
+                    }
+                    _ => None,
+                };
+                if local == "run_tools" {
+                    denied = Some("PTC_RECURSION_FORBIDDEN".into());
+                }
+                if (authority.phone_scoped && crate::phone_settings::forbidden_tool(local))
+                    || (!authority.phone_scoped && crate::phone_settings::control_tool(local))
+                {
+                    denied = Some("PHONE_SCOPE_FORBIDDEN".into());
+                }
+                if authority
+                    .authorization
+                    .workflow_scope
+                    .as_ref()
+                    .and_then(|s| s.tool_filter.as_ref())
+                    .is_some_and(|filter| {
+                        !filter.iter().any(|n| n == local || n == &request.target)
+                    })
+                {
+                    denied = Some("WORKFLOW_TOOL_FILTER".into());
+                }
+                // 这些入口必须由任务驱动建立专用事务，不能伪装成普通 executor 调用。
+                if matches!(prepared.origin, ToolOrigin::FirstParty)
+                    && crate::subagents::request_delegation(&request).is_some()
+                {
+                    denied = Some("PTC_DELEGATION_REQUIRES_DIRECT_DRIVER".into());
+                }
+                if let Some(reason) = denied {
+                    fail(reason)
+                } else {
+                    let approved = match &prepared.policy {
+                        PolicyVerdict::NeedsApproval { .. } => match self.approval.as_ref() {
+                            Some(gate) => {
+                                let approval = ApprovalRequest {
+                                    requires_scope_review: prepared.permission_kind
+                                        == PermissionKind::Review,
+                                    tool_call_id: call.clone(),
+                                    target: request.target.clone(),
+                                    args_digest: request.args_digest.hex.clone(),
+                                    args_summary: prepared.review_summary.clone().or_else(|| {
+                                        Some(lingxi_kernel::toolcatalog::summarize_arguments(
+                                            &request.arguments,
+                                        ))
+                                    }),
+                                    resources: prepared.resources.clone(),
+                                };
+                                tokio::select! {biased; _=lifetime.cancel.cancelled()=>false, decision=gate.request(ctx,&approval)=>matches!(decision,ApprovalDecision::Approved)}
+                            }
+                            None => false,
+                        },
+                        _ => true,
+                    };
+                    if !approved {
+                        fail("PTC_APPROVAL_REJECTED_OR_UNAVAILABLE".into())
+                    } else {
+                        db.advance_invocation(ctx, &call, InvocationPhase::Authorized, now_ms)
+                            .await
+                            .map_err(|e| e.to_string())?;
+                        if let Err(reason) = self.validate_program_authority(&authority, ctx).await
+                        {
+                            let outcome = fail(reason);
+                            self.close_program_child(
+                                db, events, ctx, &call, &request, &outcome, false, now_ms,
+                            )
+                            .await?;
+                            return Ok(outcome);
+                        }
+                        if lifetime.cancel.is_cancelled() {
+                            fail("PTC_CANCELLED_BEFORE_DISPATCH".into())
+                        } else {
+                            db.advance_invocation(ctx, &call, InvocationPhase::Started, now_ms)
+                                .await
+                                .map_err(|e| e.to_string())?;
+                            // 与直接入口相同：Started写入也是等待点，之后必须再查实时撤权。
+                            if let Err(reason) =
+                                self.validate_program_authority(&authority, ctx).await
+                            {
+                                let outcome = fail(reason);
+                                self.close_program_child(
+                                    db, events, ctx, &call, &request, &outcome, false, now_ms,
+                                )
+                                .await?;
+                                return Ok(outcome);
+                            }
+                            if lifetime.cancel.is_cancelled() {
+                                ToolOutcome::Unknown {
+                                    reason: "cancelled after durable start; not redispatched"
+                                        .into(),
+                                }
+                            } else {
+                                let scope = lifetime.cancel.child(
+                                    format!("tool_call:{}", call.as_str()),
+                                    crate::cancel::ScopeKind::ToolCall,
+                                );
+                                let owner = self.clone();
+                                let db = db.clone();
+                                let events = events.clone();
+                                let ctx = ctx.clone();
+                                let call = call.clone();
+                                let request = request.clone();
+                                let handle = prepared.handle.clone();
+                                let gateway = gateway.clone();
+                                let mut child_lifetime = lifetime.clone();
+                                child_lifetime.cancel = scope.clone();
+                                let workflow = authority.authorization.workflow_scope.clone();
+                                let settle = matches!(prepared.origin, ToolOrigin::FirstParty)
+                                    && matches!(
+                                        local,
+                                        "knowledge_search" | "browser" | "web_search" | "web_fetch"
+                                    )
+                                    || (local == "html-to-pdf"
+                                        && matches!(&prepared.origin,ToolOrigin::Plugin{plugin_id}if plugin_id=="office"));
+                                let child_run = ctx.run_id.to_string();
+                                let child=self.tasks.spawn_linked_with_settlement(&child_run,&scope,format!("tool_call:{}",call.as_str()),settle,async move {
+                                    // 实际I/O、协作收尾和持久回执全程持同一配额；父编排取消不抢先释放。
+                                    let _permit=_tool_permit;
+                                    let result=toolgateway::WORKFLOW_SCOPE.scope(workflow,toolgateway::TOOL_LIFETIME.scope(child_lifetime.clone(),gateway.execute_prepared(&ctx,&call,&handle))).await;
+                                    let (outcome,dispatched)=match result{
+                                        Err(error)=>(ToolOutcome::Failed{error:error.to_tool_error()},false),
+                                        Ok(result)=>{let outcome=match owner.fence_verdict(&child_lifetime.cancel,&result.fence,&ctx){FenceVerdict::Current=>result.outcome,FenceVerdict::Stale(reason)=>{owner.audit_late_result(db.as_ref(),&ctx,&result.fence,reason,vec!["ptc_tool_call_result".into()],now_ms).await;ToolOutcome::Unknown{reason:"PTC stale/cancelled result refused for state".into()}}};(outcome,true)}
+                                    };
+                                    owner.close_program_child(db.as_ref(),events.as_ref(),&ctx,&call,&request,&outcome,dispatched,now_ms).await?;
+                                    Ok::<ToolOutcome,String>(guard_program_result(authority.hooks.as_ref(),&request,&call,outcome))
+                                }).map_err(|error|error.to_string())?;
+                                return match child.wait().await {
+                                    Ok(result) => result,
+                                    Err(exit) => Ok(ToolOutcome::Unknown {
+                                        reason: unobserved_tool_exit_reason(&exit),
+                                    }),
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        self.close_program_child(db, events, ctx, &call, &request, &outcome, false, now_ms)
+            .await?;
+        Ok(outcome)
+    }
+    async fn validate_program_authority(
+        &self,
+        authority: &ProgramAuthority,
+        ctx: &lingxi_kernel::RunContext,
+    ) -> Result<(), String> {
+        crate::bridge_run_authority::validate(
+            self.context_session_store.as_deref(),
+            &authority.authorization,
+            ctx,
+            &authority.agent_id,
+            self.chat_settings_home.as_deref(),
+        )
+        .await?;
+        crate::phone_run_authority::validate(
+            self.context_session_store.as_deref(),
+            &authority.authorization,
+            ctx,
+            self.chat_settings_home.as_deref(),
+            authority.admitted_parentless_subagent,
+        )
+        .await?;
+        if let Some(scope) = authority.authorization.workflow_scope.as_ref() {
+            crate::workflow::validate_node_authority(
+                self.context_session_store
+                    .as_deref()
+                    .ok_or("PTC_WORKFLOW_STORE_MISSING")?,
+                ctx.session_id.as_str(),
+                scope,
+                authority.authorization.session_mode,
+            )
+            .await?;
+        }
+        Ok(())
+    }
+    #[allow(clippy::too_many_arguments)]
+    async fn close_program_child(
+        &self,
+        db: &lingxi_adapters::storage::RunDatabase,
+        events: &EventService,
+        ctx: &lingxi_kernel::RunContext,
+        call: &ToolCallId,
+        request: &ToolRequest,
+        outcome: &ToolOutcome,
+        dispatched: bool,
+        now: u64,
+    ) -> Result<(), String> {
+        let mut receipt = journal_receipt_of(outcome);
+        receipt.dispatched = dispatched;
+        db.record_invocation_receipt(ctx, call, receipt, now)
+            .await
+            .map_err(|e| e.to_string())?;
+        self.persist_tool_event(db, events, ctx, call, request, Some(outcome), now)
+            .await
+            .map_err(|e| e.to_string())?;
+        // 父编排内的零派发拒绝也更新同一失败/循环守卫；独立子任务在回执后投影。
+        if let Ok(hooks) = PROGRAM_AUTHORITY.try_with(|authority| authority.hooks.clone()) {
+            let _ = guard_program_result(hooks.as_ref(), request, call, outcome.clone());
+        }
+        Ok(())
+    }
+}
+
+fn guard_program_result(
+    hooks: Option<&Arc<std::sync::Mutex<crate::hooks::ExtensionHooks>>>,
+    request: &ToolRequest,
+    call: &ToolCallId,
+    mut outcome: ToolOutcome,
+) -> ToolOutcome {
+    if let Some(hooks) = hooks {
+        let mut hooks = hooks.lock().unwrap_or_else(|p| p.into_inner());
+        let content = match &outcome {
+            ToolOutcome::Success { result } => result.content.clone(),
+            _ => vec![],
+        };
+        let (warnings, guarded, truncated) = crate::hooks::tool_result_guard(
+            &mut hooks,
+            request.target.rsplit(':').next().unwrap_or(&request.target),
+            call.as_str(),
+            matches!(outcome, ToolOutcome::Failed { .. }),
+            &content,
+        );
+        match &mut outcome {
+            ToolOutcome::Success { result } => {
+                outcome = crate::hooks::project_tool_success(result, &warnings, guarded, truncated)
+            }
+            ToolOutcome::Failed { error } if !warnings.is_empty() => {
+                error.message = format!("{}\n{}", warnings.join("\n"), error.message)
+            }
+            _ => {}
+        }
+    }
+    outcome
+}
+
 /// 明确用户封面动作仅允许这两个固定步骤，不接受任意目标或准备句柄。
 #[derive(Clone, Copy)]
 pub(crate) enum CoverAction {
@@ -2764,8 +3306,10 @@ impl RunSupervisor {
         // R06-T06: the Pi extension hooks state (fresh per run — the
         // incumbent resets on session_start/agent_start; one run IS one
         // agent start). `None` = the pre-T06 shape, byte-identical paths.
-        let mut t06_hooks = if self.extension_hooks {
-            Some(crate::hooks::ExtensionHooks::new())
+        let t06_hooks = if self.extension_hooks {
+            Some(Arc::new(std::sync::Mutex::new(
+                crate::hooks::ExtensionHooks::new(),
+            )))
         } else {
             None
         };
@@ -2777,7 +3321,8 @@ impl RunSupervisor {
                 // to the tool_result hook. Warnings prepend as ONE text
                 // block (incumbent prependWarnings).
                 let mut outcome: ToolOutcome = $outcome.clone();
-                if let Some(hooks) = t06_hooks.as_mut() {
+                if let Some(hooks) = t06_hooks.as_ref() {
+                    let mut hooks = hooks.lock().unwrap_or_else(|p| p.into_inner());
                     let is_error = matches!(outcome, ToolOutcome::Failed { .. });
                     let content_ref: Vec<ContentBlock> = match &outcome {
                         ToolOutcome::Success { result } => result.content.clone(),
@@ -2793,7 +3338,7 @@ impl RunSupervisor {
                         .unwrap_or($request.target.as_str());
                     let (warnings, guarded_content, any_truncated) =
                         crate::hooks::tool_result_guard(
-                            hooks,
+                            &mut hooks,
                             local_name,
                             $call_id.as_str(),
                             is_error,
@@ -4109,7 +4654,8 @@ impl RunSupervisor {
                             // The guard is name-keyed (the incumbent sees
                             // tool NAMES like "read") — derive the local
                             // name from the registry target id.
-                            if let Some(hooks) = t06_hooks.as_mut() {
+                            if let Some(hooks) = t06_hooks.as_ref() {
+                                let mut hooks = hooks.lock().unwrap_or_else(|p| p.into_inner());
                                 let local_name = request
                                     .target
                                     .rsplit(':')
@@ -4285,46 +4831,48 @@ impl RunSupervisor {
                         // call, held across the approval wait AND the tool
                         // I/O (the incumbent registers the execution for
                         // its whole lifetime, approval wait included).
-                        let tool_permit = match self
-                            .acquire_or_break(
-                                &QuotaResource::Tool,
-                                agent_id,
-                                quota_session_lane,
-                                &run_id,
-                                &root,
-                                // The tool lane has no model-call budget;
-                                // its queue wait is cancellation-bounded
-                                // (R03-T03 semantics, unchanged).
-                                None,
-                            )
-                            .await
-                        {
-                            Ok(Some(permit)) => permit,
-                            Ok(None) => {
-                                break 'turns RunFinish::Failed {
-                                    cause: FailureCause::QuotaExhausted {
-                                        resource: QuotaResource::Tool,
-                                    },
-                                };
-                            }
-                            Err(()) => {
-                                let reason =
-                                    root.reason().unwrap_or_else(|| "cancelled".to_string());
-                                let finish = self
-                                    .settle_cancellation(
-                                        port,
-                                        events,
-                                        &ctx,
-                                        &entry,
-                                        live_status,
-                                        reason,
-                                        now_ms,
-                                    )
-                                    .await?;
-                                guard.disarm();
-                                return Ok(finish);
-                            }
-                        };
+                        let mut tool_permit = Some(
+                            match self
+                                .acquire_or_break(
+                                    &QuotaResource::Tool,
+                                    agent_id,
+                                    quota_session_lane,
+                                    &run_id,
+                                    &root,
+                                    // The tool lane has no model-call budget;
+                                    // its queue wait is cancellation-bounded
+                                    // (R03-T03 semantics, unchanged).
+                                    None,
+                                )
+                                .await
+                            {
+                                Ok(Some(permit)) => permit,
+                                Ok(None) => {
+                                    break 'turns RunFinish::Failed {
+                                        cause: FailureCause::QuotaExhausted {
+                                            resource: QuotaResource::Tool,
+                                        },
+                                    };
+                                }
+                                Err(()) => {
+                                    let reason =
+                                        root.reason().unwrap_or_else(|| "cancelled".to_string());
+                                    let finish = self
+                                        .settle_cancellation(
+                                            port,
+                                            events,
+                                            &ctx,
+                                            &entry,
+                                            live_status,
+                                            reason,
+                                            now_ms,
+                                        )
+                                        .await?;
+                                    guard.disarm();
+                                    return Ok(finish);
+                                }
+                            },
+                        );
                         // F03-C04: re-check after the admission wait — a
                         // cancellation accepted while queued for the tool
                         // permit must not write a new invocation intent.
@@ -5247,6 +5795,16 @@ impl RunSupervisor {
                         // journal entry stays at `started`; recovery
                         // classifies it as unobserved).
                         gate_bridge_authority!();
+                        // 编排本身不占实际 I/O 槽；子调用逐个使用同一全局配额，cap=1也不自锁。
+                        if prepared.as_ref().is_some_and(|plan| {
+                            plan.local_name == "run_tools"
+                                && matches!(
+                                    plan.origin,
+                                    lingxi_kernel::toolcatalog::ToolOrigin::FirstParty
+                                )
+                        }) {
+                            drop(tool_permit.take());
+                        }
                         // ── supervised tool execution ──
                         // R04-T02: on the gateway wiring the dispatch is
                         // the gateway's re-verified, single-use
@@ -5283,6 +5841,16 @@ impl RunSupervisor {
                             Some(gateway) => {
                                 let gateway = Arc::clone(gateway);
                                 let workflow_scope = authorization.workflow_scope.clone();
+                                let program_authority = ProgramAuthority::new(
+                                    tool_ctx.clone(),
+                                    exec_call_id.clone(),
+                                    authorization.clone(),
+                                    agent_id.to_string(),
+                                    phone_scoped,
+                                    admitted_parentless_subagent,
+                                    quota_session_lane.to_string(),
+                                    t06_hooks.clone(),
+                                );
                                 let handle = prepared
                                     .as_ref()
                                     .expect("the gateway wiring prepared this call")
@@ -5309,7 +5877,7 @@ impl RunSupervisor {
                                             ))
                                         }),
                                         async move {
-                                            crate::toolgateway::WORKFLOW_SCOPE.scope(workflow_scope, crate::toolgateway::TOOL_LIFETIME
+                                            PROGRAM_AUTHORITY.scope(program_authority, crate::toolgateway::WORKFLOW_SCOPE.scope(workflow_scope, crate::toolgateway::TOOL_LIFETIME
                                                 .scope(
                                                     trusted_lifetime,
                                                     gateway.execute_prepared(
@@ -5317,7 +5885,7 @@ impl RunSupervisor {
                                                         &exec_call_id,
                                                         &handle,
                                                     ),
-                                                )).await
+                                                ))).await
                                         },
                                     )
                                     .map_err(|rejected| DriveError::Storage(rejected.into()))?

@@ -66,6 +66,9 @@ granit-parser = "=1.3.0"
 # 与现役配置 schema 使用相同的标量时间戳判定；不预处理 YAML 文本。
 regex = "=1.13.1"
 sha2 = "0.11.0"
+# R08-T04 B3：旧 observability RFC3339 时间戳解析。chrono 0.4.45 已在锁内
+# （lingxi-service 同钉版 =0.4.45），此处仅新增依赖边，零新锁条目（同 sha2 先例）。
+chrono = "=0.4.45"
 # R02-T06: `time` feature flag added for the backup-while-writing
 # integration test's head-start sleep (same locked tokio 1.53.1; the flag
 # unlocks existing code inside the crate — no new lock entries).

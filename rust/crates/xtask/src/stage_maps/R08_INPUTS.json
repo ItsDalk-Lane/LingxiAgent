@@ -1,0 +1,1983 @@
+{
+  "schema": "lingxi.r08.stage-inputs.v1",
+  "stage": "R08",
+  "baseScenarios": [
+    {
+      "id": "R08-A01",
+      "specMirror": {
+        "name": "旧客户端不用猜新状态",
+        "given": "旧客户端连接Rust并执行多工具任务",
+        "when": "读取事件及历史",
+        "then": "旧显示语义正确，任务结束由Rust单源给出",
+        "evidence": "接口golden与UI结果",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R08-T01"
+        ],
+        "featureIds": [],
+        "ledgerStatus": "NOT_STARTED"
+      }
+    },
+    {
+      "id": "R08-A02",
+      "specMirror": {
+        "name": "重连不重新执行",
+        "given": "任务工具已执行，客户端断线",
+        "when": "重连旧协议订阅",
+        "then": "只续读状态，无第二次工具副作用",
+        "evidence": "工具调用计数",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R08-T01"
+        ],
+        "featureIds": [],
+        "ledgerStatus": "NOT_STARTED"
+      }
+    },
+    {
+      "id": "R08-A03",
+      "specMirror": {
+        "name": "前端不直接依赖Electron",
+        "given": "组件测试使用Web Host替身",
+        "when": "运行会话、设置和文件预览测试",
+        "then": "无require electron/window私有直连；受限能力可解释",
+        "evidence": "依赖扫描与组件结果",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R08-T02"
+        ],
+        "featureIds": [],
+        "ledgerStatus": "NOT_STARTED"
+      }
+    },
+    {
+      "id": "R08-A04",
+      "specMirror": {
+        "name": "卡片展开不退化",
+        "given": "只有工具结果没有最终回复的会话",
+        "when": "展开汇总区再点击任意工具卡",
+        "then": "正常展开，错误/思考/产物内容可查看",
+        "evidence": "UI交互断言",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R08-T02"
+        ],
+        "featureIds": [],
+        "ledgerStatus": "NOT_STARTED"
+      }
+    },
+    {
+      "id": "R08-A05",
+      "specMirror": {
+        "name": "旧界面真正使用Rust内核",
+        "given": "禁用旧Node服务并开启预览",
+        "when": "完成真实文件任务",
+        "then": "Rust独立运行；不能回退旧Pi循环",
+        "evidence": "进程树及执行轨迹",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R08-T03"
+        ],
+        "featureIds": [],
+        "ledgerStatus": "NOT_STARTED"
+      }
+    },
+    {
+      "id": "R08-A06",
+      "specMirror": {
+        "name": "远端模式不误关服务",
+        "given": "两个客户端连接同一测试服务",
+        "when": "关闭其中一个桌面客户端",
+        "then": "另一个仍工作，任务继续，无本地服务偷启动",
+        "evidence": "多客户端集成",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R08-T03"
+        ],
+        "featureIds": [],
+        "ledgerStatus": "NOT_STARTED"
+      }
+    },
+    {
+      "id": "R08-A07",
+      "specMirror": {
+        "name": "历史身份与引用不丢失",
+        "given": "夹具含fork/附件/旧trace/未知块",
+        "when": "导入后查询并导出",
+        "then": "关系可还原，未知块归档，附件链接有效，无重复会话",
+        "evidence": "逐类计数/摘要/引用校验",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R08-T04"
+        ],
+        "featureIds": [
+          "F-D08-C-RESEARCH-LEDGER"
+        ],
+        "ledgerStatus": "NOT_STARTED"
+      }
+    },
+    {
+      "id": "R08-A08",
+      "specMirror": {
+        "name": "中断导入可恢复",
+        "given": "批量导入完成一半时终止",
+        "when": "重跑导入",
+        "then": "已确认批次不重复，未完成批次安全重试，源文件不变",
+        "evidence": "前后行数与源哈希",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R08-T04"
+        ],
+        "featureIds": [
+          "F-D08-C-RESEARCH-LEDGER"
+        ],
+        "ledgerStatus": "NOT_STARTED"
+      }
+    },
+    {
+      "id": "R08-A09",
+      "specMirror": {
+        "name": "切换各断点可恢复",
+        "given": "在预检/备份/导入/指针更新/启动处逐一注入崩溃",
+        "when": "按同一迁移入口重试",
+        "then": "总能确定有效数据根，旧数据保留，无两套写者",
+        "evidence": "逐断点恢复日志",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R08-T05"
+        ],
+        "featureIds": [],
+        "ledgerStatus": "NOT_STARTED"
+      }
+    },
+    {
+      "id": "R08-A10",
+      "specMirror": {
+        "name": "磁盘空间不足不破坏数据",
+        "given": "测试盘空间低于预检阈值",
+        "when": "启动迁移",
+        "then": "提前拒绝或安全中止，原库完整且不切默认路径",
+        "evidence": "空间故障与完整性检查",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R08-T05"
+        ],
+        "featureIds": [],
+        "ledgerStatus": "NOT_STARTED"
+      }
+    },
+    {
+      "id": "R08-A11",
+      "specMirror": {
+        "name": "新增会话在回滚后仍保留",
+        "given": "迁移后新增会话与附件",
+        "when": "回滚旧版本再重新前滚",
+        "then": "新数据可恢复且不重复，旧版本期间可读范围明确",
+        "evidence": "往返数据与附件摘要",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R08-T06"
+        ],
+        "featureIds": [
+          "F-D20-CLI-CLI-SUBCOMMAND-CHECKPOINTS-00E57B",
+          "F-D20-CLI-CLI-SUBCOMMAND-DATA-RESTORE-1388F8",
+          "F-D20-CLI-CLI-SUBCOMMAND-DIAGNOSE-0BE8B2"
+        ],
+        "ledgerStatus": "NOT_STARTED"
+      }
+    },
+    {
+      "id": "R08-A12",
+      "specMirror": {
+        "name": "回滚不重放外发操作",
+        "given": "新版本已有确认的外部操作收据",
+        "when": "回滚再前滚",
+        "then": "不重新发送工具动作，只恢复历史记录",
+        "evidence": "外部计数器和收据",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R08-T06"
+        ],
+        "featureIds": [
+          "F-D20-CLI-CLI-SUBCOMMAND-CHECKPOINTS-00E57B",
+          "F-D20-CLI-CLI-SUBCOMMAND-DATA-RESTORE-1388F8",
+          "F-D20-CLI-CLI-SUBCOMMAND-DIAGNOSE-0BE8B2"
+        ],
+        "ledgerStatus": "NOT_STARTED"
+      }
+    },
+    {
+      "id": "R08-A13",
+      "specMirror": {
+        "name": "相同界面验证内核替换",
+        "given": "相同React构建分别接旧新内核",
+        "when": "运行固定产品任务集",
+        "then": "保留功能语义一致，差异有明确批准或修复",
+        "evidence": "A/B用户行为结果",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R08-T07"
+        ],
+        "featureIds": [
+          "F-D01-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-QUICK-CHAT-WINDOW-A2C385",
+          "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHAT-TASK-TASKID-ABORT-POST-B47CAC",
+          "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHAT-WEBSOCKET-TRANSPORT-010BA6",
+          "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DRAFT-CLEAR-081FAC",
+          "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DRAFT-HOME-SAVE-F829AE",
+          "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DRAFT-SESSION-SAVE-D90185",
+          "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-INPUT-DRAFTS-INPUT-DRAFTS-READ-1B712E",
+          "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-QUICK-CH-B5CB29",
+          "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-QUICK-CH-D92CD5",
+          "F-D01-SLASH_COMMAND-SLASH-COMMAND-COMPACT-0FE8BE",
+          "F-D01-SLASH_COMMAND-SLASH-COMMAND-FRESH-COMPACT-5A6E0D",
+          "F-D01-SLASH_COMMAND-SLASH-COMMAND-STOP-4EA88B",
+          "F-D01-TOOL-TOOL-ASK-USER-94CB74",
+          "F-D01-TOOL-TOOL-CURRENT-STATUS-386675",
+          "F-D01-TOOL-TOOL-TODO-WRITE-B34F2B",
+          "F-D01-UI-UI-PAGE-CHAT-81B217",
+          "F-D01-WS_IN-WS-IN-ABORT-7CBF6F",
+          "F-D01-WS_IN-WS-IN-COMPACT-421EEA",
+          "F-D01-WS_IN-WS-IN-INTERJECT-92620B",
+          "F-D01-WS_IN-WS-IN-PROMPT-D483E4",
+          "F-D01-WS_IN-WS-IN-RESUME-STREAM-816642",
+          "F-D01-WS_IN-WS-IN-SLASH-2FAA74",
+          "F-D01-WS_IN-WS-IN-STEER-C1FB9C",
+          "F-D02-ROUTE_BEHAVIOR-BEHAVIOR-SESSIONS-SESSIONS-ARCHIVED-DELETE-POST-52226F",
+          "F-D02-ROUTE_BEHAVIOR-BEHAVIOR-SESSIONS-SESSIONS-CLEANUP-POST-B0F05B",
+          "F-D02-ROUTE_BEHAVIOR-BEHAVIOR-SESSIONS-SESSIONS-CONTINUE-DELETED-AGEN-3818AD",
+          "F-D02-ROUTE_BEHAVIOR-BEHAVIOR-SESSIONS-SESSIONS-RESTORE-POST-31CDA2",
+          "F-D02-ROUTE_BEHAVIOR-BEHAVIOR-SESSIONS-SESSIONS-TURNS-ROLLBACK-PREVIE-477DA3",
+          "F-D02-ROUTE_BEHAVIOR-BEHAVIOR-SESSIONS-SESSIONS-WORKSPACE-ROLLBACK-PU-015A65",
+          "F-D02-ROUTE_BEHAVIOR-BEHAVIOR-SESSIONS-SESSIONS-WORKSPACE-ROLLBACK-RE-221501",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHECKPOINTS-CHECKPOINTS-3FAFA3",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHECKPOINTS-CHECKPOINTS-ID-1AEDB2",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHECKPOINTS-CHECKPOINTS-ID-RESTO-3562B5",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHECKPOINTS-CHECKPOINTS-USER-EDI-BB0A16",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONVERSATION-MAP-COLLAPSED-REPLA-94B9BE",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONVERSATION-MAP-CONVERSATION-MA-F28086",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONVERSATION-MAP-CONVERSATION-MA-F6A1A5",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONVERSATION-MAP-POSITIONS-MERGE-5370DA",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONVERSATION-MAP-POSITIONS-REPLA-527121",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PROJECTS-SESSION-PROJECT-059066",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PROJECTS-SESSION-PROJECT-20E9C8",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PROJECTS-SESSION-PROJECT-3ECCF7",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PROJECTS-SESSION-PROJECT-60A580",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PROJECTS-SESSION-PROJECT-AFA722",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PROJECTS-SESSION-PROJECT-D43836",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PROJECTS-SESSION-PROJECT-D58B65",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PROJECTS-SESSION-PROJECT-E16729",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PROJECTS-SESSION-PROJECT-EEDFB7",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PROJECTS-SESSION-PROJECT-EF5DD6",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-38EEA9",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-ARCHIVE-ARCHIV-3F9516",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-ARCHIVE-ARCHIV-5235D8",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-ARCHIVED-43FFB7",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-AUTHORIZED-FOL-1E0D47",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-AUTHORIZED-FOL-604C64",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-AUTHORIZED-FOL-73B631",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-AUTHORIZED-FOL-98DDC9",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-CONTENT-CONTEN-ED0891",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-FIND-4F1F69",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-FORK-960668",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-FRESH-COMPACT-D62A81",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-HISTORY-OVERVI-CDBFE6",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-LATEST-USER-ME-4DD3F7",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-MEMORY-51905C",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-MEMORY-961659",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-MESSAGES-AA9EB3",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-NEW-B9DA1A",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-NEW-DETACHED-9D9E72",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-PIN-0D4F0E",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-PIN-ORDER-2ED065",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-PROMPT-SNAPSHO-FF4F06",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-RENAME-FDB0FE",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-SEARCH-A18187",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-SUMMARY-F0319F",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-SWEEP-ORPHANED-21A99D",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-SWITCH-FBDEED",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-TODOS-CANCEL-5CD35D",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-TODOS-COMPLETE-45C5CE",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-TODOS-DISMISS-17FCFE",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-TURNS-RETRY-4CEBEA",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-WORKSPACE-DISP-2D4EBE",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-WORKSPACE-DISP-6658E9",
+          "F-D02-SLASH_COMMAND-SLASH-COMMAND-NEW-485B2D",
+          "F-D02-SLASH_COMMAND-SLASH-COMMAND-RESET-3FCB25",
+          "F-D02-TOOL-TOOL-CHECKPOINT-6207F7",
+          "F-D02-TOOL-TOOL-REWIND-E1625F",
+          "F-D02-TOOL-TOOL-SESSION-5DCB03",
+          "F-D02-TOOL-TOOL-SESSION-FOLDERS-7C959E",
+          "F-D02-UI-UI-PAGE-MAP-8E2D44"
+        ],
+        "ledgerStatus": "NOT_STARTED"
+      }
+    },
+    {
+      "id": "R08-A14",
+      "specMirror": {
+        "name": "失败不靠隐藏功能消失",
+        "given": "一个保留入口在Rust下报错",
+        "when": "检查修复及回归",
+        "then": "入口仍存在并真实可用，不改成disabled冒充完成",
+        "evidence": "UI入口盘点与测试",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R08-T07"
+        ],
+        "featureIds": [
+          "F-D01-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-QUICK-CHAT-WINDOW-A2C385",
+          "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHAT-TASK-TASKID-ABORT-POST-B47CAC",
+          "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHAT-WEBSOCKET-TRANSPORT-010BA6",
+          "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DRAFT-CLEAR-081FAC",
+          "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DRAFT-HOME-SAVE-F829AE",
+          "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DRAFT-SESSION-SAVE-D90185",
+          "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-INPUT-DRAFTS-INPUT-DRAFTS-READ-1B712E",
+          "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-QUICK-CH-B5CB29",
+          "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-QUICK-CH-D92CD5",
+          "F-D01-SLASH_COMMAND-SLASH-COMMAND-COMPACT-0FE8BE",
+          "F-D01-SLASH_COMMAND-SLASH-COMMAND-FRESH-COMPACT-5A6E0D",
+          "F-D01-SLASH_COMMAND-SLASH-COMMAND-STOP-4EA88B",
+          "F-D01-TOOL-TOOL-ASK-USER-94CB74",
+          "F-D01-TOOL-TOOL-CURRENT-STATUS-386675",
+          "F-D01-TOOL-TOOL-TODO-WRITE-B34F2B",
+          "F-D01-UI-UI-PAGE-CHAT-81B217",
+          "F-D01-WS_IN-WS-IN-ABORT-7CBF6F",
+          "F-D01-WS_IN-WS-IN-COMPACT-421EEA",
+          "F-D01-WS_IN-WS-IN-INTERJECT-92620B",
+          "F-D01-WS_IN-WS-IN-PROMPT-D483E4",
+          "F-D01-WS_IN-WS-IN-RESUME-STREAM-816642",
+          "F-D01-WS_IN-WS-IN-SLASH-2FAA74",
+          "F-D01-WS_IN-WS-IN-STEER-C1FB9C",
+          "F-D02-ROUTE_BEHAVIOR-BEHAVIOR-SESSIONS-SESSIONS-ARCHIVED-DELETE-POST-52226F",
+          "F-D02-ROUTE_BEHAVIOR-BEHAVIOR-SESSIONS-SESSIONS-CLEANUP-POST-B0F05B",
+          "F-D02-ROUTE_BEHAVIOR-BEHAVIOR-SESSIONS-SESSIONS-CONTINUE-DELETED-AGEN-3818AD",
+          "F-D02-ROUTE_BEHAVIOR-BEHAVIOR-SESSIONS-SESSIONS-RESTORE-POST-31CDA2",
+          "F-D02-ROUTE_BEHAVIOR-BEHAVIOR-SESSIONS-SESSIONS-TURNS-ROLLBACK-PREVIE-477DA3",
+          "F-D02-ROUTE_BEHAVIOR-BEHAVIOR-SESSIONS-SESSIONS-WORKSPACE-ROLLBACK-PU-015A65",
+          "F-D02-ROUTE_BEHAVIOR-BEHAVIOR-SESSIONS-SESSIONS-WORKSPACE-ROLLBACK-RE-221501",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHECKPOINTS-CHECKPOINTS-3FAFA3",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHECKPOINTS-CHECKPOINTS-ID-1AEDB2",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHECKPOINTS-CHECKPOINTS-ID-RESTO-3562B5",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHECKPOINTS-CHECKPOINTS-USER-EDI-BB0A16",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONVERSATION-MAP-COLLAPSED-REPLA-94B9BE",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONVERSATION-MAP-CONVERSATION-MA-F28086",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONVERSATION-MAP-CONVERSATION-MA-F6A1A5",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONVERSATION-MAP-POSITIONS-MERGE-5370DA",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONVERSATION-MAP-POSITIONS-REPLA-527121",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PROJECTS-SESSION-PROJECT-059066",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PROJECTS-SESSION-PROJECT-20E9C8",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PROJECTS-SESSION-PROJECT-3ECCF7",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PROJECTS-SESSION-PROJECT-60A580",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PROJECTS-SESSION-PROJECT-AFA722",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PROJECTS-SESSION-PROJECT-D43836",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PROJECTS-SESSION-PROJECT-D58B65",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PROJECTS-SESSION-PROJECT-E16729",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PROJECTS-SESSION-PROJECT-EEDFB7",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PROJECTS-SESSION-PROJECT-EF5DD6",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-38EEA9",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-ARCHIVE-ARCHIV-3F9516",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-ARCHIVE-ARCHIV-5235D8",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-ARCHIVED-43FFB7",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-AUTHORIZED-FOL-1E0D47",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-AUTHORIZED-FOL-604C64",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-AUTHORIZED-FOL-73B631",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-AUTHORIZED-FOL-98DDC9",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-CONTENT-CONTEN-ED0891",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-FIND-4F1F69",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-FORK-960668",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-FRESH-COMPACT-D62A81",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-HISTORY-OVERVI-CDBFE6",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-LATEST-USER-ME-4DD3F7",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-MEMORY-51905C",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-MEMORY-961659",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-MESSAGES-AA9EB3",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-NEW-B9DA1A",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-NEW-DETACHED-9D9E72",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-PIN-0D4F0E",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-PIN-ORDER-2ED065",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-PROMPT-SNAPSHO-FF4F06",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-RENAME-FDB0FE",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-SEARCH-A18187",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-SUMMARY-F0319F",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-SWEEP-ORPHANED-21A99D",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-SWITCH-FBDEED",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-TODOS-CANCEL-5CD35D",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-TODOS-COMPLETE-45C5CE",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-TODOS-DISMISS-17FCFE",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-TURNS-RETRY-4CEBEA",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-WORKSPACE-DISP-2D4EBE",
+          "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-WORKSPACE-DISP-6658E9",
+          "F-D02-SLASH_COMMAND-SLASH-COMMAND-NEW-485B2D",
+          "F-D02-SLASH_COMMAND-SLASH-COMMAND-RESET-3FCB25",
+          "F-D02-TOOL-TOOL-CHECKPOINT-6207F7",
+          "F-D02-TOOL-TOOL-REWIND-E1625F",
+          "F-D02-TOOL-TOOL-SESSION-5DCB03",
+          "F-D02-TOOL-TOOL-SESSION-FOLDERS-7C959E",
+          "F-D02-UI-UI-PAGE-MAP-8E2D44"
+        ],
+        "ledgerStatus": "NOT_STARTED"
+      }
+    },
+    {
+      "id": "R08-A15",
+      "specMirror": {
+        "name": "试用仍隔离生产",
+        "given": "完成整套迁移与回滚演练",
+        "when": "检查真实home与默认启动配置",
+        "then": "用户真实数据未变，预览开关显式",
+        "evidence": "目录/配置前后摘要",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R08-T08"
+        ],
+        "featureIds": [],
+        "ledgerStatus": "NOT_STARTED"
+      }
+    },
+    {
+      "id": "R08-A16",
+      "specMirror": {
+        "name": "Tauri对照基线固定",
+        "given": "R08成果准备交接",
+        "when": "验证版本/契约摘要",
+        "then": "React/Rust/数据fixture版本明确，不依赖漂移main",
+        "evidence": "交接版本清单",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R08-T08"
+        ],
+        "featureIds": [],
+        "ledgerStatus": "NOT_STARTED"
+      }
+    }
+  ],
+  "requiredLeaves": [
+    {
+      "id": "R00-T02-LA-00E57BB5F32B",
+      "taskIds": [
+        "R07-T09",
+        "R08-T06",
+        "R10-T04"
+      ],
+      "executionStageIds": [
+        "R07",
+        "R08",
+        "R10"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-010BA6693880",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-015A65726C05",
+      "taskIds": [
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-0199B843D759",
+      "taskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-04A6A2BD1547",
+      "taskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-059066969D44",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-081FACA79F2C",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-0B669B30C854",
+      "taskIds": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-0BE8B22DA5D5",
+      "taskIds": [
+        "R07-T09",
+        "R08-T06",
+        "R10-T04"
+      ],
+      "executionStageIds": [
+        "R07",
+        "R08",
+        "R10"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-0D4F0EFC9DAE",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-0FE8BED686E2",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-1388F8EE0EBC",
+      "taskIds": [
+        "R07-T09",
+        "R08-T06",
+        "R10-T04"
+      ],
+      "executionStageIds": [
+        "R07",
+        "R08",
+        "R10"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-17FCFE45576B",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-18EFB2D9D5FD",
+      "taskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-1AEDB2670EB9",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-1B712E189DDF",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-1E0D477755CD",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-20E9C8F26CEA",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-21A99DB98735",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-21B3F4DC9140",
+      "taskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-22150190C7B1",
+      "taskIds": [
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-240E200EF440",
+      "taskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-25C4FF66FEE5",
+      "taskIds": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-2D194C1684BC",
+      "taskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-2D4EBE0FF3C2",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-2DA782C5C7B9",
+      "taskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-2ED065BED168",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-2FAA749DA790",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-31CDA283A11A",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-3562B5D44C5E",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-3818ADEAFA7A",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-38667593C3E1",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-38EEA99077E8",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-3ECCF7C95483",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-3F95164A488C",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-3FAFA387AD68",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-3FCB259FF69C",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-421EEA1AC8D5",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-43FFB75F252C",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-45C5CE361CCB",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-477DA3D558B8",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-485B2D0A8A02",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-48B0C7A7453E",
+      "taskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-4C35E6AEC6F7",
+      "taskIds": [
+        "R04-T05"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-4CEBEA945B7A",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-4DD3F71FA2CD",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-4EA88B5073E4",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-4F1F69CCA760",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-51905CECDD1B",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-52226FEA5997",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-5235D8EDD673",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-5271217DB01B",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-5370DA3742CB",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-5A6E0D526903",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-5CD35D9EED20",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-5DCB0352EB08",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-5E61048F19B9",
+      "taskIds": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-604C64F4828A",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-60A58027CCCE",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-6207F7E8C697",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-6658E9B80314",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-67256417FB2B",
+      "taskIds": [
+        "R04-T03"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-73B631D77531",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-75C0AE981505",
+      "taskIds": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-7C959E75B8C3",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-7CBF6F4A6760",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-7FF8D4E48BC9",
+      "taskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-81664285F927",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-81B217A7E581",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-8D3CEB6133E1",
+      "taskIds": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-8E2D44B48905",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-92620BF2264F",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-94B9BE3AA7A6",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-94CB746D04B7",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-960668141E07",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-9616596B5720",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-98DDC94776F1",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-9D9E72CB6051",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-A18187567AF9",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-A2C385A33493",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-A336F79E964D",
+      "taskIds": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-AA9EB3FD034D",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-AFA7227BFB63",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-B0F05BC32D62",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-B34F2B298BFA",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-B47CAC08F418",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-B4BB2438E855",
+      "taskIds": [
+        "R04-T01",
+        "R04-T02"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-B5CB2993A5C0",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-B9DA1A584C6E",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-BB0A168006D7",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-BB1BB3A9C5F4",
+      "taskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-BC2FBD618278",
+      "taskIds": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-C1FB9C92E813",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-C70E819F8DA4",
+      "taskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-CD1524CC7DC3",
+      "taskIds": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-CDBFE6616EB9",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-CE69063550AA",
+      "taskIds": [
+        "R04-T05"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-CFD9F02BC6AA",
+      "taskIds": [
+        "R04-T05"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-D01766AF4475",
+      "taskIds": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-D43836A3A579",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-D483E4CD0935",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-D58B651BF099",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-D62A81C2AEB2",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-D901852E1B1A",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-D92CD567D6D6",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-DA5AD5C40098",
+      "taskIds": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-DD47275AC5AE",
+      "taskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-E1625F70C7CC",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-E167298FD87C",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-E1FBE1A59BC6",
+      "taskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-E7F852F9BF60",
+      "taskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-E9C7A48CADC4",
+      "taskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-EC033184BA37",
+      "taskIds": [
+        "R04-T03"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-ED089133C106",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-EEDFB7AB889C",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-EF43ADCE19A1",
+      "taskIds": [
+        "R04-T03"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-EF5DD65C558E",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-F0319FC4F93D",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-F28086B64522",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-F4DA2AFCB72B",
+      "taskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-F6A1A50E97E4",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-F829AEA5931C",
+      "taskIds": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R03",
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-FAE7503D0D0F",
+      "taskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-FBDEEDAC0B11",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-FDB0FE6528EE",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-FF4F06011B48",
+      "taskIds": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "executionStageIds": [
+        "R06",
+        "R08"
+      ]
+    }
+  ],
+  "currentStatus": "IMPLEMENTATION_REGISTERED_ACCEPTANCE_PARTIAL",
+  "coverageHonesty": "9/126 叶绑定本阶段份额图钉（A/B 正路径平价）；117 叶 required_behavior_pending；A05 呈 PPG-1/PPG-2 双 BLOCKED（T03 裁决）；D-4 差异未决（T07 差异报告）。"
+}

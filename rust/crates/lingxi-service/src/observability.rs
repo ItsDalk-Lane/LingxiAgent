@@ -1431,106 +1431,12 @@ async fn import_legacy(
 }
 
 /// 只读打开旧库并映射成行。任何形状不符显式 400（不静默吞行）。
+/// R08-T04 B3：实现下沉至 adapters `legacy_import::observability`（CLI 与
+/// 端点共用同一条读链，不发明第二实现）；此处仅做错误形状包装，端点行为
+/// （400 措辞与行映射）逐字节不变。
 fn read_legacy_store(path: &Path) -> Result<Vec<LegacyUsageImportRow>, Response> {
-    let conn =
-        rusqlite::Connection::open_with_flags(path, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)
-            .map_err(|e| bad_query("path", format!("cannot open legacy store read-only: {e}")))?;
-    // 旧库 v2+ 才有 usage 投影表；v1 只有调用行。
-    let has_usage: bool = conn
-        .prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='model_call_usage'")
-        .map_err(|e| bad_query("path", format!("cannot inspect legacy schema: {e}")))?
-        .exists([])
-        .map_err(|e| bad_query("path", format!("cannot inspect legacy schema: {e}")))?;
-    let sql = if has_usage {
-        "SELECT c.call_id, c.trace_id, c.parent_call_id, c.provider, c.model_id, c.api, \
-         c.subsystem, c.call_purpose, c.session_id, c.started_at, c.ended_at, c.terminal_status, \
-         u.input_total_tokens, u.output_total_tokens, u.reasoning_tokens, \
-         u.cache_read_tokens, u.cache_write_tokens \
-         FROM model_calls c LEFT JOIN model_call_usage u ON u.model_call_id = c.call_id \
-         ORDER BY c.started_at, c.call_id"
-    } else {
-        "SELECT c.call_id, c.trace_id, c.parent_call_id, c.provider, c.model_id, c.api, \
-         c.subsystem, c.call_purpose, c.session_id, c.started_at, c.ended_at, c.terminal_status, \
-         NULL, NULL, NULL, NULL, NULL \
-         FROM model_calls c ORDER BY c.started_at, c.call_id"
-    };
-    let mut stmt = conn
-        .prepare(sql)
-        .map_err(|e| bad_query("path", format!("legacy schema does not match v1..v7: {e}")))?;
-    let mut rows = stmt
-        .query([])
-        .map_err(|e| bad_query("path", format!("legacy read failed: {e}")))?;
-    let mut out = Vec::new();
-    while let Some(row) = rows
-        .next()
-        .map_err(|e| bad_query("path", format!("legacy read failed: {e}")))?
-    {
-        let get = |i: usize| -> Option<String> { row.get::<_, Option<String>>(i).ok().flatten() };
-        let call_id = get(0).ok_or_else(|| bad_query("path", "legacy row without call_id"))?;
-        let started = get(9).map(|s| parse_legacy_instant(&s)).transpose()?;
-        let ended = get(10).map(|s| parse_legacy_instant(&s)).transpose()?;
-        let recorded = started.or(ended).unwrap_or(0);
-        let outcome = match get(11).as_deref() {
-            Some("ok") => CallOutcome::Succeeded,
-            Some("error") => CallOutcome::Failed,
-            Some("aborted") => CallOutcome::Cancelled,
-            _ => CallOutcome::Unknown,
-        };
-        let to_u64 = |i: usize| -> Option<u64> {
-            row.get::<_, Option<i64>>(i)
-                .ok()
-                .flatten()
-                .and_then(|v| u64::try_from(v).ok())
-        };
-        let usage = match (to_u64(12), to_u64(13)) {
-            (None, None) => None,
-            (input, output) => Some(lingxi_kernel::usage::ModelCallUsage {
-                input_tokens: input,
-                output_tokens: output,
-                cache_read_tokens: to_u64(15),
-                cache_write_tokens: to_u64(16),
-                reasoning_tokens: to_u64(14),
-                provenance: lingxi_kernel::usage::UsageProvenance::Reported,
-            }),
-        };
-        out.push(LegacyUsageImportRow {
-            record: ModelCallUsageRecord {
-                session_id: get(8),
-                run_id: None,
-                attempt: None,
-                model_call_id: call_id.clone(),
-                purpose: get(7)
-                    .or_else(|| get(6))
-                    .unwrap_or_else(|| "unknown".to_string()),
-                origin: "imported".to_string(),
-                parent_run_id: None,
-                cause_ref: None,
-                parent_tool_call_id: None,
-                provider: get(3).unwrap_or_else(|| "unknown".to_string()),
-                model: get(4).unwrap_or_else(|| "unknown".to_string()),
-                protocol: get(5).unwrap_or_else(|| "unknown".to_string()),
-                usage,
-                invalid_detail: None,
-                transport_attempts: Some(1),
-                outcome,
-                started_at_unix_ms: started,
-                settled_at_unix_ms: ended,
-                emitted_tool_calls: Vec::new(),
-                cost_basis: None,
-            },
-            recorded_at_unix_ms: recorded,
-            legacy_trace_id: get(1),
-            legacy_parent_call_id: get(2),
-        });
-    }
-    Ok(out)
-}
-
-fn parse_legacy_instant(raw: &str) -> Result<u64, Response> {
-    chrono::DateTime::parse_from_rfc3339(raw)
-        .ok()
-        .and_then(|t| u64::try_from(t.timestamp_millis()).ok())
-        .ok_or_else(|| bad_query("path", format!("legacy timestamp {raw:?} is not RFC3339")))
+    lingxi_adapters::storage::legacy_import::observability::read_legacy_observability_rows(path)
+        .map_err(|e| bad_query("path", e))
 }
 
 async fn observability_health(State(state): State<ServiceState>) -> Response {

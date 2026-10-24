@@ -201,6 +201,14 @@ impl Scope {
         }
         let mut paths = Vec::<Vec<u8>>::new();
         for raw in output.stdout.split(|b| *b == 0).filter(|p| !p.is_empty()) {
+            // 工作树已删除的 tracked 条目（git status 呈 D 的任务前遗留脏态）
+            // 不入候选：候选快照绑定的是工作树现状，删除文件无字节可哈希
+            // （R08-T08 修复：否则遗留删除即阻断阶段门快照）。
+            if let Ok(relative) = path_from_git(raw) {
+                if fs::symlink_metadata(root.join(&relative)).is_err() {
+                    continue;
+                }
+            }
             paths.push(raw.to_vec());
         }
         paths.sort();

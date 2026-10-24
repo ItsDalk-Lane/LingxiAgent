@@ -103,6 +103,13 @@ pub struct CliOptions {
     pub home: Option<PathBuf>,
     pub config: Option<PathBuf>,
     pub test_mode: bool,
+    /// R08-T05 cutover self-check mode (`--self-check`): run the full startup
+    /// chain (layout → epoch gate → storage open) with every background writer
+    /// and the business write surface structurally closed; only health plus
+    /// the read-only probe endpoint are served. Loopback-only; the readiness
+    /// line becomes `SELF_CHECK_LISTEN addr=<addr>`. Coordinator-only verb —
+    /// never set by the desktop shell.
+    pub self_check: bool,
     /// Explicit network mode (`--network-mode loopback|lan`); `None` = the
     /// loopback default. LAN exposure exists ONLY through this flag
     /// (R02-T03).
@@ -407,6 +414,14 @@ where
                     });
                 }
                 options.test_mode = true;
+            }
+            "--self-check" => {
+                if options.self_check {
+                    return Err(ConfigError::DuplicateArgument {
+                        flag: "--self-check".to_string(),
+                    });
+                }
+                options.self_check = true;
             }
             "--network-mode" => {
                 if options.network_mode.is_some() {
@@ -1357,6 +1372,29 @@ mod tests {
         assert!(matches!(
             parse_cli(args(&["--test-mode", "--test-mode"])),
             Err(ConfigError::DuplicateArgument { flag }) if flag == "--test-mode"
+        ));
+    }
+
+    #[test]
+    fn cli_parses_self_check_flag_and_rejects_duplicates() {
+        // R08-T05 Phase D: --self-check is a boolean flag on the same strict
+        // contract as --test-mode (no value, no repeats, no equals form).
+        let parsed =
+            parse_cli(args(&["--home", "/tmp/x", "--self-check"])).expect("self-check flag parses");
+        assert!(parsed.self_check);
+        assert!(!parsed.test_mode);
+        assert!(
+            !parse_cli(args(&["--home", "/tmp/x"]))
+                .expect("default parses")
+                .self_check
+        );
+        assert!(matches!(
+            parse_cli(args(&["--self-check", "--self-check"])),
+            Err(ConfigError::DuplicateArgument { flag }) if flag == "--self-check"
+        ));
+        assert!(matches!(
+            parse_cli(args(&["--self-check=1"])),
+            Err(ConfigError::UnknownArgument { .. })
         ));
     }
 

@@ -1198,7 +1198,7 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                                 "supplemental leaf {id:?} complete behavior has no assertionContract"
                             ))
                         })?;
-                        let mut seen = Vec::new();
+                        let mut assigned = Vec::new();
                         let mut coverage = Vec::with_capacity(groups.len());
                         for (assertion_index, group) in groups.iter().enumerate() {
                             let refs = group.as_array().ok_or_else(|| {
@@ -1228,18 +1228,24 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                                          #{assertion_index} references unpinned case {name:?}"
                                     )));
                                 }
-                                if seen.contains(&name) {
+                                // F02 repair: a single real test may prove several
+                                // original assertions, so reuse across groups is
+                                // legitimate. Repeating a case inside ONE assertion
+                                // group is still meaningless and stays an error.
+                                if names.contains(&name) {
                                     return Err(err(&format!(
-                                        "supplemental leaf {id:?} reuses original-behavior \
-                                         case {name:?} across assertions"
+                                        "supplemental leaf {id:?} repeats case {name:?} \
+                                         within original assertion #{assertion_index}"
                                     )));
                                 }
-                                seen.push(name.clone());
-                                names.push(name);
+                                names.push(name.clone());
                             }
+                            assigned.extend(names.iter().cloned());
                             coverage.push(names);
                         }
-                        if seen.len() != contract.cases.len() {
+                        assigned.sort();
+                        assigned.dedup();
+                        if assigned.len() != contract.cases.len() {
                             return Err(err(&format!(
                                 "supplemental leaf {id:?} has pinned cases not assigned \
                                  to an original R00 assertion"
@@ -1910,10 +1916,29 @@ mod map_tests {
             "{missing}"
         );
 
+        // F02 repair: a real test may prove several original assertions, so the
+        // same case across two assertion groups is legitimate coverage now.
+        // The leaf then pins exactly that one case (nothing unassigned).
+        value["supplementalLeafScenarios"][0]["assertionContract"]["cases"] =
+            serde_json::json!([{"case":"positive","expect":200}]);
         value["supplementalLeafScenarios"][0]["originalAssertionCases"] =
             serde_json::json!([["positive"], ["positive"]]);
-        let reused = parse_stage_map(&value.to_string()).unwrap_err();
-        assert!(reused.contains("reuses original-behavior case"), "{reused}");
+        let parsed = parse_stage_map(&value.to_string())
+            .expect("one real case may cover two original assertions");
+        assert_eq!(
+            parsed.supplemental_leaves[0].original_assertion_cases.len(),
+            2
+        );
+
+        // Repeating a case inside ONE assertion group stays meaningless.
+        value["supplementalLeafScenarios"][0]["assertionContract"]["cases"] = serde_json::json!([
+            {"case":"positive","expect":200},
+            {"case":"negative","expect":403}
+        ]);
+        value["supplementalLeafScenarios"][0]["originalAssertionCases"] =
+            serde_json::json!([["positive", "positive"], ["negative"]]);
+        let repeated = parse_stage_map(&value.to_string()).unwrap_err();
+        assert!(repeated.contains("repeats case"), "{repeated}");
 
         value["supplementalLeafScenarios"][0]["originalAssertionCases"] =
             serde_json::json!([["positive"], ["negative"]]);

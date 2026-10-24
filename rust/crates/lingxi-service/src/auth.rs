@@ -802,6 +802,15 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
     if p == "/lingxi/v1/session-thinking-level" && (m == "GET" || m == "POST") {
         return RoutePolicy::Scope("chat");
     }
+    // R08-T01 旧组合状态端口：读会话权限归 chat 面（与 thinking-level 同级），
+    // 写含默认/会话权限切换，按偏好默认 PUT 先例收本机所有者。
+    if p == "/lingxi/v1/session-permission-mode" {
+        return if m == "GET" || m == "HEAD" {
+            RoutePolicy::Scope("chat")
+        } else {
+            RoutePolicy::LocalOnly
+        };
+    }
     if (m == "POST"
         && matches!(
             p,
@@ -1470,6 +1479,37 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
         if p == "/lingxi/v1/preferences/sidebar-ui" {
             return if matches!(m.as_str(), "GET" | "HEAD" | "PUT") {
                 RoutePolicy::Scope("chat")
+            } else {
+                RoutePolicy::LocalOnly
+            };
+        }
+        // R08-T01 外观偏好沿现役 route-security 显式分类：GET settings.read /
+        // PUT settings.write；其余动词现役落 /api/* STUDIO_OWNER 兜底 → 取最严
+        // LocalOnly（与同族 R06 tenets 注释口径一致）。
+        if p == "/lingxi/v1/preferences/appearance" {
+            return if m == "GET" || m == "HEAD" {
+                RoutePolicy::Scope("settings.read")
+            } else if m == "PUT" {
+                RoutePolicy::Scope("settings.write")
+            } else {
+                RoutePolicy::LocalOnly
+            };
+        }
+        // R08-T01 环境依赖探测面：现役 route-security.ts 无 /api/system/env-deps
+        // 显式条目 → 全部动词落 /api/* STUDIO_OWNER 兜底（studio owner 会话
+        // 凭证），候选无该会话概念 → 取最严 LocalOnly（仅本机 token 可达）。
+        if p == "/lingxi/v1/system/env-deps" || p == "/lingxi/v1/system/env-deps/refresh" {
+            return RoutePolicy::LocalOnly;
+        }
+        // R08-T01 工作区 UI 状态沿现役 route-security 显式分类
+        // （server/http/route-security.ts:74-78）：GET files.read /
+        // PUT files.write；其余动词现役落 /api/* STUDIO_OWNER 兜底 → 取最严
+        // LocalOnly（与同族 R08-T01 appearance 注释口径一致）。
+        if p == "/lingxi/v1/preferences/workspace-ui-state" {
+            return if m == "GET" || m == "HEAD" {
+                RoutePolicy::Scope("files.read")
+            } else if m == "PUT" {
+                RoutePolicy::Scope("files.write")
             } else {
                 RoutePolicy::LocalOnly
             };

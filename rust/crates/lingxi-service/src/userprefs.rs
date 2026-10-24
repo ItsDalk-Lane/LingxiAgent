@@ -1,5 +1,6 @@
 //! R06 用户偏好读写对（server/routes/preferences.ts 的端口）：
 //! 自动学习（`autolearn`，默认开）与快捷聊天窗口（`quick_chat`）。
+//! R08-T01 增补外观偏好（`appearance`，规范化 + 事件发布）。
 //! 存储与 workspace-rollback 同源的 user/preferences.json，合并写入保留
 //! 其他键；读取不回退文件语义（显式值或默认，不写盘）。
 use axum::extract::State;
@@ -649,4 +650,239 @@ pub async fn sidebar_ui_put_route(
     body: axum::body::Bytes,
 ) -> Response {
     interface_put(state, principal, InterfacePreference::Sidebar, body).await
+}
+
+// ── R08-T01：旧 /api/preferences/appearance 端口 ────────────────────────────
+// GET 返回规范化外观偏好（core/preferences-manager.ts normalizeAppearance）；
+// PUT 合并写入（body.appearance 对象优先、否则 body 本身），随后按旧
+// emitAppearanceEvents 口径发布值变化的 app 事件。规范化仅保留 theme
+// （非空白串 trim）与 serif/paperTexture/leavesOverlay（布尔），其余键丢弃。
+// 端口决策：旧 PUT 的 catch→400 全包（含存储损坏）按本模块族既有约定改为
+// 损坏/IO 响亮 500，仅体校验失败 400——不复制 catch-all 静默口径。
+
+fn normalize_appearance(source: &Value) -> Value {
+    let mut out = serde_json::Map::new();
+    if let Some(theme) = source
+        .get("theme")
+        .and_then(Value::as_str)
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+    {
+        out.insert("theme".to_string(), json!(theme));
+    }
+    for key in ["serif", "paperTexture", "leavesOverlay"] {
+        if let Some(value) = source.get(key).and_then(Value::as_bool) {
+            out.insert(key.to_string(), json!(value));
+        }
+    }
+    Value::Object(out)
+}
+
+pub async fn appearance_get_route(State(state): State<ServiceState>) -> Response {
+    match state.memory().read_root() {
+        Ok(root) => {
+            Json(json!({ "appearance": normalize_appearance(&root["appearance"]) })).into_response()
+        }
+        Err(response) => response,
+    }
+}
+
+pub async fn appearance_put_route(
+    State(state): State<ServiceState>,
+    body: axum::body::Bytes,
+) -> Response {
+    let patch = match body_object(body, "appearance") {
+        Ok(value) => value,
+        Err(response) => return response,
+    };
+    let before = match state.memory().read_root() {
+        Ok(root) => normalize_appearance(&root["appearance"]),
+        Err(response) => return response,
+    };
+    let merged = match state.memory().merge_write("appearance", patch) {
+        Ok(value) => value,
+        Err(response) => return response,
+    };
+    let after = normalize_appearance(&merged);
+    // emitAppearanceEvents：仅在规范化值变化时发布对应事件。
+    if let (Some(theme), true) = (
+        after.get("theme").and_then(Value::as_str),
+        after.get("theme") != before.get("theme"),
+    ) {
+        state
+            .app_events()
+            .publish("theme-changed", json!({ "theme": theme }));
+    }
+    for (key, event) in [
+        ("serif", "font-changed"),
+        ("paperTexture", "paper-texture-changed"),
+        ("leavesOverlay", "leaves-overlay-changed"),
+    ] {
+        if let (Some(value), true) = (
+            after.get(key).and_then(Value::as_bool),
+            after.get(key) != before.get(key),
+        ) {
+            let payload = if key == "serif" {
+                json!({ "serif": value })
+            } else {
+                json!({ "enabled": value })
+            };
+            state.app_events().publish(event, payload);
+        }
+    }
+    Json(json!({ "ok": true, "appearance": after })).into_response()
+}
+
+// ── R08-T01：旧 /api/session-permission-mode 的组合状态端口 ──────────────────
+// GET 返回当前会话显式权限（缺省回落偏好默认）；POST 按旧契约四分支：
+// currentSessionOnly / pendingNewSession / sessionPath / 默认。Rust 侧裁决：
+// 会话级写入走 SessionStore::set_permission_mode_for（R03-T06 面），
+// 默认/pending 写偏好 session_permission_mode_default（Rust 无独立 pending
+// 状态，下一会话即消费该默认——与旧行为等价的持久形态）。会话级 "auto"
+// 为默认域取值，旧引擎的“清除会话覆盖”在当前持久面无对应，显式 409
+// 不静默降级。
+
+fn permission_default_raw(memory: &MemoryService) -> String {
+    memory
+        .read_preferences_root()
+        .ok()
+        .and_then(|root| {
+            root.get("session_permission_mode_default")
+                .and_then(Value::as_str)
+                .map(str::to_string)
+        })
+        .filter(|raw| matches!(raw.as_str(), "auto" | "operate" | "ask" | "read_only"))
+        .unwrap_or_else(|| "auto".into())
+}
+
+fn current_session_id(memory: &MemoryService) -> Option<String> {
+    memory
+        .read_preferences_root()
+        .ok()
+        .and_then(|prefs| {
+            prefs
+                .get("current_session_id")
+                .and_then(Value::as_str)
+                .map(str::to_string)
+        })
+        .filter(|id| !id.is_empty())
+}
+
+fn permission_mode_state(mode: &str) -> Value {
+    json!({
+        "mode": mode,
+        "accessMode": if mode == "read_only" { "read_only" } else { "operate" },
+    })
+}
+
+pub async fn session_permission_mode_get_route(State(state): State<ServiceState>) -> Response {
+    let default = permission_default_raw(state.memory());
+    let mode = match current_session_id(state.memory()) {
+        Some(sid) => state
+            .session_admin()
+            .get_session_row(&sid)
+            .await
+            .ok()
+            .flatten()
+            .and_then(|row| row.permission_mode)
+            .unwrap_or_else(|| default.clone()),
+        None => default.clone(),
+    };
+    let mut body = permission_mode_state(&mode);
+    body["defaultMode"] = json!(default);
+    Json(body).into_response()
+}
+
+pub async fn session_permission_mode_post_route(
+    axum::Extension(principal): axum::Extension<crate::auth::Principal>,
+    State(state): State<ServiceState>,
+    body: axum::body::Bytes,
+) -> Response {
+    let payload: Value = match serde_json::from_slice(&body) {
+        Ok(value) => value,
+        Err(_) => json!({}),
+    };
+    let mode = payload
+        .get("mode")
+        .and_then(Value::as_str)
+        .map(str::to_string)
+        .unwrap_or_default();
+    if !matches!(mode.as_str(), "auto" | "operate" | "ask" | "read_only") {
+        return EndpointError::invalid_message("mode must be auto|operate|ask|read_only")
+            .into_response();
+    }
+    let default = permission_default_raw(state.memory());
+    let current_only = payload.get("currentSessionOnly").and_then(Value::as_bool) == Some(true);
+    let pending = payload.get("pendingNewSession").and_then(Value::as_bool) == Some(true);
+    let session_path = payload.get("sessionPath").and_then(Value::as_str);
+    // 会话级目标：currentSessionOnly → 当前会话；否则显式 sessionPath（仅
+    // native: 定位，旧 JSONL 路径不猜映射）。
+    let session_target = if current_only {
+        current_session_id(state.memory())
+    } else if pending {
+        None
+    } else {
+        session_path
+            .filter(|value| !value.trim().is_empty() && value.starts_with("native:"))
+            .and_then(|value| value.strip_prefix("native:").map(str::to_string))
+    };
+    if current_only || (!pending && session_path.is_some()) {
+        let Some(session_id) = session_target else {
+            return (
+                StatusCode::CONFLICT,
+                Json(json!({
+                    "ok": false,
+                    "error": "session permission mode requires an active session",
+                    "defaultMode": default,
+                })),
+            )
+                .into_response();
+        };
+        let Some(parsed) = lingxi_kernel::subagent::SessionPermissionMode::parse(&mode) else {
+            return (
+                StatusCode::CONFLICT,
+                Json(json!({
+                    "ok": false,
+                    "error": "auto applies to the default; pick operate/ask/read_only for this session",
+                    "defaultMode": default,
+                })),
+            )
+                .into_response();
+        };
+        return match state
+            .sessions()
+            .set_permission_mode_for(&principal, &session_id, parsed)
+            .await
+        {
+            Ok(()) => {
+                let mut body = permission_mode_state(parsed.wire_name());
+                body["ok"] = json!(true);
+                body["defaultMode"] = json!(default);
+                Json(body).into_response()
+            }
+            Err(error) => (
+                StatusCode::CONFLICT,
+                Json(json!({
+                    "ok": false,
+                    "error": format!("{error:?}"),
+                    "defaultMode": default,
+                })),
+            )
+                .into_response(),
+        };
+    }
+    // 默认/pending 域：写偏好默认（下一会话消费）。
+    match state
+        .memory()
+        .set_session_permission_default(json!({ "permissionMode": mode }))
+    {
+        Ok(value) => {
+            let normalized = value["permissionMode"].as_str().unwrap_or("auto");
+            let mut body = permission_mode_state(normalized);
+            body["ok"] = json!(true);
+            body["defaultMode"] = json!(normalized);
+            Json(body).into_response()
+        }
+        Err(response) => response,
+    }
 }

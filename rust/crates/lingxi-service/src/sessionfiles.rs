@@ -428,6 +428,26 @@ pub struct ImportReport {
     pub skipped: usize,
 }
 
+// ── R08-T04 A07 附件坏因扩展（纯增量）──
+// Lead 条件①：ImportReport（V1）响应形状一字节不变；V2 是兄弟结构，
+// 只有新的 import_legacy_sidecar_v2 返回它。坏因受控词表：
+//   payload-missing | payload-truncated（含 sha256 不符）|
+//   sidecar-row-invalid | unsupported-version
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ImportLegacyBrokenEntry {
+    pub file_id: String,
+    pub reason: String,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ImportLegacyReportV2 {
+    pub imported: usize,
+    pub skipped_existing: usize,
+    pub broken: Vec<ImportLegacyBrokenEntry>,
+}
+
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CleanupOutcome {
@@ -1303,6 +1323,300 @@ impl SessionFileService {
             }
         }
         Ok(ImportReport { imported, skipped })
+    }
+
+    /// R08-T04 A07：V1 的坏因感知兄弟版（纯增量；V1 形状与行为一字节不变）。
+    /// 差异只在报告与 payload 校验：
+    ///   - 行级 version ≠ 1 → broken/unsupported-version（顶层 version 仍旧
+    ///     UnsupportedSidecarVersion 硬错误，不降级）；
+    ///   - realPath 缺失 → status=missing + broken/payload-missing；
+    ///   - 声明 size/sha256 与实际不符 → status=broken + broken/payload-truncated；
+    ///   - map_legacy_row 无法成形 → broken/sidecar-row-invalid，跳过该行；
+    ///   - ForkCollision 语义与 V1 完全一致（响亮错误，不合并）。
+    pub async fn import_legacy_sidecar_v2(
+        &self,
+        session_id: &str,
+        sidecar_path: &Path,
+    ) -> Result<ImportLegacyReportV2, SessionFileError> {
+        let _lease = self.payload_lease().await;
+        let raw = std::fs::read_to_string(sidecar_path)?;
+        let parsed: serde_json::Value = serde_json::from_str(&raw)
+            .map_err(|err| SessionFileError::BadSidecar(err.to_string()))?;
+        let version = parsed
+            .get("version")
+            .and_then(serde_json::Value::as_i64)
+            .unwrap_or(-1);
+        if version != 1 {
+            return Err(SessionFileError::UnsupportedSidecarVersion(version));
+        }
+        let now = self.now_ms();
+        let owner_key = session_file_owner_key(Some(session_id), None);
+        let files = parsed
+            .get("files")
+            .and_then(serde_json::Value::as_object)
+            .ok_or_else(|| SessionFileError::BadSidecar("missing files map".to_string()))?;
+        let mut imported = 0usize;
+        let mut skipped_existing = 0usize;
+        let mut broken: Vec<ImportLegacyBrokenEntry> = Vec::new();
+        // 确定性顺序：按 key 排序（JSON 对象序不可靠）。
+        let mut keys: Vec<&String> = files.keys().collect();
+        keys.sort();
+        for key in keys {
+            let value = &files[key];
+            // 行级显式版本钉：显式声明且 ≠1 → broken，跳过该行。
+            if let Some(row_version) = value.get("version").and_then(serde_json::Value::as_i64) {
+                if row_version != 1 {
+                    broken.push(ImportLegacyBrokenEntry {
+                        file_id: value
+                            .get("fileId")
+                            .and_then(serde_json::Value::as_str)
+                            .unwrap_or(key.as_str())
+                            .to_string(),
+                        reason: "unsupported-version".to_string(),
+                    });
+                    continue;
+                }
+            }
+            let Some(mut row) = self.map_legacy_row(session_id, &owner_key, value, now) else {
+                broken.push(ImportLegacyBrokenEntry {
+                    file_id: value
+                        .get("fileId")
+                        .and_then(serde_json::Value::as_str)
+                        .unwrap_or(key.as_str())
+                        .to_string(),
+                    reason: "sidecar-row-invalid".to_string(),
+                });
+                continue;
+            };
+            if let Some(existing) = store::get_session_file(&self.db, &row.file_id).await? {
+                if existing.owner_session_id != session_id {
+                    return Err(SessionFileError::ForkCollision(row.file_id));
+                }
+                if existing.identity_key != row.identity_key || existing.real_path != row.real_path
+                {
+                    return Err(SessionFileError::ForkCollision(row.file_id));
+                }
+                skipped_existing += 1;
+            } else {
+                // payload 校验（V1 只查存在性 → missing；V2 加坏因报告与
+                // size/sha256 校验）。读失败的行仍登记，绝不冒充 available。
+                match std::fs::read(Path::new(&row.real_path)) {
+                    Err(_) => {
+                        row.status = SessionFileStatus::Missing;
+                        broken.push(ImportLegacyBrokenEntry {
+                            file_id: row.file_id.clone(),
+                            reason: "payload-missing".to_string(),
+                        });
+                    }
+                    Ok(bytes) => {
+                        let declared_size = value.get("size").and_then(serde_json::Value::as_u64);
+                        let declared_sha = value
+                            .get("sha256")
+                            .and_then(serde_json::Value::as_str)
+                            .map(str::to_string);
+                        let truncated = declared_size
+                            .is_some_and(|size| size != bytes.len() as u64)
+                            || declared_sha
+                                .is_some_and(|sha| !sha.eq_ignore_ascii_case(&sha256_hex(&bytes)));
+                        if truncated {
+                            row.status = SessionFileStatus::Broken;
+                            broken.push(ImportLegacyBrokenEntry {
+                                file_id: row.file_id.clone(),
+                                reason: "payload-truncated".to_string(),
+                            });
+                        }
+                    }
+                }
+                store::insert_session_file(&self.db, &row).await?;
+                imported += 1;
+            }
+            let legacy_ids = row.legacy_file_ids.clone();
+            for legacy in legacy_ids {
+                // 别名冲突不致命：与 V1 同 stance，后到的同别名词条跳过。
+                if store::resolve_alias(&self.db, &legacy).await?.is_none() {
+                    store::insert_alias(&self.db, &legacy, &row.file_id, now).await?;
+                }
+            }
+        }
+        // 现役 sidecar refs（注册操作日志）→ 候选 import 引用行（同 V1）。
+        if let Some(refs) = parsed.get("refs").and_then(serde_json::Value::as_array) {
+            for refr in refs {
+                let Some(file_id) = refr.get("fileId").and_then(serde_json::Value::as_str) else {
+                    continue;
+                };
+                let Some(file) = self.get_file(session_id, file_id).await? else {
+                    continue;
+                };
+                if file.status != "available" {
+                    continue;
+                }
+                let file_id = file.file_id.as_str();
+                let created = refr
+                    .get("createdAt")
+                    .and_then(serde_json::Value::as_u64)
+                    .unwrap_or(now);
+                store::insert_ref(
+                    &self.db,
+                    &store::SessionFileRefRow {
+                        file_id: file_id.to_string(),
+                        session_id: session_id.to_string(),
+                        message_id: None,
+                        ref_kind: RefKind::Import,
+                        created_at_ms: created,
+                    },
+                )
+                .await?;
+            }
+        }
+        Ok(ImportLegacyReportV2 {
+            imported,
+            skipped_existing,
+            broken,
+        })
+    }
+
+    /// R08-T04 A07：旧根 `session-files/{hash}` 目录整体导入。
+    /// 流程：枚举 *.meta.json 描述符（排序，确定性）→ payload 逐字节保真
+    /// 复制进 canonical cache（确定性命名 `legacy-{fileId}-{filename}`，源
+    /// 文件永不改动）→ 合成 v1 sidecar → import_legacy_sidecar_v2 校验落库。
+    /// 描述符 JSON 损坏 → broken/sidecar-row-invalid；多个 sessionId 混杂
+    /// → BadSidecar 响亮拒绝（fixture/registry 结构上一目录一 session）。
+    pub async fn import_legacy_session_files_dir(
+        &self,
+        source_dir: &Path,
+        staging_dir: &Path,
+    ) -> Result<ImportLegacyReportV2, SessionFileError> {
+        let mut descriptor_paths: Vec<PathBuf> = std::fs::read_dir(source_dir)?
+            .filter_map(|entry| entry.ok().map(|e| e.path()))
+            .filter(|path| {
+                path.file_name()
+                    .and_then(|n| n.to_str())
+                    .is_some_and(|n| n.ends_with(".meta.json"))
+            })
+            .collect();
+        descriptor_paths.sort();
+        if descriptor_paths.is_empty() {
+            return Err(SessionFileError::BadSidecar(format!(
+                "no *.meta.json descriptors in {}",
+                source_dir.display()
+            )));
+        }
+        let mut pre_broken: Vec<ImportLegacyBrokenEntry> = Vec::new();
+        struct Descriptor {
+            file_id: String,
+            session_id: String,
+            filename: String,
+            mime: String,
+            size: Option<u64>,
+            sha256: Option<String>,
+            payload: PathBuf,
+        }
+        let mut descriptors: Vec<Descriptor> = Vec::new();
+        for meta_path in descriptor_paths {
+            let fallback_id = meta_path
+                .file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or("unknown")
+                .trim_end_matches(".meta.json")
+                .to_string();
+            let parsed: Result<serde_json::Value, String> = std::fs::read_to_string(&meta_path)
+                .map_err(|e| e.to_string())
+                .and_then(|raw| serde_json::from_str(&raw).map_err(|e| e.to_string()));
+            let Ok(value) = parsed else {
+                pre_broken.push(ImportLegacyBrokenEntry {
+                    file_id: fallback_id,
+                    reason: "sidecar-row-invalid".to_string(),
+                });
+                continue;
+            };
+            let get_str = |key: &str| value.get(key).and_then(serde_json::Value::as_str);
+            let (Some(file_id), Some(session_id), Some(filename)) =
+                (get_str("fileId"), get_str("sessionId"), get_str("filename"))
+            else {
+                pre_broken.push(ImportLegacyBrokenEntry {
+                    file_id: get_str("fileId").unwrap_or(&fallback_id).to_string(),
+                    reason: "sidecar-row-invalid".to_string(),
+                });
+                continue;
+            };
+            descriptors.push(Descriptor {
+                file_id: file_id.to_string(),
+                session_id: session_id.to_string(),
+                filename: filename.to_string(),
+                mime: get_str("mime")
+                    .unwrap_or("application/octet-stream")
+                    .to_string(),
+                size: value.get("size").and_then(serde_json::Value::as_u64),
+                sha256: get_str("sha256").map(str::to_string),
+                payload: source_dir.join(filename),
+            });
+        }
+        if descriptors.is_empty() {
+            // 全部描述符损坏：无行可导，坏因仍是响亮报告（不整目录丢弃）。
+            return Ok(ImportLegacyReportV2 {
+                imported: 0,
+                skipped_existing: 0,
+                broken: pre_broken,
+            });
+        }
+        let session_id = descriptors[0].session_id.clone();
+        if descriptors.iter().any(|d| d.session_id != session_id) {
+            return Err(SessionFileError::BadSidecar(format!(
+                "mixed sessionId in {} (expected single-owner dir {session_id})",
+                source_dir.display()
+            )));
+        }
+        let dest_dir = session_files_cache_dir(&self.home, Some(&session_id), None);
+        std::fs::create_dir_all(&dest_dir)?;
+        let now = self.now_ms();
+        let mut files = serde_json::Map::new();
+        for d in &descriptors {
+            // 确定性目标名（A08 重跑同路径 → V2 skipped_existing，不漂移）；
+            // 路径分隔符压平，防目录逃逸。
+            let sanitized = d.filename.replace(['/', '\\'], "_");
+            let dest = dest_dir.join(format!("legacy-{}-{}", d.file_id, sanitized));
+            if d.payload.exists() {
+                // 逐字节保真复制（含截断字节）；校验在 v2 落库前。
+                std::fs::copy(&d.payload, &dest)?;
+            }
+            let mut row = serde_json::json!({
+                "fileId": d.file_id,
+                "realPath": dest.to_string_lossy(),
+                "filePath": dest.to_string_lossy(),
+                "filename": d.filename,
+                "mime": d.mime,
+                "storageKind": "managed_cache",
+                "status": "available",
+                "createdAt": now,
+                "legacyFilePaths": [d.payload.to_string_lossy()],
+            });
+            if let Some(size) = d.size {
+                row["size"] = serde_json::json!(size);
+            }
+            if let Some(sha256) = &d.sha256 {
+                row["sha256"] = serde_json::json!(sha256);
+            }
+            files.insert(d.file_id.clone(), row);
+        }
+        std::fs::create_dir_all(staging_dir)?;
+        let dir_name = source_dir
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("session-files");
+        let staging_path = staging_dir.join(format!("{dir_name}.sidecar.json"));
+        let sidecar = serde_json::json!({"version": 1, "files": files});
+        std::fs::write(
+            &staging_path,
+            serde_json::to_string_pretty(&sidecar).map_err(|e| {
+                SessionFileError::Io(std::io::Error::new(std::io::ErrorKind::Other, e))
+            })?,
+        )?;
+        let mut report = self
+            .import_legacy_sidecar_v2(&session_id, &staging_path)
+            .await?;
+        // 描述符级坏因并入报告（文件序在前，目录级坏因随后追加）。
+        report.broken.append(&mut pre_broken);
+        Ok(report)
     }
 
     fn map_legacy_row(

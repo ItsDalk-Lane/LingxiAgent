@@ -605,7 +605,9 @@ impl ToolPolicyPort for FailClosedPolicy {
             | PermissionKind::ArgumentAwareChannel
             | PermissionKind::ArgumentAwareBrowser
             | PermissionKind::ArgumentAwareGoal
-            | PermissionKind::ArgumentAwareSettings => PolicyVerdict::NeedsApproval {
+            | PermissionKind::ArgumentAwareSettings
+            | PermissionKind::ArgumentAwareRunCode
+            | PermissionKind::ArgumentAwareLsp => PolicyVerdict::NeedsApproval {
                 reason: format!(
                     "no tool policy service is configured; the gateway cannot safely \
                      adjudicate an execution-class invocation of {} ({}) and never \

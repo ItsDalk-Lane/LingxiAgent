@@ -62,6 +62,10 @@ pub mod chat_settings;
 pub mod chat_wire;
 pub mod checkpoint_store;
 pub mod client_context;
+pub mod coding_ast_lsp;
+pub mod coding_ptc;
+pub mod coding_run_code;
+pub mod coding_security;
 pub mod compaction;
 pub mod computer_use_settings;
 pub mod config;
@@ -73,12 +77,14 @@ pub mod conversation_status;
 pub mod conversation_tools;
 pub mod conversations;
 pub mod credentials;
+pub mod cutover;
 pub mod dedup;
 pub mod desk_files;
 pub mod desk_logs;
 pub mod diary;
 pub mod discovery_tools;
 pub mod dream_service;
+pub mod env_deps;
 pub mod epoch;
 pub mod events;
 pub mod exectools;
@@ -190,6 +196,7 @@ pub mod workerrpc;
 pub mod workflow;
 pub mod workflow_routes;
 pub mod workflowjs;
+pub mod workspace_ui_state;
 pub mod ws;
 
 pub use approval::{ApprovalDecision, ApprovalGate, ApprovalRequest};
@@ -546,6 +553,13 @@ impl Drop for KnowledgeWorkerOwner {
 #[derive(Clone)]
 pub struct ServiceState {
     config: Arc<ServiceConfig>,
+    /// R08-T05 cutover self-check mode: bootstrapped for `--self-check`.
+    /// When true the run loop (a) never starts the background writers
+    /// (dream ticker, automation, bridge/conversation recovery, browsers,
+    /// knowledge worker, loop recovery, cold-session cleanup) and (b)
+    /// serves only the restricted self-check router (health + read-only
+    /// probe; every other route is a loud 503). Coordinator-only.
+    self_check: bool,
     _knowledge_worker_owner: Arc<KnowledgeWorkerOwner>,
     auth: Arc<AuthService>,
     management: Arc<management::ManagementState>,
@@ -600,6 +614,7 @@ pub struct ServiceState {
     /// Run lifecycle supervisor (R03-T01): drives every execute through
     /// the real queued→running→…→single-finalize chain.
     runs: Arc<runs::RunSupervisor>,
+    native_processes: Option<Arc<procsupervisor::ProcessSupervisor>>,
     /// R06-T03: the session tree service (fork / retry / rewind /
     /// checkpoints / branch index) over the same storage + events.
     session_tree: Arc<session_tree::SessionService>,
@@ -1242,16 +1257,22 @@ impl ServiceState {
             layout,
             deps,
             instance::InstanceIdentity::generate(),
+            false,
         )
         .await
     }
 
     /// 二进制入口必须沿用已取得独占锁的实例身份，令实例记录和本机令牌指向同一次启动。
+    /// `self_check`（R08-T05）：切割自检模式——完整启动链照常（epoch 门、
+    /// 存储打开、实例锁），但知识库 worker / loop 恢复 / 冷会话清理一律
+    /// 不启动，run 循环再叠加后台子系统禁启与受限路由面（写面结构性关闭）。
+    /// 仅切割协调器经 `--self-check` 置位。
     pub async fn bootstrap_with_locked_instance(
         config: ServiceConfig,
         layout: &DataRootLayout,
         deps: ServiceDeps,
         guard: &InstanceGuard,
+        self_check: bool,
     ) -> Result<Self, ServiceStartupError> {
         let configured_home = std::fs::canonicalize(&config.data_home).map_err(|err| {
             ServiceStartupError::Storage(StorageError::Io {
@@ -1264,7 +1285,14 @@ impl ServiceState {
                     .into(),
             }));
         }
-        Self::bootstrap_with_instance_identity(config, layout, deps, guard.identity().clone()).await
+        Self::bootstrap_with_instance_identity(
+            config,
+            layout,
+            deps,
+            guard.identity().clone(),
+            self_check,
+        )
+        .await
     }
 
     async fn bootstrap_with_instance_identity(
@@ -1272,6 +1300,7 @@ impl ServiceState {
         layout: &DataRootLayout,
         mut deps: ServiceDeps,
         identity: InstanceIdentity,
+        self_check: bool,
     ) -> Result<Self, ServiceStartupError> {
         deps.event_limits
             .validate()
@@ -1303,7 +1332,7 @@ impl ServiceState {
             .await
             .map_err(ServiceStartupError::Storage)?;
         storage
-            .ensure_session_seed(sessions::SessionStore::seed_rows(deps.clock.now_unix_ms()))
+            .ensure_session_seed_if_empty(sessions::SessionStore::seed_rows(deps.clock.now_unix_ms()))
             .await
             .map_err(ServiceStartupError::Storage)?;
         storage
@@ -1594,6 +1623,7 @@ impl ServiceState {
         );
         let mut tool_plane: Option<ToolPlaneHandles> = None;
         let mut read_file_tools = None;
+        let mut native_processes = None;
         let mut approval_service_handle = None;
         if let Some(model_gateway) = model_gateway_for_wiring {
             // R05-T02 (C01): the production chain dispatches through the
@@ -1719,13 +1749,26 @@ impl ServiceState {
                 let _core_process_tools = exectools::register_process_tools(
                     &registry,
                     gateway.as_ref(),
-                    exec_supervisor,
+                    exec_supervisor.clone(),
                     Arc::clone(&access),
                     workspace.clone(),
                     None,
                     Arc::clone(&deps.clock),
                     &budget,
                 );
+                coding_run_code::register(
+                    &registry,
+                    gateway.as_ref(),
+                    access.clone(),
+                    workspace.clone(),
+                    exec_supervisor.clone(),
+                    deps.clock.clone(),
+                    &budget,
+                )
+                .map_err(|detail| {
+                    ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+                })?;
+                native_processes = Some(exec_supervisor);
                 // R06-T06: the memory/skill model-side tools. Each executor is
                 // BOUND to one agent at registration (the resolved primary
                 // agent) — there is no cross-agent handle (A11). Registration
@@ -2021,7 +2064,14 @@ impl ServiceState {
             .with_session_resource_access(
                 workspace_access
                     .as_ref()
-                    .map(|(access, _)| Arc::clone(access)),
+                    .map(|(access, _)| Arc::clone(access))
+                    // 预览（无 workspace）模式：read 工具面用的是零根
+                    // session_read_access 实例（lib.rs:1838 注册）；运行时根刷新
+                    // 此前只写 workspace_access 实例 → 会话 authorized_folders
+                    // 永不生效（PPG-2 机制成因；a05 读腿 t09-a05-standalone-01
+                    // 红实证）。接到同一实例：会话级授权目录经正规孔道生效，
+                    // 不授予任何 workspace（零根策略不变）。
+                    .or_else(|| session_read_access.clone()),
             )
             .with_chat_settings_home(config.data_home.clone());
         // R06-T06: the Pi extension hooks port — production ON (the
@@ -2039,6 +2089,22 @@ impl ServiceState {
             Arc::clone(&storage),
         ))));
         let runs = Arc::new(runs.with_knowledge(Arc::clone(&knowledge_service)));
+        if wired_real_model_chain {
+            if let Some(gateway) = deps.tool_gateway.as_ref() {
+                coding_ptc::register(
+                    gateway.registry(),
+                    gateway,
+                    Arc::downgrade(&runs),
+                    storage.clone(),
+                    events.clone(),
+                    deps.clock.clone(),
+                    &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+                )
+                .map_err(|detail| {
+                    ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+                })?;
+            }
+        }
         let session_tools = Arc::new(
             sessiontools::SessionTools::new(sessiontools::Dependencies {
                 storage: Arc::clone(&storage),
@@ -2537,6 +2603,34 @@ impl ServiceState {
         if let (Some(gateway), Some((access, cwd))) =
             (deps.tool_gateway.as_ref(), workspace_access.as_ref())
         {
+            if wired_real_model_chain {
+                coding_ast_lsp::register(
+                    gateway.registry(),
+                    gateway,
+                    access.clone(),
+                    cwd.clone(),
+                    resource_io.clone(),
+                    None,
+                    &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+                )
+                .map_err(|detail| {
+                    ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+                })?;
+                coding_security::register(
+                    gateway.registry(),
+                    gateway,
+                    access.clone(),
+                    cwd.clone(),
+                    data_home.clone(),
+                    resource_io.clone(),
+                    None,
+                    deps.clock.clone(),
+                    &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+                )
+                .map_err(|detail| {
+                    ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+                })?;
+            }
             resource_tools::register(
                 gateway.registry(),
                 gateway,
@@ -2700,8 +2794,10 @@ impl ServiceState {
         mcp_settings.attach_tasks(runs.task_supervisor());
         mcp_settings.attach_network(deps.network_plane.as_ref());
         let state = Self {
+            native_processes,
             _knowledge_worker_owner: Arc::new(KnowledgeWorkerOwner(knowledge_service.clone())),
             config: Arc::new(config),
+            self_check,
             auth,
             management,
             static_web: Arc::new(static_web::StaticWebConfig::resolve()),
@@ -3098,20 +3194,25 @@ impl ServiceState {
             .map_err(ServiceStartupError::Storage)?;
         // 同进程最后 owner 的 Drop 已通知停止，但原任务必须真实退出并释放 OS 锁。
         // 有界异步等待不提前释放锁，也不把仍活任务恢复为 queued。
-        let handoff_deadline = tokio::time::Instant::now() + std::time::Duration::from_millis(500);
-        loop {
-            match state.knowledge().start_worker() {
-                Ok(()) => break,
-                Err(error)
-                    if error.code == "KNOWLEDGE_CONFLICT"
-                        && tokio::time::Instant::now() < handoff_deadline =>
-                {
-                    tokio::time::sleep(std::time::Duration::from_millis(10)).await
-                }
-                Err(error) => {
-                    return Err(ServiceStartupError::Storage(StorageError::InvalidRequest {
-                        detail: error.to_string(),
-                    }))
+        // R08-T05：自检模式结构性跳过——知识库 worker 会发起摄取/写入，
+        // 自检面只读，worker 永不启动（wait_worker_stopped 对未启动态即 Ok）。
+        if !self_check {
+            let handoff_deadline =
+                tokio::time::Instant::now() + std::time::Duration::from_millis(500);
+            loop {
+                match state.knowledge().start_worker() {
+                    Ok(()) => break,
+                    Err(error)
+                        if error.code == "KNOWLEDGE_CONFLICT"
+                            && tokio::time::Instant::now() < handoff_deadline =>
+                    {
+                        tokio::time::sleep(std::time::Duration::from_millis(10)).await
+                    }
+                    Err(error) => {
+                        return Err(ServiceStartupError::Storage(StorageError::InvalidRequest {
+                            detail: error.to_string(),
+                        }))
+                    }
                 }
             }
         }
@@ -3119,15 +3220,21 @@ impl ServiceState {
         // recoverAtBoot）——启动期 run 恢复扫描之后、开始服务之前：不可
         // 投递的循环标记停止，缺闹钟的活跃循环补兜底闹钟。闹钟定时器
         // 在 tokio 运行时内武装。
-        state
-            .runs()
-            .attach_loop_controller(&state.loop_services().controller);
-        state.loop_services().controller.recover_at_boot().await;
+        // R08-T05：自检模式跳过——recover_at_boot 会写循环状态并武装闹钟
+        // 定时器；自检面不允许任何写与定时器。
+        if !self_check {
+            state
+                .runs()
+                .attach_loop_controller(&state.loop_services().controller);
+            state.loop_services().controller.recover_at_boot().await;
+        }
         // R06-T05 D14：启动清扫一次（现役 server/index.ts:563-570
         // fire-and-forget + warn 日志；失败不阻断启动）。现役 24h
         // setInterval 不引入——常驻定时器违背 R02-T06 关停纪律，周期调度
         // 如需由服务编排层显式加。
-        {
+        // R08-T05：自检模式跳过——cleanup_cold_sessions 会删除磁盘文件，
+        // 自检面零删除。
+        if !self_check {
             let cleanup = state.session_files().clone();
             tokio::spawn(async move {
                 if let Err(err) = cleanup.cleanup_cold_sessions().await {
@@ -3145,6 +3252,14 @@ impl ServiceState {
 
     pub fn config(&self) -> &ServiceConfig {
         &self.config
+    }
+
+    /// R08-T05: whether this state was bootstrapped for cutover self-check
+    /// (`--self-check`). The run loop consults it to skip background writers
+    /// and to serve the restricted self-check router instead of the full
+    /// business surface.
+    pub fn self_check(&self) -> bool {
+        self.self_check
     }
 
     fn actual_port(&self) -> u16 {
@@ -3527,7 +3642,7 @@ fn health_payload() -> HealthResponse {
         server_version: server_version(),
         wire_protocol_min: WIRE_PROTOCOL_MIN_SUPPORTED,
         wire_protocol_max: WIRE_PROTOCOL_MAX_SUPPORTED,
-        data_epoch: ContractVersions::R00_BASELINE.data_epoch,
+        data_epoch: ContractVersions::R08_CUTOVER.data_epoch,
     }
 }
 
@@ -7449,7 +7564,7 @@ async fn run_ws_session<IO>(
                         selected_protocol: selected,
                         wire_protocol_min: WIRE_PROTOCOL_MIN_SUPPORTED,
                         wire_protocol_max: WIRE_PROTOCOL_MAX_SUPPORTED,
-                        data_epoch: ContractVersions::R00_BASELINE.data_epoch,
+                        data_epoch: ContractVersions::R08_CUTOVER.data_epoch,
                         server_kind: SERVER_KIND.to_string(),
                         server_version: server_version().to_string(),
                         rejected_caps: Vec::new(),
@@ -8522,6 +8637,12 @@ pub fn build_router(state: ServiceState) -> Router {
             "/lingxi/v1/checkpoints/{checkpoint_id}/restore",
             post(checkpoint_store::restore_route),
         )
+        // R08-T01：现役 DELETE /api/checkpoints/:id（removeCheckpoint）的
+        // 端口；LocalOnly 沿同族既有分类，缺失幂等、IO 失败响亮。
+        .route(
+            "/lingxi/v1/checkpoints/{checkpoint_id}",
+            delete(checkpoint_store::delete_route),
+        )
         // R06-T05 Round 5 fs 直读面（server/routes/fs.ts :89-115，D5
         // 前缀）：LocalOnly，授权根 = data_home + workspace。
         .route("/lingxi/v1/fs/read", get(fsread::fs_read_route))
@@ -8638,6 +8759,31 @@ pub fn build_router(state: ServiceState) -> Router {
             "/lingxi/v1/preferences/sidebar-ui",
             get(userprefs::sidebar_ui_get_route).put(userprefs::sidebar_ui_put_route),
         )
+        // R08-T01：现役 /api/preferences/appearance 端口（规范化合并写 +
+        // 变化事件发布；读 settings.read / 写 settings.write 沿现役分类）。
+        .route(
+            "/lingxi/v1/preferences/appearance",
+            get(userprefs::appearance_get_route).put(userprefs::appearance_put_route),
+        )
+        // R08-T01：现役 /api/system/env-deps 端口（环境依赖探测报告 +
+        // 强制刷新；现役无显式安全条目 → 走 /api/* STUDIO_OWNER 兜底，候选
+        // 取最严 LocalOnly；refresh 路径现役仅注册 POST，GET 保持 404）。
+        .route(
+            "/lingxi/v1/system/env-deps",
+            get(env_deps::env_deps_get_route),
+        )
+        .route(
+            "/lingxi/v1/system/env-deps/refresh",
+            post(env_deps::env_deps_refresh_route),
+        )
+        // R08-T01：现役 /api/preferences/workspace-ui-state 端口（workspace+surface
+        // 键控读写、全量规范化与缺失目录 GC 裁剪；读 files.read / 写 files.write
+        // 沿现役 route-security 显式分类）。
+        .route(
+            "/lingxi/v1/preferences/workspace-ui-state",
+            get(workspace_ui_state::workspace_ui_state_get_route)
+                .put(workspace_ui_state::workspace_ui_state_put_route),
+        )
         // R06 用户偏好对（现役 /preferences/autolearn、/preferences/quick-chat）
         .route(
             "/lingxi/v1/preferences/autolearn",
@@ -8654,6 +8800,10 @@ pub fn build_router(state: ServiceState) -> Router {
         )
         // R06 会话项目/文件夹目录（现役 /session-projects* 全量面）
         .route("/lingxi/v1/session-projects", get(projects::catalog_route))
+        .route(
+            "/lingxi/v1/session-projects/session-assignment",
+            post(projects::set_session_assignment_route),
+        )
         .route(
             "/lingxi/v1/session-projects/projects",
             post(projects::create_project_route),
@@ -8993,6 +9143,111 @@ pub fn build_router(state: ServiceState) -> Router {
         .with_state(state)
 }
 
+// ── R08-T05 cutover self-check surface ───────────────────────────────────────
+
+/// Restricted router served by `lingxi-service --self-check` (design §9.1).
+/// The full startup chain still ran (layout → epoch gate → storage open →
+/// instance lock), but the business surface is STRUCTURALLY absent: only
+/// `/lingxi/v1/health` (public, same as the normal router) and
+/// `/lingxi/v1/self-check/probe` (local-owner token, read-only counts) are
+/// routed; everything else — reads included — hits the loud 503 fallback,
+/// never a silent 404. The SAME middleware stack as [`build_router`] applies
+/// (error envelope, admission, transport guard, token auth), so auth parity
+/// with the normal path is preserved.
+pub fn build_self_check_router(state: ServiceState) -> Router {
+    Router::new()
+        .route("/lingxi/v1/health", get(health))
+        .route("/lingxi/v1/self-check/probe", get(self_check_probe))
+        .fallback(self_check_fallback)
+        .layer(axum::extract::DefaultBodyLimit::max(
+            limits::DEFAULT_BODY_LIMIT_BYTES,
+        ))
+        .layer(middleware::from_fn_with_state(state.clone(), auth_guard))
+        .layer(middleware::from_fn_with_state(
+            state.clone(),
+            transport_guard,
+        ))
+        .layer(middleware::from_fn_with_state(
+            state.clone(),
+            http_admission,
+        ))
+        .layer(middleware::from_fn_with_state(
+            state.clone(),
+            error_enrichment,
+        ))
+        .with_state(state)
+}
+
+/// One read-only count through the storage worker's inspection seam
+/// (`query_one_text` — never the write path). A missing row or a
+/// non-numeric value is a loud probe failure, never a guessed zero.
+async fn self_check_count(state: &ServiceState, sql: &str) -> Result<u64, String> {
+    let raw = state
+        .storage()
+        .query_one_text(sql, Vec::new())
+        .await
+        .map_err(|error| format!("probe query failed: {sql}: {error}"))?;
+    let raw = raw.ok_or_else(|| format!("probe query returned no row: {sql}"))?;
+    raw.parse::<u64>()
+        .map_err(|error| format!("probe query non-numeric: {sql}: {raw}: {error}"))
+}
+
+/// GET `/lingxi/v1/self-check/probe` — read-only adoption-verification
+/// counts (design §9.1: session count, model_call_usage count, cron task
+/// count, plus the schema user_version). `classify_route` leaves this path
+/// at the default `LocalOnly` policy, so `auth_guard` already required the
+/// loopback owner token; the explicit `is_local_owner` check mirrors the
+/// cron surface's belt-and-braces pattern.
+async fn self_check_probe(
+    State(state): State<ServiceState>,
+    axum::Extension(principal): axum::Extension<Principal>,
+) -> Response {
+    if !principal.is_local_owner() {
+        return (
+            StatusCode::FORBIDDEN,
+            Json(serde_json::json!({"error":"local_owner_required"})),
+        )
+            .into_response();
+    }
+    let probe = async {
+        Ok::<_, String>(serde_json::json!({
+            "schemaVersion": 1,
+            "mode": "self-check",
+            "counts": {
+                "sessions": self_check_count(&state, "SELECT COUNT(*) FROM sessions").await?,
+                "modelCallUsage": self_check_count(&state, "SELECT COUNT(*) FROM model_call_usage").await?,
+                // desk/cron visible-jobs semantics: soft-deleted rows are
+                // not tasks the coordinator expects to see.
+                "cronJobs": self_check_count(&state, "SELECT COUNT(*) FROM automation_jobs_v1 WHERE deleted_at IS NULL").await?,
+            },
+            "userVersion": self_check_count(&state, "PRAGMA user_version").await?,
+        }))
+    };
+    match probe.await {
+        Ok(body) => Json(body).into_response(),
+        Err(detail) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({"error":"self_check_probe_failed","detail":detail})),
+        )
+            .into_response(),
+    }
+}
+
+/// Loud closure for everything outside the self-check surface — a 503 with
+/// an explicit code, so a misdirected write can never look like success or
+/// a silent no-route 404 (设计 §9.1「响亮 405/503，不静默吞」).
+async fn self_check_fallback() -> Response {
+    (
+        StatusCode::SERVICE_UNAVAILABLE,
+        Json(serde_json::json!({
+            "error": "self_check_surface_closed",
+            "mode": "self-check",
+            "detail": "cutover self-check serves only /lingxi/v1/health and /lingxi/v1/self-check/probe; the business surface stays closed until the cutover journal reaches committed",
+        })),
+    )
+        .into_response()
+}
+
 /// Runtime errors of the serving loop.
 #[derive(Debug)]
 pub enum ServiceError {
@@ -9150,29 +9405,38 @@ where
         .bound_addr
         .write()
         .unwrap_or_else(|poisoned| poisoned.into_inner()) = Some(local);
-    state.memory().dream().ticker().start(state.clone());
-    state.automation().start(state.clone());
-    state.bridge().start(state.clone());
-    // 桥启动恢复（inbox/outbox/指令重投）必须抢在就绪前完成；恢复失败
-    // 响亮拒绝服务，不在半恢复状态接流量（就绪前的外部位锁故障不再
-    // 在半途中杀死桥宿主）。
-    state
-        .bridge()
-        .wait_recovery()
-        .await
-        .map_err(|error| ServiceError::Serve {
-            source: std::io::Error::other(format!("bridge recovery: {error}")),
-        })?;
-    state.conversations().start(state.clone());
-    // 对话宿主的启动恢复同理：就绪前拿到确定结果，失败响亮拒绝。
-    state
-        .conversations()
-        .wait_recovery()
-        .await
-        .map_err(|error| ServiceError::Serve {
-            source: std::io::Error::other(format!("conversation recovery: {error}")),
-        })?;
-    state.browsers().start();
+    let self_check = state.self_check();
+    // R08-T05: in self-check mode none of the background writers ever start
+    // — the dream ticker, the automation scheduler, bridge/conversation
+    // recovery (inbox/outbox redispatch is a write path), and the browser
+    // host stay down so the imported tree is byte-frozen while the probe
+    // counts are read. Their stop paths below are safe on never-started
+    // hosts (idempotent no-ops).
+    if !self_check {
+        state.memory().dream().ticker().start(state.clone());
+        state.automation().start(state.clone());
+        state.bridge().start(state.clone());
+        // 桥启动恢复（inbox/outbox/指令重投）必须抢在就绪前完成；恢复失败
+        // 响亮拒绝服务，不在半恢复状态接流量（就绪前的外部位锁故障不再
+        // 在半途中杀死桥宿主）。
+        state
+            .bridge()
+            .wait_recovery()
+            .await
+            .map_err(|error| ServiceError::Serve {
+                source: std::io::Error::other(format!("bridge recovery: {error}")),
+            })?;
+        state.conversations().start(state.clone());
+        // 对话宿主的启动恢复同理：就绪前拿到确定结果，失败响亮拒绝。
+        state
+            .conversations()
+            .wait_recovery()
+            .await
+            .map_err(|error| ServiceError::Serve {
+                source: std::io::Error::other(format!("conversation recovery: {error}")),
+            })?;
+        state.browsers().start();
+    }
     on_ready(local);
 
     // R2-F04: the serving loop enforces CONNECTION-level admission at the
@@ -9197,8 +9461,16 @@ where
     let dream_stop_at = Arc::new(std::sync::Mutex::new(None::<std::time::Instant>));
     let dream_signal_at = Arc::clone(&dream_stop_at);
     let workflows = Arc::clone(state.workflows());
+    let native_processes = state.native_processes.clone();
     let state_on_signal = state.clone();
-    let router = build_router(state);
+    // R08-T05: self-check mode serves the restricted read-only surface —
+    // every business route (read or write) is structurally absent and the
+    // fallback answers a loud 503 instead of a silent 404.
+    let router = if self_check {
+        build_self_check_router(state)
+    } else {
+        build_router(state)
+    };
     // The graceful-shutdown future consumes the stop signal and records the
     // signal instant; the drain budget watchdog is armed at THAT instant (the
     // unified from-signal budget — F03) and races the drain. Serving therefore
@@ -9258,6 +9530,27 @@ where
             }
         }
     };
+    if let Some(processes) = native_processes {
+        let remaining = dream_stop_at
+            .lock()
+            .unwrap()
+            .map(|at| dream_budget.saturating_sub(at.elapsed()))
+            .unwrap_or(dream_budget);
+        match tokio::time::timeout(remaining, processes.shutdown_all()).await {
+            Ok(receipts)
+                if receipts.iter().all(|receipt| {
+                    !matches!(
+                        receipt.outcome,
+                        procsupervisor::TerminationOutcome::CleanupTimedOut
+                    )
+                }) => {}
+            _ => {
+                return outcome.map(|_| ServeOutcome {
+                    drain_timed_out: true,
+                })
+            }
+        }
+    }
     knowledge_worker
         .wait_worker_stopped()
         .await
@@ -9612,7 +9905,7 @@ mod tests {
                 "serverVersion": server_version(),
                 "wireProtocolMin": 1,
                 "wireProtocolMax": 1,
-                "dataEpoch": 1
+                "dataEpoch": 2
             })
         );
     }

@@ -576,16 +576,23 @@ async fn bridge_wechat_qrcode_create_reports_external_failure() {
 #[tokio::test]
 async fn bridge_settings_receipt_and_rich_streaming_toggles_persist() {
     let server = boot("toggles").await;
-    for (field, value) in [("receiptEnabled", false), ("richStreamingEnabled", true)] {
-        let (status, body) = server
-            .call(
-                "POST",
-                "/lingxi/v1/bridge/settings",
-                Some(json!({ field: value })),
-            )
-            .await;
-        assert_eq!(status, 200, "{body}");
-        assert_eq!(body[field], json!(value), "{body}");
+    // 两个开关各自双向写入并从真实响应回读；rich/receipt 源码默认均为 true，
+    // false 方向才是可区分默认的保存证明（bridge_routes.rs:204）。
+    for (field, first, second) in [
+        ("receiptEnabled", false, true),
+        ("richStreamingEnabled", true, false),
+    ] {
+        for value in [first, second] {
+            let (status, body) = server
+                .call(
+                    "POST",
+                    "/lingxi/v1/bridge/settings",
+                    Some(json!({ field: value })),
+                )
+                .await;
+            assert_eq!(status, 200, "{body}");
+            assert_eq!(body[field], json!(value), "{body}");
+        }
     }
     // 只提交无关字段（permissionMode）时既有开关保持最后写入值（同一响应回读）。
     let (status, kept) = server
@@ -596,9 +603,9 @@ async fn bridge_settings_receipt_and_rich_streaming_toggles_persist() {
         )
         .await;
     assert_eq!(status, 200, "{kept}");
-    assert_eq!(kept["receiptEnabled"], json!(false), "{kept}");
-    assert_eq!(kept["richStreamingEnabled"], json!(true), "{kept}");
-    // 非法权限模式拒绝。
+    assert_eq!(kept["receiptEnabled"], json!(true), "{kept}");
+    assert_eq!(kept["richStreamingEnabled"], json!(false), "{kept}");
+    // 非法权限模式拒绝后目标状态不变：经真实端点读回核对，不凭 400 本身推断。
     let (status, _) = server
         .call(
             "POST",
@@ -607,6 +614,24 @@ async fn bridge_settings_receipt_and_rich_streaming_toggles_persist() {
         )
         .await;
     assert_eq!(status, 400);
+    let (status, after_reject) = server
+        .call(
+            "POST",
+            "/lingxi/v1/bridge/settings",
+            Some(json!({"permissionMode": "auto"})),
+        )
+        .await;
+    assert_eq!(status, 200, "{after_reject}");
+    assert_eq!(
+        after_reject["receiptEnabled"],
+        json!(true),
+        "{after_reject}"
+    );
+    assert_eq!(
+        after_reject["richStreamingEnabled"],
+        json!(false),
+        "{after_reject}"
+    );
     server.stop().await;
 }
 

@@ -1079,6 +1079,76 @@ CREATE INDEX idx_bridge_outbox_inbox ON bridge_outbox_v1(inbox_id);
 CREATE INDEX idx_bridge_outbox_loop ON bridge_outbox_v1(loop_delivery_id);
 "#;
 
+/// R08-T04 LegacyImporter 簿记（A07/A08）：导入 run、批次与问题清单三表。
+/// 纯追加新表；不改写任何既有表。批次以 (store_class, 源文件) 为粒度，
+/// 恢复语义由 legacy_import 引擎在 importer 侧裁决（done 复核哈希后跳过、
+/// in_progress 安全重跑、同键冲突记 issue 不覆盖）。
+pub const V27_NAME: &str = "r08_legacy_import_bookkeeping";
+pub const V27_SQL: &str = r#"
+CREATE TABLE import_runs (
+    run_id TEXT PRIMARY KEY,
+    source_root TEXT NOT NULL,
+    source_root_sha256 TEXT NOT NULL,
+    state TEXT NOT NULL CHECK(state IN ('planned','running','interrupted','completed','failed')),
+    created_at_unix_ms INTEGER NOT NULL,
+    finished_at_unix_ms INTEGER
+);
+CREATE TABLE import_batches (
+    run_id TEXT NOT NULL REFERENCES import_runs(run_id),
+    batch_key TEXT NOT NULL,
+    store_class TEXT NOT NULL,
+    strategy TEXT NOT NULL CHECK(strategy IN ('convert','register','regenerable','out-of-scope')),
+    source_relpath TEXT NOT NULL,
+    source_sha256 TEXT,
+    state TEXT NOT NULL CHECK(state IN ('planned','in_progress','done','failed','skipped')),
+    rows_planned INTEGER,
+    rows_done INTEGER,
+    detail_json TEXT,
+    PRIMARY KEY (run_id, batch_key)
+);
+CREATE INDEX idx_import_batches_state ON import_batches(run_id,state);
+CREATE TABLE import_issues (
+    run_id TEXT NOT NULL REFERENCES import_runs(run_id),
+    seq INTEGER NOT NULL,
+    batch_key TEXT NOT NULL,
+    severity TEXT NOT NULL CHECK(severity IN ('info','warning','error')),
+    kind TEXT NOT NULL,
+    ref_id TEXT,
+    message TEXT NOT NULL,
+    PRIMARY KEY (run_id, seq)
+);
+"#;
+
+/// R08-T04 B3（version 28）：legacy-import 扩展收据 + 运行态登记面。
+/// - `import_run_extensions`：切片 B/C 的纯增量收据载体（legacyTrace /
+///   legacyCron / runtimeState / knowledgeEvidence / legacyPlugins），
+///   (run_id, ext_key) 幂等 upsert，收据重写时原样带出；空表时收据形状与
+///   B2 逐字节一致。
+/// - `legacy_runtime_state_registry`：8 个运行态类的键登记面——键
+///   （runId/sessionId/leaseId…）+ 源路径哈希 + 逐字节归档路径 + 原样
+///   detail_json（未知字段透传）。登记≠消费，消费端待对应任务。
+pub const V28_NAME: &str = "r08_legacy_import_extensions_registry";
+pub const V28_SQL: &str = r#"
+CREATE TABLE import_run_extensions (
+    run_id TEXT NOT NULL REFERENCES import_runs(run_id),
+    ext_key TEXT NOT NULL,
+    payload_json TEXT NOT NULL,
+    updated_at_unix_ms INTEGER NOT NULL,
+    PRIMARY KEY (run_id, ext_key)
+);
+CREATE TABLE legacy_runtime_state_registry (
+    run_id TEXT NOT NULL REFERENCES import_runs(run_id),
+    store_class TEXT NOT NULL,
+    entry_key TEXT NOT NULL,
+    source_relpath TEXT NOT NULL,
+    source_sha256 TEXT NOT NULL,
+    archived_relpath TEXT NOT NULL,
+    detail_json TEXT,
+    registered_at_unix_ms INTEGER NOT NULL,
+    PRIMARY KEY (run_id, store_class, entry_key)
+);
+"#;
+
 pub const MIGRATIONS: &[Migration] = &[
     Migration {
         version: 1,
@@ -1209,6 +1279,16 @@ pub const MIGRATIONS: &[Migration] = &[
         version: 26,
         name: V26_NAME,
         sql: V26_SQL,
+    },
+    Migration {
+        version: 27,
+        name: V27_NAME,
+        sql: V27_SQL,
+    },
+    Migration {
+        version: 28,
+        name: V28_NAME,
+        sql: V28_SQL,
     },
 ];
 

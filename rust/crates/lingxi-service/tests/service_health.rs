@@ -215,7 +215,7 @@ async fn health_check_over_real_loopback() {
         "serverVersion": env!("CARGO_PKG_VERSION"),
         "wireProtocolMin": 1,
         "wireProtocolMax": 1,
-        "dataEpoch": 1
+        "dataEpoch": 2
     });
     assert_eq!(json, expected, "health payload must be exactly minimal");
 
@@ -312,6 +312,7 @@ async fn locked_instance_and_local_token_share_one_start_identity() {
         &layout,
         ServiceDeps::default(),
         &guard,
+        false,
     )
     .await;
     assert!(
@@ -328,6 +329,7 @@ async fn locked_instance_and_local_token_share_one_start_identity() {
         &layout,
         ServiceDeps::default(),
         &guard,
+        false,
     )
     .await
     .expect("boot with locked identity");

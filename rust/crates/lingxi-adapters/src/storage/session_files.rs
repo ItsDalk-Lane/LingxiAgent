@@ -70,11 +70,14 @@ impl StorageKind {
 }
 
 /// 现役 status：`available` / `missing` / `expired`。
+/// R08-T04 追加 `broken`（A07 legacy 附件坏因：payload 缺失/截断仍登记行、
+/// 响亮报告，绝不以 available 冒充可读）。
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SessionFileStatus {
     Available,
     Missing,
     Expired,
+    Broken,
 }
 
 impl SessionFileStatus {
@@ -83,6 +86,7 @@ impl SessionFileStatus {
             SessionFileStatus::Available => "available",
             SessionFileStatus::Missing => "missing",
             SessionFileStatus::Expired => "expired",
+            SessionFileStatus::Broken => "broken",
         }
     }
 
@@ -91,6 +95,7 @@ impl SessionFileStatus {
             "available" => Ok(SessionFileStatus::Available),
             "missing" => Ok(SessionFileStatus::Missing),
             "expired" => Ok(SessionFileStatus::Expired),
+            "broken" => Ok(SessionFileStatus::Broken),
             other => Err(invalid(format!("unknown session_files.status {other:?}"))),
         }
     }

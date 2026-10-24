@@ -34,8 +34,12 @@ use lingxi_service::{
     HOME_ENV_VAR, SINGLE_WRITER_BLOCKED_MARKER, STALE_RECORD_MARKER,
 };
 
+mod cutover_orchestrator;
+mod cutover_rollback;
+mod legacy_import_runner;
+
 const USAGE: &str = r#"usage: lingxi-service [--bind <SOCKADDR>] [--home <DIR>] \
-[--config <FILE>] [--test-mode] [--network-mode <loopback|lan>] \
+[--config <FILE>] [--test-mode] [--self-check] [--network-mode <loopback|lan>] \
 [--tls-cert <ABS_PEM>] [--tls-key <ABS_PEM>] \
 [--shutdown-timeout-ms <MS>] [--max-ws-connections <N>] [--db-queue-bound <N>] \
 [--event-subscriber-queue <N>] [--event-reorder-bound <N>] [--max-subscribers <N>] \
@@ -53,6 +57,25 @@ Options:
                           plane, R05-T01).
   --test-mode             Force an isolated synthetic home under the system temp
                           dir; --home/LINGXI_HOME/--config home are ignored.
+  --self-check            R08-T05 cutover self-check mode (coordinator-only; the
+                          desktop shell NEVER sets this). The full startup chain
+                          still runs (layout -> data-epoch gate -> storage open ->
+                          single-writer instance lock), but every background
+                          writer is skipped (dream ticker, automation scheduler,
+                          bridge/conversation recovery, browser host, knowledge
+                          worker, loop recovery, cold-session cleanup) and the
+                          business HTTP surface is structurally closed: only
+                          /lingxi/v1/health and the read-only
+                          /lingxi/v1/self-check/probe endpoint (local-owner token)
+                          are served; every other route answers a loud 503
+                          self_check_surface_closed. The single stdout readiness
+                          line becomes SELF_CHECK_LISTEN addr=<addr> (deviation
+                          from design §9.1's bare port: same k=v shape as the
+                          READY line, strictly more info). Loopback-only:
+                          --network-mode lan with --self-check is a startup
+                          error. Not a serving mode for users — the write-open
+                          criterion is the cutover journal reaching committed,
+                          never this process.
   --network-mode <MODE>   loopback (default) or lan. LAN exposure is an explicit
                           opt-in: a non-loopback --bind without --network-mode lan
                           is a startup error, and even loopback requests require
@@ -205,7 +228,7 @@ fn print_version() {
         lingxi_service::server_version(),
         lingxi_protocol::handshake::WIRE_PROTOCOL_MIN_SUPPORTED,
         lingxi_protocol::handshake::WIRE_PROTOCOL_MAX_SUPPORTED,
-        lingxi_protocol::ContractVersions::R00_BASELINE.data_epoch,
+        lingxi_protocol::ContractVersions::R08_CUTOVER.data_epoch,
     );
 }
 
@@ -284,6 +307,351 @@ async fn main() -> ExitCode {
             return ExitCode::from(2);
         }
     }
+    // R08-T04：legacy-import 是离线单写者 CLI 动词——不启 tracing/服务栈，
+    // 不触网络，不绑定 legacy root。用法：
+    //   lingxi-service legacy-import --source <old-home> --target <new-home> [--resume <runId>] [--stop-after-batch <k>]
+    if raw_args.first().is_some_and(|arg| arg == "legacy-import") {
+        let mut source: Option<std::path::PathBuf> = None;
+        let mut target: Option<std::path::PathBuf> = None;
+        let mut resume: Option<String> = None;
+        let mut stop_after_batch: Option<u64> = None;
+        let mut iter = raw_args.iter().skip(1);
+        while let Some(arg) = iter.next() {
+            let Some(flag) = arg.to_str() else {
+                eprintln!("error: legacy-import: non-utf8 argument");
+                return ExitCode::from(2);
+            };
+            let value = match iter.next().and_then(|v| v.to_str()) {
+                Some(value) => value,
+                None => {
+                    eprintln!("error: legacy-import: {flag} requires a value");
+                    return ExitCode::from(2);
+                }
+            };
+            match flag {
+                "--source" => source = Some(std::path::PathBuf::from(value)),
+                "--target" => target = Some(std::path::PathBuf::from(value)),
+                "--resume" => resume = Some(value.to_string()),
+                "--stop-after-batch" => match value.parse::<u64>() {
+                    Ok(k) => stop_after_batch = Some(k),
+                    Err(_) => {
+                        eprintln!("error: legacy-import: --stop-after-batch expects a non-negative integer, got {value}");
+                        return ExitCode::from(2);
+                    }
+                },
+                _ => {
+                    eprintln!("error: legacy-import: unknown flag {flag}");
+                    return ExitCode::from(2);
+                }
+            }
+        }
+        let (Some(source), Some(target)) = (source, target) else {
+            eprintln!(
+                "usage: lingxi-service legacy-import --source <old-home> --target <new-home> [--resume <runId>] [--stop-after-batch <k>]"
+            );
+            return ExitCode::from(2);
+        };
+        // 实例互斥（批准设计⑤）：导入全程持有目标根单写者锁——同一目标根
+        // 同时只有一个 importer/服务；也是 kill -9 复核路径「running 但无
+        // 活锁持有者 → 判 interrupted」的裁决依据。持锁失败响亮退出。
+        // R08-T05（P3）：实现链已提取到 legacy_import_runner（与 migrate
+        // 动词共用）；stderr 文案与退出码逐字节保持。
+        let _target_lock = match legacy_import_runner::acquire_target_lock(&target) {
+            Ok(lock) => lock,
+            Err((code, line)) => {
+                eprintln!("{line}");
+                return ExitCode::from(code);
+            }
+        };
+        let args = lingxi_adapters::storage::legacy_import::ImportArgs {
+            source,
+            target,
+            resume,
+            stop_after_batch,
+            instance_lock_held: true,
+        };
+        return match legacy_import_runner::run_import(args).await {
+            Ok(outcome) => {
+                legacy_import_runner::print_outcome(&outcome);
+                ExitCode::SUCCESS
+            }
+            Err(failure) => {
+                eprintln!("{}", failure.line);
+                ExitCode::from(failure.code)
+            }
+        };
+    }
+    // R08-T05：migrate 是切割编排动词——十相状态机驱动（设计 §3），journal
+    // 相位是恢复唯一权威。离线单写者：不启 tracing/服务栈，不触网络，
+    // 源根零写。用法：
+    //   lingxi-service migrate --source <old-home> --target <new-home> \
+    //     --work-dir <dir> --backup-dir <dir> --pointer <file> \
+    //     [--resume <cutoverId>] [--stop-after-phase <phase>] \
+    //     [--min-avail-bytes-override <bytes>]
+    if raw_args.first().is_some_and(|arg| arg == "migrate") {
+        let mut source: Option<std::path::PathBuf> = None;
+        let mut target: Option<std::path::PathBuf> = None;
+        let mut work_dir: Option<std::path::PathBuf> = None;
+        let mut backup_dir: Option<std::path::PathBuf> = None;
+        let mut pointer: Option<std::path::PathBuf> = None;
+        let mut resume: Option<String> = None;
+        let mut stop_after_phase: Option<String> = None;
+        let mut min_avail_bytes_override: Option<u64> = None;
+        let mut iter = raw_args.iter().skip(1);
+        while let Some(arg) = iter.next() {
+            let Some(flag) = arg.to_str() else {
+                eprintln!("error: migrate: non-utf8 argument");
+                return ExitCode::from(2);
+            };
+            let value = match iter.next().and_then(|v| v.to_str()) {
+                Some(value) => value,
+                None => {
+                    eprintln!("error: migrate: {flag} requires a value");
+                    return ExitCode::from(2);
+                }
+            };
+            match flag {
+                "--source" => source = Some(std::path::PathBuf::from(value)),
+                "--target" => target = Some(std::path::PathBuf::from(value)),
+                "--work-dir" => work_dir = Some(std::path::PathBuf::from(value)),
+                "--backup-dir" => backup_dir = Some(std::path::PathBuf::from(value)),
+                "--pointer" => pointer = Some(std::path::PathBuf::from(value)),
+                "--resume" => resume = Some(value.to_string()),
+                "--stop-after-phase" => stop_after_phase = Some(value.to_string()),
+                "--min-avail-bytes-override" => match value.parse::<u64>() {
+                    Ok(n) => min_avail_bytes_override = Some(n),
+                    Err(_) => {
+                        eprintln!(
+                            "error: migrate: --min-avail-bytes-override expects a non-negative integer, got {value}"
+                        );
+                        return ExitCode::from(2);
+                    }
+                },
+                _ => {
+                    eprintln!("error: migrate: unknown flag {flag}");
+                    return ExitCode::from(2);
+                }
+            }
+        }
+        let (Some(source), Some(target), Some(work_dir), Some(backup_dir), Some(pointer)) =
+            (source, target, work_dir, backup_dir, pointer)
+        else {
+            eprintln!(
+                "usage: lingxi-service migrate --source <old-home> --target <new-home> --work-dir <dir> --backup-dir <dir> --pointer <file> [--resume <cutoverId>] [--stop-after-phase <phase>] [--min-avail-bytes-override <bytes>]"
+            );
+            return ExitCode::from(2);
+        };
+        let args = cutover_orchestrator::MigrateArgs {
+            source,
+            target,
+            work_dir,
+            backup_dir,
+            pointer,
+            resume,
+            stop_after_phase,
+            min_avail_bytes_override,
+        };
+        return match cutover_orchestrator::run_migrate(&args).await {
+            Ok(outcome) => {
+                println!(
+                    "CUTOVER_RESULT cutoverId={} phase={} outcome={} detail={}",
+                    outcome.cutover_id, outcome.phase, outcome.outcome, outcome.detail
+                );
+                ExitCode::SUCCESS
+            }
+            Err(failure) => {
+                eprintln!("{}", failure.line);
+                ExitCode::from(failure.code)
+            }
+        };
+    }
+    // R08-T06：rollback 回滚编排动词——九相状态机（T06_DESIGN §9），独立
+    // journal（rollback-journal.json），migrate 本体零改动。离线单写者：
+    // 不启 tracing/服务栈，双侧根保留。用法：
+    //   lingxi-service rollback --pointer <file> --old-root <dir> --new-root <dir> \
+    //     --work-dir <dir> --backup-dir <dir> --delta-out <dir> \
+    //     --old-stack-launcher <launch.js> --old-stack-cwd <dir> \
+    //     [--resume <rollbackId>] [--stop-after-phase <phase>]
+    if raw_args.first().is_some_and(|arg| arg == "rollback") {
+        let mut pointer: Option<std::path::PathBuf> = None;
+        let mut old_root: Option<std::path::PathBuf> = None;
+        let mut new_root: Option<std::path::PathBuf> = None;
+        let mut work_dir: Option<std::path::PathBuf> = None;
+        let mut backup_dir: Option<std::path::PathBuf> = None;
+        let mut delta_out: Option<std::path::PathBuf> = None;
+        let mut old_stack_launcher: Option<std::path::PathBuf> = None;
+        let mut old_stack_cwd: Option<std::path::PathBuf> = None;
+        let mut resume: Option<String> = None;
+        let mut stop_after_phase: Option<String> = None;
+        let mut iter = raw_args.iter().skip(1);
+        while let Some(arg) = iter.next() {
+            let Some(flag) = arg.to_str() else {
+                eprintln!("error: rollback: non-utf8 argument");
+                return ExitCode::from(2);
+            };
+            let value = match iter.next().and_then(|v| v.to_str()) {
+                Some(value) => value,
+                None => {
+                    eprintln!("error: rollback: {flag} requires a value");
+                    return ExitCode::from(2);
+                }
+            };
+            match flag {
+                "--pointer" => pointer = Some(std::path::PathBuf::from(value)),
+                "--old-root" => old_root = Some(std::path::PathBuf::from(value)),
+                "--new-root" => new_root = Some(std::path::PathBuf::from(value)),
+                "--work-dir" => work_dir = Some(std::path::PathBuf::from(value)),
+                "--backup-dir" => backup_dir = Some(std::path::PathBuf::from(value)),
+                "--delta-out" => delta_out = Some(std::path::PathBuf::from(value)),
+                "--old-stack-launcher" => {
+                    old_stack_launcher = Some(std::path::PathBuf::from(value))
+                }
+                "--old-stack-cwd" => old_stack_cwd = Some(std::path::PathBuf::from(value)),
+                "--resume" => resume = Some(value.to_string()),
+                "--stop-after-phase" => stop_after_phase = Some(value.to_string()),
+                _ => {
+                    eprintln!("error: rollback: unknown flag {flag}");
+                    return ExitCode::from(2);
+                }
+            }
+        }
+        let (
+            Some(pointer),
+            Some(old_root),
+            Some(new_root),
+            Some(work_dir),
+            Some(backup_dir),
+            Some(delta_out),
+            Some(old_stack_launcher),
+            Some(old_stack_cwd),
+        ) = (
+            pointer,
+            old_root,
+            new_root,
+            work_dir,
+            backup_dir,
+            delta_out,
+            old_stack_launcher,
+            old_stack_cwd,
+        )
+        else {
+            eprintln!(
+                "usage: lingxi-service rollback --pointer <file> --old-root <dir> --new-root <dir> --work-dir <dir> --backup-dir <dir> --delta-out <dir> --old-stack-launcher <launch.js> --old-stack-cwd <dir> [--resume <rollbackId>] [--stop-after-phase <phase>]"
+            );
+            return ExitCode::from(2);
+        };
+        let args = cutover_rollback::RollbackArgs {
+            pointer,
+            old_root,
+            new_root,
+            work_dir,
+            backup_dir,
+            delta_out,
+            old_stack_launcher,
+            old_stack_cwd,
+            resume,
+            stop_after_phase,
+        };
+        return match cutover_rollback::run_rollback(&args).await {
+            Ok(outcome) => {
+                println!(
+                    "ROLLBACK_RESULT rollbackId={} phase={} outcome={} detail={}",
+                    outcome.id, outcome.phase, outcome.outcome, outcome.detail
+                );
+                ExitCode::SUCCESS
+            }
+            Err(failure) => {
+                eprintln!("{}", failure.line);
+                ExitCode::from(failure.code)
+            }
+        };
+    }
+    // R08-T06：reforward 再前进编排动词——mode A 快回指（默认，J4）/
+    // mode B 恢复重导入（--recover-new-root）。独立 journal
+    // （reforward-journal.json），只读消费 rollback journal 的 committed 事实。
+    // 用法：
+    //   lingxi-service reforward --pointer <file> --old-root <dir> --new-root <dir> \
+    //     --work-dir <dir> [--recover-new-root --backup-dir <dir> \
+    //     --delta-package <dir> [--target <dir>]] \
+    //     [--resume <reforwardId>] [--stop-after-phase <phase>]
+    if raw_args.first().is_some_and(|arg| arg == "reforward") {
+        let mut pointer: Option<std::path::PathBuf> = None;
+        let mut old_root: Option<std::path::PathBuf> = None;
+        let mut new_root: Option<std::path::PathBuf> = None;
+        let mut work_dir: Option<std::path::PathBuf> = None;
+        let mut backup_dir: Option<std::path::PathBuf> = None;
+        let mut delta_package: Option<std::path::PathBuf> = None;
+        let mut target: Option<std::path::PathBuf> = None;
+        let mut recover_new_root = false;
+        let mut resume: Option<String> = None;
+        let mut stop_after_phase: Option<String> = None;
+        let mut iter = raw_args.iter().skip(1);
+        while let Some(arg) = iter.next() {
+            let Some(flag) = arg.to_str() else {
+                eprintln!("error: reforward: non-utf8 argument");
+                return ExitCode::from(2);
+            };
+            if flag == "--recover-new-root" {
+                recover_new_root = true;
+                continue;
+            }
+            let value = match iter.next().and_then(|v| v.to_str()) {
+                Some(value) => value,
+                None => {
+                    eprintln!("error: reforward: {flag} requires a value");
+                    return ExitCode::from(2);
+                }
+            };
+            match flag {
+                "--pointer" => pointer = Some(std::path::PathBuf::from(value)),
+                "--old-root" => old_root = Some(std::path::PathBuf::from(value)),
+                "--new-root" => new_root = Some(std::path::PathBuf::from(value)),
+                "--work-dir" => work_dir = Some(std::path::PathBuf::from(value)),
+                "--backup-dir" => backup_dir = Some(std::path::PathBuf::from(value)),
+                "--delta-package" => delta_package = Some(std::path::PathBuf::from(value)),
+                "--target" => target = Some(std::path::PathBuf::from(value)),
+                "--resume" => resume = Some(value.to_string()),
+                "--stop-after-phase" => stop_after_phase = Some(value.to_string()),
+                _ => {
+                    eprintln!("error: reforward: unknown flag {flag}");
+                    return ExitCode::from(2);
+                }
+            }
+        }
+        let (Some(pointer), Some(old_root), Some(new_root), Some(work_dir)) =
+            (pointer, old_root, new_root, work_dir)
+        else {
+            eprintln!(
+                "usage: lingxi-service reforward --pointer <file> --old-root <dir> --new-root <dir> --work-dir <dir> [--recover-new-root --backup-dir <dir> --delta-package <dir> [--target <dir>]] [--resume <reforwardId>] [--stop-after-phase <phase>]"
+            );
+            return ExitCode::from(2);
+        };
+        let args = cutover_rollback::ReforwardArgs {
+            pointer,
+            old_root,
+            new_root,
+            work_dir,
+            backup_dir,
+            delta_package,
+            target,
+            recover_new_root,
+            resume,
+            stop_after_phase,
+        };
+        return match cutover_rollback::run_reforward(&args).await {
+            Ok(outcome) => {
+                println!(
+                    "REFORWARD_RESULT reforwardId={} phase={} outcome={} detail={}",
+                    outcome.id, outcome.phase, outcome.outcome, outcome.detail
+                );
+                ExitCode::SUCCESS
+            }
+            Err(failure) => {
+                eprintln!("{}", failure.line);
+                ExitCode::from(failure.code)
+            }
+        };
+    }
     // R02-T07 logging pipeline: ONE global subscriber whose writer redacts
     // every event line (mirror of the incumbent log-redactor semantics)
     // and fans out to stderr plus (once the data home is known) a
@@ -330,6 +698,21 @@ async fn main() -> ExitCode {
             return ExitCode::from(2);
         }
     };
+
+    // R08-T05: self-check is loopback-only by construction. An explicit
+    // `--network-mode lan` conflicts and is refused loudly at parse time —
+    // the restricted probe surface must never become a LAN-reachable
+    // counting oracle while the cutover journal is uncommitted.
+    if cli.self_check
+        && matches!(cli.network_mode.as_deref(), Some(mode) if !mode.eq_ignore_ascii_case("loopback"))
+    {
+        eprintln!(
+            "error: --self-check requires loopback networking; --network-mode lan is refused \
+             (self-check probe surface is coordinator-local only)"
+        );
+        return ExitCode::from(2);
+    }
+    let self_check = cli.self_check;
 
     // ---- composition-root dependency wiring (R02-T07 resource limits) ----
     // Every limit has a documented production default; the CLI can only
@@ -651,7 +1034,7 @@ async fn main() -> ExitCode {
             .unwrap_or(0);
         match epoch::coordinate_data_epoch_startup(
             &layout.home,
-            u64::from(lingxi_protocol::ContractVersions::R00_BASELINE.data_epoch),
+            u64::from(lingxi_protocol::ContractVersions::R08_CUTOVER.data_epoch),
             lingxi_service::server_version(),
             now_ms,
         ) {
@@ -681,14 +1064,17 @@ async fn main() -> ExitCode {
     // startup error (exit 2), never an auth-less serve.
     let home_display = layout.home.display().to_string();
     let source_display = config.home_source.to_string();
-    let state =
-        match ServiceState::bootstrap_with_locked_instance(config, &layout, deps, &guard).await {
-            Ok(state) => state,
-            Err(err) => {
-                eprintln!("error: {err}");
-                return ExitCode::from(2);
-            }
-        };
+    let state = match ServiceState::bootstrap_with_locked_instance(
+        config, &layout, deps, &guard, self_check,
+    )
+    .await
+    {
+        Ok(state) => state,
+        Err(err) => {
+            eprintln!("error: {err}");
+            return ExitCode::from(2);
+        }
+    };
     tracing::info!(
         local_token_file = %state.auth().local_token_path().display(),
         run_database = %state.storage().db_path().display(),
@@ -755,9 +1141,21 @@ async fn main() -> ExitCode {
                 "instance record published (atomic write)"
             );
             // Readiness contract: exactly one stdout line, machine-parseable.
-            println!(
-                "LINGXI_SERVICE_READY addr={addr} home={home_display} source={source_display}"
-            );
+            // R08-T05 self-check mode REPLACES the READY line with
+            // SELF_CHECK_LISTEN — never a second line, so existing READY-line
+            // parsers on the normal path see zero change. (Deviation from
+            // design §9.1's `SELF_CHECK_LISTEN <port>`: k=v addr= form,
+            // same shape as READY, strictly more information, same
+            // discoverability — recorded in PROGRESS-t05.)
+            if self_check {
+                println!(
+                    "SELF_CHECK_LISTEN addr={addr} home={home_display} source={source_display}"
+                );
+            } else {
+                println!(
+                    "LINGXI_SERVICE_READY addr={addr} home={home_display} source={source_display}"
+                );
+            }
             use std::io::Write as _;
             let _ = std::io::stdout().flush();
         },
