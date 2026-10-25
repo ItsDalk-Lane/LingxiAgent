@@ -176,3 +176,10 @@ desktop/native/LingxiSpeechPermissions/build/
 # 照 R02/R06 先例保留本机取证，提交只带回执与结果 JSON，复核以本机原件为准。
 /artifacts/rust-tauri/R07/T08/lan-layer-diagnosis-g2/isolated/
 /artifacts/rust-tauri/R07/T12/verify-r07-*/candidate-source-*.json
+
+# R08 重型可再生证据本地化（沿 R05/R06/R07 先例）：各套件的全仓候选差异
+# gzip 快照（单份最大 2.75GB，合计约 66GB）与 verify-stage 全仓哈希清单
+# （candidate-source-*.json，可由对应提交重生）不入库；回执与结果 JSON 照常
+# 入库，复核以本机原件为准。
+/artifacts/rust-tauri/R08/**/candidate.diff.gz
+/artifacts/rust-tauri/R08/**/candidate-source-*.json
