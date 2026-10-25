@@ -17,7 +17,8 @@
 | D-1 | 会话标题投影：旧内核对无题会话返回 `null`（UI 走回退显示），Rust 列表以 id 干（"ab-real-alpha"）为题 | UI 绑定（列表投影） | 已知差异（记录） | 差异报告披露；产品裁决（保留/对齐）移交 post-R08 |
 | D-2 | B 腿 `sessions/new` 404：迁移根无 agents/ 名册（Register 类不随迁，T04 设计）→ `agent not found: a1` | 迁移设计 | 已知语义（记录） | 补偿操作=正式入口补建同 id agent（T06 D1 已证）；T07 对照：真实切换演练须含此步骤（入 runbook/交接） |
 | D-3 | A 腿 `sessions/switch` 500：旧栈无模型配置时拒开会话运行时（环境前置，A13 模型替身未注入 A 腿）| 环境前置 | recorded | 完整 A/B（含聊天回合）需旧格式 models.json 注入——移交 post-R08 扩腿 |
-| D-4 | B 侧 rename 标题在后续重载中回落为 id 干 + 任务序列中会话数 3→2（archive 任务因找不到重命名会话而 B-failed）| 待定位（rust 列表投影 vs rename 持久化竞态） | **未决差异（如实 B-failed）** | 未在 R08 内修复；差异证据 t07-ab-drill-final-05（B observations）；移交 post-R08 定位（首疑 studio-list 标题计算与 rename 写入字段不一致） |
+| D-4 | ~~B 侧 rename 标题跨重载回落~~ **已推翻（2026-10-24）**：探针 t10-d4-probe-01 证明服务端 rename→DB 持久化→studio-list 重载（0/500/2000ms）全部返回新标题——服务端无缺陷。套件内 B-failed 真因=任务序列级联（rename 目标与 boundary 固定 byTitle 假设冲突），套件已修（t10-ab-drill-d04-01 起 boundary 目标与 rename 目标严格不相交） | 套件缺陷（已修） | **改判关闭** | 探针 t10-d4-probe-01；套件修复 t10-ab-drill-d04-01 |
+| D-7 | **新发现**：switch 投影 permissionMode——旧栈归一化默认 mode（A 腿无模型 500 不可读，D-3 同根）；Rust 透传 DB 原值（无显式模式的迁移会话=null） | 服务契约（switch 投影语义） | 未决差异（如实） | t10-ab-drill-d04-01（B: status 200 modeValue null）；post-R08 裁决（归一化 vs 透传） |
 | D-5 | A/B 双腿 `sessions.create` 皆 false：A=D-3 同因；B=D-2 同因 | 环境前置 | recorded | 同 D-2/D-3 |
 
 ## A14 失败不靠隐藏消失（证据）

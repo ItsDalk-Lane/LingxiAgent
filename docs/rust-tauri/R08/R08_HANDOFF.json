@@ -1,23 +1,25 @@
 {
   "schema": "lingxi.r08.handoff.v1",
-  "generatedAt": "2026-10-23",
+  "generatedAt": "2026-10-25",
   "gitHead": "86840d1700397d3dd620a41f2b884df4cddd5cc2",
   "branch": "codex/rust-tauri-migration",
   "uncommittedWorkspaceIsSoleCopy": true,
-  "stageOutcome": "CLOSED_HONEST_NOT_FULLY_GREEN: implemented items READY_FOR_REVIEW; 124/126 supplemental leaves required_behavior_pending; gate registered and run (see verify-r08-final-01)",
+  "stageOutcome": "CLOSED_HONEST_NOT_FULLY_GREEN: implemented items READY_FOR_REVIEW; verify-r08-final-15 = commands 17/17 PASS, scenarios 16/16 PASS, supplemental leaves 20 full_original_behavior PASS / 106 required_behavior_pending (BLOCKED by gate rule; R09+ authorization needed — R08_DECISION_BRIEF.md path 2). a05 passed via native keyboard in gates 14 and 15 (hideMechanism=keyboard, quitMechanism=keyboard, manualMode=false) after host-side authorization; a06 same-bundle focus defect named and fixed (t20-a06-focusfix-01 green); overall FAIL is due solely to the 106 pending leaves",
   "deliverables": {
     "report": "docs/rust-tauri/R08/R08_REPORT.md",
     "runbook": "docs/rust-tauri/R08/T06_ROLLBACK_RUNBOOK.md",
     "t06Review": "docs/rust-tauri/R08/T06_REVIEW.md (PASS-with-MINORS B0/M0/N5; rev-t06-* reruns green)",
     "uiDifferenceReport": "docs/rust-tauri/R08/T07_UI_DIFFERENCE_REPORT.md",
     "featureParityResults": "docs/rust-tauri/R08/FEATURE_PARITY_RESULTS.json",
-    "stageMap": "rust/crates/xtask/src/stage_maps/R08.json (18 commands / 16 scenarios / 126 leaves: 2 full_original_behavior PASS (rename/list, per-assertion dedicated cases machine-checked), 124 required_behavior_pending; 9 further leaves carry tested positive-path pins in evidenceRequired notes — non-gating)",
+    "stageMap": "rust/crates/xtask/src/stage_maps/R08.json (18 commands / 126 leaves: 20 full_original_behavior PASS (D02: pin/reorder/rename/list/messages-page/history-overview/session-summary/view-archived/restore-archived/permanent-delete/cross-search/archive-workspace/auth-folders view/add/remove/set/memory view/memory set; D03: mcp-connection-status; D04: set-default-permission), 106 pending)",
     "migrationCommand": "lingxi-service migrate (unchanged this stage)",
     "rollbackCommands": [
       "lingxi-service rollback",
       "lingxi-service reforward"
     ],
-    "evidenceRoot": "artifacts/rust-tauri/R08/ (all receipts via r08_run.py; final gate at verify-r08-final-01)"
+    "evidenceRoot": "artifacts/rust-tauri/R08/ (all receipts via r08_run.py; full gates verify-r08-final-01..15, final=15; single-suite proofs t20-a06-focusfix-01, t20-d3-standin-instr-01)",
+    "a06UnlockGuide": "docs/rust-tauri/R08/A06_HOST_AUTOMATION_UNLOCK.md (host TCC grant steps + six-level diagnosis history; 2026-10-25 resolution: a05 native keyboard PASS in gate 14; a06 same-bundle frontmost ambiguity documented with CDP document.hasFocus() guard fix)",
+    "decisionBrief": "docs/rust-tauri/R08/R08_DECISION_BRIEF.md (path ① host unlock — taken by user, effective; path ② 106-leaf R09+ authorization — still open)"
   },
   "interfaceVersions": {
     "rustBinarySha256": "c15e8096bba379f170f0be350eff529ae7aa8306f7f8ab64795384d0b7987632",
@@ -33,7 +35,12 @@
     "F-T07-1 real Pi session format import (legacy_import parser+converter)",
     "F-T07-2 client route translation + connection gate",
     "N2/N3 T06 review handovers (dead block, P6 on old-root reads)",
-    "xtask candidate snapshot tolerates worktree deletions"
+    "xtask candidate snapshot tolerates worktree deletions",
+    "PPG-2 session-root wiring (lib.rs): preview-mode run-time root refresh now lands on the read tool's access instance; A05 suite green in-gate",
+    "archive-chain round: archived-list 500 (preview tolerance), listArchivedSessions unwrap ({sessions:[…]}), /api/sessions/restore translation + bare-sessionId fallback, switch permissionMode null->ask normalize",
+    "a06 harness: System Events frontmost-by-pid is answered per bundle for two instances of the same Electron bundle (gate14: Cmd+Q for B quit A); quitClientByPid now verifies target renderer document.hasFocus() via CDP before any keystroke, never sends a blind Cmd+Q, falls back to disclosed sigterm-graceful, and hard-asserts client-a-alive-after-b",
+    "T06 drills d1/d3 + stand-in: abort prints err.cause and stand-in exit status, stand-in exit is journaled, /journal read uses node:http agent:false (no keep-alive reuse) with one logged retry only while the stand-in is alive, stand-in crashes persist standin-crash.log (exit 70), /journal tolerates malformed lines and reports malformedLines (gate14 d3 flake: fetch failed with no cause captured; green in gates 11-13 and t20-d3-standin-instr-01)",
+    "t07 A/B driver reaps the stub provider at normal shutdown (previously leaked one ppid=1 node per run)"
   ],
   "openItems": {
     "PPG": [
@@ -44,16 +51,25 @@
     "differences": [
       "D-1 title projection",
       "D-2 agent roster after migration",
-      "D-4 rust rename-title reload regression (unresolved)"
+      "D-4 overturned (suite target-selection cascade; server-side rename verified correct, t10-d4-probe-01)",
+      "D-6 overturned (child-session 409 cleanup semantics correct)",
+      "D-7 fixed (switch projection permissionMode null→ask normalized)",
+      "D-8 A-leg explicit delete leg",
+      "D-9 cleanup mtime vs archived_at",
+      "D-10 in-session find /api/sessions/find?q= unmigrated to Rust"
     ],
-    "pendingLeaves": 117,
-    "deferredSuites": "D-3 full chat A/B needs old-stack model standin injection"
+    "pendingLeaves": 106,
+    "deferredSuites": "D-3 full chat A/B needs old-stack model standin injection",
+    "envReds": [
+      "a05: resolved — native keyboard hide/quit PASS in verify-r08-final-14 after host-side authorization; manual-assist mode (R08_A05_MANUAL=1) kept as fallback",
+      "a06: second same-bundle Electron instance cannot be given keyboard focus via System Events on this host (focus lands on the first instance); B quits via disclosed sigterm-graceful, A via real keyboard — platform limitation, semantics (zero-touch isolation) fully verified"
+    ]
   },
   "r09Constraints": [
     "不得重改模型协议或数据架构",
     "以 a16-versions.json 为对照基线",
-    "117 pending 叶同门补证转绿"
+    "106 pending 叶同门补证转绿"
   ],
-  "stageMap": "rust/crates/xtask/src/stage_maps/R08.json (18 commands / 16 scenarios / 126 leaves: 2 full_original_behavior PASS (rename/list, per-assertion dedicated cases machine-checked), 124 required_behavior_pending; 9 further leaves carry tested positive-path pins in evidenceRequired notes — non-gating)",
+  "stageMap": "rust/crates/xtask/src/stage_maps/R08.json (18 commands / 126 leaves: 20 full_original_behavior PASS (D02: pin/reorder/rename/list/messages-page/history-overview/session-summary/view-archived/restore-archived/permanent-delete/cross-search/archive-workspace/auth-folders view/add/remove/set/memory view/memory set; D03: mcp-connection-status; D04: set-default-permission), 106 pending)",
   "candidateBindingCaveat": "candidateDiffSha256 (r08_run.py) covers tracked files only; F-T07-1 fix lives in untracked legacy_import/ dirs — red->green binding for it is carried by per-file sourceBindings (verified in R08_FINAL_REVIEW M4)"
 }
