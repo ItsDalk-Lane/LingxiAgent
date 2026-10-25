@@ -1,0 +1,8 @@
+before rename: sess-corrupt-0005 | title: "损坏尾行会话" | revision: r808-e0
+DB before: {"session_id":"sess-corrupt-0005","title":"损坏尾行会话"}
+rename status: 200 {"ok":true}
+DB after: {"session_id":"sess-corrupt-0005","title":"D4-PROBE-RENAMED"}
+list after 0ms: title="D4-PROBE-RENAMED" revision=r808-e0
+list after 500ms: title="D4-PROBE-RENAMED" revision=r808-e0
+list after 2000ms: title="D4-PROBE-RENAMED" revision=r808-e0
+D4_PROBE_DONE

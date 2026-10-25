@@ -1,0 +1,9 @@
+
+running 2 tests
+test a01_old_client_events_and_history_come_from_rust_single_source ... ok
+test a02_reconnect_resume_replays_without_any_reexecution ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.72s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.64s
+     Running tests/r08_t01_a01_a02_ws.rs (rust/target/debug/deps/r08_t01_a01_a02_ws-c4528ffe6116a86d)

@@ -1,0 +1,8 @@
+
+running 1 test
+test env_deps_auth_contract_signals_managed_and_cache_lifecycle ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.54s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.57s
+     Running tests/r08_t01_env_deps.rs (rust/target/debug/deps/r08_t01_env_deps-8239272b2e606edb)

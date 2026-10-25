@@ -1,0 +1,37 @@
+FAIL stub provider ready :: null
+PASS fixture gen
+PASS root-a prepared (knowledge integrity ok) :: ok
+PASS root-b migrated (T05 path)
+PASS kernel A (node) ready :: port=51528
+FAIL kernel B (rust) ready :: exit=2
+PASS suite ran on A (observations present) :: vitest exit=0
+FAIL suite ran on B (observations present) :: vitest exit=null
+FAIL [identity] B-failed :: {"A":{"status":200,"hasUserId":true,"keys":["authState","capabilities","connectionKind","credentialKind","executionBoundary","label","officialServiceKind","platformAccountId","serverId","serverNodeId","serverNodeKind","serverNodeTransport"]}}
+FAIL [sessions.list] B-failed :: {"A":{"count":3,"titles":[null,null,null],"pinned":0}}
+FAIL [sessions.switch] B-failed :: {"A":{"focused":false,"messages":null}}
+FAIL [sessions.rename] B-failed :: {"A":{"ok":true,"persisted":true}}
+FAIL [sessions.pin] B-failed :: {"A":{"pinA":true,"pinB":true,"pinnedCount":0,"reorder":false,"reorderedReversed":true,"unpinA":true,"unpinB":true,"pinnedFinal":0}}
+FAIL [sessions.create] B-failed :: {"A":{"created":false,"delta":0}}
+FAIL [sessions.archive] B-failed :: {"A":{"inArchive":true,"goneFromVisible":true,"restored":true,"backVisible":true,"deleted":"skipped-not-restorable","stillArchived":true}}
+FAIL [sessions.maintenance] B-failed :: {"A":{"cleanupDeletedIsNumber":true,"sweptIsNumber":true}}
+FAIL [sessions.capabilities] B-failed :: {"A":{"ok":false}}
+FAIL [sessions.todos] B-failed :: {"A":{"complete":true,"cancel":true,"dismiss":true}}
+FAIL [permissions.default] B-failed :: {"A":{"mode":"auto","attempts":1}}
+FAIL [preferences.appearance] B-failed :: {"A":{"getBefore":true,"putStatus":200,"themeAfter":"t07-ab-theme"}}
+FAIL [error-path.unauthorized] B-failed :: {"A":{"status":403,"rejected":true}}
+FAIL [error-path.not-found] B-failed :: {"A":{"status":403,"explicitError":true}}
+FAIL [drift-guard] B-failed :: {"A":{"count":2,"titles":["T07-AB-renamed",null]}}
+FAIL [leaf.rename.negative] B-failed :: {"A":{"emptyRejected":true,"emptyStatus":400,"invalidRejected":true,"invalidStatus":403}}
+FAIL [leaf.pin.negative] B-failed :: {"A":{"rejected":true,"status":403}}
+FAIL [leaf.todos.negative] B-failed :: {"A":{"rejected":true,"status":403}}
+FAIL [leaf.cleanup.boundary] B-failed :: {"A":{"keptDeletedIsNumber":true,"expiredDeleted":false,"freshKept":true,"purgedOk":false,"expiringGone":false}}
+FAIL [leaf.list.fields] B-failed :: {"A":{"hasKeys":true,"hasRevision":true,"hasOwner":true,"hasSummaryOrBadge":true,"keys":["agentDeleted","agentId","agentName","continuationAvailable","cwd","deletedAt","firstMessage","forkedFrom","hasSummary","loopStatus","messageCount","modelId","modelProvide
+FAIL [leaf.permissions.read-idempotent] B-failed :: {"A":{"identical":true,"mode":"auto"}}
+FAIL [leaf.mcp.state] B-failed :: {"A":{"ok":true,"status":200,"enabledIsBool":true,"connectorsIsArray":true,"deferFlag":true,"agentScoped":true}}
+FAIL [leaf.mcp.state.unauthorized] B-failed :: {"A":{"status":403,"rejected":true}}
+FAIL [leaf.permission.session-mode] B-failed :: {"A":{"modePresent":false,"modeValue":null,"status":500,"idempotent":false}}
+FAIL [leaf.permission.default-set] B-failed :: {"A":{"putStatus":200,"roundTrip":true,"badRejected":true,"badStatus":400}}
+FAIL [leaf.archive.negative] B-failed :: {"A":{"archiveRejected":true,"archiveStatus":403,"restoreRejected":true,"restoreStatus":403,"cleanupBadRejected":false,"cleanupBadStatus":200}}
+FAIL harness integrity: both suites produced observations
+AB_RESULT tasks=26 parity=0 differs=0 recorded=0 failedA=0 failedB=26 out=/private/tmp/t12-ab-d3-01/out
+T07 AB FAILURES: 4

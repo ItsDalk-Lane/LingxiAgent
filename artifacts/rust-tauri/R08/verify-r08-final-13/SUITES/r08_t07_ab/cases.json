@@ -1,0 +1,227 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "cases": [
+  {
+   "case": "ab::sessions.list.count",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.list.parity",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.pin.pin",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.pin.unpin",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.rename.ok",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.rename.persisted",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::archive-workspace.invalid-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::archive-workspace.recoverable",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::archive.negative.rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::archive.positive-cycle",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::archived-delete.file-and-lifecycle-cleared",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::archived-delete.unrecoverable",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::auth-folders.add",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::auth-folders.invalid-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::auth-folders.read",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::auth-folders.remove",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::auth-folders.set",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::list.revision-field-present",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::list.summary-or-badge-present",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::list.unauthorized-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::mcp.state.shape",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::mcp.state.unauthorized-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::permission.default-invalid-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::permission.default-roundtrip",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::pin-order.duplicate-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::pin-order.reorder-applies",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::pin.invalid-session.explicit-error",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::pin.state-cleared",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::pin.state-projected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::read.history-page",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::read.invalid-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::read.overview",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::read.summary",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::rename.empty-title.rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::rename.invalid-session.explicit-error",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::search.content-hit",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::search.empty-query-empty-result",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  }
+ ]
+}

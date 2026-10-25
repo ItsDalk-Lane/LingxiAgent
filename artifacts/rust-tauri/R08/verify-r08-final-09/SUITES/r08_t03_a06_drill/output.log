@@ -1,0 +1,43 @@
+[PASS] freshness: 构建产物新鲜（main/preload/src 均无新于 dist-renderer 的改动；实测 main=0 preload=0 src=0）
+[journal] svc-home {"svcHome":"/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-svc-whnHSY"}
+[journal] stub {"pid":96298,"port":61037}
+[journal] stamp {"stamp":{"committedDataEpoch":2,"epoch":2,"lastVersion":"0.0.0","minimumReaderEpoch":2,"schemaVersion":2,"updatedAt":"2026-10-24T12:30:25.860Z"}}
+[PASS] stamp: 服务自盖章 data-epoch.json schemaVersion===2（实测 2）
+[journal] service-spawn {"pid":96300}
+[journal] rust-service {"pid":96300,"port":61039,"baseUrl":"http://127.0.0.1:61039"}
+[PASS] rust-service: rust service pid 96300 alive
+[journal] electron-A {"pid":96301,"cdpPort":9520,"home":"/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliA-Z4EQGk"}
+[journal] conn-info-A {"connInfo":{"port":61039,"token":"<redacted>","serverNodeKind":"lingxi-service","serverNodeTransport":"http","host":"127.0.0.1"}}
+[PASS] remote-mode-A: 客户端 A GSCI 确证 remote 分支（host/port/kind/transport；实测 {"port":61039,"token":"<redacted>","serverNodeKind":"lingxi-service","serverNodeTransport":"http","host":"127.0.0.1"}）
+[PASS] zero-touch-instance-A: 客户端 A HOME 下无 lingxi-service/instance.json（remote 零接触）
+[journal] electron-B {"pid":96524,"cdpPort":10020,"home":"/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliB-croGKa"}
+[journal] conn-info-B {"connInfo":{"port":61039,"token":"<redacted>","serverNodeKind":"lingxi-service","serverNodeTransport":"http","host":"127.0.0.1"}}
+[PASS] remote-mode-B: 客户端 B GSCI 确证 remote 分支（host/port/kind/transport；实测 {"port":61039,"token":"<redacted>","serverNodeKind":"lingxi-service","serverNodeTransport":"http","host":"127.0.0.1"}）
+[PASS] zero-touch-instance-B: 客户端 B HOME 下无 lingxi-service/instance.json（remote 零接触）
+[PASS] tree-s1: harness 子树 node-kernel count 0 !== 0（硬断言）
+[PASS] tree-s1: harness 子树 rust-kernel count 1 !== 1
+[PASS] tree-s1: harness 子树 Electron 主进程 count 2 !== 2
+[PASS] tree-s1-rust-pid: 子树内唯一 rust-kernel = harness 服务 pid 96300（实测 96300）
+[journal] leg-a1 {"sessionId":"a06-clientA-leg1","frameCount":10,"runEnded":true,"runEndReason":null,"sawFinal":true,"sawMarker":true}
+[PASS] leg-a1-run-end: leg-a1 assistant_run_end 到达且 reason 为空（成功语义；实测 {"runEnded":true,"reason":null}）
+[PASS] leg-a1-final: leg-a1 帧含 A06-CHAT-FINAL leg-a1（任务真实完成）
+[PASS] history-leg-a1: leg-a1 服务侧历史含终结回答（status=200）
+[journal] quit-b-keystroke-1 {"status":0,"stdout":"","stderr":""}
+[journal] electron-A-exit {"code":0,"signal":null}
+[journal] quit-b-keystroke-2 {"status":0,"stdout":"","stderr":""}
+[journal] electron-B-exit {"code":0,"signal":null}
+[PASS] quit-b-exit: 客户端 B 主进程退出（mechanism=keyboard）
+[PASS] service-alive-after-b: 退 B 后服务 pid 96300 存活（对客户端退出零接触）
+[PASS] service-continuity: 服务实例连续（pid/instanceId 不变；实测 pid=96300）
+[PASS] health-after-b: 退 B 后 /lingxi/v1/health → 200（实测 200）
+[journal] reap-service {"pid":96300,"aliveAtReap":true}
+[journal] service-exit {"code":0,"signal":null}
+[journal] reap-service-result {"exited":{"code":0,"signal":null}}
+[PASS] reap-service: harness 回收服务（SIGTERM 收敛；实测 {"code":0,"signal":null}）
+[journal] cleanup {"homes":["/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-svc-whnHSY","/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliA-Z4EQGk","/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliB-croGKa"]}
+[a06-dbg] finally tail reached
+[r08-t03-a06] crash: Error: cdp-main-page: timeout after 90000ms
+    at waitFor (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t03_a06_drill.mjs:99:38)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async cdpEvaluateClient (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t03_a06_drill.mjs:337:18)
+    at async main (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t03_a06_drill.mjs:673:24)

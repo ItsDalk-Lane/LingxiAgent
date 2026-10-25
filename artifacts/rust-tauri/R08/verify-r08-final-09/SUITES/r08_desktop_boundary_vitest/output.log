@@ -1,0 +1,13 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/services/r08-a01-ui-projection.test.ts (5 tests) 94ms
+ ✓ desktop/src/react/__tests__/services/r08-p1-data-epoch-hello.test.ts (13 tests) 348ms
+ ↓ desktop/src/react/__tests__/services/r08-session-legacy-compat.test.ts (1 test | 1 skipped)
+ ✓ desktop/src/react/__tests__/host/r08-a03-web-desktop-host.test.tsx (5 tests) 51ms
+
+ Test Files  3 passed | 1 skipped (4)
+      Tests  23 passed | 1 skipped (24)
+   Start at  20:19:11
+   Duration  1.78s (transform 1.53s, setup 67ms, import 2.40s, tests 493ms, environment 1.38s)
+

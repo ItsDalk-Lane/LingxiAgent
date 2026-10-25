@@ -1,0 +1,40 @@
+PASS stub provider ready :: 57903
+PASS fixture gen
+PASS root-a prepared (knowledge integrity ok) :: ok
+PASS root-b migrated (T05 path)
+PASS kernel A (node) ready :: port=57929
+PASS kernel B (rust) ready :: 127.0.0.1:57943
+PASS suite ran on A (observations present) :: vitest exit=0
+PASS suite ran on B (observations present) :: vitest exit=0
+PASS [identity] parity
+PASS [sessions.list] parity
+RECORD [sessions.switch] recorded :: {"A":{"focused":false,"messages":null},"B":{"focused":true,"messages":null}}
+PASS [sessions.rename] parity
+PASS [sessions.pin] parity
+RECORD [sessions.create] recorded :: {"A":{"created":false,"delta":0},"B":{"created":false,"delta":0}}
+PASS [sessions.archive] parity
+FAIL [sessions.maintenance] differs :: {"A":{"cleanupDeletedIsNumber":true,"cleanupDeletedAtLeastOne":false,"sweptIsNumber":true},"B":{"cleanupDeletedIsNumber":true,"cleanupDeletedAtLeastOne":true,"sweptIsNumber":true}}
+PASS [sessions.capabilities] parity
+PASS [sessions.todos] parity
+PASS [permissions.default] parity
+PASS [preferences.appearance] parity
+PASS [error-path.unauthorized] parity
+PASS [error-path.not-found] parity
+PASS [drift-guard] parity
+PASS [leaf.rename.negative] parity
+PASS [leaf.pin.negative] parity
+PASS [leaf.todos.negative] parity
+FAIL [leaf.cleanup.boundary] differs :: {"A":{"freshKept":false,"purgedOk":false,"expiringGone":false,"skipped":true},"B":{"freshKept":false,"purgedOk":false,"expiringGone":false,"skipped":true}}
+PASS [leaf.list.fields] parity
+PASS [leaf.permissions.read-idempotent] parity
+PASS [leaf.mcp.state] parity
+PASS [leaf.mcp.state.unauthorized] parity
+FAIL [leaf.permission.session-mode] differs :: {"A":{"modePresent":false,"modeValue":null,"status":500,"idempotent":false},"B":{"modePresent":true,"modeValue":"ask","status":200,"idempotent":true}}
+PASS [leaf.permission.default-set] parity
+PASS [leaf.archive.negative] parity
+FAIL [leaf.pin-order] differs :: {"A":{"reorderOk":false,"dupRejected":true,"dupStatus":400},"B":{"reorderOk":false,"dupRejected":true,"dupStatus":400}}
+FAIL [leaf.archived-delete] differs :: {"A":{"deleted":false,"goneFromArchive":false,"restoreAfterDeleteRefused":true,"delStatus":409,"restoreStatus":403},"B":{"deleted":true,"goneFromArchive":true,"restoreAfterDeleteRefused":true,"delStatus":200,"restoreStatus":404}}
+FAIL [leaf.search] differs :: {"A":{"hitStatus":200,"hitRowsIsArray":true,"hitAtLeastOne":true,"emptyStatus":200,"emptyIsEmpty":true,"badPhaseStatus":200},"B":{"hitStatus":200,"hitRowsIsArray":true,"hitAtLeastOne":false,"emptyStatus":200,"emptyIsEmpty":true,"badPhaseStatus":400}}
+PASS harness integrity: both suites produced observations
+AB_RESULT tasks=29 parity=21 differs=6 recorded=2 failedA=0 failedB=0 out=/private/tmp/t13-ab-b2-01/out
+T07 AB OK
