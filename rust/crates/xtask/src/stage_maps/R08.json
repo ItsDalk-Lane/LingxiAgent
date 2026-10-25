@@ -383,8 +383,7 @@
       "id": "R08-A05",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r08_t03_a05_drill",
-        "r08_t03_a06_drill"
+        "r08_t03_a05_drill"
       ],
       "specMirror": {
         "name": "旧界面真正使用Rust内核",
@@ -405,7 +404,6 @@
       "id": "R08-A06",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r08_t03_a05_drill",
         "r08_t03_a06_drill"
       ],
       "specMirror": {
@@ -1104,7 +1102,7 @@
       "id": "R00-T02-LA-0D4F0EFC9DAE",
       "featureId": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-PIN-0D4F0E",
       "requirement": "REQUIRED_SUPPLEMENTAL",
-      "basisKind": "required_behavior_pending",
+      "basisKind": "full_original_behavior",
       "r00Kind": "supplemental",
       "r00TaskIds": [
         "R06-T03",
@@ -1124,9 +1122,50 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "evidenceCommandRefs": [],
-      "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。【已实测份额（非门禁）】正路径：置顶与取消置顶调用成功（双内核）；已删 Agent 禁置顶等分支未测；图钉见 r08_t07_ab cases.json：ab::sessions.pin.pin, ab::sessions.pin.unpin"
+      "evidenceCommandRefs": [
+        "r08_t07_ab"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r08_t07_ab/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径平价 + 负路径双内核显式拒绝），机器核对 cases.json。",
+      "assertionContract": {
+        "producerCommand": "r08_t07_ab",
+        "evidencePath": "{EVIDENCE}/SUITES/r08_t07_ab/cases.json",
+        "cases": [
+          {
+            "case": "ab::sessions.pin.pin",
+            "expect": 1
+          },
+          {
+            "case": "ab::sessions.pin.unpin",
+            "expect": 1
+          },
+          {
+            "case": "leaf::pin.state-projected",
+            "expect": 1
+          },
+          {
+            "case": "leaf::pin.invalid-session.explicit-error",
+            "expect": 1
+          },
+          {
+            "case": "leaf::pin.state-cleared",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "ab::sessions.pin.pin",
+          "ab::sessions.pin.unpin",
+          "leaf::pin.state-projected"
+        ],
+        [
+          "leaf::pin.invalid-session.explicit-error",
+          "leaf::pin.state-cleared"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-0FE8BED686E2",
@@ -1303,7 +1342,7 @@
       "id": "R00-T02-LA-1E0D477755CD",
       "featureId": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-AUTHORIZED-FOL-1E0D47",
       "requirement": "REQUIRED_SUPPLEMENTAL",
-      "basisKind": "required_behavior_pending",
+      "basisKind": "full_original_behavior",
       "r00Kind": "supplemental",
       "r00TaskIds": [
         "R06-T03",
@@ -1323,9 +1362,35 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "evidenceCommandRefs": [],
-      "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+      "evidenceCommandRefs": [
+        "r08_t07_ab"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r08_t07_ab/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径平价 + 负路径双内核显式拒绝），机器核对 cases.json。",
+      "assertionContract": {
+        "producerCommand": "r08_t07_ab",
+        "evidencePath": "{EVIDENCE}/SUITES/r08_t07_ab/cases.json",
+        "cases": [
+          {
+            "case": "leaf::auth-folders.remove",
+            "expect": 1
+          },
+          {
+            "case": "leaf::auth-folders.invalid-rejected",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf::auth-folders.remove"
+        ],
+        [
+          "leaf::auth-folders.invalid-rejected"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-20E9C8F26CEA",
@@ -1526,7 +1591,7 @@
       "id": "R00-T02-LA-2D4EBE0FF3C2",
       "featureId": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-WORKSPACE-DISP-2D4EBE",
       "requirement": "REQUIRED_SUPPLEMENTAL",
-      "basisKind": "required_behavior_pending",
+      "basisKind": "full_original_behavior",
       "r00Kind": "supplemental",
       "r00TaskIds": [
         "R06-T03",
@@ -1546,9 +1611,35 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "evidenceCommandRefs": [],
-      "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+      "evidenceCommandRefs": [
+        "r08_t07_ab"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r08_t07_ab/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径平价 + 负路径双内核显式拒绝），机器核对 cases.json。",
+      "assertionContract": {
+        "producerCommand": "r08_t07_ab",
+        "evidencePath": "{EVIDENCE}/SUITES/r08_t07_ab/cases.json",
+        "cases": [
+          {
+            "case": "leaf::archive-workspace.recoverable",
+            "expect": 1
+          },
+          {
+            "case": "leaf::archive-workspace.invalid-rejected",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf::archive-workspace.recoverable"
+        ],
+        [
+          "leaf::archive-workspace.invalid-rejected"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-2DA782C5C7B9",
@@ -1582,7 +1673,7 @@
       "id": "R00-T02-LA-2ED065BED168",
       "featureId": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-PIN-ORDER-2ED065",
       "requirement": "REQUIRED_SUPPLEMENTAL",
-      "basisKind": "required_behavior_pending",
+      "basisKind": "full_original_behavior",
       "r00Kind": "supplemental",
       "r00TaskIds": [
         "R06-T03",
@@ -1602,9 +1693,35 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "evidenceCommandRefs": [],
-      "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+      "evidenceCommandRefs": [
+        "r08_t07_ab"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r08_t07_ab/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径平价 + 负路径双内核显式拒绝），机器核对 cases.json。",
+      "assertionContract": {
+        "producerCommand": "r08_t07_ab",
+        "evidencePath": "{EVIDENCE}/SUITES/r08_t07_ab/cases.json",
+        "cases": [
+          {
+            "case": "leaf::pin-order.reorder-applies",
+            "expect": 1
+          },
+          {
+            "case": "leaf::pin-order.duplicate-rejected",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf::pin-order.reorder-applies"
+        ],
+        [
+          "leaf::pin-order.duplicate-rejected"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-2FAA749DA790",
@@ -1639,7 +1756,7 @@
       "id": "R00-T02-LA-31CDA283A11A",
       "featureId": "F-D02-ROUTE_BEHAVIOR-BEHAVIOR-SESSIONS-SESSIONS-RESTORE-POST-31CDA2",
       "requirement": "REQUIRED_SUPPLEMENTAL",
-      "basisKind": "required_behavior_pending",
+      "basisKind": "full_original_behavior",
       "r00Kind": "supplemental",
       "r00TaskIds": [
         "R06-T03",
@@ -1659,9 +1776,35 @@
         "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "evidenceCommandRefs": [],
-      "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+      "evidenceCommandRefs": [
+        "r08_t07_ab"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r08_t07_ab/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径平价 + 负路径双内核显式拒绝），机器核对 cases.json。",
+      "assertionContract": {
+        "producerCommand": "r08_t07_ab",
+        "evidencePath": "{EVIDENCE}/SUITES/r08_t07_ab/cases.json",
+        "cases": [
+          {
+            "case": "leaf::archive.positive-cycle",
+            "expect": 1
+          },
+          {
+            "case": "leaf::archive.negative.rejected",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf::archive.positive-cycle"
+        ],
+        [
+          "leaf::archive.negative.rejected"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-3562B5D44C5E",
@@ -1964,7 +2107,7 @@
       "id": "R00-T02-LA-43FFB75F252C",
       "featureId": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-ARCHIVED-43FFB7",
       "requirement": "REQUIRED_SUPPLEMENTAL",
-      "basisKind": "required_behavior_pending",
+      "basisKind": "full_original_behavior",
       "r00Kind": "supplemental",
       "r00TaskIds": [
         "R06-T03",
@@ -1984,9 +2127,35 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "evidenceCommandRefs": [],
-      "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+      "evidenceCommandRefs": [
+        "r08_t07_ab"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r08_t07_ab/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径平价 + 负路径双内核显式拒绝），机器核对 cases.json。",
+      "assertionContract": {
+        "producerCommand": "r08_t07_ab",
+        "evidencePath": "{EVIDENCE}/SUITES/r08_t07_ab/cases.json",
+        "cases": [
+          {
+            "case": "leaf::archive.positive-cycle",
+            "expect": 1
+          },
+          {
+            "case": "leaf::archive.negative.rejected",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf::archive.positive-cycle"
+        ],
+        [
+          "leaf::archive.negative.rejected"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-45C5CE361CCB",
@@ -2237,13 +2406,13 @@
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
       "evidenceCommandRefs": [],
       "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。【已实测份额（非门禁）】A 腿旧栈 /api/sessions/find?path=&q= 会话内文本查找可用（200+命中+无效会话 403）；Rust /lingxi/v1/sessions/find 仅按 id 定位且拒绝 q 键（400 unknown query key）——旧会话内查找路由未迁移（t14-ab-drill-batch3-01 实证），登记 D-10，绑定不可行；图钉见 r08_t07_ab cases.json："
     },
     {
       "id": "R00-T02-LA-51905CECDD1B",
       "featureId": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-MEMORY-51905C",
       "requirement": "REQUIRED_SUPPLEMENTAL",
-      "basisKind": "required_behavior_pending",
+      "basisKind": "full_original_behavior",
       "r00Kind": "supplemental",
       "r00TaskIds": [
         "R06-T03",
@@ -2263,15 +2432,41 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "evidenceCommandRefs": [],
-      "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+      "evidenceCommandRefs": [
+        "r08_t07_ab"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r08_t07_ab/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径平价 + 负路径双内核显式拒绝），机器核对 cases.json。",
+      "assertionContract": {
+        "producerCommand": "r08_t07_ab",
+        "evidencePath": "{EVIDENCE}/SUITES/r08_t07_ab/cases.json",
+        "cases": [
+          {
+            "case": "leaf::memory.read",
+            "expect": 1
+          },
+          {
+            "case": "leaf::memory-snapshot.invalid-rejected",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf::memory.read"
+        ],
+        [
+          "leaf::memory-snapshot.invalid-rejected"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-52226FEA5997",
       "featureId": "F-D02-ROUTE_BEHAVIOR-BEHAVIOR-SESSIONS-SESSIONS-ARCHIVED-DELETE-POST-52226F",
       "requirement": "REQUIRED_SUPPLEMENTAL",
-      "basisKind": "required_behavior_pending",
+      "basisKind": "full_original_behavior",
       "r00Kind": "supplemental",
       "r00TaskIds": [
         "R06-T03",
@@ -2291,9 +2486,35 @@
         "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "evidenceCommandRefs": [],
-      "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+      "evidenceCommandRefs": [
+        "r08_t07_ab"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r08_t07_ab/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径平价 + 负路径双内核显式拒绝），机器核对 cases.json。",
+      "assertionContract": {
+        "producerCommand": "r08_t07_ab",
+        "evidencePath": "{EVIDENCE}/SUITES/r08_t07_ab/cases.json",
+        "cases": [
+          {
+            "case": "leaf::archived-delete.file-and-lifecycle-cleared",
+            "expect": 1
+          },
+          {
+            "case": "leaf::archived-delete.unrecoverable",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf::archived-delete.file-and-lifecycle-cleared"
+        ],
+        [
+          "leaf::archived-delete.unrecoverable"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-5235D8EDD673",
@@ -2498,7 +2719,7 @@
       "id": "R00-T02-LA-604C64F4828A",
       "featureId": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-AUTHORIZED-FOL-604C64",
       "requirement": "REQUIRED_SUPPLEMENTAL",
-      "basisKind": "required_behavior_pending",
+      "basisKind": "full_original_behavior",
       "r00Kind": "supplemental",
       "r00TaskIds": [
         "R06-T03",
@@ -2518,9 +2739,35 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "evidenceCommandRefs": [],
-      "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+      "evidenceCommandRefs": [
+        "r08_t07_ab"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r08_t07_ab/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径平价 + 负路径双内核显式拒绝），机器核对 cases.json。",
+      "assertionContract": {
+        "producerCommand": "r08_t07_ab",
+        "evidencePath": "{EVIDENCE}/SUITES/r08_t07_ab/cases.json",
+        "cases": [
+          {
+            "case": "leaf::auth-folders.add",
+            "expect": 1
+          },
+          {
+            "case": "leaf::auth-folders.invalid-rejected",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf::auth-folders.add"
+        ],
+        [
+          "leaf::auth-folders.invalid-rejected"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-60A58027CCCE",
@@ -2639,7 +2886,7 @@
       "id": "R00-T02-LA-73B631D77531",
       "featureId": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-AUTHORIZED-FOL-73B631",
       "requirement": "REQUIRED_SUPPLEMENTAL",
-      "basisKind": "required_behavior_pending",
+      "basisKind": "full_original_behavior",
       "r00Kind": "supplemental",
       "r00TaskIds": [
         "R06-T03",
@@ -2659,9 +2906,35 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "evidenceCommandRefs": [],
-      "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+      "evidenceCommandRefs": [
+        "r08_t07_ab"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r08_t07_ab/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径平价 + 负路径双内核显式拒绝），机器核对 cases.json。",
+      "assertionContract": {
+        "producerCommand": "r08_t07_ab",
+        "evidencePath": "{EVIDENCE}/SUITES/r08_t07_ab/cases.json",
+        "cases": [
+          {
+            "case": "leaf::auth-folders.set",
+            "expect": 1
+          },
+          {
+            "case": "leaf::auth-folders.invalid-rejected",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf::auth-folders.set"
+        ],
+        [
+          "leaf::auth-folders.invalid-rejected"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-75C0AE981505",
@@ -2843,7 +3116,7 @@
       "id": "R00-T02-LA-8D3CEB6133E1",
       "featureId": "F-D04-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-SESSION-PERMISS-8D3CEB",
       "requirement": "REQUIRED_SUPPLEMENTAL",
-      "basisKind": "required_behavior_pending",
+      "basisKind": "full_original_behavior",
       "r00Kind": "supplemental",
       "r00TaskIds": [
         "R04-T03",
@@ -2863,9 +3136,35 @@
         "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "evidenceCommandRefs": [],
-      "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+      "evidenceCommandRefs": [
+        "r08_t07_ab"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r08_t07_ab/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径平价 + 负路径双内核显式拒绝），机器核对 cases.json。",
+      "assertionContract": {
+        "producerCommand": "r08_t07_ab",
+        "evidencePath": "{EVIDENCE}/SUITES/r08_t07_ab/cases.json",
+        "cases": [
+          {
+            "case": "leaf::permission.default-roundtrip",
+            "expect": 1
+          },
+          {
+            "case": "leaf::permission.default-invalid-rejected",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf::permission.default-roundtrip"
+        ],
+        [
+          "leaf::permission.default-invalid-rejected"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-8E2D44B48905",
@@ -3021,7 +3320,7 @@
       "id": "R00-T02-LA-9616596B5720",
       "featureId": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-MEMORY-961659",
       "requirement": "REQUIRED_SUPPLEMENTAL",
-      "basisKind": "required_behavior_pending",
+      "basisKind": "full_original_behavior",
       "r00Kind": "supplemental",
       "r00TaskIds": [
         "R06-T03",
@@ -3041,15 +3340,41 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "evidenceCommandRefs": [],
-      "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+      "evidenceCommandRefs": [
+        "r08_t07_ab"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r08_t07_ab/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径平价 + 负路径双内核显式拒绝），机器核对 cases.json。",
+      "assertionContract": {
+        "producerCommand": "r08_t07_ab",
+        "evidencePath": "{EVIDENCE}/SUITES/r08_t07_ab/cases.json",
+        "cases": [
+          {
+            "case": "leaf::memory.set",
+            "expect": 1
+          },
+          {
+            "case": "leaf::memory-snapshot.invalid-rejected",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf::memory.set"
+        ],
+        [
+          "leaf::memory-snapshot.invalid-rejected"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-98DDC94776F1",
       "featureId": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-AUTHORIZED-FOL-98DDC9",
       "requirement": "REQUIRED_SUPPLEMENTAL",
-      "basisKind": "required_behavior_pending",
+      "basisKind": "full_original_behavior",
       "r00Kind": "supplemental",
       "r00TaskIds": [
         "R06-T03",
@@ -3069,9 +3394,35 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "evidenceCommandRefs": [],
-      "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+      "evidenceCommandRefs": [
+        "r08_t07_ab"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r08_t07_ab/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径平价 + 负路径双内核显式拒绝），机器核对 cases.json。",
+      "assertionContract": {
+        "producerCommand": "r08_t07_ab",
+        "evidencePath": "{EVIDENCE}/SUITES/r08_t07_ab/cases.json",
+        "cases": [
+          {
+            "case": "leaf::auth-folders.read",
+            "expect": 1
+          },
+          {
+            "case": "leaf::auth-folders.invalid-rejected",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf::auth-folders.read"
+        ],
+        [
+          "leaf::auth-folders.invalid-rejected"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-9D9E72CB6051",
@@ -3105,7 +3456,7 @@
       "id": "R00-T02-LA-A18187567AF9",
       "featureId": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-SEARCH-A18187",
       "requirement": "REQUIRED_SUPPLEMENTAL",
-      "basisKind": "required_behavior_pending",
+      "basisKind": "full_original_behavior",
       "r00Kind": "supplemental",
       "r00TaskIds": [
         "R06-T03",
@@ -3125,9 +3476,35 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "evidenceCommandRefs": [],
-      "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+      "evidenceCommandRefs": [
+        "r08_t07_ab"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r08_t07_ab/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径平价 + 负路径双内核显式拒绝），机器核对 cases.json。",
+      "assertionContract": {
+        "producerCommand": "r08_t07_ab",
+        "evidencePath": "{EVIDENCE}/SUITES/r08_t07_ab/cases.json",
+        "cases": [
+          {
+            "case": "leaf::search.content-hit",
+            "expect": 1
+          },
+          {
+            "case": "leaf::search.empty-query-empty-result",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf::search.content-hit"
+        ],
+        [
+          "leaf::search.empty-query-empty-result"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-A2C385A33493",
@@ -3190,7 +3567,7 @@
       "id": "R00-T02-LA-AA9EB3FD034D",
       "featureId": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-MESSAGES-AA9EB3",
       "requirement": "REQUIRED_SUPPLEMENTAL",
-      "basisKind": "required_behavior_pending",
+      "basisKind": "full_original_behavior",
       "r00Kind": "supplemental",
       "r00TaskIds": [
         "R06-T03",
@@ -3210,9 +3587,35 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "evidenceCommandRefs": [],
-      "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+      "evidenceCommandRefs": [
+        "r08_t07_ab"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r08_t07_ab/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径平价 + 负路径双内核显式拒绝），机器核对 cases.json。",
+      "assertionContract": {
+        "producerCommand": "r08_t07_ab",
+        "evidencePath": "{EVIDENCE}/SUITES/r08_t07_ab/cases.json",
+        "cases": [
+          {
+            "case": "leaf::read.history-page",
+            "expect": 1
+          },
+          {
+            "case": "leaf::read.invalid-rejected",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf::read.history-page"
+        ],
+        [
+          "leaf::read.invalid-rejected"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-AFA7227BFB63",
@@ -3268,7 +3671,7 @@
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
       "evidenceCommandRefs": [],
       "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。【已实测份额（非门禁）】正路径：返回删除数量形状（双内核）；实际按期限删除未测；图钉见 r08_t07_ab cases.json：ab::sessions.maintenance.cleanup"
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。【已实测份额（非门禁）】形状+期限边界（新归档保留双内核）；A 腿 cleanup(30) 对 fixture 超期归档计数 0 vs B 1——旧栈删除计数语义未对齐（t12-ab-drill-d3-07），如实留债；图钉见 r08_t07_ab cases.json：ab::sessions.maintenance.cleanup"
     },
     {
       "id": "R00-T02-LA-B34F2B298BFA",
@@ -3501,7 +3904,7 @@
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
       "evidenceCommandRefs": [],
       "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。【已实测份额（非门禁）】switch 投影正路径 A 腿被旧栈无模型 500 阻断（D-3 同根）；B 腿 200 但 permissionMode 为 DB 原值 null（新发现 D-7：旧栈归一化默认 mode vs Rust 透传 DB 值）——双内核均不可绑定，如实留债；图钉见 r08_t07_ab cases.json："
     },
     {
       "id": "R00-T02-LA-C1FB9C92E813",
@@ -3592,7 +3995,7 @@
       "id": "R00-T02-LA-CDBFE6616EB9",
       "featureId": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-HISTORY-OVERVI-CDBFE6",
       "requirement": "REQUIRED_SUPPLEMENTAL",
-      "basisKind": "required_behavior_pending",
+      "basisKind": "full_original_behavior",
       "r00Kind": "supplemental",
       "r00TaskIds": [
         "R06-T03",
@@ -3612,9 +4015,35 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "evidenceCommandRefs": [],
-      "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+      "evidenceCommandRefs": [
+        "r08_t07_ab"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r08_t07_ab/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径平价 + 负路径双内核显式拒绝），机器核对 cases.json。",
+      "assertionContract": {
+        "producerCommand": "r08_t07_ab",
+        "evidencePath": "{EVIDENCE}/SUITES/r08_t07_ab/cases.json",
+        "cases": [
+          {
+            "case": "leaf::read.overview",
+            "expect": 1
+          },
+          {
+            "case": "leaf::read.invalid-rejected",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf::read.overview"
+        ],
+        [
+          "leaf::read.invalid-rejected"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-CE69063550AA",
@@ -4233,7 +4662,7 @@
       "id": "R00-T02-LA-F0319FC4F93D",
       "featureId": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-SUMMARY-F0319F",
       "requirement": "REQUIRED_SUPPLEMENTAL",
-      "basisKind": "required_behavior_pending",
+      "basisKind": "full_original_behavior",
       "r00Kind": "supplemental",
       "r00TaskIds": [
         "R06-T03",
@@ -4253,9 +4682,35 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "evidenceCommandRefs": [],
-      "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+      "evidenceCommandRefs": [
+        "r08_t07_ab"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r08_t07_ab/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径平价 + 负路径双内核显式拒绝），机器核对 cases.json。",
+      "assertionContract": {
+        "producerCommand": "r08_t07_ab",
+        "evidencePath": "{EVIDENCE}/SUITES/r08_t07_ab/cases.json",
+        "cases": [
+          {
+            "case": "leaf::read.summary",
+            "expect": 1
+          },
+          {
+            "case": "leaf::read.invalid-rejected",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf::read.summary"
+        ],
+        [
+          "leaf::read.invalid-rejected"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-F28086B64522",
@@ -4516,7 +4971,7 @@
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
       "evidenceCommandRefs": [],
       "evidencePaths": [],
-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。【已实测份额（非门禁）】记忆开关读/写与负路径双内核全绿；提示词快照 A 腿 500——合成会话无冻结快照 sidecar（需真实模型回合产生，t19-ab-drill-memsnap-01 实证；B 腿 200）——产品侧合成前提，如实留债；图钉见 r08_t07_ab cases.json："
     }
   ],
   "inputDigestSha256": "70b7505462adda72ebd97b3e361ecc78e7e8509ea92187ef50db1706fce3cf3b"

@@ -194,6 +194,311 @@ describe.skipIf(!enabled)(`R08-T07 kernel A/B [${kind}]`, () => {
     });
   });
 
+  it('leaf.permission.session-mode: 查看当前会话权限模式（switch 投影 mode 字段）', async () => {
+    await observe('leaf.permission.session-mode', async () => {
+      const first = (useStore.getState().sessions as any[])[0];
+      if (!first) return { modePresent: false, modeValue: null };
+      // 正路径：切换到会话读取投影的 permissionMode（旧 /api/sessions/switch
+      // 返回 permissionMode；Rust /lingxi/v1/sessions/switch 同名字段）。
+      const path = kind === 'rust' ? '/lingxi/v1/sessions/switch' : '/api/sessions/switch';
+      const res = await lingxiFetch(path, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(kind === 'rust' ? { sessionId: first.sessionId } : { path: first.path }),
+        throwOnHttpError: false,
+      });
+      const data = await res.json().catch(() => null);
+      const mode = data?.permissionMode ?? null;
+      // 断言1（读无副作用）：同会话二次切换读 mode 一致。
+      const res2 = await lingxiFetch(path, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(kind === 'rust' ? { sessionId: first.sessionId } : { path: first.path }),
+        throwOnHttpError: false,
+      });
+      const data2 = await res2.json().catch(() => null);
+      const mode2 = data2?.permissionMode ?? null;
+      return { modePresent: res.status < 300 && typeof mode === 'string', modeValue: mode, status: res.status, idempotent: mode === mode2 && mode !== null };
+    });
+  });
+
+  it('leaf.permission.default-set: 设置新会话默认权限（写-回读-非法值拒绝）', async () => {
+    await observe('leaf.permission.default-set', async () => {
+      // 正路径：PUT 合法值 → GET 回读一致；复原为原值。
+      const orig = await loadPendingNewSessionPermissionDefault();
+      const put = await lingxiFetch('/api/preferences/session-permission-default', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ permissionMode: 'auto' }), throwOnHttpError: false,
+      });
+      await sleep(150);
+      const after = await loadPendingNewSessionPermissionDefault();
+      // 负路径：非法值 400 拒绝。
+      const bad = await lingxiFetch('/api/preferences/session-permission-default', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ permissionMode: 'bogus-mode' }), throwOnHttpError: false,
+      });
+      // 复原
+      if (orig) {
+        await lingxiFetch('/api/preferences/session-permission-default', {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ permissionMode: orig }), throwOnHttpError: false,
+        });
+      }
+      return { putStatus: put.status, roundTrip: after === 'auto', badRejected: bad.status >= 400, badStatus: bad.status };
+    });
+  });
+
+  it('leaf.memory-snapshot: 记忆开关查看/设置 + 提示词快照（已翻译读端口）', async () => {
+    await observe('leaf.memory-snapshot', async () => {
+      const target = (useStore.getState().sessions as any[])[0];
+      if (!target) return { memoryRead: false, memorySet: false, snapshotOk: false, invalidRejected: false, skipped: true };
+      const loc = kind === 'rust' ? `native:${target.sessionId}` : target.path;
+      // 记忆开关读（GET memory 已翻译读端口）。
+      const mem = await lingxiFetch(`/api/sessions/memory?${kind === 'rust' ? `path=${encodeURIComponent(loc)}` : `path=${encodeURIComponent(target.path)}`}`, { method: 'GET', throwOnHttpError: false });
+      const memBody = await mem.json().catch(() => null);
+      const memoryRead = mem.status < 300 && memBody != null && (memBody?.memoryEnabled !== undefined || memBody?.enabled !== undefined || typeof memBody === 'boolean');
+      // 记忆开关设置（PATCH memory 已翻译写端口；设回原值保真）。
+      const original = memBody?.memoryEnabled ?? memBody?.enabled ?? true;
+      const set = await lingxiFetch('/api/sessions/memory', {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: loc, memoryEnabled: original }), throwOnHttpError: false,
+      });
+      const setBody = await set.json().catch(() => null);
+      const memorySet = set.status < 300 && (setBody?.ok !== false) && (setBody?.memoryEnabled === undefined || setBody?.memoryEnabled === original || setBody?.enabled === undefined || setBody?.enabled === original);
+      // 提示词快照（GET prompt-snapshot 已翻译读端口）。
+      const snap = await lingxiFetch(`/api/sessions/prompt-snapshot?${kind === 'rust' ? `path=${encodeURIComponent(loc)}` : `path=${encodeURIComponent(target.path)}`}`, { method: 'GET', throwOnHttpError: false });
+      const snapBody = await snap.json().catch(() => null);
+      const snapshotOk = snap.status < 300 && snapBody != null;
+      // 负路径：无效会话三端口显式拒。
+      const badLoc = kind === 'rust' ? 'native:sess-does-not-exist-t07' : 'agents/a1/sessions/sess-does-not-exist-t07.jsonl';
+      const badMem = await lingxiFetch(`/api/sessions/memory?path=${encodeURIComponent(badLoc)}`, { method: 'GET', throwOnHttpError: false });
+      const badSnap = await lingxiFetch(`/api/sessions/prompt-snapshot?path=${encodeURIComponent(badLoc)}`, { method: 'GET', throwOnHttpError: false });
+      const invalidRejected = badMem.status >= 400 && badSnap.status >= 400;
+      return { memoryRead, memorySet, snapshotOk, invalidRejected, memStatus: mem.status, setStatus: set.status, snapStatus: snap.status, badMemStatus: badMem.status, badSnapStatus: badSnap.status };
+    });
+  });
+
+  it('leaf.auth-folders: 授权目录四操作（读/增/撤/替换 + 负路径）', async () => {
+    await observe('leaf.auth-folders', async () => {
+      const target = (useStore.getState().sessions as any[])[0];
+      if (!target) return { readOk: false, addOk: false, removeOk: false, setOk: false, invalidRejected: false, skipped: true };
+      const loc = kind === 'rust' ? `native:${target.sessionId}` : target.path;
+      const path = '/api/sessions/authorized-folders';
+      // 读：已翻译读端口。
+      const read = await lingxiFetch(`${path}?${kind === 'rust' ? `path=${encodeURIComponent(loc)}` : `path=${encodeURIComponent(target.path)}`}`, { method: 'GET', throwOnHttpError: false });
+      const readBody = await read.json().catch(() => null);
+      const readList = Array.isArray(readBody) ? readBody : (readBody?.folders ?? readBody?.authorizedFolders ?? null);
+      const readOk = read.status < 300 && (Array.isArray(readList) || readBody != null);
+      // 合成目录：work 目录下一个真实存在的目录（验证真实目录语义）。
+      const realDir = kind === 'rust' ? target.cwd || '/tmp' : '/tmp';
+      // 增（add）。
+      const add = await lingxiFetch(path, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: loc, action: 'add', folder: realDir }), throwOnHttpError: false,
+      });
+      const addBody = await add.json().catch(() => null);
+      const addList = Array.isArray(addBody) ? addBody : (addBody?.folders ?? null);
+      const addOk = add.status < 300 && (addList == null || Array.isArray(addList));
+      // 撤（remove 同一目录）。
+      const remove = await lingxiFetch(path, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: loc, action: 'remove', folder: realDir }), throwOnHttpError: false,
+      });
+      const removeBody = await remove.json().catch(() => null);
+      const removeList = Array.isArray(removeBody) ? removeBody : (removeBody?.folders ?? null);
+      const removeOk = remove.status < 300 && (removeList == null || Array.isArray(removeList));
+      // 替换（set 整体替换）。
+      const set = await lingxiFetch(path, {
+        method: 'PATCH', headers: { 'Content': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: loc, action: 'set', folders: [] }), throwOnHttpError: false,
+      });
+      const setBody = await set.json().catch(() => null);
+      const setList = Array.isArray(setBody) ? setBody : (setBody?.folders ?? null);
+      const setOk = set.status < 300 && (setList == null || (Array.isArray(setList) && setList.length === 0));
+      // 负路径：add 不存在的目录 → 显式拒（验证真实目录语义）。
+      const bad = await lingxiFetch(path, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: loc, action: 'add', folder: '/nonexistent-dir-t07-does-not-exist' }), throwOnHttpError: false,
+      });
+      const badBody = await bad.json().catch(() => null);
+      const invalidRejected = bad.status >= 400 || Boolean(badBody?.error);
+      return { readOk, addOk, removeOk, setOk, invalidRejected, readStatus: read.status, addStatus: add.status, removeStatus: remove.status, setStatus: set.status, badStatus: bad.status };
+    });
+  });
+
+  it('leaf.read-ports: 消息页/历史概览/摘要（已翻译读端口双内核对拍）', async () => {
+    await observe('leaf.read-ports', async () => {
+      const target = (useStore.getState().sessions as any[])[0];
+      if (!target) return { historyOk: false, overviewOk: false, summaryOk: false, invalidRejected: false, skipped: true };
+      // 消息页：旧栈客户端真实面 /api/sessions/messages?path=（session-actions.ts:226）；
+      // Rust 统一历史读面 /lingxi/v1/sessions/{id}/history?all=1（R06-T04）。
+      const historyPath = kind === 'rust'
+        ? `/lingxi/v1/sessions/${encodeURIComponent(target.sessionId)}/history?all=1`
+        : `/api/sessions/messages?path=${encodeURIComponent(target.path)}&reconciliation=1`;
+      const history = await lingxiFetch(historyPath, { method: 'GET', throwOnHttpError: false });
+      const historyBody = await history.json().catch(() => null);
+      const historyRows = Array.isArray(historyBody) ? historyBody : (historyBody?.items ?? historyBody?.messages ?? historyBody);
+      const historyOk = history.status < 300 && (Array.isArray(historyRows) || historyBody?.items != null);
+      // 历史概览：已翻译读端口（translateLegacySessionCall GET history-overview）。
+      const overview = await lingxiFetch(`/api/sessions/history-overview?path=${encodeURIComponent(kind === 'rust' ? `native:${target.sessionId}` : target.path)}`, { method: 'GET', throwOnHttpError: false });
+      const overviewBody = await overview.json().catch(() => null);
+      const overviewOk = overview.status < 300 && overviewBody != null && (overviewBody?.available !== undefined || overviewBody?.ok !== undefined || typeof overviewBody === 'object');
+      // 摘要：已翻译读端口（GET summary）。
+      const summary = await lingxiFetch(`/api/sessions/summary?path=${encodeURIComponent(kind === 'rust' ? `native:${target.sessionId}` : target.path)}`, { method: 'GET', throwOnHttpError: false });
+      const summaryOk = summary.status < 300;
+      // 负路径：无效会话三端口显式拒（任一 4xx 即拒）。
+      const badPath = kind === 'rust' ? `native:sess-does-not-exist-t07` : `agents/a1/sessions/sess-does-not-exist-t07.jsonl`;
+      const badOverview = await lingxiFetch(`/api/sessions/history-overview?path=${encodeURIComponent(badPath)}`, { method: 'GET', throwOnHttpError: false });
+      const badSummary = await lingxiFetch(`/api/sessions/summary?path=${encodeURIComponent(badPath)}`, { method: 'GET', throwOnHttpError: false });
+      const invalidRejected = badOverview.status >= 400 && badSummary.status >= 400;
+      return { historyOk, overviewOk, summaryOk, invalidRejected, historyStatus: history.status, overviewStatus: overview.status, summaryStatus: summary.status, badOverviewStatus: badOverview.status, badSummaryStatus: badSummary.status };
+    });
+  });
+
+  it('leaf.pin.projection: 置顶状态投影（pinnedAt/pinOrder 落列表）', async () => {
+    await observe('leaf.pin.projection', async () => {
+      const sessions = useStore.getState().sessions as any[];
+      const target = sessions.find((x) => !x.parentSessionId);
+      if (!target) return { pinnedProjected: false, clearedProjected: false, skipped: true };
+      await pinSession(target.path, true);
+      await loadSessions();
+      const after = (useStore.getState().sessions as any[]).find((x) => x.sessionId === target.sessionId);
+      // 投影断言：pinned=true 且带置顶时间戳（pinnedAt/pinnedAtUnixMs/pinned_at 族）与顺序位。
+      // 旧栈投影无 pinned 布尔（只有 pinnedAt/pinOrder 字符串/数字）；Rust 同族。
+      // 置顶态从任一投影字段推导。
+      const pinnedFlag = after?.pinned === true || after?.pinnedAt != null || after?.pinnedAtUnixMs != null || after?.pinOrder != null;
+      const hasStamp = after?.pinnedAt != null || after?.pinnedAtUnixMs != null || after?.pinned_at != null;
+      const hasOrder = after?.pinOrder != null || after?.pin_order != null || after?.pinned === true;
+      const pinnedProjected = pinnedFlag && (hasStamp || hasOrder);
+      await pinSession(target.path, false);
+      await loadSessions();
+      const cleared = (useStore.getState().sessions as any[]).find((x) => x.sessionId === target.sessionId);
+      const clearedProjected = !cleared?.pinned;
+      return { pinnedProjected, clearedProjected, hasStamp, hasOrder };
+    });
+  });
+
+  it('leaf.archive.workspace: 归档工作台会话（正路径入可恢复归档 + 无效目标拒）', async () => {
+    await observe('leaf.archive.workspace', async () => {
+      await loadSessions();
+      const sessions = useStore.getState().sessions as any[];
+      const victim = sessions.filter((x) => !x.parentSessionId && (x.title || x.sessionId) !== 'T07-AB-renamed').pop();
+      if (!victim) return { archivedToRecoverable: false, invalidRejected: false, skipped: true };
+      const res = await lingxiFetch('/api/sessions/archive', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(kind === 'rust'
+          ? { sessionId: victim.sessionId }
+          : { path: victim.path }),
+        throwOnHttpError: false,
+      });
+      const bad = await lingxiFetch('/api/sessions/archive', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(kind === 'rust' ? { sessionId: 'sess-does-not-exist-t07' } : { path: 'agents/a1/sessions/sess-does-not-exist-t07.jsonl' }),
+        throwOnHttpError: false,
+      });
+      const badBody = await bad.json().catch(() => null);
+      // 可恢复归档 = 归档列表可见（随后恢复保住会话）。
+      const archived = (await listArchivedSessions()) as any[];
+      const row = Array.isArray(archived) ? archived.find((x: any) => x.sessionId === victim.sessionId || x.path === victim.path) : null;
+      if (row) await restoreSession(row as any);
+      await loadSessions();
+      const invalidRejected = bad.status >= 400 || Boolean(badBody?.error) || badBody?.ok === false;
+      return { archivedToRecoverable: Boolean(row), invalidRejected, archiveStatus: res.status, badStatus: bad.status };
+    });
+  });
+
+  it('leaf.find.in-session: 在指定会话内查找（正路径命中 + 无效会话拒）', async () => {
+    await observe('leaf.find.in-session', async () => {
+      const sessions = useStore.getState().sessions as any[];
+      const target = sessions[0];
+      if (!target) return { hitAtLeastOne: false, invalidRejected: false, skipped: true };
+      const base = kind === 'rust' ? `/lingxi/v1/sessions/find?sessionId=${encodeURIComponent(target.sessionId)}&q=${encodeURIComponent('T07')}` : `/api/sessions/find?path=${encodeURIComponent(target.path)}&q=${encodeURIComponent('T07')}`;
+      const res = await lingxiFetch(base, { method: 'GET', throwOnHttpError: false });
+      const body = await res.json().catch(() => null);
+      const rows = Array.isArray(body) ? body : (body?.results ?? body?.entries ?? body?.matches ?? []);
+      const badPath = kind === 'rust' ? '/lingxi/v1/sessions/find?sessionId=sess-does-not-exist-t07&q=x' : '/api/sessions/find?path=agents/a1/sessions/sess-does-not-exist-t07.jsonl&q=x';
+      const bad = await lingxiFetch(badPath, { method: 'GET', throwOnHttpError: false });
+      const badBody = await bad.json().catch(() => null);
+      return {
+        status: res.status, rowsIsArray: Array.isArray(rows),
+        hitAtLeastOne: res.status < 300 && (Array.isArray(rows) ? rows.length >= 1 : Boolean(body)),
+        badStatus: bad.status, invalidRejected: bad.status >= 400 || Boolean(badBody?.error),
+      };
+    });
+  });
+
+  it('leaf.pin-order: 置顶区整体重编号（正路径 + 重复 id 拒绝）', async () => {
+    await observe('leaf.pin-order', async () => {
+      const sessions = useStore.getState().sessions as any[];
+      const two = sessions.slice(0, 2).map((x) => x.sessionId).filter(Boolean);
+      if (two.length < 2 || new Set(two).size < 2) return { reorderOk: false, dupRejected: false, skipped: true };
+      // 重排的前提是置顶区有这两个会话（旧栈对未置顶 id 的重排会拒）。
+      await pinSession(useStore.getState().sessions.find((x: any) => x.sessionId === two[0])!.path, true);
+      await pinSession(useStore.getState().sessions.find((x: any) => x.sessionId === two[1])!.path, true);
+      await loadSessions();
+      const ok = await reorderPinnedSessions([two[1], two[0]]);
+      const dup = await lingxiFetch(kind === 'rust' ? '/lingxi/v1/sessions/pin-order' : '/api/sessions/pin-order', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionIds: [two[0], two[0]] }), throwOnHttpError: false,
+      });
+      const dupBody = await dup.json().catch(() => null);
+      const dupRejected = dup.status >= 400 || Boolean(dupBody?.error) || dupBody?.ok === false;
+      await reorderPinnedSessions(two);
+      await pinSession(useStore.getState().sessions.find((x: any) => x.sessionId === two[0])!.path, false);
+      await pinSession(useStore.getState().sessions.find((x: any) => x.sessionId === two[1])!.path, false);
+      await loadSessions();
+      return { reorderOk: ok, dupRejected, dupStatus: dup.status };
+    });
+  });
+
+  it('leaf.archived-delete: 永久删除归档会话（正路径 + 删除后不可恢复）', async () => {
+    await observe('leaf.archived-delete', async () => {
+      await loadSessions();
+      const sessions = useStore.getState().sessions as any[];
+      const victim = sessions.filter((x) => !x.parentSessionId && (x.title || x.sessionId) !== 'T07-AB-renamed').pop();
+      if (!victim) return { deleted: false, goneFromArchive: false, restoreAfterDeleteRefused: false, skipped: true };
+      await archiveSession(victim.path);
+      const archived = (await listArchivedSessions()) as any[];
+      const row = Array.isArray(archived) ? archived.find((x: any) => x.sessionId === victim.sessionId || x.path === victim.path) : null;
+      if (!row) return { deleted: false, goneFromArchive: false, restoreAfterDeleteRefused: false, skipped: 'archive-failed' };
+      const del = await lingxiFetch('/api/sessions/archived/delete', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        // 旧栈要求归档目录下的 path（resolveSessionLocatorFromBody + isArchivedDesktopSessionPath；
+        // 活跃 path 会 409/403——t13-ab-drill-batch2-01 实证）；Rust 收 sessionId。
+        body: JSON.stringify(kind === 'rust' ? { sessionId: victim.sessionId } : { path: row.path }),
+        throwOnHttpError: false,
+      });
+      const deleted = del.status < 300;
+      const after = (await listArchivedSessions()) as any[];
+      const goneFromArchive = !Array.isArray(after) || !after.some((x: any) => x.sessionId === victim.sessionId || x.path === victim.path);
+      const restore = await lingxiFetch('/api/sessions/restore', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(kind === 'rust' ? { sessionId: victim.sessionId } : { path: row.path }),
+        throwOnHttpError: false,
+      });
+      const restoreBody = await restore.json().catch(() => null);
+      const restoreAfterDeleteRefused = restore.status >= 400 || Boolean(restoreBody?.error) || restoreBody?.status === 'error';
+      return { deleted, goneFromArchive, restoreAfterDeleteRefused, delStatus: del.status, restoreStatus: restore.status };
+    });
+  });
+
+  it('leaf.search: 跨会话搜索（正路径命中 + 空查询空结果）', async () => {
+    await observe('leaf.search', async () => {
+      const path = kind === 'rust' ? '/lingxi/v1/sessions/search' : '/api/sessions/search';
+      const hit = await lingxiFetch(`${path}?q=${encodeURIComponent('T07 A/B 任务')}&phase=content`, { method: 'GET', throwOnHttpError: false });
+      const hitBody = await hit.json().catch(() => null);
+      const hitRows = Array.isArray(hitBody) ? hitBody : (hitBody?.results ?? hitBody?.sessions ?? []);
+      const empty = await lingxiFetch(`${path}?q=`, { method: 'GET', throwOnHttpError: false });
+      const emptyBody = await empty.json().catch(() => null);
+      const emptyRows = Array.isArray(emptyBody) ? emptyBody : (emptyBody?.results ?? emptyBody?.sessions ?? []);
+      const bad = await lingxiFetch(`${path}?q=x&phase=bogus`, { method: 'GET', throwOnHttpError: false });
+      return {
+        hitStatus: hit.status, hitRowsIsArray: Array.isArray(hitRows),
+        hitAtLeastOne: Array.isArray(hitRows) && hitRows.length >= 1,
+        emptyStatus: empty.status, emptyIsEmpty: Array.isArray(emptyRows) && emptyRows.length === 0,
+        badPhaseStatus: bad.status,
+      };
+    });
+  });
+
   it('sessions.rename: 重命名会话（持久化回读）', async () => {
     await observe('sessions.rename', async () => {
       const first = (useStore.getState().sessions as any[])[0];
@@ -242,7 +547,9 @@ describe.skipIf(!enabled)(`R08-T07 kernel A/B [${kind}]`, () => {
     await observe('sessions.maintenance', async () => {
       const cleanup = await cleanupArchivedSessions(30);
       const swept = await sweepOrphanedWorkspaceSessions();
-      return { cleanupDeletedIsNumber: typeof cleanup?.deleted === 'number', sweptIsNumber: typeof swept === 'number' };
+      // fixture 自带超期归档（archived_at=2025-10 > 30 天）——首个 cleanup(30)
+      // 正当删除之（探针 t11-archive-probe-03 语义）：deleted>=1。
+      return { cleanupDeletedIsNumber: typeof cleanup?.deleted === 'number', cleanupDeletedAtLeastOne: (cleanup?.deleted ?? 0) >= 1, sweptIsNumber: typeof swept === 'number' };
     });
   });
 
@@ -278,19 +585,55 @@ describe.skipIf(!enabled)(`R08-T07 kernel A/B [${kind}]`, () => {
     });
   });
 
+  it('leaf.archive.negative: 无效归档/恢复/清理目标显式拒绝', async () => {
+    await observe('leaf.archive.negative', async () => {
+      const body = kind === 'rust' ? { sessionId: 'sess-does-not-exist-t07' } : { path: 'agents/a1/sessions/sess-does-not-exist-t07.jsonl' };
+      const arch = await lingxiFetch('/api/sessions/archive', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body), throwOnHttpError: false,
+      });
+      const archBody = await arch.json().catch(() => null);
+      const restore = await lingxiFetch('/api/sessions/restore', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body), throwOnHttpError: false,
+      });
+      const restoreBody = await restore.json().catch(() => null);
+      const cleanupBad = await lingxiFetch('/api/sessions/cleanup', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ maxAgeDays: 'bogus' }), throwOnHttpError: false,
+      });
+      const rejected = (st: number, b: any) => st >= 400 || Boolean(b?.error) || b?.ok === false;
+      return {
+        archiveRejected: rejected(arch.status, archBody), archiveStatus: arch.status,
+        restoreRejected: rejected(restore.status, restoreBody), restoreStatus: restore.status,
+        cleanupBadRejected: rejected(cleanupBad.status, null), cleanupBadStatus: cleanupBad.status,
+      };
+    });
+  });
+
   it('leaf.cleanup.boundary: 期限边界 + 显式永久删除', async () => {
     await observe('leaf.cleanup.boundary', async () => {
       await loadSessions();
       const sessions = useStore.getState().sessions as any[];
-      const byTitle = (t: string) => sessions.find((x) => (x.title || x.sessionId) === t || x.sessionId === t || x.path?.endsWith(`${t}.jsonl`));
-      const fresh = byTitle('ab-real-beta') ?? sessions[sessions.length - 1];
-      const expiring = byTitle('ab-real-gamma') ?? sessions[sessions.length - 2];
+      // 目标选取（D-4 改判后修正）：rename 任务可能已改 sessions[0] 的标题，
+      // 固定 byTitle('ab-real-beta') 会错选/漏选——改为「标题未被本套件改过
+      // 的会话」取两个，与 rename 目标（T07-AB-renamed）严格不相交。
+      // 目标选取（D-6 改判后修正）：还需「无子会话」——有子的顶层会话归档被
+      // 409 child_sessions_present 正确拒绝（现役语义，t11-archive-probe-01
+      // 实证），套件此前把该正确拒绝误记为「Rust 立删新归档」伪差异。
+      const untouched = sessions.filter((x) =>
+        (x.title || x.sessionId) !== 'T07-AB-renamed' && !x.parentSessionId);
+      const fresh = untouched[untouched.length - 1];
+      const expiring = untouched[untouched.length - 2];
       if (!fresh || !expiring || fresh === expiring) {
         return { freshKept: false, purgedOk: false, expiringGone: false, skipped: true };
       }
       await archiveSession(fresh.path);
       await archiveSession(expiring.path);
       const kept = await cleanupArchivedSessions(30);
+      // fixture 自带超期归档（archived_at=2025-10 > 30 天）——按期限正当删除
+      // 即 deleted>=1（探针 t11-archive-probe-03 实证语义）。
+      const expiredDeleted = typeof kept?.deleted === 'number' && kept.deleted >= 1;
       const afterKeep = (await listArchivedSessions()) as any[];
       const freshStillArchived = Array.isArray(afterKeep) && afterKeep.some((s: any) => s.sessionId === fresh.sessionId || s.path === fresh.path);
       const delRes = await lingxiFetch('/api/sessions/archived/delete', {
@@ -304,7 +647,7 @@ describe.skipIf(!enabled)(`R08-T07 kernel A/B [${kind}]`, () => {
       const freshRow = Array.isArray(afterPurge) ? afterPurge.find((s: any) => s.sessionId === fresh.sessionId || s.path === fresh.path) : null;
       if (freshRow) await restoreSession(freshRow as any);
       await loadSessions();
-      return { keptDeletedIsNumber: typeof kept?.deleted === 'number', freshKept: freshStillArchived, purgedOk, expiringGone };
+      return { keptDeletedIsNumber: typeof kept?.deleted === 'number', expiredDeleted, freshKept: freshStillArchived, purgedOk, expiringGone };
     });
   });
 
@@ -316,6 +659,18 @@ describe.skipIf(!enabled)(`R08-T07 kernel A/B [${kind}]`, () => {
         return { inArchive: false, goneFromVisible: false, restored: false, backVisible: false, deleted: 'skipped-no-target', stillArchived: true, skipped: true };
       }
       await archiveSession(target.path);
+      // 有子会话的归档被 409 正确拒绝（现役语义）——带 archive_children 重试
+      // （两内核同一规则；probe 实证 t11-archive-probe-01）。
+      await loadSessions();
+      if (useStore.getState().sessions.some((x: any) => x.sessionId === target.sessionId)) {
+        await lingxiFetch('/api/sessions/archive', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(kind === 'rust'
+            ? { sessionId: target.sessionId, childMode: 'archive_children' }
+            : { path: target.path, childMode: 'archive_children' }),
+          throwOnHttpError: false,
+        });
+      }
       const archived = (await listArchivedSessions()) as any[];
       const row = Array.isArray(archived) ? archived.find((s: any) => s.sessionId === target.sessionId || s.path === target.path) : null;
       const inArchive = Boolean(row);

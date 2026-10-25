@@ -1953,7 +1953,13 @@ export async function listArchivedSessions(): Promise<ArchivedSession[]> {
   try {
     const res = await lingxiFetch('/api/sessions/archived');
     if (!res.ok) return [];
-    return await res.json();
+    const data = await res.json();
+    // F-T07-3（2026-10-24 定位）：Rust /lingxi/v1/sessions/archived 返回
+    // {sessions:[…]} 包裹形（旧栈裸数组）——未解包时 UI 归档列表拿到对象，
+    // .some/渲染全断（t10-ab-drill-d04-01 B 腿伪差异 D-6 的真因）。
+    if (Array.isArray(data)) return data;
+    if (data && Array.isArray(data.sessions)) return data.sessions;
+    return [];
   } catch (err) {
     console.error('[archived] list failed:', err);
     return [];

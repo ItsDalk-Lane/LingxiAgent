@@ -48,6 +48,18 @@ mkdirSync(scratch, { recursive: true });
 const STATE_PATH = join(scratch, 'standin-state.json');
 const JOURNAL_PATH = join(scratch, 'standin-journal.jsonl');
 const WORKER_PATH = join(scratch, 't06-standin-worker.cjs');
+const CRASH_LOG_PATH = join(scratch, 'standin-crash.log');
+
+// 替身一旦意外退出，演习末尾的计数断言就会以网络错误形式失败而失去根因
+// （gate14 d3 红迹）。任何未捕获异常/未处理拒绝都先落盘再以 70 退出，不静默。
+for (const event of ['uncaughtException', 'unhandledRejection']) {
+  process.on(event, (err) => {
+    const text = `${new Date().toISOString()} ${event} ${err?.stack || err}\n`;
+    try { appendFileSync(CRASH_LOG_PATH, text); } catch { /* scratch 已不可写：仅 stderr */ }
+    console.error(`STANDIN_CRASH ${text.trimEnd()}`);
+    process.exit(70);
+  });
+}
 
 // ── 持久计数器（跨重启续值）──
 function loadState() {
@@ -168,7 +180,13 @@ const server = http.createServer((req, res) => {
   }
   if (req.method === 'GET' && url.pathname === '/journal') {
     const lines = existsSync(JOURNAL_PATH) ? readFileSync(JOURNAL_PATH, 'utf8').trimEnd().split('\n').filter(Boolean) : [];
-    return send(200, { entries: lines.map((l) => JSON.parse(l)) });
+    const entries = [];
+    let malformedLines = 0;
+    for (const l of lines) {
+      try { entries.push(JSON.parse(l)); } catch { malformedLines += 1; }
+    }
+    if (malformedLines > 0) console.error(`STANDIN_JOURNAL_MALFORMED lines=${malformedLines}`);
+    return send(200, { entries, malformedLines });
   }
   if (req.method === 'POST' && url.pathname === '/admin/shutdown') {
     send(200, { ok: true });

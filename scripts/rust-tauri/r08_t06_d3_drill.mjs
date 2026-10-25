@@ -12,6 +12,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import http from 'node:http';
 import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 
@@ -48,13 +49,21 @@ async function until(fn, label, budgetMs = 120000) {
 rmSync(work, { recursive: true, force: true });
 mkdirSync(work, { recursive: true });
 const children = [];
-process.on('uncaughtException', (err) => {
+const standinStatus = { alive: false, exitCode: null, signal: null };
+let standinErr = '';
+// gate14 红迹：末尾 /journal 读取 `TypeError: fetch failed` 只打了 stack，
+// cause 与替身退出状态都没留下——根因无法判定。abort 时一并输出。
+const abort = (err) => {
   for (const child of children) {
     try { child.kill('SIGKILL'); } catch { /* already gone */ }
   }
   console.error(`D3_ABORT ${err?.stack || err}`);
+  if (err?.cause) console.error(`D3_ABORT_CAUSE ${err.cause?.stack || err.cause}`);
+  console.error(`D3_ABORT_STANDIN ${JSON.stringify(standinStatus)} stderrTail=${JSON.stringify(standinErr.slice(-600))}`);
   process.exit(1);
-});
+};
+process.on('uncaughtException', abort);
+process.on('unhandledRejection', abort);
 
 const source = join(work, 'old-root');
 const target = join(work, 'new-root');
@@ -73,8 +82,12 @@ check('migrate committed', migrate.status === 0 && /outcome=committed/.test(migr
 // ── 2. 替身 + 服务 ──
 const standin = spawn(process.execPath, [join(REPO, 'scripts/rust-tauri/r08_t06_standin.mjs'), '--scratch', standinScratch], { stdio: ['ignore', 'pipe', 'pipe'] });
 children.push(standin);
-let standinErr = '';
+standinStatus.alive = true;
 standin.stderr.on('data', (d) => (standinErr += d));
+standin.on('exit', (code, signal) => {
+  Object.assign(standinStatus, { alive: false, exitCode: code, signal });
+  console.log(`STANDIN_EXITED code=${code} signal=${signal} at=${new Date().toISOString()}`);
+});
 await until(async () => standinErr.includes('STANDIN_READY'), 'standin ready');
 const workerPath = join(standinScratch, 't06-standin-worker.cjs');
 const configPath = join(work, 'service-config.json');
@@ -170,9 +183,36 @@ function attachmentShas(root) {
   return out;
 }
 const snapAttachments = attachmentShas(target);
+// 替身日志读取不走全局 fetch 连接池：每次新建连接（agent:false），排除 keep-alive
+// 复用已被服务端关闭的空闲套接字这一竞态；错误保留 code/cause 原样抛出。
+function standinGetJson(pathname) {
+  return new Promise((resolve, reject) => {
+    const req = http.get({ host: '127.0.0.1', port: STANDIN_PORT, path: pathname, agent: false }, (res) => {
+      let raw = '';
+      res.setEncoding('utf8');
+      res.on('data', (d) => (raw += d));
+      res.on('end', () => {
+        if (res.statusCode !== 200) return reject(new Error(`standin ${pathname} → ${res.statusCode}: ${raw.slice(0, 200)}`));
+        try { resolve(JSON.parse(raw)); } catch (e) { reject(new Error(`standin ${pathname} bad json: ${e.message}`, { cause: e })); }
+      });
+    });
+    req.on('error', (e) => reject(new Error(`standin ${pathname} request failed: ${e.code || e.message}`, { cause: e })));
+  });
+}
 async function standinLegs() {
-  const res = await fetch(`http://127.0.0.1:${STANDIN_PORT}/journal`);
-  const { entries } = await res.json();
+  let payload;
+  try {
+    payload = await standinGetJson('/journal');
+  } catch (err) {
+    // 替身进程仍在才允许一次重试（瞬时套接字错误）；进程已退则直接响亮失败。
+    if (!standinStatus.alive) {
+      throw new Error(`standin journal unreachable and standin process already exited: ${JSON.stringify(standinStatus)}`, { cause: err });
+    }
+    console.log(`STANDIN_FETCH_RETRY reason=${err.message} standin=${JSON.stringify(standinStatus)}`);
+    await sleep(500);
+    payload = await standinGetJson('/journal');
+  }
+  const { entries } = payload;
   const legs = { s1: 0, s2: 0, s3: 0, other: 0 };
   for (const e of entries) {
     if (e.kind !== 'platform-send') continue;

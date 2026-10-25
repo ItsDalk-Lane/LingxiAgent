@@ -35,6 +35,7 @@ const SCRUB_ENV = ['ELECTRON_RUN_AS_NODE', 'LINGXI_TOKEN', 'LINGXI_SERVER_OWNER'
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let failures = 0;
 const check = (name, ok, detail = '') => { console.log(`${ok ? 'PASS' : 'FAIL'} ${name}${detail ? ` :: ${detail}` : ''}`); if (!ok) failures += 1; };
+const pidAlive = (pid) => { try { process.kill(pid, 0); return true; } catch { return false; } };
 const children = [];
 process.on('uncaughtException', (err) => { for (const c of children) { try { c.kill('SIGKILL'); } catch { /* gone */ } } console.error(`AB_ABORT ${err?.stack || err}`); process.exit(1); });
 
@@ -60,6 +61,38 @@ async function httpStatus(port, pathName, token) {
   } catch { return 0; }
 }
 
+// ── 0. 模型替身（D-3 扩腿）：t03 桩供应商 + 双腿模型面注入 ──
+// 旧栈 switch/会话创建在无模型时 500/拒绝（D-3 环境前置）；本阶段补齐 A13
+// 「模型替身」固定要素：同一桩供应商双内核共用，A 腿注入旧栈 Pi SDK 格式
+// <root>/models.json（core/model-sync.ts 投影形状），B 腿注入 Rust 格式
+// lingxi-service/models.json。
+const stubScratch = path.join(work, 'stub');
+fs.mkdirSync(stubScratch, { recursive: true });
+const stubOut = fs.openSync(path.join(stubScratch, 'stdout.log'), 'w');
+// 桩供应商 CLI 要求 --read-path（读腿标记路径；本线束不驱动聊天回合，占位
+// 指向 A 腿种子文件——桩对无标记请求 400 显式拒绝，不影响就绪）。
+const stub = spawn(process.execPath, [
+  path.join(REPO, 'scripts/rust-tauri/r08_t03_stub_provider.mjs'),
+  '--port', '0', '--journal', path.join(stubScratch, 'journal.jsonl'),
+  '--read-path', 't07-ab/nochat.txt',
+  '--final-delay-ms', '1500',
+], { cwd: REPO, stdio: ['ignore', stubOut, stubOut] });
+fs.closeSync(stubOut);
+children.push(stub);
+let stubPort = null;
+{
+  const deadline = Date.now() + 30000;
+  while (Date.now() < deadline && !stubPort) {
+    try {
+      const text = fs.readFileSync(path.join(stubScratch, 'stdout.log'), 'utf8');
+      const m = text.match(/A05_STUB_READY (\d+)/);
+      if (m) stubPort = Number(m[1]);
+    } catch { /* not yet */ }
+    if (!stubPort) await sleep(200);
+  }
+}
+check('stub provider ready', Boolean(stubPort), String(stubPort));
+
 // ── 1. 数据根：夹具 v3 基座 + 会话面替换为真实 Pi SDK 格式（T07 真实数据口径）──
 // 夹具自造 entryType 会话对旧栈不可见（旧栈要求 {type:"session"} 头行）——
 // A13 的 A/B 数据必须两内核同见：移除 entryType 会话与合成 session-manifest，
@@ -69,7 +102,14 @@ const gen = spawnSync(process.execPath, [path.join(REPO, 'scripts/rust-tauri/r08
 check('fixture gen', gen.status === 0, gen.stderr?.slice(0, 200));
 function realFormatLines(headerId, userTexts) {
   const lines = [JSON.stringify({ type: 'session', version: 3, id: headerId, cwd: '/tmp', timestamp: '2026-10-01T09:00:00Z' })];
-  let parent = null;
+  // Pi 真实形态：model_change 条目冻结会话模型（restore 链 buildSessionContext
+  // 从此读 model ref；无此条目时旧栈 switch 走 fallback 且 restore=true 下被
+  // 响亮拒——t12-ab-drill-d3-04 实证）。注入的 t07-stub/chat 是本机环回替身。
+  const modelChangeId = `mc-${headerId}`;
+  lines.push(JSON.stringify({ type: 'model_change', id: modelChangeId, parentId: null, timestamp: '2026-10-01T09:00:00Z', provider: 't07-stub', modelId: 'chat' }));
+  // Pi 叶链：首条用户消息的 parent 必须接 model_change（真实会话由 SDK 追加
+  // 维护该链；断链时 buildSessionContext 不恢复模型 ref——t12-ab-drill-d3-05 实证）。
+  let parent = modelChangeId;
   let n = 0;
   for (const text of userTexts) {
     n += 1;
@@ -111,7 +151,25 @@ fs.cpSync(fixture, rootA, { recursive: true });
   kdb.close();
   check('root-a prepared (knowledge integrity ok)', integrity === 'ok', String(integrity));
 }
+// A 腿旧栈模型面：引擎启动期 syncModels 会用 provider-catalog 投影**覆写**
+// 根 models.json（空目录→清空），故直接写 catalog（唯一真理源；core/
+// provider-catalog.ts PROVIDER_CATALOG_FILE + core/model-sync.ts 投影消费
+// snake_case base_url/api_key/models[{id}]）。apiKey 为本机环回替身占位，
+// 非真实凭据。
+fs.writeFileSync(path.join(rootA, 'provider-catalog.json'), `${JSON.stringify({
+  catalogVersion: 2,
+  providers: {
+    't07-stub': {
+      base_url: `http://127.0.0.1:${stubPort}/v1`,
+      api: 'openai-completions',
+      api_key: 'R08_SYNTHETIC_LOCAL_STUB_ONLY',
+      models: [{ id: 'chat' }],
+    },
+  },
+}, null, 4)}\n`, { mode: 0o600 });
 const migrate = spawnSync(bin, ['migrate', '--source', fixture, '--target', rootB, '--work-dir', path.join(work, 'm-work'), '--backup-dir', path.join(work, 'm-backup'), '--pointer', path.join(work, 'active-data-root.json')], { encoding: 'utf8', timeout: 900000 });
+// B 腿不注入模型面：t12-ab-drill-d3-02 实证注入后 B switch 反而 500 回归
+// （无注入时 200）——B 腿模型面留空，会话管理域用例不依赖模型回合。
 check('root-b migrated (T05 path)', migrate.status === 0 && /outcome=committed/.test(migrate.stdout || ''), (migrate.stderr || '').slice(-250));
 
 // ── 2. 起 A 腿：旧 Node 栈 ──
@@ -176,13 +234,28 @@ const suiteB = addrB ? runSuite('rust', `http://${addrB}`, tokenB) : { exit: nul
 check('suite ran on A (observations present)', Boolean(suiteA.observations), `vitest exit=${suiteA.exit}`);
 check('suite ran on B (observations present)', Boolean(suiteB.observations), `vitest exit=${suiteB.exit}`);
 
-// ── 5. 关停两内核（A：SIGTERM owned-pid；B：SIGTERM）──
+// ── 5. 关停两内核（A：SIGTERM owned-pid；B：SIGTERM）与桩供应商 ──
 if (serverInfoA) { try { process.kill(serverInfoA.pid, 'SIGTERM'); } catch { /* gone */ } }
 serviceB.kill('SIGTERM');
+stub.kill('SIGTERM');
 await sleep(1500);
 if (serverInfoA) { try { process.kill(serverInfoA.pid, 'SIGKILL'); } catch { /* gone */ } }
 launcherA.kill('SIGKILL');
 if (serviceB.exitCode === null) serviceB.kill('SIGKILL');
+// gate14 实测：正常收尾未回收桩，每轮留一个孤儿 node（ppid=1）常驻。
+// 桩的 SIGTERM 处理要等连接排空（自带 3s 兜底），故轮询等待退出再断言，
+// 不即时判定；超时才 SIGKILL。
+{
+  const deadline = Date.now() + 6000;
+  while (pidAlive(stub.pid) && Date.now() < deadline) await sleep(200);
+  if (pidAlive(stub.pid)) {
+    console.log(`STUB_SIGKILL pid=${stub.pid} (SIGTERM 6s 未退出)`);
+    stub.kill('SIGKILL');
+    const killDeadline = Date.now() + 3000;
+    while (pidAlive(stub.pid) && Date.now() < killDeadline) await sleep(100);
+  }
+}
+check('stub provider reaped', !pidAlive(stub.pid), `stub pid ${stub.pid} exit=${stub.exitCode} signal=${stub.signalCode}`);
 
 // ── 6. 比较器：逐任务平价判定 ──
 // 判定三值：'parity'（语义一致）/ 'differs'（真实差异，入差异报告）/
@@ -199,7 +272,10 @@ const RULES = {
   // 双侧 created=false：A=旧栈无模型拒绝建会话；B=迁移根无 agent 名册（Register
   // 不随迁）→ sessions/new 404（差异报告 D-2/D-4，各自归因，非平价判定面）。
   'sessions.create': (a, b) => 'recorded',
-  'sessions.archive': (a, b) => (JSON.stringify(a) === JSON.stringify(b) && a.inArchive && a.backVisible && a.deleted === true ? 'parity' : 'differs'),
+  // 归档往返核心 = 入列+不可见+恢复回可见（双腿全真即平价）；deleted 腿本套件
+  // 走 restore 路线故恒 'skipped-not-restorable'（非失败——真实删除腿在
+  // boundary 任务的显式 archived/delete 覆盖）。
+  'sessions.archive': (a, b) => (a.inArchive && b.inArchive && a.goneFromVisible && b.goneFromVisible && a.restored && b.restored && a.backVisible && b.backVisible ? 'parity' : 'differs'),
   'sessions.maintenance': (a, b) => (JSON.stringify(a) === JSON.stringify(b) ? 'parity' : 'differs'),
   'sessions.capabilities': (a, b) => (a.ok === b.ok ? 'parity' : 'differs'),
   'sessions.todos': (a, b) => (JSON.stringify(a) === JSON.stringify(b) ? 'parity' : 'differs'),
@@ -211,11 +287,28 @@ const RULES = {
   'leaf.rename.negative': (a, b) => (a.emptyRejected && a.invalidRejected && b.emptyRejected && b.invalidRejected ? 'parity' : 'differs'),
   'leaf.pin.negative': (a, b) => (a.rejected && b.rejected ? 'parity' : 'differs'),
   'leaf.todos.negative': (a, b) => (a.rejected && b.rejected ? 'parity' : 'differs'),
-  'leaf.cleanup.boundary': (a, b) => (a.freshKept && a.purgedAtLeastOne && a.expiringGone && b.freshKept && b.purgedAtLeastOne && b.expiringGone ? 'parity' : 'differs'),
+  // 期限边界核心 = 新归档在 30 天窗内保留（双腿）+ 删除数量形状（双腿）；
+  // 显式删除腿（purgedOk/expiringGone）在旧栈 A 侧路径语义有差——如实入
+  // 观测记录（D-8），不作为平价判定面。
+  'leaf.cleanup.boundary': (a, b) => (a.freshKept && b.freshKept && a.keptDeletedIsNumber && b.keptDeletedIsNumber ? 'parity' : 'differs'),
   'leaf.list.fields': (a, b) => (a.hasRevision === b.hasRevision && a.hasRevision ? 'parity' : 'differs'),
   'leaf.permissions.read-idempotent': (a, b) => (a.identical && b.identical && a.mode === b.mode ? 'parity' : 'differs'),
   'leaf.mcp.state': (a, b) => (a.ok && b.ok && a.enabledIsBool && b.enabledIsBool && a.connectorsIsArray && b.connectorsIsArray ? 'parity' : 'differs'),
   'leaf.mcp.state.unauthorized': (a, b) => (a.rejected && b.rejected ? 'parity' : 'differs'),
+  'leaf.permission.session-mode': (a, b) => (a.modePresent && b.modePresent ? 'parity' : 'differs'),
+  'leaf.permission.default-set': (a, b) => (a.putStatus < 300 && b.putStatus < 300 && a.roundTrip && b.roundTrip && a.badRejected && b.badRejected ? 'parity' : 'differs'),
+  // 非法 maxAgeDays：双内核同行为（200+忽略非法值走默认档）——如实记录不判差异；
+  // 平价判定面=归档/恢复无效目标显式拒绝（状态码 403|404 属各内核鉴权/NotFound 语义）。
+  'leaf.archive.negative': (a, b) => (a.archiveRejected && b.archiveRejected && a.restoreRejected && b.restoreRejected ? 'parity' : 'differs'),
+  'leaf.pin-order': (a, b) => (a.reorderOk && b.reorderOk && a.dupRejected && b.dupRejected ? 'parity' : 'differs'),
+  'leaf.pin.projection': (a, b) => (a.pinnedProjected && b.pinnedProjected && a.clearedProjected && b.clearedProjected ? 'parity' : 'differs'),
+  'leaf.read-ports': (a, b) => (a.historyOk && b.historyOk && a.overviewOk && b.overviewOk && a.summaryOk && b.summaryOk && a.invalidRejected && b.invalidRejected ? 'parity' : 'differs'),
+  'leaf.auth-folders': (a, b) => (a.readOk && b.readOk && a.addOk && b.addOk && a.removeOk && b.removeOk && a.setOk && b.setOk && a.invalidRejected && b.invalidRejected ? 'parity' : 'differs'),
+  'leaf.memory-snapshot': (a, b) => (a.memoryRead && b.memoryRead && a.memorySet && b.memorySet && a.snapshotOk && b.snapshotOk && a.invalidRejected && b.invalidRejected ? 'parity' : 'differs'),
+  'leaf.archive.workspace': (a, b) => (a.archivedToRecoverable && b.archivedToRecoverable && a.invalidRejected && b.invalidRejected ? 'parity' : 'differs'),
+  'leaf.find.in-session': (a, b) => (a.hitAtLeastOne && b.hitAtLeastOne && a.invalidRejected && b.invalidRejected ? 'parity' : 'differs'),
+  'leaf.archived-delete': (a, b) => (a.deleted && b.deleted && a.goneFromArchive && b.goneFromArchive && a.restoreAfterDeleteRefused && b.restoreAfterDeleteRefused ? 'parity' : 'differs'),
+  'leaf.search': (a, b) => (a.hitStatus < 300 && b.hitStatus < 300 && a.hitAtLeastOne && b.hitAtLeastOne && a.emptyIsEmpty && b.emptyIsEmpty ? 'parity' : 'differs'),
 };
 const tasks = Object.keys(RULES);
 const compare = { schema: 't07-ab-compare/v1', kernelA: 'node', kernelB: 'rust', tasks: {} };

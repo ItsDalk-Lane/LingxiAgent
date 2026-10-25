@@ -5925,7 +5925,9 @@ fn session_row_json(
         "pinOrder": row.pin_order,
         "memoryEnabled": row.memory_enabled,
         "authorizedFolders": row.authorized_folders,
-        "permissionMode": row.permission_mode,
+        // D-7（2026-10-24）：旧栈 switch 投影把无显式模式归一化为默认 ask；
+            // Rust 透传 DB 原值会让迁移会话拿到 null。对齐旧栈：null/空 → "ask"。
+            "permissionMode": row.permission_mode.as_deref().filter(|m| !m.is_empty()).unwrap_or("ask"),
         "archivedAtUnixMs": row.archived_at_unix_ms,
         "lastActivityUnixMs": row.last_activity_unix_ms,
     })
@@ -6288,7 +6290,9 @@ async fn switch_session_route(
             "workspaceFolders": metadata.as_ref().map(|value| value.workspace_folders.clone()).unwrap_or_default(),
             "cwd": metadata.as_ref().and_then(|value| value.cwd.clone()),
             "projectId": row.project_id,
-            "permissionMode": row.permission_mode,
+            // D-7（2026-10-24）：旧栈 switch 投影把无显式模式归一化为默认 ask；
+            // Rust 透传 DB 原值会让迁移会话拿到 null。对齐旧栈：null/空 → "ask"。
+            "permissionMode": row.permission_mode.as_deref().filter(|m| !m.is_empty()).unwrap_or("ask"),
             "thinkingLevel": choice.thinking_level,
             "currentModelProvider": choice.model.as_ref().map(|pair| pair.0.clone()),
             "currentModelId": choice.model.as_ref().map(|pair| pair.1.clone()),

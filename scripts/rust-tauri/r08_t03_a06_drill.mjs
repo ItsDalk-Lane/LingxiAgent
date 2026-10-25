@@ -19,7 +19,8 @@
  *   3. 双客户端共连：任务腿从客户端 A 渲染进程内发起（CDP 在 A 页面上下文执行
  *      与真实客户端相同的 wsTicket + wire 协议流程，连接真实源自 A 进程），
  *      leg-a1 在双端在线时完成。
- *   4. 退 B 后 A 继续工作：Cmd+Q 定向退 B（frontmost by unix id），B 进程收敛；
+ *   4. 退 B 后 A 继续工作：Cmd+Q 定向退 B（AXRaise+frontmost by unix id，再经 CDP
+ *      核实 B 渲染进程 document.hasFocus() 且 A 不持焦点后才发键），B 进程收敛、A 未被误伤；
  *      服务 pid/instanceId 不变、health 200；A 端 leg-a2 仍完成。
  *   5. 退 A 后服务仍存活（对客户端退出零接触），harness 负责回收服务并记录退出码。
  *
@@ -395,47 +396,62 @@ function osascript(script) {
 }
 
 /**
- * 定向 Cmd+Q：双 Electron 实例同名，activate "Electron" 有歧义。
- * frontmost by unix id 锁定目标实例主进程后再发 keystroke。
+ * 定向 Cmd+Q：双 Electron 实例同名且同 bundle。System Events 的
+ * `set frontmost of p` / `frontmost of p` 按 bundle 而非 unix id 回答——
+ * gate14 红实证：对 B 设前台、frontmost 回 true，Cmd+Q 却退了 A
+ * （quit-b-keystroke-1 → electron-A-exit）。此前键击被 TCC 拦截时走
+ * SIGTERM 兜底把这一缺陷盖住了。
+ *
+ * 键击前以 CDP 在目标渲染进程读 document.hasFocus()（按 pid 的真实键盘焦点，
+ * 与 bundle 无关），并确认其余存活客户端 hasFocus()!==true；核实不到绝不盲发
+ * Cmd+Q（盲发会退掉任意前台应用），直接走已披露的 SIGTERM 兜底。
  */
-async function quitClientByPid(step, pid, electronChild) {
-  // drill-01..04 红迹：双同名实例下前台激活竞态不可控（frontmost 未确认即
-  // keystroke / 进程内 keystroke 不触发键等价 / set frontmost 被拒）。
-  // 定稿分层：① AXRaise 窗口（窗口管理器层激活，绕 frontmost 竞态）→
-  // 确认 frontmost → keystroke（真实用户路径，尽力而为，journal 全程留痕）；
-  // ② 未收敛 → SIGTERM 兜底（Electron 捕获后走正常退出链：drill-01..04
-  // cleanup 实测 exit code 0 / signal null，before-quit 处理照常执行）。
-  // 替代显式记入 verdict.quitMechanism，不静默。
-  const raiseScript = (action) => `
+async function quitClientByPid(step, target, others = []) {
+  const { pid, electron: electronChild } = target;
+  const raiseScript = `
 tell application "System Events"
   set p to first process whose unix id is ${pid}
   try
     perform action "AXRaise" of (first window of p)
   end try
   set frontmost of p to true
-  set n to 0
-  repeat until (frontmost of p) or n > 16
-    delay 0.25
-    set n to n + 1
-  end repeat
-  if not (frontmost of p) then error "frontmost-not-achieved"
-  ${action}
 end tell`;
+  const keystrokeScript = 'tell application "System Events" to keystroke "q" using {command down}';
+  const readFocus = async (client) => {
+    if (!pidAlive(client.pid)) return 'exited';
+    try { return await cdpEvaluateClient(client, 'document.hasFocus()', false, 5000); } catch { return 'cdp-error'; }
+  };
+  const focusState = async () => {
+    const state = { target: await readFocus(target), others: {} };
+    for (const client of others) state.others[client.name] = await readFocus(client);
+    return state;
+  };
+  const focusVerified = (state) => state.target === true
+    && Object.values(state.others).every((value) => value !== true);
   let mechanism = 'keyboard';
   let exited = false;
   for (let attempt = 1; attempt <= 2 && pidAlive(pid); attempt += 1) {
-    const q = osascript(raiseScript('keystroke "q" using {command down}'));
-    journal(`${step}-keystroke-${attempt}`, q);
+    journal(`${step}-raise-${attempt}`, osascript(raiseScript));
+    let state = await focusState();
+    const deadline = Date.now() + 8000;
+    while (!focusVerified(state) && Date.now() < deadline) {
+      await sleep(250);
+      state = await focusState();
+    }
+    journal(`${step}-focus-${attempt}`, { verified: focusVerified(state), state });
+    if (!focusVerified(state)) continue;
+    journal(`${step}-keystroke-${attempt}`, osascript(keystrokeScript));
     try { await waitFor(`${step}-exit-${attempt}`, () => !pidAlive(pid), 20000); exited = true; } catch { /* 下一轮/兜底 */ }
   }
   if (pidAlive(pid)) {
     mechanism = 'sigterm-graceful';
-    journal(`${step}-sigterm`, { pid, reason: 'keyboard-path-exhausted' });
+    journal(`${step}-sigterm`, { pid, reason: 'keyboard-path-exhausted-or-focus-unverified' });
     try { electronChild.kill('SIGTERM'); } catch { /* 已退出 */ }
     await waitFor(`${step}-sigterm-exit`, () => !pidAlive(pid), 30000);
     exited = true;
   }
-  return { mechanism, exited };
+  const collateral = others.filter((client) => !pidAlive(client.pid)).map((client) => client.name);
+  return { mechanism, exited, collateral };
 }
 
 /**
@@ -656,11 +672,16 @@ async function main() {
       && JSON.stringify(hist1.value).includes('A06-CHAT-FINAL leg-a1'),
       `leg-a1 服务侧历史含终结回答（status=${hist1.status}）`);
 
-    // ── 步骤 6：定向退 B → B 收敛、服务 pid/instanceId 连续、A 健康 ──
-    const qb = await quitClientByPid('quit-b', clients.B.pid, clients.B.electron);
+    // ── 步骤 6：定向退 B → B 收敛、A 未被误伤、服务 pid/instanceId 连续、A 健康 ──
+    const qb = await quitClientByPid('quit-b', clients.B, [clients.A]);
     quitMechanisms.B = qb.mechanism;
     assert('quit-b-exit', !pidAlive(clients.B.pid),
       `客户端 B 主进程退出（mechanism=${qb.mechanism}）`);
+    assert('client-a-alive-after-b', pidAlive(clients.A.pid) && qb.collateral.length === 0,
+      `退 B 未误伤 A（A pid ${clients.A.pid} 存活；collateral=${JSON.stringify(qb.collateral)}）`);
+    if (!pidAlive(clients.A.pid)) {
+      throw new Error('client-a-collateral-exit: 定向退 B 时客户端 A 一并退出（Cmd+Q 错投），后续 A 侧断言无法成立');
+    }
     assert('service-alive-after-b', pidAlive(conn.pid),
       `退 B 后服务 pid ${conn.pid} 存活（对客户端退出零接触）`);
     const connAfterB = readRuntimeRecords(svcHome);
@@ -700,7 +721,7 @@ async function main() {
       `leg-a2 服务侧历史含终结回答（status=${hist2.status}）`);
 
     // ── 步骤 9：退 A → 全客户端收敛、服务仍存活（零接触终态）──
-    const qa = await quitClientByPid('quit-a', clients.A.pid, clients.A.electron);
+    const qa = await quitClientByPid('quit-a', clients.A, []);
     quitMechanisms.A = qa.mechanism;
     assert('quit-a-exit', !pidAlive(clients.A.pid),
       `客户端 A 主进程退出（mechanism=${qa.mechanism}）`);
@@ -813,9 +834,11 @@ function finish(outDir, svcHome, serviceReaped) {
       evidence: ['t03-a06-auth-probe-04/output.log', 'verdict.json'],
     },
     quitMechanisms,
-    quitMechanismNote: 'keyboard=AXRaise+frontmost 确认后 Cmd+Q（真实用户路径）；'
-      + 'sigterm-graceful=键盘路径穷尽后 SIGTERM 兜底（Electron 捕获走正常退出链，exit 0；'
-      + 'drill-01..04 红迹证明双同名实例前台激活竞态不可控）。替代显式记录，不静默。',
+    quitMechanismNote: 'keyboard=AXRaise+set frontmost 后，经 CDP 核实目标渲染进程 document.hasFocus()===true'
+      + ' 且其余存活客户端 !==true 再发 Cmd+Q（真实用户路径；System Events 的 frontmost 对同 bundle 双实例按 bundle 回答，'
+      + 'gate14 红实证 Cmd+Q 错投退了 A，故不再以其为发键依据）；'
+      + 'sigterm-graceful=焦点核实不到或键盘路径穷尽后 SIGTERM 兜底（Electron 捕获走正常退出链，exit 0）。'
+      + '绝不盲发 Cmd+Q；替代显式记录，不静默。',
     failures,
     serviceHome: svcHome || null,
     serviceReapedByHarness: Boolean(serviceReaped),

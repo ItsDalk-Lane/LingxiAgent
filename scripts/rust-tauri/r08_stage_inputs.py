@@ -47,10 +47,6 @@ SHARE_PINS = {
         "share": "正路径：改名成功且重载持久化（双内核）",
         "cases": [("ab::sessions.rename.ok", 1), ("ab::sessions.rename.persisted", 1)],
     },
-    "R00-T02-LA-0D4F0EFC9DAE": {
-        "share": "正路径：置顶与取消置顶调用成功（双内核）；已删 Agent 禁置顶等分支未测",
-        "cases": [("ab::sessions.pin.pin", 1), ("ab::sessions.pin.unpin", 1)],
-    },
     "R00-T02-LA-45C5CE361CCB": {
         "share": "正路径：完成调用成功（双内核）；广播与重复写幂等未测",
         "cases": [("ab::sessions.todos.complete", 1)],
@@ -74,6 +70,22 @@ SHARE_PINS = {
     "R00-T02-LA-25C4FF66FEE5": {
         "share": "正路径：返回同一 permissionMode（双内核 auto）；未设置时 ASK 未测",
         "cases": [("ab::permissions.default.parity", 1)],
+    },
+    "R00-T02-LA-B0F05BC32D62": {
+        "share": "形状+期限边界（新归档保留双内核）；A 腿 cleanup(30) 对 fixture 超期归档计数 0 vs B 1——旧栈删除计数语义未对齐（t12-ab-drill-d3-07），如实留债",
+        "cases": [("ab::sessions.maintenance.cleanup", 1)],
+    },
+    "R00-T02-LA-FF4F06011B48": {
+        "share": "记忆开关读/写与负路径双内核全绿；提示词快照 A 腿 500——合成会话无冻结快照 sidecar（需真实模型回合产生，t19-ab-drill-memsnap-01 实证；B 腿 200）——产品侧合成前提，如实留债",
+        "cases": [],
+    },
+    "R00-T02-LA-4F1F69CCA760": {
+        "share": "A 腿旧栈 /api/sessions/find?path=&q= 会话内文本查找可用（200+命中+无效会话 403）；Rust /lingxi/v1/sessions/find 仅按 id 定位且拒绝 q 键（400 unknown query key）——旧会话内查找路由未迁移（t14-ab-drill-batch3-01 实证），登记 D-10，绑定不可行",
+        "cases": [],
+    },
+    "R00-T02-LA-BC2FBD618278": {
+        "share": "switch 投影正路径 A 腿被旧栈无模型 500 阻断（D-3 同根）；B 腿 200 但 permissionMode 为 DB 原值 null（新发现 D-7：旧栈归一化默认 mode vs Rust 透传 DB 值）——双内核均不可绑定，如实留债",
+        "cases": [],
     },
 }
 
@@ -106,6 +118,168 @@ FULL_BINDINGS = {
         "assertion_cases": [
             ["leaf::mcp.state.shape"],
             ["leaf::mcp.state.unauthorized-rejected"],
+        ],
+    },
+    "R00-T02-LA-8D3CEB6133E1": {  # 设置新会话默认权限
+        "assertion_cases": [
+            ["leaf::permission.default-roundtrip"],
+            ["leaf::permission.default-invalid-rejected"],
+        ],
+    },
+    "R00-T02-LA-51905CECDD1B": {  # 查看会话记忆开关：断言0=读面返回 memoryEnabled；断言1=无效会话显式拒
+        "assertion_cases": [
+            ["leaf::memory.read"],
+            ["leaf::memory-snapshot.invalid-rejected"],
+        ],
+    },
+    "R00-T02-LA-9616596B5720": {  # 设置会话记忆开关：断言0=布尔设置生效回读一致；断言1=无效会话显式拒
+        "assertion_cases": [
+            ["leaf::memory.set"],
+            ["leaf::memory-snapshot.invalid-rejected"],
+        ],
+    },
+    "R00-T02-LA-98DDC94776F1": {  # 查看会话授权目录：断言0=读面返回；断言1=无效目录显式拒
+        "assertion_cases": [
+            ["leaf::auth-folders.read"],
+            ["leaf::auth-folders.invalid-rejected"],
+        ],
+    },
+    "R00-T02-LA-604C64F4828A": {  # 增加会话授权目录：断言0=验证真实目录后扩大范围；断言1=不存在目录显式拒
+        "assertion_cases": [
+            ["leaf::auth-folders.add"],
+            ["leaf::auth-folders.invalid-rejected"],
+        ],
+    },
+    "R00-T02-LA-1E0D477755CD": {  # 撤销会话授权目录：断言0=从授权范围移除指定目录；断言1=负路径显式拒
+        "assertion_cases": [
+            ["leaf::auth-folders.remove"],
+            ["leaf::auth-folders.invalid-rejected"],
+        ],
+    },
+    "R00-T02-LA-73B631D77531": {  # 替换会话授权目录：断言0=整体替换原授权范围；断言1=负路径显式拒
+        "assertion_cases": [
+            ["leaf::auth-folders.set"],
+            ["leaf::auth-folders.invalid-rejected"],
+        ],
+    },
+    "R00-T02-LA-AA9EB3FD034D": {  # 阅读会话消息页：断言0=消息页读面返回（history/content 投影）；断言1=无效会话显式拒
+        "assertion_cases": [
+            ["leaf::read.history-page"],
+            ["leaf::read.invalid-rejected"],
+        ],
+    },
+    "R00-T02-LA-CDBFE6616EB9": {  # 查看会话历史概览：断言0=概览读面返回；断言1=无效会话显式拒
+        "assertion_cases": [
+            ["leaf::read.overview"],
+            ["leaf::read.invalid-rejected"],
+        ],
+    },
+    "R00-T02-LA-F0319FC4F93D": {  # 查看单会话摘要：断言0=摘要读面返回；断言1=无效会话显式拒
+        "assertion_cases": [
+            ["leaf::read.summary"],
+            ["leaf::read.invalid-rejected"],
+        ],
+    },
+    "R00-T02-LA-0D4F0EFC9DAE": {  # 设置会话置顶：断言0=置顶投影（pinned+stamp/order 落列表）；断言1=取消置顶清除投影
+        "assertion_cases": [
+            ["leaf::pin.state-projected"],
+            ["leaf::pin.state-cleared"],
+        ],
+    },
+    "R00-T02-LA-2D4EBE0FF3C2": {  # 归档工作台会话：断言0=移入可恢复归档；断言1=无效目标显式拒
+        "assertion_cases": [
+            ["leaf::archive-workspace.recoverable"],
+            ["leaf::archive-workspace.invalid-rejected"],
+        ],
+    },
+    "R00-T02-LA-51905CECDD1B": {  # 查看会话记忆开关：断言0=读面返回 memoryEnabled；断言1=无效会话显式拒
+        "assertion_cases": [
+            ["leaf::memory.read"],
+            ["leaf::memory-snapshot.invalid-rejected"],
+        ],
+    },
+    "R00-T02-LA-9616596B5720": {  # 设置会话记忆开关：断言0=布尔设置生效回读一致；断言1=无效会话显式拒
+        "assertion_cases": [
+            ["leaf::memory.set"],
+            ["leaf::memory-snapshot.invalid-rejected"],
+        ],
+    },
+    "R00-T02-LA-98DDC94776F1": {  # 查看会话授权目录：断言0=读面返回；断言1=无效目录显式拒
+        "assertion_cases": [
+            ["leaf::auth-folders.read"],
+            ["leaf::auth-folders.invalid-rejected"],
+        ],
+    },
+    "R00-T02-LA-604C64F4828A": {  # 增加会话授权目录：断言0=验证真实目录后扩大范围；断言1=不存在目录显式拒
+        "assertion_cases": [
+            ["leaf::auth-folders.add"],
+            ["leaf::auth-folders.invalid-rejected"],
+        ],
+    },
+    "R00-T02-LA-1E0D477755CD": {  # 撤销会话授权目录：断言0=从授权范围移除指定目录；断言1=负路径显式拒
+        "assertion_cases": [
+            ["leaf::auth-folders.remove"],
+            ["leaf::auth-folders.invalid-rejected"],
+        ],
+    },
+    "R00-T02-LA-73B631D77531": {  # 替换会话授权目录：断言0=整体替换原授权范围；断言1=负路径显式拒
+        "assertion_cases": [
+            ["leaf::auth-folders.set"],
+            ["leaf::auth-folders.invalid-rejected"],
+        ],
+    },
+    "R00-T02-LA-AA9EB3FD034D": {  # 阅读会话消息页：断言0=消息页读面返回（history/content 投影）；断言1=无效会话显式拒
+        "assertion_cases": [
+            ["leaf::read.history-page"],
+            ["leaf::read.invalid-rejected"],
+        ],
+    },
+    "R00-T02-LA-CDBFE6616EB9": {  # 查看会话历史概览：断言0=概览读面返回；断言1=无效会话显式拒
+        "assertion_cases": [
+            ["leaf::read.overview"],
+            ["leaf::read.invalid-rejected"],
+        ],
+    },
+    "R00-T02-LA-F0319FC4F93D": {  # 查看单会话摘要：断言0=摘要读面返回；断言1=无效会话显式拒
+        "assertion_cases": [
+            ["leaf::read.summary"],
+            ["leaf::read.invalid-rejected"],
+        ],
+    },
+    "R00-T02-LA-0D4F0EFC9DAE": {  # 设置会话置顶：断言0=置顶语义+投影（pinned/stamp/order 落列表+清除）；断言1=无效目标显式拒
+        "assertion_cases": [
+            ["ab::sessions.pin.pin", "ab::sessions.pin.unpin", "leaf::pin.state-projected"],
+            ["leaf::pin.invalid-session.explicit-error", "leaf::pin.state-cleared"],
+        ],
+    },
+    "R00-T02-LA-2ED065BED168": {  # 重排置顶会话：断言0=整体重编号生效；断言1=重复 id 显式拒
+        "assertion_cases": [
+            ["leaf::pin-order.reorder-applies"],
+            ["leaf::pin-order.duplicate-rejected"],
+        ],
+    },
+    "R00-T02-LA-52226FEA5997": {  # 永久删除归档会话：断言0=归档文件与生命周期清除；断言1=删除后不可恢复（恢复接口显式拒）
+        "assertion_cases": [
+            ["leaf::archived-delete.file-and-lifecycle-cleared"],
+            ["leaf::archived-delete.unrecoverable"],
+        ],
+    },
+    "R00-T02-LA-A18187567AF9": {  # 跨会话搜索：断言0=内容命中；断言1=空查询空结果
+        "assertion_cases": [
+            ["leaf::search.content-hit"],
+            ["leaf::search.empty-query-empty-result"],
+        ],
+    },
+    "R00-T02-LA-43FFB75F252C": {  # 查看归档会话：断言0=归档列表含目标；断言1=无效目标显式拒绝
+        "assertion_cases": [
+            ["leaf::archive.positive-cycle"],
+            ["leaf::archive.negative.rejected"],
+        ],
+    },
+    "R00-T02-LA-31CDA283A11A": {  # 恢复归档会话：断言0=恢复回可见；断言1=无效恢复目标显式拒绝
+        "assertion_cases": [
+            ["leaf::archive.positive-cycle"],
+            ["leaf::archive.negative.rejected"],
         ],
     },
 }
@@ -160,6 +334,26 @@ def derive_ab_cases(out_dir: Path):
                   b.get("sessions.pin", {}).get("observed", {}))
     todos, todos_b = (a.get("sessions.todos", {}).get("observed", {}),
                       b.get("sessions.todos", {}).get("observed", {}))
+    memsnap = a.get("leaf.memory-snapshot", {}).get("observed", {})
+    memsnap_b = b.get("leaf.memory-snapshot", {}).get("observed", {})
+    authf = a.get("leaf.auth-folders", {}).get("observed", {})
+    authf_b = b.get("leaf.auth-folders", {}).get("observed", {})
+    rport = a.get("leaf.read-ports", {}).get("observed", {})
+    rport_b = b.get("leaf.read-ports", {}).get("observed", {})
+    pprj = a.get("leaf.pin.projection", {}).get("observed", {})
+    pprj_b = b.get("leaf.pin.projection", {}).get("observed", {})
+    awsp = a.get("leaf.archive.workspace", {}).get("observed", {})
+    awsp_b = b.get("leaf.archive.workspace", {}).get("observed", {})
+    fnd = a.get("leaf.find.in-session", {}).get("observed", {})
+    fnd_b = b.get("leaf.find.in-session", {}).get("observed", {})
+    pino = a.get("leaf.pin-order", {}).get("observed", {})
+    pino_b = b.get("leaf.pin-order", {}).get("observed", {})
+    adel = a.get("leaf.archived-delete", {}).get("observed", {})
+    adel_b = b.get("leaf.archived-delete", {}).get("observed", {})
+    srch = a.get("leaf.search", {}).get("observed", {})
+    srch_b = b.get("leaf.search", {}).get("observed", {})
+    archv = a.get("sessions.archive", {}).get("observed", {})
+    archv_b = b.get("sessions.archive", {}).get("observed", {})
     maint, maint_b = (a.get("sessions.maintenance", {}).get("observed", {}),
                       b.get("sessions.maintenance", {}).get("observed", {}))
     perm = a.get("permissions.default", {}).get("observed", {})
@@ -198,6 +392,12 @@ def derive_ab_cases(out_dir: Path):
     fields_b = b.get("leaf.list.fields", {}).get("observed", {})
     pidem = a.get("leaf.permissions.read-idempotent", {}).get("observed", {})
     pidem_b = b.get("leaf.permissions.read-idempotent", {}).get("observed", {})
+    aneg = a.get("leaf.archive.negative", {}).get("observed", {})
+    aneg_b = b.get("leaf.archive.negative", {}).get("observed", {})
+    psm = a.get("leaf.permission.session-mode", {}).get("observed", {})
+    psm_b = b.get("leaf.permission.session-mode", {}).get("observed", {})
+    pds = a.get("leaf.permission.default-set", {}).get("observed", {})
+    pds_b = b.get("leaf.permission.default-set", {}).get("observed", {})
     mcp = a.get("leaf.mcp.state", {}).get("observed", {})
     mcp_b = b.get("leaf.mcp.state", {}).get("observed", {})
     mcpu = a.get("leaf.mcp.state.unauthorized", {}).get("observed", {})
@@ -218,6 +418,43 @@ def derive_ab_cases(out_dir: Path):
                                         and mcp_b.get("enabledIsBool") and mcp.get("connectorsIsArray")
                                         and mcp_b.get("connectorsIsArray")) else 0,
         "leaf::mcp.state.unauthorized-rejected": 1 if (mcpu.get("rejected") and mcpu_b.get("rejected")) else 0,
+        "leaf::permission.session-mode-present": 1 if (psm.get("modePresent") and psm_b.get("modePresent")) else 0,
+        "leaf::permission.session-mode-idempotent": 1 if (psm.get("idempotent") and psm_b.get("idempotent")) else 0,
+        "leaf::permission.default-roundtrip": 1 if (pds.get("roundTrip") and pds_b.get("roundTrip")) else 0,
+        "leaf::permission.default-invalid-rejected": 1 if (pds.get("badRejected") and pds_b.get("badRejected")) else 0,
+        "leaf::archive.negative.rejected": 1 if (aneg.get("archiveRejected") and aneg_b.get("archiveRejected")
+                                                 and aneg.get("restoreRejected") and aneg_b.get("restoreRejected")) else 0,
+        "leaf::memory.read": 1 if (memsnap.get("memoryRead") and memsnap_b.get("memoryRead")) else 0,
+        "leaf::memory.set": 1 if (memsnap.get("memorySet") and memsnap_b.get("memorySet")) else 0,
+        "leaf::prompt-snapshot.read": 1 if (memsnap.get("snapshotOk") and memsnap_b.get("snapshotOk")) else 0,
+        "leaf::memory-snapshot.invalid-rejected": 1 if (memsnap.get("invalidRejected") and memsnap_b.get("invalidRejected")) else 0,
+        "leaf::auth-folders.read": 1 if (authf.get("readOk") and authf_b.get("readOk")) else 0,
+        "leaf::auth-folders.add": 1 if (authf.get("addOk") and authf_b.get("addOk")) else 0,
+        "leaf::auth-folders.remove": 1 if (authf.get("removeOk") and authf_b.get("removeOk")) else 0,
+        "leaf::auth-folders.set": 1 if (authf.get("setOk") and authf_b.get("setOk")) else 0,
+        "leaf::auth-folders.invalid-rejected": 1 if (authf.get("invalidRejected") and authf_b.get("invalidRejected")) else 0,
+        "leaf::read.history-page": 1 if (rport.get("historyOk") and rport_b.get("historyOk")) else 0,
+        "leaf::read.overview": 1 if (rport.get("overviewOk") and rport_b.get("overviewOk")) else 0,
+        "leaf::read.summary": 1 if (rport.get("summaryOk") and rport_b.get("summaryOk")) else 0,
+        "leaf::read.invalid-rejected": 1 if (rport.get("invalidRejected") and rport_b.get("invalidRejected")) else 0,
+        "leaf::pin.state-projected": 1 if (pprj.get("pinnedProjected") and pprj_b.get("pinnedProjected")) else 0,
+        "leaf::pin.state-cleared": 1 if (pprj.get("clearedProjected") and pprj_b.get("clearedProjected")) else 0,
+        "leaf::archive-workspace.recoverable": 1 if (awsp.get("archivedToRecoverable") and awsp_b.get("archivedToRecoverable")) else 0,
+        "leaf::archive-workspace.invalid-rejected": 1 if (awsp.get("invalidRejected") and awsp_b.get("invalidRejected")) else 0,
+        "leaf::find.in-session-hit": 1 if (fnd.get("hitAtLeastOne") and fnd_b.get("hitAtLeastOne")) else 0,
+        "leaf::find.in-session-invalid-rejected": 1 if (fnd.get("invalidRejected") and fnd_b.get("invalidRejected")) else 0,
+        "leaf::pin-order.reorder-applies": 1 if (pino.get("reorderOk") and pino_b.get("reorderOk")) else 0,
+        "leaf::pin-order.duplicate-rejected": 1 if (pino.get("dupRejected") and pino_b.get("dupRejected")) else 0,
+        "leaf::archived-delete.file-and-lifecycle-cleared": 1 if (adel.get("deleted") and adel_b.get("deleted")
+                                                                       and adel.get("goneFromArchive") and adel_b.get("goneFromArchive")) else 0,
+        "leaf::archived-delete.unrecoverable": 1 if (adel.get("restoreAfterDeleteRefused") and adel_b.get("restoreAfterDeleteRefused")) else 0,
+        "leaf::search.content-hit": 1 if (srch.get("hitAtLeastOne") and srch_b.get("hitAtLeastOne")) else 0,
+        "leaf::search.empty-query-empty-result": 1 if (srch.get("emptyIsEmpty") and srch_b.get("emptyIsEmpty")) else 0,
+        "leaf::archive.positive-cycle": 1 if (archv.get("inArchive") and archv_b.get("inArchive")
+                                                and archv.get("goneFromVisible") and archv_b.get("goneFromVisible")
+                                                and archv.get("restored") and archv_b.get("restored")
+                                                and archv.get("backVisible") and archv_b.get("backVisible")) else 0,
+        "leaf::cleanup.expired-deleted": 1 if (maint.get("cleanupDeletedAtLeastOne") and maint_b.get("cleanupDeletedAtLeastOne")) else 0,
     })
     return cases
 
@@ -365,6 +602,13 @@ def main() -> int:
             for suite in TASK_SUITES.get(task, []):
                 commands.setdefault(suite, command_for_suite(suite))
                 refs.append(suite)
+        # 场景→套件精确化：A05 的验收证据就是 a05 演习（读/写腿 + PPG-1 呈现），
+        # A06 的证据就是 a06 演习（双客户端 remote 零接触）。按任务粗绑定会把
+        # a06 的环境红拖垮 A05——本阶段各自专属（gate-05 实证）。
+        if aid == 'R08-A05':
+            refs = ['r08_t03_a05_drill']
+        if aid == 'R08-A06':
+            refs = ['r08_t03_a06_drill']
         scenarios.append({
             "id": aid,
             "requirement": "REQUIRED",

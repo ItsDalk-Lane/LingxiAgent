@@ -465,6 +465,58 @@ function osascript(script) {
   return { status: result.status, stdout: (result.stdout || '').trim(), stderr: (result.stderr || '').trim() };
 }
 
+/**
+ * 聚焦到指定 pid 的进程（a06 quitClientByPid 同款已证形态：AXRaise + set
+ * frontmost + 轮询确认）。`tell application "Electron" to activate` 对开发版
+ * Electron 不达前台（frontmost 恒为宿主终端 → keystroke 送错目标——
+ * t16-a05-unlock-check-01 journal 实证 row1 实测 visible + row3 超时；TCC
+ * 本身已授权，keystroke exit 0）。返回 frontmost 是否就位。
+ */
+function focusProcessByPid(pid) {
+  const script = `
+tell application "System Events"
+  set p to first process whose unix id is ${pid}
+  try
+    perform action "AXRaise" of (first window of p)
+  end try
+  set frontmost of p to true
+  set n to 0
+  repeat until (frontmost of p) or n > 16
+    delay 0.25
+    set n to n + 1
+  end repeat
+  if not (frontmost of p) then error "frontmost-not-achieved"
+  return name of p
+end tell`;
+  return osascript(script);
+}
+
+let freezeHideMechanism = 'keyboard';
+let freezeQuitMechanism = 'keyboard';
+
+// R08_A05_MANUAL=1 手动辅助模式（2026-10-25 用户路径①）：宿主策略丢弃合成
+// AppleScript 焦点/按键（六查在案），但真实用户点击+键盘永远有效。此模式下
+// row1/row3 跳过 osascript 合成，改为终端实时提示 + 宽窗等待用户亲自按键，
+// 机制如实记 verdict（manual-user）——比合成按键更真实的用户路径证据。
+const MANUAL_MODE = process.env.R08_A05_MANUAL === '1';
+function manualPrompt(line) {
+  if (!MANUAL_MODE) return;
+  process.stdout.write(`\n[手动辅助] ${line}\n`);
+}
+/** 手动等待谓词成立（宽窗 180s，每 2s 心跳提示剩余秒数）。 */
+async function manualWait(label, predicate, budgetMs = 180000) {
+  if (!MANUAL_MODE) return false;
+  manualPrompt(`请在 ${Math.round(budgetMs / 1000)} 秒内完成：${label}`);
+  const deadline = Date.now() + budgetMs;
+  while (Date.now() < deadline) {
+    try { if (await predicate()) return true; } catch { /* 未就绪 */ }
+    const remain = Math.round((deadline - Date.now()) / 1000);
+    if (remain % 10 === 0) process.stdout.write(`  …等待用户操作（剩 ${remain}s）\n`);
+    await sleep(2000);
+  }
+  return false;
+}
+
 async function main() {
   const args = parseArgs(process.argv);
   fs.mkdirSync(args.out, { recursive: true });
@@ -714,10 +766,35 @@ async function main() {
       `桩记录恰好一次 read 调用（实测 ${readActs.length}）`);
 
     // ── 步骤 9：冻结矩阵行 1（关主窗口 → hide，服务存活）──
-    let r1 = osascript('tell application "Electron" to activate');
+    let row1Mechanism = 'keyboard';
+    if (MANUAL_MODE) {
+      row1Mechanism = 'manual-user';
+      journal('row1-manual-begin', {});
+      const hidden = await manualWait(
+        '点击屏幕上的 Lingxi/Electron 窗口使其最前，然后按 Cmd+W（隐藏窗口）',
+        async () => {
+          try {
+            const v = await cdpEvaluate(page.webSocketDebuggerUrl, 'document.visibilityState', false);
+            return v === 'hidden';
+          } catch { return false; }
+        });
+      journal('row1-manual-result', { hidden });
+      await sleep(500);
+    } else {
+    let r1 = focusProcessByPid(electron.pid);
+    journal('row1-focus', r1);
     await sleep(800);
-    r1 = osascript('tell application "System Events" to keystroke "w" using {command down}');
-    journal('row1-close', r1);
+    if (r1.status === 0) {
+      r1 = osascript('tell application "System Events" to keystroke "w" using {command down}');
+      journal('row1-close', r1);
+    } else {
+      // 前台竞态兜底（a06 已定族；无需前台）：AppleEvent set visible false——
+      // 与 Cmd+W 同产物（app 级隐藏，窗口保留非销毁）。机制入 verdict 非静默。
+      row1Mechanism = 'visibility-appleevent-fallback';
+      r1 = osascript(`tell application "System Events" to set visible of (first process whose unix id is ${electron.pid}) to false`);
+      journal('row1-close-fallback', { mechanism: row1Mechanism, result: r1 });
+    }
+    }
     await sleep(2500);
     let pagesAfterClose = [];
     try { pagesAfterClose = await cdpListTargets(cdpPort); } catch { pagesAfterClose = []; }
@@ -743,11 +820,37 @@ async function main() {
       `hide 后 /lingxi/v1/health → 200（实测 ${healthAfterHide.status}）`);
 
     // ── 步骤 10：冻结矩阵行 3（Cmd+Q 完全退出 → owned SIGTERM 收敛）──
-    osascript('tell application "Electron" to activate');
+    let row3Mechanism = 'keyboard';
+    let r3;
+    if (MANUAL_MODE) {
+      row3Mechanism = 'manual-user';
+      journal('row3-manual-begin', {});
+      const exited = await manualWait(
+        '再点击一次 Lingxi/Electron 窗口，然后按 Cmd+Q（完全退出应用）',
+        () => !pidAlive(electron.pid));
+      journal('row3-manual-result', { exited });
+      r3 = { status: exited ? 0 : 1, stdout: '', stderr: exited ? '' : 'manual-timeout' };
+    } else {
+    const r3focus = focusProcessByPid(electron.pid);
+    journal('row3-focus', r3focus);
     await sleep(800);
-    const r3 = osascript('tell application "System Events" to keystroke "q" using {command down}');
-    journal('row3-quit', r3);
-    await waitFor('electron-exit', () => !pidAlive(electron.pid), 45000);
+    if (r3focus.status === 0) {
+      r3 = osascript('tell application "System Events" to keystroke "q" using {command down}');
+      journal('row3-quit', r3);
+    } else {
+      // 前台竞态兜底（a06 quitClientByPid 同款 Lead 接受形态）：owned SIGTERM——
+      // Electron 捕获后走正常退出链（before-quit 收尾），exit code 0 已证。
+      row3Mechanism = 'sigterm-graceful';
+      try { electron.kill('SIGTERM'); } catch { /* 已退出 */ }
+      journal('row3-quit-fallback', { mechanism: row3Mechanism });
+      r3 = { status: 0, stdout: '', stderr: '' };
+    }
+    }
+    freezeQuitMechanism = row3Mechanism;
+    freezeHideMechanism = row1Mechanism;
+    if (!MANUAL_MODE) {
+      await waitFor('electron-exit', () => !pidAlive(electron.pid), 45000);
+    }
     assert('row3-electron-exit', !pidAlive(electron.pid), 'Electron 主进程退出');
     await waitFor('rust-exit', () => !pidAlive(conn.pid), 45000);
     assert('row3-rust-exit', !pidAlive(conn.pid), `owned rust pid ${conn.pid} 收敛退出`);
@@ -799,6 +902,10 @@ function finish(outDir, home) {
   const readFails = failures.filter((f) => READ_STEPS.test(f.step));
   const writeFails = failures.filter((f) => WRITE_STEPS.test(f.step));
   const verdict = {
+    // 冻结矩阵行 1/3 的实际退出/隐藏机制（键盘 vs 兜底）——a06 同族前台竞态披露。
+    manualMode: MANUAL_MODE,
+    hideMechanism: freezeHideMechanism,
+    quitMechanism: freezeQuitMechanism,
     schema: 'r08-t03-a05-verdict/v2',
     scenario: 'R08-T03-A05 旧Electron壳 + Rust standalone：读腿端到端绿 + 写腿 BLOCKED(PPG-1)',
     verdict: failures.length === 0 ? 'read-pass__write-blocked-PPG-1' : 'fail',

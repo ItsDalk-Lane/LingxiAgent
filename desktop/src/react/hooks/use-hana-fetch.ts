@@ -77,10 +77,12 @@ export function translateLegacySessionCall(
     return { path: '/lingxi/v1/sessions/archived' };
   }
   if (method === 'POST' && bodyRecord) {
-    // 仅当会话定位符是 rust 根形态（native:<id>）才翻译——旧内核连接的定位符
-    // 是文件路径，直连旧端点（否则旧腿会被误翻译到 /lingxi/v1/* 而 404，
-    // t07-ab-drill-03 A 腿实证）。
-    const sid = nativeIdOf(bodyRecord.path);
+    // 定位符：native:<id>（rust 会话列表/归档行）或裸 sessionId（Rust 归档
+    // 行投影无 path 字段——t11-ab-drill-fixes-04 实证 restore 翻译落空）。
+    // sessionId 回退只在 Rust 连接门内发生（调用点的连接门保证旧腿不进此
+    // 分支——t07-ab-drill-03 A 腿实证需门）。
+    const sid = nativeIdOf(bodyRecord.path)
+      ?? (typeof bodyRecord.sessionId === 'string' && bodyRecord.sessionId ? bodyRecord.sessionId : null);
     const rust = (suffix: string, body: Record<string, unknown>) => ({ path: `/lingxi/v1/sessions/${suffix}`, body });
     switch (path) {
       case '/api/sessions/rename':
@@ -90,6 +92,8 @@ export function translateLegacySessionCall(
       case '/api/sessions/archive':
         return sid ? rust('archive', { sessionId: sid, ...(bodyRecord.childMode ? { childMode: bodyRecord.childMode } : {}) }) : null;
       case '/api/sessions/restore':
+        // F-T07-2 补遗：Rust 路由 RestoreSessionBody 收 sessionId（或 path 别名）；
+        // 旧栈 body 携 path/native sessionId → 统一 sessionId。
         return sid ? rust('restore', { sessionId: sid }) : null;
       case '/api/sessions/archived/delete':
         return sid ? rust('archived/delete', { sessionId: sid }) : null;

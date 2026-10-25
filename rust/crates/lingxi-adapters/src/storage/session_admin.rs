@@ -876,13 +876,14 @@ async fn read_archived_sessions(
                     .map_err(map_err)?;
                 for content in contents {
                     let raw = content.map_err(map_err)?;
-                    let input: StoredUserInput =
-                        serde_json::from_str(&raw).map_err(|error| StorageError::Corrupted {
-                            detail: format!(
-                                "archived session {} has invalid message content: {error}",
-                                row.session_id
-                            ),
-                        })?;
+                    // 预览是装饰性字段：单条消息 content_json 形状不匹配
+                    // （legacy 导入消息无 text 字段——t11-archive-probe-02 实证
+                    // 归档列表整体 500）时跳过该条，不失败整个列表。首条可见
+                    // 文本缺席 → first_message 保持空串（旧栈同样允许无预览）。
+                    let input: StoredUserInput = match serde_json::from_str(&raw) {
+                        Ok(input) => input,
+                        Err(_) => continue,
+                    };
                     let visible = strip_preview_envelopes(&input.text);
                     if !visible.is_empty() {
                         // Match the original JS 100-unit limit without splitting a UTF-8 scalar.
