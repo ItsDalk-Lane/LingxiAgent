@@ -1,0 +1,147 @@
+{
+  "schema": "t07-ab-compare/v1",
+  "kernelA": "node",
+  "kernelB": "rust",
+  "suiteFiles": [
+    "desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts"
+  ],
+  "tasks": {
+    "leaf.lazy-content": {
+      "verdict": "parity",
+      "A": {
+        "ok": true,
+        "observed": {
+          "cases": {
+            "lazy.large-result-referenced-in-history": true,
+            "lazy.content-fetch-returns-full-body": true,
+            "lazy.other-session-locator-404": true,
+            "lazy.unknown-content-404": true
+          },
+          "contentId": "eyJ2ZXJzaW9uIjoxLCJzb3VyY2VJbmRleCI6NSwiZW50cnlJZCI6IjJlZWE1NjIzIiwia2luZCI6InRvb2xfb3V0cHV0Iiwib3JkaW5hbCI6MH0",
+          "gotStatus": 200,
+          "gotKeys": [
+            "id",
+            "kind",
+            "content"
+          ],
+          "gotLen": 26252,
+          "gotHasEnd": true,
+          "gotHas0299": false,
+          "gotHas2999": true,
+          "gotLineCount": 592,
+          "gotSample": "R08-LAZY-LINE-1837 xxxxxxxxxxxxxxxxxxxxxxxx\nR08-LAZY-LINE-1838 xxxxxxxxxxxxxxxxxxxxxxxx\nR08-LAZY-LINE-1839 xxxxxxxxxxxxxxxxxxxxxxxx\nR08-LAZY-LINE-1840 xxxxxxxxx",
+          "foreignStatus": 404,
+          "histLen": 7135,
+          "final": true,
+          "resourceRefCount": 0,
+          "deferredCount": 1,
+          "histSample": "\",\"traceId\":\"mt_mvp5h1nv_q_7vj2lb\",\"parentCallId\":null},\"assistantSegments\":[],\"turnInputEntryId\":\"02dc42e6\",\"turnInputVisible\":true,\"toolCalls\":[{\"id\":\"r08-plan-lazy1-0\",\"name\":\"exec_command\",\"args\":{\"cmd\":\"node -e 'const a=[];for(let i=0;i<3000;i++)a.push(\\\"R08-LAZY-LINE-\\\"+String(i).padStart(4,\\\"0\\\")+\\\" \\\"+\\\"x\\\".repeat(24));process.stdout.write(a.join(\\\"\\\\n\\\")+\\\"\\\\nEND-R08-LAZY\\\\n\\\")'\"},\"processOrder\":0,\"startedAt\":\"2026-10-26T11:05:10.719Z\",\"endedAt\":\"2026-10-26T11:05:10.799Z\",\"status\":\"succ"
+        },
+        "ms": 3743
+      },
+      "B": {
+        "ok": true,
+        "observed": {
+          "cases": {
+            "lazy.large-result-referenced-in-history": true,
+            "lazy.content-fetch-returns-full-body": true,
+            "lazy.other-session-locator-404": true,
+            "lazy.unknown-content-404": true
+          },
+          "contentId": "exec-output:lingxi-exec-output-e24303d1cc223f17.log",
+          "gotStatus": 200,
+          "gotKeys": [
+            "content",
+            "id",
+            "kind",
+            "mimeType"
+          ],
+          "gotLen": 132013,
+          "gotHasEnd": true,
+          "gotHas0299": true,
+          "gotHas2999": true,
+          "gotLineCount": 3000,
+          "gotSample": "R08-LAZY-LINE-0000 xxxxxxxxxxxxxxxxxxxxxxxx\nR08-LAZY-LINE-0001 xxxxxxxxxxxxxxxxxxxxxxxx\nR08-LAZY-LINE-0002 xxxxxxxxxxxxxxxxxxxxxxxx\nR08-LAZY-LINE-0003 xxxxxxxxx",
+          "foreignStatus": 404,
+          "histLen": 57170,
+          "final": true,
+          "resourceRefCount": 1,
+          "deferredCount": 0,
+          "histSample": "DdfYWItbGVhZC0wNC93b3Jrc3BhY2UifX1dfQ\"},{\"argsDigest\":{\"algorithm\":\"sha256\",\"canonicalization\":\"lingxi-canonical-json-v1\",\"hex\":\"24c8f196447b473a1df19281ae75f3563d4146548caad20f3db69845423d3abe\"},\"firstSeq\":\"5\",\"kind\":\"tool_call\",\"result\":{\"content\":[{\"text\":\"R08-LAZY-LINE-0000 xxxxxxxxxxxxxxxxxxxxxxxx\\nR08-LAZY-LINE-0001 xxxxxxxxxxxxxxxxxxxxxxxx\\nR08-LAZY-LINE-0002 xxxxxxxxxxxxxxxxxxxxxxxx\\nR08-LAZY-LINE-0003 xxxxxxxxxxxxxxxxxxxxxxxx\\nR08-LAZY-LINE-0004 xxxxxxxxxxxxxxxxxxxxxxxx\\nR08-LAZY-LINE-0"
+        },
+        "ms": 3621
+      }
+    },
+    "leaf.mcp.face": {
+      "verdict": "parity",
+      "A": {
+        "ok": true,
+        "observed": {
+          "cases": {
+            "resources.uri-returns-content": true,
+            "resources.missing-uri-400": true,
+            "resources.unknown-uri-rejected": true,
+            "apps.launch-hands-over-launch-input": true,
+            "apps.unknown-tool-rejected": true,
+            "resources.unknown-connector-rejected": true,
+            "apps.unauthorized-rejected": true
+          },
+          "addStatus": 200,
+          "startedStatus": 200,
+          "connectorRunning": true,
+          "appToolVisible": true,
+          "goodStatus": 200,
+          "goodContentType": "text/html",
+          "goodSample": "<!doctype html><title>R08-APP-STANDIN</title>R08 app resource",
+          "noUriStatus": 400,
+          "badUriStatus": 502,
+          "launchStatus": 200,
+          "launchNoToolStatus": 404,
+          "ghostStatus": 404,
+          "unauthStatus": 403,
+          "launchBody": "{\"type\":\"mcp_app\",\"connectorId\":\"r08-face-1\",\"serverId\":\"r08-face-1\",\"toolName\":\"r08_app\",\"title\":\"r08_app\",\"description\":\"R08 确定性应用替身\",\"resourceUri\":\"ui://r08/app.html\",\"visibility\":[\"model\",\"app\"],\"launchInput\":{\"mode\":\"r08\"},\"binding\":{\""
+        },
+        "ms": 70
+      },
+      "B": {
+        "ok": true,
+        "observed": {
+          "cases": {
+            "resources.uri-returns-content": true,
+            "resources.missing-uri-400": true,
+            "resources.unknown-uri-rejected": true,
+            "apps.launch-hands-over-launch-input": true,
+            "apps.unknown-tool-rejected": true,
+            "resources.unknown-connector-rejected": true,
+            "apps.unauthorized-rejected": true
+          },
+          "addStatus": 200,
+          "startedStatus": 200,
+          "connectorRunning": true,
+          "appToolVisible": true,
+          "goodStatus": 200,
+          "goodContentType": "text/html",
+          "goodSample": "<!doctype html><title>R08-APP-STANDIN</title>R08 app resource",
+          "noUriStatus": 400,
+          "badUriStatus": 502,
+          "launchStatus": 200,
+          "launchNoToolStatus": 404,
+          "ghostStatus": 404,
+          "unauthStatus": 401,
+          "launchBody": "{\"type\":\"mcp_app\",\"connectorId\":\"r08-face-1\",\"serverId\":\"r08-face-1\",\"toolName\":\"r08_app\",\"title\":\"r08_app\",\"description\":\"R08 确定性应用替身\",\"resourceUri\":\"ui://r08/app.html\",\"visibility\":[\"model\",\"app\"],\"launchInput\":{\"mode\":\"r08\"},\"binding\":{\""
+        },
+        "ms": 149
+      }
+    }
+  },
+  "summary": {
+    "tasks": 2,
+    "parity": 2,
+    "differs": 0,
+    "recorded": 0,
+    "failedA": 0,
+    "failedB": 0,
+    "suiteExitA": 0,
+    "suiteExitB": 0
+  }
+}

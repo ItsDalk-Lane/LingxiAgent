@@ -1,0 +1,15 @@
+{
+ "schema": "lingxi.r08.suite-receipt.v1",
+ "suite": "r08_a04_ui_vitest",
+ "exitCode": 0,
+ "guardFailures": [],
+ "argv": [
+  "npx",
+  "vitest",
+  "run",
+  "desktop/src/react/__tests__/components/r08-a04-card-expansion.test.tsx",
+  "--reporter=verbose"
+ ],
+ "durationSecs": 2.523,
+ "logSha256": "8e040fb64e21da3d8f98392b9accbb28c94e2cf14822e1242f676eb558d36d21"
+}

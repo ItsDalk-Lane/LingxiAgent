@@ -1,0 +1,49 @@
+{
+  "kind": "node",
+  "observations": {
+    "leaf.terminal.positive": {
+      "ok": true,
+      "observed": {
+        "cases": {
+          "snapshot.current-terminal-listed": true,
+          "snapshot.lists-both-session-terminals": true,
+          "snapshot.identity-mismatch-rejected": true,
+          "snapshot.other-session-no-leak": true,
+          "tail.initial-window": true,
+          "tail.new-output-after-since": true,
+          "tail.identity-mismatch-rejected": true,
+          "tail.foreign-terminal-rejected": true,
+          "close.reports-killed-or-already-stopped": true,
+          "close.process-really-stopped": true,
+          "close.unknown-id-rejected": true,
+          "close.foreign-terminal-rejected": true,
+          "close.identity-mismatch-rejected": true,
+          "transport.survives-frame-family": true
+        },
+        "infra": {
+          "final": true,
+          "echo": {
+            "steps": 2,
+            "last": "{\n  \"terminalId\": \"term_mvp5se2v_abd69a53\",\n  \"toolCallId\": \"r08-plan-term1-1\",\n  \"sessionId\": \"sess_0mvp5sd1l_e435d0703b6b42def9d3\",\n  \"sessionPath\": \"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/root-a-node/agents/a1/sessions/2026-10-26T11-13-58-266Z_01a177ea-c9fa-7617-b757-298e051ecca5.jsonl\",\n  \"agentId\": \"a1\",\n  \"cwd\": \"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/workspace\",\n  \"command\": \"cd '/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/workspace' && while true; do printf 'beat\\\\n' >> \\\"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/workspace/r08-terminal-heartbeat-node-1793013238312-31888.txt\\\"; sleep 0.2; done\",\n  \"label\": \"while true; do printf 'beat\\\\n' >> \\\"/private/tmp/lingxi-r08-verif\",\n  \"status\": \"running\",\n  \"seq\": 0,\n  \"createdAt\": 1793013239623,\n  \"lastActivityAt\": 1793013239623,\n  \"exitedAt\": null,\n  \"exitCode\": null,\n  \"signal\": null,\n  \"transcriptPath\": \"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/root-a-node/.ephemeral/terminal-sessions/term_mvp5se2v_abd69a53.jsonl\",\n  \"output\": \"\",\n  \"processId\": \"term_mvp5se2v_abd69a53\",\n  \"process_id\": \"term_mvp5se2v_abd69a53\",\n  \"execCommand\": {\n    \"cmd\": \"wh"
+          },
+          "terminalIds": [
+            "term_mvp5sdsl_803bf66b",
+            "term_mvp5se2v_abd69a53"
+          ],
+          "workspace": "/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/workspace"
+        },
+        "heartbeat": "/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/workspace/r08-terminal-heartbeat-node-1793013238312-31888.txt",
+        "last0": 3,
+        "closeInteractiveStatus": "killed",
+        "tailNewLastSeq": 4,
+        "framesSample": [
+          ">>> {\"type\":\"terminal_close_request\",\"sessionId\":\"sess_0mvp5sd1l_e435d0703b6b42def9d3\",\"sessionPath\":\"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/",
+          "{\"type\":\"terminal_state\",\"sessionId\":\"sess_0mvp5sd1l_e435d0703b6b42def9d3\",\"sessionPath\":\"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/root-a-node/",
+          "{\"type\":\"terminal_close_result\",\"requestId\":\"term-close-interactive\",\"sessionId\":\"sess_0mvp5sd1l_e435d0703b6b42def9d3\",\"sessionPath\":\"/private/tmp/lingxi-r08-ve",
+          "{\"type\":\"terminal_state\",\"sessionId\":\"sess_0mvp5sd1l_e435d0703b6b42def9d3\",\"sessionPath\":\"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/root-a-node/"
+        ]
+      },
+      "ms": 12463
+    }
+  }
+}

@@ -1,0 +1,170 @@
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --check --evidence {EVIDENCE}/R08_INPUTS] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_inputs_check
+xtask: verify-stage R08 [r08_inputs_check] PASS
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_t01_a01_a02_ws --evidence {EVIDENCE}/SUITES/r08_t01_a01_a02_ws] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_t01_a01_a02_ws
+xtask: verify-stage R08 [r08_t01_a01_a02_ws] PASS
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_t01_env_deps --evidence {EVIDENCE}/SUITES/r08_t01_env_deps] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_t01_env_deps
+xtask: verify-stage R08 [r08_t01_env_deps] PASS
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_desktop_boundary_vitest --evidence {EVIDENCE}/SUITES/r08_desktop_boundary_vitest] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_desktop_boundary_vitest
+xtask: verify-stage R08 [r08_desktop_boundary_vitest] PASS
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_a04_no_final_ws --evidence {EVIDENCE}/SUITES/r08_a04_no_final_ws] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_a04_no_final_ws
+xtask: verify-stage R08 [r08_a04_no_final_ws] PASS
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_a04_ui_vitest --evidence {EVIDENCE}/SUITES/r08_a04_ui_vitest] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_a04_ui_vitest
+xtask: verify-stage R08 [r08_a04_ui_vitest] PASS
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_t03_a05_drill --evidence {EVIDENCE}/SUITES/r08_t03_a05_drill] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_t03_a05_drill
+xtask: verify-stage R08 [r08_t03_a05_drill] PASS
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_t03_a06_drill --evidence {EVIDENCE}/SUITES/r08_t03_a06_drill] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_t03_a06_drill
+xtask: verify-stage R08 [r08_t03_a06_drill] PASS
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_t04_sessionfiles_v2 --evidence {EVIDENCE}/SUITES/r08_t04_sessionfiles_v2] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_t04_sessionfiles_v2
+xtask: verify-stage R08 [r08_t04_sessionfiles_v2] PASS
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_registry_amend_proof --evidence {EVIDENCE}/SUITES/r08_registry_amend_proof] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_registry_amend_proof
+xtask: verify-stage R08 [r08_registry_amend_proof] PASS
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_registry_consistency --evidence {EVIDENCE}/SUITES/r08_registry_consistency] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_registry_consistency
+xtask: verify-stage R08 [r08_registry_consistency] PASS
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_t05_seed_guard --evidence {EVIDENCE}/SUITES/r08_t05_seed_guard] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_t05_seed_guard
+xtask: verify-stage R08 [r08_t05_seed_guard] PASS
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_t06_d1 --evidence {EVIDENCE}/SUITES/r08_t06_d1] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_t06_d1
+xtask: verify-stage R08 [r08_t06_d1] PASS
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_t06_d2 --evidence {EVIDENCE}/SUITES/r08_t06_d2] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_t06_d2
+xtask: verify-stage R08 [r08_t06_d2] PASS
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_t06_d3 --evidence {EVIDENCE}/SUITES/r08_t06_d3] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_t06_d3
+xtask: verify-stage R08 [r08_t06_d3] PASS
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_c3_find_bridge_redaction --evidence {EVIDENCE}/SUITES/r08_c3_find_bridge_redaction] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_c3_find_bridge_redaction
+xtask: verify-stage R08 [r08_c3_find_bridge_redaction] PASS
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_cli_data_vitest --evidence {EVIDENCE}/SUITES/r08_cli_data_vitest] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_cli_data_vitest
+xtask: verify-stage R08 [r08_cli_data_vitest] PASS
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_t07_ab --evidence {EVIDENCE}/SUITES/r08_t07_ab] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_t07_ab
+xtask: verify-stage R08 [r08_t07_ab] PASS
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_t07_real_format --evidence {EVIDENCE}/SUITES/r08_t07_real_format] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_t07_real_format
+xtask: verify-stage R08 [r08_t07_real_format] PASS
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_a15_isolation --evidence {EVIDENCE}/SUITES/r08_a15_isolation] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_a15_isolation
+xtask: verify-stage R08 [r08_a15_isolation] PASS
+xtask: verify-stage R08 [python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_a16_versions --evidence {EVIDENCE}/SUITES/r08_a16_versions] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/r08_a16_versions
+xtask: verify-stage R08 [r08_a16_versions] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-00E57BB5F32B [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-010BA6693880 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-015A65726C05 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-0199B843D759 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-04A6A2BD1547 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-059066969D44 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-081FACA79F2C [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-0B669B30C854 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-0BE8B22DA5D5 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-0D4F0EFC9DAE [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-0FE8BED686E2 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-1388F8EE0EBC [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-17FCFE45576B [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-18EFB2D9D5FD [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-1AEDB2670EB9 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-1B712E189DDF [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-1E0D477755CD [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-20E9C8F26CEA [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-21A99DB98735 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-21B3F4DC9140 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-22150190C7B1 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-240E200EF440 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-25C4FF66FEE5 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-2D194C1684BC [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-2D4EBE0FF3C2 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-2DA782C5C7B9 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-2ED065BED168 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-2FAA749DA790 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-31CDA283A11A [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-3562B5D44C5E [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-3818ADEAFA7A [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-38667593C3E1 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-38EEA99077E8 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-3ECCF7C95483 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-3F95164A488C [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-3FAFA387AD68 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-3FCB259FF69C [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-421EEA1AC8D5 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-43FFB75F252C [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-45C5CE361CCB [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-477DA3D558B8 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-485B2D0A8A02 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-48B0C7A7453E [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-4C35E6AEC6F7 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-4CEBEA945B7A [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-4DD3F71FA2CD [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-4EA88B5073E4 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-4F1F69CCA760 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-51905CECDD1B [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-52226FEA5997 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-5235D8EDD673 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-5271217DB01B [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-5370DA3742CB [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-5A6E0D526903 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-5CD35D9EED20 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-5DCB0352EB08 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-5E61048F19B9 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-604C64F4828A [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-60A58027CCCE [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-6207F7E8C697 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-6658E9B80314 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-67256417FB2B [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-73B631D77531 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-75C0AE981505 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-7C959E75B8C3 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-7CBF6F4A6760 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-7FF8D4E48BC9 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-81664285F927 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-81B217A7E581 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-8D3CEB6133E1 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-8E2D44B48905 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-92620BF2264F [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-94B9BE3AA7A6 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-94CB746D04B7 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-960668141E07 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-9616596B5720 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-98DDC94776F1 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-9D9E72CB6051 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-A18187567AF9 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-A2C385A33493 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-A336F79E964D [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-AA9EB3FD034D [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-AFA7227BFB63 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-B0F05BC32D62 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-B34F2B298BFA [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-B47CAC08F418 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-B4BB2438E855 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-B5CB2993A5C0 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-B9DA1A584C6E [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-BB0A168006D7 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-BB1BB3A9C5F4 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-BC2FBD618278 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-C1FB9C92E813 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-C70E819F8DA4 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-CD1524CC7DC3 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-CDBFE6616EB9 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-CE69063550AA [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-CFD9F02BC6AA [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-D01766AF4475 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-D43836A3A579 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-D483E4CD0935 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-D58B651BF099 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-D62A81C2AEB2 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-D901852E1B1A [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-D92CD567D6D6 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-DA5AD5C40098 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-DD47275AC5AE [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-E1625F70C7CC [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-E167298FD87C [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-E1FBE1A59BC6 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-E7F852F9BF60 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-E9C7A48CADC4 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-EC033184BA37 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-ED089133C106 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-EEDFB7AB889C [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-EF43ADCE19A1 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-EF5DD65C558E [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-F0319FC4F93D [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-F28086B64522 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-F4DA2AFCB72B [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-F6A1A50E97E4 [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-F829AEA5931C [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-FAE7503D0D0F [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-FBDEEDAC0B11 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 supplemental R00-T02-LA-FDB0FE6528EE [full_original_behavior] PASS
+xtask: verify-stage R08 supplemental R00-T02-LA-FF4F06011B48 [required_behavior_pending] BLOCKED
+xtask: verify-stage R08 result written to /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-05/verify-stage-result.json (overall: "FAIL")
+GATE_EXIT=1

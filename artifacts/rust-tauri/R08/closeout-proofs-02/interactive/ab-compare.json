@@ -1,0 +1,282 @@
+{
+  "schema": "t07-ab-compare/v1",
+  "kernelA": "node",
+  "kernelB": "rust",
+  "suiteFiles": [
+    "desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts"
+  ],
+  "tasks": {
+    "leaf.chat.task-abort": {
+      "verdict": "parity",
+      "A": {
+        "ok": true,
+        "observed": {
+          "cases": {
+            "a0.owned-task-aborted-or-already-stopped": true,
+            "a0.owned-response-scoped": true,
+            "a1.terminal-state-decides-result": true,
+            "a0.unknown-task-404": true,
+            "a1.missing-session-context-400": true,
+            "a1.unauthorized-rejected": true,
+            "a0.cross-session-403": true,
+            "a1.cross-session-no-leak": true,
+            "a1.cross-session-task-unaffected": true
+          },
+          "debug": {
+            "owned": {
+              "task": "task_subagent_mvp62uv7_1_vp7c2n",
+              "status": 200,
+              "body": "{\"ok\":true,\"status\":\"aborted\"}",
+              "second": 404,
+              "secondBody": "{\"ok\":false,\"status\":\"rejected\",\"reason\":\"not_found\"}"
+            },
+            "unknown": {
+              "status": 404,
+              "body": "{\"ok\":false,\"status\":\"rejected\",\"reason\":\"not_found\"}"
+            },
+            "missing": {
+              "status": 400,
+              "body": "{\"error\":\"internal_contract\"}"
+            },
+            "unauthorized": 403,
+            "cross": {
+              "task": "task_subagent_mvp62vlc_2_t3w5le",
+              "status": 403,
+              "body": "{\"ok\":false,\"status\":\"rejected\",\"reason\":\"session_mismatch\"}",
+              "ownerAbort": 200,
+              "ownerBody": "{\"ok\":true,\"status\":\"aborted\"}"
+            }
+          },
+          "parent": "sess_0mvp62u9z_b6b60d8b672c7282de60",
+          "other": "sess_0mvp62uam_74f088ad6262919e3adb"
+        },
+        "ms": 3121
+      },
+      "B": {
+        "ok": true,
+        "observed": {
+          "cases": {
+            "a0.owned-task-aborted-or-already-stopped": true,
+            "a0.owned-response-scoped": true,
+            "a1.terminal-state-decides-result": true,
+            "a0.unknown-task-404": true,
+            "a1.missing-session-context-400": true,
+            "a1.unauthorized-rejected": true,
+            "a0.cross-session-403": true,
+            "a1.cross-session-no-leak": true,
+            "a1.cross-session-task-unaffected": true
+          },
+          "debug": {
+            "owned": {
+              "task": "run_000001a177f2f9f6_00000a",
+              "status": 200,
+              "body": "{\"ok\":true,\"reason\":null,\"sessionId\":\"sess-39676-1a177f2f9ef-5\",\"sessionPath\":\"native:sess-39676-1a177f2f9ef-5\",\"status\":\"aborted\",\"taskId\":\"run_000001a177f2f9f6_00000a\"}",
+              "second": 200,
+              "secondBody": "{\"ok\":true,\"reason\":null,\"sessionId\":\"sess-39676-1a177f2f9ef-5\",\"sessionPath\":\"native:sess-39676-1a177f2f9ef-5\",\"status\":\"already_stopped\",\"taskId\":\"run_000001a177f2f9f6_00000a\"}"
+            },
+            "unknown": {
+              "status": 404,
+              "body": "{\"ok\":false,\"reason\":\"not_found\",\"sessionId\":\"sess-39676-1a177f2f9ef-5\",\"sessionPath\":\"native:sess-39676-1a177f2f9ef-5\",\"status\":\"rejected\",\"taskId\":\"r08-no-such-task-mvp63vri\"}"
+            },
+            "missing": {
+              "status": 400,
+              "body": "{\"code\":\"invalid_message\",\"details\":{\"causeId\":\"request.invalid_message\",\"requestId\":\"req-326e198df33474c50b9c60499ea077f6\"},\"message\":\"stable_session_required\",\"retryable\":false}"
+            },
+            "unauthorized": 401,
+            "cross": {
+              "task": "run_000001a177f2fd94_00000c",
+              "status": 403,
+              "body": "{\"ok\":false,\"reason\":\"session_mismatch\",\"sessionId\":\"sess-39676-1a177f2f9ef-5\",\"sessionPath\":\"native:sess-39676-1a177f2f9ef-5\",\"status\":\"rejected\",\"taskId\":\"run_000001a177f2fd94_00000c\"}",
+              "ownerAbort": 200,
+              "ownerBody": "{\"ok\":true,\"reason\":null,\"sessionId\":\"sess-39676-1a177f2f9f2-6\",\"sessionPath\":\"native:sess-39676-1a177f2f9f2-6\",\"status\":\"aborted\",\"taskId\":\"run_000001a177f2fd94_00000c\"}"
+            }
+          },
+          "parent": "sess-39676-1a177f2f9ef-5",
+          "other": "sess-39676-1a177f2f9f2-6"
+        },
+        "ms": 3053
+      }
+    },
+    "leaf.tool.ask-user": {
+      "verdict": "parity",
+      "A": {
+        "ok": true,
+        "observed": {
+          "cases": {
+            "a0.questions-and-options-visible": true,
+            "a0.values-and-labels-visible": true,
+            "a0.recommended-visible": true,
+            "a0.pending-question-exposed": true,
+            "a1.confirmed-answered-true": true,
+            "a1.keys-mapped": true,
+            "a1.values-mapped": true,
+            "a1.labels-mapped": true,
+            "a1.unknown-value-dropped": true,
+            "a1.optional-unanswered": true,
+            "a1.no-auto-selected": true,
+            "a1.pending-cleared-after-answer": true,
+            "a1.round-completes": true,
+            "a4.settled-or-unknown-question-explicit-error": true,
+            "a4.missing-session-explicit-error": true,
+            "a2.timedout-flag": true,
+            "a2.recommended-auto-selected": true,
+            "a2.non-recommended-not-filled": true,
+            "a2.round-completes": true,
+            "a2.pending-cleared-after-timeout": true,
+            "a3.dismissed-no-answers": true,
+            "a3.dismissed-pending-cleared": true,
+            "a3.dismissed-round-completes": true,
+            "a4.dismissed-does-not-fabricate-answer": true,
+            "a3.aborted-no-answers": true,
+            "a3.abort-acknowledged": true,
+            "a4.aborted-does-not-fabricate-answer": true,
+            "a4.invalid-questions-explicit-error": true,
+            "a4.invalid-questions-no-card": true
+          },
+          "debug": {
+            "card": {
+              "id": "fca001f3-b9cf-4e32-a8e4-eb3eb8780ce8",
+              "surface": "ws",
+              "questions": 4,
+              "pendingSurface": true
+            },
+            "answerStatus": 200,
+            "answerDetails": "{\"answered\":true,\"timedOut\":false,\"answers\":[{\"key\":\"mode\",\"question\":\"选择处理方式\",\"values\":[\"v-fast\"],\"labels\":[\"快速\"],\"unanswered\":false,\"autoSelected\":false},{\"key\":\"steps\",\"question\":\"选择处理步骤\",\"values\":[\"v-s2\"],\"labels\":[\"步骤二\"],\"unanswered\":false,\"autoSelected\":false},{\"key\":\"note\",\"question\":\"补充说明\",\"values\":[\"用户原文\"],\"labels\":[\"用户原文\"],\"unanswered\":false,\"autoSelected\":false},{\"key\":\"extra\",\"question\":\"可选补充\",\"values\":[],\"labels\":[],\"unanswered\":true,\"autoSelected\":false}]}",
+            "settled": {
+              "status": 404,
+              "ghost": 404,
+              "missing": 404
+            },
+            "timeout": {
+              "card": true,
+              "details": "{\"answered\":true,\"timedOut\":true,\"answers\":[{\"key\":\"mode\",\"question\":\"选择处理方式\",\"values\":[\"v-safe\"],\"labels\":[\"稳妥\"],\"unanswered\":false,\"autoSelected\":true},{\"key\":\"steps\",\"question\":\"选择处理步骤\",\"values\":[],\"labels\":[],\"unanswered\":true,\"autoSelected\":false},{\"key\":\"note\",\"question\":\"补充说明\",\"values\":[],\"labels\":[],\"unanswered\":true,\"autoSelected\":false},{\"key\":\"extra\",\"question\":\"可选补充\",\"values\":[],\"labels\":[],\"unanswered\":true,\"autoSelected\":false}]}",
+              "final": true
+            },
+            "dismiss": {
+              "answered": 200,
+              "details": "{\"answered\":false,\"dismissed\":true,\"answers\":[]}",
+              "echo": "用户暂不回答。按你的最佳判断继续。"
+            },
+            "abort": {
+              "card": true,
+              "settled": true,
+              "ack": true,
+              "details": "null",
+              "framesTail": [
+                "{\"type\":\"status\",\"isStreaming\":false,\"sessionPath\":\"/private/tmp/lingxi-r08-verify/r08_t07_ab-interactive-dev-03/root-a-node/agents/a1/sessions/2026-10-26T11-22-03-225Z_01a177f2-30",
+                "{\"type\":\"abort_result\",\"status\":\"accepted\",\"sessionId\":\"sess_0mvp62r8p_9b7a3fbffae6e1e11e97\",\"sessionPath\":\"/private/tmp/lingxi-r08-verify/r08_t07_ab-interactive-dev-03/root-a-node",
+                "{\"type\":\"status\",\"isStreaming\":false,\"sessionPath\":\"/private/tmp/lingxi-r08-verify/r08_t07_ab-interactive-dev-03/root-a-node/agents/a1/sessions/2026-10-26T11-22-03-225Z_01a177f2-30"
+              ]
+            },
+            "invalid": {
+              "echo": "提问内容不合法：duplicate question key \"dup\"",
+              "pending": true
+            }
+          },
+          "sessionIds": [
+            "sess_0mvp61xm3_017e73171bae971b3001",
+            "sess_0mvp61zw5_20d294a7bec0ec2b1a47",
+            "sess_0mvp62oyw_2090c39ed86fa91c2cc4",
+            "sess_0mvp62r8p_9b7a3fbffae6e1e11e97",
+            "sess_0mvp62s2k_f52fde20bb709ee91004"
+          ]
+        },
+        "ms": 42726
+      },
+      "B": {
+        "ok": true,
+        "observed": {
+          "cases": {
+            "a0.questions-and-options-visible": true,
+            "a0.values-and-labels-visible": true,
+            "a0.recommended-visible": true,
+            "a0.pending-question-exposed": true,
+            "a1.confirmed-answered-true": true,
+            "a1.keys-mapped": true,
+            "a1.values-mapped": true,
+            "a1.labels-mapped": true,
+            "a1.unknown-value-dropped": true,
+            "a1.optional-unanswered": true,
+            "a1.no-auto-selected": true,
+            "a1.pending-cleared-after-answer": true,
+            "a1.round-completes": true,
+            "a4.settled-or-unknown-question-explicit-error": true,
+            "a4.missing-session-explicit-error": true,
+            "a2.timedout-flag": true,
+            "a2.recommended-auto-selected": true,
+            "a2.non-recommended-not-filled": true,
+            "a2.round-completes": true,
+            "a2.pending-cleared-after-timeout": true,
+            "a3.dismissed-no-answers": true,
+            "a3.dismissed-pending-cleared": true,
+            "a3.dismissed-round-completes": true,
+            "a4.dismissed-does-not-fabricate-answer": true,
+            "a3.aborted-no-answers": true,
+            "a3.abort-acknowledged": true,
+            "a4.aborted-does-not-fabricate-answer": true,
+            "a4.invalid-questions-explicit-error": true,
+            "a4.invalid-questions-no-card": true
+          },
+          "debug": {
+            "card": {
+              "id": "c593780dc8414e46201a145ea8c2e167",
+              "surface": "interactions",
+              "questions": 4,
+              "pendingSurface": true
+            },
+            "answerStatus": 200,
+            "answerDetails": "{\"answered\":true,\"answers\":[{\"autoSelected\":false,\"key\":\"mode\",\"labels\":[\"快速\"],\"question\":\"选择处理方式\",\"unanswered\":false,\"values\":[\"v-fast\"]},{\"autoSelected\":false,\"key\":\"steps\",\"labels\":[\"步骤二\"],\"question\":\"选择处理步骤\",\"unanswered\":false,\"values\":[\"v-s2\"]},{\"autoSelected\":false,\"key\":\"note\",\"labels\":[\"用户原文\"],\"question\":\"补充说明\",\"unanswered\":false,\"values\":[\"用户原文\"]},{\"autoSelected\":false,\"key\":\"extra\",\"labels\":[],\"question\":\"可选补充\",\"unanswered\":true,\"values\":[]}],\"timedOut\":false}",
+            "settled": {
+              "status": 409,
+              "ghost": 409,
+              "missing": 404
+            },
+            "timeout": {
+              "card": true,
+              "details": "{\"answered\":true,\"answers\":[{\"autoSelected\":true,\"key\":\"mode\",\"labels\":[\"稳妥\"],\"question\":\"选择处理方式\",\"unanswered\":false,\"values\":[\"v-safe\"]},{\"autoSelected\":false,\"key\":\"steps\",\"labels\":[],\"question\":\"选择处理步骤\",\"unanswered\":true,\"values\":[]},{\"autoSelected\":false,\"key\":\"note\",\"labels\":[],\"question\":\"补充说明\",\"unanswered\":true,\"values\":[]},{\"autoSelected\":false,\"key\":\"extra\",\"labels\":[],\"question\":\"可选补充\",\"unanswered\":true,\"values\":[]}],\"timedOut\":true}",
+              "final": true
+            },
+            "dismiss": {
+              "answered": 200,
+              "details": "{\"answered\":false,\"answers\":[],\"dismissed\":true}",
+              "echo": "用户提问已结束"
+            },
+            "abort": {
+              "card": true,
+              "settled": true,
+              "ack": true,
+              "details": "null",
+              "framesTail": [
+                "{\"aborted\":true,\"isStreaming\":false,\"reason\":\"user\",\"sessionId\":\"sess-39676-1a177f2eba9-3\",\"sessionPath\":\"native:sess-39676-1a177f2eba9-3\",\"streamId\":\"run_000001a177f2ebae_000007\",",
+                "{\"reason\":\"cancelled.requested\",\"runId\":\"run_000001a177f2ebae_000007\",\"seq\":9,\"sessionId\":\"sess-39676-1a177f2eba9-3\",\"sessionPath\":\"native:sess-39676-1a177f2eba9-3\",\"sessionRefVers",
+                "{\"aborted\":true,\"isStreaming\":false,\"seq\":10,\"sessionId\":\"sess-39676-1a177f2eba9-3\",\"sessionPath\":\"native:sess-39676-1a177f2eba9-3\",\"sessionRefVersion\":2,\"streamId\":\"run_000001a177"
+              ]
+            },
+            "invalid": {
+              "echo": "tool error [invalid_message]: invalid or duplicate question key",
+              "pending": true
+            }
+          },
+          "sessionIds": [
+            "sess-39676-1a177f25575-0",
+            "sess-39676-1a177f260fe-1",
+            "sess-39676-1a177f2e029-2",
+            "sess-39676-1a177f2eba9-3",
+            "sess-39676-1a177f2eede-4"
+          ]
+        },
+        "ms": 42491
+      }
+    }
+  },
+  "summary": {
+    "tasks": 2,
+    "parity": 2,
+    "differs": 0,
+    "recorded": 0,
+    "failedA": 0,
+    "failedB": 0,
+    "suiteExitA": 0,
+    "suiteExitB": 0
+  }
+}

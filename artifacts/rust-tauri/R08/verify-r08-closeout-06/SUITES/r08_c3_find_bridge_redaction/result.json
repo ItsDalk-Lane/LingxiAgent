@@ -1,0 +1,19 @@
+{
+ "schema": "lingxi.r08.suite-receipt.v1",
+ "suite": "r08_c3_find_bridge_redaction",
+ "exitCode": 0,
+ "guardFailures": [],
+ "argv": [
+  "cargo",
+  "test",
+  "--manifest-path",
+  "rust/Cargo.toml",
+  "--locked",
+  "-p",
+  "lingxi-service",
+  "--test",
+  "r08_c3_find_bridge_redaction"
+ ],
+ "durationSecs": 5.784,
+ "logSha256": "f8131461d04f5405d23f03ed46447d65daad8844d3fa572ca379b9b92a3d3967"
+}

@@ -1,0 +1,50 @@
+PASS fixture gen exit 0
+PASS migrate committed
+PASS agents create
+PASS sessions/new :: 200
+PASS attachments/local
+PASS preferences/appearance
+PASS bridge POST config
+PASS bridge POST owner
+PASS bridge POST config
+PASS sentinels exactly 3 (no queued) :: [["conv-t06-s2","unknown"],["conv-t06-s1","confirmed"],["conv-t06-s3","started"]]
+PASS B3 legacy session present on new root :: {"session_id":"sess-parent-0001","title":"父会话"}
+PASS B3 rename legacy session on new root :: 200 {"ok":true}
+PASS B3 renamed title persisted on new root
+PASS B1 files list on new root :: 200
+PASS B1 attachment row on new root (managed_cache) :: {"createdAtMs":1792955347916,"fileId":"sf_7bc165241b633595","filePath":"/private/tmp/lingxi-r08-verify/r08_t06_d3-25793-1792955346501/new-root/session-files/dd8fc5d5368a0e8edb17dee0/t06-attach-payload_mvo7bkjw_bb9a1e6d.txt","filename":"t06-
+PASS B2 new agent config.yaml exists on new root
+PASS external sends once per leg (gen) :: {"s1":1,"s2":1,"s3":1,"other":0}
+PASS rollback committed
+PASS delta package dir exists :: /private/tmp/lingxi-r08-verify/r08_t06_d3-25793-1792955346501/delta-out/rb-1792955348565-25806
+PASS original new root isolated before reforward
+PASS reforward-B exit 0
+PASS reforward-B committed :: ":0,"issues":5,"status":"complete","interrupted":false,"receipt_path":"/private/tmp/lingxi-r08-verify/r08_t06_d3-25793-1792955346501/recovered-root/legacy-import/migration-receipt.json"}
+REFORWARD_RESULT reforwardId=rf-1792955350955-26124 phase=committed outcome=committed detail=reforward committed
+
+PASS pointer → recovered root :: {"schemaVersion":1,"activeDataRoot":"/private/tmp/lingxi-r08-verify/r08_t06_d3-25793-1792955346501/recovered-root","cutoverId":"rf-1792955350955-26124","committedAt":"2026-10-25T19:09:12.070Z"}
+PASS reforward receipt present :: /private/tmp/lingxi-r08-verify/r08_t06_d3-25793-1792955346501/rb-work/reforward-receipt.json
+PASS J4 secondImportZeroGrowth=true in receipt :: {"generatedAt":"2026-10-25T19:09:12.222Z","hashConvention":"manifest-domain sha256 values use the internal double-hash convention (same domain as T04/T05 manifests, comparison-only); delta package payload entries carry true content sha256 (shasum-verifiable)","lineage":{"deltaPackageSha256":"9c44dce
+PASS A11 session/message counts equal (recovered root) :: {"sessions":12,"messages":835} → {"sessions":12,"messages":835}
+PASS A11 attachments: every original-new-root file byte-identical in recovered root (subset) :: []
+A11_REIMPORTED_LEGACY_FILES count=3 ["e1bcfbf68c6456df067aa1ad/legacy-file-broken-1-big.bin","e1bcfbf68c6456df067aa1ad/legacy-file-good-1-notes.md","e4e7c6710b86cbd718cfd22e/legacy-file-good-2-chart.json"]
+PASS A11 settings edit recovered
+PASS A12 S1 confirmed + receipt byte-identical (recovered) :: ["{\"platform\":\"telegram\",\"messageIds\":[\"t06-standin-1\"],\"rawJson\":null}","{\"platform\":\"telegram\",\"messageIds\":[\"t06-standin-1\"],\"rawJson\":null}"]
+PASS A12 S2 unknown unchanged (recovered) :: {"delivery_id":"reply:bridge-b80f64e94e6cd0c1a6279ff3c9190a2385cf4c7828fdf2baaf1e82966d81dc8c","conversation_id":"conv-t06-s2","status":"unknown","platform_receipt_json":null,"error":"platform_returned_no_message_id"}
+PASS A12 S3 settled unknown controlled (recovered) :: {"delivery_id":"reply:bridge-f22fe357e9ed6695616f0632403e58fb465bbb0697d805250277cbf9cb0201a8","conversation_id":"conv-t06-s3","status":"unknown","platform_receipt_json":null,"error":"worker stopped before a confirmed receipt"}
+PASS B1 attachment opens by original fileId/sessionId on recovered root :: 200 {"file":{"createdAtMs":1792955347916,"fileId":"sf_7bc165241b633595","filePath":"/private/tmp/lingxi-r08-verify/r08_t06_d3-25793-1792955346501/recovered-root/session-files/dd8fc5d5368a0e8edb17dee0/t06-
+PASS B1 attachment paths rebased into recovered root (not the isolated origin) :: {"recRealPath":"/private/tmp/lingxi-r08-verify/r08_t06_d3-25793-1792955346501/recovered-root/session-files/dd8fc5d5368a0e8edb17dee0/t06-attach-payload_mvo7bkjw_bb9a1e6d.txt","recFilePath":"/private/tmp/lingxi-r08-verify/r08_t06_d3-25793-1792955346501/recovered-root/session-files/dd8fc5d5368a0e8edb17dee0/t06-attach-payload_mvo7bkjw_bb9a1e6d.txt","recoveredRoot":"/private/tmp/lingxi-r08-verify/r08_t06_d3-25793-1792955346501/recovered-root"}
+PASS B1 attachment bytes at interface-reported path identical to original :: /private/tmp/lingxi-r08-verify/r08_t06_d3-25793-1792955346501/recovered-root/session-files/dd8fc5d5368a0e8edb17dee0/t06-attach-payload_mvo7bkjw_bb9a1e6d.txt
+PASS B2 new agent config.yaml recovered from package (origin isolated)
+PASS B2 new agent listed with its name on recovered root :: [["t06d3","T06-D3"]]
+PASS B2 new agent config readable on recovered root :: 200
+PASS B2 new session ownership preserved (agentId=t06d3) :: {"agentId":"t06d3","archivedAtUnixMs":null,"authorizedFolders":[],"createdAtUnixMs":1792955347914,"forkPointMessageId":null,"lastActivityUnixMs":1792955347916,"
+PASS B2 switch to new agent on recovered root :: 200 {"agent":{"id":"t06d3","name":"T06-D3"},"authorizedFolders":[],"currentModelId":"t06-standin-model","currentModelProvider":"t06-standin","cwd":null,"cwdHistory"
+PASS B2 continue using new agent (new session) on recovered root :: 200 {"accessMode":"operate","agentId":"t06d3","agentName":"T06-D3","authorizedFolders":[],"currentModelId":"t06-standin-model","currentModelName":"t06-standin-model
+PASS B3 legacy session renamed title preserved after rollback→reforward :: {"got":"B3-RENAMED 旧会话切后改名","want":"B3-RENAMED 旧会话切后改名"}
+PASS B3 second apply reports sessions sessionRowsUpdated=0 (idempotent) :: secondApplyTotals":{"filesAlreadyPresent":18,"filesApplied":0,"tables":{"automation_internal_sessions_v1":{"alreadyPresent":2,"applied":0,"pathRebased":0,"pathScopedPreserved":0,"sessionRowsUpdated":0},"automation_jobs_v1":{"alreadyPresent":3,"applied":0,"pathRebased":0,"pathScopedPreserved":0,"sessionRowsUpdated":0},"automation_triggers_v1":{"alreadyPresent":2,"applied":0,"pathRebased":0,"pathSco
+PASS external sends frozen (counter 恒=1/腿 across rollback+reforward-B) :: {"s1":1,"s2":1,"s3":1,"other":0} → {"s1":1,"s2":1,"s3":1,"other":0}
+PASS original new root preserved (epoch stamp intact, isolated copy)
+STANDIN_EXITED code=null signal=SIGTERM at=2026-10-25T19:09:12.717Z
+D3_RESULT failures=0 legs={"s1":1,"s2":1,"s3":1,"other":0} counts={"sessions":12,"messages":835}
+D3 DRILL OK

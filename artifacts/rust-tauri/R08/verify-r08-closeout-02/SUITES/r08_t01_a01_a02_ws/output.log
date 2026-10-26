@@ -1,0 +1,15 @@
+
+running 2 tests
+test a01_old_client_events_and_history_come_from_rust_single_source ... ok
+test a02_reconnect_resume_replays_without_any_reexecution ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.53s
+
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (test "r08_t01_a01_a02_ws") generated 1 warning
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.19s
+     Running tests/r08_t01_a01_a02_ws.rs (rust/target/debug/deps/r08_t01_a01_a02_ws-8d82fd00e933f837)

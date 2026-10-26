@@ -1,0 +1,51 @@
+PASS fixture gen exit 0
+PASS migrate committed
+PASS agents create
+PASS sessions/new :: 200
+PASS attachments/local
+PASS preferences/appearance
+PASS bridge POST config
+PASS bridge POST owner
+PASS bridge POST config
+PASS sentinels exactly 3 (no queued) :: [["conv-t06-s2","unknown"],["conv-t06-s3","started"],["conv-t06-s1","confirmed"]]
+PASS B3 legacy session present on new root :: {"session_id":"sess-parent-0001","title":"父会话"}
+PASS B3 rename legacy session on new root :: 200 {"ok":true}
+PASS B3 renamed title persisted on new root
+PASS B1 files list on new root :: 200
+PASS B1 attachment row on new root (managed_cache) :: {"createdAtMs":1792917571572,"fileId":"sf_0ef38a8b8b850681","filePath":"/private/tmp/r08-closeout-b-green/work/new-root/session-files/1acb308b055dcc53585a5757/t06-attach-payload_mvnktw50_b6f78ad1.txt","filename":"t06-attach-payload_mvnktw50
+PASS B2 new agent config.yaml exists on new root
+PASS external sends once per leg (gen) :: {"s1":1,"s2":1,"s3":1,"other":0}
+PASS rollback committed
+PASS delta package dir exists :: /private/tmp/r08-closeout-b-green/work/delta-out/rb-1792917572245-19441
+PASS original new root isolated before reforward
+PASS reforward-B exit 0
+PASS reforward-B committed :: batches_pending_convert":0,"issues":5,"status":"complete","interrupted":false,"receipt_path":"/private/tmp/r08-closeout-b-green/work/recovered-root/legacy-import/migration-receipt.json"}
+REFORWARD_RESULT reforwardId=rf-1792917574689-19728 phase=committed outcome=committed detail=reforward committed
+
+PASS pointer → recovered root :: {"schemaVersion":1,"activeDataRoot":"/private/tmp/r08-closeout-b-green/work/recovered-root","cutoverId":"rf-1792917574689-19728","committedAt":"2026-10-25T08:39:35.868Z"}
+PASS reforward receipt present :: /private/tmp/r08-closeout-b-green/work/rb-work/reforward-receipt.json
+PASS J4 secondImportZeroGrowth=true in receipt :: {"generatedAt":"2026-10-25T08:39:36.023Z","hashConvention":"manifest-domain sha256 values use the internal double-hash convention (same domain as T04/T05 manifests, comparison-only); delta package payload entries carry true content sha256 (shasum-verifiable)","lineage":{"deltaPackageSha256":"c65f28f
+PASS A11 session/message counts equal (recovered root) :: {"sessions":12,"messages":835} → {"sessions":12,"messages":835}
+PASS A11 attachments: every original-new-root file byte-identical in recovered root (subset) :: []
+A11_REIMPORTED_LEGACY_FILES count=3 ["e1bcfbf68c6456df067aa1ad/legacy-file-broken-1-big.bin","e1bcfbf68c6456df067aa1ad/legacy-file-good-1-notes.md","e4e7c6710b86cbd718cfd22e/legacy-file-good-2-chart.json"]
+PASS A11 settings edit recovered
+PASS A12 S1 confirmed + receipt byte-identical (recovered) :: ["{\"platform\":\"telegram\",\"messageIds\":[\"t06-standin-1\"],\"rawJson\":null}","{\"platform\":\"telegram\",\"messageIds\":[\"t06-standin-1\"],\"rawJson\":null}"]
+PASS A12 S2 unknown unchanged (recovered) :: {"delivery_id":"reply:bridge-201c795c1031b8f531ad163c9982a786047d21066aa53c61c1ee18c3bed5ea73","conversation_id":"conv-t06-s2","status":"unknown","platform_receipt_json":null,"error":"platform_returned_no_message_id"}
+PASS A12 S3 settled unknown controlled (recovered) :: {"delivery_id":"reply:bridge-ac2258f785e58fdd065896b50afdd8ec00ceb29a2a4ac407c1147a869cf37f06","conversation_id":"conv-t06-s3","status":"unknown","platform_receipt_json":null,"error":"worker stopped before a confirmed receipt"}
+PASS B1 attachment opens by original fileId/sessionId on recovered root :: 200 {"file":{"createdAtMs":1792917571572,"fileId":"sf_0ef38a8b8b850681","filePath":"/private/tmp/r08-closeout-b-green/work/recovered-root/session-files/1acb308b055dcc53585a5757/t06-attach-payload_mvnktw50
+PASS B1 attachment paths rebased into recovered root (not the isolated origin) :: {"recRealPath":"/private/tmp/r08-closeout-b-green/work/recovered-root/session-files/1acb308b055dcc53585a5757/t06-attach-payload_mvnktw50_b6f78ad1.txt","recFilePath":"/private/tmp/r08-closeout-b-green/work/recovered-root/session-files/1acb308b055dcc53585a5757/t06-attach-payload_mvnktw50_b6f78ad1.txt","recoveredRoot":"/private/tmp/r08-closeout-b-green/work/recovered-root"}
+PASS B1 attachment bytes at interface-reported path identical to original :: /private/tmp/r08-closeout-b-green/work/recovered-root/session-files/1acb308b055dcc53585a5757/t06-attach-payload_mvnktw50_b6f78ad1.txt
+PASS B2 new agent config.yaml recovered from package (origin isolated)
+PASS B2 new agent listed with its name on recovered root :: [["t06d3","T06-D3"]]
+PASS B2 new agent config readable on recovered root :: 200
+PASS B2 new session ownership preserved (agentId=t06d3) :: {"agentId":"t06d3","archivedAtUnixMs":null,"authorizedFolders":[],"createdAtUnixMs":1792917571569,"forkPointMessageId":null,"lastActivityUnixMs":1792917571572,"
+PASS B2 switch to new agent on recovered root :: 200 {"agent":{"id":"t06d3","name":"T06-D3"},"authorizedFolders":[],"currentModelId":"t06-standin-model","currentModelProvider":"t06-standin","cwd":null,"cwdHistory"
+PASS B2 continue using new agent (new session) on recovered root :: 200 {"accessMode":"operate","agentId":"t06d3","agentName":"T06-D3","authorizedFolders":[],"currentModelId":"t06-standin-model","currentModelName":"t06-standin-model
+PASS B3 legacy session renamed title preserved after rollback→reforward :: {"got":"B3-RENAMED 旧会话切后改名","want":"B3-RENAMED 旧会话切后改名"}
+PASS B3 second apply reports sessions sessionRowsUpdated=0 (idempotent) :: secondApplyTotals":{"filesAlreadyPresent":18,"filesApplied":0,"tables":{"automation_internal_sessions_v1":{"alreadyPresent":2,"applied":0,"pathRebased":0,"pathScopedPreserved":0,"sessionRowsUpdated":0},"automation_jobs_v1":{"alreadyPresent":3,"applied":0,"pathRebased":0,"pathScopedPreserved":0,"sessionRowsUpdated":0},"automation_triggers_v1":{"alreadyPresent":2,"applied":0,"pathRebased":0,"pathSco
+PASS external sends frozen (counter 恒=1/腿 across rollback+reforward-B) :: {"s1":1,"s2":1,"s3":1,"other":0} → {"s1":1,"s2":1,"s3":1,"other":0}
+PASS original new root preserved (epoch stamp intact, isolated copy)
+STANDIN_EXITED code=null signal=SIGTERM at=2026-10-25T08:39:36.520Z
+D3_RESULT failures=0 legs={"s1":1,"s2":1,"s3":1,"other":0} counts={"sessions":12,"messages":835}
+D3 DRILL OK
+EXIT=0

@@ -1,0 +1,15 @@
+PASS stub provider ready :: 55701
+PASS oauth standin ready :: 55702
+PASS fixture gen
+PASS root-a prepared (knowledge integrity ok) :: ok
+PASS root-b migrated (T05 path)
+PASS kernel A (node) ready :: port=55705
+PASS kernel B (rust) ready :: 127.0.0.1:55710
+PASS suite ran on A (observations present) :: vitest exit=0
+PASS suite ran on B (observations present) :: vitest exit=0
+PASS stub provider reaped :: stub pid 68178 exit=0 signal=null
+PASS [leaf.terminal.positive] parity
+PASS harness integrity: both suites produced observations
+AB_RESULT tasks=1 parity=1 differs=0 recorded=0 failedA=0 failedB=0 out=/private/tmp/review-terminal-ab-01/out
+T07 AB OK
+EXIT=0

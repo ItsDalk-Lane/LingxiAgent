@@ -1,0 +1,60 @@
+{
+ "command": "LINGXI_R08_AB_TEST_FILTER='leaf.terminal.positive' node scripts/rust-tauri/r08_t07_ab_drill.mjs --bin rust/target/debug/lingxi-service --work /private/tmp/review-terminal-ab-01 --suite-files desktop/src/react/__tests__/r08/r08-t07-terminal-ab.test.ts",
+ "exitCode": 0,
+ "abResult": {
+  "tasks": 1,
+  "parity": 1,
+  "differs": 0,
+  "recorded": 0,
+  "failedA": 0,
+  "failedB": 0,
+  "suiteExitA": 0,
+  "suiteExitB": 0
+ },
+ "casesA": {
+  "snapshot.current-terminal-listed": true,
+  "snapshot.lists-both-session-terminals": true,
+  "snapshot.identity-mismatch-rejected": true,
+  "snapshot.other-session-no-leak": true,
+  "tail.initial-window": true,
+  "tail.new-output-after-since": true,
+  "tail.identity-mismatch-rejected": true,
+  "tail.foreign-terminal-rejected": true,
+  "close.reports-killed-or-already-stopped": true,
+  "close.process-really-stopped": true,
+  "close.unknown-id-rejected": true,
+  "close.foreign-terminal-rejected": true,
+  "close.identity-mismatch-rejected": true,
+  "transport.survives-frame-family": true
+ },
+ "casesB": {
+  "snapshot.current-terminal-listed": true,
+  "snapshot.lists-both-session-terminals": true,
+  "snapshot.identity-mismatch-rejected": true,
+  "snapshot.other-session-no-leak": true,
+  "tail.initial-window": true,
+  "tail.new-output-after-since": true,
+  "tail.identity-mismatch-rejected": true,
+  "tail.foreign-terminal-rejected": true,
+  "close.reports-killed-or-already-stopped": true,
+  "close.process-really-stopped": true,
+  "close.unknown-id-rejected": true,
+  "close.foreign-terminal-rejected": true,
+  "close.identity-mismatch-rejected": true,
+  "transport.survives-frame-family": true
+ },
+ "allCasesBothLegsTrue": true,
+ "probesCloseA": {
+  "before": 185,
+  "after1": 185,
+  "after2": 185
+ },
+ "probesCloseB": {
+  "before": 195,
+  "after1": 195,
+  "after2": 195
+ },
+ "foreignTerminalStillRunningB": true,
+ "binarySha256": "b855e5d638aea6605c1b2d634377f230e1b6118e71522eb98a8be841ed10faa0",
+ "a16RustBinarySha256": "b855e5d638aea6605c1b2d634377f230e1b6118e71522eb98a8be841ed10faa0"
+}

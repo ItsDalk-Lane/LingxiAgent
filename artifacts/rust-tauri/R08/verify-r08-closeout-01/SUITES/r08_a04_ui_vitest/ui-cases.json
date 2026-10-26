@@ -1,0 +1,23 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "cases": [
+  {
+   "case": "a04::expand-and-click-all-viewable",
+   "expect": 1,
+   "actual": 0,
+   "ok": false
+  },
+  {
+   "case": "a04::fixture-is-honest-capture",
+   "expect": 1,
+   "actual": 0,
+   "ok": false
+  },
+  {
+   "case": "a04::projection-real-blocks",
+   "expect": 1,
+   "actual": 0,
+   "ok": false
+  }
+ ]
+}

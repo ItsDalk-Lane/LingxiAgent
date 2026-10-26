@@ -1,0 +1,18 @@
+{
+ "command": "python3 -B scripts/rust-tauri/r08_stage_inputs.py --run-suite r08_ui_pages --evidence /private/tmp/review-ui-pages-indep-01",
+ "exitCode": 0,
+ "durationSecs": 51.893,
+ "guardFailures": [],
+ "gateSuiteEvidence": "artifacts/rust-tauri/R08/verify-r08-closeout-08/SUITES/r08_ui_pages",
+ "rerunEvidence": "/private/tmp/review-ui-pages-indep-01",
+ "gateCases": 87,
+ "rerunCases": 87,
+ "caseSetEqual": true,
+ "allOkGate": true,
+ "allOkRerun": true,
+ "caseValueDiffs": [],
+ "liveSuites": {
+  "quickchat": "PASS checks=9 exit=0",
+  "session-map": "PASS checks=19 exit=0"
+ }
+}

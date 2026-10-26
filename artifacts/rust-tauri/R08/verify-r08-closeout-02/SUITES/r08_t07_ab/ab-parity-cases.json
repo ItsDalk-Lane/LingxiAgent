@@ -1,0 +1,263 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "cases": [
+  {
+   "case": "ab::drift-guard",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::error-path.not-found",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::error-path.unauthorized",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::identity",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.archive.negative",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.archive.workspace",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.archived-delete",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.auth-folders",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.checkpoints",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.cleanup.boundary",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.conversation-map",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.find.in-session",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.list.fields",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.mcp.state",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.mcp.state.unauthorized",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.memory-snapshot",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.permission-mode",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.permission.default-set",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.permission.session-mode",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.permissions.read-idempotent",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.pin-order",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.pin.negative",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.pin.projection",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.projects",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.prompt-snapshot",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.read-ports",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.rename.negative",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.search",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.sessions.create",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.todos.negative",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::leaf.workspace-rollback",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::permissions.default",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::preferences.appearance",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.archive",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.capabilities",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.create",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.list",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.maintenance",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.pin",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.rename",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.switch",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.todos",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  }
+ ],
+ "recordedApprovals": {
+  "leaf.prompt-snapshot": {
+   "diff": "FIXTURE-PROMPT-SNAPSHOT",
+   "basis": "A 腿旧栈对合成会话（无真实模型回合）读提示词快照 500——冻结 sidecar 只在首个模型回合后产生（夹具前提缺口，非内核语义差；Rust 腿 200、双腿无效会话均显式拒）。叶 FF4F06011B48 保持 pending，待聊天线束（D01）产生真实回合后转为平价对拍。"
+  }
+ }
+}

@@ -1,0 +1,61 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [node] > leaf.tool.ask-user: 卡片可见/确认映射/超时推荐/拒答与中止无答案/无效与缺省显式错误（5 断言） 42751ms
+ ✓ desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [node] > leaf.chat.task-abort: 终止本会话拥有的后台子代理任务 + 404/403/运行态/不扩权（2 断言） 3121ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  19:21:23
+   Duration  46.68s (transform 536ms, setup 20ms, import 461ms, tests 45.88s, environment 244ms)
+
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [node] > leaf.tool.ask-user: 卡片可见/确认映射/超时推荐/拒答与中止无答案/无效与缺省显式错误（5 断言）
+[lm-entry] targetPath= -b27d-e15757d8472d.jsonl preloaded= false
+[cmf-entry] path= -b27d-e15757d8472d.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fprivate%2Ftmp%2Flingxi-r08-ve
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [node] > leaf.tool.ask-user: 卡片可见/确认映射/超时推荐/拒答与中止无答案/无效与缺省显式错误（5 断言）
+[lm-dbg] before save, etag= W/"hrp1-b74f478386043510d51aa93d2651cc53e8e6cbb0c94d5b252c0b04a557d0bf82" proto= 1
+[save-dbg] etag= W/"hrp1-b74f478386043510d51aa93d2651cc53e8e6cbb0c94d5b252c0b04a557d0bf82" proto= 1 limit= 50
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [node] > leaf.tool.ask-user: 卡片可见/确认映射/超时推荐/拒答与中止无答案/无效与缺省显式错误（5 断言）
+[has-dbg] called sessionPath= /private/tmp/lingxi-r08-verify/r08_t07_ab-interactive-dev-03/root-a-node/agents/a1/sessions/2026-10-26T11-21-24-829Z_01a177f1-9a5d-7127-b27d-e15757d8472d.jsonl sessionId= sess_0mvp61xm3_017e73171bae971b3001
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [node] > leaf.tool.ask-user: 卡片可见/确认映射/超时推荐/拒答与中止无答案/无效与缺省显式错误（5 断言）
+[has-dbg] called sessionPath= /private/tmp/lingxi-r08-verify/r08_t07_ab-interactive-dev-03/root-a-node/agents/a1/sessions/2026-10-26T11-21-24-829Z_01a177f1-9a5d-7127-b27d-e15757d8472d.jsonl sessionId= sess_0mvp61xm3_017e73171bae971b3001
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [node] > leaf.tool.ask-user: 卡片可见/确认映射/超时推荐/拒答与中止无答案/无效与缺省显式错误（5 断言）
+[has-dbg] called sessionPath= /private/tmp/lingxi-r08-verify/r08_t07_ab-interactive-dev-03/root-a-node/agents/a1/sessions/2026-10-26T11-21-24-829Z_01a177f1-9a5d-7127-b27d-e15757d8472d.jsonl sessionId= sess_0mvp61xm3_017e73171bae971b3001
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [node] > leaf.tool.ask-user: 卡片可见/确认映射/超时推荐/拒答与中止无答案/无效与缺省显式错误（5 断言）
+[has-dbg] called sessionPath= /private/tmp/lingxi-r08-verify/r08_t07_ab-interactive-dev-03/root-a-node/agents/a1/sessions/2026-10-26T11-21-24-829Z_01a177f1-9a5d-7127-b27d-e15757d8472d.jsonl sessionId= sess_0mvp61xm3_017e73171bae971b3001
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [node] > leaf.tool.ask-user: 卡片可见/确认映射/超时推荐/拒答与中止无答案/无效与缺省显式错误（5 断言）
+[has-dbg] called sessionPath= /private/tmp/lingxi-r08-verify/r08_t07_ab-interactive-dev-03/root-a-node/agents/a1/sessions/2026-10-26T11-21-24-829Z_01a177f1-9a5d-7127-b27d-e15757d8472d.jsonl sessionId= sess_0mvp61xm3_017e73171bae971b3001
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [node] > leaf.tool.ask-user: 卡片可见/确认映射/超时推荐/拒答与中止无答案/无效与缺省显式错误（5 断言）
+[has-dbg] called sessionPath= /private/tmp/lingxi-r08-verify/r08_t07_ab-interactive-dev-03/root-a-node/agents/a1/sessions/2026-10-26T11-21-24-829Z_01a177f1-9a5d-7127-b27d-e15757d8472d.jsonl sessionId= sess_0mvp61xm3_017e73171bae971b3001
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [node] > leaf.tool.ask-user: 卡片可见/确认映射/超时推荐/拒答与中止无答案/无效与缺省显式错误（5 断言）
+[has-dbg] called sessionPath= /private/tmp/lingxi-r08-verify/r08_t07_ab-interactive-dev-03/root-a-node/agents/a1/sessions/2026-10-26T11-21-24-829Z_01a177f1-9a5d-7127-b27d-e15757d8472d.jsonl sessionId= sess_0mvp61xm3_017e73171bae971b3001
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [node] > leaf.chat.task-abort: 终止本会话拥有的后台子代理任务 + 404/403/运行态/不扩权（2 断言）
+[has-dbg] called sessionPath= /private/tmp/lingxi-r08-verify/r08_t07_ab-interactive-dev-03/root-a-node/agents/a1/sessions/2026-10-26T11-21-24-829Z_01a177f1-9a5d-7127-b27d-e15757d8472d.jsonl sessionId= sess_0mvp61xm3_017e73171bae971b3001
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [node] > leaf.chat.task-abort: 终止本会话拥有的后台子代理任务 + 404/403/运行态/不扩权（2 断言）
+[has-dbg] called sessionPath= /private/tmp/lingxi-r08-verify/r08_t07_ab-interactive-dev-03/root-a-node/agents/a1/sessions/2026-10-26T11-21-24-829Z_01a177f1-9a5d-7127-b27d-e15757d8472d.jsonl sessionId= sess_0mvp61xm3_017e73171bae971b3001
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [node] > leaf.chat.task-abort: 终止本会话拥有的后台子代理任务 + 404/403/运行态/不扩权（2 断言）
+[has-dbg] called sessionPath= /private/tmp/lingxi-r08-verify/r08_t07_ab-interactive-dev-03/root-a-node/agents/a1/sessions/2026-10-26T11-21-24-829Z_01a177f1-9a5d-7127-b27d-e15757d8472d.jsonl sessionId= sess_0mvp61xm3_017e73171bae971b3001
+[has-dbg] recordsSize= 0 limit= 50
+

@@ -1,0 +1,53 @@
+{
+  "schema": "t07-ab-compare/v1",
+  "kernelA": "node",
+  "kernelB": "rust",
+  "suiteFiles": [
+    "desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts"
+  ],
+  "tasks": {
+    "leaf.ws.terminal": {
+      "verdict": "recorded",
+      "A": {
+        "ok": true,
+        "observed": {
+          "cases": {
+            "snapshot.explicit-reply": true,
+            "tail.rust-explicit-or-old-real": true,
+            "close.result-rejected-explicit": true,
+            "transport.survives-frame-family": true
+          },
+          "snapExplicit": true,
+          "tailExplicit": false,
+          "closeExplicit": true
+        },
+        "ms": 9920
+      },
+      "B": {
+        "ok": true,
+        "observed": {
+          "cases": {
+            "snapshot.explicit-reply": true,
+            "tail.rust-explicit-or-old-real": false,
+            "close.result-rejected-explicit": true,
+            "transport.survives-frame-family": true
+          },
+          "snapExplicit": true,
+          "tailExplicit": false,
+          "closeExplicit": true
+        },
+        "ms": 9862
+      }
+    }
+  },
+  "summary": {
+    "tasks": 1,
+    "parity": 0,
+    "differs": 0,
+    "recorded": 1,
+    "failedA": 0,
+    "failedB": 0,
+    "suiteExitA": 0,
+    "suiteExitB": 0
+  }
+}

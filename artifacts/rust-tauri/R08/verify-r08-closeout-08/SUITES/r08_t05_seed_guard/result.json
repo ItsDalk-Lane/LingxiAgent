@@ -1,0 +1,19 @@
+{
+ "schema": "lingxi.r08.suite-receipt.v1",
+ "suite": "r08_t05_seed_guard",
+ "exitCode": 0,
+ "guardFailures": [],
+ "argv": [
+  "cargo",
+  "test",
+  "--manifest-path",
+  "rust/Cargo.toml",
+  "--locked",
+  "-p",
+  "lingxi-service",
+  "--test",
+  "r08_t05_seed_guard"
+ ],
+ "durationSecs": 1.228,
+ "logSha256": "23373da9dff51ef5736e1696249751661c198818366724ec957927cef2db4df2"
+}

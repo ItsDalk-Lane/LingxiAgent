@@ -1,0 +1,69 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts (104 tests) 69ms
+ ✓ desktop/src/react/__tests__/services/r08-a01-ui-projection.test.ts (5 tests) 31ms
+ ✓ desktop/src/react/__tests__/services/r08-p1-data-epoch-hello.test.ts (13 tests) 346ms
+ ✓ desktop/src/react/__tests__/host/r08-a03-web-desktop-host.test.tsx (5 tests) 42ms
+ ✓ desktop/src/react/__tests__/services/r08-session-legacy-compat.test.ts (1 test) 3244ms
+     ✓ memory/authorized-folders 经翻译层真实往返（无 LINGXI_R07_SERVICE_BIN 明确跳过）  3244ms
+ ✓ desktop/src/react/__tests__/services/r08-pin-projection-compat.test.ts (2 tests) 3192ms
+ ✓ desktop/src/react/__tests__/services/r08-continue-disposal-compat.test.ts (2 tests) 3219ms
+
+ Test Files  7 passed (7)
+      Tests  132 passed (132)
+   Start at  06:20:33
+   Duration  4.09s (transform 2.13s, setup 94ms, import 2.87s, tests 10.14s, environment 1.40s)
+
+stderr | desktop/src/react/__tests__/services/r08-pin-projection-compat.test.ts > 置顶投影形状统一（真实组件 + 真实 Rust 服务） > Rust 列表与 pin 响应经边界归一后：即时置顶、重载置顶、双置顶排序、取消清除（真实分组）
+[has-dbg] called sessionPath= native:r08-pin-s2 sessionId= r08-pin-s2
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/services/r08-continue-disposal-compat.test.ts > 续接已删 Agent 会话 / 工作台处置（真实动作 + 真实 Rust 服务） > 续接已删 Agent 会话：真实动作 → Rust 新会话身份 → 列表刷新 → 切换到返回的 path
+[has-dbg] called sessionPath= native:r08-cont-src sessionId= r08-cont-src
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/services/r08-continue-disposal-compat.test.ts > 续接已删 Agent 会话 / 工作台处置（真实动作 + 真实 Rust 服务） > 续接已删 Agent 会话：真实动作 → Rust 新会话身份 → 列表刷新 → 切换到返回的 path
+[session] continue deleted-agent session failed: Error: lingxiFetch /lingxi/v1/sessions/continue-deleted-agent: 400 Bad Request
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/hooks/use-hana-fetch.ts:224:13)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at continueDeletedAgentSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1844:17)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/services/r08-continue-disposal-compat.test.ts:118:12
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/services/r08-continue-disposal-compat.test.ts > 续接已删 Agent 会话 / 工作台处置（真实动作 + 真实 Rust 服务） > 续接已删 Agent 会话：真实动作 → Rust 新会话身份 → 列表刷新 → 切换到返回的 path
+[has-dbg] called sessionPath= native:r08-cont-src sessionId= r08-cont-src
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/services/r08-pin-projection-compat.test.ts > 置顶投影形状统一（真实组件 + 真实 Rust 服务） > Rust 列表与 pin 响应经边界归一后：即时置顶、重载置顶、双置顶排序、取消清除（真实分组）
+[has-dbg] called sessionPath= native:r08-pin-s2 sessionId= r08-pin-s2
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/services/r08-pin-projection-compat.test.ts > 置顶投影形状统一（真实组件 + 真实 Rust 服务） > Rust 列表与 pin 响应经边界归一后：即时置顶、重载置顶、双置顶排序、取消清除（真实分组）
+[has-dbg] called sessionPath= native:r08-pin-s2 sessionId= r08-pin-s2
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/services/r08-continue-disposal-compat.test.ts > 续接已删 Agent 会话 / 工作台处置（真实动作 + 真实 Rust 服务） > 续接已删 Agent 会话：真实动作 → Rust 新会话身份 → 列表刷新 → 切换到返回的 path
+[has-dbg] called sessionPath= native:r08-cont-src sessionId= r08-cont-src
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/services/r08-continue-disposal-compat.test.ts > 续接已删 Agent 会话 / 工作台处置（真实动作 + 真实 Rust 服务） > 工作台处置：按 cwd 身份归档匹配会话（matched/disposed 一致），其他工作台不受影响；缺身份显式拒且无副作用
+[has-dbg] called sessionPath= native:sess-79879-1a17526c48a-0 sessionId= sess-79879-1a17526c48a-0
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/services/r08-continue-disposal-compat.test.ts > 续接已删 Agent 会话 / 工作台处置（真实动作 + 真实 Rust 服务） > 工作台处置：按 cwd 身份归档匹配会话（matched/disposed 一致），其他工作台不受影响；缺身份显式拒且无副作用
+[workspace-disposal] failed: Error: lingxiFetch /lingxi/v1/sessions/workspace-disposal: 400 Bad Request
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/hooks/use-hana-fetch.ts:224:13)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at disposeWorkspaceSessions (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:2087:17)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/services/r08-continue-disposal-compat.test.ts:148:12
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/services/r08-continue-disposal-compat.test.ts > 续接已删 Agent 会话 / 工作台处置（真实动作 + 真实 Rust 服务） > 工作台处置：按 cwd 身份归档匹配会话（matched/disposed 一致），其他工作台不受影响；缺身份显式拒且无副作用
+[has-dbg] called sessionPath= native:sess-79879-1a17526c48a-0 sessionId= sess-79879-1a17526c48a-0
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/services/r08-continue-disposal-compat.test.ts > 续接已删 Agent 会话 / 工作台处置（真实动作 + 真实 Rust 服务） > 工作台处置：按 cwd 身份归档匹配会话（matched/disposed 一致），其他工作台不受影响；缺身份显式拒且无副作用
+[has-dbg] called sessionPath= native:sess-79879-1a17526c48a-0 sessionId= sess-79879-1a17526c48a-0
+[has-dbg] recordsSize= 0 limit= 50
+

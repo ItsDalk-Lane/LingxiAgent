@@ -1,0 +1,29 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/cli-data.test.ts > CLI args: data command family > parses each data subcommand 29ms
+ ✓ tests/cli-data.test.ts > CLI args: data command family > parses --confirm-token alongside restore 0ms
+ ✓ tests/cli-data.test.ts > CLI args: data command family > rejects a missing data subcommand 0ms
+ ✓ tests/cli-data.test.ts > CLI args: data command family > rejects an unknown data subcommand 0ms
+ ✓ tests/cli-data.test.ts > CLI args: data command family > rejects data restore without a transitionId 0ms
+ ✓ tests/cli-data.test.ts > CLI args: data command family > mentions the data commands in the help text 0ms
+ ✓ tests/cli-data.test.ts > hana data diagnose — read-only across three home states > reports a clean, unstamped home 2ms
+ ✓ tests/cli-data.test.ts > hana data diagnose — read-only across three home states > reports an in-progress transition journal with its continuation suggestion 25ms
+ ✓ tests/cli-data.test.ts > hana data diagnose — read-only across three home states > reports an available checkpoint 4ms
+ ✓ tests/cli-data.test.ts > hana data diagnose — read-only across three home states > never writes to the home directory across all three states 12ms
+ ✓ tests/cli-data.test.ts > hana data diagnose — corrupt state is reported, never auto-repaired > reports a corrupt stamp explicitly and leaves the home untouched (no repair, no fresh store) 1ms
+ ✓ tests/cli-data.test.ts > hana data checkpoints > prints a friendly message when nothing is available 1ms
+ ✓ tests/cli-data.test.ts > hana data checkpoints > lists complete checkpoints with transitionId, epoch range, createdAt, store count, and size 3ms
+ ✓ tests/cli-data.test.ts > hana data checkpoints > skips .tmp-* and .invalid-* directories and reports them as a count instead of listing them 3ms
+ ✓ tests/cli-data.test.ts > hana data restore — confirmation is never skippable > aborts on a TTY when the retyped confirmation does not match, without calling restore 3ms
+ ✓ tests/cli-data.test.ts > hana data restore — confirmation is never skippable > refuses on a non-TTY without --confirm-token, without calling restore 3ms
+ ✓ tests/cli-data.test.ts > hana data restore — confirmation is never skippable > refuses on a non-TTY when --confirm-token does not exactly match, without calling restore 3ms
+ ✓ tests/cli-data.test.ts > hana data restore — confirmation is never skippable > errors clearly when the transitionId has no checkpoint on disk 0ms
+ ✓ tests/cli-data.test.ts > hana data restore — confirmation is never skippable > restores end-to-end with the exact confirm token on a non-TTY, using the real provider and restore transaction 53ms
+ ✓ tests/cli-data.test.ts > hana data restore — confirmation is never skippable > prompts for confirmation on a TTY and restores when the retyped phrase matches exactly 52ms
+
+ Test Files  1 passed (1)
+      Tests  20 passed (20)
+   Start at  20:01:21
+   Duration  393ms (transform 100ms, setup 20ms, import 101ms, tests 197ms, environment 0ms)
+

@@ -1,0 +1,133 @@
+{
+  "kind": "node",
+  "observations": {
+    "leaf.tool.ask-user": {
+      "ok": true,
+      "observed": {
+        "cases": {
+          "a0.questions-and-options-visible": true,
+          "a0.values-and-labels-visible": true,
+          "a0.recommended-visible": true,
+          "a0.pending-question-exposed": true,
+          "a1.confirmed-answered-true": true,
+          "a1.keys-mapped": true,
+          "a1.values-mapped": true,
+          "a1.labels-mapped": true,
+          "a1.unknown-value-dropped": true,
+          "a1.optional-unanswered": true,
+          "a1.no-auto-selected": true,
+          "a1.pending-cleared-after-answer": true,
+          "a1.round-completes": true,
+          "a4.settled-or-unknown-question-explicit-error": true,
+          "a4.missing-session-explicit-error": true,
+          "a2.timedout-flag": true,
+          "a2.recommended-auto-selected": true,
+          "a2.non-recommended-not-filled": true,
+          "a2.round-completes": true,
+          "a2.pending-cleared-after-timeout": true,
+          "a3.dismissed-no-answers": true,
+          "a3.dismissed-pending-cleared": true,
+          "a3.dismissed-round-completes": true,
+          "a4.dismissed-does-not-fabricate-answer": true,
+          "a3.aborted-no-answers": true,
+          "a3.abort-acknowledged": true,
+          "a4.aborted-does-not-fabricate-answer": true,
+          "a4.invalid-questions-explicit-error": true,
+          "a4.invalid-questions-no-card": true
+        },
+        "debug": {
+          "card": {
+            "id": "fca001f3-b9cf-4e32-a8e4-eb3eb8780ce8",
+            "surface": "ws",
+            "questions": 4,
+            "pendingSurface": true
+          },
+          "answerStatus": 200,
+          "answerDetails": "{\"answered\":true,\"timedOut\":false,\"answers\":[{\"key\":\"mode\",\"question\":\"选择处理方式\",\"values\":[\"v-fast\"],\"labels\":[\"快速\"],\"unanswered\":false,\"autoSelected\":false},{\"key\":\"steps\",\"question\":\"选择处理步骤\",\"values\":[\"v-s2\"],\"labels\":[\"步骤二\"],\"unanswered\":false,\"autoSelected\":false},{\"key\":\"note\",\"question\":\"补充说明\",\"values\":[\"用户原文\"],\"labels\":[\"用户原文\"],\"unanswered\":false,\"autoSelected\":false},{\"key\":\"extra\",\"question\":\"可选补充\",\"values\":[],\"labels\":[],\"unanswered\":true,\"autoSelected\":false}]}",
+          "settled": {
+            "status": 404,
+            "ghost": 404,
+            "missing": 404
+          },
+          "timeout": {
+            "card": true,
+            "details": "{\"answered\":true,\"timedOut\":true,\"answers\":[{\"key\":\"mode\",\"question\":\"选择处理方式\",\"values\":[\"v-safe\"],\"labels\":[\"稳妥\"],\"unanswered\":false,\"autoSelected\":true},{\"key\":\"steps\",\"question\":\"选择处理步骤\",\"values\":[],\"labels\":[],\"unanswered\":true,\"autoSelected\":false},{\"key\":\"note\",\"question\":\"补充说明\",\"values\":[],\"labels\":[],\"unanswered\":true,\"autoSelected\":false},{\"key\":\"extra\",\"question\":\"可选补充\",\"values\":[],\"labels\":[],\"unanswered\":true,\"autoSelected\":false}]}",
+            "final": true
+          },
+          "dismiss": {
+            "answered": 200,
+            "details": "{\"answered\":false,\"dismissed\":true,\"answers\":[]}",
+            "echo": "用户暂不回答。按你的最佳判断继续。"
+          },
+          "abort": {
+            "card": true,
+            "settled": true,
+            "ack": true,
+            "details": "null",
+            "framesTail": [
+              "{\"type\":\"status\",\"isStreaming\":false,\"sessionPath\":\"/private/tmp/lingxi-r08-verify/r08_t07_ab-interactive-dev-03/root-a-node/agents/a1/sessions/2026-10-26T11-22-03-225Z_01a177f2-30",
+              "{\"type\":\"abort_result\",\"status\":\"accepted\",\"sessionId\":\"sess_0mvp62r8p_9b7a3fbffae6e1e11e97\",\"sessionPath\":\"/private/tmp/lingxi-r08-verify/r08_t07_ab-interactive-dev-03/root-a-node",
+              "{\"type\":\"status\",\"isStreaming\":false,\"sessionPath\":\"/private/tmp/lingxi-r08-verify/r08_t07_ab-interactive-dev-03/root-a-node/agents/a1/sessions/2026-10-26T11-22-03-225Z_01a177f2-30"
+            ]
+          },
+          "invalid": {
+            "echo": "提问内容不合法：duplicate question key \"dup\"",
+            "pending": true
+          }
+        },
+        "sessionIds": [
+          "sess_0mvp61xm3_017e73171bae971b3001",
+          "sess_0mvp61zw5_20d294a7bec0ec2b1a47",
+          "sess_0mvp62oyw_2090c39ed86fa91c2cc4",
+          "sess_0mvp62r8p_9b7a3fbffae6e1e11e97",
+          "sess_0mvp62s2k_f52fde20bb709ee91004"
+        ]
+      },
+      "ms": 42726
+    },
+    "leaf.chat.task-abort": {
+      "ok": true,
+      "observed": {
+        "cases": {
+          "a0.owned-task-aborted-or-already-stopped": true,
+          "a0.owned-response-scoped": true,
+          "a1.terminal-state-decides-result": true,
+          "a0.unknown-task-404": true,
+          "a1.missing-session-context-400": true,
+          "a1.unauthorized-rejected": true,
+          "a0.cross-session-403": true,
+          "a1.cross-session-no-leak": true,
+          "a1.cross-session-task-unaffected": true
+        },
+        "debug": {
+          "owned": {
+            "task": "task_subagent_mvp62uv7_1_vp7c2n",
+            "status": 200,
+            "body": "{\"ok\":true,\"status\":\"aborted\"}",
+            "second": 404,
+            "secondBody": "{\"ok\":false,\"status\":\"rejected\",\"reason\":\"not_found\"}"
+          },
+          "unknown": {
+            "status": 404,
+            "body": "{\"ok\":false,\"status\":\"rejected\",\"reason\":\"not_found\"}"
+          },
+          "missing": {
+            "status": 400,
+            "body": "{\"error\":\"internal_contract\"}"
+          },
+          "unauthorized": 403,
+          "cross": {
+            "task": "task_subagent_mvp62vlc_2_t3w5le",
+            "status": 403,
+            "body": "{\"ok\":false,\"status\":\"rejected\",\"reason\":\"session_mismatch\"}",
+            "ownerAbort": 200,
+            "ownerBody": "{\"ok\":true,\"status\":\"aborted\"}"
+          }
+        },
+        "parent": "sess_0mvp62u9z_b6b60d8b672c7282de60",
+        "other": "sess_0mvp62uam_74f088ad6262919e3adb"
+      },
+      "ms": 3121
+    }
+  }
+}

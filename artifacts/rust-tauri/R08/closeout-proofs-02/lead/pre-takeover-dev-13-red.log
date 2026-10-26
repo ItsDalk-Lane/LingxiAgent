@@ -1,0 +1,82 @@
+PASS stub provider ready :: 54567
+PASS oauth standin ready :: 54568
+PASS fixture gen
+PASS root-a prepared (knowledge integrity ok) :: ok
+PASS root-b migrated (T05 path)
+PASS kernel A (node) ready :: port=54571
+PASS kernel B (rust) ready :: 127.0.0.1:54576
+PASS suite ran on A (observations present) :: vitest exit=0
+PASS suite ran on B (observations present) :: vitest exit=0
+PASS stub provider reaped :: stub pid 8563 exit=0 signal=null
+PASS [identity] parity
+PASS [sessions.list] parity
+PASS [sessions.switch] parity
+PASS [sessions.rename] parity
+PASS [sessions.pin] parity
+PASS [sessions.create] parity
+PASS [sessions.archive] parity
+PASS [sessions.maintenance] parity
+PASS [sessions.capabilities] parity
+PASS [sessions.todos] parity
+PASS [permissions.default] parity
+PASS [preferences.appearance] parity
+PASS [error-path.unauthorized] parity
+PASS [error-path.not-found] parity
+PASS [drift-guard] parity
+PASS [leaf.rename.negative] parity
+PASS [leaf.pin.negative] parity
+PASS [leaf.todos.negative] parity
+PASS [leaf.cleanup.boundary] parity
+PASS [leaf.list.fields] parity
+PASS [leaf.permissions.read-idempotent] parity
+PASS [leaf.mcp.state] parity
+PASS [leaf.mcp.state.unauthorized] parity
+PASS [leaf.permission.session-mode] parity
+PASS [leaf.permission.default-set] parity
+PASS [leaf.archive.negative] parity
+PASS [leaf.pin-order] parity
+PASS [leaf.pin.projection] parity
+PASS [leaf.read-ports] parity
+PASS [leaf.auth-folders] parity
+PASS [leaf.memory-snapshot] parity
+PASS [leaf.prompt-snapshot] parity
+PASS [leaf.archive.workspace] parity
+PASS [leaf.find.in-session] parity
+PASS [leaf.archived-delete] parity
+PASS [leaf.search] parity
+PASS [leaf.projects] parity
+PASS [leaf.conversation-map] parity
+PASS [leaf.checkpoints] parity
+PASS [leaf.workspace-rollback] parity
+PASS [leaf.sessions.create] parity
+PASS [leaf.permission-mode] parity
+PASS [leaf.mcp.crud] parity
+PASS [leaf.sessions.admin] parity
+RECORD [leaf.ws.terminal] recorded :: {"A":{"cases":{"snapshot.explicit-reply":true,"tail.rust-explicit-or-old-real":true,"close.result-rejected-explicit":true,"transport.survives-frame-family":true},"snapExplicit":true,"tailExplicit":false,"closeExplicit":true},"B":{"cases":{"snapshot.explicit-re
+PASS [leaf.plan-mode] parity
+PASS [leaf.prefs.quick-chat] parity
+PASS [leaf.drafts] parity
+PASS [leaf.ws.compact] parity
+PASS [leaf.chat.transport] parity
+PASS [leaf.chat.round] parity
+RECORD [leaf.slash] recorded :: {"A":{"cases":{"slash.reset.explicit-reply":false,"slash.reset.history-cleared":false,"slash.reset.history-cleared-readable":true,"slash.reset.other-sessions-intact":true,"slash.reset.invalid-session-rejected":true,"slash.compact.replies":true,"slash.compact.a
+RECORD [leaf.slash.new] recorded :: {"A":{"cases":{"slash.new.rotates-and-archives":false,"slash.new.explicit-reply":false,"slash.new.old-recoverable":false,"slash.new.invalid-session-rejected":true},"rotated":false,"oldStackLimit":true,"freshForReset":"sess_0mvp4dwo4_73d8cd10b2584b865a84"},"B":
+PASS [leaf.chat.abort] parity
+PASS [leaf.tool.todos] parity
+PASS [leaf.tool.checkpoint] parity
+PASS [leaf.tool.rewind] parity
+PASS [leaf.tool.session] parity
+PASS [leaf.tool.current-status] parity
+PASS [leaf.tool.session-folders] parity
+PASS [leaf.ws.stream] parity
+PASS [leaf.cleanup.expiry] parity
+FAIL [leaf.lazy-content] differs :: {"A":{"cases":{"lazy.large-result-referenced-in-history":false,"lazy.content-fetch-returns-full-body":false,"lazy.other-session-locator-404":true,"lazy.unknown-content-404":true},"contentId":"eyJ2ZXJzaW9uIjoxLCJzb3VyY2VJbmRleCI6NSwiZW50cnlJZCI6ImQ0Zjc5NzRmIiwi
+PASS [leaf.replay-latest] parity
+PASS [leaf.switch.focus] parity
+PASS [leaf.prompt-snapshot.real] parity
+FAIL [leaf.mcp.face] differs :: {"A":{"cases":{"resources.uri-returns-content":false,"resources.missing-uri-400":true,"resources.unknown-uri-rejected":true,"apps.launch-hands-over-launch-input":true,"apps.unknown-tool-rejected":true,"resources.unknown-connector-rejected":true},"addStatus":20
+PASS [leaf.mcp.oauth] parity
+PASS harness integrity: both suites produced observations
+AB_RESULT tasks=68 parity=63 differs=2 recorded=3 failedA=0 failedB=0 out=/private/tmp/lingxi-r08-verify/r08_t07_ab-dev-13/out
+T07 AB OK
+EXIT=0

@@ -1,0 +1,32 @@
+PASS [leg-a] fixture gen
+PASS [leg-a] migrate committed
+PASS [leg-a] stop-after delta_export exit 0
+PASS [leg-a] package manifest exists
+PASS [leg-a] resume refused (non-zero) :: status=2
+PASS [leg-a] refusal names export_verify :: error: rollback: phase export_verify refused: re-read delta package: delta refused: manifest.json packageSha256 mismatch (tamper or corruption)
+
+PASS [leg-a] journal terminal refused (status=refused at export_verify) :: refused/export_verify
+PASS [leg-a] pointer unchanged (→ new root) :: /private/tmp/lingxi-r08-verify/r08_t06_d2-81950-1792967019646/leg-a/new-root
+PASS [leg-a] old root untouched (zero-touch)
+PASS [leg-a] new root intact
+PASS [leg-b] ram disk attached :: /dev/disk4
+PASS [leg-b] tiny volume mounted at /Volumes/T06D2TINY :: /Volumes/T06D2TINY fmt=0 mnt=0
+PASS [leg-b] fixture gen
+PASS [leg-b] migrate committed
+PASS [leg-b] preflight refused (non-zero) :: status=2
+PASS [leg-b] refusal names insufficient space :: error: rollback: phase preflight refused: insufficient space on backup volume: need 271803304 bytes (2×tree+slack), available 32751616
+
+PASS [leg-b] pointer unchanged (→ new root) :: /private/tmp/lingxi-r08-verify/r08_t06_d2-81950-1792967019646/leg-b/new-root
+PASS [leg-b] old root untouched (zero-touch)
+PASS [leg-b] old stamp untouched (still fixture {epoch:7})
+PASS [leg-c] fixture gen
+PASS [leg-c] migrate committed
+PASS [leg-c] rollback refused (non-zero) :: status=2
+PASS [leg-c] refusal names old stack probe :: error: rollback: phase old_stack_probe refused: old stack probe failed: old stack exited before readiness (status exit status: 1, server_info_seen=false, last_http_status=0); stderr tail: ; pointer restored to new root (/private/tmp/lingxi-r08-verify/r08_t06_d2-81950-1792967019646/leg-c/new-root)
+
+PASS [leg-c] J6: pointer restored to new root :: /private/tmp/lingxi-r08-verify/r08_t06_d2-81950-1792967019646/leg-c/new-root
+PASS [leg-c] journal terminal refused (status=refused at old_stack_probe) :: refused/old_stack_probe
+PASS [leg-c] repairAction recorded (修复模式 + 双侧保留) :: {"action":"指针已回指新根（新根恢复为活跃根）；旧根保留；按 probe 失败详情修复后重跑","context":{"bothSidesPreserved":true,"journal":"/private/tmp/lingxi-r08-verify/r08_t06_d2-81950-1792967019646/leg-c/rb-work/rollback-journal.json","resume":"lingxi-ser
+PASS [leg-c] both sides preserved
+D2 DRILL OK
+D2_RESULT failures=0

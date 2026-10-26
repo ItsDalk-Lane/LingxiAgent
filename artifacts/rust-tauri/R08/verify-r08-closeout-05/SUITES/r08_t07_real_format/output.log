@@ -1,0 +1,8 @@
+PASS fixture gen
+PASS A: old stack ready
+PASS A: real-format session LISTED by old stack :: [[null,"ents/a1/sessions/real-format-probe.jsonl"]]
+PASS A: real-format session content readable :: {"summaryStatus":200,"messageCount":null,"keys":["hasSummary","summary","createdAt","updatedAt"]}
+PASS B: legacy-import exit 0
+PASS B: real-format entries imported as user/assistant messages (EXPECTED RED if F-T07-1 holds) :: {"sessions":2,"messages":4,"probeRows":3,"conversational":3,"unknownBlocks":0,"issues":8}
+REAL_FORMAT_PROBE_RESULT listedByOldStack=1 oldStackContent={"summaryStatus":200,"messageCount":null,"keys":["hasSummary","summary","createdAt","updatedAt"]} importedConversational=3 importedUnknownBlocks=0 failures=0
+REAL FORMAT PROBE: BOTH KERNELS FAITHFUL

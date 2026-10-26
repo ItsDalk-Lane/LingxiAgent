@@ -1,0 +1,15 @@
+PASS stub provider ready :: 62381
+PASS oauth standin ready :: 62383
+PASS fixture gen
+PASS root-a prepared (knowledge integrity ok) :: ok
+PASS root-b migrated (T05 path)
+PASS kernel A (node) ready :: port=62388
+PASS kernel B (rust) ready :: 127.0.0.1:62399
+PASS suite ran on A (observations present) :: vitest exit=0
+PASS suite ran on B (observations present) :: vitest exit=0
+PASS stub provider reaped :: stub pid 39316 exit=0 signal=null
+PASS [leaf.chat.task-abort] parity
+PASS [leaf.tool.ask-user] parity
+PASS harness integrity: both suites produced observations
+AB_RESULT tasks=2 parity=2 differs=0 recorded=0 failedA=0 failedB=0 out=/private/tmp/lingxi-r08-verify/r08_t07_ab-interactive-dev-03/out
+T07 AB OK

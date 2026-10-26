@@ -1,0 +1,141 @@
+{
+  "kind": "rust",
+  "origin": "http://127.0.0.1:61168",
+  "observations": {
+    "leaf.terminal.positive": {
+      "ok": true,
+      "observed": {
+        "cases": {
+          "snapshot.current-terminal-listed": true,
+          "snapshot.lists-both-session-terminals": true,
+          "snapshot.identity-mismatch-rejected": true,
+          "snapshot.other-session-no-leak": true,
+          "tail.initial-window": true,
+          "tail.new-output-after-since": true,
+          "tail.identity-mismatch-rejected": true,
+          "tail.foreign-terminal-rejected": true,
+          "close.reports-killed-or-already-stopped": true,
+          "close.process-really-stopped": true,
+          "close.unknown-id-rejected": true,
+          "close.foreign-terminal-rejected": true,
+          "close.identity-mismatch-rejected": true,
+          "transport.survives-frame-family": true
+        },
+        "infra": {
+          "final": true,
+          "echo": {
+            "steps": 2,
+            "last": "Interactive process started (pty).\nprocess_id: proc:44249283ae0e7aecc0cd143a8f21e595\nstatus: running\ncwd: /private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02/workspace\nUse write_stdin (process_id, chars) to interact and read output; the process keeps running across tool calls until it exits or is closed.\n[process still running (handle: proc:44249283ae0e7aecc0cd143a8f21e595)]"
+          },
+          "terminalIds": [
+            "proc:823f7c6448cae7a5e63155961eab4801",
+            "proc:44249283ae0e7aecc0cd143a8f21e595"
+          ],
+          "workspace": "/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02/workspace"
+        },
+        "probes": {
+          "managerUnavailableReachable": false,
+          "snapshot": {
+            "type": "terminal_snapshot",
+            "currentStatus": "running",
+            "terminalCount": 2,
+            "currentKeys": [
+              "agentId",
+              "command",
+              "createdAt",
+              "cwd",
+              "exitCode",
+              "exitedAt",
+              "label",
+              "lastActivityAt",
+              "seq",
+              "sessionId",
+              "sessionPath",
+              "signal",
+              "status",
+              "terminalId",
+              "toolCallId",
+              "transcriptPath"
+            ],
+            "mismatch": {
+              "type": "error",
+              "code": "session_identity_mismatch",
+              "leakedTerminalFrames": 0
+            },
+            "foreign": {
+              "type": "terminal_snapshot",
+              "terminals": 0,
+              "leaked": false
+            }
+          },
+          "tail": {
+            "initial": {
+              "type": "terminal_tail",
+              "chunks": 2,
+              "lastSeq": 2,
+              "truncated": false
+            },
+            "writeFinal": true,
+            "next": {
+              "type": "terminal_tail",
+              "lastSeq": 21,
+              "markerSeen": true,
+              "truncated": false
+            },
+            "mismatch": {
+              "type": "error",
+              "code": "session_identity_mismatch",
+              "terminalTailFrames": 0
+            },
+            "foreign": {
+              "type": "error",
+              "code": "terminal_not_found_or_mismatch",
+              "terminalTailFrames": 0
+            }
+          },
+          "close": {
+            "requested": {
+              "status": "killed",
+              "requestIdEcho": "term-close-1"
+            },
+            "heartbeat": {
+              "before": 195,
+              "after1": 195,
+              "after2": 195
+            },
+            "unknown": {
+              "type": "terminal_close_result",
+              "status": "rejected",
+              "reason": "terminal_not_found_or_mismatch"
+            },
+            "foreign": {
+              "status": "rejected",
+              "reason": "terminal_not_found_or_mismatch",
+              "terminalStillRunning": true
+            },
+            "mismatch": {
+              "type": "error",
+              "status": null,
+              "code": "session_identity_mismatch"
+            },
+            "interactive": {
+              "status": "killed",
+              "requestIdEcho": "term-close-interactive"
+            }
+          }
+        },
+        "heartbeat": "/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02/workspace/r08-terminal-heartbeat-rust-1793013327227-34237.txt",
+        "last0": 2,
+        "closeInteractiveStatus": "killed",
+        "tailNewLastSeq": 21,
+        "framesSample": [
+          ">>> {\"type\":\"terminal_close_request\",\"sessionId\":\"sess-33299-1a177ec2573-0\",\"sessionPath\":\"native:sess-33299-1a177ec2578-1\",\"terminalId\":\"proc:823f7c6448cae7a5e",
+          "{\"code\":\"session_identity_mismatch\",\"message\":\"sessionId and sessionPath do not resolve to one session\",\"type\":\"error\"}",
+          ">>> {\"type\":\"terminal_close_request\",\"sessionId\":\"sess-33299-1a177ec2573-0\",\"sessionPath\":\"native:sess-33299-1a177ec2573-0\",\"terminalId\":\"proc:823f7c6448cae7a5e",
+          "{\"requestId\":\"term-close-interactive\",\"sessionId\":\"sess-33299-1a177ec2573-0\",\"sessionPath\":\"native:sess-33299-1a177ec2573-0\",\"status\":\"killed\",\"terminalId\":\"pro"
+        ]
+      },
+      "ms": 12392
+    }
+  }
+}

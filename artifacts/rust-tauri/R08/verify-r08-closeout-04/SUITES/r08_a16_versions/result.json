@@ -1,0 +1,14 @@
+{
+ "schema": "lingxi.r08.suite-receipt.v1",
+ "suite": "r08_a16_versions",
+ "exitCode": 0,
+ "guardFailures": [],
+ "argv": [
+  "node",
+  "scripts/rust-tauri/r08_t08_version_manifest.mjs",
+  "--out",
+  "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-04/SUITES/r08_a16_versions"
+ ],
+ "durationSecs": 0.232,
+ "logSha256": "846409c5ffd224eff024be125d70fc861270db3d4381b46655f12e57bac81340"
+}

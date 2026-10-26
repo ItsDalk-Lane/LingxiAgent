@@ -1,0 +1,77 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "cases": [
+  {
+   "case": "cli::checkpoints.list-complete",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "cli::checkpoints.skips-staging-quarantine",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "cli::diagnose.available-checkpoint",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "cli::diagnose.clean-home",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "cli::diagnose.corrupt-reported-not-repaired",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "cli::diagnose.in-progress-journal",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "cli::diagnose.zero-write",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "cli::restore.executes-with-exact-token",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "cli::restore.non-tty-no-token-refused",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "cli::restore.tty-mismatch-aborts",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "cli::restore.unknown-transition-errored",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "cli::restore.wrong-token-refused",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  }
+ ]
+}

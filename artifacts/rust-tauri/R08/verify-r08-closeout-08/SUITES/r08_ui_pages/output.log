@@ -1,0 +1,421 @@
+R08 UI 逐断言客户端证据生产 — out=/private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out
+node=v24.16.0 service=/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service
+
+$ npx vitest run desktop/src/react/__tests__/r08/r08-ui-settings-container.test.tsx desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx desktop/src/react/__tests__/r08/r08-ui-settings-security.test.tsx desktop/src/react/__tests__/r08/r08-ui-settings-guards.test.ts desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx --reporter=verbose --reporter=json --outputFile.json=/private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out/raw/r08-new-ui-report.json
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-guards.test.ts > R08 安全设置页共用法守卫：loadSettingsConfig 请求边界 > 无 agentId 时 loadSettingsConfig 不发任何请求，并显式报 No settings agent selected 55ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-guards.test.ts > R08 安全设置页共用法守卫：loadSettingsConfig 请求边界 > 经验未启用时不 GET experience；显式启用后才发起 experience 读取 4ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-guards.test.ts > R08 安全设置页共用法守卫：loadSettingsConfig 请求边界 > 无可用连接（resourceKey 无法定位真实服务）时 loadSettingsConfig 不发出网络请求 0ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx > R08 MCP 设置页：连接器状态与工具权限（断言 2） > 读取真实连接器列表并逐条显示状态、工具数与助手权限；无连接器时显示添加入口 66ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-security.test.tsx > R08 安全设置页：沙箱与沙箱网络（断言 1） > 两个沙箱开关经每助手配置接口写入并重读当前助手合成配置视图 124ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-security.test.tsx > R08 安全设置页：沙箱与沙箱网络（断言 1） > 状态未初始化时开关为 loading/禁用，不把未加载当关闭，也不发保存请求 9ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-security.test.tsx > R08 安全设置页：沙箱与沙箱网络（断言 1） > 保存失败恢复开关并提示错误；PUT 已成功但快照读取失败时如实报保存失败 23ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-security.test.tsx > R08 安全设置页：检查点保留策略与备份列表（断言 2） > 保留天数写入每助手配置并展开读取真实检查点列表 45ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-security.test.tsx > R08 安全设置页：检查点保留策略与备份列表（断言 2） > 无检查点显示空列表；读取失败显示显式错误并保留重试，不冒充空列表 44ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-security.test.tsx > R08 安全设置页：网络代理模式与字段保存（断言 3） > 手工代理保存 HTTP/HTTPS/WS/WSS/noProxy 并广播 network-proxy-changed、重读配置 31ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-security.test.tsx > R08 安全设置页：网络代理模式与字段保存（断言 3） > 系统代理模式不渲染手工字段（保存仅模式）；保存失败提示并保留草稿，不广播 73ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-security.test.tsx > R08 安全设置页：代理通知失败不得冒充完成（补充断言 3 未覆盖子句） > network-proxy-changed 通知抛错时仅记录未处理异常，不弹保存成功、不完成后续重读 18ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx > R08 MCP 设置页：连接器状态与工具权限（断言 2） > 连接器读取失败显示显式错误并保留旧状态，不把失败冒充成空列表 555ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx > R08 MCP 设置页：全局启停与延迟（断言 3） > 总开关保存后按助手重读状态并显示真实成功提示 23ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx > R08 MCP 设置页：全局启停与延迟（断言 3） > 总开关保存失败恢复旧配置并显示错误，不写成功状态 19ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx > R08 MCP 设置页：全局启停与延迟（断言 3） > 延迟加载开关与阈值保存到全局设置，并在保存后重读状态 27ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx > R08 MCP 设置页：全局启停与延迟（断言 3） > 无 agentId 时读取全局状态（不带 agentId 查询），不伪造助手权限 10ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx > R08 MCP 设置页：添加与批量导入（断言 4） > 添加连接器提交真实动作与启动意图，成功后面板出现新连接器 34ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx > R08 MCP 设置页：添加与批量导入（断言 4） > 空表单不可提交；批量导入逐项反馈部分成功，不冒充全成功 45ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx > R08 MCP 设置页：编辑/删除/启停/刷新（断言 5） > 删除需确认，确认后提交真实移除动作；失败时保留连接器并显示错误 31ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-container.test.tsx > R08 设置容器初始化（MCP 设置页叶 & 安全设置页叶共用断言 1） > MCP 设置页冷启动：显示 loading mask，初始化完成后移除并真实渲染 MCP 页 96ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx > R08 MCP 设置页：编辑/删除/启停/刷新（断言 5） > 启动、停止与刷新工具提交真实动作；停用不清凭据，成功后重读连接状态 111ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-container.test.tsx > R08 设置容器初始化（MCP 设置页叶 & 安全设置页叶共用断言 1） > 安全设置页冷启动：初始化完成后移除 mask 并渲染沙箱/备份/代理配置 35ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx > R08 聊天页：欢迎态/消息流/输入区（断言 1） > 无会话显示欢迎页与输入框；选中当前会话后欢迎页隐藏、消息区与输入区并存 98ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx > R08 MCP 设置页：按助手权限/工具/置顶（断言 6） > 按助手启停连接器并保存工具权限与置顶，动作携带当前助手身份 50ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx > R08 MCP 设置页：按助手权限/工具/置顶（断言 6） > 无工具显示空目录；无助手时不伪造授权，打开详情被明确拒绝 7ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx > R08 MCP 设置页：OAuth 登录/取消/退出（断言 7） > 登录打开外链并轮询到 done 后刷新连接器并显示保存成功 34ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx > R08 MCP 设置页：OAuth 登录/取消/退出（断言 7） > 取消只提交取消动作并关闭等待卡，不因取消本身重读状态 36ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-container.test.tsx > R08 设置容器初始化（MCP 设置页叶 & 安全设置页叶共用断言 1） > 已有缓存直接显示旧数据并在后台刷新，不阻塞 ready、不显示全屏 mask 128ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-container.test.tsx > R08 设置容器初始化（MCP 设置页叶 & 安全设置页叶共用断言 1） > 供应商摘要失败不阻塞 ready，也不冒充空列表成功 26ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-container.test.tsx > R08 设置容器初始化（MCP 设置页叶 & 安全设置页叶共用断言 1） > 初始化异常记录日志后仍 ready，并保留可操作的恢复入口（不装成成功空数据） 27ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-container.test.tsx > R08 设置容器初始化（MCP 设置页叶 & 安全设置页叶共用断言 1） > 15 秒无响应强制 ready 并移除 loading mask，杜绝无限白屏 17ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx > R08 MCP 设置页：OAuth 登录/取消/退出（断言 7） > 退出登录走统一动作并经真实状态刷新显示成功；启动失败不打开外链 34ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx > R08 MCP 设置页：OAuth 登录/取消/退出（断言 7） > 登录启动失败显示错误且不打开外链、不进入轮询 36ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx > R08 MCP 设置页：批量成功/失败混合回执与权限保存失败（补充断言 4/6 未覆盖子句） > 批量导入 HTTP 200 混合回执逐行呈现成功/runtimeApplied=false 事实，不弹全成功 toast 21ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx > R08 MCP 设置页：批量成功/失败混合回执与权限保存失败（补充断言 4/6 未覆盖子句） > 工具权限与置顶保存失败显示错误且不伪装授权已更新 33ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx > R08 聊天页：欢迎态/消息流/输入区（断言 1） > mobile 或服务未连接时不请求该会话思考档位 GET 15ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx > R08 聊天页：欢迎态/消息流/输入区（断言 1） > 区域渲染失败由 RegionalErrorBoundary 捕获并显示重试，不冒充消息成功 48ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx > R08 聊天页：运行状态控件（断言 3） > 运行信息控件随真实运行态切换：无运行任务只有发送，会话在跑显示中止 22ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx > R08 聊天页：模型切换空态（断言 5） > 已建会话选择相同且可用模型直接返回、不发 switch 请求；无可选模型不产生有效切换 19ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx > R08 聊天页：思考档位空态/错误态（断言 6） > 未建立会话时只改默认档位（请求不带 sessionPath）；保存失败仅 console.error，不宣称已持久化 127ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx > R08 聊天页：WS 拒绝/断线与恢复流状态（补充断言 2/3 未覆盖子句） > WS 拒绝/断线事件在页面内显式呈现错误，不冒充消息成功 19ms
+ ✓ desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx > R08 聊天页：WS 拒绝/断线与恢复流状态（补充断言 2/3 未覆盖子句） > 恢复流的运行状态经真实 ws 分发后与输入区控件态一致 25ms
+
+ Test Files  5 passed (5)
+      Tests  43 passed (43)
+   Start at  20:01:28
+   Duration  2.50s (transform 3.73s, setup 106ms, import 5.07s, tests 2.31s, environment 1.57s)
+
+JSON report written to /private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out/raw/r08-new-ui-report.json
+stderr | desktop/src/react/__tests__/r08/r08-ui-settings-security.test.tsx > R08 安全设置页：沙箱与沙箱网络（断言 1） > 保存失败恢复开关并提示错误；PUT 已成功但快照读取失败时如实报保存失败
+[settings] load failed: Error: 真实快照读取失败
+    at errorWithCode (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/errors/error-presenter.ts:38:17)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/api.ts:78:27)
+    at async Promise.all (index 0)
+    at loadSettingsConfig (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/actions.ts:175:7)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/SecurityTab.tsx:92:5
+
+stderr | desktop/src/react/__tests__/r08/r08-ui-settings-container.test.tsx > R08 设置容器初始化（MCP 设置页叶 & 安全设置页叶共用断言 1） > MCP 设置页冷启动：显示 loading mask，初始化完成后移除并真实渲染 MCP 页
+[mcp] load failed: Error: settings lingxiFetch /api/mcp/state: server connection not ready
+    at requireServerConnection (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/server-connection.ts:620:26)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/api.ts:46:22)
+    at loadMcpState (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/mcp/mcp-api.ts:83:21)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/McpTab.tsx:93:26
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/McpTab.tsx:127:10
+    at Object.react_stack_bottom_frame (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+    at runWithFiberInDEV (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+    at commitHookEffectListMount (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+    at commitHookPassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13336:11)
+    at commitPassiveMountOnFiber (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:15484:13)
+
+stderr | desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx > R08 聊天页：欢迎态/消息流/输入区（断言 1） > 无会话显示欢迎页与输入框；选中当前会话后欢迎页隐藏、消息区与输入区并存
+[context-ring] failed to load instant compaction experiment: TypeError: Body is unusable: Body has already been read
+    at consumeBody (node:internal/deps/undici/undici:6979:31)
+    at _Response.json (node:internal/deps/undici/undici:6930:18)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/ContextRing.tsx:90:26
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+stderr | desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx > R08 聊天页：欢迎态/消息流/输入区（断言 1） > 无会话显示欢迎页与输入框；选中当前会话后欢迎页隐藏、消息区与输入区并存
+[InputArea] load thinking level failed TypeError: Body is unusable: Body has already been read
+    at consumeBody (node:internal/deps/undici/undici:6979:31)
+    at _Response.json (node:internal/deps/undici/undici:6930:18)
+    at _Response.response.json (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/chat-client.ts:77:34)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/InputArea.tsx:1741:22
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+stderr | desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx > R08 聊天页：欢迎态/消息流/输入区（断言 1） > 无会话显示欢迎页与输入框；选中当前会话后欢迎页隐藏、消息区与输入区并存
+[context-ring] failed to load instant compaction experiment: TypeError: Body is unusable: Body has already been read
+    at consumeBody (node:internal/deps/undici/undici:6979:31)
+    at _Response.json (node:internal/deps/undici/undici:6930:18)
+    at _Response.response.json (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/chat-client.ts:77:34)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/ContextRing.tsx:90:26
+
+stderr | desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx > R08 聊天页：欢迎态/消息流/输入区（断言 1） > 无会话显示欢迎页与输入框；选中当前会话后欢迎页隐藏、消息区与输入区并存
+[InputArea] load thinking level failed TypeError: Body is unusable: Body has already been read
+    at consumeBody (node:internal/deps/undici/undici:6979:31)
+    at _Response.json (node:internal/deps/undici/undici:6930:18)
+    at _Response.response.json (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/chat-client.ts:77:34)
+    at _Response.response.json (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/chat-client.ts:77:34)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/InputArea.tsx:1741:22
+
+stderr | desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx > R08 聊天页：欢迎态/消息流/输入区（断言 1） > mobile 或服务未连接时不请求该会话思考档位 GET
+[context-ring] failed to load instant compaction experiment: TypeError: Body is unusable: Body has already been read
+    at consumeBody (node:internal/deps/undici/undici:6979:31)
+    at _Response.json (node:internal/deps/undici/undici:6930:18)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/ContextRing.tsx:90:26
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:567:9)
+    at processTimers (node:internal/timers:541:7)
+
+stderr | desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx > R08 聊天页：欢迎态/消息流/输入区（断言 1） > mobile 或服务未连接时不请求该会话思考档位 GET
+[workspace] load studio workspaces failed: TypeError: Body is unusable: Body has already been read
+    at consumeBody (node:internal/deps/undici/undici:6979:31)
+    at _Response.json (node:internal/deps/undici/undici:6930:18)
+    at loadStudioWorkspaces (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/desk-actions.ts:246:28)
+
+stderr | desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx > R08 聊天页：欢迎态/消息流/输入区（断言 1） > mobile 或服务未连接时不请求该会话思考档位 GET
+[context-ring] failed to load instant compaction experiment: TypeError: Body is unusable: Body has already been read
+    at consumeBody (node:internal/deps/undici/undici:6979:31)
+    at _Response.json (node:internal/deps/undici/undici:6930:18)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/ContextRing.tsx:90:26
+
+stderr | desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx > R08 聊天页：运行状态控件（断言 3） > 运行信息控件随真实运行态切换：无运行任务只有发送，会话在跑显示中止
+[InputArea] load thinking level failed TypeError: Body is unusable: Body has already been read
+    at consumeBody (node:internal/deps/undici/undici:6979:31)
+    at _Response.json (node:internal/deps/undici/undici:6930:18)
+    at _Response.response.json (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/chat-client.ts:77:34)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/InputArea.tsx:1741:22
+
+stderr | desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx > R08 聊天页：WS 拒绝/断线与恢复流状态（补充断言 2/3 未覆盖子句） > WS 拒绝/断线事件在页面内显式呈现错误，不冒充消息成功
+[InputArea] load thinking level failed TypeError: Body is unusable: Body has already been read
+    at consumeBody (node:internal/deps/undici/undici:6979:31)
+    at _Response.json (node:internal/deps/undici/undici:6930:18)
+    at _Response.response.json (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/chat-client.ts:77:34)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/InputArea.tsx:1741:22
+
+stderr | desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx > R08 聊天页：WS 拒绝/断线与恢复流状态（补充断言 2/3 未覆盖子句） > 恢复流的运行状态经真实 ws 分发后与输入区控件态一致
+[InputArea] load thinking level failed TypeError: Body is unusable: Body has already been read
+    at consumeBody (node:internal/deps/undici/undici:6979:31)
+    at _Response.json (node:internal/deps/undici/undici:6930:18)
+    at _Response.response.json (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/chat-client.ts:77:34)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/InputArea.tsx:1741:22
+[vitest:r08-new-ui] exit=0 report=yes files=5/5 failed=0
+
+$ npx vitest run desktop/src/react/__tests__/components/ModelSelector.test.tsx desktop/src/react/__tests__/components/thinking-level-button.test.tsx desktop/src/react/__tests__/components/InputArea.media-send.test.tsx desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx desktop/src/react/__tests__/components/slash-commands-ws.test.ts desktop/src/react/__tests__/services/ws-message-handler.test.ts desktop/src/react/__tests__/services/stream-resume.test.ts desktop/src/react/__tests__/components/SideChatPanel.test.tsx desktop/src/react/__tests__/components/AttachedFilesBar.media.test.tsx desktop/src/react/__tests__/components/RuntimeInfoCapsule.test.tsx --reporter=verbose --reporter=json --outputFile.json=/private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out/raw/r08-existing-ui-report.json
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/components/AttachedFilesBar.media.test.tsx > AttachedFilesBar media chips > renders image attachments with rounded thumbnail previews 52ms
+ ✓ desktop/src/react/__tests__/components/AttachedFilesBar.media.test.tsx > AttachedFilesBar media chips > renders audio attachments with a play control, fake waveform, and remove action 12ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler applyStreamingStatus > isStreaming=true 对传入的 path 做 addStreamingSession（即使不是焦点 session） 28ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler applyStreamingStatus > isStreaming=false 对传入的 path 做 removeStreamingSession（非焦点 session 也必须清） 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler applyStreamingStatus > stream_resume 场景：服务端返回 isStreaming=false，前端把焦点 session 从 streamingSessions 移除 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler applyStreamingStatus > ignores stale status=false when its streamId no longer matches the active stream 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler applyStreamingStatus > isStreaming=true 时重复调用不会产生重复 path 2ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler applyStreamingStatus > sessionPath 为 null 不抛错（防御调用方漏传） 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler applyStreamingStatus > 后台 session 从 streaming 变为完成时标记未读输出 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler applyStreamingStatus > 当前焦点 session 完成时不标记未读输出 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler applyStreamingStatus > 收到 isStreaming=true 只维护运行集合，不产生未读输出标记 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > session_user_message 直接把 user message 追加到对应桌面 session 6ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > session_user_message 把 [Use skill: x] 前缀还原成 skills 胶囊并清洗正文 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > drops a websocket event whose sessionId is already bound to a different known path (#2078) 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > session_user_message 透传 origin 到 store 里的 ChatMessage.origin 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > session_user_message 无 origin 字段时不在 ChatMessage 上生成 origin 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > session_user_message 保存附件-only 消息时不生成 textHtml 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > session_user_message confirms an optimistic user message by clientMessageId without duplicating it 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > drops an ordinary stream event that tries to move a known sessionId to an unknown new path 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > voice_transcription_update 按 fileId 回填现有用户语音附件 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > session_created 乐观插入后延迟刷新 session 列表，避免同一波事件重复全量拉取 3ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > stream replay 中的 session_user_message 若已由历史加载存在，不重复追加 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > session_branch_reset 只截断目标会话尾部并提升 message live version 2ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > session_branch_reset 携带 fileRollbackReport 时写入会话作用域报告，无报告则不写 2ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > session_branch_reset 带 sessionFiles 时，通过 applyBranchResetSessionFiles 整表替换 registry（#2188） 2ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > session_branch_reset 不带 sessionFiles 时，仍调用 applyBranchResetSessionFiles(path, null) 而不是跳过 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > session_branch_reset 在 live client id 失配时回退到历史 sourceEntryId 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > session_branch_reset 用显式投影边界截断隐藏输入触发的 Agent turn 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > session_branch_reset 在首个持久化回复不可见时按 turn input 截断可见回复 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > computer_overlay 写入当前 session 的 overlay keyed 状态并支持 clear 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > tool_end 带 sessionFile 时更新 session registry 文件状态 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > content_block 文件事件把 resource envelope 同步进 session registry 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > todo_write 全部 completed 时按生命周期移除当前 session todo 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > todo_update 事件按 sessionPath 更新 keyed todos 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > bridge_rc_attached / detached 直接补丁 sessions 列表上的接管态 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > patches session metadata updates and syncs focused thinking level 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > merges a pin order update into the matching session 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler activity updates > merges activity_update by id so stale running cards do not remain in the panel 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler permission mode events > keeps explicit auto mode from legacy plan_mode messages instead of collapsing to operate 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler permission mode events > syncs explicit permission_mode messages for the focused session 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler background chat stream routing > 非当前 session 的正文流也进入主聊天 buffer，同时保留 streamKey 预览分发 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler background chat stream routing > 远程端写入的用户消息会按 sessionPath 同步到桌面端后台会话缓存 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler compaction lifecycle > tracks compaction_start for a background session before stream routing returns 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler compaction lifecycle > tracks compaction_end and preserves the provided context window when tokens are unknown 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler compaction lifecycle > routes lifecycle by sessionId without trusting stale path metadata as locator truth 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler compaction lifecycle > tracks accepted and clears succeeded results by sessionId 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler compaction lifecycle > clears busy and surfaces noop and failed results 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler compaction lifecycle > preserves context_usage window even when tokens are unknown 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler compaction lifecycle > stores the context_usage breakdown alongside the totals 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler compaction lifecycle > keeps the existing breakdown when a context_usage message omits the field 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler compaction lifecycle > clears the breakdown when compaction_end explicitly reports null 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler compaction lifecycle > keeps the breakdown when compaction_end carries a fresh one 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler app events > app_event 消息会 route 到 handleAppEvent 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler app events > resource.changed 消息会刷新匹配的打开预览文档 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler app events > resource.deleted 和 resource.renamed 消息也走同一条刷新路径 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > turn_end for the current session does not request input focus 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > background turn_end keeps refresh and context usage but does not request input focus 4ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > status=false requests input focus when the focused session was streaming 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > stale status=false does not finish the newer local stream turn 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > identity-less status=false does not finish a stream with a known streamId 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > already_stopped abort_result clears a stale streaming marker when no stream identity exists 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > rejected abort_result leaves local stream state untouched 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > turn_end does not clear the matching stream before status=false arrives 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > intermediate turn_end keeps streaming state and input focus untouched 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > stale turn_end does not clear a newer stream identity 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > passes sessionId from turn_start into stream buffer lifecycle; status never touches it 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > background status=false does not request input focus 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > turn_end requests context usage through the injected callback 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > shows focused slash_result through the inline notice bridge 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > does not mark an old browser thumbnail as fresh when a running update omits thumbnail data 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > keys browser status by sessionId when the locator is known 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > coalesces rapid turn_end session refreshes into one list request 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler error presentation > shows the generic internal-contract sentence and hides the raw assertion in the details 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler error presentation > toasts an identity error that carries no session to attach to 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler loop_status > loop_status 消息把完整字段写入 loopStatusBySession 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler loop_status > 循环保存故障保留真实running状态并只提醒一次，不伪造暂停 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler loop_status > loop_status 缺省字段归一化为 0 / null 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler loop_status > stopped / completed 消息清除该会话的 key，避免徽章残留 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler loop_status > 无 sessionId 的 loop_status 消息不写 store 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler knowledge_retrieval_started（知识检索中状态） > knowledge_retrieval_started 记录该 session 的检索中状态 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler knowledge_retrieval_started（知识检索中状态） > 后续 status 事件（流式开始）清除检索中状态 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler knowledge_retrieval_started（知识检索中状态） > 后续 session_user_message 事件（检索统计随行）清除检索中状态 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler knowledge_retrieval_started（知识检索中状态） > 其他 session 的事件不清除本 session 的检索中状态 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler knowledge_retrieval_started（知识检索中状态） > 缺少 sessionPath 的 knowledge_retrieval_started 不写 store 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turnPending（发送后等待助手状态） > knowledge_retrieval_started 不清除 pending（发送 → 检索是同一段等待） 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turnPending（发送后等待助手状态） > 首个后续事件（status isStreaming=true）清除 pending 1ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turnPending（发送后等待助手状态） > error 回包（session_busy 等）清除 pending 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turnPending（发送后等待助手状态） > 其他 session 的事件不清除本 session 的 pending 0ms
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turnPending（发送后等待助手状态） > clearAllTurnPending 清空全部 pending（ws 断连路径） 0ms
+ ✓ desktop/src/react/__tests__/services/stream-resume.test.ts > stream-resume > hydrates a completed empty resume for background sessions instead of leaving them stuck streaming 40ms
+ ✓ desktop/src/react/__tests__/services/stream-resume.test.ts > stream-resume > does not dedupe a new stream seq=1 against the previous stream consumed seqs 52ms
+ ✓ desktop/src/react/__tests__/services/stream-resume.test.ts > stream-resume > replays background session events to the normal websocket handler 1ms
+ ✓ desktop/src/react/__tests__/services/stream-resume.test.ts > stream-resume > does not replay the same stream sequence twice when a resume response is repeated 0ms
+ ✓ desktop/src/react/__tests__/services/stream-resume.test.ts > stream-resume > reports duplicate live stream sequences as already consumed 0ms
+ ✓ desktop/src/react/__tests__/services/stream-resume.test.ts > stream-resume > requests the current stream from the beginning after render state is invalidated 0ms
+ ✓ desktop/src/react/__tests__/services/stream-resume.test.ts > stream-resume > includes sessionId when requesting stream resume for a known locator 0ms
+ ✓ desktop/src/react/__tests__/services/stream-resume.test.ts > stream-resume > keeps stream metadata under sessionId when the session locator changes 1ms
+ ✓ desktop/src/react/__tests__/services/stream-resume.test.ts > stream-resume > replays resume events through the canonical path when sessionId points away from a legacy path 0ms
+ ✓ desktop/src/react/__tests__/services/stream-resume.test.ts > stream-resume > rebuilds the current session by sessionId when a reset resume carries a legacy path 1ms
+ ✓ desktop/src/react/__tests__/services/stream-resume.test.ts > stream-resume > keeps the session marked streaming when resume replay is empty but runtime says it is still running 0ms
+ ✓ desktop/src/react/__tests__/services/stream-resume.test.ts > stream-resume > force-clears a stale active stream when runtime resume says the session is no longer running 0ms
+ ✓ desktop/src/react/__tests__/components/slash-commands-ws.test.ts > executeSlashViaWs > carries the agent that owns this input box so the server never has to guess 31ms
+ ✓ desktop/src/react/__tests__/components/slash-commands-ws.test.ts > executeSlashViaWs > keeps the typed command line intact and still carries the identity 1ms
+ ✓ desktop/src/react/__tests__/components/slash-commands-ws.test.ts > executeSlashViaWs > states an unknown identity explicitly instead of dropping the field 1ms
+ ✓ desktop/src/react/__tests__/components/slash-commands-ws.test.ts > executeSlashViaWs > materializes a pending draft session before sending, like the prompt channel does 1ms
+ ✓ desktop/src/react/__tests__/components/slash-commands-ws.test.ts > executeSlashViaWs > falls back to the ensured session owner when the caller has no agent identity 0ms
+ ✓ desktop/src/react/__tests__/components/slash-commands-ws.test.ts > executeSlashViaWs > does not send an identity-less slash when session creation fails 0ms
+ ✓ desktop/src/react/__tests__/components/slash-commands-ws.test.ts > executeSlashViaWs > refuses explicitly when there is no session at all instead of tripping the server contract 0ms
+ ✓ desktop/src/react/__tests__/components/thinking-level-button.test.tsx > ThinkingLevelButton > saves thinking changes to the current session when a session is active 72ms
+ ✓ desktop/src/react/__tests__/components/ModelSelector.test.tsx > ModelSelector > shows an explicit unselected state when models exist but none is current 97ms
+ ✓ desktop/src/react/__tests__/components/RuntimeInfoCapsule.test.tsx > RuntimeInfoCapsule > renders collapsed as a pill outside the document flow of the transcript 102ms
+ ✓ desktop/src/react/__tests__/components/ModelSelector.test.tsx > ModelSelector > shows the selected model provider icon in the closed trigger 9ms
+ ✓ desktop/src/react/__tests__/components/ModelSelector.test.tsx > ModelSelector > does not open the model menu while the session is streaming 9ms
+ ✓ desktop/src/react/__tests__/components/ModelSelector.test.tsx > ModelSelector > marks the session model unavailable when its provider/id is no longer in the model list 5ms
+ ✓ desktop/src/react/__tests__/components/ModelSelector.test.tsx > ModelSelector > shows a reliable removal reason and allows explicitly re-selecting the same restored model 15ms
+ ✓ desktop/src/react/__tests__/components/ModelSelector.test.tsx > ModelSelector > maps a server streaming-switch rejection to the same explicit warning 14ms
+ ✓ desktop/src/react/__tests__/components/thinking-level-button.test.tsx > ThinkingLevelButton > saves pending new-session thinking changes as the model default draft 57ms
+ ✓ desktop/src/react/__tests__/components/thinking-level-button.test.tsx > ThinkingLevelButton > shows Medium instead of Auto for legacy auto state 49ms
+ ✓ desktop/src/react/__tests__/components/thinking-level-button.test.tsx > ThinkingLevelButton > hides the xhigh level when the model does not support it 8ms
+ ✓ desktop/src/react/__tests__/components/ModelSelector.test.tsx > ModelSelector > applies the selected model thinking default while preparing a new session 59ms
+ ✓ desktop/src/react/__tests__/components/ModelSelector.test.tsx > ModelSelector > surfaces the model-switch response body when the server rejects an unavailable provider model 13ms
+ ✓ desktop/src/react/__tests__/components/ModelSelector.test.tsx > ModelSelector > 显式 sessionPath 时按该会话切换，并把结果回调给调用方 10ms
+ ✓ desktop/src/react/__tests__/components/thinking-level-button.test.tsx > ThinkingLevelButton > shows and saves Max for models that support the deep thinking tier 64ms
+ ✓ desktop/src/react/__tests__/components/thinking-level-button.test.tsx > ThinkingLevelButton > does not render a trailing checkmark for the selected thinking level 3ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > sends pasted image bytes through the platform API when window.hana is unavailable 60ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > keeps an async pending-session submission bound to its original session and leaves the new composer intact (#2078) 10ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > keeps the send alive as file-only when the text model has no auxiliary vision (#1647) 11ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > keeps the send alive as file-only when reading image bytes fails (#1647) 12ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > keeps desktop editor creation immediate while deferring mobile editor creation until after mount 52ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > consumes a rich URL paste through the TipTap paste hook before the default editor paste runs 7ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > selects the highlighted slash command on Enter without falling through to message send 18ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > uses the chat-scoped auxiliary vision route for mobile image preflight 9ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > sends audio bytes natively for official MiMo audio models 8ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > uses the switched session model audio snapshot when sending recorded audio 8ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > starts recording from the app-local voice shortcut only on the focused chat page 7ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > ignores the app-local voice shortcut while settings is open 3ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > keeps audio attachments on the legacy text path for unsupported models 8ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > rejects video before send when the selected model does not support video 9ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > sends a valid video as an independent native media type for a supported provider 8ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > rejects spoofed video content before WebSocket send 8ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > sends ordinary attachments by fileId instead of using visible path text as the machine contract 10ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > interjects streaming attachment sends with the same message envelope as prompt sends 13ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > 立即插入被未核实投递阻止时提示原因并保留队列 13ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > does not send while an agent switch session is still pending 8ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > binds Stop to the focused session current stream identity (#2078) 6ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > replaces only the selected rich-document slash trigger when a skill is clicked 64ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > inserts a toolbar-selected skill at the current selection when there is no slash trigger 17ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > saves rich list drafts as markdown text plus the editor document 7ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > uses Shift+Enter inside list items to create the next list item 4ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > leaves Shift+Enter outside lists to the editor default soft break behavior 3ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > handles welcome Enter inside TipTap before the editor inserts a newline 15ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > maps mobile insertParagraph beforeinput to the same send path as Enter 8ms
+ ✓ desktop/src/react/__tests__/components/RuntimeInfoCapsule.test.tsx > RuntimeInfoCapsule > expands into one unified container holding jian, terminal, workflow, agent, status and git env (todo list moved above the input) 389ms
+ ✓ desktop/src/react/__tests__/components/RuntimeInfoCapsule.test.tsx > RuntimeInfoCapsule > collapses again on pill click and on outside mousedown 13ms
+ ✓ desktop/src/react/__tests__/components/RuntimeInfoCapsule.test.tsx > RuntimeInfoCapsule > summarizes running terminals, workflows and subagents of the current session on the pill 2ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > returns focus to the editor after the desktop file picker resolves 58ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > passes pasted clipboard files with filesystem paths through the drag attachment path 6ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > registers pasted image blob uploads as path-backed attachments without base64Data 10ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > compresses oversized pasted images before upload-blob 9ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > sends chat quoted selection through the existing prompt quote contract 7ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > adds an optimistic user message with a clientMessageId when sending a prompt 6ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > uploads mobile file-picker attachments through browser File API 10ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx > InputArea paste and slash menu behavior > compresses oversized mobile browser image files before upload-blob 9ms
+ ✓ desktop/src/react/__tests__/components/SideChatPanel.test.tsx > SideChatPanel > renders the side session transcript and its own composer 124ms
+ ✓ desktop/src/react/__tests__/components/SideChatPanel.test.tsx > SideChatPanel > routes the shared default session to the side session while open 12ms
+ ✓ desktop/src/react/__tests__/components/SideChatPanel.test.tsx > SideChatPanel > closes the panel and returns the shared default session to the main chat 33ms
+ ✓ desktop/src/react/__tests__/components/SideChatPanel.test.tsx > SideChatPanel > gives the side panel its own session-memory switch (off by default, toggle writes per session) 47ms
+ ✓ desktop/src/react/__tests__/components/SideChatPanel.test.tsx > SideChatPanel > does not offer the main-chat "new chat" entry inside the side panel 10ms
+ ✓ desktop/src/react/__tests__/components/SideChatPanel.test.tsx > SideChatPanel > renders nothing while the panel is closed 1ms
+
+ Test Files  10 passed (10)
+      Tests  169 passed (169)
+   Start at  20:01:31
+   Duration  2.05s (transform 4.10s, setup 103ms, import 6.72s, tests 2.03s, environment 3.64s)
+
+JSON report written to /private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out/raw/r08-existing-ui-report.json
+stderr | desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > drops a websocket event whose sessionId is already bound to a different known path (#2078)
+[ws] session locator mismatch; dropping non-authoritative event {
+  sessionId: 'sess_a',
+  sessionPath: '/session/b.jsonl',
+  knownLocatorPath: '/session/a.jsonl'
+}
+
+stderr | desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > drops an ordinary stream event that tries to move a known sessionId to an unknown new path
+[ws] session locator mismatch; dropping non-authoritative event {
+  sessionId: 'sess_ws_moved',
+  sessionPath: '/session/new-a.jsonl',
+  knownLocatorPath: '/session/old-a.jsonl'
+}
+
+stderr | desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > session_branch_reset 携带 fileRollbackReport 时写入会话作用域报告，无报告则不写
+[ws] session_branch_reset target message not found: /session/a.jsonl [ 'u1' ]
+
+stderr | desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > rejected abort_result leaves local stream state untouched
+[ws] abort refused: stale_stream
+
+stderr | desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler knowledge_retrieval_started（知识检索中状态） > 缺少 sessionPath 的 knowledge_retrieval_started 不写 store
+[ws] knowledge_retrieval_started missing sessionPath, skipping
+
+Not implemented: Window's scrollTo() method
+stderr | desktop/src/react/__tests__/components/ModelSelector.test.tsx > ModelSelector > surfaces the model-switch response body when the server rejects an unavailable provider model
+[model] switch failed: Error: Model not found: minimax-token-plan/MiniMax-M2.7
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/ModelSelector.tsx:116:28
+
+stderr | desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > keeps the send alive as file-only when reading image bytes fails (#1647)
+[input] failed to read image attachment Error: failed to read image attachment: /tmp/hana/session-files/pasted.png
+    at prepareComposerSend (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/composer-send.ts:355:17)
+    at sendWithLease (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1012:12)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/InputArea.tsx:2110:7
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/InputArea.tsx:2150:5
+
+stderr | desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > rejects spoofed video content before WebSocket send
+[input] failed to read video attachment Error: unsupported or oversized video: clip.mp4
+    at prepareComposerSend (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/composer-send.ts:406:19)
+    at sendWithLease (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1012:12)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/InputArea.tsx:2110:7
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/InputArea.tsx:2150:5
+[vitest:r08-existing-ui] exit=0 report=yes files=10/10 failed=0
+
+$ npx vitest run desktop/src/react/__tests__/components/composer-send.transaction.test.ts --reporter=verbose --reporter=json --outputFile.json=/private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out/raw/r08-composer-send-report.json -t P07：全空白正文|S04：ws 不存在
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > Rust wire 只有握手时拒绝旧聊天帧且不清空输入
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S01：普通发送视频预检失败，编辑器、草稿、附件与引用全部保留
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S03：视频数超限与格式错误都是明确 blocked，不冒充成功
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S04：ws 不存在 / CONNECTING / CLOSING / CLOSED，明确结果、不清输入、不发消息 71ms
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S05：读文件期间会话删除/定位器变化/模型变更，重新验证后旧目标不误发
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S06：准备期间用户继续输入，原快照独立、新草稿不被清除或覆盖
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S07：文字+文件+skill+agent+quote+notebook 组合，失败与重试保留所有字段
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S08：图片按既有规则退化为文件引用，提示保留、文件身份不丢
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S09：ws.send 同步抛错，正确标失败、完整快照可按同一记录重试
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S10：提交后断线无回执与回执超时，都标 delivery_unknown 且不自动重发
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S11：重连后经恢复/历史找到原 clientMessageId，合并不重复追加
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S13：带首行空格与末尾换行的输入，快照逐字符保留
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S14：首页 ensureSession 期间重复点击，只创建/提交一次
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S15：入队后改变界面选中的笔记本，已排队消息仍使用入队快照范围
+ ✓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P07：全空白正文（无其他内容维度）不发，且不做破坏性清空 6ms
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P08：全空白正文但有附件 → 按已有内容维度发送，wire 保真、附件身份保留
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P10：排队 → 编辑 → 失败 → 重试 → wire，每次都不 trim 正文
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03 InputArea 编辑点击接线 > R03-03：点击编辑同步取消慢附件，保存后仅提交新正文
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03 InputArea 编辑点击接线 > R03-05：点击取消保留原 blocked 状态与正文
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03-09：真实 InputArea StrictMode 卸载撤销 timer，重挂只发一次
+ ↓ desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03-12：InputArea A 慢附件时切 B 可发送，A 完成不再清 B 编辑器
+
+ Test Files  1 passed (1)
+      Tests  2 passed | 21 skipped (23)
+   Start at  20:01:35
+   Duration  1.24s (transform 603ms, setup 19ms, import 816ms, tests 78ms, environment 252ms)
+
+JSON report written to /private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out/raw/r08-composer-send-report.json
+[vitest:r08-composer-send] exit=0 report=yes files=1/1 failed=0
+
+$ python3 tests/rust-native/quickchat-live.py  # evidence=/private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out/live/quickchat
+/private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out/live/quickchat PASS
+[live:quickchat] exit=0 status=PASS checks=9 ok=true
+
+$ python3 tests/rust-native/session-map-live.py  # evidence=/private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out/live/session-map
+/private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out/live/session-map PASS
+[live:session-map] exit=0 status=PASS checks=19 ok=true
+
+写入 /private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out/ui-cases.json（87 cases, 87 ok）
+写入 /private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out/result.json
+EXIT 0 — 全部 case ok（vitest 与 live 证据均为真实通过）

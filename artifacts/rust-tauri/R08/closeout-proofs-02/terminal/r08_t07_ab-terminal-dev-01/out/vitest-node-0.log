@@ -1,0 +1,40 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/r08/r08-t07-terminal-ab.test.ts > R08-T07 terminal A/B [node] > leaf.terminal.positive: snapshot/tail/close 三帧真实正路径（双内核 PTY） 12493ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  19:13:57
+   Duration  13.22s (transform 571ms, setup 22ms, import 361ms, tests 12.49s, environment 264ms)
+
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-terminal-ab.test.ts > R08-T07 terminal A/B [node] > leaf.terminal.positive: snapshot/tail/close 三帧真实正路径（双内核 PTY）
+[lm-entry] targetPath= -b757-298e051ecca5.jsonl preloaded= false
+[cmf-entry] path= -b757-298e051ecca5.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fprivate%2Ftmp%2Flingxi-r08-ve
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-terminal-ab.test.ts > R08-T07 terminal A/B [node] > leaf.terminal.positive: snapshot/tail/close 三帧真实正路径（双内核 PTY）
+[lm-dbg] before save, etag= W/"hrp1-b73fc34d48af7b0e367636c5d1667c6c950245eb94ae473199920dc60ca256f6" proto= 1
+[save-dbg] etag= W/"hrp1-b73fc34d48af7b0e367636c5d1667c6c950245eb94ae473199920dc60ca256f6" proto= 1 limit= 50
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-terminal-ab.test.ts > R08-T07 terminal A/B [node] > leaf.terminal.positive: snapshot/tail/close 三帧真实正路径（双内核 PTY）
+[has-dbg] called sessionPath= /private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/root-a-node/agents/a1/sessions/2026-10-26T11-13-58-266Z_01a177ea-c9fa-7617-b757-298e051ecca5.jsonl sessionId= sess_0mvp5sd1l_e435d0703b6b42def9d3
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-terminal-ab.test.ts > R08-T07 terminal A/B [node] > leaf.terminal.positive: snapshot/tail/close 三帧真实正路径（双内核 PTY）
+[ws] session locator mismatch; dropping non-authoritative event {
+  sessionId: 'sess_0mvp5sd1l_e435d0703b6b42def9d3',
+  sessionPath: '/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/root-a-node/agents/a1/sessions/2026-10-26T11-13-58-293Z_01a177ea-ca15-7617-b757-2990ed2e888f.jsonl',
+  knownLocatorPath: '/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/root-a-node/agents/a1/sessions/2026-10-26T11-13-58-266Z_01a177ea-c9fa-7617-b757-298e051ecca5.jsonl'
+}
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-terminal-ab.test.ts > R08-T07 terminal A/B [node] > leaf.terminal.positive: snapshot/tail/close 三帧真实正路径（双内核 PTY）
+[lm-entry] targetPath= -b757-298e051ecca5.jsonl preloaded= false
+[cmf-entry] path= -b757-298e051ecca5.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fprivate%2Ftmp%2Flingxi-r08-ve
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-terminal-ab.test.ts > R08-T07 terminal A/B [node] > leaf.terminal.positive: snapshot/tail/close 三帧真实正路径（双内核 PTY）
+[lm-dbg] before save, etag= W/"hrp1-ea46ce9ebd2eeb227b472642b1a9ebdd993e56069c8f4b7da6e0e56a96cbe7d6" proto= 1
+[save-dbg] etag= W/"hrp1-ea46ce9ebd2eeb227b472642b1a9ebdd993e56069c8f4b7da6e0e56a96cbe7d6" proto= 1 limit= 100
+

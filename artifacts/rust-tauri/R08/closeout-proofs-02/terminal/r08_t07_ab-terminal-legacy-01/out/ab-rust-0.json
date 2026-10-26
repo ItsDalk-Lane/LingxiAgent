@@ -1,0 +1,21 @@
+{
+  "kind": "rust",
+  "origin": "http://127.0.0.1:61374",
+  "observations": {
+    "leaf.ws.terminal": {
+      "ok": true,
+      "observed": {
+        "cases": {
+          "snapshot.explicit-reply": true,
+          "tail.rust-explicit-or-old-real": false,
+          "close.result-rejected-explicit": true,
+          "transport.survives-frame-family": true
+        },
+        "snapExplicit": true,
+        "tailExplicit": false,
+        "closeExplicit": true
+      },
+      "ms": 9862
+    }
+  }
+}

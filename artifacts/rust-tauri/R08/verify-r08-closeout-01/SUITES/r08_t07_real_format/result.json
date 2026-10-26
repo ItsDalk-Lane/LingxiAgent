@@ -1,0 +1,16 @@
+{
+ "schema": "lingxi.r08.suite-receipt.v1",
+ "suite": "r08_t07_real_format",
+ "exitCode": 0,
+ "guardFailures": [],
+ "argv": [
+  "node",
+  "scripts/rust-tauri/r08_t07_real_format_probe.mjs",
+  "--bin",
+  "rust/target/debug/lingxi-service",
+  "--work",
+  "/private/tmp/lingxi-r08-verify/r08_t07_real_format-57967-1792925354188"
+ ],
+ "durationSecs": 3.543,
+ "logSha256": "99c3ff9a9cd1c0ea5125e4b050418fcbb45dab7381b85ad24040827e03fece67"
+}

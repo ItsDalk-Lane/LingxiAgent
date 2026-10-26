@@ -1,0 +1,965 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "cases": [
+  {
+   "case": "ab::permissions.default.parity",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.list.count",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.list.parity",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.pin.pin",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.pin.unpin",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.rename.ok",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.rename.persisted",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::archive-workspace.invalid-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::archive-workspace.recoverable",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::archive.negative.rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::archive.positive-cycle",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::archived-delete.file-and-lifecycle-cleared",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::archived-delete.unrecoverable",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::auth-folders.add",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::auth-folders.invalid-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::auth-folders.read",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::auth-folders.remove",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::auth-folders.set",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::find.bridge-redaction",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::find.in-session-hit",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::find.in-session-invalid-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.chat.abort.abort.accepted-stream-stopped",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.chat.abort.abort.invalid-explicit-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.chat.transport.events.forwarded",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.chat.transport.unauthorized-foreign-session-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.chat.transport.ws.connected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.chat.transport.ws.unauthorized-ticket-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.checkpoints.delete.removes-from-store",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.checkpoints.delete.unauthorized-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.checkpoints.list.read",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.checkpoints.list.unauthorized-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.checkpoints.restore.missing-404",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.checkpoints.restore.writes-back-and-reports-location",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.checkpoints.user-edit.create.listed",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.checkpoints.user-edit.rejects-bad-reason-and-relative-path",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.conversation-map.collapsed.replace.whole-list",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.conversation-map.layout.read.default-or-persisted",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.conversation-map.negative.invalid-not-persisted",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.conversation-map.positions.merge.only-specified-changes",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.conversation-map.positions.replace.unspecified-removed",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.conversation-map.turns.invalid-session-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.conversation-map.turns.read.folds-qa-cards",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.drafts.clear.empties-scoped-only",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.drafts.home.save-readback",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.drafts.invalid-surface-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.drafts.put-missing-scope-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.drafts.read.shape",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.drafts.session.save-readback",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.mcp.crud.add.autostart-running-with-tools",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.mcp.crud.add.saved-in-state",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.mcp.crud.agent-connector.config-returned",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.mcp.crud.agent-connector.reflected-in-state",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.mcp.crud.apps.list-or-503",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.mcp.crud.bulk.bad-row-rejects-whole-batch",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.mcp.crud.bulk.valid-rows-imported",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.mcp.crud.defer.patch-only-provided-fields",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.mcp.crud.enabled.on-returns-merged-state",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.mcp.crud.negative.invalid-connector-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.mcp.crud.refresh-tools.returns-status",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.mcp.crud.remove.config-and-runtime-removed",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.mcp.crud.session-permission.granted-scoped",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.mcp.crud.state.unauthorized-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.mcp.crud.stop-then-start.new-run-state",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.mcp.crud.update.config-updated",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.permission-mode.read.no-side-effect",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.permission-mode.read.shape-mode-accessMode-defaultMode",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.permission-mode.read.unauthorized-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.permission-mode.set.current-scope.applies",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.permission-mode.set.global-scope.applies",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.permission-mode.set.session-scope.applies",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.permission-mode.set.unauthorized-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.permission-mode.set.unauthorized-state-unchanged",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.plan-mode.invalid-rejected-state-unchanged",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.plan-mode.mode-precedence",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.plan-mode.read.no-side-effect",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.plan-mode.read.shape",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.plan-mode.read.unauthorized-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.plan-mode.toggle.off-readback",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.plan-mode.toggle.on-readback",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.prefs.quick-chat.put.invalid-rejected-state-unchanged",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.prefs.quick-chat.put.roundtrip",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.prefs.quick-chat.read.shape",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.prefs.quick-chat.read.unauthorized-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.projects.assignment.set.and.clear",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.projects.catalog.read",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.projects.folder.create",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.projects.folder.delete.semantics",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.projects.folder.patch",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.projects.folders.reorder",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.projects.negative.assignment.unauthorized",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.projects.negative.catalog.unauthorized",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.projects.negative.folder.create-empty-name",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.projects.negative.folder.delete-missing",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.projects.negative.folder.patch-missing",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.projects.negative.folders.reorder-unauthorized",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.projects.negative.project.create-empty-name",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.projects.negative.project.delete-missing",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.projects.negative.project.patch-missing",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.projects.negative.projects.reorder-missing-folder",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.projects.project.create",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.projects.project.delete.semantics",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.projects.project.patch",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.projects.projects.reorder",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.sessions.admin.archive-cascade.parent-and-children-archived",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.sessions.admin.archive-detach.child-stays-parent-archived",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.sessions.admin.fork.depth-limit-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.sessions.admin.fork.invalid-session-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.sessions.admin.fork.new-session-with-lineage",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.sessions.admin.fresh-compact.returns-result",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.sessions.admin.rollback-preview.invalid-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.sessions.admin.rollback-preview.readonly-shape",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.sessions.admin.sweep-orphaned.missing-dir-archived",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.sessions.admin.turns-retry.file-rollback-disabled-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.sessions.admin.turns-retry.invalid-session-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.sessions.admin.turns-retry.submitted-and-replied",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.sessions.admin.workspace-disposal.permanent-delete",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.sessions.create.negative.invalid-agent-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.sessions.create.new-detached.created",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.sessions.create.new-detached.focus-unchanged",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.sessions.create.new-detached.lineage-depth-limit-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.sessions.create.new.focus.created-with-metadata",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.slash.new.slash.new.explicit-reply",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.slash.new.slash.new.invalid-session-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.slash.new.slash.new.old-recoverable",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.slash.new.slash.new.rotates-and-archives",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.slash.slash.reset.explicit-reply",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.slash.slash.reset.history-cleared",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.slash.slash.reset.invalid-session-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.slash.slash.reset.other-sessions-intact",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.workspace-rollback.no-file-rollback-side-effect",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.workspace-rollback.put.invalid-rejected-state-unchanged",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.workspace-rollback.put.roundtrip",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.workspace-rollback.read.enabled-boolean",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.workspace-rollback.read.unauthorized-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.ws.compact.compact.accepted-frame",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.ws.compact.compact.invalid-session-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::leaf.ws.compact.compact.result-succeeded-or-noop",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::list.revision-field-present",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::list.summary-or-badge-present",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::list.unauthorized-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::mcp.state.shape",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::mcp.state.unauthorized-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::memory-snapshot.invalid-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::memory.read",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::memory.set",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::permission.default-invalid-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::permission.default-roundtrip",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::pin-order.duplicate-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::pin-order.reorder-applies",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::pin.invalid-session.explicit-error",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::pin.state-cleared",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::pin.state-projected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::read.history-page",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::read.invalid-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::read.overview",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::read.summary",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::rename.empty-title.rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::rename.invalid-session.explicit-error",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::search.content-hit",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::search.empty-query-empty-result",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  }
+ ]
+}

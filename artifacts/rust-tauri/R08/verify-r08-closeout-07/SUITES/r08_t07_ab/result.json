@@ -1,0 +1,18 @@
+{
+ "schema": "lingxi.r08.suite-receipt.v1",
+ "suite": "r08_t07_ab",
+ "exitCode": 0,
+ "guardFailures": [],
+ "argv": [
+  "node",
+  "scripts/rust-tauri/r08_t07_ab_drill.mjs",
+  "--bin",
+  "rust/target/debug/lingxi-service",
+  "--work",
+  "/private/tmp/lingxi-r08-verify/r08_t07_ab-52451-1793015164238",
+  "--suite-files",
+  "desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts,desktop/src/react/__tests__/r08/r08-t07-terminal-ab.test.ts,desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts"
+ ],
+ "durationSecs": 573.256,
+ "logSha256": "c17f72802306cb16770eb3e76e873ff5f0dd1b9275d5c7ba00847f9940c0c6ba"
+}
