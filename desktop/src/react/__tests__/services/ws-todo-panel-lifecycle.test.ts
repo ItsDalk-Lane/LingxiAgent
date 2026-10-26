@@ -215,4 +215,48 @@ describe('清单改版阶段1：实时清单更新回归', () => {
     expect(useStore.getState().todoPanelBySession[SESSION_A]?.todos).toEqual(OLD_TODOS);
     expect(useStore.getState().todoPanelBySession[SESSION_B]?.finished).toBe(true);
   });
+
+  // R08 收尾（t07 ab 工具回合线束实证）：todo_write 非常驻，模型默认经按需目录桥
+  // mcp_call 调用，tool_end 以桥名报出、载荷为 todo_write 的版本化结果；按名
+  // 筛选会让面板对整条清单失明。识别改为「名或版本化载荷形状」。
+  it('mcp_call 桥接的 todo_write 结果（details.todoVersion + todos）更新面板', () => {
+    const next = [{ content: '桥接任务', activeForm: '正在做桥接任务', status: 'in_progress' as const }];
+    handleServerMessage({
+      type: 'tool_end', id: 'tc-bridge', name: 'mcp_call', sessionPath: SESSION_A, success: true,
+      details: { todoVersion: 2, todos: next },
+    });
+
+    expect(useStore.getState().todoPanelBySession[SESSION_A]?.todos).toEqual(next);
+  });
+
+  it('mcp_call 转发其他工具的结果不触碰清单', () => {
+    handleServerMessage({
+      type: 'tool_end', id: 'tc-bridge-other', name: 'mcp_call', sessionPath: SESSION_A, success: true,
+      details: { checkpoint: 'cp-1', createdAt: 1 },
+    });
+
+    expect(useStore.getState().todoPanelBySession[SESSION_A]?.todos).toEqual(OLD_TODOS);
+    expect(useStore.getState().todoPanelBySession[SESSION_A]?.updateFailed).toBe(false);
+  });
+
+  it('mcp_call 桥接的 todo_write 拒绝（invalid_todos）保留最后有效清单并标记失败', () => {
+    handleServerMessage({
+      type: 'tool_end', id: 'tc-bridge-bad', name: 'mcp_call', sessionPath: SESSION_A, success: false,
+      error: 'Invalid todo list', details: { error: 'invalid_todos', reasons: ['todo[0]: blocked item requires blockedReason'] },
+    });
+
+    const panel = useStore.getState().todoPanelBySession[SESSION_A];
+    expect(panel?.todos).toEqual(OLD_TODOS);
+    expect(panel?.updateFailed).toBe(true);
+  });
+
+  it('Rust 内核以目标 id 报名（tool:first-party:todo_write）同样更新面板', () => {
+    const next = [{ content: 'Rust 任务', activeForm: '正在做 Rust 任务', status: 'pending' as const }];
+    handleServerMessage({
+      type: 'tool_end', id: 'tc-rust', name: 'tool:first-party:todo_write', sessionPath: SESSION_A, success: true,
+      details: { todoVersion: 2, todos: next },
+    });
+
+    expect(useStore.getState().todoPanelBySession[SESSION_A]?.todos).toEqual(next);
+  });
 });

@@ -13,6 +13,7 @@ import {
   dropSessionCheckpoint,
   SESSION_CHECKPOINT_RESERVED_NAME,
 } from "../../core/session-checkpoints.ts";
+import { getToolSessionPath } from "./tool-session.ts";
 
 export interface CheckpointToolDeps {
   getSessionPath: () => string | null;
@@ -41,9 +42,11 @@ export function createCheckpointTool(deps: CheckpointToolDeps) {
         return { action: input?.action === "drop" ? "drop" : "create", kind: "routine", capability: `checkpoint.${input?.action === "drop" ? "drop" : "create"}` };
       },
     },
-    async execute(_toolCallId: string, params: any = {}, ..._rest: any[]) {
+    async execute(_toolCallId: string, params: any = {}, _signal?: any, _onUpdate?: any, ctx?: any) {
       const action = params?.action === "list" || params?.action === "drop" ? params.action : "create";
-      const sessionPath = deps.getSessionPath?.() || null;
+      // 会话归属取执行上下文（tool-session.ts 口径：不依赖焦点回调）——后台/独立
+      // 会话上的回合不得把存档点写到焦点会话的侧车；无 ctx 时回退焦点路径。
+      const sessionPath = getToolSessionPath(ctx) || deps.getSessionPath?.() || null;
       if (!sessionPath) {
         return { isError: true, content: [{ type: "text", text: "no active session — checkpoints are session-scoped" }] };
       }

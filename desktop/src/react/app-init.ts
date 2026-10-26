@@ -15,6 +15,7 @@ import { loadPendingNewSessionPermissionDefault, loadSessions, pendingNewSession
 import { initSessionProjectCatalog } from './stores/session-project-actions';
 import { loadSidebarUiPrefs } from './stores/sidebar-ui-slice';
 import { connectWebSocket, disconnectWebSocketForRestart, getWebSocket } from './services/websocket';
+import { resolveServerConnection } from './services/server-connection';
 import { setStatus, showError, loadModels } from './utils/ui-helpers';
 import { initJian, loadStudioWorkspaces } from './stores/desk-actions';
 import { initViewerEvents } from './stores/preview-actions';
@@ -94,6 +95,9 @@ export async function initApp(): Promise<void> {
   initInputDraftPersistence();
 
   const requestContextUsage = (sessionPath: string) => {
+    // R08 收尾（D01）：context_usage 是旧内核 wire 帧，Rust 不认（close 1008）。
+    // Rust 连接的 ContextRing 由 websocket.ts rust 分支的资源事件维护，不经此帧。
+    if (resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service') return;
     const ws = getWebSocket();
     if (ws?.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ type: 'context_usage', sessionPath }));

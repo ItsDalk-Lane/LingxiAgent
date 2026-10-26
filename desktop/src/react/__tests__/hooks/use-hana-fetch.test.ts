@@ -306,7 +306,6 @@ describe('Rust 逐项补接的直连缺口（desk 技能/预览/检查点/权限
     '/api/checkpoints/user-edit',
     '/api/preferences/session-permission-default',
     '/api/sessions/search?q=x',
-    '/api/sessions/find?text=y',
     '/api/sessions/new-detached',
     '/api/session-thinking-level',
     '/api/session-permission-mode',
@@ -435,6 +434,26 @@ describe('Rust 会话域旧 query 寻址的协议翻译', () => {
     expect(fetchMock.mock.calls[2][0]).toBe('http://127.0.0.1:3210/lingxi/v1/sessions/s-1/content/rc-1');
     await lingxiFetch(`/api/sessions/prompt-snapshot?sessionId=s-2`);
     expect(fetchMock.mock.calls[3][0]).toBe('http://127.0.0.1:3210/lingxi/v1/sessions/s-2/prompt-snapshot');
+  });
+
+  it('会话内文本查找（chat-find-actions 真实形状 ?path=&q=）改写为 /sessions/{id}/find?q=（R08-C③/D-10）', async () => {
+    await lingxiFetch(`/api/sessions/find?path=${encodeURIComponent('native:s-1')}&q=${encodeURIComponent('关键 词')}`);
+    expect(fetchMock.mock.calls[0][0]).toBe('http://127.0.0.1:3210/lingxi/v1/sessions/s-1/find?q=%E5%85%B3%E9%94%AE+%E8%AF%8D');
+  });
+
+  it('会话管理写端口（续接已删 Agent / 工作台处置）走 Rust 同名路由并以 sessionId 定位（R08-C②）', async () => {
+    await lingxiFetch('/api/sessions/continue-deleted-agent', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path: 'native:s-9' }),
+    });
+    expect(fetchMock.mock.calls[0][0]).toBe('http://127.0.0.1:3210/lingxi/v1/sessions/continue-deleted-agent');
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ sessionId: 's-9' });
+    await lingxiFetch('/api/sessions/workspace-disposal', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cwd: '/w', action: 'archive' }),
+    });
+    expect(fetchMock.mock.calls[1][0]).toBe('http://127.0.0.1:3210/lingxi/v1/sessions/workspace-disposal');
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body)).toEqual({ cwd: '/w', action: 'archive' });
   });
 
   it('写端口剥离旧 body.path 后走 Rust 子路由', async () => {

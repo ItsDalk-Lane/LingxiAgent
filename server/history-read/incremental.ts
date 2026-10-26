@@ -24,7 +24,7 @@
 import { historyMessageFromEntry, annotateOriginMessages } from "../../core/message-utils.ts";
 import { projectSessionMessageForDisplay } from "../../core/session-reminders.ts";
 import { DESKTOP_INPUT_CORRELATION_TYPE } from "../../core/desktop-input-correlation.ts";
-import { TODO_TOOL_NAMES, TODO_STATE_CUSTOM_TYPE } from "../../lib/tools/todo-constants.ts";
+import { isTodoToolResult, TODO_STATE_CUSTOM_TYPE } from "../../lib/tools/todo-constants.ts";
 import { extractLatestTodoSnapshot } from "../../lib/tools/todo-compat.ts";
 import { collectSessionFileReferenceIdentities } from "../../lib/session-files/session-file-registry.ts";
 import { scanHistoryFile } from "./scan.ts";
@@ -462,7 +462,7 @@ export async function buildHistoryDirectoryIncremental(opts: {
       if (global == null) continue;
       const message = appendedMessages[local];
       const isTodoCandidate = message.role === "toolResult"
-        ? TODO_TOOL_NAMES.includes(message.toolName)
+        ? isTodoToolResult(message.toolName, message.details)
         : message.role === "custom" && message.customType === TODO_STATE_CUSTOM_TYPE;
       if (!isTodoCandidate) continue;
       const snapshot = extractLatestTodoSnapshot([message]);

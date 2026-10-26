@@ -559,6 +559,38 @@ pub enum WsClientRequest {
         #[serde(default, rename = "agentId")]
         agent_id: Option<String>,
     },
+    // ── D13 终端帧族（现役 terminal-client.ts / server chat.ts:2294-2331）──
+    // R08 收尾第六轮起由真实终端子系统回答（`crate::terminals`：进程监督器的
+    // 持久 PTY 记录 + 只读转录 tail + 真实 terminate），身份/归属走
+    // `session_locator::resolve` + `sessions.get_for`；帧形状保持现役契约
+    // `shared/terminal-ui-contract.ts` 不变。此前「显式能力错误」的传输面实现
+    // 仅作为上一轮断点记录，已由真实正路径替换。
+    TerminalSnapshotRequest {
+        #[serde(default, rename = "sessionId")]
+        session_id: Option<String>,
+        #[serde(default, rename = "sessionPath")]
+        session_path: Option<String>,
+    },
+    TerminalTailRequest {
+        #[serde(default, rename = "sessionId")]
+        session_id: Option<String>,
+        #[serde(default, rename = "sessionPath")]
+        session_path: Option<String>,
+        #[serde(default, rename = "terminalId")]
+        terminal_id: Option<String>,
+        #[serde(default, rename = "sinceSeq")]
+        since_seq: Option<serde_json::Value>,
+    },
+    TerminalCloseRequest {
+        #[serde(default, rename = "sessionId")]
+        session_id: Option<String>,
+        #[serde(default, rename = "sessionPath")]
+        session_path: Option<String>,
+        #[serde(default, rename = "terminalId")]
+        terminal_id: Option<String>,
+        #[serde(default, rename = "requestId")]
+        request_id: Option<String>,
+    },
     SessionRead {
         #[serde(rename = "sessionId")]
         session_id: String,

@@ -11,7 +11,7 @@
 // 用法：node scripts/rust-tauri/r08_t06_d3_drill.mjs --bin <lingxi-service> --work <dir>
 import { spawn, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import http from 'node:http';
 import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
@@ -183,6 +183,24 @@ function attachmentShas(root) {
   return out;
 }
 const snapAttachments = attachmentShas(target);
+
+// ── 3b. R08 收尾 B 域前置：切后可变更新 + 附件身份 + 新助手持久化文件 ──
+// B③：旧根迁入的 legacy 会话在新根上改名（可变元数据），回滚包必须携带该更新。
+const legacySessionRow = q(target, `SELECT session_id, title FROM sessions WHERE session_id <> '${String(sessionId).replace(/'/g, "''")}' ORDER BY created_at_unix_ms, session_id LIMIT 1`)[0];
+check('B3 legacy session present on new root', Boolean(legacySessionRow?.session_id), JSON.stringify(legacySessionRow));
+const B3_TITLE = 'B3-RENAMED 旧会话切后改名';
+const renamed = await api('POST', '/lingxi/v1/sessions/rename', { sessionId: legacySessionRow.session_id, title: B3_TITLE });
+check('B3 rename legacy session on new root', renamed.status < 300, `${renamed.status} ${JSON.stringify(renamed.value).slice(0, 160)}`);
+check('B3 renamed title persisted on new root', q(target, `SELECT title FROM sessions WHERE session_id='${legacySessionRow.session_id}'`)[0]?.title === B3_TITLE);
+// B①：新增附件的正式身份（fileId）与原字节 sha（恢复后按原 fileId/sessionId 打开比对）。
+const attachBytesSha = createHash('sha256').update(readFileSync(attachPath)).digest('hex');
+const filesList = await api('GET', `/lingxi/v1/sessions/${sessionId}/files`);
+check('B1 files list on new root', filesList.status < 300, `${filesList.status}`);
+const attachRow = (Array.isArray(filesList.value?.files) ? filesList.value.files : Array.isArray(filesList.value) ? filesList.value : []).find((f) => f.label === 't06-d3-attachment' || f.filename === 't06-attach-payload.txt');
+check('B1 attachment row on new root (managed_cache)', attachRow?.fileId && attachRow?.storageKind === 'managed_cache', JSON.stringify(attachRow).slice(0, 240));
+const attachFileId = attachRow?.fileId;
+// B②：切后新助手的持久化文件在新根真实存在（agents/t06d3/config.yaml）。
+check('B2 new agent config.yaml exists on new root', existsSync(join(target, 'agents/t06d3/config.yaml')));
 // 替身日志读取不走全局 fetch 连接池：每次新建连接（agent:false），排除 keep-alive
 // 复用已被服务端关闭的空闲套接字这一竞态；错误保留 code/cause 原样抛出。
 function standinGetJson(pathname) {
@@ -236,6 +254,11 @@ check('delta package dir exists', existsSync(join(pkgDir, 'manifest.json')), pkg
 
 // ── 5. reforward 模态 B：恢复式再前滚到全新根 ──
 const recoveredRoot = join(work, 'recovered-root');
+// R08 收尾 B①：先隔离原新根（改名移走）再恢复——恢复根内任何仍指向原新根
+// 的附件路径都无法再被解析，路径与身份脱钩会在正式接口读取时响亮暴露。
+const isolatedTarget = `${target}.isolated`;
+renameSync(target, isolatedTarget);
+check('original new root isolated before reforward', !existsSync(target) && existsSync(join(isolatedTarget, 'data-epoch.json')));
 // reforward 与 rollback 共用 work-dir：预检只读消费同目录 rollback-journal.json
 // 的 committed 事实（偏差③：journal 按动词分离文件、同目录共存）。
 const reforward = spawnSync(bin, ['reforward', '--pointer', pointer, '--old-root', source, '--new-root', target, '--work-dir', workDir, '--recover-new-root', '--backup-dir', join(work, 'rf-backup'), '--delta-package', pkgDir, '--target', recoveredRoot], { encoding: 'utf8', timeout: 900000 });
@@ -278,10 +301,69 @@ check('A12 S1 confirmed + receipt byte-identical (recovered)', r1?.status === 'c
 check('A12 S2 unknown unchanged (recovered)', r2?.status === 'unknown' && r2?.error?.includes('platform_returned_no_message_id'), JSON.stringify(r2));
 check('A12 S3 settled unknown controlled (recovered)', r3?.status === 'unknown' && (/do not resend/.test(r3?.error || '') || /worker stopped before a confirmed receipt/.test(r3?.error || '') || /platform_returned_no_message_id/.test(r3?.error || '')), JSON.stringify(r3));
 
+// ── 5b. R08 收尾 B 域：恢复根上经正式接口验收（原新根已隔离） ──
+const recoveredConfigPath = join(work, 'service-config.recovered.json');
+writeFileSync(recoveredConfigPath, readFileSync(configPath, 'utf8').replace(JSON.stringify(target), JSON.stringify(recoveredRoot)));
+const recoveredService = spawn(bin, ['--config', recoveredConfigPath, '--bind', '127.0.0.1:0'], {
+  cwd: REPO,
+  env: { ...process.env, LINGXI_BRIDGE_NODE: process.execPath, LINGXI_BRIDGE_WORKER: workerPath, LINGXI_PRODUCT_DIR: join(REPO, 'lib') },
+  stdio: ['ignore', 'pipe', 'pipe'],
+});
+children.push(recoveredService);
+let recoveredText = '';
+recoveredService.stdout.on('data', (d) => (recoveredText += d));
+recoveredService.stderr.on('data', (d) => (recoveredText += d));
+const recoveredAddr = await until(async () => (recoveredText.match(/LINGXI_SERVICE_READY addr=(\S+) /) || [])[1], 'recovered service ready');
+const recoveredTokenJson = JSON.parse(readFileSync(join(recoveredRoot, 'lingxi-service/local-token.json'), 'utf8'));
+const recoveredToken = recoveredTokenJson.token ?? recoveredTokenJson.localToken ?? recoveredTokenJson;
+async function rapi(method, path, body) {
+  const res = await fetch(`http://${recoveredAddr}${path}`, {
+    method,
+    headers: { authorization: `Bearer ${recoveredToken}`, ...(body ? { 'content-type': 'application/json' } : {}) },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  const text = await res.text();
+  let value = text;
+  try { value = JSON.parse(text); } catch { /* keep text */ }
+  return { status: res.status, value };
+}
+// B①：按原 sessionId/fileId 经正式接口打开附件；行路径必须落在恢复根（不指向
+// 已隔离的原新根），且接口给出的路径处字节与原字节 sha 一致。
+const recFile = await rapi('GET', `/lingxi/v1/sessions/${sessionId}/files/${attachFileId}`);
+check('B1 attachment opens by original fileId/sessionId on recovered root', recFile.status === 200 && Boolean(recFile.value?.file), `${recFile.status} ${JSON.stringify(recFile.value).slice(0, 200)}`);
+const recRealPath = recFile.value?.file?.realPath ?? '';
+const recFilePath = recFile.value?.file?.filePath ?? '';
+const recoveredRootReal = realpathSync(recoveredRoot);
+check('B1 attachment paths rebased into recovered root (not the isolated origin)', [recRealPath, recFilePath].every((p) => typeof p === 'string' && p.length > 0 && (p.startsWith(recoveredRootReal) || p.startsWith(recoveredRoot)) && !p.startsWith(isolatedTarget) && !p.startsWith(target)), JSON.stringify({ recRealPath, recFilePath, recoveredRoot }));
+check('B1 attachment bytes at interface-reported path identical to original', existsSync(recRealPath) && createHash('sha256').update(readFileSync(recRealPath)).digest('hex') === attachBytesSha, recRealPath);
+// B②：切后新助手在恢复根上配置齐全、归属正确、可切换、可继续新建会话。
+check('B2 new agent config.yaml recovered from package (origin isolated)', existsSync(join(recoveredRoot, 'agents/t06d3/config.yaml')));
+const recAgents = await rapi('GET', '/lingxi/v1/agents');
+const recAgentList = Array.isArray(recAgents.value?.agents) ? recAgents.value.agents : Array.isArray(recAgents.value) ? recAgents.value : [];
+const recAgent = recAgentList.find((a) => a.id === 't06d3');
+check('B2 new agent listed with its name on recovered root', recAgents.status === 200 && recAgent?.name === 'T06-D3', JSON.stringify(recAgentList.map((a) => [a.id, a.name])).slice(0, 200));
+const recAgentConfig = await rapi('GET', '/lingxi/v1/agents/t06d3/config');
+check('B2 new agent config readable on recovered root', recAgentConfig.status === 200, `${recAgentConfig.status}`);
+const recSessionRow = await rapi('GET', `/lingxi/v1/sessions/find?sessionId=${encodeURIComponent(sessionId)}`);
+check('B2 new session ownership preserved (agentId=t06d3)', recSessionRow.status === 200 && recSessionRow.value?.agentId === 't06d3', JSON.stringify(recSessionRow.value).slice(0, 160));
+const recSwitch = await rapi('POST', '/lingxi/v1/agents/switch', { id: 't06d3' });
+check('B2 switch to new agent on recovered root', recSwitch.status < 300, `${recSwitch.status} ${JSON.stringify(recSwitch.value).slice(0, 160)}`);
+const recContinue = await rapi('POST', '/lingxi/v1/sessions/new', { agentId: 't06d3', title: 'B2 继续使用新助手' });
+check('B2 continue using new agent (new session) on recovered root', recContinue.status < 300, `${recContinue.status} ${JSON.stringify(recContinue.value).slice(0, 160)}`);
+// B③：旧会话切后改名经回滚→恢复后标题保留（不退回旧标题）。
+const recLegacy = await rapi('GET', `/lingxi/v1/sessions/find?sessionId=${encodeURIComponent(legacySessionRow.session_id)}`);
+check('B3 legacy session renamed title preserved after rollback→reforward', recLegacy.status === 200 && recLegacy.value?.title === B3_TITLE, JSON.stringify({ got: recLegacy.value?.title, want: B3_TITLE }));
+// B③ 幂等：J4 二次回灌零增长已含 sessionRowsUpdated=0（收据字段逐项核对）。
+const rfReceiptText = JSON.stringify(rfReceipt ?? {});
+const secondTotalsAt = rfReceiptText.indexOf('secondApplyTotals');
+check('B3 second apply reports sessions sessionRowsUpdated=0 (idempotent)', secondTotalsAt >= 0 && /"sessions":\{[^}]*"sessionRowsUpdated":0/.test(rfReceiptText.slice(secondTotalsAt)), rfReceiptText.slice(Math.max(0, secondTotalsAt), Math.max(0, secondTotalsAt) + 400));
+recoveredService.kill('SIGTERM');
+await until(async () => recoveredService.exitCode !== null, 'recovered service stop', 15000).catch(() => recoveredService.kill('SIGKILL'));
+
 // 替身计数冻结 + 原新根零触碰（J6 双侧保留）。
 const legsFinal = await standinLegs();
 check('external sends frozen (counter 恒=1/腿 across rollback+reforward-B)', JSON.stringify(legsFinal) === JSON.stringify(legsAfterGen), `${JSON.stringify(legsAfterGen)} → ${JSON.stringify(legsFinal)}`);
-check('original new root preserved (epoch stamp intact)', existsSync(join(target, 'data-epoch.json')));
+check('original new root preserved (epoch stamp intact, isolated copy)', existsSync(join(isolatedTarget, 'data-epoch.json')));
 
 standin.kill('SIGTERM');
 await until(async () => standin.exitCode !== null, 'standin stop', 15000).catch(() => standin.kill('SIGKILL'));

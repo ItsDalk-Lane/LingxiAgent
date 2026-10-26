@@ -606,6 +606,10 @@ pub(crate) fn routes() -> Router<ServiceState> {
             get(crate::userprefs::session_permission_mode_get_route)
                 .post(crate::userprefs::session_permission_mode_post_route),
         )
+        .route(
+            "/lingxi/v1/plan-mode",
+            get(crate::userprefs::plan_mode_get_route).post(crate::userprefs::plan_mode_post_route),
+        )
         .route("/lingxi/v1/models/reload", post(reload_models))
         .route("/lingxi/v1/models/credentials", get(list_model_credentials))
         .route(

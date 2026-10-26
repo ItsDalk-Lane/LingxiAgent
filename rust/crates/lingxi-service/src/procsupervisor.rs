@@ -886,6 +886,58 @@ pub struct TranscriptDelivery {
     pub spill: Option<SpillInfo>,
 }
 
+/// One chunk of the read-only terminal log (the D13 terminal-panel view).
+///
+/// Unlike [`TranscriptDelivery`], the terminal log is NOT a delivery
+/// cursor: reading it never consumes bytes, so the desktop panel may poll
+/// the same window repeatedly while write_stdin keeps its own exactly-once
+/// delivery. `data` is decoded at complete UTF-8 boundaries; a trailing
+/// partial sequence waits for the next read and — once the stream is over —
+/// is flushed as one U+FFFD (the honest lossy end state, never silence).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TerminalLogChunk {
+    pub seq: u64,
+    pub data: String,
+    /// The chunk exceeded the caller's byte budget; only its UTF-8 tail is
+    /// returned. The UI must not present it as the chunk's beginning.
+    pub truncated_start: bool,
+}
+
+/// Result of [`ProcessSupervisor::terminal_tail`] — a read-only window of
+/// the terminal log plus the facts needed to state truncation honestly.
+#[derive(Debug, Clone)]
+pub struct TerminalTail {
+    pub chunks: Vec<TerminalLogChunk>,
+    pub since_seq: Option<u64>,
+    /// The terminal log's last assigned seq (0 = no output recorded yet).
+    pub last_seq: u64,
+    /// True when output before the returned window was evicted by the
+    /// bounded ring or clipped by the caller's byte/chunk bounds.
+    pub truncated: bool,
+}
+
+/// Read-only view of one persistent-terminal record (the snapshot source
+/// for the D13 `terminal_snapshot` frame). Only REAL record facts are
+/// surfaced; missing facts stay `None`/empty, never fabricated.
+#[derive(Debug, Clone)]
+pub struct TerminalRecordView {
+    pub id: ProcessHandleId,
+    pub pid: i32,
+    pub pgid: i32,
+    pub owner: ProcessOwner,
+    pub argv: Vec<String>,
+    pub cwd: PathBuf,
+    pub phase: RecordPhase,
+    pub spawned_at_unix_ms: u64,
+    /// Last moment output arrived (the record's spawn time before any).
+    pub last_activity_at_unix_ms: u64,
+    /// The terminal log's last seq (0 = no output recorded).
+    pub seq: u64,
+    /// The full-output spill reference (the transcript file), when the
+    /// supervisor opened one for this terminal.
+    pub spill: Option<SpillInfo>,
+}
+
 /// One transcript chunk with its CONSUMED prefix length. The consumption
 /// point is a byte offset inside the chunk (R04-RR1-F04): a chunk may be
 /// partially consumed — its delivered prefix is never re-delivered.
@@ -1046,6 +1098,165 @@ impl TranscriptCore {
     }
 }
 
+/// Bounded read-only terminal log for the terminal-panel view.
+///
+/// Decode-on-append: bytes are turned into complete-UTF-8 text chunks at the
+/// moment they arrive (a trailing partial sequence is held over and completed
+/// by the next read; at stream end it is flushed as one U+FFFD). The ring is
+/// bounded by `ring_cap` bytes of decoded text — an output storm evicts old
+/// chunks and the tail query reports the gap, never "complete".
+struct TerminalLog {
+    chunks: VecDeque<TerminalLogChunk>,
+    bytes: usize,
+    ring_cap: usize,
+    next_seq: u64,
+    last_activity_at_unix_ms: u64,
+    /// Bytes of a not-yet-complete UTF-8 sequence held for the next read.
+    pending: Vec<u8>,
+    finished: bool,
+}
+
+impl TerminalLog {
+    fn new(ring_cap: usize, now_ms: u64) -> Self {
+        Self {
+            chunks: VecDeque::new(),
+            bytes: 0,
+            ring_cap: ring_cap.max(1),
+            next_seq: 1,
+            last_activity_at_unix_ms: now_ms,
+            pending: Vec::new(),
+            finished: false,
+        }
+    }
+
+    fn append(&mut self, bytes: &[u8], now_ms: u64) {
+        if bytes.is_empty() {
+            return;
+        }
+        self.last_activity_at_unix_ms = now_ms;
+        self.pending.extend_from_slice(bytes);
+        self.flush_complete(now_ms);
+    }
+
+    /// Marks the stream over: a dangling partial sequence is flushed as one
+    /// U+FFFD instead of waiting forever (the documented lossy final state).
+    fn finish(&mut self, now_ms: u64) {
+        if self.finished {
+            return;
+        }
+        self.finished = true;
+        self.last_activity_at_unix_ms = now_ms;
+        self.flush_complete(now_ms);
+    }
+
+    fn flush_complete(&mut self, now_ms: u64) {
+        if self.pending.is_empty() {
+            return;
+        }
+        let (mut text, mut consumed) = decode_prefix_utf8(&self.pending);
+        if self.finished && consumed < self.pending.len() {
+            text.push('\u{FFFD}');
+            consumed = self.pending.len();
+        }
+        if consumed == 0 {
+            return;
+        }
+        self.pending.drain(..consumed);
+        let seq = self.next_seq;
+        self.next_seq += 1;
+        self.bytes += text.len();
+        self.last_activity_at_unix_ms = now_ms;
+        self.chunks.push_back(TerminalLogChunk {
+            seq,
+            data: text,
+            truncated_start: false,
+        });
+        while self.bytes > self.ring_cap {
+            let Some(evicted) = self.chunks.pop_front() else {
+                break;
+            };
+            self.bytes = self.bytes.saturating_sub(evicted.data.len());
+        }
+    }
+
+    fn last_seq(&self) -> u64 {
+        self.next_seq.saturating_sub(1)
+    }
+
+    /// Selects the bounded tail window. `truncated` is derived from REAL
+    /// facts only: an evicted gap before the window, or bytes/chunks clipped
+    /// by the caller's bounds — never a claim that the window is complete.
+    fn tail(
+        &self,
+        since_seq: Option<u64>,
+        max_bytes: usize,
+        max_chunks: usize,
+    ) -> (Vec<TerminalLogChunk>, bool) {
+        let candidates: Vec<&TerminalLogChunk> = self
+            .chunks
+            .iter()
+            .filter(|chunk| since_seq.is_none_or(|since| chunk.seq > since))
+            .collect();
+        let first_available = candidates.first().map(|chunk| chunk.seq);
+        let gap = match since_seq {
+            Some(since) => match first_available {
+                Some(first) => first > since.saturating_add(1),
+                None => self.last_seq() > since,
+            },
+            None => first_available.is_some_and(|first| first > 1),
+        };
+        let max_chunks = max_chunks.max(1);
+        let max_bytes = max_bytes.max(1);
+        let mut selected: Vec<TerminalLogChunk> = Vec::new();
+        let mut used = 0usize;
+        let mut omitted = false;
+        for chunk in candidates.iter().rev() {
+            if selected.len() >= max_chunks {
+                omitted = true;
+                break;
+            }
+            let remaining = max_bytes.saturating_sub(used);
+            if chunk.data.len() > remaining {
+                if selected.is_empty() && remaining > 0 {
+                    selected.push(TerminalLogChunk {
+                        seq: chunk.seq,
+                        data: utf8_tail_str(&chunk.data, remaining),
+                        truncated_start: true,
+                    });
+                }
+                omitted = true;
+                break;
+            }
+            selected.push((*chunk).clone());
+            used += chunk.data.len();
+        }
+        selected.reverse();
+        (selected, gap || omitted)
+    }
+}
+
+/// The UTF-8-boundary-safe tail of `text` bounded to `max_bytes` bytes.
+fn utf8_tail_str(text: &str, max_bytes: usize) -> String {
+    let raw = text.as_bytes();
+    if raw.len() <= max_bytes {
+        return text.to_string();
+    }
+    let mut start = raw.len() - max_bytes;
+    while start < raw.len() && (raw[start] & 0xC0) == 0x80 {
+        start += 1;
+    }
+    String::from_utf8_lossy(&raw[start..]).into_owned()
+}
+
+/// Wall-clock milliseconds for terminal-log activity stamps (the reader has
+/// no injected clock; this value is display metadata, never a run fact).
+fn unix_ms_now() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|elapsed| elapsed.as_millis() as u64)
+        .unwrap_or(0)
+}
+
 /// Decodes `bytes` returning the text and how many bytes were consumed.
 /// Interior invalid subsequences become one replacement character each
 /// and are consumed (matching `from_utf8_lossy`'s maximal-subpart rule);
@@ -1093,8 +1304,12 @@ struct RecordInner {
     settled: bool,
     /// One-shot collector (shared with the pump tasks).
     collector: Option<Arc<Mutex<CollectorCore>>>,
-    /// PTY transcript.
+    /// PTY transcript (the write_stdin delivery cursor).
     transcript: Option<Arc<Mutex<TranscriptCore>>>,
+    /// Read-only terminal log (the D13 terminal-panel tail view). Kept
+    /// independent of the transcript: reading it never consumes a byte of
+    /// the write_stdin delivery cursor.
+    terminal_log: Option<Arc<Mutex<TerminalLog>>>,
     /// REAL observation (R04-RR1-F02): the reaper's `wait()` resolved —
     /// the direct child WAS reaped, so from this instant the record's
     /// pid/pgid are no longer provably ours and no group signal may be
@@ -1117,6 +1332,8 @@ struct ProcessRecord {
     owner: ProcessOwner,
     kind: ProcessKind,
     argv: Vec<String>,
+    /// The spawn cwd (a real spawn fact; surfaced in the terminal view).
+    cwd: PathBuf,
     pid: i32,
     pgid: i32,
     spawned_at_unix_ms: u64,
@@ -1126,6 +1343,44 @@ struct ProcessRecord {
 
 fn lock_or_poison<T>(lock: &Mutex<T>) -> std::sync::MutexGuard<'_, T> {
     lock.lock().unwrap_or_else(|poisoned| poisoned.into_inner())
+}
+
+/// Builds the read-only terminal view from a live/settled record. Locks are
+/// taken in the same order as the rest of the module (state → record inner →
+/// output structures) and no lock is held while calling out.
+fn terminal_record_view(record: &Arc<ProcessRecord>) -> TerminalRecordView {
+    let (phase, log, transcript) = {
+        let inner = lock_or_poison(&record.inner);
+        (
+            inner.phase.clone(),
+            inner.terminal_log.clone(),
+            inner.transcript.clone(),
+        )
+    };
+    let (seq, last_activity_at_unix_ms) = match log {
+        Some(log) => {
+            let log = lock_or_poison(&log);
+            (log.last_seq(), log.last_activity_at_unix_ms)
+        }
+        None => (0, record.spawned_at_unix_ms),
+    };
+    let spill = transcript.and_then(|transcript| {
+        let transcript = lock_or_poison(&transcript);
+        transcript.spill.as_ref().and_then(|spill| spill.info())
+    });
+    TerminalRecordView {
+        id: record.id.clone(),
+        pid: record.pid,
+        pgid: record.pgid,
+        owner: record.owner.clone(),
+        argv: record.argv.clone(),
+        cwd: record.cwd.clone(),
+        phase,
+        spawned_at_unix_ms: record.spawned_at_unix_ms,
+        last_activity_at_unix_ms,
+        seq,
+        spill,
+    }
 }
 
 impl ProcessRecord {
@@ -1577,6 +1832,7 @@ impl ProcessSupervisor {
             owner: spec.owner.clone(),
             kind: ProcessKind::OneShot,
             argv: spec.argv.clone(),
+            cwd: spec.cwd.clone(),
             pid,
             pgid: pid,
             spawned_at_unix_ms: now,
@@ -1594,6 +1850,7 @@ impl ProcessSupervisor {
                 settled: false,
                 collector: Some(Arc::clone(&collector)),
                 transcript: None,
+                terminal_log: None,
                 child_reaped: false,
                 drained_stdio: false,
                 reclaimed: false,
@@ -1825,11 +2082,19 @@ impl ProcessSupervisor {
             total_bytes: 0,
             spill,
         }));
+        // The read-only terminal log for the D13 terminal tail view: its
+        // own bounded ring, decode-on-append, independent of the
+        // write_stdin delivery cursor.
+        let terminal_log = Arc::new(Mutex::new(TerminalLog::new(
+            self.limits.transcript_ring_bytes,
+            now,
+        )));
         let record = Arc::new(ProcessRecord {
             id: id.clone(),
             owner: spec.owner.clone(),
             kind: ProcessKind::PersistentTerminal,
             argv: spec.argv.clone(),
+            cwd: spec.cwd.clone(),
             pid,
             pgid: pid,
             spawned_at_unix_ms: now,
@@ -1849,6 +2114,7 @@ impl ProcessSupervisor {
                 settled: false,
                 collector: None,
                 transcript: Some(Arc::clone(&transcript)),
+                terminal_log: Some(Arc::clone(&terminal_log)),
                 child_reaped: false,
                 drained_stdio: false,
                 reclaimed: false,
@@ -1868,7 +2134,13 @@ impl ProcessSupervisor {
         // bounded grace the reaper aborts the reader AND observes its
         // end — the reader's dup'd master fd drops with it, closing the
         // LAST reference (no unbounded read-end leak; R04-RR1-F02).
-        let reader = spawn_pty_reader(&self, &record, Arc::clone(&master), Arc::clone(&transcript));
+        let reader = spawn_pty_reader(
+            &self,
+            &record,
+            Arc::clone(&master),
+            Arc::clone(&transcript),
+            Arc::clone(&terminal_log),
+        );
         // The pty reaper: wait + reaped-observation + bounded reader
         // drain + terminal recording + settle.
         {
@@ -2026,6 +2298,71 @@ impl ProcessSupervisor {
         };
         let mut core = lock_or_poison(&transcript);
         Some(core.deliver_since_cursor(force))
+    }
+
+    /// Every retained persistent-terminal record (live and settled), ordered
+    /// by spawn time — the snapshot source for the D13 `terminal_snapshot`
+    /// frame. Only real records are listed; nothing is synthesized.
+    pub fn persistent_terminals(&self) -> Vec<TerminalRecordView> {
+        let records: Vec<Arc<ProcessRecord>> = {
+            let state = lock_or_poison(&self.state);
+            state.records.values().cloned().collect()
+        };
+        let mut views: Vec<TerminalRecordView> = records
+            .iter()
+            .filter(|record| matches!(record.kind, ProcessKind::PersistentTerminal))
+            .map(terminal_record_view)
+            .collect();
+        views.sort_by(|left, right| {
+            left.spawned_at_unix_ms
+                .cmp(&right.spawned_at_unix_ms)
+                .then_with(|| left.id.as_str().cmp(right.id.as_str()))
+        });
+        views
+    }
+
+    /// One retained persistent-terminal record as a read-only view. `None`
+    /// when the handle is unknown or belongs to a non-terminal process.
+    pub fn persistent_terminal(&self, id: &ProcessHandleId) -> Option<TerminalRecordView> {
+        let record = self.any_record(id)?;
+        matches!(record.kind, ProcessKind::PersistentTerminal).then(|| terminal_record_view(&record))
+    }
+
+    /// Read-only tail of the terminal log — NEVER consumes the write_stdin
+    /// delivery cursor (the terminal panel may poll the same window
+    /// repeatedly; the tool plane keeps its own exactly-once delivery).
+    /// `None` when the handle is unknown or not a persistent terminal.
+    pub fn terminal_tail(
+        &self,
+        id: &ProcessHandleId,
+        since_seq: Option<u64>,
+        max_bytes: usize,
+        max_chunks: usize,
+    ) -> Option<TerminalTail> {
+        let record = self.any_record(id)?;
+        if !matches!(record.kind, ProcessKind::PersistentTerminal) {
+            return None;
+        }
+        let (log, phase_terminal) = {
+            let inner = lock_or_poison(&record.inner);
+            (inner.terminal_log.clone(), inner.phase.is_terminal())
+        };
+        let log = log?;
+        let mut log = lock_or_poison(&log);
+        if phase_terminal && !log.finished {
+            // The stream is over and the reader published no end (e.g. the
+            // reader was aborted by the reaper): flush the dangling partial
+            // rather than holding it forever.
+            log.finish(unix_ms_now());
+        }
+        let last_seq = log.last_seq();
+        let (chunks, truncated) = log.tail(since_seq, max_bytes, max_chunks);
+        Some(TerminalTail {
+            chunks,
+            since_seq,
+            last_seq,
+            truncated,
+        })
     }
 
     /// The terminal's phase snapshot (for write_stdin status reporting).
@@ -2806,6 +3143,7 @@ fn spawn_pty_reader(
     record: &Arc<ProcessRecord>,
     master: Arc<PtyMasterHandle>,
     transcript: Arc<Mutex<TranscriptCore>>,
+    terminal_log: Arc<Mutex<TerminalLog>>,
 ) -> tokio::task::JoinHandle<()> {
     let guard = OwnedTaskGuard::for_output_task(supervisor, record);
     let fault = supervisor.take_pump_fault();
@@ -2817,7 +3155,7 @@ fn spawn_pty_reader(
                  (exercises the reaper's panicked-task observation)"
             );
         }
-        pty_read_loop(master, transcript).await;
+        pty_read_loop(master, transcript, terminal_log).await;
     })
 }
 
@@ -2957,7 +3295,22 @@ fn set_pty_size(fd: RawFd, cols: u16, rows: u16) {
 }
 
 #[cfg(unix)]
-async fn pty_read_loop(master: Arc<PtyMasterHandle>, transcript: Arc<Mutex<TranscriptCore>>) {
+async fn pty_read_loop(
+    master: Arc<PtyMasterHandle>,
+    transcript: Arc<Mutex<TranscriptCore>>,
+    terminal_log: Arc<Mutex<TerminalLog>>,
+) {
+    pty_read_loop_inner(master, transcript, Arc::clone(&terminal_log)).await;
+    // The stream is over (EOF/EIO/aborted fd): the terminal log's dangling
+    // partial sequence is flushed as one U+FFFD instead of waiting forever.
+    lock_or_poison(&terminal_log).finish(unix_ms_now());
+}
+
+async fn pty_read_loop_inner(
+    master: Arc<PtyMasterHandle>,
+    transcript: Arc<Mutex<TranscriptCore>>,
+    terminal_log: Arc<Mutex<TerminalLog>>,
+) {
     let Some(fd) = master.try_clone_fd() else {
         return;
     };
@@ -2974,7 +3327,11 @@ async fn pty_read_loop(master: Arc<PtyMasterHandle>, transcript: Arc<Mutex<Trans
         match guard.try_io(|io| raw_read(io.get_ref().as_raw_fd(), &mut buf)) {
             Ok(Ok(0)) => return,
             Ok(Ok(n)) => {
+                // Two independent bounded views of the same stream event:
+                // the write_stdin transcript (exactly-once delivery cursor)
+                // and the read-only terminal log (terminal-panel tail).
                 lock_or_poison(&transcript).append(&buf[..n]);
+                lock_or_poison(&terminal_log).append(&buf[..n], unix_ms_now());
             }
             Ok(Err(err)) => {
                 // macOS reports EIO once the slave side is fully closed.
@@ -3647,6 +4004,7 @@ mod tests {
             },
             kind: ProcessKind::OneShot,
             argv: vec!["unit".to_string()],
+            cwd: std::env::temp_dir(),
             // 当前进程的真实组号必为正数，0 故意不匹配；固定假 PID 可能碰到无关程序。
             pid: std::process::id() as i32,
             pgid: 0,
@@ -3657,6 +4015,7 @@ mod tests {
                 settled: false,
                 collector: None,
                 transcript: None,
+                terminal_log: None,
                 child_reaped: false,
                 drained_stdio: false,
                 reclaimed: false,

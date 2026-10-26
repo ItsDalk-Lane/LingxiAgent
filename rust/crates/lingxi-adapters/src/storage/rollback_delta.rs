@@ -112,8 +112,31 @@ pub struct LegacyIdentitySet {
     /// user/preferences.json 的 sha256（settings-preserved-format）。
     /// 同上：manifest 约定哈希，仅内部比对。
     pub preferences_sha256: Option<String>,
+    /// 其余 Register 策略（保格式登记）类文件：relpath → sha256。覆盖
+    /// agents/{id}/config.yaml 等 agent-profile/agent-memory/agent-authored-
+    /// records/agent-phone/desk-activity/cron-automation/channels/file-history
+    /// 族（R08 收尾 B②/B④：切后新助手与其持久化文件此前不在差集面；按
+    /// T04 分类表系统性纳入，不逐个特例）。排除 session-files/knowledge（各
+    /// 有专属映射）与 device-access-registries（T06 §4.2 设备身份安全域，
+    /// 旧根自带原身份，明示不导出）。同上：manifest 约定哈希，仅内部比对。
+    pub register_files: BTreeMap<String, String>,
     /// 不合 agents/{agent}/sessions/** 形状的 jsonl（converter 同规则跳过）。
     pub skipped_jsonl: Vec<String>,
+}
+
+/// Register 类文件是否进通用差集面（B②/B④）：排除专属映射类与安全域类。
+fn is_generic_register_file(rel: &str) -> bool {
+    if rel.starts_with("session-files/") || rel.starts_with("knowledge/") || rel == "user/preferences.json" {
+        return false;
+    }
+    match classes::classify(rel) {
+        Some((def, _)) => {
+            def.strategy == classes::Strategy::Register
+                && !def.external
+                && def.id != "device-access-registries"
+        }
+        None => false,
+    }
 }
 
 impl LegacyIdentitySet {
@@ -141,6 +164,9 @@ impl LegacyIdentitySet {
         if let Some(sha) = &self.preferences_sha256 {
             canon.push_str(&format!("preferences {sha}\n"));
         }
+        for (rel, sha) in &self.register_files {
+            canon.push_str(&format!("register_file {rel} {sha}\n"));
+        }
         for rel in &self.skipped_jsonl {
             canon.push_str(&format!("skipped_jsonl {rel}\n"));
         }
@@ -156,6 +182,7 @@ impl LegacyIdentitySet {
             "sessionFiles": self.session_files.len(),
             "knowledgeFiles": self.knowledge_files.len(),
             "preferencesPresent": self.preferences_sha256.is_some(),
+            "registerFiles": self.register_files.len(),
             "skippedUnmappedJsonl": self.skipped_jsonl.len(),
         })
     }
@@ -186,6 +213,9 @@ pub fn derive_legacy_identity_set(old_root: &Path) -> Result<LegacyIdentitySet, 
         }
         if rel == "user/preferences.json" {
             set.preferences_sha256 = Some(entry.sha256.clone());
+        }
+        if is_generic_register_file(rel) {
+            set.register_files.insert(rel.to_string(), entry.sha256.clone());
         }
         let Some((def, _)) = classes::classify(rel) else {
             continue;
@@ -472,13 +502,21 @@ pub fn export_db_delta(
                 obj.insert(name.clone(), sql_value_to_json(v));
             }
             let identity: Vec<Value> = pk_idx.iter().map(|i| obj[&col_names[*i]].clone()).collect();
-            if identity_in_legacy(&table, &pk_cols, &identity, legacy) {
+            let legacy_identity = identity_in_legacy(&table, &pk_cols, &identity, legacy);
+            // B③（R08 收尾）：sessions 是可变元数据表（标题/置顶/归档/项目归属
+            // 等切后合法更新）。旧会话按身份整行跳过会把切后改名等更新丢在
+            // 新根里，恢复退回旧标题——改为旧身份行也入包：回灌侧对同身份行
+            // 逐列比对，相同 already_present、发散 session_rows_updated（设计
+            // 裁决原文：会话元数据可变）。账簿表（messages/runs/model_call_
+            // usage/observability）仍按身份跳过（不可改账，旧数据保留）。
+            if legacy_identity && table != "sessions" {
                 continue;
             }
             let row_sha256 = sha256_hex(canonical_row_string(&obj).as_bytes());
             delta_rows.push(DeltaRow {
                 identity,
-                old_ui_readable: if table == "sessions" { Some(false) } else { None },
+                // 旧身份会话行对旧 UI 可读（旧根原有会话）；新身份会话行不可读。
+                old_ui_readable: if table == "sessions" { Some(legacy_identity) } else { None },
                 row: obj,
                 row_sha256,
             });
@@ -536,7 +574,7 @@ pub struct FileDeltaEntry {
     /// 本包层只用真·内容哈希，两套约定在此显式隔离、互不混用。
     pub sha256: String,
     pub size: u64,
-    /// session-files | knowledge | preferences
+    /// session-files | knowledge | preferences | register（其余 Register 类，B②/B④）
     pub category: &'static str,
 }
 
@@ -602,6 +640,14 @@ pub fn diff_files(
                 continue;
             }
             emit(entry, "preferences")?;
+        } else if is_generic_register_file(rel) {
+            // B②/B④：其余 Register 类（agents/{id}/config.yaml 等 agent 持久化
+            // 文件、channels、file-history…）同 knowledge 语义——不在 L 或异
+            // sha 即整文件入包；回灌侧发散=整文件覆盖（切后新根为权威）。
+            if legacy.register_files.get(rel) == Some(&entry.sha256) {
+                continue;
+            }
+            emit(entry, "register")?;
         }
     }
     out.sort_by(|a, b| a.relpath.cmp(&b.relpath));
@@ -958,6 +1004,7 @@ pub fn read_delta_package(
             "session-files" => "session-files",
             "knowledge" => "knowledge",
             "preferences" => "preferences",
+            "register" => "register",
             other => {
                 return Err(DeltaError::Refused {
                     reason: format!("unknown file category {other}"),
@@ -1007,6 +1054,34 @@ pub struct TableApplyStats {
     /// session_files 族身份冲突且内容发散时保留目标行（根作用域路径正确性
     /// 优先）的计数——显式降级披露，不静默。
     pub path_scoped_preserved: u64,
+    /// B①：新身份 session_files 行（managed_cache）插入时 file_path/real_path
+    /// 由原新根前缀重基到恢复根的计数（路径与身份重新关联，不再指向被隔离
+    /// 的原新根）。
+    pub path_rebased: u64,
+}
+
+/// B①（R08 收尾）：附件行路径重基。包内 session_files 行携带**原新根**的绝对
+/// file_path/real_path（managed_cache 存储形态 `{home}/session-files/…`），而
+/// 字节经包 files 面恢复到**恢复根**同 relpath——原样 INSERT 会让行指向已被
+/// 隔离/丢失的原新根（身份与路径脱钩）。回灌时对 managed_cache 行把任一
+/// 原根前缀（原样/规范化两形态）替换为恢复根；external 存储形态（用户自有
+/// 文件，不在根内）不改写。
+#[derive(Debug, Clone, PartialEq)]
+pub struct PathRebase {
+    pub origins: Vec<PathBuf>,
+    pub target: PathBuf,
+}
+
+impl PathRebase {
+    fn rebase(&self, value: &str) -> Option<String> {
+        let path = Path::new(value);
+        for origin in &self.origins {
+            if let Ok(rest) = path.strip_prefix(origin) {
+                return Some(self.target.join(rest).to_string_lossy().into_owned());
+            }
+        }
+        None
+    }
 }
 
 #[derive(Debug, Default, Clone, PartialEq)]
@@ -1032,7 +1107,7 @@ impl ApplyStats {
             .map(|(t, s)| {
                 (
                     t.clone(),
-                    json!({"applied": s.applied, "alreadyPresent": s.already_present, "sessionRowsUpdated": s.session_rows_updated, "pathScopedPreserved": s.path_scoped_preserved}),
+                    json!({"applied": s.applied, "alreadyPresent": s.already_present, "sessionRowsUpdated": s.session_rows_updated, "pathScopedPreserved": s.path_scoped_preserved, "pathRebased": s.path_rebased}),
                 )
             })
             .collect();
@@ -1050,6 +1125,7 @@ impl ApplyStats {
 pub fn apply_db_delta(
     target_db: &Path,
     tables: &[TableDelta],
+    rebase: Option<&PathRebase>,
 ) -> Result<ApplyStats, DeltaError> {
     let mut conn = rusqlite::Connection::open(target_db)
         .map_err(|e| DeltaError::Db(format!("open {} rw: {e}", target_db.display())))?;
@@ -1080,7 +1156,7 @@ pub fn apply_db_delta(
         }
         let table_stats = stats.per_table.entry(delta.table.clone()).or_default();
         for row in &delta.rows {
-            apply_row(&tx, delta, &pk_cols, row, table_stats)?;
+            apply_row(&tx, delta, &pk_cols, row, table_stats, rebase)?;
         }
     }
     // 提交前 FK 全量校验：违规=回滚响亮拒。
@@ -1113,8 +1189,35 @@ fn apply_row(
     pk_cols: &[String],
     row: &DeltaRow,
     stats: &mut TableApplyStats,
+    rebase: Option<&PathRebase>,
 ) -> Result<(), DeltaError> {
     let table = &delta.table;
+    // B①：有效行 = 包行经路径重基（仅 session_files 的 managed_cache 行）。
+    // 比对与插入都用有效行：二次回灌时目标行已是重基路径，与有效行相等 →
+    // already_present（零增长成立），而不是误落 path_scoped_preserved。
+    let mut effective_row = row.row.clone();
+    let mut rebased_here = 0u64;
+    if table == "session_files" {
+        if let Some(rebase) = rebase {
+            let managed = effective_row
+                .get("storage_kind")
+                .and_then(Value::as_str)
+                == Some("managed_cache");
+            if managed {
+                for column in ["file_path", "real_path"] {
+                    let Some(Value::String(current)) = effective_row.get(column) else {
+                        continue;
+                    };
+                    if let Some(next) = rebase.rebase(current) {
+                        if next != *current {
+                            effective_row.insert(column.to_string(), Value::String(next));
+                            rebased_here += 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
     let where_clause = pk_cols
         .iter()
         .enumerate()
@@ -1154,7 +1257,7 @@ fn apply_row(
     };
     match existing {
         None => {
-            let cols: Vec<&String> = row.row.keys().collect();
+            let cols: Vec<&String> = effective_row.keys().collect();
             let insert = format!(
                 "INSERT INTO \"{table}\" ({}) VALUES ({})",
                 cols.iter()
@@ -1168,14 +1271,17 @@ fn apply_row(
             );
             let params: Vec<rusqlite::types::Value> = cols
                 .iter()
-                .map(|c| json_to_sql_value(&row.row[*c]))
+                .map(|c| json_to_sql_value(&effective_row[*c]))
                 .collect::<Result<Vec<_>, _>>()?;
             tx.execute(&insert, rusqlite::params_from_iter(params.iter()))
                 .map_err(|e| DeltaError::Db(format!("apply insert {table}: {e}")))?;
             stats.applied += 1;
+            if rebased_here > 0 {
+                stats.path_rebased += 1;
+            }
         }
         Some(existing_row) => {
-            if canonical_row_string(&existing_row) == canonical_row_string(&row.row) {
+            if canonical_row_string(&existing_row) == canonical_row_string(&effective_row) {
                 stats.already_present += 1;
                 return Ok(());
             }
@@ -1387,14 +1493,22 @@ mod tests {
         let by_name: BTreeMap<_, _> = tables.iter().map(|t| (t.table.as_str(), t)).collect();
         // 簿记表不出现。
         assert!(!by_name.contains_key("import_runs"));
-        assert_eq!(by_name["sessions"].rows.len(), 1);
-        assert_eq!(
-            by_name["sessions"].rows[0].identity,
-            vec![json!("s-new")]
-        );
-        // J7：新根导出会话 oldUiReadable=false。
-        assert_eq!(by_name["sessions"].rows[0].old_ui_readable, Some(false));
+        // B③：sessions 为可变元数据表——旧身份行也入包（回灌侧按内容判
+        // already_present / session_rows_updated），新身份行照常入包。
+        assert_eq!(by_name["sessions"].rows.len(), 2);
+        let session_row = |id: &str| {
+            by_name["sessions"]
+                .rows
+                .iter()
+                .find(|r| r.identity == vec![json!(id)])
+                .unwrap_or_else(|| panic!("sessions row {id} missing"))
+        };
+        // J7：新根新建会话 oldUiReadable=false；旧根原有会话 oldUiReadable=true。
+        assert_eq!(session_row("s-new").old_ui_readable, Some(false));
+        assert_eq!(session_row("s1").old_ui_readable, Some(true));
+        // 账簿表（messages/runs）仍按旧身份过滤：不可改账，旧数据保留。
         assert_eq!(by_name["messages"].rows.len(), 1);
+        assert_eq!(by_name["messages"].rows[0].identity, vec![json!("s-new"), json!("m-new")]);
         assert_eq!(by_name["runs"].rows.len(), 1);
         // L=∅ 表全行为增量。
         assert_eq!(by_name["bridge_outbox_v1"].rows.len(), 1);
@@ -1482,20 +1596,78 @@ mod tests {
                 ],
             },
         ];
-        let first = apply_db_delta(&db, &tables).unwrap();
+        let first = apply_db_delta(&db, &tables, None).unwrap();
         assert_eq!(first.per_table["sessions"].session_rows_updated, 1);
         assert_eq!(first.per_table["messages"].applied, 1);
         assert_eq!(first.per_table["messages"].already_present, 1);
         // 二次回灌 = 零增长（J4 证明原料）。
-        let second = apply_db_delta(&db, &tables).unwrap();
+        let second = apply_db_delta(&db, &tables, None).unwrap();
         assert!(second.zero_growth(), "second apply: {second:?}");
         // 异内容消息 → conflict 响亮拒（不可改账）。
         let mut conflict = tables.clone();
         conflict[1].rows[1]
             .row
             .insert("body".into(), json!("rewritten"));
-        let err = apply_db_delta(&db, &conflict).unwrap_err().to_string();
+        let err = apply_db_delta(&db, &conflict, None).unwrap_err().to_string();
         assert!(err.contains("conflict"), "unexpected: {err}");
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn session_files_rows_rebase_managed_cache_paths_only() {
+        // B①：managed_cache 行 file_path/real_path 由原新根重基到恢复根；
+        // external 行不改写；二次回灌同包 already_present（零增长）。
+        let dir = temp_root("rebase");
+        let db = dir.join("runs.db");
+        let conn = rusqlite::Connection::open(&db).unwrap();
+        conn.execute_batch(
+            "CREATE TABLE session_files (file_id TEXT PRIMARY KEY, storage_kind TEXT, file_path TEXT, real_path TEXT);",
+        )
+        .unwrap();
+        drop(conn);
+        let origin = PathBuf::from("/tmp/origin-root");
+        let origin_canonical = PathBuf::from("/private/tmp/origin-root");
+        let target = PathBuf::from("/private/tmp/recover-root");
+        let row = |id: &str, kind: &str, p: &str, r: &str| DeltaRow {
+            identity: vec![json!(id)],
+            row: [
+                ("file_id".into(), json!(id)),
+                ("storage_kind".into(), json!(kind)),
+                ("file_path".into(), json!(p)),
+                ("real_path".into(), json!(r)),
+            ]
+            .into_iter()
+            .collect(),
+            row_sha256: String::new(),
+            old_ui_readable: None,
+        };
+        let tables = vec![TableDelta {
+            table: "session_files".into(),
+            pk_columns: vec!["file_id".into()],
+            rows: vec![
+                row("sf_managed", "managed_cache", "/tmp/origin-root/session-files/ab/x.bin", "/private/tmp/origin-root/session-files/ab/x.bin"),
+                row("sf_external", "external", "/Users/u/Documents/own.pdf", "/Users/u/Documents/own.pdf"),
+            ],
+        }];
+        let rebase = PathRebase { origins: vec![origin, origin_canonical], target: target.clone() };
+        let first = apply_db_delta(&db, &tables, Some(&rebase)).unwrap();
+        assert_eq!(first.per_table["session_files"].applied, 2);
+        assert_eq!(first.per_table["session_files"].path_rebased, 1);
+        let conn = rusqlite::Connection::open(&db).unwrap();
+        let (fp, rp): (String, String) = conn
+            .query_row("SELECT file_path, real_path FROM session_files WHERE file_id='sf_managed'", [], |r| Ok((r.get(0)?, r.get(1)?)))
+            .unwrap();
+        assert_eq!(fp, "/private/tmp/recover-root/session-files/ab/x.bin");
+        assert_eq!(rp, "/private/tmp/recover-root/session-files/ab/x.bin");
+        let ext: String = conn
+            .query_row("SELECT file_path FROM session_files WHERE file_id='sf_external'", [], |r| r.get(0))
+            .unwrap();
+        assert_eq!(ext, "/Users/u/Documents/own.pdf");
+        drop(conn);
+        let second = apply_db_delta(&db, &tables, Some(&rebase)).unwrap();
+        assert!(second.zero_growth(), "second apply: {second:?}");
+        assert_eq!(second.per_table["session_files"].already_present, 2);
+        assert_eq!(second.per_table["session_files"].path_scoped_preserved, 0);
         std::fs::remove_dir_all(&dir).unwrap();
     }
 
@@ -1516,7 +1688,7 @@ mod tests {
                 old_ui_readable: None,
             }],
         }];
-        let err = apply_db_delta(&db, &tables).unwrap_err().to_string();
+        let err = apply_db_delta(&db, &tables, None).unwrap_err().to_string();
         assert!(err.contains("foreign-key"), "unexpected: {err}");
         // 回滚后行不存在。
         let conn = rusqlite::Connection::open(&db).unwrap();

@@ -259,14 +259,25 @@ function build() {
     let isMapped = mappedPath !== placeholder;
     let mappedVia = isMapped ? 'serviceRoute' : null;
     // 兼容翻译层（lingxiFetch translateLegacySessionCall）：旧 query 寻址的
-    // 会话子端口。矩阵路径不带 query，用真实调用者的代表性形状
-    // （?path=native:__p__，PATCH body 同形）求值。
+    // 会话子端口。矩阵路径不带 query，用真实调用者的代表性形状求值：
+    // GET ?path=native:__p__（find 另带 &q=）；PATCH body.path；POST 写端口
+    // 的 body 携 path/sessionId/sessionIds 与各端口字段（R08-C③ 修正：此前
+    // POST 不带 body → 翻译恒 null → rename/pin/archive/restore/…被误判
+    // DUAL_BRANCH_ONLY，绑定表与真实边界不一致）。
     if (!isMapped) {
       const method = item.method.toUpperCase();
-      const translateInput = method === 'PATCH'
-        ? { method, body: { path: 'native:__p__' } }
-        : {};
-      const translated = translate(placeholder + (method === 'GET' ? '?path=native%3A__p__' : ''), translateInput);
+      const representativeBody = {
+        path: 'native:__p__', sessionId: '__p__', sessionIds: ['__p__'],
+        title: 'x', pinned: true, maxAgeDays: 30, version: 1,
+        action: 'archive', cwd: '/__cwd__', workspaceMountId: '__m__',
+      };
+      const translateInput = method === 'PATCH' || method === 'POST'
+        ? { method, body: representativeBody }
+        : { method };
+      const query = method === 'GET'
+        ? (placeholder.endsWith('/find') ? '?path=native%3A__p__&q=x' : '?path=native%3A__p__')
+        : '';
+      const translated = translate(placeholder + query, translateInput);
       if (translated && typeof translated.path === 'string') {
         mappedPath = translated.path.split('?')[0].replace(/\/+$/, '');
         isMapped = true;

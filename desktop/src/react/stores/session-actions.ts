@@ -54,6 +54,21 @@ function captureNativeSessionConnection() {
     ? captureSessionConnection() : null;
 }
 
+/**
+ * 置顶时间戳的线上形状归一（R08-C①）：旧 Node 栈投影给 ISO 字符串
+ * pinnedAt；Rust 列表投影给数字 pinnedAt（Unix 毫秒）、pin 响应给
+ * pinnedAtUnixMs。store/组件层（session-sections/SessionList/ws 合并）统一
+ * 消费 string|null，所以在唯一边界（列表映射与 pin 响应）把数字归一为
+ * ISO 字符串——两种内核写入 store 的形状自此一致。
+ */
+function pinnedAtFromWire(value: unknown): string | null {
+  if (typeof value === 'string' && value.length > 0) return value;
+  if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
+    return new Date(value).toISOString();
+  }
+  return null;
+}
+
 
 export interface SessionRef {
   sessionId: string;
@@ -999,7 +1014,7 @@ export async function loadSessions(): Promise<void> {
     const data = await res.json();
     if (native && (!ownsSessionConnection(owner) || version !== nativeListVersion)) return;
     if (native && (!data || !Array.isArray(data.sessions) || data.sessions.some((item: any) => !item || typeof item.sessionId !== 'string' || item.path !== `native:${item.sessionId}` || typeof item.revision !== 'string'))) throw new Error('会话列表格式无效，已保留原列表');
-    const rows = native ? data.sessions.map((item: any) => ({ ...item, revision: JSON.stringify(item.revision), modified: typeof item.modified === 'number' ? new Date(item.modified).toISOString() : null })) : data;
+    const rows = native ? data.sessions.map((item: any) => ({ ...item, revision: JSON.stringify(item.revision), modified: typeof item.modified === 'number' ? new Date(item.modified).toISOString() : null, pinnedAt: pinnedAtFromWire(item.pinnedAt) })) : data;
     const serverSessions = Array.isArray(rows) ? rows.map(normalizeServerSessionProjection) : [];
     const localSessions = useStore.getState().sessions || [];
     const sessions = mergeSessionsWithOptimisticFirstMessages(serverSessions, localSessions);
@@ -1425,9 +1440,16 @@ export async function switchSession(path: string): Promise<void> {
     // 切换会话后刷新 context ring
     useStore.setState({ contextTokens: null, contextWindow: null, contextPercent: null });
     import('../services/websocket').then(({ getWebSocket, requestTerminalSnapshotForCurrentSession }) => {
+      if (myVersion !== _switchVersion || (native && !ownsSessionConnection(owner))) return;
+      // R08 收尾（D01）：context_usage 与 terminal_snapshot_request 都是旧内核
+      // wire 帧，Rust 不认（close 1008 invalid_message）——Rust 预览下每次会话
+      // 切换都会打断聊天连接（t07 ab run-19 实证 terminal 帧同样非法）。终端
+      // 快照在 Rust 腿由终端域自己的通道承担（D13）；ContextRing 由 rust 分支
+      // 资源事件维护。
+      const rustWire = resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service';
+      if (rustWire) return;
       // 终端快照走会话切换的通用路径：compact 布局不挂 TerminalCard，没人替它发请求。
       // 服务端快照是幂等单播，与 ws 重连 / TerminalCard 挂载时的重复请求不冲突。
-      if (myVersion !== _switchVersion || (native && !ownsSessionConnection(owner))) return;
       requestTerminalSnapshotForCurrentSession(useStore.getState());
       const wsConn = getWebSocket();
       if (wsConn?.readyState === WebSocket.OPEN) {
@@ -1825,7 +1847,12 @@ export async function continueDeletedAgentSession(path: string): Promise<boolean
       body: JSON.stringify({ path }),
     });
     const data = await res.json();
-    if (!res.ok || data.error || !data.path) {
+    // R08-C②：响应形状适配——旧栈回 path；Rust 回 sessionId（无 path）。
+    // UI 需要可切换的会话定位符，Rust 会话定位符 = native:<sessionId>。
+    const targetPath = typeof data.path === 'string' && data.path
+      ? data.path
+      : (typeof data.sessionId === 'string' && data.sessionId ? `native:${data.sessionId}` : null);
+    if (!res.ok || data.error || !targetPath) {
       const routeError = normalizeSessionRouteError(data);
       const message = routeError.message || res.statusText || 'continue failed';
       console.error('[session] continue deleted-agent session failed:', message, routeError.code || '');
@@ -1839,7 +1866,7 @@ export async function continueDeletedAgentSession(path: string): Promise<boolean
     }
 
     await loadSessions();
-    await switchSession(data.path);
+    await switchSession(targetPath);
     if (data.compactionError) {
       useStore.getState().addToast(
         `${tr('session.deletedAgent.continueCompactionFailed')}: ${data.compactionError}`,
@@ -2176,7 +2203,11 @@ export async function pinSession(path: string, pinned: boolean): Promise<boolean
       return false;
     }
 
-    const pinnedAt = typeof data.pinnedAt === 'string' ? data.pinnedAt : null;
+    // R08-C①：pin 响应形状归一——Rust 回 pinnedAtUnixMs（数字）/旧栈回
+    // pinnedAt（ISO 字符串）；统一经 pinnedAtFromWire 落 store 为 string|null。
+    const pinnedAt = pinned
+      ? pinnedAtFromWire(data.pinnedAtUnixMs ?? data.pinnedAt ?? null)
+      : null;
     const responseSessionId = normalizeSessionId(data.sessionId) || localSessionId;
     const sessions = useStore.getState().sessions.map(s =>
       (responseSessionId && normalizeSessionId(s.sessionId) === responseSessionId) || s.path === path

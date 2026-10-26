@@ -867,8 +867,11 @@ export class Agent {
       isSessionStreaming: (sp) => {
         try { return this._cb?.getEngine?.()?.isSessionStreaming?.(sp) === true; } catch { return false; }
       },
-      getDeferredStore: () => this._cb?.getEngine?.()?.getDeferredResultStore?.() || null,
-      getTaskRegistry: () => this._cb?.getEngine?.()?.getTaskRegistry?.() || null,
+      // Engine 没有 getDeferredResultStore/getTaskRegistry 方法；延迟账本与任务登记只能
+      // 经 agent 回调（agent-manager 的 getDeferredResults/getTaskRegistry 取值器）拿到，
+      // 否则流式中的已确认回档无法挂起到流结束。
+      getDeferredStore: () => this._cb?.getDeferredResults?.() || null,
+      getTaskRegistry: () => this._cb?.getTaskRegistry?.() || null,
       rewindToCheckpoint: (opts) => {
         const engine = this._cb?.getEngine?.();
         if (!engine?.rewindToCheckpoint) {

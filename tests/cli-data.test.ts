@@ -195,6 +195,24 @@ describe("hana data diagnose — read-only across three home states", () => {
   });
 });
 
+describe("hana data diagnose — corrupt state is reported, never auto-repaired", () => {
+  it("reports a corrupt stamp explicitly and leaves the home untouched (no repair, no fresh store)", async () => {
+    const home = makeHomeDir();
+    // 损坏形态：data-epoch.json 存在但既不是合法印章也不是空对象——
+    // shared/data-epoch.cjs 读回 corrupt。
+    fs.writeFileSync(path.join(home, "data-epoch.json"), "{ this is not json");
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+    const code = await runDataDiagnose({ lingxiHome: home });
+
+    expect(code).toBe(0);
+    const output = stripAnsi(collectOutput(logSpy));
+    expect(output).toMatch(/corrupt/);
+    // 不自动修复：损坏字节原样保留（没有重写成新印章/空库）。
+    expect(fs.readFileSync(path.join(home, "data-epoch.json"), "utf8")).toBe("{ this is not json");
+  });
+});
+
 describe("hana data checkpoints", () => {
   it("prints a friendly message when nothing is available", async () => {
     const home = makeHomeDir();

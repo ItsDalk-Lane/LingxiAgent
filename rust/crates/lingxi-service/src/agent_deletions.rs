@@ -233,7 +233,7 @@ impl MemoryService {
     fn validate_deletion_materials(&self, receipt: &Value) -> Result<(), AgentLifecycleError> {
         let agent = receipt["agentId"].as_str().unwrap();
         let id = receipt["deletionId"].as_str().unwrap();
-        let public_present = directory_present(&self.agents_root().join(agent))?;
+        let public_present = self.public_agent_data_present(agent)?;
         let staged_present = directory_present(&self.deletion_transaction(id)?.join("data"))?;
         let consistent = match receipt["status"].as_str().unwrap() {
             "prepared" => public_present != staged_present,
@@ -248,6 +248,26 @@ impl MemoryService {
             ));
         }
         Ok(())
+    }
+    /// 公共路径只剩 `.deleted-agent.json` 墓碑（R08 收尾续接接缝）视为已无
+    /// agent 数据——墓碑是删除事实的载体，不是残留 agent。
+    fn public_agent_data_present(&self, agent: &str) -> Result<bool, AgentLifecycleError> {
+        let dir = self.agents_root().join(agent);
+        if !directory_present(&dir)? {
+            return Ok(false);
+        }
+        let mut entries = std::fs::read_dir(&dir).map_err(io_error)?;
+        loop {
+            match entries.next() {
+                Some(Ok(entry)) => {
+                    if entry.file_name().to_string_lossy() != ".deleted-agent.json" {
+                        return Ok(true);
+                    }
+                }
+                Some(Err(error)) => return Err(io_error(error)),
+                None => return Ok(false),
+            }
+        }
     }
     // 首份收据之前崩溃只能留下空目录或未发布收据；不碰任何带data/未知文件的目录。
     fn unpublished_intent(&self, dir: &Path) -> Result<bool, AgentLifecycleError> {
@@ -478,6 +498,23 @@ impl MemoryService {
                 receipt["cleanupPending"] = json!(true);
                 receipt["referencesPending"] = json!(true);
                 receipt["status"] = json!("committed");
+                // R08 收尾（continue-deleted-agent 接缝）：现役删除语义在原位留
+                // `.deleted-agent.json` 墓碑（旧栈 _deletedAgentTombstonePath），
+                // is_agent_deleted_checked / scan_live_agent_dirs / 续接路由都以它
+                // 判定"已删"。目录移入事务后公共路径补写墓碑，删除事实经同一
+                // 约定对全路由可见；写失败按 journalError 如实记录不静默。
+                let tombstone = dir.join(".deleted-agent.json");
+                let tombstone_body = serde_json::json!({
+                    "schemaVersion": 1,
+                    "agentId": agent,
+                    "deletionId": receipt["deletionId"],
+                    "logicalDeleted": true,
+                });
+                if let Err(error) = std::fs::create_dir_all(&dir)
+                    .and_then(|_| std::fs::write(&tombstone, format!("{tombstone_body}\n")))
+                {
+                    receipt["tombstoneError"] = json!(error.to_string());
+                }
                 if let Err(error) =
                     sync_dir(&self.agents_root()).and_then(|_| sync_dir(&transaction))
                 {

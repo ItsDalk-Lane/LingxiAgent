@@ -755,6 +755,12 @@ fn permission_default_raw(memory: &MemoryService) -> String {
         .unwrap_or_else(|| "auto".into())
 }
 
+/// 新会话默认权限模式（偏好 `session_permission_mode_default`，缺省/非法 → "auto"）。
+/// 供会话创建把请求的 "auto"（默认域取值）解析为具体模式（session_focus）。
+pub(crate) fn permission_default_mode(memory: &MemoryService) -> String {
+    permission_default_raw(memory)
+}
+
 fn current_session_id(memory: &MemoryService) -> Option<String> {
     memory
         .read_preferences_root()
@@ -881,6 +887,119 @@ pub async fn session_permission_mode_post_route(
             let mut body = permission_mode_state(normalized);
             body["ok"] = json!(true);
             body["defaultMode"] = json!(normalized);
+            Json(body).into_response()
+        }
+        Err(response) => response,
+    }
+}
+
+// ── R08 收尾（D04 叶 BC2FBD618278/A336F79E964D）：旧 /api/plan-mode 的组合端口 ──
+// 现役语义：GET 返回 {enabled(=planMode), mode, accessMode, locked}；POST 无
+// mode 时由 !!enabled 切 planMode（=read_only），有 mode 时走会话权限模式。
+// Rust 的 planMode 投影 = 当前会话权限模式为 read_only（sessions.rs switch
+// 投影同口径：planMode: mode=="read_only"）。
+
+fn plan_mode_state(mode: &str) -> Value {
+    json!({
+        "enabled": mode == "read_only",
+        "mode": mode,
+        "accessMode": if mode == "read_only" { "read_only" } else { "operate" },
+        "locked": false,
+    })
+}
+
+async fn current_permission_mode(state: &ServiceState) -> String {
+    let default = permission_default_raw(state.memory());
+    match current_session_id(state.memory()) {
+        Some(sid) => state
+            .session_admin()
+            .get_session_row(&sid)
+            .await
+            .ok()
+            .flatten()
+            .and_then(|row| row.permission_mode)
+            .unwrap_or(default),
+        None => default,
+    }
+}
+
+pub async fn plan_mode_get_route(State(state): State<ServiceState>) -> Response {
+    let mode = current_permission_mode(&state).await;
+    Json(plan_mode_state(&mode)).into_response()
+}
+
+pub async fn plan_mode_post_route(
+    axum::Extension(principal): axum::Extension<crate::auth::Principal>,
+    State(state): State<ServiceState>,
+    body: axum::body::Bytes,
+) -> Response {
+    let payload: Value = match serde_json::from_slice(&body) {
+        Ok(value) => value,
+        Err(_) => json!({}),
+    };
+    // 有 mode 走会话权限模式语义（旧栈同款优先级）；无 mode 由 !!enabled 切
+    // read_only/operate。enabled 非布尔且无 mode → 400（现役 ok=false 分支）。
+    let requested_mode = payload.get("mode").and_then(Value::as_str).map(str::to_string);
+    let mode = match requested_mode {
+        Some(mode) => {
+            if !matches!(mode.as_str(), "auto" | "operate" | "ask" | "read_only") {
+                return EndpointError::invalid_message("mode must be auto|operate|ask|read_only")
+                    .into_response();
+            }
+            mode
+        }
+        None => match payload.get("enabled") {
+            Some(Value::Bool(enabled)) => {
+                if *enabled { "read_only".to_string() } else { "operate".to_string() }
+            }
+            _ => {
+                return EndpointError::invalid_message(
+                    "plan mode requires a boolean enabled or a mode string",
+                )
+                .into_response()
+            }
+        },
+    };
+    // 会话级生效：read_only/operate/ask 写当前会话；auto 归默认域（下一会话）。
+    if mode != "auto" {
+        let Some(session_id) = current_session_id(state.memory()) else {
+            return (
+                StatusCode::CONFLICT,
+                Json(json!({
+                    "ok": false,
+                    "error": "plan mode requires an active session",
+                })),
+            )
+                .into_response();
+        };
+        let Some(parsed) = lingxi_kernel::subagent::SessionPermissionMode::parse(&mode) else {
+            return EndpointError::invalid_message("auto applies to the default; pick operate/ask/read_only for this session")
+                .into_response();
+        };
+        return match state
+            .sessions()
+            .set_permission_mode_for(&principal, &session_id, parsed)
+            .await
+        {
+            Ok(()) => {
+                let mut body = plan_mode_state(parsed.wire_name());
+                body["ok"] = json!(true);
+                Json(body).into_response()
+            }
+            Err(error) => (
+                StatusCode::FORBIDDEN,
+                Json(json!({ "ok": false, "error": format!("{error:?}") })),
+            )
+                .into_response(),
+        };
+    }
+    match state
+        .memory()
+        .set_session_permission_default(json!({ "permissionMode": mode }))
+    {
+        Ok(_) => {
+            let mut body = plan_mode_state("auto");
+            body["ok"] = json!(true);
             Json(body).into_response()
         }
         Err(response) => response,

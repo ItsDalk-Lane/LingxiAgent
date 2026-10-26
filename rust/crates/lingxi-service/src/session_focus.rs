@@ -191,10 +191,22 @@ pub(crate) async fn create_locked(
     }
     let mut roots = cwd.clone().into_iter().collect::<Vec<_>>();
     roots.extend(folders.clone());
-    let mode = body.permission_mode.as_deref().unwrap_or("operate");
+    // R08 收尾（真实 UI 流 createNewSession→ensureSession 在 Rust 腿 400 实证）：
+    // 旧栈接受 permissionMode:"auto"（= 沿用默认域取值，不显式覆盖会话权限）；
+    // 客户端默认偏好即 auto。kernel 枚举无 Auto，按 userprefs 既定裁决
+    // 「会话级 auto 为默认域取值」把 auto 解析为默认偏好的具体模式；默认偏好
+    // 本身为 auto 时取 operate（auto=自动放行，与 accessMode operate 同口径）。
+    let requested_mode = body.permission_mode.as_deref().unwrap_or("operate");
+    let resolved_default;
+    let mode = if requested_mode == "auto" {
+        resolved_default = crate::userprefs::permission_default_mode(state.memory());
+        if resolved_default == "auto" { "operate" } else { resolved_default.as_str() }
+    } else {
+        requested_mode
+    };
     if lingxi_kernel::subagent::SessionPermissionMode::parse(mode).is_none() {
         return Err((EndpointError::invalid_message(
-            "permissionMode must be operate, ask or read_only",
+            "permissionMode must be auto, operate, ask or read_only",
         )
         .into_response())
         .into());

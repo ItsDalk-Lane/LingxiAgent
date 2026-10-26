@@ -25,9 +25,10 @@ function serviceRoute(connection: { serverNodeKind?: string }, path: string): st
     || /^\/api\/speech-recognition(?:[/?]|$)/.test(path)
     || /^\/api\/file-history(?:[/?]|$)/.test(path)
     || /^\/api\/session-projects(?:[/?]|$)/.test(path)
-    || /^\/api\/sessions\/(?:search|find|new-detached)(?:[/?]|$)/.test(path)
+    || /^\/api\/sessions\/(?:search|new-detached)(?:[/?]|$)/.test(path)
     || /^\/api\/session-thinking-level(?:[/?]|$)/.test(path)
     || /^\/api\/session-permission-mode(?:[/?]|$)/.test(path)
+    || /^\/api\/plan-mode(?:[/?]|$)/.test(path)
     || /^\/api\/preferences\/appearance(?:[/?]|$)/.test(path)
     || /^\/api\/preferences\/workspace-ui-state(?:[/?]|$)/.test(path)
     || /^\/api\/system\/env-deps(?:\/refresh)?(?:[/?]|$)/.test(path)
@@ -109,6 +110,23 @@ export function translateLegacySessionCall(
         return sid ? rust(path.slice('/api/sessions/'.length), { sessionId: sid, ...(bodyRecord.version != null ? { version: bodyRecord.version } : {}) }) : null;
       case '/api/sessions/fresh-compact':
         return sid ? { path: `/lingxi/v1/sessions/${encodeURIComponent(sid)}/fresh-compact`, body: {} } : null;
+      // R08 收尾：重试前回退预览（现役 sessions.ts:1623）——Rust 补齐对应面
+      // /sessions/{id}/turns/rollback-preview（只读：偏好/检查点/文件清单）。
+      case '/api/sessions/turns/rollback-preview':
+        return sid ? { path: `/lingxi/v1/sessions/${encodeURIComponent(sid)}/turns/rollback-preview`, body: { targetMessageId: bodyRecord.targetMessageId ?? null } } : null;
+      // R08-C②：续接已删 Agent 会话——旧栈 body 携 path（native:<id> 或旧
+      // JSONL）；Rust 路由收 sessionId。响应适配（path 字段）在
+      // continueDeletedAgentSession 动作内完成（UI 要求返回 path 供切换）。
+      case '/api/sessions/continue-deleted-agent':
+        return sid ? rust('continue-deleted-agent', { sessionId: sid }) : null;
+      // R08-C②：工作台处置——body 形状两侧一致（workspaceMountId/cwd/action），
+      // 仅路由名翻译；响应 {ok, matched, disposed, skippedStreaming} 两侧同形。
+      case '/api/sessions/workspace-disposal':
+        return rust('workspace-disposal', {
+          ...(bodyRecord.workspaceMountId != null ? { workspaceMountId: bodyRecord.workspaceMountId } : {}),
+          ...(bodyRecord.cwd != null ? { cwd: bodyRecord.cwd } : {}),
+          ...(bodyRecord.action != null ? { action: bodyRecord.action } : {}),
+        });
       default:
         break;
     }
@@ -141,7 +159,11 @@ export function translateLegacySessionCall(
     return encoded ? `?${encoded}` : '';
   };
   const id = encodeURIComponent(sessionId);
-  const readMatch = path.match(/^\/api\/sessions\/(summary|memory|prompt-snapshot|history-overview|authorized-folders)(?:\?|$)/);
+  // R08-C③（D-10 关闭）：会话内文本查找 /api/sessions/find?path=native:<id>&q=
+  // → Rust 子路由 /lingxi/v1/sessions/{id}/find?q=（现役 sessions.ts:947 语义：
+  // 命中位置/tokens/bestIndex/revision；Bridge 会话脱敏在 Rust 路由内）。
+  // 此前被 serviceRoute 粗映射到行定位路由 /lingxi/v1/sessions/find（拒 q 键 400）。
+  const readMatch = path.match(/^\/api\/sessions\/(summary|memory|prompt-snapshot|history-overview|authorized-folders|find)(?:\?|$)/);
   if (readMatch && method === 'GET') {
     return { path: `/lingxi/v1/sessions/${id}/${readMatch[1]}${keepQuery()}` };
   }

@@ -2132,6 +2132,22 @@ impl ToolRegistry {
             };
             permission.capability_base = format!("checkpoint.{action}");
         }
+        // session_folders（现役 shared/tool-categories SESSION_FOLDERS_TOOL_READ_ACTIONS
+        // + firstPartyDeferredInvocation）：list 只读；add/remove 为写类——operate
+        // 预批、ask 经审批、read_only 拒；变更只作用于当前会话的授权目录。
+        if permission.kind == PermissionKind::ArgumentAwareSessionFolders {
+            let action = effective
+                .as_value()
+                .get("action")
+                .and_then(serde_json::Value::as_str)
+                .unwrap_or("list");
+            permission.kind = if action == "list" {
+                PermissionKind::Read
+            } else {
+                PermissionKind::Execute
+            };
+            permission.capability_base = format!("session_folders.{action}");
+        }
         if permission.kind == PermissionKind::ArgumentAwareFile {
             let action = effective
                 .as_value()

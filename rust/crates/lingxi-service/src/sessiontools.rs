@@ -648,9 +648,33 @@ pub async fn answer_route(
         answer,
     );
     match outcome {
-        crate::approval_service::AnswerOutcome::Settled(decision)|crate::approval_service::AnswerOutcome::AlreadySettled(decision)=>axum::Json(json!({"ok":true,"decision":if matches!(decision,crate::approval_service::Answer::Approve){"confirmed"}else{"rejected"}})).into_response(),
-        crate::approval_service::AnswerOutcome::Refused{reason}=>crate::EndpointError::new(axum::http::StatusCode::CONFLICT,ErrorCode::Conflict,reason).into_response(),
+        crate::approval_service::AnswerOutcome::Settled(decision)=>{
+            publish_confirmation_resolved(&state,&sid,&id,&decision);
+            axum::Json(json!({"ok":true,"decision":if matches!(decision,crate::approval_service::Answer::Approve){"confirmed"}else{"rejected"}})).into_response()
+        }
+        crate::approval_service::AnswerOutcome::AlreadySettled(_)=>crate::EndpointError::new(axum::http::StatusCode::NOT_FOUND,ErrorCode::NotFound,"confirmation not found or already resolved").into_response(),
+        crate::approval_service::AnswerOutcome::Refused{reason}=>crate::EndpointError::new(axum::http::StatusCode::NOT_FOUND,ErrorCode::NotFound,format!("confirmation not found or already resolved: {reason}")).into_response(),
     }
+}
+
+/// 现役 confirm 路由/斜杠命令在 resolve 后广播 `confirmation_resolved`
+/// （server/routes/confirm.ts:43、bridge-commands.ts:333）。Rust 侧 app 级事件
+/// 面同名映射（appevents 面板：`confirmation-resolved`），载荷携带会话、
+/// 确认 ID 与决策，供 UI/桥按游标消费。
+pub fn publish_confirmation_resolved(
+    state: &crate::ServiceState,
+    session_id: &str,
+    approval_id: &str,
+    decision: &crate::approval_service::Answer,
+) {
+    state.app_events().publish(
+        "confirmation-resolved",
+        json!({
+            "sessionId": session_id,
+            "confirmId": approval_id,
+            "action": if matches!(decision, crate::approval_service::Answer::Approve) { "confirmed" } else { "rejected" },
+        }),
+    );
 }
 
 #[cfg(test)]

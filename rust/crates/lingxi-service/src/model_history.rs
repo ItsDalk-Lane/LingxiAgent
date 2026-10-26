@@ -40,6 +40,23 @@ fn corrupt(detail: impl Into<String>) -> StorageError {
         detail: format!("model_history: {}", detail.into()),
     }
 }
+/// 用户收尾动作写入的待办状态条目（todos 路由 complete/cancel/dismiss，
+/// 无源 Run）。它与工具写入的 todo-state-v1 同类型但不是模型产物；模型
+/// 上下文投影按现役 lingxi.todo_state source:"user" 的口径恒定排除。
+fn is_user_todo_state_action(entry_type: &str, content_json: &str) -> bool {
+    if entry_type != crate::todos::TODO_STATE_ENTRY_TYPE {
+        return false;
+    }
+    serde_json::from_str::<Value>(content_json)
+        .ok()
+        .and_then(|v| v["action"].as_str().map(str::to_owned))
+        .is_some_and(|action| {
+            matches!(
+                action.as_str(),
+                "complete_all" | "cancel_remaining" | "dismiss"
+            )
+        })
+}
 fn str_field<'a>(v: &'a Value, key: &str) -> Result<&'a str, StorageError> {
     v[key]
         .as_str()
@@ -47,6 +64,21 @@ fn str_field<'a>(v: &'a Value, key: &str) -> Result<&'a str, StorageError> {
 }
 fn decode<T: serde::de::DeserializeOwned>(v: &Value) -> Result<T, StorageError> {
     serde_json::from_value(v.clone()).map_err(|e| corrupt(e.to_string()))
+}
+
+/// 把消息行 JSON 投影到模型上下文消费的规范化键（role/content/modelCallId，
+/// 另保留 modelText/text 供用户文本快路径）。只在对象含其他键时裁剪——T04
+/// 迁移行全字段透传旧条目原文；Rust 原生行恒为规范形状，不受影响。
+fn project_normalized_message(value: Value) -> Value {
+    const KEEP: [&str; 5] = ["role", "content", "modelCallId", "modelText", "text"];
+    match value {
+        Value::Object(map) if map.keys().any(|k| !KEEP.contains(&k.as_str())) => Value::Object(
+            map.into_iter()
+                .filter(|(k, _)| KEEP.contains(&k.as_str()))
+                .collect(),
+        ),
+        other => other,
+    }
 }
 
 // 当前读取权限和原始执行身份分别验证：本地主人可读所有会话，其余主体精确归属。
@@ -890,6 +922,14 @@ impl ModelHistory {
             if row.entry_type == crate::loopx::LOOP_USER_PROMPT_MESSAGE_TYPE {
                 continue;
             }
+            // R08 收尾（t07 ab run-07 实证 fresh-compact 500）：T04 转换把 Pi 的
+            // model_change/compaction 等控制条目物化为 `legacy-unknown-block`
+            // 标记行（原字节归档隔离，展示层以不透明块呈现）。真实旧栈会话几乎
+            // 都含 model_change，若在此判"损坏"则所有迁移真实会话都无法压缩/
+            // 续聊。它不是对话内容，模型上下文按控制类同口径排除。
+            if row.entry_type == "legacy-unknown-block" {
+                continue;
+            }
             if matches!(
                 row.entry_type.as_str(),
                 "todo-state-v1"
@@ -897,6 +937,14 @@ impl ModelHistory {
                     | "interactive-answer-v1"
                     | "interactive-card-v1"
             ) {
+                // 用户收尾动作（todos 路由 complete/cancel/dismiss）写入的
+                // todo-state-v1 没有源 Run：它是会话内 UI 状态（现役以
+                // lingxi.todo_state 自定义消息 source:"user" 追加，模型上下文恒定
+                // 排除），不是模型/工具产物。只有 action 属用户动作集时才按无 Run
+                // 条目跳过；其余无 Run 的交互条目仍按损坏拒绝。
+                if row.run_id.is_none() && is_user_todo_state_action(&row.entry_type, &row.content_json) {
+                    continue;
+                }
                 let source_run = row
                     .run_id
                     .as_deref()
@@ -928,6 +976,11 @@ impl ModelHistory {
             }
             let value: Value =
                 serde_json::from_str(&row.content_json).map_err(|e| corrupt(e.to_string()))?;
+            // R08 收尾（t07 ab run-08 实证 `unknown field id`）：T04 转换的消息行按
+            // 设计全字段透传旧条目原文（id/parentId/timestamp/type/message…供展示
+            // 层保真），而模型上下文只消费规范化 {role, content, modelCallId}。
+            // 对带额外键的行投影到规范化三键再解码；Rust 原生行无额外键，零变化。
+            let value = project_normalized_message(value);
             match row.role.as_str() {
                 "user" => {
                     let text = if let Some(text) = value
@@ -1392,6 +1445,8 @@ impl ModelHistory {
                 .map(|(_, child)| child)
                 .collect();
         // 本次输入之后只能有本Run档案/正文和绑定child正文；新reset或其它writer不能混入。
+        // 例外：用户收尾动作的 todo-state-v1（无源 Run；现役 dismiss 在流式中可用）
+        // 是会话 UI 状态，不改变模型上下文，不视为分支被改写。
         if chain[input_index + 1..].iter().any(|r| {
             !(r.entry_type == ENTRY_TYPE
                 && r.message_id
@@ -1403,6 +1458,7 @@ impl ModelHistory {
                         | "interactive-answer-v1"
                         | "interactive-card-v1"
                 ) && r.run_id.as_deref() == Some(ctx.run_id.as_str()))
+                && !(r.run_id.is_none() && is_user_todo_state_action(&r.entry_type, &r.content_json))
                 && !(r.entry_type == "message"
                     && (r.run_id.as_deref() == Some(ctx.run_id.as_str())
                         || r.run_id.as_ref().is_some_and(|id| children.contains(id))

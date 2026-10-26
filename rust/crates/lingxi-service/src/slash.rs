@@ -638,6 +638,90 @@ pub async fn dispatch(
                 Err(e) => send(&tx, id, target, "error", e).await,
             }
         }
+        "/new" => {
+            // R08 收尾（叶 485B2D0A8A02）：现役 core/slash-commands/bridge-commands.ts
+            // 的 /new —— rotate 合约三态（not-found / no-history / 归档轮换）。
+            // 接管态拒绝，与 /reset 同口径。
+            if attachment.is_some() {
+                send(
+                    &tx,
+                    id,
+                    target,
+                    "error",
+                    "接管桌面会话期间禁止使用 /new，请先退出接管",
+                )
+                .await;
+                return;
+            }
+            match lingxi_adapters::storage::session_tree::get_session_row(state.storage(), target)
+                .await
+            {
+                Ok(Some(_)) => {}
+                Ok(None) => {
+                    send(&tx, id, target, "success", "未找到当前会话").await;
+                    return;
+                }
+                Err(e) => {
+                    send(&tx, id, target, "error", format!("读取会话失败：{e}")).await;
+                    return;
+                }
+            }
+            let has_history = lingxi_adapters::storage::session_tree::branch_has_display_messages(
+                state.storage(),
+                target,
+            )
+            .await
+            .unwrap_or(false);
+            if let Err(e) = state
+                .session_admin
+                .archive_session(target, None, state.clock().now_unix_ms())
+                .await
+            {
+                let text = match e {
+                    crate::session_admin::SessionAdminError::Busy => {
+                        "会话忙碌，请稍后再试".to_string()
+                    }
+                    other => format!("归档失败：{other:?}"),
+                };
+                send(&tx, id, target, "error", text).await;
+                return;
+            }
+            let new_session_id = crate::fresh_session_id(state.clock().now_unix_ms());
+            if let Err(e) = state
+                .session_admin
+                .create_session(
+                    &new_session_id,
+                    &target_facts.agent_id,
+                    &target_facts.owner_user_id,
+                    "新会话",
+                    None,
+                    &[],
+                    true,
+                    state.clock().now_unix_ms(),
+                )
+                .await
+            {
+                send(&tx, id, target, "error", format!("新建失败：{e:?}")).await;
+                return;
+            }
+            if let Err(e) = state.memory().set_current_session(&new_session_id) {
+                send(&tx, id, target, "error", format!("焦点切换失败：{e}")).await;
+                return;
+            }
+            state.app_events().publish(
+                "session-created",
+                json!({"sessionId": new_session_id, "agentId": target_facts.agent_id, "rotatedFrom": target}),
+            );
+            state
+                .app_events()
+                .publish("session-archived", json!({"sessionId": target}));
+            let text = if has_history {
+                "已开启新会话，旧会话已归档"
+            } else {
+                "已开启新会话（之前无历史记录）"
+            };
+            send(&tx, id, target, "success", text).await;
+        }
         "/reset" | "/clear" => {
             if attachment.is_some() {
                 send(
@@ -684,6 +768,54 @@ pub async fn dispatch(
         "/stop" | "/abort" | "/halt" => {
             for (level, text) in stop_run_texts(state, principal, target).await {
                 send(&tx, id, target, level, text).await;
+            }
+        }
+        // 现役 core/slash-commands/bridge-commands.ts 的 /confirm(/approve) 与
+        // /reject(/deny)（permission:"owner"；_resolvePendingConfirmation 逐字文本）。
+        // 待批记录归属已由 approval service 按主体×会话绑定；ID 缺失/不存在/已处理
+        // 均不重复决策，不执行原动作。
+        "/confirm" | "/approve" | "/reject" | "/deny" => {
+            let confirmed = matches!(command.as_str(), "/confirm" | "/approve");
+            if !principal.is_local_owner() {
+                send(&tx, id, target, "error", "处理待确认请求需要本机所有者权限").await;
+                return;
+            }
+            let Some(approval_id) = args.split_whitespace().next() else {
+                let usage = if confirmed { "用法：/confirm <确认ID>" } else { "用法：/reject <确认ID>" };
+                send(&tx, id, target, "error", usage).await;
+                return;
+            };
+            let Some(service) = state.approvals.as_ref() else {
+                send(&tx, id, target, "error", "确认系统未初始化").await;
+                return;
+            };
+            let answer = if confirmed {
+                crate::approval_service::Answer::Approve
+            } else {
+                crate::approval_service::Answer::Reject {
+                    reason: "user rejected the action".into(),
+                }
+            };
+            let outcome = service.answer_for_principal(
+                &crate::sessions::kernel_principal_of(principal),
+                target,
+                approval_id,
+                answer,
+            );
+            match outcome {
+                crate::approval_service::AnswerOutcome::Settled(decision) => {
+                    crate::sessiontools::publish_confirmation_resolved(state, target, approval_id, &decision);
+                    let text = if matches!(decision, crate::approval_service::Answer::Approve) {
+                        "已确认，正在继续处理。"
+                    } else {
+                        "已拒绝，已取消这次请求。"
+                    };
+                    send(&tx, id, target, "success", text).await;
+                }
+                crate::approval_service::AnswerOutcome::AlreadySettled(_)
+                | crate::approval_service::AnswerOutcome::Refused { .. } => {
+                    send(&tx, id, target, "error", "确认请求不存在或已处理").await;
+                }
             }
         }
         // 现役 core/slash-commands/bridge-commands.ts 的 /loop

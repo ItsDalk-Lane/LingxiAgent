@@ -756,6 +756,78 @@ impl SessionService {
             })
         })?
     }
+
+    /// R08 收尾（叶 477DA3D558B8，现役 /api/sessions/turns/rollback-preview）：
+    /// 只读预览重试轮次的分支重置点与工作区文件影响——不写状态、不动文件、
+    /// 不发布事件。偏好关→enabled:false + file_rollback_disabled（现役首个
+    /// 分支同款）；偏好开且目标可解析→检查点存在时列受影响文件（path+status），
+    /// 无检查点→available:false/no_turn_checkpoint。目标不在分支→400（响亮）。
+    pub async fn preview_turn_rollback(
+        &self,
+        session_id: &str,
+        target_message_id: Option<&str>,
+        file_rollback_enabled: bool,
+    ) -> Result<serde_json::Value, SessionTreeError> {
+        let rows = store::list_branch_messages(&self.storage, session_id)
+            .await
+            .map_err(SessionTreeError::from)?;
+        let nodes: Vec<(String, Option<String>, String)> = rows
+            .iter()
+            .filter(|m| m.entry_type == "message")
+            .map(|m| {
+                (
+                    m.message_id.clone(),
+                    m.parent_message_id.clone(),
+                    m.role.clone(),
+                )
+            })
+            .collect();
+        let point = logic::resolve_retry_reset_point(&as_logic_nodes(&nodes), target_message_id)?;
+        if !file_rollback_enabled {
+            return Ok(serde_json::json!({
+                "ok": true, "enabled": false, "available": false, "degraded": false,
+                "commit": serde_json::Value::Null, "reason": "file_rollback_disabled",
+                "turnInputEntryId": point.turn_input_message_id,
+                "fileCount": 0, "files": [],
+            }));
+        }
+        let anchor = store::find_checkpoint_by_turn_input(
+            &self.storage,
+            session_id,
+            &point.turn_input_message_id,
+        )
+        .await
+        .map_err(SessionTreeError::from)?;
+        let Some(cp) = anchor else {
+            return Ok(serde_json::json!({
+                "ok": true, "enabled": true, "available": false, "degraded": false,
+                "commit": serde_json::Value::Null, "reason": "no_turn_checkpoint",
+                "turnInputEntryId": point.turn_input_message_id,
+                "fileCount": 0, "files": [],
+            }));
+        };
+        let versions = store::list_file_versions(&self.storage, &cp.checkpoint_id)
+            .await
+            .map_err(SessionTreeError::from)?;
+        let files: Vec<serde_json::Value> = versions
+            .iter()
+            .map(|v| {
+                serde_json::json!({
+                    "path": v.file_path,
+                    "status": "would_restore",
+                    "sha256": v.sha256,
+                    "sizeBytes": v.size_bytes,
+                })
+            })
+            .collect();
+        let count = files.len();
+        Ok(serde_json::json!({
+            "ok": true, "enabled": true, "available": true, "degraded": false,
+            "commit": cp.checkpoint_id, "reason": serde_json::Value::Null,
+            "turnInputEntryId": point.turn_input_message_id,
+            "fileCount": count, "files": files,
+        }))
+    }
     pub async fn rewind_to_checkpoint(
         &self,
         sid: &str,

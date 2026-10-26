@@ -9,7 +9,7 @@
  * 前端不需要。
  */
 
-import { TODO_FORMAT_VERSION, TODO_STATE_CUSTOM_TYPE, TODO_TOOL_NAMES } from "./todo-constants";
+import { TODO_FORMAT_VERSION, TODO_STATE_CUSTOM_TYPE, isTodoToolResult } from "./todo-constants";
 import type { TodoItem, TodoStatus } from "../types";
 
 type LegacyTodoItem = { id?: number; text: string; done: boolean };
@@ -228,7 +228,8 @@ export function extractLatestTodoSnapshot(sourceMessages: (MessageLike & { custo
     }
 
     if (m.role !== "toolResult") continue;
-    if (!m.toolName || !TODO_TOOL_NAMES.includes(m.toolName as typeof TODO_TOOL_NAMES[number])) continue;
+    // 按名（todo/todo_write）或 mcp_call 桥接的版本化 todo 载荷形状识别。
+    if (!isTodoToolResult(m.toolName, m.details)) continue;
     const toolSnapshot = snapshotFromToolResult(m);
     if ("invalid" in toolSnapshot) continue;
     return toolSnapshot;

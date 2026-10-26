@@ -973,6 +973,12 @@ fn rb_delta_export(args: &RollbackArgs, journal: &RollbackJournal) -> Result<Vec
         "identitySetSha256": legacy.identity_set_sha256(),
         "legacyCounts": legacy.counts_json(),
         "hashConvention": HASH_CONVENTION_NOTE,
+        // B①：原新根路径（原样 + 规范化两形态）——恢复式再前滚回灌时据此把
+        // managed_cache 附件行的绝对路径重基到恢复根（身份与路径重新关联）。
+        "originNewRoot": args.new_root.display().to_string(),
+        "originNewRootCanonical": std::fs::canonicalize(&args.new_root)
+            .map(|p| p.display().to_string())
+            .unwrap_or_else(|_| args.new_root.display().to_string()),
     });
     let package_dir = args.delta_out.join(&journal.id);
     if package_dir.exists() {
@@ -2147,12 +2153,42 @@ fn collect_outbox_sentinels(tables: &[rollback_delta::TableDelta]) -> Value {
 }
 
 /// 相 4B：delta_import —— 增量回放进恢复根。
+/// B①：从包 lineage.json 读原新根（原样 + 规范化）并构造到恢复根的路径重基。
+/// 旧包（无 originNewRoot 字段）如实返回 None——不猜原根，附件行按原样回灌
+/// 并在收据里以 pathRebased=0 可见。
+fn delta_path_rebase(delta_package: &Path, target: &Path) -> Result<Option<rollback_delta::PathRebase>, String> {
+    let lineage_path = delta_package.join("lineage.json");
+    let lineage: Value = serde_json::from_slice(
+        &std::fs::read(&lineage_path).map_err(|e| format!("read {}: {e}", lineage_path.display()))?,
+    )
+    .map_err(|e| format!("parse lineage.json: {e}"))?;
+    let mut origins: Vec<PathBuf> = Vec::new();
+    for key in ["originNewRoot", "originNewRootCanonical"] {
+        if let Some(value) = lineage.get(key).and_then(Value::as_str) {
+            let path = PathBuf::from(value);
+            if !origins.contains(&path) {
+                origins.push(path);
+            }
+        }
+    }
+    if origins.is_empty() {
+        return Ok(None);
+    }
+    let target_canonical = std::fs::canonicalize(target)
+        .map_err(|e| format!("canonicalize target root {}: {e}", target.display()))?;
+    Ok(Some(rollback_delta::PathRebase {
+        origins,
+        target: target_canonical,
+    }))
+}
+
 fn rf_b_delta_import(args: &ReforwardArgs, journal: &RollbackJournal) -> Result<Vec<(String, Value)>, String> {
     let delta_package = args.delta_package.clone().ok_or("delta-package missing")?;
     let target = PathBuf::from(journal.fact_str("targetRoot")?);
     let (pkg, tables, files) = rollback_delta::read_delta_package(&delta_package)
         .map_err(|e| format!("read delta package: {e}"))?;
-    let mut stats = rollback_delta::apply_db_delta(&target.join(TARGET_DB_RELPATH), &tables)
+    let rebase = delta_path_rebase(&delta_package, &target)?;
+    let mut stats = rollback_delta::apply_db_delta(&target.join(TARGET_DB_RELPATH), &tables, rebase.as_ref())
         .map_err(|e| format!("apply db delta: {e}"))?;
     rollback_delta::apply_files_delta(&delta_package, &target, &files, &mut stats)
         .map_err(|e| format!("apply files delta: {e}"))?;
@@ -2160,6 +2196,10 @@ fn rf_b_delta_import(args: &ReforwardArgs, journal: &RollbackJournal) -> Result<
         ("deltaImport".into(), json!({
             "packageSha256": pkg.package_sha256,
             "stats": stats.totals_json(),
+            "pathRebase": rebase.as_ref().map(|r| json!({
+                "origins": r.origins.iter().map(|p| p.display().to_string()).collect::<Vec<_>>(),
+                "target": r.target.display().to_string(),
+            })),
         })),
         ("sentinelReceipts".into(), collect_outbox_sentinels(&tables)),
     ])
@@ -2172,7 +2212,8 @@ fn rf_b_delta_verify(args: &ReforwardArgs, journal: &RollbackJournal) -> Result<
     let target = PathBuf::from(journal.fact_str("targetRoot")?);
     let (_pkg, tables, files) = rollback_delta::read_delta_package(&delta_package)
         .map_err(|e| format!("read delta package: {e}"))?;
-    let mut stats = rollback_delta::apply_db_delta(&target.join(TARGET_DB_RELPATH), &tables)
+    let rebase = delta_path_rebase(&delta_package, &target)?;
+    let mut stats = rollback_delta::apply_db_delta(&target.join(TARGET_DB_RELPATH), &tables, rebase.as_ref())
         .map_err(|e| format!("second apply db delta: {e}"))?;
     rollback_delta::apply_files_delta(&delta_package, &target, &files, &mut stats)
         .map_err(|e| format!("second apply files delta: {e}"))?;

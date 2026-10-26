@@ -20,7 +20,7 @@
 
 import fs from "fs/promises";
 import { parseSessionEntries, buildSessionContext } from "../pi-sdk/index.ts";
-import { TODO_FORMAT_VERSION, TODO_STATE_CUSTOM_TYPE, TODO_TOOL_NAMES } from "./todo-constants.ts";
+import { TODO_FORMAT_VERSION, TODO_STATE_CUSTOM_TYPE, isTodoToolResult } from "./todo-constants.ts";
 import { createModuleLogger } from "../debug-log.ts";
 import { redactLogValue } from "../log-redactor.ts";
 
@@ -259,7 +259,8 @@ export function extractLatestTodoSnapshot(sourceMessages): TodoSnapshot | null {
     }
 
     if (m.role !== "toolResult") continue;
-    if (!TODO_TOOL_NAMES.includes(m.toolName)) continue;
+    // 按名（todo/todo_write）或 mcp_call 桥接的版本化 todo 载荷形状识别。
+    if (!isTodoToolResult(m.toolName, m.details)) continue;
     const toolSnapshot = snapshotFromToolResult(m);
     if (toolSnapshot.invalid) continue;
     return toolSnapshot as TodoSnapshot;

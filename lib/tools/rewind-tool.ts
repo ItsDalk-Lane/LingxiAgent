@@ -12,6 +12,7 @@ import { Type } from "../pi-sdk/index.ts";
 import { t } from "../i18n.ts";
 import { registerTaskExecution, type TaskExecution, type TaskRegistryClient } from "../tasks/task-execution.ts";
 import { mintTaskId } from "../tasks/task-identity.ts";
+import { getToolSessionPath } from "./tool-session.ts";
 
 const CONFIRM_TIMEOUT_MS = 5 * 60_000;
 const PREVIEW_FILE_CAP = 50;
@@ -49,8 +50,10 @@ export function createRewindTool(deps: RewindToolDeps) {
         capability: "rewind.apply",
       }),
     },
-    async execute(_toolCallId: string, params: any = {}, ..._rest: any[]) {
-      const sessionPath = deps.getSessionPath?.() || null;
+    async execute(_toolCallId: string, params: any = {}, _signal?: any, _onUpdate?: any, ctx?: any) {
+      // 会话归属取执行上下文（tool-session.ts 口径：不依赖焦点回调）——后台/独立
+      // 会话上的回合不得把确认卡与回档打到焦点会话；无 ctx 时回退焦点路径。
+      const sessionPath = getToolSessionPath(ctx) || deps.getSessionPath?.() || null;
       if (!sessionPath) {
         return { isError: true, content: [{ type: "text", text: "no active session — rewind is session-scoped" }] };
       }

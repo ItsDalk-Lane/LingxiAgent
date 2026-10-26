@@ -1,18 +1,18 @@
 {
   "schema": "lingxi.r08.t01-api-binding.v1",
   "generatedBy": "scripts/rust-tauri/r08_t01_api_binding.mjs",
-  "generatedAt": "2026-10-22T11:13:14.490Z",
+  "generatedAt": "2026-10-25T07:52:51.819Z",
   "inputs": {
     "matrix": "docs/rust-tauri/R01/API_COMPAT_MATRIX.json",
     "matrixSha256": "0dce885626ab4d3a4f6f28b050148847d34ba8087fc657740f65995aa4dcf520",
     "useHanaFetch": "desktop/src/react/hooks/use-hana-fetch.ts",
-    "useHanaFetchSha256": "4603f6070f4c5879f8e1ae6c08a0a00fea79030a41bf17a1b353e6860dda561d"
+    "useHanaFetchSha256": "b4d194899cee839ec7752e43b1f6d1a0467b88114c4d605942e788e08157c48d"
   },
   "method": "映射=真实 serviceRoute 求值（TypeScript 转译后调用，未改产品源码）；路由=rust/crates/lingxi-service/src 生产源码 .route 注册扫描（注释剔除）；消费者=desktop/src 字符串字面量形状匹配。绑定表证明引用与映射存在，不是运行时验收。",
-  "rustRouteCount": 420,
+  "rustRouteCount": 421,
   "summary": {
-    "MAPPED_ROUTE_EXISTS": 347,
-    "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY": 38,
+    "MAPPED_ROUTE_EXISTS": 361,
+    "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY": 24,
     "UNMAPPED_NOT_CONSUMED": 32,
     "UNMAPPED_REFERENCED_DIRECT": 6,
     "WS_MAPPED_ROUTE_EXISTS": 1,
@@ -216,10 +216,10 @@
       "module": "agents (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/app-init.ts:252→/api/agents",
+        "desktop/src/react/app-init.ts:258→/api/agents",
         "desktop/src/react/onboarding/onboarding-actions.ts:102→/api/agents",
         "desktop/src/react/quick-chat/QuickChatApp.tsx:281→/api/agents",
-        "desktop/src/react/quick-chat/QuickChatApp.tsx:345→/api/agents",
+        "desktop/src/react/quick-chat/QuickChatApp.tsx:346→/api/agents",
         "desktop/src/react/settings/actions.ts:35→/api/agents",
         "desktop/src/react/settings/overlays/AgentCreateOverlay.tsx:64→/api/agents",
         "desktop/src/react/settings/rust-agents.ts:8→/api/agents",
@@ -235,7 +235,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8679"
+          "rust/crates/lingxi-service/src/lib.rs:8732"
         ]
       }
     },
@@ -247,10 +247,10 @@
       "module": "agents (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/app-init.ts:252→/api/agents",
+        "desktop/src/react/app-init.ts:258→/api/agents",
         "desktop/src/react/onboarding/onboarding-actions.ts:102→/api/agents",
         "desktop/src/react/quick-chat/QuickChatApp.tsx:281→/api/agents",
-        "desktop/src/react/quick-chat/QuickChatApp.tsx:345→/api/agents",
+        "desktop/src/react/quick-chat/QuickChatApp.tsx:346→/api/agents",
         "desktop/src/react/settings/actions.ts:35→/api/agents",
         "desktop/src/react/settings/overlays/AgentCreateOverlay.tsx:64→/api/agents",
         "desktop/src/react/settings/rust-agents.ts:8→/api/agents",
@@ -266,7 +266,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8679"
+          "rust/crates/lingxi-service/src/lib.rs:8732"
         ]
       }
     },
@@ -289,7 +289,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8683"
+          "rust/crates/lingxi-service/src/lib.rs:8736"
         ]
       }
     },
@@ -312,7 +312,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:9025"
+          "rust/crates/lingxi-service/src/lib.rs:9078"
         ]
       }
     },
@@ -328,7 +328,7 @@
         "desktop/src/react/settings/actions.ts:357→/api/agents/switch",
         "desktop/src/react/settings/actions.ts:390→/api/agents/primary",
         "desktop/src/react/settings/overlays/AgentDeleteOverlay.tsx:167→/api/agents/${targetId}",
-        "desktop/src/react/settings/tabs/AgentTab.tsx:143→/api/agents/${agentId}",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:144→/api/agents/${agentId}",
         "desktop/src/react/settings/tabs/agent/AgentCardStack.tsx:249→/api/agents/order"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
@@ -340,7 +340,7 @@
           "DELETE"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8695"
+          "rust/crates/lingxi-service/src/lib.rs:8748"
         ]
       }
     },
@@ -363,7 +363,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8687"
+          "rust/crates/lingxi-service/src/lib.rs:8740"
         ]
       }
     },
@@ -386,7 +386,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8691"
+          "rust/crates/lingxi-service/src/lib.rs:8744"
         ]
       }
     },
@@ -398,14 +398,14 @@
       "module": "agents (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/quick-chat/QuickChatApp.tsx:896→/api/agents/${encodeURIComponent(selectedAgent.id)}/avatar",
+        "desktop/src/react/quick-chat/QuickChatApp.tsx:897→/api/agents/${encodeURIComponent(selectedAgent.id)}/avatar",
         "desktop/src/react/settings/overlays/CropOverlay.tsx:179→/api/agents/${agentId}/avatar",
         "desktop/src/react/settings/tabs/bridge/AgentSelect.tsx:29→/api/agents/${agent.id}/avatar",
         "desktop/src/react/settings/tabs/bridge/AgentSelect.tsx:48→/api/agents/${agent.id}/avatar",
         "desktop/src/react/settings/tabs/bridge/BridgeAgentRow.tsx:55→/api/agents/${agent.id}/avatar",
-        "desktop/src/react/stores/session-actions.ts:1286→/api/agents/${data.agentId}/avatar",
+        "desktop/src/react/stores/session-actions.ts:1303→/api/agents/${data.agentId}/avatar",
         "desktop/src/react/utils/agent-display.tsx:70→/api/agents/${agent.id}/avatar",
-        "desktop/src/react/utils/screenshot.ts:388→/api/agents/${agentId}/avatar"
+        "desktop/src/react/utils/screenshot.ts:395→/api/agents/${agentId}/avatar"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/agents/__p__/avatar",
@@ -418,7 +418,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8947"
+          "rust/crates/lingxi-service/src/lib.rs:9000"
         ]
       }
     },
@@ -430,14 +430,14 @@
       "module": "agents (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/quick-chat/QuickChatApp.tsx:896→/api/agents/${encodeURIComponent(selectedAgent.id)}/avatar",
+        "desktop/src/react/quick-chat/QuickChatApp.tsx:897→/api/agents/${encodeURIComponent(selectedAgent.id)}/avatar",
         "desktop/src/react/settings/overlays/CropOverlay.tsx:179→/api/agents/${agentId}/avatar",
         "desktop/src/react/settings/tabs/bridge/AgentSelect.tsx:29→/api/agents/${agent.id}/avatar",
         "desktop/src/react/settings/tabs/bridge/AgentSelect.tsx:48→/api/agents/${agent.id}/avatar",
         "desktop/src/react/settings/tabs/bridge/BridgeAgentRow.tsx:55→/api/agents/${agent.id}/avatar",
-        "desktop/src/react/stores/session-actions.ts:1286→/api/agents/${data.agentId}/avatar",
+        "desktop/src/react/stores/session-actions.ts:1303→/api/agents/${data.agentId}/avatar",
         "desktop/src/react/utils/agent-display.tsx:70→/api/agents/${agent.id}/avatar",
-        "desktop/src/react/utils/screenshot.ts:388→/api/agents/${agentId}/avatar"
+        "desktop/src/react/utils/screenshot.ts:395→/api/agents/${agentId}/avatar"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/agents/__p__/avatar",
@@ -450,7 +450,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8947"
+          "rust/crates/lingxi-service/src/lib.rs:9000"
         ]
       }
     },
@@ -462,14 +462,14 @@
       "module": "agents (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/quick-chat/QuickChatApp.tsx:896→/api/agents/${encodeURIComponent(selectedAgent.id)}/avatar",
+        "desktop/src/react/quick-chat/QuickChatApp.tsx:897→/api/agents/${encodeURIComponent(selectedAgent.id)}/avatar",
         "desktop/src/react/settings/overlays/CropOverlay.tsx:179→/api/agents/${agentId}/avatar",
         "desktop/src/react/settings/tabs/bridge/AgentSelect.tsx:29→/api/agents/${agent.id}/avatar",
         "desktop/src/react/settings/tabs/bridge/AgentSelect.tsx:48→/api/agents/${agent.id}/avatar",
         "desktop/src/react/settings/tabs/bridge/BridgeAgentRow.tsx:55→/api/agents/${agent.id}/avatar",
-        "desktop/src/react/stores/session-actions.ts:1286→/api/agents/${data.agentId}/avatar",
+        "desktop/src/react/stores/session-actions.ts:1303→/api/agents/${data.agentId}/avatar",
         "desktop/src/react/utils/agent-display.tsx:70→/api/agents/${agent.id}/avatar",
-        "desktop/src/react/utils/screenshot.ts:388→/api/agents/${agentId}/avatar"
+        "desktop/src/react/utils/screenshot.ts:395→/api/agents/${agentId}/avatar"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/agents/__p__/avatar",
@@ -482,7 +482,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8947"
+          "rust/crates/lingxi-service/src/lib.rs:9000"
         ]
       }
     },
@@ -494,14 +494,14 @@
       "module": "agents (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/app-init.ts:265→/api/agents/${encodeURIComponent(bootAgentId)}/config",
+        "desktop/src/react/app-init.ts:271→/api/agents/${encodeURIComponent(bootAgentId)}/config",
         "desktop/src/react/onboarding/onboarding-actions.ts:64→/api/agents/${encodeURIComponent(agentId)}/config",
         "desktop/src/react/settings/helpers.ts:81→/api/agents/${ownerId}/config",
         "desktop/src/react/settings/helpers.ts:101→/api/agents/${agentId}/config",
-        "desktop/src/react/settings/tabs/AgentTab.tsx:112→/api/agents/${agentId}/config",
-        "desktop/src/react/settings/tabs/AgentTab.tsx:356→/api/agents/${agentId}/config",
-        "desktop/src/react/settings/tabs/WorkTab.tsx:115→/api/agents/${selectedAgentId}/config",
-        "desktop/src/react/settings/tabs/WorkTab.tsx:141→/api/agents/${agentId}/config",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:113→/api/agents/${agentId}/config",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:357→/api/agents/${agentId}/config",
+        "desktop/src/react/settings/tabs/WorkTab.tsx:116→/api/agents/${selectedAgentId}/config",
+        "desktop/src/react/settings/tabs/WorkTab.tsx:142→/api/agents/${agentId}/config",
         "desktop/src/react/settings/tabs/agent/AgentMemoryEmbedding.tsx:49→/api/agents/${encodeURIComponent(agentId)}/config",
         "desktop/src/react/settings/tabs/agent/AgentMemoryEmbedding.tsx:91→/api/agents/${encodeURIComponent(agentId)}/config",
         "desktop/src/react/settings/tabs/agent/agent-memory-dream-actions.ts:137→/api/agents/${encodeURIComponent(agentId)}/config"
@@ -517,7 +517,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8897"
+          "rust/crates/lingxi-service/src/lib.rs:8950"
         ]
       }
     },
@@ -529,14 +529,14 @@
       "module": "agents (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/app-init.ts:265→/api/agents/${encodeURIComponent(bootAgentId)}/config",
+        "desktop/src/react/app-init.ts:271→/api/agents/${encodeURIComponent(bootAgentId)}/config",
         "desktop/src/react/onboarding/onboarding-actions.ts:64→/api/agents/${encodeURIComponent(agentId)}/config",
         "desktop/src/react/settings/helpers.ts:81→/api/agents/${ownerId}/config",
         "desktop/src/react/settings/helpers.ts:101→/api/agents/${agentId}/config",
-        "desktop/src/react/settings/tabs/AgentTab.tsx:112→/api/agents/${agentId}/config",
-        "desktop/src/react/settings/tabs/AgentTab.tsx:356→/api/agents/${agentId}/config",
-        "desktop/src/react/settings/tabs/WorkTab.tsx:115→/api/agents/${selectedAgentId}/config",
-        "desktop/src/react/settings/tabs/WorkTab.tsx:141→/api/agents/${agentId}/config",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:113→/api/agents/${agentId}/config",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:357→/api/agents/${agentId}/config",
+        "desktop/src/react/settings/tabs/WorkTab.tsx:116→/api/agents/${selectedAgentId}/config",
+        "desktop/src/react/settings/tabs/WorkTab.tsx:142→/api/agents/${agentId}/config",
         "desktop/src/react/settings/tabs/agent/AgentMemoryEmbedding.tsx:49→/api/agents/${encodeURIComponent(agentId)}/config",
         "desktop/src/react/settings/tabs/agent/AgentMemoryEmbedding.tsx:91→/api/agents/${encodeURIComponent(agentId)}/config",
         "desktop/src/react/settings/tabs/agent/agent-memory-dream-actions.ts:137→/api/agents/${encodeURIComponent(agentId)}/config"
@@ -552,7 +552,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8897"
+          "rust/crates/lingxi-service/src/lib.rs:8950"
         ]
       }
     },
@@ -574,7 +574,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8943"
+          "rust/crates/lingxi-service/src/lib.rs:8996"
         ]
       }
     },
@@ -596,7 +596,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8943"
+          "rust/crates/lingxi-service/src/lib.rs:8996"
         ]
       }
     },
@@ -618,7 +618,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8927"
+          "rust/crates/lingxi-service/src/lib.rs:8980"
         ]
       }
     },
@@ -640,7 +640,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8931"
+          "rust/crates/lingxi-service/src/lib.rs:8984"
         ]
       }
     },
@@ -662,7 +662,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8927"
+          "rust/crates/lingxi-service/src/lib.rs:8980"
         ]
       }
     },
@@ -684,7 +684,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8931"
+          "rust/crates/lingxi-service/src/lib.rs:8984"
         ]
       }
     },
@@ -709,7 +709,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8935"
+          "rust/crates/lingxi-service/src/lib.rs:8988"
         ]
       }
     },
@@ -731,7 +731,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8939"
+          "rust/crates/lingxi-service/src/lib.rs:8992"
         ]
       }
     },
@@ -756,7 +756,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8935"
+          "rust/crates/lingxi-service/src/lib.rs:8988"
         ]
       }
     },
@@ -778,7 +778,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8939"
+          "rust/crates/lingxi-service/src/lib.rs:8992"
         ]
       }
     },
@@ -800,7 +800,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8881"
+          "rust/crates/lingxi-service/src/lib.rs:8934"
         ]
       }
     },
@@ -822,7 +822,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8881"
+          "rust/crates/lingxi-service/src/lib.rs:8934"
         ]
       }
     },
@@ -846,7 +846,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8885"
+          "rust/crates/lingxi-service/src/lib.rs:8938"
         ]
       }
     },
@@ -870,7 +870,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8885"
+          "rust/crates/lingxi-service/src/lib.rs:8938"
         ]
       }
     },
@@ -893,7 +893,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8893"
+          "rust/crates/lingxi-service/src/lib.rs:8946"
         ]
       }
     },
@@ -920,7 +920,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8869"
+          "rust/crates/lingxi-service/src/lib.rs:8922"
         ]
       }
     },
@@ -947,7 +947,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8869"
+          "rust/crates/lingxi-service/src/lib.rs:8922"
         ]
       }
     },
@@ -972,7 +972,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8873"
+          "rust/crates/lingxi-service/src/lib.rs:8926"
         ]
       }
     },
@@ -996,7 +996,7 @@
           "DELETE"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8877"
+          "rust/crates/lingxi-service/src/lib.rs:8930"
         ]
       }
     },
@@ -1110,7 +1110,7 @@
         "desktop/src/react/settings/overlays/CropOverlay.tsx:198→/api/avatar/${role}",
         "desktop/src/react/stores/agent-actions.ts:109→/api/avatar/user",
         "desktop/src/react/stores/agent-actions.ts:112→/api/avatar/agent",
-        "desktop/src/react/utils/screenshot.ts:387→/api/avatar/user"
+        "desktop/src/react/utils/screenshot.ts:394→/api/avatar/user"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/avatar/__p__",
@@ -1123,7 +1123,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8960"
+          "rust/crates/lingxi-service/src/lib.rs:9013"
         ]
       }
     },
@@ -1141,7 +1141,7 @@
         "desktop/src/react/settings/overlays/CropOverlay.tsx:198→/api/avatar/${role}",
         "desktop/src/react/stores/agent-actions.ts:109→/api/avatar/user",
         "desktop/src/react/stores/agent-actions.ts:112→/api/avatar/agent",
-        "desktop/src/react/utils/screenshot.ts:387→/api/avatar/user"
+        "desktop/src/react/utils/screenshot.ts:394→/api/avatar/user"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/avatar/__p__",
@@ -1154,7 +1154,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8960"
+          "rust/crates/lingxi-service/src/lib.rs:9013"
         ]
       }
     },
@@ -1172,7 +1172,7 @@
         "desktop/src/react/settings/overlays/CropOverlay.tsx:198→/api/avatar/${role}",
         "desktop/src/react/stores/agent-actions.ts:109→/api/avatar/user",
         "desktop/src/react/stores/agent-actions.ts:112→/api/avatar/agent",
-        "desktop/src/react/utils/screenshot.ts:387→/api/avatar/user"
+        "desktop/src/react/utils/screenshot.ts:394→/api/avatar/user"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/avatar/__p__",
@@ -1185,7 +1185,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8960"
+          "rust/crates/lingxi-service/src/lib.rs:9013"
         ]
       }
     },
@@ -1197,7 +1197,7 @@
       "module": "bridge (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/app-init.ts:356→/api/bridge/status",
+        "desktop/src/react/app-init.ts:362→/api/bridge/status",
         "desktop/src/react/components/BridgePanel.tsx:95→/api/bridge/status",
         "desktop/src/react/components/BridgePanel.tsx:115→/api/bridge/status",
         "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:288→/api/bridge/status"
@@ -1211,7 +1211,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8087"
+          "rust/crates/lingxi-service/src/lib.rs:8140"
         ]
       }
     },
@@ -1232,7 +1232,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8117"
+          "rust/crates/lingxi-service/src/lib.rs:8170"
         ]
       }
     },
@@ -1253,7 +1253,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8113"
+          "rust/crates/lingxi-service/src/lib.rs:8166"
         ]
       }
     },
@@ -1276,7 +1276,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8119"
+          "rust/crates/lingxi-service/src/lib.rs:8172"
         ]
       }
     },
@@ -1297,7 +1297,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8118"
+          "rust/crates/lingxi-service/src/lib.rs:8171"
         ]
       }
     },
@@ -1318,7 +1318,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8123"
+          "rust/crates/lingxi-service/src/lib.rs:8176"
         ]
       }
     },
@@ -1331,7 +1331,7 @@
       "disposition": "retain",
       "consumers": [
         "desktop/src/react/components/BridgePanel.tsx:116→/api/bridge/sessions",
-        "desktop/src/react/components/right-workspace/SessionRegistryFilesPanel.tsx:493→/api/bridge/sessions"
+        "desktop/src/react/components/right-workspace/SessionRegistryFilesPanel.tsx:494→/api/bridge/sessions"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/bridge/sessions",
@@ -1342,7 +1342,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8127"
+          "rust/crates/lingxi-service/src/lib.rs:8180"
         ]
       }
     },
@@ -1363,7 +1363,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8088"
+          "rust/crates/lingxi-service/src/lib.rs:8141"
         ]
       }
     },
@@ -1386,7 +1386,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8092"
+          "rust/crates/lingxi-service/src/lib.rs:8145"
         ]
       }
     },
@@ -1409,7 +1409,7 @@
       "module": "bridge (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/right-workspace/SessionRegistryFilesPanel.tsx:544→/api/bridge/send-media"
+        "desktop/src/react/components/right-workspace/SessionRegistryFilesPanel.tsx:545→/api/bridge/send-media"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/bridge/send-media",
@@ -1420,7 +1420,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8096"
+          "rust/crates/lingxi-service/src/lib.rs:8149"
         ]
       }
     },
@@ -1441,7 +1441,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8104"
+          "rust/crates/lingxi-service/src/lib.rs:8157"
         ]
       }
     },
@@ -1462,7 +1462,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8105"
+          "rust/crates/lingxi-service/src/lib.rs:8158"
         ]
       }
     },
@@ -1483,7 +1483,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8109"
+          "rust/crates/lingxi-service/src/lib.rs:8162"
         ]
       }
     },
@@ -1505,7 +1505,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:9067"
+          "rust/crates/lingxi-service/src/lib.rs:9120"
         ]
       }
     },
@@ -1527,7 +1527,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:9067"
+          "rust/crates/lingxi-service/src/lib.rs:9120"
         ]
       }
     },
@@ -1898,7 +1898,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8785"
+          "rust/crates/lingxi-service/src/lib.rs:8838"
         ]
       }
     },
@@ -1921,7 +1921,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8806"
+          "rust/crates/lingxi-service/src/lib.rs:8859"
         ]
       }
     },
@@ -1944,7 +1944,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8810"
+          "rust/crates/lingxi-service/src/lib.rs:8863"
         ]
       }
     },
@@ -1967,7 +1967,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8790"
+          "rust/crates/lingxi-service/src/lib.rs:8843"
         ]
       }
     },
@@ -1979,7 +1979,7 @@
       "module": "character-cards (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/settings/tabs/AgentTab.tsx:181→/api/character-cards/export/preview"
+        "desktop/src/react/settings/tabs/AgentTab.tsx:182→/api/character-cards/export/preview"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/character-cards/export/preview",
@@ -1990,7 +1990,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8794"
+          "rust/crates/lingxi-service/src/lib.rs:8847"
         ]
       }
     },
@@ -2011,7 +2011,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8798"
+          "rust/crates/lingxi-service/src/lib.rs:8851"
         ]
       }
     },
@@ -2023,7 +2023,7 @@
       "module": "character-cards (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/settings/tabs/AgentTab.tsx:205→/api/character-cards/export"
+        "desktop/src/react/settings/tabs/AgentTab.tsx:206→/api/character-cards/export"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/character-cards/export",
@@ -2034,7 +2034,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8802"
+          "rust/crates/lingxi-service/src/lib.rs:8855"
         ]
       }
     },
@@ -2057,7 +2057,7 @@
       "module": "checkpoints (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/settings/tabs/SecurityTab.tsx:127→/api/checkpoints"
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:128→/api/checkpoints"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/checkpoints",
@@ -2068,7 +2068,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8582"
+          "rust/crates/lingxi-service/src/lib.rs:8635"
         ]
       }
     },
@@ -2091,7 +2091,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8583"
+          "rust/crates/lingxi-service/src/lib.rs:8636"
         ]
       }
     },
@@ -2112,7 +2112,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8587"
+          "rust/crates/lingxi-service/src/lib.rs:8640"
         ]
       }
     },
@@ -2135,7 +2135,7 @@
           "DELETE"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8593"
+          "rust/crates/lingxi-service/src/lib.rs:8646"
         ]
       }
     },
@@ -2158,15 +2158,15 @@
       "module": "config (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/app-init.ts:251→/api/config",
+        "desktop/src/react/app-init.ts:257→/api/config",
         "desktop/src/react/components/ActivityPanel.tsx:154→/api/config",
         "desktop/src/react/hooks/use-config.ts:36→/api/config",
-        "desktop/src/react/quick-chat/QuickChatApp.tsx:351→/api/config",
+        "desktop/src/react/quick-chat/QuickChatApp.tsx:352→/api/config",
         "desktop/src/react/quick-chat/rust-quick-chat.ts:9→/api/config",
         "desktop/src/react/services/rust-automation.ts:27→/api/config",
         "desktop/src/react/services/rust-settings.ts:5→/api/config",
-        "desktop/src/react/settings/SettingsContent.tsx:464→/api/config",
-        "desktop/src/react/settings/SettingsContent.tsx:570→/api/config",
+        "desktop/src/react/settings/SettingsContent.tsx:466→/api/config",
+        "desktop/src/react/settings/SettingsContent.tsx:573→/api/config",
         "desktop/src/react/settings/tabs/MeTab.tsx:46→/api/config",
         "desktop/src/react/settings/tabs/providers/ApiKeyCredentials.tsx:18→/api/config",
         "desktop/src/react/settings/tabs/providers/ProviderDetail.tsx:88→/api/config",
@@ -2186,7 +2186,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8819"
+          "rust/crates/lingxi-service/src/lib.rs:8872"
         ]
       }
     },
@@ -2208,7 +2208,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:9041"
+          "rust/crates/lingxi-service/src/lib.rs:9094"
         ]
       }
     },
@@ -2230,7 +2230,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:9041"
+          "rust/crates/lingxi-service/src/lib.rs:9094"
         ]
       }
     },
@@ -2251,7 +2251,7 @@
           "DELETE"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:9046"
+          "rust/crates/lingxi-service/src/lib.rs:9099"
         ]
       }
     },
@@ -2276,7 +2276,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:9050"
+          "rust/crates/lingxi-service/src/lib.rs:9103"
         ]
       }
     },
@@ -2301,7 +2301,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:9050"
+          "rust/crates/lingxi-service/src/lib.rs:9103"
         ]
       }
     },
@@ -2313,15 +2313,15 @@
       "module": "config (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/app-init.ts:251→/api/config",
+        "desktop/src/react/app-init.ts:257→/api/config",
         "desktop/src/react/components/ActivityPanel.tsx:154→/api/config",
         "desktop/src/react/hooks/use-config.ts:36→/api/config",
-        "desktop/src/react/quick-chat/QuickChatApp.tsx:351→/api/config",
+        "desktop/src/react/quick-chat/QuickChatApp.tsx:352→/api/config",
         "desktop/src/react/quick-chat/rust-quick-chat.ts:9→/api/config",
         "desktop/src/react/services/rust-automation.ts:27→/api/config",
         "desktop/src/react/services/rust-settings.ts:5→/api/config",
-        "desktop/src/react/settings/SettingsContent.tsx:464→/api/config",
-        "desktop/src/react/settings/SettingsContent.tsx:570→/api/config",
+        "desktop/src/react/settings/SettingsContent.tsx:466→/api/config",
+        "desktop/src/react/settings/SettingsContent.tsx:573→/api/config",
         "desktop/src/react/settings/tabs/MeTab.tsx:46→/api/config",
         "desktop/src/react/settings/tabs/providers/ApiKeyCredentials.tsx:18→/api/config",
         "desktop/src/react/settings/tabs/providers/ProviderDetail.tsx:88→/api/config",
@@ -2341,7 +2341,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8819"
+          "rust/crates/lingxi-service/src/lib.rs:8872"
         ]
       }
     },
@@ -2366,7 +2366,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8863"
+          "rust/crates/lingxi-service/src/lib.rs:8916"
         ]
       }
     },
@@ -2391,7 +2391,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8863"
+          "rust/crates/lingxi-service/src/lib.rs:8916"
         ]
       }
     },
@@ -2414,7 +2414,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8614"
+          "rust/crates/lingxi-service/src/lib.rs:8667"
         ]
       }
     },
@@ -2439,7 +2439,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8610"
+          "rust/crates/lingxi-service/src/lib.rs:8663"
         ]
       }
     },
@@ -2465,7 +2465,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8618"
+          "rust/crates/lingxi-service/src/lib.rs:8671"
         ]
       }
     },
@@ -2488,7 +2488,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8622"
+          "rust/crates/lingxi-service/src/lib.rs:8675"
         ]
       }
     },
@@ -2511,7 +2511,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8626"
+          "rust/crates/lingxi-service/src/lib.rs:8679"
         ]
       }
     },
@@ -2534,7 +2534,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8630"
+          "rust/crates/lingxi-service/src/lib.rs:8683"
         ]
       }
     },
@@ -2557,7 +2557,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8634"
+          "rust/crates/lingxi-service/src/lib.rs:8687"
         ]
       }
     },
@@ -2580,7 +2580,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8638"
+          "rust/crates/lingxi-service/src/lib.rs:8691"
         ]
       }
     },
@@ -2606,7 +2606,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8618"
+          "rust/crates/lingxi-service/src/lib.rs:8671"
         ]
       }
     },
@@ -2631,7 +2631,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8610"
+          "rust/crates/lingxi-service/src/lib.rs:8663"
         ]
       }
     },
@@ -2652,7 +2652,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8642"
+          "rust/crates/lingxi-service/src/lib.rs:8695"
         ]
       }
     },
@@ -2673,7 +2673,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8646"
+          "rust/crates/lingxi-service/src/lib.rs:8699"
         ]
       }
     },
@@ -2696,7 +2696,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8074"
+          "rust/crates/lingxi-service/src/lib.rs:8127"
         ]
       }
     },
@@ -2708,8 +2708,8 @@
       "module": "confirm (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/chat/AssistantMessage.tsx:1276→/api/confirm/${block.confirmId}",
-        "desktop/src/react/components/chat/AssistantMessage.tsx:1302→/api/confirm/${block.confirmId}",
+        "desktop/src/react/components/chat/AssistantMessage.tsx:1277→/api/confirm/${block.confirmId}",
+        "desktop/src/react/components/chat/AssistantMessage.tsx:1303→/api/confirm/${block.confirmId}",
         "desktop/src/react/components/chat/AutolearnLessonCard.tsx:41→/api/confirm/${block.confirmId}",
         "desktop/src/react/components/chat/SettingsConfirmCard.tsx:95→/api/confirm/${confirmId}",
         "desktop/src/react/components/chat/SettingsConfirmCard.tsx:106→/api/confirm/${confirmId}",
@@ -2767,7 +2767,7 @@
       "module": "desk (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/preview/FloatingActions.tsx:219→/api/desk/beautify/status"
+        "desktop/src/react/components/preview/FloatingActions.tsx:220→/api/desk/beautify/status"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/desk/beautify/status",
@@ -2870,7 +2870,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8173"
+          "rust/crates/lingxi-service/src/lib.rs:8226"
         ]
       }
     },
@@ -2893,7 +2893,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8177"
+          "rust/crates/lingxi-service/src/lib.rs:8230"
         ]
       }
     },
@@ -2916,7 +2916,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8181"
+          "rust/crates/lingxi-service/src/lib.rs:8234"
         ]
       }
     },
@@ -2937,7 +2937,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8245"
+          "rust/crates/lingxi-service/src/lib.rs:8298"
         ]
       }
     },
@@ -2958,7 +2958,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8244"
+          "rust/crates/lingxi-service/src/lib.rs:8297"
         ]
       }
     },
@@ -2979,7 +2979,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8189"
+          "rust/crates/lingxi-service/src/lib.rs:8242"
         ]
       }
     },
@@ -2991,16 +2991,16 @@
       "module": "desk (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/app-init.ts:346→/api/desk/cron",
+        "desktop/src/react/app-init.ts:352→/api/desk/cron",
         "desktop/src/react/components/AutomationPanel.tsx:77→/api/desk/cron",
         "desktop/src/react/components/AutomationPanel.tsx:112→/api/desk/cron",
         "desktop/src/react/components/AutomationPanel.tsx:121→/api/desk/cron",
         "desktop/src/react/components/AutomationPanel.tsx:130→/api/desk/cron",
         "desktop/src/react/components/AutomationPanel.tsx:160→/api/desk/cron",
-        "desktop/src/react/components/chat/AssistantMessage.tsx:1228→/api/desk/cron",
-        "desktop/src/react/components/chat/AssistantMessage.tsx:1254→/api/desk/cron",
-        "desktop/src/react/services/app-event-actions.ts:241→/api/desk/cron",
-        "desktop/src/react/services/app-event-actions.ts:301→/api/desk/cron"
+        "desktop/src/react/components/chat/AssistantMessage.tsx:1229→/api/desk/cron",
+        "desktop/src/react/components/chat/AssistantMessage.tsx:1255→/api/desk/cron",
+        "desktop/src/react/services/app-event-actions.ts:242→/api/desk/cron",
+        "desktop/src/react/services/app-event-actions.ts:302→/api/desk/cron"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/desk/cron",
@@ -3012,7 +3012,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8185"
+          "rust/crates/lingxi-service/src/lib.rs:8238"
         ]
       }
     },
@@ -3024,16 +3024,16 @@
       "module": "desk (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/app-init.ts:346→/api/desk/cron",
+        "desktop/src/react/app-init.ts:352→/api/desk/cron",
         "desktop/src/react/components/AutomationPanel.tsx:77→/api/desk/cron",
         "desktop/src/react/components/AutomationPanel.tsx:112→/api/desk/cron",
         "desktop/src/react/components/AutomationPanel.tsx:121→/api/desk/cron",
         "desktop/src/react/components/AutomationPanel.tsx:130→/api/desk/cron",
         "desktop/src/react/components/AutomationPanel.tsx:160→/api/desk/cron",
-        "desktop/src/react/components/chat/AssistantMessage.tsx:1228→/api/desk/cron",
-        "desktop/src/react/components/chat/AssistantMessage.tsx:1254→/api/desk/cron",
-        "desktop/src/react/services/app-event-actions.ts:241→/api/desk/cron",
-        "desktop/src/react/services/app-event-actions.ts:301→/api/desk/cron"
+        "desktop/src/react/components/chat/AssistantMessage.tsx:1229→/api/desk/cron",
+        "desktop/src/react/components/chat/AssistantMessage.tsx:1255→/api/desk/cron",
+        "desktop/src/react/services/app-event-actions.ts:242→/api/desk/cron",
+        "desktop/src/react/services/app-event-actions.ts:302→/api/desk/cron"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/desk/cron",
@@ -3045,7 +3045,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8185"
+          "rust/crates/lingxi-service/src/lib.rs:8238"
         ]
       }
     },
@@ -3057,7 +3057,7 @@
       "module": "desk (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/desk/DeskCwdSkills.tsx:56→/api/desk/skills"
+        "desktop/src/react/components/desk/DeskCwdSkills.tsx:57→/api/desk/skills"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/desk/skills",
@@ -3068,7 +3068,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8136"
+          "rust/crates/lingxi-service/src/lib.rs:8189"
         ]
       }
     },
@@ -3080,7 +3080,7 @@
       "module": "desk (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/desk/DeskCwdSkills.tsx:125→/api/desk/install-skill"
+        "desktop/src/react/components/desk/DeskCwdSkills.tsx:126→/api/desk/install-skill"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/desk/install-skill",
@@ -3091,7 +3091,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8975"
+          "rust/crates/lingxi-service/src/lib.rs:9028"
         ]
       }
     },
@@ -3103,7 +3103,7 @@
       "module": "desk (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/desk/DeskCwdSkills.tsx:95→/api/desk/delete-skill"
+        "desktop/src/react/components/desk/DeskCwdSkills.tsx:96→/api/desk/delete-skill"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/desk/delete-skill",
@@ -3114,7 +3114,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8141"
+          "rust/crates/lingxi-service/src/lib.rs:8194"
         ]
       }
     },
@@ -3147,21 +3147,21 @@
       "module": "desk (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/desk-actions.ts:575→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:577→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:741→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:743→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:920→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:933→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:953→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:1016→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:1071→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:1133→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:1186→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:1274→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:1303→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:1336→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:1363→/api/desk/files"
+        "desktop/src/react/stores/desk-actions.ts:576→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:578→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:742→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:744→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:921→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:934→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:954→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:1017→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:1072→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:1134→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:1187→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:1275→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:1304→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:1337→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:1364→/api/desk/files"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/desk/files",
@@ -3185,7 +3185,7 @@
       "module": "desk (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/desk-actions.ts:792→/api/desk/search-files"
+        "desktop/src/react/stores/desk-actions.ts:793→/api/desk/search-files"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/desk/search-files",
@@ -3208,8 +3208,8 @@
       "module": "desk (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/desk-actions.ts:873→/api/desk/jian",
-        "desktop/src/react/stores/desk-actions.ts:902→/api/desk/jian"
+        "desktop/src/react/stores/desk-actions.ts:874→/api/desk/jian",
+        "desktop/src/react/stores/desk-actions.ts:903→/api/desk/jian"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/desk/jian",
@@ -3233,8 +3233,8 @@
       "module": "desk (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/desk-actions.ts:873→/api/desk/jian",
-        "desktop/src/react/stores/desk-actions.ts:902→/api/desk/jian"
+        "desktop/src/react/stores/desk-actions.ts:874→/api/desk/jian",
+        "desktop/src/react/stores/desk-actions.ts:903→/api/desk/jian"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/desk/jian",
@@ -3258,21 +3258,21 @@
       "module": "desk (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/desk-actions.ts:575→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:577→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:741→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:743→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:920→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:933→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:953→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:1016→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:1071→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:1133→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:1186→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:1274→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:1303→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:1336→/api/desk/files",
-        "desktop/src/react/stores/desk-actions.ts:1363→/api/desk/files"
+        "desktop/src/react/stores/desk-actions.ts:576→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:578→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:742→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:744→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:921→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:934→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:954→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:1017→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:1072→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:1134→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:1187→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:1275→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:1304→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:1337→/api/desk/files",
+        "desktop/src/react/stores/desk-actions.ts:1364→/api/desk/files"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/desk/files",
@@ -3517,7 +3517,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8722"
+          "rust/crates/lingxi-service/src/lib.rs:8775"
         ]
       }
     },
@@ -3540,7 +3540,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8726"
+          "rust/crates/lingxi-service/src/lib.rs:8779"
         ]
       }
     },
@@ -3553,7 +3553,7 @@
       "disposition": "retain",
       "consumers": [
         "desktop/src/react/components/input/ContextRing.tsx:89→/api/experiments",
-        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:385→/api/experiments"
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:386→/api/experiments"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/experiments",
@@ -3564,7 +3564,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8908"
+          "rust/crates/lingxi-service/src/lib.rs:8961"
         ]
       }
     },
@@ -3576,7 +3576,7 @@
       "module": "experiments (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:392→/api/experiments/${id}"
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:393→/api/experiments/${id}"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/experiments/__p__",
@@ -3587,7 +3587,7 @@
           "PATCH"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8912"
+          "rust/crates/lingxi-service/src/lib.rs:8965"
         ]
       }
     },
@@ -3599,7 +3599,7 @@
       "module": "experiments (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:195→/api/experiments/memory/cache-snapshot-reflection/observation"
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:196→/api/experiments/memory/cache-snapshot-reflection/observation"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/experiments/memory/cache-snapshot-reflection/observation",
@@ -3611,7 +3611,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8916"
+          "rust/crates/lingxi-service/src/lib.rs:8969"
         ]
       }
     },
@@ -3623,7 +3623,7 @@
       "module": "experiments (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:195→/api/experiments/memory/cache-snapshot-reflection/observation"
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:196→/api/experiments/memory/cache-snapshot-reflection/observation"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/experiments/memory/cache-snapshot-reflection/observation",
@@ -3635,7 +3635,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8916"
+          "rust/crates/lingxi-service/src/lib.rs:8969"
         ]
       }
     },
@@ -3658,7 +3658,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8561"
+          "rust/crates/lingxi-service/src/lib.rs:8614"
         ]
       }
     },
@@ -3681,7 +3681,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8565"
+          "rust/crates/lingxi-service/src/lib.rs:8618"
         ]
       }
     },
@@ -3704,7 +3704,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8569"
+          "rust/crates/lingxi-service/src/lib.rs:8622"
         ]
       }
     },
@@ -3727,7 +3727,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8573"
+          "rust/crates/lingxi-service/src/lib.rs:8626"
         ]
       }
     },
@@ -4296,7 +4296,7 @@
       "module": "html-preview (mounted /)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/preview/PreviewRenderer.tsx:126→/api/preview/html"
+        "desktop/src/react/components/preview/PreviewRenderer.tsx:127→/api/preview/html"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/preview/html",
@@ -4307,7 +4307,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8541"
+          "rust/crates/lingxi-service/src/lib.rs:8594"
         ]
       }
     },
@@ -4861,7 +4861,7 @@
       "module": "media (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/chat/AssistantMessage.tsx:235→/api/media/speech/generate"
+        "desktop/src/react/components/chat/AssistantMessage.tsx:236→/api/media/speech/generate"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/media/speech/generate",
@@ -5325,7 +5325,7 @@
       "module": "media (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/chat/AssistantMessage.tsx:483→/api/media/tasks/${encodeURIComponent(viewBlock.taskId)}/retry"
+        "desktop/src/react/components/chat/AssistantMessage.tsx:484→/api/media/tasks/${encodeURIComponent(viewBlock.taskId)}/retry"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/media/tasks/__p__/retry",
@@ -5369,8 +5369,8 @@
       "module": "media (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/chat/AssistantMessage.tsx:253→/api/media/generated/${encodeURIComponent(filename)}",
-        "desktop/src/react/components/chat/AssistantMessage.tsx:880→/api/media/generated/${encodeURIComponent(basename)}"
+        "desktop/src/react/components/chat/AssistantMessage.tsx:254→/api/media/generated/${encodeURIComponent(filename)}",
+        "desktop/src/react/components/chat/AssistantMessage.tsx:881→/api/media/generated/${encodeURIComponent(basename)}"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/media/generated/__p__",
@@ -5425,7 +5425,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8650"
+          "rust/crates/lingxi-service/src/lib.rs:8703"
         ]
       }
     },
@@ -5449,7 +5449,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8654"
+          "rust/crates/lingxi-service/src/lib.rs:8707"
         ]
       }
     },
@@ -5472,7 +5472,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8658"
+          "rust/crates/lingxi-service/src/lib.rs:8711"
         ]
       }
     },
@@ -5495,7 +5495,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8662"
+          "rust/crates/lingxi-service/src/lib.rs:8715"
         ]
       }
     },
@@ -5518,7 +5518,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8666"
+          "rust/crates/lingxi-service/src/lib.rs:8719"
         ]
       }
     },
@@ -5945,7 +5945,7 @@
         "desktop/src/react/components/AutomationPanel.tsx:78→/api/models",
         "desktop/src/react/components/ChannelsPanel.tsx:877→/api/models",
         "desktop/src/react/components/input/ModelSelector.tsx:167→/api/models",
-        "desktop/src/react/quick-chat/QuickChatApp.tsx:360→/api/models",
+        "desktop/src/react/quick-chat/QuickChatApp.tsx:361→/api/models",
         "desktop/src/react/services/chat-client.ts:43→/api/models",
         "desktop/src/react/settings/actions.ts:113→/api/models",
         "desktop/src/react/utils/ui-helpers.ts:31→/api/models"
@@ -5959,7 +5959,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8839"
+          "rust/crates/lingxi-service/src/lib.rs:8892"
         ]
       }
     },
@@ -5971,7 +5971,7 @@
       "module": "models (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/InputArea.tsx:1607→/api/models/auxiliary-vision"
+        "desktop/src/react/components/InputArea.tsx:1608→/api/models/auxiliary-vision"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/models/auxiliary-vision",
@@ -6019,7 +6019,7 @@
       "consumers": [
         "desktop/src/react/components/input/ModelSelector.tsx:147→/api/models/set",
         "desktop/src/react/services/chat-client.ts:51→/api/models/set",
-        "desktop/src/react/utils/workspace-switch.ts:38→/api/models/set"
+        "desktop/src/react/utils/workspace-switch.ts:39→/api/models/set"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/models/set",
@@ -6030,7 +6030,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8840"
+          "rust/crates/lingxi-service/src/lib.rs:8893"
         ]
       }
     },
@@ -6054,7 +6054,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8850"
+          "rust/crates/lingxi-service/src/lib.rs:8903"
         ]
       }
     },
@@ -6077,7 +6077,7 @@
       "module": "preferences (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/InputArea.tsx:1615→/api/preferences/models",
+        "desktop/src/react/components/InputArea.tsx:1616→/api/preferences/models",
         "desktop/src/react/components/knowledge/NotebookSettingsDialog.tsx:115→/api/preferences/models",
         "desktop/src/react/onboarding/onboarding-actions.ts:202→/api/preferences/models",
         "desktop/src/react/services/composer-send-coordinator.ts:708→/api/preferences/models",
@@ -6096,7 +6096,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8854"
+          "rust/crates/lingxi-service/src/lib.rs:8907"
         ]
       }
     },
@@ -6108,7 +6108,7 @@
       "module": "preferences (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/InputArea.tsx:1615→/api/preferences/models",
+        "desktop/src/react/components/InputArea.tsx:1616→/api/preferences/models",
         "desktop/src/react/components/knowledge/NotebookSettingsDialog.tsx:115→/api/preferences/models",
         "desktop/src/react/onboarding/onboarding-actions.ts:202→/api/preferences/models",
         "desktop/src/react/services/composer-send-coordinator.ts:708→/api/preferences/models",
@@ -6127,7 +6127,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8854"
+          "rust/crates/lingxi-service/src/lib.rs:8907"
         ]
       }
     },
@@ -6151,7 +6151,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8715"
+          "rust/crates/lingxi-service/src/lib.rs:8768"
         ]
       }
     },
@@ -6175,7 +6175,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8715"
+          "rust/crates/lingxi-service/src/lib.rs:8768"
         ]
       }
     },
@@ -6190,9 +6190,9 @@
         "desktop/src/react/components/input/PlanModeButton.tsx:85→/api/preferences/session-permission-default",
         "desktop/src/react/mobile/mobile-init.ts:282→/api/preferences/session-permission-default",
         "desktop/src/react/quick-chat/QuickChatApp.tsx:284→/api/preferences/session-permission-default",
-        "desktop/src/react/quick-chat/QuickChatApp.tsx:354→/api/preferences/session-permission-default",
-        "desktop/src/react/quick-chat/QuickChatApp.tsx:597→/api/preferences/session-permission-default",
-        "desktop/src/react/stores/session-actions.ts:1630→/api/preferences/session-permission-default"
+        "desktop/src/react/quick-chat/QuickChatApp.tsx:355→/api/preferences/session-permission-default",
+        "desktop/src/react/quick-chat/QuickChatApp.tsx:598→/api/preferences/session-permission-default",
+        "desktop/src/react/stores/session-actions.ts:1647→/api/preferences/session-permission-default"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/preferences/session-permission-default",
@@ -6204,7 +6204,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8743"
+          "rust/crates/lingxi-service/src/lib.rs:8796"
         ]
       }
     },
@@ -6219,9 +6219,9 @@
         "desktop/src/react/components/input/PlanModeButton.tsx:85→/api/preferences/session-permission-default",
         "desktop/src/react/mobile/mobile-init.ts:282→/api/preferences/session-permission-default",
         "desktop/src/react/quick-chat/QuickChatApp.tsx:284→/api/preferences/session-permission-default",
-        "desktop/src/react/quick-chat/QuickChatApp.tsx:354→/api/preferences/session-permission-default",
-        "desktop/src/react/quick-chat/QuickChatApp.tsx:597→/api/preferences/session-permission-default",
-        "desktop/src/react/stores/session-actions.ts:1630→/api/preferences/session-permission-default"
+        "desktop/src/react/quick-chat/QuickChatApp.tsx:355→/api/preferences/session-permission-default",
+        "desktop/src/react/quick-chat/QuickChatApp.tsx:598→/api/preferences/session-permission-default",
+        "desktop/src/react/stores/session-actions.ts:1647→/api/preferences/session-permission-default"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/preferences/session-permission-default",
@@ -6233,7 +6233,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8743"
+          "rust/crates/lingxi-service/src/lib.rs:8796"
         ]
       }
     },
@@ -6258,7 +6258,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8197"
+          "rust/crates/lingxi-service/src/lib.rs:8250"
         ]
       }
     },
@@ -6283,7 +6283,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8197"
+          "rust/crates/lingxi-service/src/lib.rs:8250"
         ]
       }
     },
@@ -6296,7 +6296,7 @@
       "disposition": "retain",
       "consumers": [
         "desktop/src/react/quick-chat/QuickChatApp.tsx:278→/api/preferences/quick-chat",
-        "desktop/src/react/quick-chat/QuickChatApp.tsx:357→/api/preferences/quick-chat",
+        "desktop/src/react/quick-chat/QuickChatApp.tsx:358→/api/preferences/quick-chat",
         "desktop/src/react/settings/tabs/GeneralTab.tsx:119→/api/preferences/quick-chat",
         "desktop/src/react/settings/tabs/GeneralTab.tsx:165→/api/preferences/quick-chat",
         "desktop/src/react/settings/tabs/GeneralTab.tsx:188→/api/preferences/quick-chat"
@@ -6311,7 +6311,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8748"
+          "rust/crates/lingxi-service/src/lib.rs:8801"
         ]
       }
     },
@@ -6324,7 +6324,7 @@
       "disposition": "retain",
       "consumers": [
         "desktop/src/react/quick-chat/QuickChatApp.tsx:278→/api/preferences/quick-chat",
-        "desktop/src/react/quick-chat/QuickChatApp.tsx:357→/api/preferences/quick-chat",
+        "desktop/src/react/quick-chat/QuickChatApp.tsx:358→/api/preferences/quick-chat",
         "desktop/src/react/settings/tabs/GeneralTab.tsx:119→/api/preferences/quick-chat",
         "desktop/src/react/settings/tabs/GeneralTab.tsx:165→/api/preferences/quick-chat",
         "desktop/src/react/settings/tabs/GeneralTab.tsx:188→/api/preferences/quick-chat"
@@ -6339,7 +6339,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8748"
+          "rust/crates/lingxi-service/src/lib.rs:8801"
         ]
       }
     },
@@ -6366,7 +6366,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8705"
+          "rust/crates/lingxi-service/src/lib.rs:8758"
         ]
       }
     },
@@ -6393,7 +6393,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8705"
+          "rust/crates/lingxi-service/src/lib.rs:8758"
         ]
       }
     },
@@ -6418,7 +6418,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8739"
+          "rust/crates/lingxi-service/src/lib.rs:8792"
         ]
       }
     },
@@ -6443,7 +6443,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8739"
+          "rust/crates/lingxi-service/src/lib.rs:8792"
         ]
       }
     },
@@ -6468,7 +6468,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8701"
+          "rust/crates/lingxi-service/src/lib.rs:8754"
         ]
       }
     },
@@ -6493,7 +6493,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8701"
+          "rust/crates/lingxi-service/src/lib.rs:8754"
         ]
       }
     },
@@ -6602,7 +6602,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8733"
+          "rust/crates/lingxi-service/src/lib.rs:8786"
         ]
       }
     },
@@ -6627,7 +6627,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8733"
+          "rust/crates/lingxi-service/src/lib.rs:8786"
         ]
       }
     },
@@ -6639,8 +6639,8 @@
       "module": "preferences (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/settings/tabs/InterfaceTab.tsx:181→/api/preferences/sidebar-ui",
-        "desktop/src/react/settings/tabs/InterfaceTab.tsx:301→/api/preferences/sidebar-ui",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:182→/api/preferences/sidebar-ui",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:302→/api/preferences/sidebar-ui",
         "desktop/src/react/stores/sidebar-ui-slice.ts:84→/api/preferences/sidebar-ui",
         "desktop/src/react/stores/sidebar-ui-slice.ts:112→/api/preferences/sidebar-ui"
       ],
@@ -6654,7 +6654,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8709"
+          "rust/crates/lingxi-service/src/lib.rs:8762"
         ]
       }
     },
@@ -6666,8 +6666,8 @@
       "module": "preferences (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/settings/tabs/InterfaceTab.tsx:181→/api/preferences/sidebar-ui",
-        "desktop/src/react/settings/tabs/InterfaceTab.tsx:301→/api/preferences/sidebar-ui",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:182→/api/preferences/sidebar-ui",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:302→/api/preferences/sidebar-ui",
         "desktop/src/react/stores/sidebar-ui-slice.ts:84→/api/preferences/sidebar-ui",
         "desktop/src/react/stores/sidebar-ui-slice.ts:112→/api/preferences/sidebar-ui"
       ],
@@ -6681,7 +6681,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8709"
+          "rust/crates/lingxi-service/src/lib.rs:8762"
         ]
       }
     },
@@ -6706,7 +6706,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8823"
+          "rust/crates/lingxi-service/src/lib.rs:8876"
         ]
       }
     },
@@ -6731,7 +6731,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8823"
+          "rust/crates/lingxi-service/src/lib.rs:8876"
         ]
       }
     },
@@ -6754,7 +6754,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8831"
+          "rust/crates/lingxi-service/src/lib.rs:8884"
         ]
       }
     },
@@ -6776,7 +6776,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8827"
+          "rust/crates/lingxi-service/src/lib.rs:8880"
         ]
       }
     },
@@ -6798,7 +6798,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8827"
+          "rust/crates/lingxi-service/src/lib.rs:8880"
         ]
       }
     },
@@ -6821,7 +6821,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8859"
+          "rust/crates/lingxi-service/src/lib.rs:8912"
         ]
       }
     },
@@ -6987,7 +6987,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8514"
+          "rust/crates/lingxi-service/src/lib.rs:8567"
         ]
       }
     },
@@ -7010,7 +7010,7 @@
           "DELETE"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8518"
+          "rust/crates/lingxi-service/src/lib.rs:8571"
         ]
       }
     },
@@ -7031,7 +7031,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8530"
+          "rust/crates/lingxi-service/src/lib.rs:8583"
         ]
       }
     },
@@ -7054,7 +7054,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8534"
+          "rust/crates/lingxi-service/src/lib.rs:8587"
         ]
       }
     },
@@ -7075,7 +7075,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8522"
+          "rust/crates/lingxi-service/src/lib.rs:8575"
         ]
       }
     },
@@ -7096,7 +7096,7 @@
           "DELETE"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8526"
+          "rust/crates/lingxi-service/src/lib.rs:8579"
         ]
       }
     },
@@ -7117,7 +7117,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8490"
+          "rust/crates/lingxi-service/src/lib.rs:8543"
         ]
       }
     },
@@ -7138,7 +7138,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8491"
+          "rust/crates/lingxi-service/src/lib.rs:8544"
         ]
       }
     },
@@ -7159,7 +7159,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8492"
+          "rust/crates/lingxi-service/src/lib.rs:8545"
         ]
       }
     },
@@ -7180,7 +7180,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8493"
+          "rust/crates/lingxi-service/src/lib.rs:8546"
         ]
       }
     },
@@ -7201,7 +7201,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8497"
+          "rust/crates/lingxi-service/src/lib.rs:8550"
         ]
       }
     },
@@ -7222,7 +7222,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8501"
+          "rust/crates/lingxi-service/src/lib.rs:8554"
         ]
       }
     },
@@ -7243,7 +7243,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8505"
+          "rust/crates/lingxi-service/src/lib.rs:8558"
         ]
       }
     },
@@ -7264,7 +7264,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8509"
+          "rust/crates/lingxi-service/src/lib.rs:8562"
         ]
       }
     },
@@ -7285,7 +7285,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8510"
+          "rust/crates/lingxi-service/src/lib.rs:8563"
         ]
       }
     },
@@ -7330,9 +7330,9 @@
       "module": "server-identity (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/app-init.ts:417→/api/server/identity",
+        "desktop/src/react/app-init.ts:423→/api/server/identity",
         "desktop/src/react/mobile/mobile-init.ts:230→/api/server/identity",
-        "desktop/src/react/services/server-connection.ts:352→/api/server/identity"
+        "desktop/src/react/services/server-connection.ts:387→/api/server/identity"
       ],
       "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
       "mappedPath": null
@@ -7356,7 +7356,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8075"
+          "rust/crates/lingxi-service/src/lib.rs:8128"
         ]
       }
     },
@@ -7379,7 +7379,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8079"
+          "rust/crates/lingxi-service/src/lib.rs:8132"
         ]
       }
     },
@@ -7402,7 +7402,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8753"
+          "rust/crates/lingxi-service/src/lib.rs:8806"
         ]
       }
     },
@@ -7425,7 +7425,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8758"
+          "rust/crates/lingxi-service/src/lib.rs:8811"
         ]
       }
     },
@@ -7446,7 +7446,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8771"
+          "rust/crates/lingxi-service/src/lib.rs:8824"
         ]
       }
     },
@@ -7472,7 +7472,7 @@
           "PATCH"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8779"
+          "rust/crates/lingxi-service/src/lib.rs:8832"
         ]
       }
     },
@@ -7498,7 +7498,7 @@
           "PATCH"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8779"
+          "rust/crates/lingxi-service/src/lib.rs:8832"
         ]
       }
     },
@@ -7521,7 +7521,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8775"
+          "rust/crates/lingxi-service/src/lib.rs:8828"
         ]
       }
     },
@@ -7547,7 +7547,7 @@
           "PATCH"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8766"
+          "rust/crates/lingxi-service/src/lib.rs:8819"
         ]
       }
     },
@@ -7573,7 +7573,7 @@
           "PATCH"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8766"
+          "rust/crates/lingxi-service/src/lib.rs:8819"
         ]
       }
     },
@@ -7596,7 +7596,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8762"
+          "rust/crates/lingxi-service/src/lib.rs:8815"
         ]
       }
     },
@@ -7619,7 +7619,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8754"
+          "rust/crates/lingxi-service/src/lib.rs:8807"
         ]
       }
     },
@@ -7631,8 +7631,9 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
+        "desktop/src/react/hooks/use-hana-fetch.ts:109→/api/sessions",
         "desktop/src/react/mobile/mobile-init.ts:360→/api/sessions",
-        "desktop/src/react/stores/session-actions.ts:993→/api/sessions"
+        "desktop/src/react/stores/session-actions.ts:1010→/api/sessions"
       ],
       "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
       "mappedPath": null
@@ -7657,7 +7658,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8287"
+          "rust/crates/lingxi-service/src/lib.rs:8340"
         ]
       }
     },
@@ -7672,15 +7673,15 @@
         "desktop/src/react/stores/chat-find-actions.ts:24→/api/sessions/find"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
-      "mappedPath": "/lingxi/v1/sessions/find",
-      "mappedVia": "serviceRoute",
+      "mappedPath": "/lingxi/v1/sessions/__p__/find",
+      "mappedVia": "legacySessionTranslation",
       "rustRoute": {
-        "path": "/lingxi/v1/sessions/find",
+        "path": "/lingxi/v1/sessions/{session_id}/find",
         "methods": [
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8288"
+          "rust/crates/lingxi-service/src/lib.rs:8366"
         ]
       }
     },
@@ -7692,7 +7693,7 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/SessionList.tsx:1158→/api/sessions/summary"
+        "desktop/src/react/components/SessionList.tsx:1159→/api/sessions/summary"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/sessions/__p__/summary",
@@ -7703,7 +7704,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8329"
+          "rust/crates/lingxi-service/src/lib.rs:8382"
         ]
       }
     },
@@ -7715,10 +7716,21 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/session-actions.ts:2155→/api/sessions/pin"
+        "desktop/src/react/hooks/use-hana-fetch.ts:90→/api/sessions/pin",
+        "desktop/src/react/stores/session-actions.ts:2183→/api/sessions/pin"
       ],
-      "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
-      "mappedPath": null
+      "status": "MAPPED_ROUTE_EXISTS",
+      "mappedPath": "/lingxi/v1/sessions/pin",
+      "mappedVia": "legacySessionTranslation",
+      "rustRoute": {
+        "path": "/lingxi/v1/sessions/pin",
+        "methods": [
+          "POST"
+        ],
+        "files": [
+          "rust/crates/lingxi-service/src/lib.rs:8224"
+        ]
+      }
     },
     {
       "id": "http:POST:/api/sessions/pin-order",
@@ -7728,10 +7740,21 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/session-actions.ts:2209→/api/sessions/pin-order"
+        "desktop/src/react/hooks/use-hana-fetch.ts:104→/api/sessions/pin-order",
+        "desktop/src/react/stores/session-actions.ts:2241→/api/sessions/pin-order"
       ],
-      "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
-      "mappedPath": null
+      "status": "MAPPED_ROUTE_EXISTS",
+      "mappedPath": "/lingxi/v1/sessions/pin-order",
+      "mappedVia": "legacySessionTranslation",
+      "rustRoute": {
+        "path": "/lingxi/v1/sessions/pin-order",
+        "methods": [
+          "POST"
+        ],
+        "files": [
+          "rust/crates/lingxi-service/src/lib.rs:8225"
+        ]
+      }
     },
     {
       "id": "http:GET:/api/sessions/memory",
@@ -7743,8 +7766,8 @@
       "consumers": [
         "desktop/src/react/components/input/composer-memory-mode.ts:66→/api/sessions/memory",
         "desktop/src/react/components/input/composer-memory-mode.ts:96→/api/sessions/memory",
-        "desktop/src/react/hooks/use-hana-fetch.ts:66→/api/sessions/memory",
-        "desktop/src/react/hooks/use-hana-fetch.ts:74→/api/sessions/memory"
+        "desktop/src/react/hooks/use-hana-fetch.ts:130→/api/sessions/memory",
+        "desktop/src/react/hooks/use-hana-fetch.ts:138→/api/sessions/memory"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/sessions/__p__/memory",
@@ -7756,7 +7779,7 @@
           "PATCH"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8413"
+          "rust/crates/lingxi-service/src/lib.rs:8466"
         ]
       }
     },
@@ -7770,8 +7793,8 @@
       "consumers": [
         "desktop/src/react/components/input/composer-memory-mode.ts:66→/api/sessions/memory",
         "desktop/src/react/components/input/composer-memory-mode.ts:96→/api/sessions/memory",
-        "desktop/src/react/hooks/use-hana-fetch.ts:66→/api/sessions/memory",
-        "desktop/src/react/hooks/use-hana-fetch.ts:74→/api/sessions/memory"
+        "desktop/src/react/hooks/use-hana-fetch.ts:130→/api/sessions/memory",
+        "desktop/src/react/hooks/use-hana-fetch.ts:138→/api/sessions/memory"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/sessions/__p__/memory",
@@ -7783,7 +7806,7 @@
           "PATCH"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8413"
+          "rust/crates/lingxi-service/src/lib.rs:8466"
         ]
       }
     },
@@ -7795,8 +7818,8 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/right-workspace/SessionStatusCard.tsx:84→/api/sessions/authorized-folders",
-        "desktop/src/react/hooks/use-hana-fetch.ts:66→/api/sessions/authorized-folders"
+        "desktop/src/react/components/right-workspace/SessionStatusCard.tsx:85→/api/sessions/authorized-folders",
+        "desktop/src/react/hooks/use-hana-fetch.ts:130→/api/sessions/authorized-folders"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/sessions/__p__/authorized-folders",
@@ -7808,7 +7831,7 @@
           "PATCH"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8418"
+          "rust/crates/lingxi-service/src/lib.rs:8471"
         ]
       }
     },
@@ -7820,8 +7843,8 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/right-workspace/SessionStatusCard.tsx:84→/api/sessions/authorized-folders",
-        "desktop/src/react/hooks/use-hana-fetch.ts:66→/api/sessions/authorized-folders"
+        "desktop/src/react/components/right-workspace/SessionStatusCard.tsx:85→/api/sessions/authorized-folders",
+        "desktop/src/react/hooks/use-hana-fetch.ts:130→/api/sessions/authorized-folders"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/sessions/__p__/authorized-folders",
@@ -7833,7 +7856,7 @@
           "PATCH"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8418"
+          "rust/crates/lingxi-service/src/lib.rs:8471"
         ]
       }
     },
@@ -7856,7 +7879,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8325"
+          "rust/crates/lingxi-service/src/lib.rs:8378"
         ]
       }
     },
@@ -7879,7 +7902,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8401"
+          "rust/crates/lingxi-service/src/lib.rs:8454"
         ]
       }
     },
@@ -7902,7 +7925,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8321"
+          "rust/crates/lingxi-service/src/lib.rs:8374"
         ]
       }
     },
@@ -7915,8 +7938,8 @@
       "disposition": "retain",
       "consumers": [
         "desktop/src/react/services/rust-chat-history.ts:423→/api/sessions/messages",
-        "desktop/src/react/stores/session-actions.ts:189→/api/sessions/messages",
-        "desktop/src/react/stores/session-actions.ts:226→/api/sessions/messages"
+        "desktop/src/react/stores/session-actions.ts:205→/api/sessions/messages",
+        "desktop/src/react/stores/session-actions.ts:242→/api/sessions/messages"
       ],
       "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
       "mappedPath": null
@@ -7966,8 +7989,8 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/settings/tabs/InterfaceTab.tsx:201→/api/sessions/workspace-rollback",
-        "desktop/src/react/settings/tabs/InterfaceTab.tsx:221→/api/sessions/workspace-rollback",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:202→/api/sessions/workspace-rollback",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:222→/api/sessions/workspace-rollback",
         "desktop/src/react/stores/message-turn-actions.ts:323→/api/sessions/workspace-rollback",
         "desktop/src/react/stores/message-turn-actions.ts:334→/api/sessions/workspace-rollback"
       ],
@@ -7981,7 +8004,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8210"
+          "rust/crates/lingxi-service/src/lib.rs:8263"
         ]
       }
     },
@@ -7993,8 +8016,8 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/settings/tabs/InterfaceTab.tsx:201→/api/sessions/workspace-rollback",
-        "desktop/src/react/settings/tabs/InterfaceTab.tsx:221→/api/sessions/workspace-rollback",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:202→/api/sessions/workspace-rollback",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:222→/api/sessions/workspace-rollback",
         "desktop/src/react/stores/message-turn-actions.ts:323→/api/sessions/workspace-rollback",
         "desktop/src/react/stores/message-turn-actions.ts:334→/api/sessions/workspace-rollback"
       ],
@@ -8008,7 +8031,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8210"
+          "rust/crates/lingxi-service/src/lib.rs:8263"
         ]
       }
     },
@@ -8033,10 +8056,21 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/session-actions.ts:721→/api/sessions/todos/complete"
+        "desktop/src/react/hooks/use-hana-fetch.ts:106→/api/sessions/todos/complete",
+        "desktop/src/react/stores/session-actions.ts:738→/api/sessions/todos/complete"
       ],
-      "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
-      "mappedPath": null
+      "status": "MAPPED_ROUTE_EXISTS",
+      "mappedPath": "/lingxi/v1/sessions/todos/complete",
+      "mappedVia": "legacySessionTranslation",
+      "rustRoute": {
+        "path": "/lingxi/v1/sessions/todos/complete",
+        "methods": [
+          "POST"
+        ],
+        "files": [
+          "rust/crates/lingxi-service/src/lib.rs:8268"
+        ]
+      }
     },
     {
       "id": "http:POST:/api/sessions/todos/cancel",
@@ -8046,10 +8080,21 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/session-actions.ts:739→/api/sessions/todos/cancel"
+        "desktop/src/react/hooks/use-hana-fetch.ts:107→/api/sessions/todos/cancel",
+        "desktop/src/react/stores/session-actions.ts:756→/api/sessions/todos/cancel"
       ],
-      "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
-      "mappedPath": null
+      "status": "MAPPED_ROUTE_EXISTS",
+      "mappedPath": "/lingxi/v1/sessions/todos/cancel",
+      "mappedVia": "legacySessionTranslation",
+      "rustRoute": {
+        "path": "/lingxi/v1/sessions/todos/cancel",
+        "methods": [
+          "POST"
+        ],
+        "files": [
+          "rust/crates/lingxi-service/src/lib.rs:8272"
+        ]
+      }
     },
     {
       "id": "http:POST:/api/sessions/todos/dismiss",
@@ -8059,10 +8104,21 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/session-actions.ts:755→/api/sessions/todos/dismiss"
+        "desktop/src/react/hooks/use-hana-fetch.ts:108→/api/sessions/todos/dismiss",
+        "desktop/src/react/stores/session-actions.ts:772→/api/sessions/todos/dismiss"
       ],
-      "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
-      "mappedPath": null
+      "status": "MAPPED_ROUTE_EXISTS",
+      "mappedPath": "/lingxi/v1/sessions/todos/dismiss",
+      "mappedVia": "legacySessionTranslation",
+      "rustRoute": {
+        "path": "/lingxi/v1/sessions/todos/dismiss",
+        "methods": [
+          "POST"
+        ],
+        "files": [
+          "rust/crates/lingxi-service/src/lib.rs:8276"
+        ]
+      }
     },
     {
       "id": "http:POST:/api/sessions/new",
@@ -8085,9 +8141,9 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/quick-chat/QuickChatApp.tsx:603→/api/sessions/new-detached",
+        "desktop/src/react/quick-chat/QuickChatApp.tsx:604→/api/sessions/new-detached",
         "desktop/src/react/quick-chat/rust-quick-chat.ts:10→/api/sessions/new-detached",
-        "desktop/src/react/stores/session-actions.ts:1582→/api/sessions/new-detached",
+        "desktop/src/react/stores/session-actions.ts:1599→/api/sessions/new-detached",
         "desktop/src/react/stores/side-chat-actions.ts:102→/api/sessions/new-detached"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
@@ -8099,7 +8155,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8167"
+          "rust/crates/lingxi-service/src/lib.rs:8220"
         ]
       }
     },
@@ -8111,10 +8167,21 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/session-actions.ts:1820→/api/sessions/continue-deleted-agent"
+        "desktop/src/react/hooks/use-hana-fetch.ts:115→/api/sessions/continue-deleted-agent",
+        "desktop/src/react/stores/session-actions.ts:1837→/api/sessions/continue-deleted-agent"
       ],
-      "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
-      "mappedPath": null
+      "status": "MAPPED_ROUTE_EXISTS",
+      "mappedPath": "/lingxi/v1/sessions/continue-deleted-agent",
+      "mappedVia": "legacySessionTranslation",
+      "rustRoute": {
+        "path": "/lingxi/v1/sessions/continue-deleted-agent",
+        "methods": [
+          "POST"
+        ],
+        "files": [
+          "rust/crates/lingxi-service/src/lib.rs:8216"
+        ]
+      }
     },
     {
       "id": "http:POST:/api/sessions/switch",
@@ -8125,7 +8192,7 @@
       "disposition": "retain",
       "consumers": [
         "desktop/src/react/services/quick-chat-session-handoff.ts:30→/api/sessions/switch",
-        "desktop/src/react/stores/session-actions.ts:1239→/api/sessions/switch"
+        "desktop/src/react/stores/session-actions.ts:1256→/api/sessions/switch"
       ],
       "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
       "mappedPath": null
@@ -8138,10 +8205,21 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/session-actions.ts:2240→/api/sessions/fresh-compact"
+        "desktop/src/react/hooks/use-hana-fetch.ts:110→/api/sessions/fresh-compact",
+        "desktop/src/react/stores/session-actions.ts:2272→/api/sessions/fresh-compact"
       ],
-      "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
-      "mappedPath": null
+      "status": "MAPPED_ROUTE_EXISTS",
+      "mappedPath": "/lingxi/v1/sessions/__p__/fresh-compact",
+      "mappedVia": "legacySessionTranslation",
+      "rustRoute": {
+        "path": "/lingxi/v1/sessions/{session_id}/fresh-compact",
+        "methods": [
+          "POST"
+        ],
+        "files": [
+          "rust/crates/lingxi-service/src/lib.rs:8422"
+        ]
+      }
     },
     {
       "id": "http:GET:/api/browser/sessions",
@@ -8172,7 +8250,7 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/SessionList.tsx:188→/api/browser/session-states"
+        "desktop/src/react/components/SessionList.tsx:189→/api/browser/session-states"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/browser/session-states",
@@ -8195,7 +8273,7 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/SessionList.tsx:807→/api/browser/open-session"
+        "desktop/src/react/components/SessionList.tsx:808→/api/browser/open-session"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/browser/open-session",
@@ -8218,7 +8296,7 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/SessionList.tsx:203→/api/browser/close-session"
+        "desktop/src/react/components/SessionList.tsx:204→/api/browser/close-session"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/browser/close-session",
@@ -8241,10 +8319,21 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/session-actions.ts:2126→/api/sessions/rename"
+        "desktop/src/react/hooks/use-hana-fetch.ts:88→/api/sessions/rename",
+        "desktop/src/react/stores/session-actions.ts:2154→/api/sessions/rename"
       ],
-      "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
-      "mappedPath": null
+      "status": "MAPPED_ROUTE_EXISTS",
+      "mappedPath": "/lingxi/v1/sessions/rename",
+      "mappedVia": "legacySessionTranslation",
+      "rustRoute": {
+        "path": "/lingxi/v1/sessions/rename",
+        "methods": [
+          "POST"
+        ],
+        "files": [
+          "rust/crates/lingxi-service/src/lib.rs:8203"
+        ]
+      }
     },
     {
       "id": "http:POST:/api/sessions/cleanup",
@@ -8254,10 +8343,21 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/session-actions.ts:2021→/api/sessions/cleanup"
+        "desktop/src/react/hooks/use-hana-fetch.ts:100→/api/sessions/cleanup",
+        "desktop/src/react/stores/session-actions.ts:2049→/api/sessions/cleanup"
       ],
-      "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
-      "mappedPath": null
+      "status": "MAPPED_ROUTE_EXISTS",
+      "mappedPath": "/lingxi/v1/sessions/cleanup",
+      "mappedVia": "legacySessionTranslation",
+      "rustRoute": {
+        "path": "/lingxi/v1/sessions/cleanup",
+        "methods": [
+          "POST"
+        ],
+        "files": [
+          "rust/crates/lingxi-service/src/lib.rs:8339"
+        ]
+      }
     },
     {
       "id": "http:GET:/api/sessions/archived",
@@ -8267,7 +8367,8 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/session-actions.ts:1952→/api/sessions/archived"
+        "desktop/src/react/hooks/use-hana-fetch.ts:76→/api/sessions/archived",
+        "desktop/src/react/stores/session-actions.ts:1974→/api/sessions/archived"
       ],
       "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
       "mappedPath": null
@@ -8280,10 +8381,21 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/session-actions.ts:1870→/api/sessions/archive"
+        "desktop/src/react/hooks/use-hana-fetch.ts:92→/api/sessions/archive",
+        "desktop/src/react/stores/session-actions.ts:1892→/api/sessions/archive"
       ],
-      "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
-      "mappedPath": null
+      "status": "MAPPED_ROUTE_EXISTS",
+      "mappedPath": "/lingxi/v1/sessions/archive",
+      "mappedVia": "legacySessionTranslation",
+      "rustRoute": {
+        "path": "/lingxi/v1/sessions/archive",
+        "methods": [
+          "POST"
+        ],
+        "files": [
+          "rust/crates/lingxi-service/src/lib.rs:8332"
+        ]
+      }
     },
     {
       "id": "http:POST:/api/sessions/workspace-disposal",
@@ -8293,10 +8405,22 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/session-actions.ts:2052→/api/sessions/workspace-disposal"
+        "desktop/src/react/hooks/use-hana-fetch.ts:119→/api/sessions/workspace-disposal",
+        "desktop/src/react/stores/session-actions.ts:2080→/api/sessions/workspace-disposal"
       ],
-      "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
-      "mappedPath": null
+      "status": "MAPPED_ROUTE_EXISTS",
+      "mappedPath": "/lingxi/v1/sessions/workspace-disposal",
+      "mappedVia": "legacySessionTranslation",
+      "rustRoute": {
+        "path": "/lingxi/v1/sessions/workspace-disposal",
+        "methods": [
+          "POST"
+        ],
+        "files": [
+          "rust/crates/lingxi-service/src/lib.rs:8320",
+          "rust/crates/lingxi-service/src/session_admin.rs:1571"
+        ]
+      }
     },
     {
       "id": "http:POST:/api/sessions/sweep-orphaned-workspaces",
@@ -8306,10 +8430,22 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/session-actions.ts:2087→/api/sessions/sweep-orphaned-workspaces"
+        "desktop/src/react/hooks/use-hana-fetch.ts:102→/api/sessions/sweep-orphaned-workspaces",
+        "desktop/src/react/stores/session-actions.ts:2115→/api/sessions/sweep-orphaned-workspaces"
       ],
-      "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
-      "mappedPath": null
+      "status": "MAPPED_ROUTE_EXISTS",
+      "mappedPath": "/lingxi/v1/sessions/sweep-orphaned-workspaces",
+      "mappedVia": "legacySessionTranslation",
+      "rustRoute": {
+        "path": "/lingxi/v1/sessions/sweep-orphaned-workspaces",
+        "methods": [
+          "POST"
+        ],
+        "files": [
+          "rust/crates/lingxi-service/src/lib.rs:8324",
+          "rust/crates/lingxi-service/src/session_admin.rs:1575"
+        ]
+      }
     },
     {
       "id": "http:POST:/api/sessions/restore",
@@ -8319,10 +8455,21 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/session-actions.ts:1969→/api/sessions/restore"
+        "desktop/src/react/hooks/use-hana-fetch.ts:94→/api/sessions/restore",
+        "desktop/src/react/stores/session-actions.ts:1997→/api/sessions/restore"
       ],
-      "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
-      "mappedPath": null
+      "status": "MAPPED_ROUTE_EXISTS",
+      "mappedPath": "/lingxi/v1/sessions/restore",
+      "mappedVia": "legacySessionTranslation",
+      "rustRoute": {
+        "path": "/lingxi/v1/sessions/restore",
+        "methods": [
+          "POST"
+        ],
+        "files": [
+          "rust/crates/lingxi-service/src/lib.rs:8333"
+        ]
+      }
     },
     {
       "id": "http:POST:/api/sessions/archived/delete",
@@ -8332,10 +8479,21 @@
       "module": "sessions (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/session-actions.ts:2004→/api/sessions/archived/delete"
+        "desktop/src/react/hooks/use-hana-fetch.ts:98→/api/sessions/archived/delete",
+        "desktop/src/react/stores/session-actions.ts:2032→/api/sessions/archived/delete"
       ],
-      "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
-      "mappedPath": null
+      "status": "MAPPED_ROUTE_EXISTS",
+      "mappedPath": "/lingxi/v1/sessions/archived/delete",
+      "mappedVia": "legacySessionTranslation",
+      "rustRoute": {
+        "path": "/lingxi/v1/sessions/archived/delete",
+        "methods": [
+          "POST"
+        ],
+        "files": [
+          "rust/crates/lingxi-service/src/lib.rs:8335"
+        ]
+      }
     },
     {
       "id": "http:GET:/api/settings/snapshot",
@@ -8356,7 +8514,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8815"
+          "rust/crates/lingxi-service/src/lib.rs:8868"
         ]
       }
     },
@@ -8368,10 +8526,10 @@
       "module": "skills (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/SkillsPanel.tsx:201→/api/skills/bundles",
-        "desktop/src/react/components/SkillsPanel.tsx:514→/api/skills/bundles",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:93→/api/skills/bundles",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:255→/api/skills/bundles"
+        "desktop/src/react/components/SkillsPanel.tsx:202→/api/skills/bundles",
+        "desktop/src/react/components/SkillsPanel.tsx:515→/api/skills/bundles",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:94→/api/skills/bundles",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:256→/api/skills/bundles"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/skills/bundles",
@@ -8383,7 +8541,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8992"
+          "rust/crates/lingxi-service/src/lib.rs:9045"
         ]
       }
     },
@@ -8395,10 +8553,10 @@
       "module": "skills (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/SkillsPanel.tsx:201→/api/skills/bundles",
-        "desktop/src/react/components/SkillsPanel.tsx:514→/api/skills/bundles",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:93→/api/skills/bundles",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:255→/api/skills/bundles"
+        "desktop/src/react/components/SkillsPanel.tsx:202→/api/skills/bundles",
+        "desktop/src/react/components/SkillsPanel.tsx:515→/api/skills/bundles",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:94→/api/skills/bundles",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:256→/api/skills/bundles"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/skills/bundles",
@@ -8410,7 +8568,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8992"
+          "rust/crates/lingxi-service/src/lib.rs:9045"
         ]
       }
     },
@@ -8422,8 +8580,8 @@
       "module": "skills (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/SkillsPanel.tsx:625→/api/skills/bundles/order",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:350→/api/skills/bundles/order"
+        "desktop/src/react/components/SkillsPanel.tsx:626→/api/skills/bundles/order",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:351→/api/skills/bundles/order"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/skills/bundles/order",
@@ -8434,7 +8592,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8996"
+          "rust/crates/lingxi-service/src/lib.rs:9049"
         ]
       }
     },
@@ -8446,14 +8604,14 @@
       "module": "skills (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/SkillsPanel.tsx:538→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
-        "desktop/src/react/components/SkillsPanel.tsx:582→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
-        "desktop/src/react/components/SkillsPanel.tsx:611→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
-        "desktop/src/react/components/SkillsPanel.tsx:625→/api/skills/bundles/order",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:279→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:321→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:337→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:350→/api/skills/bundles/order"
+        "desktop/src/react/components/SkillsPanel.tsx:539→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
+        "desktop/src/react/components/SkillsPanel.tsx:583→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
+        "desktop/src/react/components/SkillsPanel.tsx:612→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
+        "desktop/src/react/components/SkillsPanel.tsx:626→/api/skills/bundles/order",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:280→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:322→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:338→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:351→/api/skills/bundles/order"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/skills/bundles/__p__",
@@ -8465,7 +8623,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:9000"
+          "rust/crates/lingxi-service/src/lib.rs:9053"
         ]
       }
     },
@@ -8477,14 +8635,14 @@
       "module": "skills (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/SkillsPanel.tsx:538→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
-        "desktop/src/react/components/SkillsPanel.tsx:582→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
-        "desktop/src/react/components/SkillsPanel.tsx:611→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
-        "desktop/src/react/components/SkillsPanel.tsx:625→/api/skills/bundles/order",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:279→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:321→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:337→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:350→/api/skills/bundles/order"
+        "desktop/src/react/components/SkillsPanel.tsx:539→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
+        "desktop/src/react/components/SkillsPanel.tsx:583→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
+        "desktop/src/react/components/SkillsPanel.tsx:612→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
+        "desktop/src/react/components/SkillsPanel.tsx:626→/api/skills/bundles/order",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:280→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:322→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:338→/api/skills/bundles/${encodeURIComponent(bundle.id)}",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:351→/api/skills/bundles/order"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/skills/bundles/__p__",
@@ -8496,7 +8654,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:9000"
+          "rust/crates/lingxi-service/src/lib.rs:9053"
         ]
       }
     },
@@ -8508,8 +8666,8 @@
       "module": "skills (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/SkillsPanel.tsx:560→/api/skills/bundles/${encodeURIComponent(bundle.id)}/export",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:300→/api/skills/bundles/${encodeURIComponent(bundle.id)}/export"
+        "desktop/src/react/components/SkillsPanel.tsx:561→/api/skills/bundles/${encodeURIComponent(bundle.id)}/export",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:301→/api/skills/bundles/${encodeURIComponent(bundle.id)}/export"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/skills/bundles/__p__/export",
@@ -8520,7 +8678,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:9005"
+          "rust/crates/lingxi-service/src/lib.rs:9058"
         ]
       }
     },
@@ -8532,10 +8690,10 @@
       "module": "skills (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/SkillsPanel.tsx:200→/api/skills",
-        "desktop/src/react/components/SkillsPanel.tsx:240→/api/skills",
+        "desktop/src/react/components/SkillsPanel.tsx:201→/api/skills",
+        "desktop/src/react/components/SkillsPanel.tsx:241→/api/skills",
         "desktop/src/react/hooks/use-slash-items.ts:51→/api/skills",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:92→/api/skills"
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:93→/api/skills"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/skills",
@@ -8546,7 +8704,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8970"
+          "rust/crates/lingxi-service/src/lib.rs:9023"
         ]
       }
     },
@@ -8567,7 +8725,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:9013"
+          "rust/crates/lingxi-service/src/lib.rs:9066"
         ]
       }
     },
@@ -8579,9 +8737,9 @@
       "module": "skills (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/SkillsPanel.tsx:440→/api/agents/${encodeURIComponent(agentId)}/skills/${encodeURIComponent(name)}",
+        "desktop/src/react/components/SkillsPanel.tsx:441→/api/agents/${encodeURIComponent(agentId)}/skills/${encodeURIComponent(name)}",
         "desktop/src/react/settings/overlays/AgentDeleteOverlay.tsx:58→/api/agents/${agentId}/skills/cleanup-preview",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:435→/api/agents/${encodeURIComponent(agentId)}/skills/${encodeURIComponent(name)}"
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:436→/api/agents/${encodeURIComponent(agentId)}/skills/${encodeURIComponent(name)}"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/agents/__p__/skills/__p__",
@@ -8592,7 +8750,7 @@
           "PATCH"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:9017"
+          "rust/crates/lingxi-service/src/lib.rs:9070"
         ]
       }
     },
@@ -8604,8 +8762,8 @@
       "module": "skills (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/SkillsPanel.tsx:484→/api/agents/${encodeURIComponent(agentId)}/skill-bundles/${encodeURIComponent(bundle.id)}",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:472→/api/agents/${encodeURIComponent(agentId)}/skill-bundles/${encodeURIComponent(bundle.id)}"
+        "desktop/src/react/components/SkillsPanel.tsx:485→/api/agents/${encodeURIComponent(agentId)}/skill-bundles/${encodeURIComponent(bundle.id)}",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:473→/api/agents/${encodeURIComponent(agentId)}/skill-bundles/${encodeURIComponent(bundle.id)}"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/agents/__p__/skill-bundles/__p__",
@@ -8616,7 +8774,7 @@
           "PATCH"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:9021"
+          "rust/crates/lingxi-service/src/lib.rs:9074"
         ]
       }
     },
@@ -8628,12 +8786,12 @@
       "module": "skills (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/MainContent.tsx:46→/api/skills/install",
+        "desktop/src/react/MainContent.tsx:47→/api/skills/install",
         "desktop/src/react/components/SkillViewerOverlay.tsx:87→/api/skills/install",
-        "desktop/src/react/components/SkillsPanel.tsx:329→/api/skills/install",
-        "desktop/src/react/components/SkillsPanel.tsx:362→/api/skills/install",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:174→/api/skills/install",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:196→/api/skills/install"
+        "desktop/src/react/components/SkillsPanel.tsx:330→/api/skills/install",
+        "desktop/src/react/components/SkillsPanel.tsx:363→/api/skills/install",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:175→/api/skills/install",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:197→/api/skills/install"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/skills/install",
@@ -8644,7 +8802,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8979"
+          "rust/crates/lingxi-service/src/lib.rs:9032"
         ]
       }
     },
@@ -8656,9 +8814,9 @@
       "module": "skills (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:118→/api/skills/external-paths",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:505→/api/skills/external-paths",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:521→/api/skills/external-paths"
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:119→/api/skills/external-paths",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:506→/api/skills/external-paths",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:522→/api/skills/external-paths"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/skills/external-paths",
@@ -8670,7 +8828,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8987"
+          "rust/crates/lingxi-service/src/lib.rs:9040"
         ]
       }
     },
@@ -8682,9 +8840,9 @@
       "module": "skills (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:118→/api/skills/external-paths",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:505→/api/skills/external-paths",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:521→/api/skills/external-paths"
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:119→/api/skills/external-paths",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:506→/api/skills/external-paths",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:522→/api/skills/external-paths"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/skills/external-paths",
@@ -8696,7 +8854,7 @@
           "PUT"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8987"
+          "rust/crates/lingxi-service/src/lib.rs:9040"
         ]
       }
     },
@@ -8708,22 +8866,22 @@
       "module": "skills (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/MainContent.tsx:46→/api/skills/install",
+        "desktop/src/react/MainContent.tsx:47→/api/skills/install",
         "desktop/src/react/components/SkillViewerOverlay.tsx:87→/api/skills/install",
-        "desktop/src/react/components/SkillsPanel.tsx:201→/api/skills/bundles",
-        "desktop/src/react/components/SkillsPanel.tsx:329→/api/skills/install",
-        "desktop/src/react/components/SkillsPanel.tsx:362→/api/skills/install",
-        "desktop/src/react/components/SkillsPanel.tsx:420→/api/skills/${encodeURIComponent(name)}",
-        "desktop/src/react/components/SkillsPanel.tsx:514→/api/skills/bundles",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:93→/api/skills/bundles",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:118→/api/skills/external-paths",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:160→/api/skills/translate",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:174→/api/skills/install",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:196→/api/skills/install",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:235→/api/skills/${encodeURIComponent(name)}",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:255→/api/skills/bundles",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:505→/api/skills/external-paths",
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:521→/api/skills/external-paths"
+        "desktop/src/react/components/SkillsPanel.tsx:202→/api/skills/bundles",
+        "desktop/src/react/components/SkillsPanel.tsx:330→/api/skills/install",
+        "desktop/src/react/components/SkillsPanel.tsx:363→/api/skills/install",
+        "desktop/src/react/components/SkillsPanel.tsx:421→/api/skills/${encodeURIComponent(name)}",
+        "desktop/src/react/components/SkillsPanel.tsx:515→/api/skills/bundles",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:94→/api/skills/bundles",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:119→/api/skills/external-paths",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:161→/api/skills/translate",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:175→/api/skills/install",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:197→/api/skills/install",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:236→/api/skills/${encodeURIComponent(name)}",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:256→/api/skills/bundles",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:506→/api/skills/external-paths",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:522→/api/skills/external-paths"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/skills/__p__",
@@ -8734,7 +8892,7 @@
           "DELETE"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:9009"
+          "rust/crates/lingxi-service/src/lib.rs:9062"
         ]
       }
     },
@@ -8755,7 +8913,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8983"
+          "rust/crates/lingxi-service/src/lib.rs:9036"
         ]
       }
     },
@@ -8767,7 +8925,7 @@
       "module": "skills (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/settings/tabs/SkillsTab.tsx:160→/api/skills/translate"
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:161→/api/skills/translate"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/skills/translate",
@@ -8778,7 +8936,7 @@
           "POST"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8971"
+          "rust/crates/lingxi-service/src/lib.rs:9024"
         ]
       }
     },
@@ -8907,8 +9065,8 @@
       "module": "studio-workspaces (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/desk-actions.ts:244→/api/studio/workspaces",
-        "desktop/src/react/stores/desk-actions.ts:272→/api/studio/workspaces"
+        "desktop/src/react/stores/desk-actions.ts:245→/api/studio/workspaces",
+        "desktop/src/react/stores/desk-actions.ts:273→/api/studio/workspaces"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/studio/workspaces",
@@ -8953,8 +9111,8 @@
       "module": "studio-workspaces (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/desk-actions.ts:244→/api/studio/workspaces",
-        "desktop/src/react/stores/desk-actions.ts:272→/api/studio/workspaces"
+        "desktop/src/react/stores/desk-actions.ts:245→/api/studio/workspaces",
+        "desktop/src/react/stores/desk-actions.ts:273→/api/studio/workspaces"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/studio/workspaces",
@@ -8978,7 +9136,7 @@
       "module": "studio-workspaces (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/stores/desk-actions.ts:341→/api/studio/workspaces/${encodeURIComponent(normalized)}"
+        "desktop/src/react/stores/desk-actions.ts:342→/api/studio/workspaces/${encodeURIComponent(normalized)}"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/studio/workspaces/__p__",
@@ -9001,7 +9159,7 @@
       "module": "upload (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/MainContent.tsx:184→/api/upload"
+        "desktop/src/react/MainContent.tsx:185→/api/upload"
       ],
       "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
       "mappedPath": null
@@ -9014,9 +9172,9 @@
       "module": "upload (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/components/InputArea.tsx:1130→/api/upload-blob",
-        "desktop/src/react/components/InputArea.tsx:1316→/api/upload-blob",
-        "desktop/src/react/components/InputArea.tsx:1674→/api/upload-blob",
+        "desktop/src/react/components/InputArea.tsx:1131→/api/upload-blob",
+        "desktop/src/react/components/InputArea.tsx:1317→/api/upload-blob",
+        "desktop/src/react/components/InputArea.tsx:1675→/api/upload-blob",
         "desktop/src/react/services/chat-client.ts:29→/api/upload-blob"
       ],
       "status": "UNMAPPED_REFERENCED_DIRECT",
@@ -9041,8 +9199,8 @@
       "module": "web-auth (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/app-init.ts:434→/api/web-auth/login",
-        "desktop/src/react/mobile/MobileApp.tsx:135→/api/web-auth/login"
+        "desktop/src/react/app-init.ts:440→/api/web-auth/login",
+        "desktop/src/react/mobile/MobileApp.tsx:136→/api/web-auth/login"
       ],
       "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
       "mappedPath": null
@@ -9069,7 +9227,7 @@
       "module": "web-auth (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/mobile/MobileApp.tsx:78→/api/web-auth/logout"
+        "desktop/src/react/mobile/MobileApp.tsx:79→/api/web-auth/logout"
       ],
       "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
       "mappedPath": null
@@ -9082,7 +9240,7 @@
       "module": "ws-auth (mounted /api)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/services/server-connection.ts:767→/api/ws-ticket"
+        "desktop/src/react/services/server-connection.ts:802→/api/ws-ticket"
       ],
       "status": "UNMAPPED_REFERENCED_DUAL_BRANCH_ONLY",
       "mappedPath": null
@@ -9095,13 +9253,13 @@
       "module": "(server/index.ts direct)",
       "disposition": "retain",
       "consumers": [
-        "desktop/src/react/app-init.ts:250→/api/health",
-        "desktop/src/react/quick-chat/QuickChatApp.tsx:348→/api/health",
+        "desktop/src/react/app-init.ts:256→/api/health",
+        "desktop/src/react/quick-chat/QuickChatApp.tsx:349→/api/health",
         "desktop/src/react/quick-chat/rust-quick-chat.ts:8→/api/health",
         "desktop/src/react/services/rust-settings.ts:15→/api/health",
         "desktop/src/react/settings/actions.ts:88→/api/health",
         "desktop/src/react/stores/agent-actions.ts:58→/api/health",
-        "desktop/src/react/stores/session-actions.ts:977→/api/health"
+        "desktop/src/react/stores/session-actions.ts:994→/api/health"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/settings/avatar-health",
@@ -9112,7 +9270,7 @@
           "GET"
         ],
         "files": [
-          "rust/crates/lingxi-service/src/lib.rs:8835"
+          "rust/crates/lingxi-service/src/lib.rs:8888"
         ]
       }
     },
@@ -9188,7 +9346,7 @@
         "desktop/src/react/components/input/ThinkingLevelButton.tsx:40→/api/session-thinking-level",
         "desktop/src/react/components/input/ThinkingLevelButton.tsx:54→/api/session-thinking-level",
         "desktop/src/react/services/chat-client.ts:59→/api/session-thinking-level",
-        "desktop/src/react/stores/session-actions.ts:1752→/api/session-thinking-level"
+        "desktop/src/react/stores/session-actions.ts:1769→/api/session-thinking-level"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/session-thinking-level",
@@ -9215,7 +9373,7 @@
         "desktop/src/react/components/input/ThinkingLevelButton.tsx:40→/api/session-thinking-level",
         "desktop/src/react/components/input/ThinkingLevelButton.tsx:54→/api/session-thinking-level",
         "desktop/src/react/services/chat-client.ts:59→/api/session-thinking-level",
-        "desktop/src/react/stores/session-actions.ts:1752→/api/session-thinking-level"
+        "desktop/src/react/stores/session-actions.ts:1769→/api/session-thinking-level"
       ],
       "status": "MAPPED_ROUTE_EXISTS",
       "mappedPath": "/lingxi/v1/session-thinking-level",

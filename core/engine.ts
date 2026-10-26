@@ -961,6 +961,9 @@ export class LingxiEngine {
 
   /** @ui-focus-only 返回 UI 焦点 agent 实例，后端逻辑应通过 getAgent(agentId) 查询 */
   get agent() { return this._agentMgr.agent; }
+  // sessions.ts 的 prompt-snapshot 路由经 engine.sessionCoordinator 读冻结快照；此前
+  // Engine 未公开该访问器，路由恒 500（Cannot read properties of undefined）。
+  get sessionCoordinator() { return this._sessionCoord; }
   get usageLedger() { return this._usageLedger; }
   getAgent(agentId) { return this._agentMgr.getAgent(agentId); }
   async ensureAgentRuntime(agentId, opts: any = {}) {

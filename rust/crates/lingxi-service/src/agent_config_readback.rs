@@ -3275,10 +3275,16 @@ fn status_logical_date(memory: &MemoryService) -> Value {
     })
 }
 
-fn status_agent(memory: &MemoryService) -> Value {
-    let resolved = focus_agent_id(memory)
-        .ok()
-        .flatten()
+/// 状态面的 agent 解析：显式 agent（工具入口按运行会话归属）优先，否则焦点 agent。
+fn status_agent_id(memory: &MemoryService, agent_id: Option<&str>) -> Option<String> {
+    match agent_id.map(str::trim).filter(|id| !id.is_empty()) {
+        Some(id) => Some(id.to_string()),
+        None => focus_agent_id(memory).ok().flatten(),
+    }
+}
+
+fn status_agent(memory: &MemoryService, agent_id: Option<&str>) -> Value {
+    let resolved = status_agent_id(memory, agent_id)
         .map(|id| {
             let name = std::fs::read_to_string(memory.agents_root().join(&id).join("config.yaml"))
                 .ok()
@@ -3295,11 +3301,14 @@ fn status_agent(memory: &MemoryService) -> Value {
     json!({ "agent": resolved })
 }
 
-/// 模型值与运行时一致：焦点 agent config.yaml 的 models.chat 复合键
-/// （migration #5 后为 {id, provider}）；读不到逐级回退，最终显式 null
-/// （不猜造供应商结果）。config 以成熟 YAML 解析器整读为 JSON 树后取值。
-fn status_model(memory: &MemoryService, _session_id: Option<&str>) -> Value {
-    let chat = focus_agent_id(memory).ok().flatten().and_then(|id| {
+/// 模型值与运行时一致：agent（工具入口为运行会话所属 agent，HTTP 入口为焦点
+/// agent）config.yaml 的 models.chat 复合键（migration #5 后为 {id, provider}）；
+/// agent 未选定时回退服务已发布的 chat 路由绑定（运行时实际派发的主对话模型，
+/// 对照现役 getSessionModel || getCurrentModel）；都读不到才显式 null（不猜造）。
+/// config 以成熟 YAML 解析器整读为 JSON 树后取值。
+fn status_model(state: &ServiceState, agent_id: Option<&str>) -> Value {
+    let memory = state.memory();
+    let chat = status_agent_id(memory, agent_id).and_then(|id| {
         let config = am::config::read_yaml_mapping_as_json(
             &memory.agents_root().join(&id).join("config.yaml"),
         )
@@ -3308,16 +3317,24 @@ fn status_model(memory: &MemoryService, _session_id: Option<&str>) -> Value {
         config.pointer("/models/chat").cloned()
     });
     let resolved = match chat {
-        Some(value) => match &value {
-            Value::String(id) => json!({ "id": id, "provider": null, "name": id }),
-            Value::Object(map) => json!({
-                "id": map.get("id").cloned().unwrap_or(Value::Null),
-                "provider": map.get("provider").cloned().unwrap_or(Value::Null),
-                "name": map.get("name").or_else(|| map.get("id")).cloned().unwrap_or(Value::Null),
+        Some(Value::String(id)) => json!({ "id": id, "provider": null, "name": id }),
+        Some(Value::Object(map)) => json!({
+            "id": map.get("id").cloned().unwrap_or(Value::Null),
+            "provider": map.get("provider").cloned().unwrap_or(Value::Null),
+            "name": map.get("name").or_else(|| map.get("id")).cloned().unwrap_or(Value::Null),
+        }),
+        Some(_) => json!({ "id": null, "provider": null, "name": null }),
+        None => match state
+            .wired_model_gateway()
+            .and_then(|gateway| gateway.configured_routes().remove("chat"))
+        {
+            Some(binding) => json!({
+                "id": binding.model,
+                "provider": binding.provider,
+                "name": binding.model,
             }),
-            _ => json!({ "id": null, "provider": null, "name": null }),
+            None => json!({ "id": null, "provider": null, "name": null }),
         },
-        None => json!({ "id": null, "provider": null, "name": null }),
     };
     json!({ "model": resolved })
 }
@@ -3332,56 +3349,69 @@ fn current_session_id(memory: &MemoryService) -> Option<String> {
     })
 }
 
-pub async fn current_status_route(
-    State(state): State<ServiceState>,
-    Query(query): Query<std::collections::HashMap<String, String>>,
-) -> Response {
-    let action = query.get("action").map(String::as_str).unwrap_or("list");
+/// 状态面错误：参数类（400 / 工具 invalid_message）与运行时类（500 / 工具内部错误）。
+pub(crate) enum CurrentStatusError {
+    BadRequest(String),
+    Internal(String),
+}
+
+/// current_status 的共享负载计算（HTTP 只读面与 `current_status` 一方工具同源）。
+/// `session_id`/`agent_id`：HTTP 入口取焦点会话/焦点 agent；工具入口取运行会话
+/// 及其归属 agent（模型/会话值与运行时一致）。
+pub(crate) async fn current_status_payload(
+    state: &ServiceState,
+    action: &str,
+    key: Option<&str>,
+    session_id: Option<&str>,
+    agent_id: Option<&str>,
+) -> Result<Value, CurrentStatusError> {
     let memory = state.memory();
     if action == "list" {
-        return Json(json!({
+        return Ok(json!({
             "available": STATUS_KEYS
                 .iter()
                 .map(|(key, description)| json!({ "key": key, "description": description }))
                 .collect::<Vec<_>>(),
             "usage": "Call action=list to discover available status keys. Then call action=get with the smallest necessary key.",
-        }))
-        .into_response();
+        }));
     }
     if action != "get" {
-        return bad_request("current_status action must be list or get");
-    }
-    let Some(key) = query.get("key").map(|k| k.trim()).filter(|k| !k.is_empty()) else {
-        return bad_request(
-            "current_status get requires a key. Call action=list to see available keys.",
-        );
-    };
-    if !STATUS_KEYS.iter().any(|(known, _)| *known == key) {
-        return bad_request(format!(
-            "Unknown status key: {key}. Call action=list to see available keys."
+        return Err(CurrentStatusError::BadRequest(
+            "current_status action must be list or get".into(),
         ));
     }
-    let session_id = current_session_id(memory);
+    let Some(key) = key.map(str::trim).filter(|k| !k.is_empty()) else {
+        return Err(CurrentStatusError::BadRequest(
+            "current_status get requires a key. Call action=list to see available keys.".into(),
+        ));
+    };
+    if !STATUS_KEYS.iter().any(|(known, _)| *known == key) {
+        return Err(CurrentStatusError::BadRequest(format!(
+            "Unknown status key: {key}. Call action=list to see available keys."
+        )));
+    }
     let payload = match key {
         "time" => status_time(memory),
         "logical_date" => status_logical_date(memory),
-        "agent" => status_agent(memory),
-        "model" => status_model(memory, session_id.as_deref()),
+        "agent" => status_agent(memory, agent_id),
+        "model" => status_model(state, agent_id),
         "session" => {
-            let session_value = match session_id.as_deref() {
+            let session_value = match session_id {
                 None => json!({ "sessionId": null, "runtimeAvailable": false }),
                 Some(id) => match state.sessions().run_count(id).await {
                     Ok(run_count) => {
                         json!({ "sessionId": id, "runCount": run_count, "runtimeAvailable": true })
                     }
                     Err(err) => {
-                        return internal_error(format!("session runtime unavailable: {err}"));
+                        return Err(CurrentStatusError::Internal(format!(
+                            "session runtime unavailable: {err}"
+                        )));
                     }
                 },
             };
             json!({ "session": session_value })
         }
-        "session_files" => match session_id.as_deref() {
+        "session_files" => match session_id {
             None => {
                 json!({ "session_files": { "sessionId": null, "registryAvailable": true, "files": [] } })
             }
@@ -3428,20 +3458,34 @@ pub async fn current_status_route(
                         }
                     }),
                     Err(err) => {
-                        return internal_error(format!("session file registry unavailable: {err}"));
+                        return Err(CurrentStatusError::Internal(format!(
+                            "session file registry unavailable: {err}"
+                        )));
                     }
                 }
             }
         },
         "session_folders" => {
-            // 会话文件夹 scope（cwd/工作区/授权目录）由会话运行时持有；端口
-            // 服务不跟踪会话 cwd，显式缺席（空列表 + null cwd），不猜造。
+            // 会话文件夹 scope：授权目录来自会话行（R06 authorized-folders 面）；
+            // cwd/工作区/沙盒根由桌面运行时持有，端口服务不跟踪，显式缺席不猜造。
+            let authorized = match session_id {
+                Some(id) => match state.session_admin().get_session_row(id).await {
+                    Ok(Some(row)) => row.authorized_folders,
+                    Ok(None) => Vec::new(),
+                    Err(err) => {
+                        return Err(CurrentStatusError::Internal(format!(
+                            "session folder scope unavailable: {err:?}"
+                        )));
+                    }
+                },
+                None => Vec::new(),
+            };
             json!({
                 "session_folders": {
-                    "sessionPath": null,
+                    "sessionPath": session_id.map(crate::session_locator::native),
                     "cwd": null,
                     "workspaceFolders": [],
-                    "authorizedFolders": [],
+                    "authorizedFolders": authorized,
                     "sandboxFolders": [],
                 }
             })
@@ -3451,7 +3495,7 @@ pub async fn current_status_route(
             json!({ "bridge_context": { "isBridgeSession": false } })
         }
         "subagents" => {
-            let open = match session_id.as_deref() {
+            let open = match session_id {
                 None => Vec::new(),
                 Some(id) => state.subagents().threads_of(id),
             };
@@ -3470,7 +3514,28 @@ pub async fn current_status_route(
         }
         _ => unreachable!("键目录已核对"),
     };
-    Json(payload).into_response()
+    Ok(payload)
+}
+
+pub async fn current_status_route(
+    State(state): State<ServiceState>,
+    Query(query): Query<std::collections::HashMap<String, String>>,
+) -> Response {
+    let action = query.get("action").map(String::as_str).unwrap_or("list");
+    let session_id = current_session_id(state.memory());
+    match current_status_payload(
+        &state,
+        action,
+        query.get("key").map(String::as_str),
+        session_id.as_deref(),
+        None,
+    )
+    .await
+    {
+        Ok(payload) => Json(payload).into_response(),
+        Err(CurrentStatusError::BadRequest(message)) => bad_request(message),
+        Err(CurrentStatusError::Internal(message)) => internal_error(message),
+    }
 }
 
 // ── experiments（server/routes/experiments.ts + lib/experiments/registry.ts）─

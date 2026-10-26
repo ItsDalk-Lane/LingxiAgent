@@ -1,32 +1,35 @@
-# R08 决策简报｜两条解锁路径，请您二选一
+# R08 决策简报（2026-10-26 最终终态）
 
-- 日期：2026-10-25（R08 会话已按任务书 §8 到达诚实关闭态）
-- 终态实测（verify-r08-final-12）：叶 **14/126** PASS · 场景 **15/16** · 命令 **16/17** · overall=FAIL（诚实覆盖缺口表达）
-- 两轮独立评审（T06 PASS-with-MINORS、R08 终审 ACCEPT_HONENT_CLOSURE）接受的即此关闭态
+## 结论：R08 完成，可信 R09 准入（无需业主再裁决）
 
-## 路径 ①：a05 全绿（最终门 → 17/17 命令 + 16/16 场景）
+- 正式门 `verify-r08-closeout-08`：**overall=PASS** · 命令 **22/22** · 场景 **16/16** ·
+  候选绑定 **stable=true** · 补充叶 **126/126 PASS（0 BLOCKED / 0 FAIL）** ·
+  in-gate A/B **71 任务 = 68 parity + 3 recorded（ADJ-4/5 + 终端帧族传输面旧任务）+ 0 differs**。
+- 收据：`artifacts/rust-tauri/R08/verify-r08-closeout-08/verify-stage-result.json`；
+  真实红 closeout-07（A15 V4 套件 argv 指向仓库）保留在 `verify-r08-closeout-07/` 并在进度账说明修复。
+- 五项裁决（ADJ-1..ADJ-5）均已执行并在册（`CLOSEOUT_ADJUDICATIONS.md`），本轮无新增待决项。
 
-- **现状**：a05 唯一失败断言=row1-hide（Cmd+W 后 visibilityState=hidden）。六查穷尽：ZCode 上下文 TCC 已授权但焦点变更被宿主策略静默丢弃（-2700，Finder 同无效）/ 宿主重启无变化 / Terminal 复用与全新进程（授权前后）均 -1712/-609 / 配置描述文件清白（仅 allowSiri3489=0）/ 两级 TCC.db 直读被 SIP 拒。
-- **您可做的两件事**：
-  1. 联系 IT/MDM 管理员核对设备管理策略日志（设置面板层与描述文件层均已证明无限制，剩余差额只能从管理侧取证）；
-  2. 或在另一台无此现象的 Mac 上 clone 同仓库重跑：
-     ```bash
-     python3 -B scripts/rust-tauri/r08_stage_inputs.py \
-       --run-suite r08_t03_a05_drill --evidence /tmp/a05-recheck/SUITES/a05
-     ```
-- 成功后跑最终门（`cargo run --manifest-path rust/Cargo.toml -p xtask -- verify-stage R08 --evidence artifacts/rust-tauri/R08/verify-r08-final-<N+1>`）即达 17/17+16/16（叶数不变——a05 属场景面）。
+## 环境阻塞：无
 
-## 路径 ②：显式授权开启 112 pending 叶补证新阶段（R09+）
+- 旧 ENV-A05-FOCUS 已自愈；closeout-05/06/07/08 的 a05 均绿，未做宿主权限修改。
+- 唯一执行约束：正式门需独占环境（并发演习会让 a05 进程树计数失真，见 CLOSEOUT_BLOCKED.md C-CONCURRENCY）。
 
-- **范围**：D01 聊天/WS、D13 terminal WS、D20 CLI 三个域需**新线束设计**（本会话 A/B 线束形态不适用）；D02 余量约 53 叶多需产品侧合成前提（计划面板内容语义需模型工具合成、孤儿挂载、已删 Agent 会话等）；D-7/D-8/D-9/D-10 四起语义差与 PPG-1/PPG-3 需**产品裁决**（非测试问题）。
-- **启动前置**：需要您显式授权（本简报即授权入口——回复授权即开工）；新线束设计文档先行（design-first 纪律同 R08）。
-- **已就绪的地基**：A/B 线束（33 任务可扩展）、阶段图机器核对管线（full_original_behavior 案例唯一身份规则已趟通）、八轮补证方法论、六查诊断链模板。
+## 未完成/留待 R09+ 的事项（非 R08 准入门槛）
 
-## 一句话对照
+| 项 | 说明 |
+|---|---|
+| 提交/推送/发布 | 本会话按要求未 commit/push；未提交工作树是成果唯一副本，待业主另行指令。 |
+| D-1 标题投影 | 已登记差异（旧=null vs 新=stem），R09 评估。 |
+| PPG-1/PPG-3 | 预览限定接受（post-R08 产品修复）；已在前序账。 |
+| D-22 | session_folders 不存在目录：旧栈工具宽松/Rust 同路由口径拒绝（ADJ-3 同族，不入 cases）。 |
+| 子句级证据边界 | ask_user A4「ConfirmStore 不可用」由既有内核测试覆盖；UI 个别不可构造子句列于证据矩阵（均如实披露，未冒充）。 |
 
-| 路径 | 谁 | 达成 | 成本 |
-|---|---|---|---|
-| ① a05 解锁 | 您（IT/异机） | 17/17 命令 + 16/16 场景 | 低（单套件复验） |
-| ② 112 叶补证 | 授权后新会话 | 逐步提升叶 PASS 数 | 高（新线束+产品裁决） |
+入口：`CLOSEOUT_PROGRESS.md`（逐轮事实/红绿证据）、`CLOSEOUT_CHECKLIST.json`（126 项全 PASS，来自 closeout-08）、
+`R08_HANDOFF.json`（最终交接）、`R08_REPORT.md §十`（最终权威结论）。
 
-两条路径互不阻塞，可先后或并行。
+## 独立上下文验收（2026-10-26 20:30）
+
+独立审查者（未参与实施）结论 **ADMIT_R09**：独立复核 126 叶逐断言覆盖（findings=[]）、A/B 观测反算、
+UI/terminal 复跑、无门禁放水、隔离与文档一致性均成立；6 条记录项（F1/F4 建议转 R09）已写入
+`CLOSEOUT_PROGRESS.md` 与 `R08_HANDOFF.json`，不阻断门级判定。报告：
+`artifacts/rust-tauri/R08/closeout-proofs-02/independent-review/`。

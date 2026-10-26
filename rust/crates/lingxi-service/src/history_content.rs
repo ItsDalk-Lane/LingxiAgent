@@ -315,7 +315,25 @@ pub async fn session_find_route(
         Ok(projected) => projected,
         Err(err) => return storage_error_response(&err),
     };
-    let entries = collect_findable_entries(&projected.items);
+    // 4F1F69CCA760 A0「Bridge 内容脱敏」：现役 find 只对 bridge 会话路径做
+    // sanitizeBridgeVisibleText（sessions.ts:965）。Rust 的 bridge 身份 =
+    // 桥会话表 current_session_id 挂接（loop_conversation_by_session）；挂接
+    // 损坏（多行）按存储错误响亮失败，不猜一条。
+    let bridge_bound = match lingxi_adapters::storage::bridge::loop_conversation_by_session(
+        &db,
+        &session_id,
+    )
+    .await
+    {
+        Ok(binding) => binding.is_some(),
+        Err(err) => return storage_error_response(&err),
+    };
+    let mut entries = collect_findable_entries(&projected.items);
+    if bridge_bound {
+        for entry in &mut entries {
+            entry.text = sanitize_bridge_visible_text(&entry.text);
+        }
+    }
     let result = find_in_session_messages(&entries, &query);
     Json(json!({
         "query": query,
@@ -510,9 +528,9 @@ fn is_reminder_header_line(line: &str) -> bool {
 }
 
 /// Bridge 可见文本脱敏（shared/bridge-visible-text.ts）：`<t> M-D HH:MM </t>`
-/// 时间标签整段移除 + 行首空白剪除。现役只在 bridge 会话路径生效；Rust
-/// 会话模型无 bridge 路径概念（无路径形态存储），路由层不可达——保留
-/// 纯函数与单元证明，等 bridge 会话宿主落地后接线。
+/// 时间标签整段移除 + 行首空白剪除。现役只在 bridge 会话路径生效；Rust 侧
+/// 以桥会话表挂接（loop_conversation_by_session）判定 bridge 身份，由
+/// session_find_route 对可查找条目接线（R08-C③）。
 pub fn sanitize_bridge_visible_text(value: &str) -> String {
     let mut out = String::with_capacity(value.len());
     let mut rest = value;
@@ -902,6 +920,39 @@ pub async fn latest_user_message_replay_route(
                     }
                 }
             }
+            // 现役契约（sessions.ts:1515 / session-turn-actions.ts:347）：重放 =
+            // 分支重置后**服务端**把同一回合输入（或替换文字）作为全新回合重新提交
+            // （submitDesktopSessionMessage）。此前本路由只做重置+回执（D6 两段式），
+            // 与现役「重放并重跑」语义不符。这里复用 WS prompt 的同一提交管线
+            // （准入/校验/后台 drive 一致）；事件通道无人消费，广播仍走事件中枢。
+            let replay_text = serde_json::from_str::<Value>(&outcome.turn_input_content_json)
+                .ok()
+                .and_then(|v| v.get("text").and_then(Value::as_str).map(str::to_string))
+                .filter(|text| !text.trim().is_empty());
+            let replay_submitted = if let Some(text) = replay_text {
+                match serde_json::from_value::<crate::chat_wire::PromptRequest>(json!({
+                    "sessionId": outcome.session_id,
+                    "text": text,
+                    "clientMessageId": format!("replay:{}", outcome.turn_input_message_id),
+                    "snapshotVersion": snapshot_version,
+                })) {
+                    Ok(prompt_req) => {
+                        let (tx, _rx) = tokio::sync::mpsc::channel::<Value>(16);
+                        crate::chat_wire::prompt(
+                            state.clone(),
+                            principal,
+                            prompt_req,
+                            false,
+                            tx,
+                        )
+                        .await;
+                        true
+                    }
+                    Err(_) => false,
+                }
+            } else {
+                false
+            };
             Json(json!({
                 "ok": true,
                 "sessionId": outcome.session_id,
@@ -910,6 +961,7 @@ pub async fn latest_user_message_replay_route(
                 "newHeadMessageId": outcome.new_head_message_id,
                 "resetMarkerId": outcome.reset_marker_id,
                 "snapshotVersion": snapshot_version,
+                "replaySubmitted": replay_submitted,
             }))
             .into_response()
         }
@@ -1128,42 +1180,59 @@ pub async fn session_content_route(
         Ok(projected) => projected,
         Err(err) => return storage_error_response(&err),
     };
-    let referenced = projected.items.iter().any(|item| match item {
+    // 授权 = 「该 id 出现在本会话投影历史的资源引用中」；同时保留引用本体，
+    // 供 res_ 之外的产物资源（exec-output:/file:）回退解析（见下）。
+    let referenced_ref = projected.items.iter().find_map(|item| match item {
         HistoryItem::ToolCall {
             result: Some(result),
             ..
         } => result
             .resource_refs
             .iter()
-            .any(|r#ref| r#ref.resource_id.as_str() == content_id),
-        HistoryItem::FinalMessage { content, .. } => content.iter().any(|block| match block {
-            ContentBlock::ResourceRef { resource } => resource.resource_id.as_str() == content_id,
-            _ => false,
+            .find(|r#ref| r#ref.resource_id.as_str() == content_id)
+            .cloned(),
+        HistoryItem::FinalMessage { content, .. } => content.iter().find_map(|block| match block {
+            ContentBlock::ResourceRef { resource }
+                if resource.resource_id.as_str() == content_id =>
+            {
+                Some(resource.clone())
+            }
+            _ => None,
         }),
-        _ => false,
+        _ => None,
     });
-    if !referenced {
+    let Some(referenced_ref) = referenced_ref else {
         return EndpointError::not_found().into_response();
-    }
-    let resolved = match state.resources().resolve_content(&content_id).await {
-        Ok(content) => content,
-        Err(_) => return EndpointError::not_found().into_response(),
     };
-    // 读取方式与现役资源内容路由一致（resources.rs std::fs::read）。
-    let bytes = match std::fs::read(&resolved.file_path) {
-        Ok(bytes) => bytes,
-        Err(_) => return EndpointError::not_found().into_response(),
-    };
-    let (content, mime_type) = match String::from_utf8(bytes) {
-        Ok(text) => (text, None),
-        Err(err) => {
-            use base64::Engine as _;
-            (
-                base64::engine::general_purpose::STANDARD.encode(err.into_bytes()),
-                Some(resolved.mime.clone()),
-            )
+    let body = match state.resources().resolve_content(&content_id).await {
+        Ok(resolved) => {
+            // 读取方式与现役资源内容路由一致（resources.rs std::fs::read）。
+            let bytes = match std::fs::read(&resolved.file_path) {
+                Ok(bytes) => bytes,
+                Err(_) => return EndpointError::not_found().into_response(),
+            };
+            match String::from_utf8(bytes) {
+                Ok(text) => (text, None),
+                Err(err) => {
+                    use base64::Engine as _;
+                    (
+                        base64::engine::general_purpose::STANDARD.encode(err.into_bytes()),
+                        Some(resolved.mime.clone()),
+                    )
+                }
+            }
         }
+        // res_ 之外的产物资源回退：真实运行里 Rust 的大内容以工具产物资源落史
+        // （exec_command 溢写封面的 exec-output:<file>；write/edit 的 file:<path>）。
+        // 它们不是 session-file 资源，资源服务解析不到——但确实被本会话历史引用，
+        // 与该路由的授权语义一致。回退只读 data_home 内的服务自有产物目录。
+        Err(_) => match read_referenced_artifact(state.config().data_home.as_path(), &referenced_ref)
+        {
+            Some(body) => body,
+            None => return EndpointError::not_found().into_response(),
+        },
     };
+    let (content, mime_type) = body;
     Json(json!({
         "id": content_id,
         "kind": "resource",
@@ -1171,6 +1240,47 @@ pub async fn session_content_route(
         "mimeType": mime_type,
     }))
     .into_response()
+}
+
+/// 历史引用产物内容的回退解析（res_ 资源服务之外的唯一入口）。
+///
+/// 授权契约不变：调用方已证明该 id 出现在本会话投影历史的资源引用里；locator
+/// 不是授权凭证。这里只做「引用是本地文件 + 文件在 data_home 内」的最小读取：
+/// - 仅接受 `file://` 绝对路径；
+/// - canonical 化后必须位于 canonical data_home 之内（服务自有的溢写/产物目录；
+///   工作区或用户目录文件一律 404，不借历史引用越界读盘）；
+/// - 只读普通文件，上限 8MiB（与历史大内容体量级一致，避免内存放大）。
+fn read_referenced_artifact(
+    home: &std::path::Path,
+    reference: &lingxi_protocol::ResourceRef,
+) -> Option<(String, Option<String>)> {
+    const MAX_HISTORICAL_ARTIFACT_BYTES: u64 = 8 * 1024 * 1024;
+    let uri = reference.uri.as_deref()?;
+    let raw = uri.strip_prefix("file://")?;
+    let path = std::path::Path::new(raw);
+    if !path.is_absolute() {
+        return None;
+    }
+    let canonical_home = std::fs::canonicalize(home).ok()?;
+    let canonical_path = std::fs::canonicalize(path).ok()?;
+    if !canonical_path.starts_with(&canonical_home) {
+        return None;
+    }
+    let metadata = std::fs::metadata(&canonical_path).ok()?;
+    if !metadata.is_file() || metadata.len() > MAX_HISTORICAL_ARTIFACT_BYTES {
+        return None;
+    }
+    let bytes = std::fs::read(&canonical_path).ok()?;
+    Some(match String::from_utf8(bytes) {
+        Ok(text) => (text, None),
+        Err(err) => {
+            use base64::Engine as _;
+            (
+                base64::engine::general_purpose::STANDARD.encode(err.into_bytes()),
+                Some("application/octet-stream".to_string()),
+            )
+        }
+    })
 }
 
 // ═══════════════ F0319FC4F93D：单会话滚动摘要 ═══════════════
@@ -2664,6 +2774,54 @@ mod tests {
             json!(["user:r1", "r1-tc0001", "r1-final"])
         );
         assert_eq!(turns[0]["truncated"], json!(false));
+    }
+
+    fn artifact_ref(resource_id: &str, uri: Option<String>) -> lingxi_protocol::ResourceRef {
+        lingxi_protocol::ResourceRef {
+            resource_id: lingxi_protocol::ResourceId::new(resource_id),
+            kind: lingxi_protocol::ResourceKind::Artifact,
+            display_name: Some("artifact".to_string()),
+            uri,
+            digest: None,
+            size_bytes: None,
+        }
+    }
+
+    #[test]
+    fn referenced_artifact_fallback_reads_only_files_inside_home() {
+        let root = std::env::temp_dir().join(format!(
+            "lingxi-content-fallback-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let home = root.join("home");
+        let outside = root.join("outside");
+        std::fs::create_dir_all(home.join("lingxi-service/exec-tool-spill")).unwrap();
+        std::fs::create_dir_all(&outside).unwrap();
+        let inside_file = home.join("lingxi-service/exec-tool-spill/exec-output.log");
+        std::fs::write(&inside_file, "R08-LAZY-LINE-0000\nEND-R08-LAZY\n").unwrap();
+        let outside_file = outside.join("secret.log");
+        std::fs::write(&outside_file, "worktree secret").unwrap();
+
+        // 正路径：引用在 data_home 内的本地产物文件 → 按 UTF-8 文本返回。
+        let inside_uri = format!("file://{}", inside_file.display());
+        let inside = read_referenced_artifact(&home, &artifact_ref("exec-output:x", Some(inside_uri)))
+            .expect("home 内产物应可读取");
+        assert_eq!(inside.0, "R08-LAZY-LINE-0000\nEND-R08-LAZY\n");
+        assert_eq!(inside.1, None);
+
+        // 拒绝面：home 外路径（历史引用不是越界读盘的授权）、缺 uri、相对 uri、文件不存在。
+        let outside_uri = format!("file://{}", outside_file.display());
+        assert!(read_referenced_artifact(&home, &artifact_ref("exec-output:y", Some(outside_uri))).is_none());
+        assert!(read_referenced_artifact(&home, &artifact_ref("exec-output:z", None)).is_none());
+        assert!(read_referenced_artifact(&home, &artifact_ref("exec-output:r", Some("file:relative.log".into()))).is_none());
+        let missing = format!("file://{}", home.join("lingxi-service/no-such.log").display());
+        assert!(read_referenced_artifact(&home, &artifact_ref("exec-output:m", Some(missing))).is_none());
+
+        std::fs::remove_dir_all(&root).ok();
     }
 
     #[test]

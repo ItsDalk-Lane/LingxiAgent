@@ -10,6 +10,7 @@ import { applyBrowserStatus } from './browser-events';
 import { streamBufferManager } from '../hooks/use-stream-buffer';
 import { dispatchStreamKey } from './stream-key-dispatcher';
 import { getWebSocket } from './websocket';
+import { resolveServerConnection } from './server-connection';
 import { useStore } from '../stores';
 import { updateKeyed } from '../stores/create-keyed-slice';
 import { sessionScopedKey, sessionScopedListIncludes, sessionScopedValue } from '../stores/session-slice';
@@ -33,7 +34,7 @@ import {
   isStreamScopedMessage,
   updateSessionStreamMeta,
 } from './stream-resume';
-import { TODO_TOOL_NAMES, type TodoToolName } from '../utils/todo-constants';
+import { isTodoToolResult } from '../utils/todo-constants';
 import { migrateLegacyTodos, panelSnapshotFromToolDetails } from '../utils/todo-compat';
 import { extractLeadingSkillNotes } from '../utils/message-parser';
 import { renderMarkdown } from '../utils/markdown';
@@ -251,7 +252,9 @@ function hasOptimisticCurrentSession(): boolean {
 
 
 function applyTodoToolEnd(msg: any): void {
-  if (msg.type !== 'tool_end' || !TODO_TOOL_NAMES.includes(msg.name as TodoToolName)) return;
+  // 按名（todo/todo_write）或 mcp_call 桥接的版本化 todo 载荷形状识别；Rust 内核
+  // 以目标 id（tool:first-party:<name>）报名，谓词内剥前缀。
+  if (msg.type !== 'tool_end' || !isTodoToolResult(msg.name, msg.details)) return;
   const sp = msg.sessionPath;
   if (!sp) {
     console.warn('[ws] tool_end(todo) missing sessionPath, skipping');
@@ -295,6 +298,16 @@ function requestInputFocusForCurrentSession(sessionPath: string | null): void {
 function applyRunEndSideEffects(msg: any): void {
   scheduleSessionsRefresh('assistant_run_end');
   const runSp = msg.sessionPath;
+  // R08 收尾（D01）：context_usage 是旧内核 wire 帧；Rust wire 不认该变体，
+  // 收到即 close 1008 invalid_message——回复结束后无条件补发会把 Rust 连接
+  // 打断（t07 ab run-14 实证：round 后续任务 wsOpen=false）。Rust 连接的
+  // ContextRing 由 rust 分支自己的资源事件轮询维护，不经此帧。
+  const rustWire = (resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service');
+  if (rustWire) {
+    // Rust wire 不收 context_usage；压缩帧（compact）两内核同形，照常调度。
+    if (runSp && !msg.runSplit) maybeRunPendingAutoCompact(runSp);
+    return;
+  }
   if (runSp) {
     requestContextUsage(runSp);
     // 插话切分（runSplit）只是 Run 语义边界，会话仍在流式：

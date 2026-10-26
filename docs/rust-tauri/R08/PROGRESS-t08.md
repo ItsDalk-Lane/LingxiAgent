@@ -144,3 +144,21 @@
 - **verify-r08-final-15**（10:27→12:08）：**命令 17/17 PASS · 场景 16/16 PASS · 叶 20 PASS / 106 BLOCKED**——R08 首次命令与场景面全绿。门内实证：a05 连续第二轮原生键盘（`hideMechanism=keyboard / quitMechanism=keyboard / manualMode=false`，failures=[]）；a06 `quit-b sigterm-graceful + client-a-alive-after-b PASS + quit-a keyboard`；d1/d3 全绿且无 FETCH_RETRY；t07_ab `PASS stub provider reaped :: exit=0`（无孤儿）。
 - **overall 仍=FAIL，且只剩一个原因：106 枚 required_behavior_pending 叶按门规则记 BLOCKED（末阶段不得降级为 share-satisfied）**。这些叶需要 R09+ 授权（D01/D13/D20 新线束域 + D-7..D-10 / PPG-1 / PPG-3 产品裁决），即 R08_DECISION_BRIEF.md 路径②，超出本阶段任务书范围（§8 完成本阶段后停止）。
 - **R08 会话内可达成面就此全部达成**：十轮叶 2→20 · 命令 17/17 · 场景 16/16 · a05 原生键盘恢复 · a06 同 bundle 缺陷定名并修复 · d3 偶发取证武装 · 7 真缺陷修复 · 3 伪差异澄清 · 4 语义差登记。工作区不 commit（任务书约束），全部改动与证据留在工作区待审。
+
+## 第十二轮：收尾会话正式门 verify-r08-closeout-01/02（2026-10-25）
+
+- 本会话（/goal 直接实施）完成验收基础设施 A①–④、恢复链 B①–④、客户端语义 C①–③、A/B 差异全部关闭（42 任务 41 平价 + 1 已登记 recorded）、4 个 Rust 缺陷修复、27 叶新绑定；逐项记录在 `CLOSEOUT_PROGRESS.md`。
+- **verify-r08-closeout-01**（18:40→18:56）：18/20 命令（a04_ui 日志解析 bug：verbose 行无括号时长、3 测试实际全过；a05 electron-exit 45s 间歇红）、14/16 场景、叶 47/79/0、**stable=true**、overall=FAIL——保留为真实红。
+- 修复解析器；a05 单跑 `verdict=read-pass__write-blocked-PPG-1 failures=0`。
+- **verify-r08-closeout-02**（19:0x→19:2x）：**命令 20/20 · 场景 16/16 · 叶 47 PASS / 79 BLOCKED / 0 FAIL · candidateSourceBinding.stable=true · overall=FAIL**（唯一原因：79 叶 required_behavior_pending）。A13 合同 42/42、锚点 c3_find_redacts… ok。
+- 回归入口（同一候选）：typecheck 0 错；cargo build/--locked 通过；触及模块 lib 单测 50/50；`npm test` 20 文件/121 失败与纯净基线 aa99d2ec1 逐数相同（无关历史红，证据 `closeout-proofs-01/regression/`）。
+- **结论：R08 未完成，不可进入 R09**（硬指标①未满足：47/126）。剩余 79 叶与三项产品裁决见 `R08_DECISION_BRIEF.md` / `CLOSEOUT_BLOCKED.md`。本会话不 commit/push。
+
+## 第十三轮：续跑第二轮正式门 verify-r08-closeout-03（2026-10-26）
+
+- 业主五项裁决（ADJ-1..5）落实（CLOSEOUT_ADJUDICATIONS.md）；裁决解锁绑定 /new、/reset、默认权限 3 叶。
+- 新增：Rust /lingxi/v1/plan-mode 路由 + 客户端映射；plan-mode、快捷聊天偏好、输入草稿、WS compact 四族 A/B 任务双内核平价；三处旧内核专用 wire 帧的 Rust 连接门修复（此前 Rust 连接被 close 1008 打断）。
+- A/B 终态 run-30：51 任务 = 48 parity + 3 recorded + 0 differs；131 图钉案例 130 绿。
+- **verify-r08-closeout-03**：命令 19/20（a05 row1-hide 环境红——宿主 System Events 焦点再次被丢弃，连续 3 次同签名，ENV-A05-FOCUS 登记；产品代码自 closeout-02 绿证未改）、场景 15/16、**stable=true**、叶 **61 PASS / 65 BLOCKED / 0 FAIL**、overall=FAIL（仅因 65 pending + a05）。
+- 回归：typecheck 0 错；cargo 通过；rollback_delta 8/8、触及模块 11/11；npm test 失败集与基线逐文件逐数相同。
+- 结论：R08 未完成，不进 R09。剩余 65 叶断点与 a05 解锁条件在 CLOSEOUT_PROGRESS/BLOCKED。不 commit/push。

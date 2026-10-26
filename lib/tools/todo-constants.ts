@@ -27,6 +27,27 @@ export const TODO_STATE_CUSTOM_TYPE = "lingxi.todo_state";
  */
 export const TODO_FORMAT_VERSION = 2;
 
+/**
+ * 按需目录桥（mcp_call）转发 todo_write 时，tool_result 落档/事件的 toolName 是
+ * 桥本身（mcp_call），而非目标工具——仅按名筛选会让面板与收尾路由对
+ * 整条清单失明（todo_write 非常驻，默认即走桥）。桥接结果的识别依据是
+ * 版本化载荷形状：details.todoVersion 为当前格式版本且 todos 为数组。
+ * Rust 内核事件以目标 id（tool:first-party:<name>）报名，剥前缀后同口径。
+ */
+export const TOOL_CATALOG_CALL_TOOL_NAME = "mcp_call";
+
+export function isTodoToolResult(toolName: unknown, details: unknown): boolean {
+  const name = typeof toolName === "string" ? toolName.replace(/^tool:first-party:/, "") : "";
+  if (TODO_TOOL_NAMES.includes(name)) return true;
+  if (name !== TOOL_CATALOG_CALL_TOOL_NAME) return false;
+  if (!details || typeof details !== "object") return false;
+  const record = details as Record<string, unknown>;
+  // 桥接的 todo_write 拒绝结果（invalid_todos）同样属 todo 结果：前端据此保留
+  // 最后有效清单并标记更新失败，而不是把它当成别的工具的失败。
+  if (record.error === "invalid_todos") return true;
+  return record.todoVersion === TODO_FORMAT_VERSION && Array.isArray(record.todos);
+}
+
 /** 全部合法 todo 状态（含 v2 新增的 blocked / cancelled） */
 export const TODO_STATUSES = Object.freeze([
   "pending",

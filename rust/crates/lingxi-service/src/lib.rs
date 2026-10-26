@@ -144,6 +144,7 @@ pub mod phone_settings;
 pub mod phone_tools;
 pub mod preview;
 pub mod procsupervisor;
+pub mod terminals;
 pub mod projects;
 pub mod provider_probe;
 pub mod provider_routes;
@@ -173,6 +174,7 @@ pub mod session_ui;
 pub mod sessionfiles;
 pub mod sessions;
 pub mod sessiontools;
+pub mod status_tools;
 pub mod settings_configuration;
 pub mod settings_tools;
 pub mod settings_ui;
@@ -3041,6 +3043,13 @@ impl ServiceState {
                 collab,
                 &lingxi_kernel::toolcatalog::SchemaBudget::default(),
             );
+            // R08 收尾：current_status / session_folders 一方工具（此前仅有 HTTP 面）。
+            status_tools::register(
+                gateway.registry(),
+                gateway,
+                state.clone(),
+                &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+            );
         }
         let import_report =
             automation_import::import_current_studio(&automation::JobApi::from_state(&state)).await;
@@ -5084,6 +5093,44 @@ async fn retry_turn_route(
     }
 }
 
+/// `POST /lingxi/v1/sessions/{id}/turns/rollback-preview` — 只读预览重试轮次
+/// 的分支重置点与文件影响（现役 /api/sessions/turns/rollback-preview 对应面，
+/// R08 收尾补齐；不写状态、不动文件、不发布事件）。
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct TurnsRollbackPreviewBody {
+    #[serde(default)]
+    target_message_id: Option<String>,
+}
+
+async fn turns_rollback_preview_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+    body: Result<Json<TurnsRollbackPreviewBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    if let Err(resp) = gate_session_tree_write(&state, &principal, &session_id).await {
+        return resp;
+    }
+    let rollback_enabled = state.rollback_file_changes_enabled();
+    match state
+        .session_tree
+        .preview_turn_rollback(
+            &session_id,
+            req.target_message_id.as_deref(),
+            rollback_enabled,
+        )
+        .await
+    {
+        Ok(value) => (StatusCode::OK, Json(value)).into_response(),
+        Err(err) => session_tree_error_response(err),
+    }
+}
+
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 struct RewindRequestBody {
@@ -6388,7 +6435,7 @@ async fn put_session_project_route(
 
 /// R06 会话 id 生成：毫秒 + 进程级原子序号，同毫秒多次创建不碰撞
 /// （裸 `pid-ms` 在一毫秒内两次轮换会撞 session_exists）。
-fn fresh_session_id(now_unix_ms: u64) -> String {
+pub(crate) fn fresh_session_id(now_unix_ms: u64) -> String {
     static SEQUENCE: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
     let seq = SEQUENCE.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
     format!("sess-{}-{:x}-{seq}", std::process::id(), now_unix_ms)
@@ -6690,6 +6737,12 @@ async fn new_detached_session_route(
     };
     if let Err(response) = gate_agent_not_deleted(&state, &agent_id) {
         return response;
+    }
+    // R08 收尾 D02（9D9E72CB6051 A1）：显式 agentId 必须真实存在——此前只查
+    // 已删标记，不存在的助手目录也能为幽灵助手建独立会话（t07 ab 实证 201）。
+    // 与焦点新建（session_focus::create_session）同一存在性闸。
+    if let Err(error) = state.memory().agent_dir_checked(&agent_id) {
+        return error.response();
     }
     let mut lineage: Option<(String, i64)> = None;
     if let Some(parent_id) = req
@@ -7491,6 +7544,70 @@ where
     false
 }
 
+/// Dispatch for the D13 terminal frame family. `None` means "not a terminal
+/// frame" (the caller falls through to the regular request match); `Some`
+/// is the exact response frame to send on this connection.
+///
+/// Identity/authorization failures still answer with an explicit `error`
+/// frame (the incumbent generic WS error shape) instead of a content-bearing
+/// frame — a mismatched or foreign session never reaches terminal records.
+async fn handle_terminal_frame(
+    state: &ServiceState,
+    principal: &Principal,
+    request: &ws::WsClientRequest,
+) -> Option<serde_json::Value> {
+    let (session_id, session_path) = match request {
+        ws::WsClientRequest::TerminalSnapshotRequest {
+            session_id,
+            session_path,
+        }
+        | ws::WsClientRequest::TerminalTailRequest {
+            session_id,
+            session_path,
+            ..
+        }
+        | ws::WsClientRequest::TerminalCloseRequest {
+            session_id,
+            session_path,
+            ..
+        } => (session_id.as_deref(), session_path.as_deref()),
+        _ => return None,
+    };
+    let target = match terminals::resolve_target(state, principal, session_id, session_path).await {
+        Ok(target) => target,
+        Err(frame) => return Some(frame),
+    };
+    let requester = terminals::TerminalRequester::from_principal(principal);
+    let hub = terminals::TerminalHub::new(state.native_processes.clone());
+    Some(match request {
+        ws::WsClientRequest::TerminalSnapshotRequest { .. } => hub.snapshot(&requester, &target),
+        ws::WsClientRequest::TerminalTailRequest {
+            terminal_id,
+            since_seq,
+            ..
+        } => hub.tail(
+            &requester,
+            &target,
+            terminal_id.as_deref(),
+            since_seq.as_ref(),
+        ),
+        ws::WsClientRequest::TerminalCloseRequest {
+            terminal_id,
+            request_id,
+            ..
+        } => {
+            hub.close(
+                &requester,
+                &target,
+                terminal_id.as_deref(),
+                request_id.as_deref(),
+            )
+            .await
+        }
+        _ => unreachable!("only terminal frames reach this match"),
+    })
+}
+
 async fn run_ws_session<IO>(
     io: IO,
     state: ServiceState,
@@ -7707,6 +7824,16 @@ async fn run_ws_session<IO>(
                         };
                         let mood_request = matches!(&request, ws::WsClientRequest::SubscribeMood { .. });
                         let chat_interject=matches!(&request,ws::WsClientRequest::Interject(_));
+                        // ── D13 终端帧族（snapshot / tail / close）──
+                        // 真实实现：session 身份经 session_locator::resolve + 会话归属
+                        // 授权，再落到进程监督器的持久终端记录（见 terminals.rs）；
+                        // 不再回显式 capability error。
+                        if let Some(frame) = handle_terminal_frame(&state, &principal, &request).await {
+                            if ws::write_ws_text(&mut writer, &serde_json::to_vec(&frame).unwrap_or_default()).await.is_err() {
+                                return;
+                            }
+                            continue;
+                        }
                         match request {
                             ws::WsClientRequest::SubagentStopRequest {session_id, session_path, task_id, request_id} => {
                                 let result = background_tasks::ws_stop(&state, &principal, background_tasks::StopBody {session_id,session_path}, &task_id, request_id).await;
@@ -7738,6 +7865,11 @@ async fn run_ws_session<IO>(
                                     slash::dispatch(&state, &principal, &session_id, slash::SlashRequest { text, agent_id }, tx).await;
                                 });
                             }
+                            // D13 终端帧：上方 handle_terminal_frame 已处理并 continue，
+                            // 此臂仅为 match 穷尽性（不可达）。
+                            ws::WsClientRequest::TerminalSnapshotRequest { .. }
+                            | ws::WsClientRequest::TerminalTailRequest { .. }
+                            | ws::WsClientRequest::TerminalCloseRequest { .. } => {}
                             ws::WsClientRequest::SessionRead { session_id } => {
                                 let access = state.sessions.get_for(&principal, &session_id).await;
                                 if !ensure_ws_principal_current(
@@ -8426,6 +8558,10 @@ pub fn build_router(state: ServiceState) -> Router {
         .route(
             "/lingxi/v1/sessions/{session_id}/turns/retry",
             post(retry_turn_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/turns/rollback-preview",
+            post(turns_rollback_preview_route),
         )
         .route(
             "/lingxi/v1/sessions/{session_id}/rewind",
