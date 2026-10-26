@@ -421,3 +421,25 @@ contentId 取回」的可达数据源，按产品缺口补最小实现（见下�
 - 工作区：HEAD `aa99d2ec1` 未变、未提交/未推送；`git status` 79 项（含本轮全部源码/测试/证据/文档与
   前序成果）。受测候选 = HEAD + 未提交工作树（门回执 worktreeDirty=true）；本文件与其它收尾文档
   在门后写作，与受测候选分离（独立审查已逐文件确认门后仅文档变化）。
+
+### 提交与推送记录（2026-10-26 20:45，业主「直接提交并推送」指令）
+
+- 工作树拆两提交并已推送到 `origin/codex/rust-tauri-migration`（推送范围
+  `aa99d2ec1..307877337`）：
+  1. `ecacab152` `feat(r08): complete closeout — 126/126 leaf evidence, real terminal WS subsystem`
+     —— 69 文件（源码/测试/脚本/文档），+26075/−2217。
+  2. `307877337` `chore(r08): file closeout gate receipts + round-6 evidence`
+     —— 827 文件（closeout-01..08 收据/合同案例/日志 + round-6 红绿与独立审查证据），+314187。
+- 未入库但保留在磁盘（遵循既有收据提交先例与 .gitignore）：
+  - `verify-r08-closeout-*/candidate-source-*.json` 机器快照（.gitignore 第 185 行已排除；
+    候选绑定摘要与 before/after digest 在 verify-stage-result.json 内）；
+  - `verify-r08-closeout-07/08/SUITES/r08_ui_pages/{live,raw}` 大型 Electron/Vite 运行缓存
+    （约 250MB；live 回执与截图已在 closeout-proofs-02/ui-pages/live 归档，raw vitest JSON
+    在 ui-pages/raw 归档）。
+- **审计封印坐标未推进**：`.sync-audit/verified-source-sha.txt` 仍为 `ab4f2281…`；本次提交后
+  `tests/post-verification-audit-seal.test.ts` 会把 R08 变更视为非白名单差异（预期红）。按
+  AGENTS.md/PROGRESS.md 纪律，坐标推进/封印是**另行授权**的流程；本会话未修改审计白名单、
+  未退役门禁、未改验证语义。R08 验证证据绑定的是被推提交的同一工作树（门回执
+  worktreeDirty=true，候选绑定 stable）。
+- 推送后复核：本地 HEAD == `origin/codex/rust-tauri-migration` == `307877337`；工作区仅剩上述
+  未入库缓存/快照（未删除，唯一副本保留）。未推送 main、未发布、未合并。

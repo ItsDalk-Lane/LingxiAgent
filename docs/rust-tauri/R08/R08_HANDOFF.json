@@ -185,5 +185,20 @@
       "terminal single-task A/B re-run: exit 0, tasks=1 parity=1, 14/14 cases true on both legs; binary sha matches the A16 baseline",
       "python3 -B scripts/rust-tauri/r08_stage_inputs.py --check: exit 0 (digest + whole-graph byte match)"
     ]
+  },
+  "gitState": {
+    "branch": "codex/rust-tauri-migration",
+    "head": "307877337b073bc3ba28104a6cd6641a5c453d28",
+    "pushed": "origin/codex/rust-tauri-migration (aa99d2ec1..307877337)",
+    "commits": [
+      "ecacab152 feat(r08): complete closeout — 126/126 leaf evidence, real terminal WS subsystem (69 files)",
+      "307877337 chore(r08): file closeout gate receipts + round-6 evidence (827 files)"
+    ],
+    "unstagedButKeptOnDisk": [
+      "artifacts/rust-tauri/R08/verify-r08-closeout-*/candidate-source-*.json (gitignored machine snapshots; binding digests are inside verify-stage-result.json)",
+      "artifacts/rust-tauri/R08/verify-r08-closeout-07/08/SUITES/r08_ui_pages/{live,raw} (large Electron/Vite run caches; live receipts archived in closeout-proofs-02/ui-pages/live, vitest JSON in ui-pages/raw)"
+    ],
+    "auditSeal": "NOT advanced: .sync-audit/verified-source-sha.txt still ab4f2281…; the post-verification audit seal test will treat the R08 commits as non-whitelisted diff (expected red). Coordinate advancement/sealing is a separately authorized workflow; no whitelist edit, no gate retirement, no verification-semantics change in this session.",
+    "notes": "Gate evidence is bound to the same worktree that was committed (gate receipt worktreeDirty=true, candidate binding stable). No main push, no release, no merge."
   }
 }
