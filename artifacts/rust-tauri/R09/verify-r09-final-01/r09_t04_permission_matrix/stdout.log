@@ -1,0 +1,1 @@
+suite r09_t04_permission_matrix: status=FAIL exit=2 cases=43 failed=['blocked::tcc.real-prompt-and-revoke', 'blocked::computer-use.helper-real-input', 'blocked::screenshot.capture-execution', 'blocked::asr.real-recognition-result', 'blocked::speech.packaged-tcc-prompt', 'blocked::permission-matrix.linux-preview', 'blocked::permission-matrix.registered-host-e2e']

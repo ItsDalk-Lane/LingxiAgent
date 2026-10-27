@@ -5831,5 +5831,30 @@
   },
   "labels": {
     "thinking": "생각"
+  },
+  "systemPermissions": {
+    "title": "시스템 권한",
+    "description": "이 테스트 빌드는 마이크, 음성 인식, 알림 권한이 필요합니다. 아래 버튼으로 시스템 요청을 표시합니다.",
+    "microphone": "마이크",
+    "speech": "음성 인식",
+    "notification": "알림",
+    "request": "권한 요청",
+    "testNotification": "테스트 알림 보내기",
+    "granted": "승인됨",
+    "denied": "거부됨",
+    "unsupported": "지원되지 않음",
+    "failed": "요청 실패",
+    "notRequested": "요청 안 됨",
+    "micGranted": "마이크가 승인되었습니다",
+    "micDenied": "마이크가 거부되었습니다",
+    "micUnsupported": "마이크 요청을 지원하지 않습니다",
+    "speechGranted": "음성 인식이 승인되었습니다",
+    "speechDenied": "음성 인식이 거부되었습니다",
+    "speechResult": "권한 상태가 업데이트되었습니다",
+    "notificationTitle": "Lingxi 알림 테스트",
+    "notificationBody": "이 알림이 보이면 알림 권한이 정상입니다.",
+    "notificationSent": "테스트 알림을 보냈습니다",
+    "notificationFailed": "테스트 알림 전송 실패",
+    "dismiss": "닫기"
   }
 }

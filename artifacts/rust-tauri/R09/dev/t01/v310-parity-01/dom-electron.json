@@ -1,0 +1,35 @@
+{
+ "projection": {
+  "title": "Lingxi · Rust 预览",
+  "platform": "darwin",
+  "reactRootMounted": true,
+  "rootChildCount": 4,
+  "rootPath": [
+   "DIV#.",
+   "DIV#.app-shell",
+   "DIV#.connection-status.connected",
+   "DIV#.toast-container"
+  ],
+  "bodyTextHash": 2070827811,
+  "bodyTextLength": 233,
+  "hasHana": true,
+  "hasTauri": false,
+  "tauriInvoke": false,
+  "location": "file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/dist-renderer/index.html"
+ },
+ "connectionInfo": {
+  "port": 56128,
+  "token": "a1b6a140a0933cf52b2f0e46436db825",
+  "serverNodeKind": "lingxi-service",
+  "serverNodeTransport": "http",
+  "host": null
+ },
+ "health": {
+  "status": "ok",
+  "serverKind": "lingxi-service",
+  "serverVersion": "0.0.0",
+  "wireProtocolMin": 1,
+  "wireProtocolMax": 1,
+  "dataEpoch": 2
+ }
+}

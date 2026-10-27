@@ -1,0 +1,14 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/r07_pdf_chromium.rs (rust/target/debug/deps/r07_pdf_chromium-499d11c618388529)
+
+running 7 tests
+test actual_r01_documents_preserve_fonts_images_pagination_and_js_contract ... ok
+test broken_background_font_and_unfrozen_stylesheet_are_explicit_failures ... ok
+test html_network_frames_and_workers_never_reach_loopback_canary ... ok
+test printing_never_switches_or_clears_the_regular_logged_in_workspace ... ok
+test static_utf8_pdf_is_returned_only_after_confirmed_private_cleanup ... ok
+test total_deadline_and_explicit_cancel_reap_before_returning_failure ... ok
+test two_auxiliary_leases_are_scoped_and_dropped_future_is_cancelled ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 24.10s
+

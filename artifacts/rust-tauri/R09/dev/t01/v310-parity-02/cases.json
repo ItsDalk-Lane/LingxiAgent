@@ -1,0 +1,26 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t01_react_parity",
+ "cases": [
+  {
+   "case": "r09_t01_react_parity::producer",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "CANDIDATE_REQUIRED: LINGXI_R09_T01_TAURI_APP 路径不存在: /private/tmp/lingxi-r09-t07/evidence-app-gate-v310-20261027-100043.app.app/Contents/MacOS/lingxi-resource-desktop"
+   }
+  },
+  {
+   "case": "isolation::no-residual-processes",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "killed": [],
+    "residual": [],
+    "marker": "/private/tmp/lingxi-r09-runtime/r09_t01_react_parity-53935-1793066519629"
+   }
+  }
+ ]
+}

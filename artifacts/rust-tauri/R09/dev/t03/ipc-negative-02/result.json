@@ -1,0 +1,54 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t03_ipc_negative",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 3.065,
+ "caseCount": 54,
+ "casesSha256": "be9e19127cbaf56bcd055d0323257f847df5dd7ded3e83f7997eeb7b7179b2c4",
+ "commands": [
+  {
+   "id": "build::native-harness",
+   "argv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "rustc",
+    "--test",
+    "--edition",
+    "2021",
+    "--cfg",
+    "r09_standalone_test",
+    "--crate-name",
+    "native_host_harness",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t03/ipc-negative-02/harness/lib.rs",
+    "-o",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t03/ipc-negative-02/harness/native_host_harness"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.623,
+   "logSha256": "32e37ab25f9d8fe9a7dd5c4a01b91c7cd86e3c780e085e8860d8792553d80ae2"
+  },
+  {
+   "id": "test::native::ipc_negative_matrix::tests::negative_matrix_emits_evidence",
+   "argv": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t03/ipc-negative-02/harness/native_host_harness",
+    "--test-threads",
+    "1",
+    "--nocapture",
+    "native::ipc_negative_matrix::tests::negative_matrix_emits_evidence"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.111,
+   "logSha256": "de992bd14925e3acad920d95f0cc6c0b681533531182721ab6bd172d9a8292e4"
+  }
+ ],
+ "logSha256": "d0de2cc4567035339f3758659285c8eec158b72d7a94340cc86b0808cd61c45a",
+ "finishedAtUnixMs": 1793026934845,
+ "blockedPendingRegistration": [
+  "命令面已注册；逐窗口 invoke 负向矩阵（ACL 拒绝 + 无副作用）需真实 GUI/wdio（Lead GUI 禁令；T06 运行期矩阵）",
+  "未授权窗口调用必须被 Tauri ACL 拒绝；capability 配置已就绪（T06），真实宿主拒绝矩阵需 GUI/wdio",
+  "真实 IPC 注入后进程表探针（无子进程/无 shell）需真实宿主会话（Lead GUI 禁令）"
+ ],
+ "blockedKind": "BLOCKED_GUI_SMOKE"
+}

@@ -1,0 +1,38 @@
+{
+ "schema": "lingxi.r09.t06.release-evidence.v1",
+ "path": "/private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app",
+ "isolatedTargetDir": "/private/tmp/lingxi-r09-t06-release-evidence-target",
+ "features": [
+  "r09-host",
+  "r09-test-hooks"
+ ],
+ "evidenceBuild": true,
+ "releaseEvidence": true,
+ "appTreeSha256": "07df2e932c432c60af1593e7d31f61f9522d7827a82cf5da8208361c0320fd55",
+ "files": {
+  "Contents/Info.plist": "da9ebff0b848d9ff1e3e6e5ac545c7270904ceb2a65677095cbb3e400e01919a",
+  "Contents/MacOS/lingxi-resource-desktop": "fd8b5cd735c8c3c7336f990742d6816dc8c8d7bd11727ecad26512cd124dff31",
+  "Contents/MacOS/lingxi-service": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+  "Contents/Resources/Lingxi.icns": "0951f493d51b3537f2b5826d45e117bba1ead1802c38658e2c0ebb1d7706b4d3",
+  "Contents/Resources/rust-service/build.json": "f1dc84f9a79682fe74281d56ed022b7b57f9837ac43719f8be87fca35ab7337f",
+  "Contents/_CodeSignature/CodeResources": "29f762fbdee2d3cc08f4950a26c3e11c89a7bbcaa61e79449ae8da12f8109c70"
+ },
+ "exeSha256": "fd8b5cd735c8c3c7336f990742d6816dc8c8d7bd11727ecad26512cd124dff31",
+ "sidecarSha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+ "buildJsonSha256": "f1dc84f9a79682fe74281d56ed022b7b57f9837ac43719f8be87fca35ab7337f",
+ "rendererSha256InBuildJson": "cba1d4f39d01e7272dd3c1b9c024cef9a3529f97267cbf55e8277900fe11dec9",
+ "rendererMatchesFrozen": true,
+ "crateSourceDigest": "b5923974d7498a762683978444be0a7cae9b7cab2c2b12b57062adab0c613aa7",
+ "crateSourceFileCount": 167,
+ "codesignVerifyExit": 0,
+ "codesignSummary": {
+  "Identifier": "Identifier=com.lingxi.app",
+  "Format": "Format=app bundle with Mach-O thin (arm64)",
+  "Signature": "Signature=adhoc",
+  "TeamIdentifier": "TeamIdentifier=not set"
+ },
+ "buildLog": "/private/tmp/r09-t06-release-evidence-build.log",
+ "note": "T02 supervisor/ownership hidden release 负向用；不弹用户可见原生弹窗；v3.1 构建后 repo 生成物已恢复、delivery 未触碰。",
+ "sourceCandidate": "v3.1 frozen（app tree 1bae1e2806c5fc025c605c60878cdd8a59f87d86e78092b1d0a99b22f40768a9）",
+ "builtAt": "2026-10-26T23:47:18+0800"
+}

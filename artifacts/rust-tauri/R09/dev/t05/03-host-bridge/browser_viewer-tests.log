@@ -1,0 +1,36 @@
+    Blocking waiting for file lock on build directory
+   Compiling objc2-exception-helper v0.1.1
+   Compiling objc2 v0.6.4
+   Compiling objc2-foundation v0.3.2
+   Compiling wry v0.57.0
+   Compiling block2 v0.6.2
+   Compiling objc2-core-foundation v0.3.2
+   Compiling dispatch2 v0.3.1
+   Compiling objc2-quartz-core v0.3.2
+   Compiling trash v5.2.9
+   Compiling objc2-app-kit v0.3.2
+   Compiling objc2-web-kit v0.3.2
+   Compiling tao v0.37.1
+   Compiling window-vibrancy v0.8.1
+   Compiling muda v0.20.0
+   Compiling rfd v0.16.0
+   Compiling tauri-runtime v2.12.1
+   Compiling tauri-runtime-wry v2.12.1
+   Compiling tauri v2.12.1
+   Compiling tauri-plugin-fs v2.5.2
+   Compiling tauri-plugin-dialog v2.7.3
+   Compiling lingxi-resource-desktop v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 20.59s
+     Running unittests src/lib.rs (desktop/src-tauri/target/debug/deps/lingxi_resource_desktop-bee51bed04619003)
+
+running 7 tests
+test browser_viewer::tests::actions_and_tabs_are_whitelisted ... ok
+test browser_viewer::tests::base_url_rejects_credentials_query_and_foreign_scheme ... ok
+test browser_viewer::tests::connection_identity_changes_with_token_and_never_contains_it ... ok
+test browser_viewer::tests::native_session_matches_service_contract_and_rejects_paths ... ok
+test browser_viewer::tests::request_url_is_http_only_without_userinfo ... ok
+test browser_viewer::tests::viewer_context_shape_matches_react_type ... ok
+test browser_viewer::tests::viewer_url_targets_the_real_renderer_entry ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 49 filtered out; finished in 0.00s
+

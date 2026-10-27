@@ -796,9 +796,20 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
   }, []);
 
   useEffect(() => {
+    if (!editor || editor.isDestroyed) return;
     const surface = inputSurfaceRef.current;
     const card = inputCardRef.current;
-    const editorElement = editor?.view.dom;
+    // R09-T01：WKWebView 下 i18n 异步加载成功后 placeholder 会立刻变化，可能先于
+    // tiptap 的 EditorContent 挂载完成触发本 effect；`editor.view` getter 在
+    // view 就绪前会抛错并被区域 ErrorBoundary 兜底（首屏变成“此区域暂时无法
+    // 显示”）。这是宿主差异暴露的既有竞态：view 未就绪时跳过度量，等就绪后
+    // 的 ResizeObserver 路径再算，不改变布局语义。
+    let editorElement: HTMLElement;
+    try {
+      editorElement = editor.view.dom as HTMLElement;
+    } catch {
+      return;
+    }
     const parent = card?.closest('.main-content') as HTMLElement | null;
     if (!surface || !card || !editorElement || !parent) return;
 
@@ -848,7 +859,22 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
 
   useEffect(() => {
     if (!editor || editor.isDestroyed) return;
-    editor.view.dispatch(editor.state.tr.setMeta('input-placeholder-refresh', placeholder));
+    // R09-T01：同上的 Tauri/WKWebView 挂载竞态。view 未就绪时在下一帧重试一次，
+    // 而不是让异常冒泡到区域 ErrorBoundary；语义仍是“placeholder 变化后刷新
+    // 装饰”，只是把时序等待显式化。
+    const dispatchPlaceholderRefresh = (): boolean => {
+      try {
+        editor.view.dispatch(editor.state.tr.setMeta('input-placeholder-refresh', placeholder));
+        return true;
+      } catch {
+        return false;
+      }
+    };
+    if (dispatchPlaceholderRefresh()) return;
+    const frame = window.requestAnimationFrame(() => {
+      dispatchPlaceholderRefresh();
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, [editor, placeholder]);
 
   // Focus trigger from store

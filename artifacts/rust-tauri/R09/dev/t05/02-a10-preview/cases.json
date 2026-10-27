@@ -1,0 +1,387 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t05_untrusted_preview",
+ "cases": [
+  {
+   "case": "a10::chromium-installed",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "candidates": [
+     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+     "/Applications/Chromium.app/Contents/MacOS/Chromium",
+     "/usr/bin/chromium",
+     "/usr/bin/chromium-browser",
+     "/usr/bin/google-chrome"
+    ]
+   }
+  },
+  {
+   "case": "a10::environment-recorded",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "platform": "macos-arm64",
+    "chromePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "chromeVersion": "Google Chrome 155.0.8059.85",
+    "chromeSha256": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d",
+    "python": "3.14.3",
+    "isolation": {
+     "LINGXI_HOME": "/private/tmp/lingxi-r09-t05/runtime-a10/r09_t05_untrusted_preview-7183-1793022025581/home",
+     "TMPDIR": "/private/tmp/lingxi-r09-t05/runtime-a10/r09_t05_untrusted_preview-7183-1793022025581/tmp"
+    }
+   }
+  },
+  {
+   "case": "a10::real-service-ready-isolated-home",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "addr": "127.0.0.1:56711",
+    "home": "/private/tmp/lingxi-r09-t05/runtime-a10/r09_t05_untrusted_preview-7183-1793022025581/home",
+    "tokenFile": "/private/tmp/lingxi-r09-t05/runtime-a10/r09_t05_untrusted_preview-7183-1793022025581/home/lingxi-service/local-token.json",
+    "tokenLength": 32,
+    "note": "token 只用于宿主 HTTP 请求，不写入证据"
+   }
+  },
+  {
+   "case": "a10::origin-allowed::tauri://localhost",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": 200,
+    "origin": "tauri://localhost"
+   }
+  },
+  {
+   "case": "a10::origin-allowed::http://tauri.localhost",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": 200,
+    "origin": "http://tauri.localhost"
+   }
+  },
+  {
+   "case": "a10::origin-allowed::https://tauri.localhost",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": 200,
+    "origin": "https://tauri.localhost"
+   }
+  },
+  {
+   "case": "a10::origin-forged-rejected::tauri://evil",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": 403,
+    "origin": "tauri://evil"
+   }
+  },
+  {
+   "case": "a10::origin-forged-rejected::tauri://localhost.evil.example",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": 403,
+    "origin": "tauri://localhost.evil.example"
+   }
+  },
+  {
+   "case": "a10::origin-forged-rejected::http://evil.tauri.localhost",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": 403,
+    "origin": "http://evil.tauri.localhost"
+   }
+  },
+  {
+   "case": "a10::origin-forged-rejected::http://tauri.localhost.evil.example",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": 403,
+    "origin": "http://tauri.localhost.evil.example"
+   }
+  },
+  {
+   "case": "a10::origin-forged-rejected::http://tauri.localhost:8080",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": 403,
+    "origin": "http://tauri.localhost:8080"
+   }
+  },
+  {
+   "case": "a10::origin-forged-rejected::http://127.0.0.1.evil.example",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": 403,
+    "origin": "http://127.0.0.1.evil.example"
+   }
+  },
+  {
+   "case": "a10::origin-exact-match-not-wildcard",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "allowed": 3,
+    "forged": 6
+   }
+  },
+  {
+   "case": "a10::malicious-html-preview-created",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": 200,
+    "body": "{\"expiresAt\":1793022630671,\"id\":\"pv_a4a7dcea25d6127c57a712250fbf2a4d\",\"previewUrl\":\"http://127.0.0.1:56711/lingxi/v1/preview/html/pv_a4a7dcea25d6127c57a712250fbf2a4d?previewToken=WFrGJftZNaErWSiC00uXG"
+   }
+  },
+  {
+   "case": "a10::preview-served-with-csp",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": 200,
+    "csp": "default-src 'none'; base-uri 'self'; form-action 'none'; object-src 'none'; connect-src 'none'; script-src 'unsafe-inline' https:; style-src 'unsafe-inline' https:; font-src https: data:; img-src 'self' https: data: blob:; media-src 'self' https: data: blob:; frame-ancestors 'self' file: http://127.0.0.1:* http://localhost:* tauri: http://tauri.localhost https://tauri.localhost",
+    "referrerPolicy": "no-referrer"
+   }
+  },
+  {
+   "case": "a10::csp-frame-ancestors-includes-exact-tauri-origins",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "frameAncestors": "frame-ancestors 'self' file: http://127.0.0.1:* http://localhost:* tauri: http://tauri.localhost https://tauri.localhost"
+   }
+  },
+  {
+   "case": "a10::service-bearer-token-not-in-preview",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "previewBytes": 5886
+   }
+  },
+  {
+   "case": "a10::preview-token-cannot-call-browser-api",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": 401,
+    "body": "{\"code\":\"unauthorized\",\"details\":{\"causeId\":\"auth.invalid_credential\",\"reason\":\"invalid_credential\",\"requestId\":\"req-ab4"
+   }
+  },
+  {
+   "case": "a10::preview-token-cannot-read-other-preview",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": 404
+   }
+  },
+  {
+   "case": "a10::no-bearer-cannot-read-fs",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": 401
+   }
+  },
+  {
+   "case": "a10::preview-forged-ancestor-origin-header-rejected",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": 403
+   }
+  },
+  {
+   "case": "a10::tauri-ancestor-iframe-loaded-and-script-ran",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "reports": 0,
+    "chromeExit": 0
+   }
+  },
+  {
+   "case": "a10::wrapper-tauri-canary-zero-invocations",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "calls": []
+   }
+  },
+  {
+   "case": "a10::wrapper-denied-token-request",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "tokenRequests": 0
+   }
+  },
+  {
+   "case": "a10::loopback-ancestor-baseline-retained",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "chromeExit": 0
+   }
+  },
+  {
+   "case": "a10::frame-ancestors-denied::evil.tauri.localhost",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "probes": 0,
+    "chromeExit": 0,
+    "note": "伪造祖先帧下 token 化预览未被加载（CSP frame-ancestors）"
+   }
+  },
+  {
+   "case": "a10::frame-ancestors-denied::evil.example",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "probes": 0,
+    "chromeExit": 0,
+    "note": "伪造祖先帧下 token 化预览未被加载（CSP frame-ancestors）"
+   }
+  },
+  {
+   "case": "a10::svg-img-rendered-no-script-execution",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "image": {
+     "src": "http://127.0.0.1:56671/asset/malicious.svg",
+     "complete": true,
+     "naturalWidth": 0,
+     "loaded": null,
+     "error": "load-error"
+    },
+    "scriptProbes": 0,
+    "note": "SVG 经 <img> 渲染：脚本惰性化；未出现脚本执行 marker"
+   }
+  },
+  {
+   "case": "a10::svg-img-cannot-read-file-url",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "image": {
+     "src": "http://127.0.0.1:56671/asset/malicious.svg",
+     "complete": true,
+     "naturalWidth": 0,
+     "loaded": null,
+     "error": "load-error"
+    },
+    "note": "img 内 file:// 引用不产生可读内容；能否加载由 <img> 语义决定"
+   }
+  },
+  {
+   "case": "a10::benign-svg-img-loads",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "image": {
+     "src": "http://127.0.0.1:56671/asset/benign.svg",
+     "complete": true,
+     "naturalWidth": 320,
+     "loaded": "1",
+     "error": null
+    }
+   }
+  },
+  {
+   "case": "a10::benign-html-preview-created",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": 200
+   }
+  },
+  {
+   "case": "a10::benign-html-preview-iframe-loads",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "reports": 0,
+    "chromeExit": 0
+   }
+  },
+  {
+   "case": "a10::loopback-canary-zero-hits",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "hits": 0,
+    "sample": []
+   }
+  },
+  {
+   "case": "a10::svg-script-probes-zero-hits",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "hits": 0
+   }
+  },
+  {
+   "case": "a10::preview-service-regression-green",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": {
+     "passed": 5,
+     "failed": 0,
+     "ignored": 0
+    }
+   }
+  },
+  {
+   "case": "a10::pdf-resource-gate-canary-zero",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": {
+     "passed": 1,
+     "failed": 0,
+     "ignored": 0
+    }
+   }
+  },
+  {
+   "case": "a10::service-shutdown-exit-clean",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "returncode": 0
+   }
+  },
+  {
+   "case": "isolation::real-home-untouched",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "before": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    },
+    "after": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    }
+   }
+  }
+ ]
+}

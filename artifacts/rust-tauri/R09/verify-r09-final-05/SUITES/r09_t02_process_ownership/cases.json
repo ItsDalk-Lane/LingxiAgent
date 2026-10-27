@@ -1,0 +1,356 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t02_process_ownership",
+ "cases": [
+  {
+   "case": "t02::candidate.debug-consume-only",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "source": "env",
+    "mode": "debug",
+    "executableSha256": "6fb2371cafddcfdc1a837ccb67648f37b04f422c13dceecc205f08a07e94f759"
+   }
+  },
+  {
+   "case": "t02::candidate.debug-features",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "features": [
+     "e2e-test",
+     "r09-host",
+     "r09-test-hooks"
+    ]
+   }
+  },
+  {
+   "case": "t02::candidate.release-consume-only",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "app": "/private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app",
+    "executableSha256": "d0072dbea750dffac45357c595a7ae59a5fbc49dd4f3fe433ce8bdbcabac708d",
+    "features": [
+     "r09-host"
+    ]
+   }
+  },
+  {
+   "case": "t02::two-services-coexist",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "local": [
+     {
+      "pid": 4772,
+      "ppid": 4771,
+      "pgid": 4772,
+      "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-4768-1793035055060/home-own-local"
+     }
+    ],
+    "remote": [
+     {
+      "pid": 4770,
+      "ppid": 4768,
+      "pgid": 4768,
+      "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-4768-1793035055060/home-remote"
+     }
+    ],
+    "appPid": 4771
+   }
+  },
+  {
+   "case": "t02::exit-owned-tree-only",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "exit": {
+     "exit": 0,
+     "timedOut": false
+    },
+    "shutdown": {
+     "confirmed": true,
+     "event": "shutdown",
+     "exit": {
+      "code": 0,
+      "signal": null,
+      "success": true
+     },
+     "forceKillWaitMs": 5000,
+     "graceMs": 17000,
+     "mode": "local-owned",
+     "ownedPids": [
+      4772
+     ],
+     "residual": [],
+     "schema": "lingxi.r09.tauri-launch.v1",
+     "signaled": [
+      "SIGTERM:pid=4772"
+     ],
+     "touchedRemote": false,
+     "unixMs": 1793035057661
+    },
+    "localAfter": [],
+    "newServices": []
+   }
+  },
+  {
+   "case": "isolation::ps-clean-ownership-owned+remote",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "label": "ownership-owned+remote",
+    "aliveAppPids": [],
+    "residualServices": []
+   }
+  },
+  {
+   "case": "t02::remote-untouched",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "remotePid": 4770,
+    "remoteAfter": [
+     {
+      "pid": 4770,
+      "ppid": 4768,
+      "pgid": 4768,
+      "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-4768-1793035055060/home-remote"
+     }
+    ],
+    "ppidBefore": 4768,
+    "instanceShaBefore": "f59d18e4f7da67a440324ed70ba0edf4ff5d76e736518bd1c414ca910d30e958",
+    "instanceShaAfter": "f59d18e4f7da67a440324ed70ba0edf4ff5d76e736518bd1c414ca910d30e958"
+   }
+  },
+  {
+   "case": "isolation::ps-clean-ownership-reused",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "label": "ownership-reused",
+    "aliveAppPids": [],
+    "residualServices": []
+   }
+  },
+  {
+   "case": "t02::reused-is-detached",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "serviceReady": {
+     "event": "service-ready",
+     "instanceId": "2e33b41f24faca2ee506fc308103fa37",
+     "mode": "local-reused",
+     "owned": false,
+     "pid": 4799,
+     "port": 63848,
+     "schema": "lingxi.r09.tauri-launch.v1",
+     "unixMs": 1793035061202
+    },
+    "shutdown": {
+     "confirmed": false,
+     "event": "shutdown",
+     "exit": null,
+     "forceKillWaitMs": 0,
+     "graceMs": 0,
+     "mode": "local-reused",
+     "ownedPids": [],
+     "residual": [],
+     "schema": "lingxi.r09.tauri-launch.v1",
+     "signaled": [],
+     "touchedRemote": false,
+     "unixMs": 1793035061730
+    },
+    "reusedAlive": true,
+    "exit": {
+     "exit": 0,
+     "timedOut": false
+    }
+   }
+  },
+  {
+   "case": "isolation::ps-clean-ownership-remote",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "label": "ownership-remote",
+    "aliveAppPids": [],
+    "residualServices": []
+   }
+  },
+  {
+   "case": "t02::remote-mode-zero-touch",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "serviceReady": {
+     "event": "service-ready",
+     "host": "127.0.0.1",
+     "identity": {
+      "serverId": "server_0dFo1nbWjf7XZBd7ayVRJw",
+      "studioId": "studio_5Q3cuEU9OoedFa76_rV9IA"
+     },
+     "mode": "remote",
+     "port": 63838,
+     "schema": "lingxi.r09.tauri-launch.v1",
+     "touchedRemote": false,
+     "unixMs": 1793035062747
+    },
+    "shutdown": {
+     "confirmed": false,
+     "event": "shutdown",
+     "exit": null,
+     "forceKillWaitMs": 0,
+     "graceMs": 0,
+     "mode": "remote",
+     "ownedPids": [],
+     "residual": [],
+     "schema": "lingxi.r09.tauri-launch.v1",
+     "signaled": [],
+     "touchedRemote": false,
+     "unixMs": 1793035063275
+    },
+    "remoteAlive": true,
+    "exit": {
+     "exit": 0,
+     "timedOut": false
+    }
+   }
+  },
+  {
+   "case": "isolation::ps-clean-ownership-package-refuses-remote",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "label": "ownership-package-refuses-remote",
+    "aliveAppPids": [],
+    "residualServices": []
+   }
+  },
+  {
+   "case": "t02::packaged-refuses-remote",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "exit": {
+     "exit": 2,
+     "timedOut": false
+    },
+    "record": {
+     "actual": null,
+     "appVersion": "0.1.43",
+     "atUnixMs": 1793035063781,
+     "debugBuild": false,
+     "detail": null,
+     "expected": null,
+     "fallbackAttempts": 0,
+     "home": "/private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-4768-1793035055060/home-release-remote-refusal",
+     "message": "Rust remote desktop connection is a dev preview; release builds refuse it",
+     "nodeFallback": "none",
+     "packaged": true,
+     "reason": "REMOTE_REQUIRES_DEV_BUILD",
+     "schema": "lingxi.r09.service-launch-failure.v1"
+    },
+    "recordPath": "/private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-4768-1793035055060/tmp/lingxi-tauri-launch/7dcf0747887937fc/failure.json"
+   }
+  },
+  {
+   "case": "isolation::ps-clean-ownership-pid-reuse",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "label": "ownership-pid-reuse",
+    "aliveAppPids": [],
+    "residualServices": []
+   }
+  },
+  {
+   "case": "t02::pid-reuse-safe",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "exit": {
+     "exit": 2,
+     "timedOut": false
+    },
+    "record": {
+     "actual": null,
+     "appVersion": "0.1.43",
+     "atUnixMs": 1793035064947,
+     "debugBuild": false,
+     "detail": {
+      "kind": "entity not found",
+      "path": "/private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-4768-1793035055060/home-pid-reuse/lingxi-service/local-token.json"
+     },
+     "expected": null,
+     "fallbackAttempts": 0,
+     "home": "/private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-4768-1793035055060/home-pid-reuse",
+     "message": "runtime record stat failed: No such file or directory (os error 2)",
+     "nodeFallback": "none",
+     "packaged": true,
+     "reason": "RUST_SERVICE_INSTANCE_INVALID",
+     "schema": "lingxi.r09.service-launch-failure.v1"
+    },
+    "sleeperAlive": true,
+    "recordPath": "/private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-4768-1793035055060/tmp/lingxi-tauri-launch/b65b83fea6d391f5/failure.json"
+   }
+  },
+  {
+   "case": "isolation::no-residual-processes",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "killed": [],
+    "residual": [],
+    "marker": "/private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-4768-1793035055060"
+   }
+  },
+  {
+   "case": "isolation::real-home-untouched",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "before": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    },
+    "after": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    }
+   }
+  },
+  {
+   "case": "t02::no-orphan-owned-services",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "orphans": [],
+    "marker": "/private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-4768-1793035055060",
+    "note": "finally 级 kill/SIGKILL 后按进程表断言零残留（含 release sidecar）；宿主被 SIGKILL 时 macOS 无父死子亡原语，属已知边界——优雅退出路径由 shutdown 报告 residual=[] 覆盖"
+   }
+  }
+ ]
+}

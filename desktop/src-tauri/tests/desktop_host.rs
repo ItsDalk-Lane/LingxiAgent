@@ -211,10 +211,7 @@ async fn native_desktop_resource_roundtrip_real_gui() {
     // 规范化形式，比较的是「选中的就是这个文件」而非路径字面拼写。
     let selected_canonical = selected.canonicalize().unwrap_or_else(|_| selected.clone());
     assert_eq!(pick, json!([selected_canonical]));
-    assert_eq!(
-        fs::read_to_string(&selected).unwrap(),
-        "原生选择不修改文件"
-    );
+    assert_eq!(fs::read_to_string(&selected).unwrap(), "原生选择不修改文件");
     assert_eq!(
         driver
             .script(
@@ -287,7 +284,10 @@ async fn native_desktop_resource_roundtrip_real_gui() {
                 .await;
             let ok = state["editor"].as_str() == Some("# resource-changed\n");
             println!("EDITOR_REFRESH_STATE {state}");
-            assert!(Instant::now() < deadline || ok, "编辑器未随资源变更刷新：{state}");
+            assert!(
+                Instant::now() < deadline || ok,
+                "编辑器未随资源变更刷新：{state}"
+            );
             if ok {
                 break;
             }

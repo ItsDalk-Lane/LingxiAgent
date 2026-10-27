@@ -1,0 +1,191 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t07_native_e2e",
+ "cases": [
+  {
+   "case": "t07::platform.macos-arm64-recorded",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "os": "27.0.1",
+    "osBuild": "26A434",
+    "arch": "arm64",
+    "kernel": "27.0.0",
+    "hostPlatform": "macos-arm64",
+    "webkit": "22625.1.29.11.28",
+    "display": "Chipset Model: Apple M3 Ultra\n          Resolution: 2560 x 1440 (QHD/WQHD - Wide Quad High Definition)"
+   }
+  },
+  {
+   "case": "t07::fixtures.deterministic-v3-anchor",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "first": "80a8d2c2640e2b2974b299a10f36679bc19daf0911e51f82f0c43399cb32feaa",
+    "second": "80a8d2c2640e2b2974b299a10f36679bc19daf0911e51f82f0c43399cb32feaa",
+    "anchor": "80a8d2c2640e2b2974b299a10f36679bc19daf0911e51f82f0c43399cb32feaa"
+   }
+  },
+  {
+   "case": "t07::fixtures.long-session-1000",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "staged": {
+     "path": "/private/tmp/lingxi-r09-runtime/r09_t07_native_e2e-29018-1793028299893/home-t07-fixtures/t07-fixtures/v3",
+     "treeDigest": "3bbb5d4bacb8af51dbcf46f5d947b9a6480e963252afac4b93a14b9cee996f8a",
+     "fileCount": 36
+    },
+    "sessions": [
+     "sess-t07-long-1000",
+     "sess-t07-tools-ok",
+     "sess-t07-tools-fail",
+     "sess-t07-tools-nofinal"
+    ]
+   }
+  },
+  {
+   "case": "t07::fixtures.tool-cards-candidate-schema",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "schemaStatus": "candidate-unverified",
+    "boundary": "legacy 夹具进入 Rust home 需 R08-T04i cutover 导入 CLI；且 rust-mode app-init 停在 status.rustCoreUnavailable，不加载会话列表（native-caps §9 非宿主面）。A13 长会话/工具卡 UI 断言依赖服务侧读取接线后的 cleared E2E 批次，不在 UI 上伪造。"
+   }
+  },
+  {
+   "case": "t07::native-e2e.candidate-consume-only",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "appBin": "/private/tmp/lingxi-r09-t07/evidence-app-v2-20261026-232431/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+    "receipt": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/.tauri-build/build-receipt-debug.json",
+    "rule": "只读消费候选；不写/不构建 desktop/src-tauri"
+   }
+  },
+  {
+   "case": "t07::native-e2e.candidate-sha",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "candidateSha256": "e87ba4c5ae2cd9c8730a1617a827c330471a7d2c9361e650cf172bd73c66d079"
+   }
+  },
+  {
+   "case": "t07::gui-cleared",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "env": "LINGXI_R09_ALLOW_GUI",
+    "note": "GUI 批次必须由 Lead cleared 后设置；未 cleared 时本套件不得启动窗口"
+   }
+  },
+  {
+   "case": "t07::native-e2e.candidate-features",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "features": [
+     "e2e-test",
+     "r09-host",
+     "r09-test-hooks"
+    ],
+    "candidateSha256": "e87ba4c5ae2cd9c8730a1617a827c330471a7d2c9361e650cf172bd73c66d079",
+    "receipt": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/.tauri-build/build-receipt-debug.json"
+   }
+  },
+  {
+   "case": "t07::native-e2e.shell",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "dpr": 1,
+    "hasHana": false,
+    "hasTauri": true,
+    "location": "tauri://localhost",
+    "platform": "darwin",
+    "title": "Lingxi · Rust 预览"
+   }
+  },
+  {
+   "case": "t07::native-e2e.ime-chinese-composition",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "available": true,
+    "boundary": "合成 CompositionEvent，不是系统输入法",
+    "compositionSynthetic": true,
+    "inserted": "灵犀中文输入测试",
+    "matches": true,
+    "observed": "灵犀中文输入测试",
+    "tag": "DIV"
+   }
+  },
+  {
+   "case": "t07::native-e2e.selection-range",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "anchorTag": "DIV",
+    "available": true,
+    "selected": 9
+   }
+  },
+  {
+   "case": "t07::native-e2e.scroll-surface-recorded",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "maxOverflow": 0,
+    "scrollContainers": 0
+   }
+  },
+  {
+   "case": "t07::native-e2e.dpi",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "dpr": 1,
+    "innerHeight": 788,
+    "innerWidth": 960,
+    "visualViewportScale": 1
+   }
+  },
+  {
+   "case": "t07::native-e2e.focus-listeners",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "documentHasFocus": false,
+    "listenersReady": true
+   }
+  },
+  {
+   "case": "t07::native-e2e.context-menu-policy",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "editablePrevented": true,
+    "nonEditablePrevented": true
+   }
+  },
+  {
+   "case": "r09_t07_native_e2e::producer",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "error": "wdio script error: {'available': True, 'error': 'TypeError: Load failed', 'ok': False, 'url': 'asset://localhost/%2Fprivate%2Ftmp%2Flingxi-r09-runtime%2Fr09_t07_native_e2e-29018-1793028299893%2Ftmp%2Ft07-asset-fixture.txt'}"
+   }
+  },
+  {
+   "case": "isolation::no-residual-processes",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "killed": [],
+    "residual": [],
+    "marker": "/private/tmp/lingxi-r09-runtime/r09_t07_native_e2e-29018-1793028299893"
+   }
+  }
+ ]
+}

@@ -1,0 +1,13 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_capability_audit",
+ "status": "FAIL",
+ "exitCode": 2,
+ "caseCount": 58,
+ "failedCases": [
+  "caps::protected-commands-window-scoped"
+ ],
+ "audit": "capability-audit.json",
+ "policy": "docs/rust-tauri/R09/R09_COMMAND_POLICY.json",
+ "gapLedgerRemaining": 0
+}

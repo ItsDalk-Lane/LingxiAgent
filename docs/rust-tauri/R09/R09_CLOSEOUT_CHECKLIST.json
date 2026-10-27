@@ -1,0 +1,1124 @@
+{
+  "schema": "lingxi.r09.closeout-checklist.v1",
+  "stage": "R09",
+  "generatedFrom": {
+    "stageMap": "rust/crates/xtask/src/stage_maps/R09.json",
+    "fullBindings": "scripts/rust-tauri/r09_stage_inputs.py:FULL_BINDINGS",
+    "gateResult": "artifacts/rust-tauri/R09/verify-r09-final-05/verify-stage-result.json"
+  },
+  "gateSummary": {
+    "overall": "FAIL",
+    "testedSha": "aac8cb9fe6bb7bfa7a41d75528221136bfe55e50",
+    "candidateStable": true,
+    "candidateSourceDigest": "d1c7da140ec4bc93572d797f088f9938b729bd44f00336e08baf9eca55b6865d",
+    "candidateSourceFileCount": 29221,
+    "commandsPass": 13,
+    "commandsTotal": 21,
+    "scenariosPass": 6,
+    "scenariosTotal": 16,
+    "supplementalLeaves": 74,
+    "leafPass": 15,
+    "leafBlocked": 59,
+    "leafFail": 0
+  },
+  "commands": [
+    {
+      "ref": "r09_inputs_check",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "ref": "r09_t01_react_parity",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "ref": "r09_t01_release_offline",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "ref": "r09_t02_supervisor_ready",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "ref": "r09_t02_process_ownership",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "ref": "r09_t03_native_matrix",
+      "status": "FAIL",
+      "exitCode": 2
+    },
+    {
+      "ref": "r09_t03_ipc_negative",
+      "status": "FAIL",
+      "exitCode": 2
+    },
+    {
+      "ref": "r09_t04_permission_matrix",
+      "status": "FAIL",
+      "exitCode": 2
+    },
+    {
+      "ref": "r09_t04_remote_boundary",
+      "status": "FAIL",
+      "exitCode": 2
+    },
+    {
+      "ref": "r09_t05_browser_pdf",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "ref": "r09_t05_untrusted_preview",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "ref": "r09_service_seam_probe",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "ref": "r09_t06_capability_matrix",
+      "status": "FAIL",
+      "exitCode": 2
+    },
+    {
+      "ref": "r09_t06_release_attack_surface",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "ref": "r09_capability_audit",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "ref": "r09_t07_native_e2e",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "ref": "r09_t07_release_smoke",
+      "status": "FAIL",
+      "exitCode": 2
+    },
+    {
+      "ref": "r09_t08_shell_parity",
+      "status": "FAIL",
+      "exitCode": 2
+    },
+    {
+      "ref": "r09_t08_host_completeness",
+      "status": "FAIL",
+      "exitCode": 2
+    },
+    {
+      "ref": "r09_map_integrity",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "ref": "r09_gate_negative",
+      "status": "PASS",
+      "exitCode": 0
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "R09-A01",
+      "status": "PASS"
+    },
+    {
+      "id": "R09-A02",
+      "status": "PASS"
+    },
+    {
+      "id": "R09-A03",
+      "status": "PASS"
+    },
+    {
+      "id": "R09-A04",
+      "status": "PASS"
+    },
+    {
+      "id": "R09-A05",
+      "status": "FAIL"
+    },
+    {
+      "id": "R09-A06",
+      "status": "FAIL"
+    },
+    {
+      "id": "R09-A07",
+      "status": "FAIL"
+    },
+    {
+      "id": "R09-A08",
+      "status": "FAIL"
+    },
+    {
+      "id": "R09-A09",
+      "status": "PASS"
+    },
+    {
+      "id": "R09-A10",
+      "status": "PASS"
+    },
+    {
+      "id": "R09-A11",
+      "status": "FAIL"
+    },
+    {
+      "id": "R09-A12",
+      "status": "FAIL"
+    },
+    {
+      "id": "R09-A13",
+      "status": "FAIL"
+    },
+    {
+      "id": "R09-A14",
+      "status": "FAIL"
+    },
+    {
+      "id": "R09-A15",
+      "status": "FAIL"
+    },
+    {
+      "id": "R09-A16",
+      "status": "FAIL"
+    }
+  ],
+  "items": [
+    {
+      "id": "R00-T02-LA-03A9E92909C6",
+      "status": "PASS",
+      "requirement": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-03A9E92909C6::a1-clear-site-data-success-and-failure-receipt",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-03A9E92909C6::a2-clear-state-matches-actual-side-effect",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-0DEEE4813B0A",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-1120B2AA320D",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-13049521EA0C",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-1329EA46F72C",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-15DFB1AED8F2",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-15E163FBFBE8",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-1629CDD9EA4F",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-173C6332527D",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-178C8CBA29C2",
+      "status": "PASS",
+      "requirement": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-178C8CBA29C2::a1-close-session-real-stop-and-state-broadcast",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-178C8CBA29C2::a2-close-invalid-unauthorized-downstream-explicit",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-1809C8E13EA3",
+      "status": "PASS",
+      "requirement": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-1809C8E13EA3::a1-read-prefs-and-running-state-no-write",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-1809C8E13EA3::a2-put-apply-no-widened-write-or-disclosure",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-18FE3FDFF9A5",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-1C41525D379C",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-1D4C7E9C713C",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-1E6EDB731186",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-322E02C7F2F9",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-367052089D11",
+      "status": "PASS",
+      "requirement": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-367052089D11::a1-states-running-resumable-unavailable-projection",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-367052089D11::a2-states-invalid-unauthorized-downstream-explicit",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-37E6C3B9A7B8",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-38B14B7B34BD",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-394DD07D2968",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-3FA31D4C3100",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-4173A08A51CC",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-429D86C4F952",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-54DC0A05A0DE",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-57728C0A6D0A",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-58822B6B138B",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-593534A4F2AB",
+      "status": "PASS",
+      "requirement": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-593534A4F2AB::a1-sessions-list-cold-url-retained",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-593534A4F2AB::a2-sessions-invalid-unauthorized-explicit",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-59987671E5AD",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-5D5938D61A00",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-6006FD0BF07D",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-6774E79F6714",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-6E13E5DF05EB",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-6E8307F57F42",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-70B07E378F42",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-713E908B7B2F",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-7D212CBD9EEF",
+      "status": "PASS",
+      "requirement": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-7D212CBD9EEF::a1-verify-success-persists-only-after-real-success",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-7D212CBD9EEF::a2-verify-reject-no-widened-persistence-visible-error",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-8A45B19A18B4",
+      "status": "PASS",
+      "requirement": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-8A45B19A18B4::a1-real-back-forward-reload-url-title-flags",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-8A45B19A18B4::a2-no-active-view-and-illegal-urls-explicit",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-8BD3BCC6D725",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-8FE26C132D8B",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-9350C3E12165",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-98B458390B7E",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-9C679D21A188",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-A09B78985A14",
+      "status": "PASS",
+      "requirement": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-A09B78985A14::a1-emergency-stop-revoke-until-new-user-run",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-A09B78985A14::a2-no-legacy-local-instance-and-close-failure-visible",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-A14D3027C881",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-A2E507EBDEF2",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-A30E4BDF2FA2",
+      "status": "PASS",
+      "requirement": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-A30E4BDF2FA2::a1-navigation-title-and-snapshot-match",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-A30E4BDF2FA2::a2-stale-ref-explicit-failure",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-A30E4BDF2FA2::a3-session-a-state-not-leaked-to-b",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-A30E4BDF2FA2::a4-no-session-blocked-or-browser-error-explicit-no-cross-session",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-A67D342381C0",
+      "status": "PASS",
+      "requirement": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-A67D342381C0::a1-tabs-and-active-sync-server-snapshot",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-A67D342381C0::a2-invalid-tab-and-close-failure-explicit",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-AC5B6EDA3FBD",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-ACA2C4C1158D",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-B6A97A19F2CB",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-B72A6D3886B7",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-BEC2074CC33C",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-C5AAF360D10F",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-CA446FE1DB71",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-CD873C715D96",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-D15E0ADC0608",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-D1B56A275C3A",
+      "status": "PASS",
+      "requirement": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-D1B56A275C3A::a1-search-real-links-and-provider",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-D1B56A275C3A::a2-no-config-not-fake-success",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-D1B56A275C3A::a3-missing-key-rate-limit-failure-explicit",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-D2575672A18D",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-D29DE479076C",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-D34F2D718CF3",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-DCD85A04A7E9",
+      "status": "PASS",
+      "requirement": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-DCD85A04A7E9::a1-open-session-explicit-resume-cold-metadata",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-DCD85A04A7E9::a2-open-invalid-unauthorized-downstream-explicit",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-DF4B5168ABB5",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-E6FB08FBBFAA",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-E84F01456B6C",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-ED5FD5B469B8",
+      "status": "PASS",
+      "requirement": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-ED5FD5B469B8::a1-update-prefs-save-and-return-new-state",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-ED5FD5B469B8::a2-apply-failure-400-readback-no-auto-rollback",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-EF9EEE38D8F6",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-F1A5597E3E78",
+      "status": "PASS",
+      "requirement": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-F1A5597E3E78::a1-close-and-revoke-authority-real",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-F1A5597E3E78::a2-revoke-invalid-unknown-explicit",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-F5DBF2A80E28",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-F6235778F816",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-F9786414DD11",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-FB5C78308878",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-FD5B420182C6",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    },
+    {
+      "id": "R00-T02-LA-FD7A5A76B8EA",
+      "status": "PASS",
+      "requirement": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-FD7A5A76B8EA::a1-fetch-body-and-final-url-session-file",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-FD7A5A76B8EA::a2-blocked-page-not-normal-content",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "leaf:R00-T02-LA-FD7A5A76B8EA::a3-invalid-url-redirect-network-error-no-workspace-write",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-FF1B331F1019",
+      "status": "BLOCKED",
+      "requirement": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "assertionResults": []
+    }
+  ],
+  "finalDeliveryStatus": "INCOMPLETE_BLOCKED_PENDING_RUNTIME_EVIDENCE",
+  "nextStageAdmission": "NOT_GRANTED",
+  "knownBlockers": [
+    "T03 native_matrix 门内 guiStats: executed 60 / passed 21 / failed 28 / blocked 11 / manual 3（真实动作/工具/权限面仍有失败）",
+    "T03 ipc_negative exit2（Negative 矩阵部分依赖 GUI/TCC）",
+    "T04 permission_matrix blockedKind BLOCKED_SYSTEM_PERMISSIONS|BLOCKED_GUI_SMOKE|BLOCKED_REAL_PROVIDER；remote_boundary BLOCKED_GUI_SMOKE|BLOCKED_SYSTEM_PERMISSIONS",
+    "T06 capability_matrix 21 blocked::runtime.*；门后 ACL hidden v33-02 PASS_WITH_BLOCKED_WINDOWS / 105 cases / blocked 35（27 side-effect + 7 window-open + 1 union）",
+    "T07 release.file-task 硬编码 False（PENDING_T06_COMMANDS，未真实执行）；G1 scroll/focus 仅指标/监听",
+    "T08 shell 60 failed（capability pending 33/blocked 3/pendingCount 59 + parity context-menu 矛盾）；host 25 failed（a16Ok 25/50 + 24 能力运行期 pending）",
+    "platform: macos-x64/windows-x64/linux-x64 无真机（BLOCKED_PLATFORM）",
+    "signing: ad-hoc only（BLOCKED-SIGNING-IDENTITY）",
+    "real provider credentials missing（BLOCKED-REAL-PROVIDER）"
+  ],
+  "independentReview": {
+    "status": "COMPLETED_WITH_FINDINGS",
+    "findingsCount": 14,
+    "independentReviewPassed": false,
+    "note": "docs corrected; final-05 receipt after tooling freeze; no re-review"
+  },
+  "postGateNote": "final-05 为工具冻结后正式门；门后仅文档/证据包更新。候选二进制未变（delivery ddbd1fad… / G1 27bf075a… / renderer b0a20250…）"
+}

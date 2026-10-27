@@ -1,0 +1,42 @@
+{
+ "allowed": {
+  "tauri://localhost": {
+   "status": 200,
+   "body": "{\"status\":\"ok\",\"serverKind\":\"lingxi-service\",\"serverVersion\":\"0.0.0\",\"wireProtocolMin\":1,\"wireProtocolMax\":1,\"dataEpoch\""
+  },
+  "http://tauri.localhost": {
+   "status": 200,
+   "body": "{\"status\":\"ok\",\"serverKind\":\"lingxi-service\",\"serverVersion\":\"0.0.0\",\"wireProtocolMin\":1,\"wireProtocolMax\":1,\"dataEpoch\""
+  },
+  "https://tauri.localhost": {
+   "status": 200,
+   "body": "{\"status\":\"ok\",\"serverKind\":\"lingxi-service\",\"serverVersion\":\"0.0.0\",\"wireProtocolMin\":1,\"wireProtocolMax\":1,\"dataEpoch\""
+  }
+ },
+ "forged": {
+  "tauri://evil": {
+   "status": 403,
+   "body": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-9dc7bcbdac249882b79ec92ba710ebf0\"},\"message\":\"transport p"
+  },
+  "tauri://localhost.evil.example": {
+   "status": 403,
+   "body": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-e55a54decd1fc2a2ecb3a579032a23f6\"},\"message\":\"transport p"
+  },
+  "http://evil.tauri.localhost": {
+   "status": 403,
+   "body": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-020f20424f04b972e5d719df7dc9d2ca\"},\"message\":\"transport p"
+  },
+  "http://tauri.localhost.evil.example": {
+   "status": 403,
+   "body": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-3e66f81a84229e54553dcf822c323f26\"},\"message\":\"transport p"
+  },
+  "http://tauri.localhost:8080": {
+   "status": 403,
+   "body": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-ffdefda36c3f966b08979f01be2206ee\"},\"message\":\"transport p"
+  },
+  "http://127.0.0.1.evil.example": {
+   "status": 403,
+   "body": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-56cfca9db9d8b0536bf1e1351dbf276a\"},\"message\":\"transport p"
+  }
+ }
+}

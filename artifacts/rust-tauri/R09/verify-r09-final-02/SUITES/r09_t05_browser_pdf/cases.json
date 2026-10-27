@@ -1,0 +1,116 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t05_browser_pdf",
+ "cases": [
+  {
+   "case": "env::chromium-installed",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "candidates": [
+     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+     "/Applications/Chromium.app/Contents/MacOS/Chromium",
+     "/usr/bin/chromium",
+     "/usr/bin/chromium-browser",
+     "/usr/bin/google-chrome"
+    ],
+    "LINGXI_TEST_CHROMIUM": null
+   }
+  },
+  {
+   "case": "a09::environment-recorded",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "platform": "macos-arm64",
+    "chromePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "chromeVersion": "Google Chrome 155.0.8059.85",
+    "chromeSha256": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d",
+    "rustToolchain": "rustup run 1.98.1",
+    "python": "3.14.3",
+    "node": "v24.16.0",
+    "electronReferenceVersion": "v42.8.1",
+    "isolation": {
+     "LINGXI_HOME": "/private/tmp/lingxi-r09-runtime/r09_t05_browser_pdf-75656-1793032048360/home",
+     "TMPDIR": "/private/tmp/lingxi-r09-runtime/r09_t05_browser_pdf-75656-1793032048360/tmp"
+    },
+    "oldChainEnvironment": "独立对照目录/隔离 HOME；旧链不进测试安装",
+    "platformBlocked": [
+     "macos-x64",
+     "windows-x64",
+     "linux-x64"
+    ]
+   }
+  },
+  {
+   "case": "a09::r01-frozen-baseline-verified",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "files": 4,
+    "commit": "15fa0cee3^"
+   }
+  },
+  {
+   "case": "a09::electron-available-for-reference-only",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "electron": "/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/.bin/electron",
+    "note": "旧链只在独立对照环境运行，不进测试安装"
+   }
+  },
+  {
+   "case": "a09::old-chain-exit-zero",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "job": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-02/SUITES/r09_t05_browser_pdf/old-chain/job-s1.json",
+    "exit_code": 0,
+    "signal": null,
+    "spawn_error": null,
+    "wall_ms": 902,
+    "timed_out": false,
+    "output_exists": true,
+    "output_size": 994832
+   }
+  },
+  {
+   "case": "a09::old-chain-s1-pdf-produced",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "bytes": 994832
+   }
+  },
+  {
+   "case": "a09::pdfkit-probe-built",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "executable": "/private/tmp/lingxi-r09-runtime/r09_t05_browser_pdf-75656-1793032048360/bin/pdf_probe"
+   }
+  },
+  {
+   "case": "a09::old-chain-74-pages",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "pageCount": 74
+   }
+  },
+  {
+   "case": "a09::old-chain-reproduction-matches-r01-frozen",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "pageCountFrozen": 74,
+    "pageCountRegenerated": 74,
+    "perPageLumaGridMaxDiff": 0.0,
+    "textLengthFrozen": 91198,
+    "textLengthRegenerated": 91198,
+    "note": "R01 冻结 old probe 来自 git 15fa0cee3^；重生成基线必须逐页一致"
+   }
+  }
+ ]
+}

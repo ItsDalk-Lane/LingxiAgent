@@ -1,0 +1,81 @@
+{
+ "schema": "lingxi.r09.t05.old-chain-baseline.v1",
+ "note": "R09-A09 旧链对照基线：Electron 生产 office-pdf-helper 在独立对照环境重生成；旧链只作对照，不进 Tauri 测试安装。",
+ "environment": {
+  "platform": "macos-arm64",
+  "chromePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "chromeVersion": "Google Chrome 155.0.8059.85",
+  "chromeSha256": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d",
+  "rustToolchain": "rustup run 1.98.1",
+  "python": "3.14.3",
+  "node": "v24.16.0",
+  "electronReferenceVersion": "v42.8.1",
+  "isolation": {
+   "LINGXI_HOME": "/private/tmp/lingxi-r09-t05/runtime-a09g/r09_t05_browser_pdf-51388-1793023607552/home",
+   "TMPDIR": "/private/tmp/lingxi-r09-t05/runtime-a09g/r09_t05_browser_pdf-51388-1793023607552/tmp"
+  },
+  "oldChainEnvironment": "独立对照目录/隔离 HOME；旧链不进测试安装",
+  "platformBlocked": [
+   "macos-x64",
+   "windows-x64",
+   "linux-x64"
+  ]
+ },
+ "pdf": {
+  "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-per-assertion-final/old-chain/s1-long-zh.pdf",
+  "sha256": "10828bf50c38601dcf6de46f45c5ed07a1823c450e25b90ac92f4307578728de",
+  "bytes": 994832,
+  "pageCount": 74
+ },
+ "probe": {
+  "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-per-assertion-final/old-chain/probe",
+  "dir": "old-chain/probe",
+  "pdfSha256InProbe": null
+ },
+ "reproductionVsR01FrozenHistory": {
+  "frozenProbePath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R01/T05/a09/old/probe/probe.json",
+  "frozenProbeGitBlobSha1": "76db4518c2d0a662be4666bd0e9b9b0ce46b5e4f",
+  "pageCountEqual": true,
+  "perPageLumaGridMaxAbsDiff": 0.0,
+  "textLengthFrozen": 91198,
+  "textLengthRegenerated": 91198,
+  "textSha256Frozen": "3071523347e0bf9fd55e2c42806a3f1a555ce7d4e539b9a80840acda35328151",
+  "textSha256Regenerated": "3071523347e0bf9fd55e2c42806a3f1a555ce7d4e539b9a80840acda35328151",
+  "allEquivalent": true
+ },
+ "r01BaselineProvenance": [
+  {
+   "path": "artifacts/rust-tauri/R01/T05/a09/new/probe/probe.json",
+   "gitCommit": "15fa0cee3^",
+   "gitBlobSha1": "69744cb4c6974cc8bb9603a2f8704c5cb388309a",
+   "sha256": "6ff9527f0a2f1e0d73b9c18bcb5dde6bb0a877b3c76d4c79c49c6a9af00503d4",
+   "restored": false,
+   "note": "兼容性恢复的未跟踪工作区文件，非 R09 候选实现；R07 判据不变"
+  },
+  {
+   "path": "artifacts/rust-tauri/R01/T05/a09/new/probe/text.txt",
+   "gitCommit": "15fa0cee3^",
+   "gitBlobSha1": "12bab09e5f8557bb28f29b5c80300c9ec022bb60",
+   "sha256": "aed576b3ab4629f9a4e8092765b7205ec3552d231536d4cc65a065c1de5fd5ec",
+   "restored": false,
+   "note": "兼容性恢复的未跟踪工作区文件，非 R09 候选实现；R07 判据不变"
+  },
+  {
+   "path": "artifacts/rust-tauri/R01/T05/a09/old/probe/probe.json",
+   "gitCommit": "15fa0cee3^",
+   "gitBlobSha1": "76db4518c2d0a662be4666bd0e9b9b0ce46b5e4f",
+   "sha256": "b117fc1833ab2fc97c5fde390089f192e1134a520139aa90902ff5fd7b47e58f",
+   "restored": false,
+   "note": "兼容性恢复的未跟踪工作区文件，非 R09 候选实现；R07 判据不变"
+  },
+  {
+   "path": "artifacts/rust-tauri/R01/T05/a09/old/probe/text.txt",
+   "gitCommit": "15fa0cee3^",
+   "gitBlobSha1": "afa556f924254ef224ed3e9cf0eecde8d76e9127",
+   "sha256": "3071523347e0bf9fd55e2c42806a3f1a555ce7d4e539b9a80840acda35328151",
+   "restored": false,
+   "note": "兼容性恢复的未跟踪工作区文件，非 R09 候选实现；R07 判据不变"
+  }
+ ],
+ "noteOnRestoredFiles": "R01 冻结基线是从 git 历史恢复的未跟踪工作区文件（兼容性恢复），非 R09 候选实现；R07 判据不变。"
+}

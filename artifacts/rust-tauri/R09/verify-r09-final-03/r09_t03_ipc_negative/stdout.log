@@ -1,0 +1,1 @@
+suite r09_t03_ipc_negative: status=FAIL exit=2 cases=54 failed=['blocked::ipc::registered-host-negative-invoke', 'blocked::ipc::acl-denied-window', 'blocked::ipc::no-child-process-observed']

@@ -1,0 +1,29 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t07_native_e2e",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 3.437,
+ "caseCount": 19,
+ "casesSha256": "579f90409264800e3672a8033639e26757b4310d8db5754d27ec5118cef10b19",
+ "commands": [
+  {
+   "id": "t07-fixtures",
+   "argv": [
+    "python3",
+    "-B",
+    "scripts/rust-tauri/r09_t07_fixture.py",
+    "--home",
+    "/private/tmp/lingxi-r09-runtime/r09_t07_native_e2e-47015-1793029733889/home-t07-fixtures",
+    "--evidence",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t07/g1-hidden-v31-02/fixtures"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.18,
+   "logSha256": "8f534c4e5ed3dd2950d7113e0ad6c13f55c16951240f879da230966ef2280a81"
+  }
+ ],
+ "logSha256": "5a3d3173b4a7607a235aa457984c43f29453b1ba39bb5df1bf21d9562a587d38",
+ "finishedAtUnixMs": 1793029737326,
+ "failureDetail": "wdio script error: {'available': True, 'error': 'img-onerror', 'loaded': False, 'url': 'asset://localhost/%2Fprivate%2Ftmp%2Flingxi-r09-runtime%2Fr09_t07_native_e2e-47015-1793029733889%2Fhome-native-e2e%2Ft07-asset-probe.png'}"
+}

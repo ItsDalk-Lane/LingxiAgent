@@ -1,0 +1,40 @@
+{
+ "label": "s1",
+ "unixMs": 1793025559487,
+ "app": [
+  {
+   "pid": 2955,
+   "ppid": 2140,
+   "pgid": 2138,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/debug/lingxi-resource-desktop"
+  }
+ ],
+ "services": [
+  {
+   "pid": 2974,
+   "ppid": 2955,
+   "pgid": 2974,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-2140-1793025511205/home-own-local"
+  }
+ ],
+ "allServices": [
+  {
+   "pid": 2138,
+   "ppid": 41966,
+   "pgid": 2138,
+   "command": "bash -c cd /Users/study_superior/Desktop/Code/LingxiAgent && EVID=artifacts/rust-tauri/R09/dev/t02/phase2-ownership-01 && rm -rf \"$EVID\" && set -o pipefail; python3 -B scripts/rust-tauri/r09_suites.py --suite r09_t02_process_ownership --evidence \"$EVID\" 2>&1 | tail -4; echo \"SUITE_EXIT:${PIPESTATUS[0]}\"; echo \"=== ps after suite ===\"; ps -o pid,command -ax | grep -E \"lingxi-resource-desktop|lingxi-service --home /private/tmp/lingxi-r09|Lingxi\\.app\" | grep -v grep | wc -l"
+  },
+  {
+   "pid": 2954,
+   "ppid": 2140,
+   "pgid": 2138,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-2140-1793025511205/home-remote"
+  },
+  {
+   "pid": 2974,
+   "ppid": 2955,
+   "pgid": 2974,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-2140-1793025511205/home-own-local"
+  }
+ ]
+}

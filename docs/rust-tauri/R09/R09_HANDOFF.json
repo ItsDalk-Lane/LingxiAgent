@@ -1,0 +1,492 @@
+{
+  "schema": "lingxi.r09.handoff.v1",
+  "stage": "R09",
+  "status": "INCOMPLETE_BLOCKED_PENDING_RUNTIME_EVIDENCE",
+  "generatedAt": "2026-10-27T00:5x+0800",
+  "note": "R09 最终正式门已真实执行：verify-r09-final-04 overall=FAIL（13/21 命令 PASS，8 条 FAIL 根因均为已登记 blocked/pending；74 叶 15 PASS / 59 BLOCKED / 0 FAIL；candidate stable=true）。交付为 READY_FOR_REVIEW + 明确阻塞，不声称 R09 完成、不授予 R10 准入。",
+  "branch": "codex/rust-tauri-migration",
+  "baseHead": "aac8cb9fe6bb7bfa7a41d75528221136bfe55e50",
+  "gitHead": "aac8cb9fe6bb7bfa7a41d75528221136bfe55e50",
+  "gitHeadNote": "HEAD 提交（工作区 uncommitted，80 个文件改动；含桌面宿主/服务接缝/脚本/证据文档）。未提交、未推送。",
+  "sourceSha": "aac8cb9fe6bb7bfa7a41d75528221136bfe55e50 (HEAD; worktree uncommitted, dirty=true)",
+  "workingTreeDigest": "3bc4a35a1b975de178f3936634481d8453edd93b6acec8cfab1f991b0d9ebc84 (final-04 gate candidate source digest, 28633 files; 门后仅 docs/evidence 包更新，见 postGateDocumentation)",
+  "platform": {
+    "os": "macos",
+    "arch": "aarch64",
+    "version": "27.0.1"
+  },
+  "toolchain": {
+    "rust": "1.98.1 (rustup run; PATH default Homebrew 1.93.0 does not honor rust-toolchain.toml)",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "python": "3.14.3",
+    "tauriCli": "2.12.4",
+    "tauriCrate": "2.12.1",
+    "tauriBuild": "2.7.2"
+  },
+  "protocolVersion": {
+    "wireProtocolMin": 1,
+    "wireProtocolMax": 1,
+    "source": "rust/crates/lingxi-protocol/src/handshake.rs + instance.json/build.json.protocol",
+    "note": "R09 未改模型协议/数据架构；Tauri 宿主以 Rust 常量为协议门（不使用 shared/contract-versions.json 的旧 Node 轴）"
+  },
+  "dataEpoch": {
+    "dataEpoch": 2,
+    "source": "lingxi-protocol R08 cutover constants; service instance/build.json"
+  },
+  "dependencyLocks": {
+    "package-lock.json": "ebd521eab15faa34498662c024c929b464fd6eddf4cb2149af983f8182acc889",
+    "desktop/src-tauri/Cargo.lock": "f84e080ce55bf0bb9d9adbe7d5df8bed2f93ad6c93bef06c91c4255d74e4a6cf",
+    "rust/Cargo.lock": "2ebcb54a360f7908f5688254ff2b3e22594578e35ee04cede558ab9e3e08e25b"
+  },
+  "deliverables": {
+    "report": "docs/rust-tauri/R09/R09_REPORT.md",
+    "handoff": "docs/rust-tauri/R09/R09_HANDOFF.json",
+    "shellParityResults": "docs/rust-tauri/R09/SHELL_PARITY_RESULTS.json",
+    "progress": "docs/rust-tauri/R09/PROGRESS.md",
+    "progressJson": "docs/rust-tauri/R09/PROGRESS.json",
+    "blocked": "docs/rust-tauri/R09/BLOCKED.md",
+    "stageMap": "rust/crates/xtask/src/stage_maps/R09.json",
+    "stageMapInputs": "rust/crates/xtask/src/stage_maps/R09_INPUTS.json",
+    "leafLedger": "docs/rust-tauri/R09/R09_LEAF_LEDGER.json",
+    "commandPolicy": "docs/rust-tauri/R09/R09_COMMAND_POLICY.json",
+    "implementationPlan": "docs/rust-tauri/R09/IMPLEMENTATION_PLAN.md",
+    "t01t02Progress": "docs/rust-tauri/R09/T01_T02_PROGRESS.md",
+    "t03t04Progress": "docs/rust-tauri/R09/T03_T04_PROGRESS.md",
+    "t05Progress": "docs/rust-tauri/R09/T05_PROGRESS.md",
+    "t06Progress": "docs/rust-tauri/R09/T06_PROGRESS.md",
+    "t07Progress": "docs/rust-tauri/R09/T07_PROGRESS.md",
+    "evidenceRoot": "artifacts/rust-tauri/R09/"
+  },
+  "artifacts": {
+    "finalGate": "TBD artifacts/rust-tauri/R09/verify-r09-<final>-<nn>/verify-stage-result.json",
+    "deliveryReleaseApp": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+    "deliveryReleaseSha256": "97f226bffba064c7b408656c6be941b58f5e6e01b191d5ae6a30f89a1fbd4ccc",
+    "evidenceBuild": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/debug/lingxi-resource-desktop",
+    "evidenceBuildSha256": "27bf075a70e57ccca607365276d261eed79764e02b663bfd881df472e51a31b6",
+    "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+    "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+    "sidecarSha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+    "buildJsonSha256": "372c2b88748dcd96e9a74956c13554fb8d0e764638c28bc52b524c3a506473f9"
+  },
+  "acceptedTasks": [
+    {
+      "taskId": "R09-T01",
+      "status": "FINAL_GATE_PASS",
+      "note": "final-04: react_parity 22 cases PASS / release_offline PASS；同 renderer 双壳对照；visible 窗口由 Lead clearance 执行"
+    },
+    {
+      "taskId": "R09-T02",
+      "status": "FINAL_GATE_PASS",
+      "note": "final-04: supervisor_ready / process_ownership PASS（debug hidden + release hidden，注入拒绝/清理/zero-touch）"
+    },
+    {
+      "taskId": "R09-T03",
+      "status": "INCOMPLETE_FAILED_ACTIONS",
+      "note": "final-04 native_matrix guiStats executed 60 / passed 6 / failed 43 / blocked 11 / manual 3；plan::logic-case-references-exist 缺 18 引用；ipc_negative exit2"
+    },
+    {
+      "taskId": "R09-T04",
+      "status": "BLOCKED_SYSTEM_PERMISSIONS",
+      "note": "permission_matrix blockedKind BLOCKED_SYSTEM_PERMISSIONS|BLOCKED_GUI_SMOKE|BLOCKED_REAL_PROVIDER；remote_boundary BLOCKED_GUI_SMOKE|BLOCKED_SYSTEM_PERMISSIONS"
+    },
+    {
+      "taskId": "R09-T05",
+      "status": "FINAL_GATE_PASS",
+      "note": "final-04 browser_pdf 73 cases / untrusted_preview 53 cases PASS（real Chrome；asset 本地预览已修复）"
+    },
+    {
+      "taskId": "R09-T06",
+      "status": "STATIC_PASS_RUNTIME_WITH_BLOCKED_WINDOWS",
+      "note": "audit 58/scan 45/release suite 51 PASS；ACL hidden v33-02 PASS_WITH_BLOCKED_WINDOWS 105 cases / blocked 35（27 side-effect+7 window-open+1 union）；capability_matrix 21 blocked 运行期项"
+    },
+    {
+      "taskId": "R09-T07",
+      "status": "PARTIAL_G1_PASS_RELEASE_SMOKE_FAIL",
+      "note": "native_e2e 聚合 30 PASS（scroll/focus 仅指标/监听，长列表/工具卡 pending）；release_smoke exit2：t07::release.file-task 硬编码 False（PENDING_T06_COMMANDS）"
+    },
+    {
+      "taskId": "R09-T08",
+      "status": "PRODUCER_ISSUES_PENDING",
+      "note": "shell 341 cases/62 failed（capability pending 33/blocked 3/pendingCount 59），host 322 cases/27 failed（a16Ok 25/50 + 2 producer 红：context-menu evidence 绑定 0 匹配、debug-commands-gated 口径）"
+    }
+  ],
+  "leafCoverage": {
+    "total": 74,
+    "pass": 15,
+    "blocked": 59,
+    "fail": 0,
+    "bound": 15,
+    "originalAssertions": 168,
+    "composition": {
+      "bound": 15,
+      "pending_gui": 23,
+      "blocked": 12,
+      "manual_pending": 4,
+      "excluded_non_host": 16,
+      "green_unbound": 4
+    },
+    "note": "gate PASS 15（T05 契约叶）；BLOCKED 59 = pending_gui23+blocked12+manual4+excluded_non_host16+green_unbound4；0 FAIL。"
+  },
+  "platformMatrix": {
+    "macos-arm64": "FINAL_GATE_EXECUTED (verify-r09-final-04): delivery release ad-hoc signed, codesign verify exit0; 13/21 commands PASS; hidden H1 30 cases PASS (asset/context-menu/IME/selection/scroll/DPI/focus); T01 parity ELECTRON↔TAURI PASS; T02 supervisor/ownership PASS; T05 73 cases PASS; T06 static audit 58/scan 45/release suite 51 PASS; gate FAIL due documented blocked/pending",
+    "macos-x64": "BLOCKED_PLATFORM (no machine)",
+    "windows-x64": "BLOCKED_PLATFORM (no machine/credentials)",
+    "linux-x64": "BLOCKED_PLATFORM (no machine)"
+  },
+  "envBlockers": [
+    {
+      "id": "BLOCKED-PLATFORM-MACOS-X64",
+      "affected": "R09-A13 macos-x64 group; platform-split leaves",
+      "resolveBy": "R10",
+      "detail": "no macos-x64 machine"
+    },
+    {
+      "id": "BLOCKED-PLATFORM-WINDOWS-X64",
+      "affected": "Windows native E2E/install/permissions",
+      "resolveBy": "R10"
+    },
+    {
+      "id": "BLOCKED-PLATFORM-LINUX-X64",
+      "affected": "Linux native E2E/install/permissions",
+      "resolveBy": "R10"
+    },
+    {
+      "id": "BLOCKED-SYSTEM-PERMISSIONS",
+      "affected": "R09-A07 and T04 TCC leaves",
+      "resolveBy": "human-assisted session",
+      "detail": "real TCC revoke/authorize requires manual system settings interaction; automation must not trigger TCC"
+    },
+    {
+      "id": "BLOCKED-SIGNING-IDENTITY",
+      "affected": "formal signing/notarization evidence",
+      "resolveBy": "R10/R11 authorization",
+      "detail": "only ad-hoc signing; codesign --verify --strict passes but no Developer ID/notarization"
+    },
+    {
+      "id": "BLOCKED-REAL-PROVIDER",
+      "affected": "LIVE model/provider scenarios (R10)",
+      "resolveBy": "R10"
+    }
+  ],
+  "knownBoundaries": [
+    "renderer tree digest non-deterministic across builds (settings.html CSS link order; 644 files) -> build-once-bind-once evidence; R10 reproducibility item",
+    "host SIGKILL leaves sidecar orphan (macOS no parent-death signal); normal exit clean; tests assert cleanup; documented boundary",
+    "Chromium distribution not bundled in R09 (path discovery/LINGXI_CHROMIUM_PATH + system Chrome); distribution/licensing/signing decision OPEN for R10",
+    "Tray 'repair components' capability absent in R09 (menu item removed; T03-REPAIR-02)",
+    "notification click focus implemented for macOS UNUserNotificationCenter delegate; real-click verification pending manual; win/linux unsupported",
+    "IME E2E uses synthesized WebDriver composition events (not OS IME); disclosed",
+    "T05 PDF Chromium known CDP disconnect flake gets one真实 rerun (two attempts archived), not an assertion relaxation",
+    "T07 release file-task case is currently hardcoded False (PENDING_T06_COMMANDS) — must be implemented before R10",
+    "T03 native_matrix has 43 failed + 11 blocked + 3 manual; plan::logic-case-references-exist missing 18 references",
+    "post-gate documentation/evidence packaging (docs/rust-tauri/R09 + dev evidence) occurred after final-04; candidate binaries unchanged; formal gate receipt remains final-04"
+  ],
+  "independentlyReviewed": false,
+  "independentReview": {
+    "status": "COMPLETED_WITH_FINDINGS",
+    "reviewer": "independent read-only subagent (ff4d4a5a-ff33-40dc-9497-618a9db86b59)",
+    "findingsCount": 14,
+    "high": [
+      "T03 43 failed 被写成 8 blocked+3 manual",
+      "A06/A07/A08/A12/A14 场景名/理由与冻结地图错配",
+      "v3.3 ACL preflight 绑定旧候选（已修复脚本并重跑 runtime-acl-v33-02）"
+    ],
+    "medium": [
+      "T08 shell pending 33/blocked 3 vs 文档 25（25 为 a16Ok 失败数）",
+      "T04 remote 根因误记 REAL_PROVIDER（实为 GUI/TCC）",
+      "T06 ACL blocked 35 vs 21/27 混用",
+      "T07 scroll/focus pending 被写 PASS",
+      "post-gate 文档未绑定候选（已在 handoff 标注）",
+      "59 BLOCKED 构成未解释（已补 composition）",
+      "T07 file-task 根因误写无 hooks（实为硬编码 PENDING_T06_COMMANDS）"
+    ],
+    "low": [
+      "644/645 文件数笔误（实际 644）",
+      "T07 G1 30 聚合 vs cases.json 29",
+      "handoverCompleteness 35/priorStageDeferred 43 未解释（已补）",
+      "T03 18 条 logic 引用缺失未单列（已补）"
+    ],
+    "correctionsApplied": "REPORT/HANDOFF/SHELL_PARITY/BLOCKED/PROGRESS/CHECKLIST 已按 findings 修正；ACL 证据重跑重绑；T08 producer 两红单列",
+    "independentReviewPassed": false,
+    "note": "复核完成不等于 R09 通过；R09 未完成，R10 不授予"
+  },
+  "remoteWriteAuthorized": false,
+  "productionDataAuthorized": false,
+  "releaseAuthorized": false,
+  "allowedNextScope": {
+    "stage": "R10",
+    "granted": false,
+    "reason": "R09 未完成：formal gate final-05 FAIL（13/21 命令）；T03 28 failed/T07 file-task 硬失败/T04 TCC-GUI/T06 21 runtime blocked/T08 25 能力+shell 口径；平台/签名阻塞未解除。"
+  },
+  "frozenCandidate": {
+    "candidateVersion": "v3.3",
+    "frozenAt": "2026-10-27 00:2x (post-gate fix wave: automation idempotent suppress, policy quick_chat_resize removal, T01/T02/T07 producer fixes; supersedes v3.2)",
+    "handoffSource": "artifacts/rust-tauri/R09/dev/t06/candidate-handoff-v3.3/candidate-handoff.json",
+    "rule": "desktop/src-tauri + renderer frozen as v3.3; delivery appTree 97f226bf… / exe ddbd1fad… / G1 27bf075a… / renderer b0a20250…; 任何进一步代码变更需新候选并重跑全部证据。",
+    "deliveryRelease": {
+      "appBundle": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+      "appTreeSha256": "97f226bffba064c7b408656c6be941b58f5e6e01b191d5ae6a30f89a1fbd4ccc",
+      "hostExeSha256": "ddbd1fad42a8b172c85204cbba0e621fabd3bf52a0ced95dd0d2a1b06af40543",
+      "sidecarSha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+      "buildJsonSha256": "372c2b88748dcd96e9a74956c13554fb8d0e764638c28bc52b524c3a506473f9",
+      "infoPlistSha256": "da9ebff0b848d9ff1e3e6e5ac545c7270904ceb2a65677095cbb3e400e01919a",
+      "features": [
+        "r09-host"
+      ],
+      "evidenceBuild": false,
+      "codesignVerifyDeepStrictExit": 0,
+      "receiptSha256": "d12ff32f9d849ad9a45593402ee06c4c551d363af2e384f31edbff60bf298dff",
+      "note": "adhoc+runtime; BLOCKED-SIGNING-IDENTITY; exe changed from v3.2 due to capability/policy + commands.rs"
+    },
+    "evidenceBuildG1": {
+      "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/debug/lingxi-resource-desktop",
+      "executableSha256": "27bf075a70e57ccca607365276d261eed79764e02b663bfd881df472e51a31b6",
+      "features": [
+        "e2e-test",
+        "r09-host",
+        "r09-test-hooks"
+      ],
+      "evidenceBuild": true,
+      "receipt": "desktop/src-tauri/.tauri-build/build-receipt-debug.json",
+      "receiptSha256": "1ac08dafaad97bf50ce400bf22d3afe7319f27c6fef2f037927b38f7145365ee",
+      "stableCopy": "/private/tmp/lingxi-r09-evidence/lingxi-resource-desktop-v33-27bf075a",
+      "note": "includes hooks-only debug_asset_probe; delivery excludes hooks"
+    },
+    "releaseEvidenceHooks": {
+      "schema": "lingxi.r09.t06.release-evidence.v1",
+      "path": "/private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app",
+      "isolatedTargetDir": "/private/tmp/lingxi-r09-t06-release-evidence-target",
+      "features": [
+        "r09-host",
+        "r09-test-hooks"
+      ],
+      "evidenceBuild": true,
+      "releaseEvidence": true,
+      "appTreeSha256": "48993e01213ab4e4715c4c77e90f819cd646b6037ffe4f530b57d26b79641341",
+      "files": {
+        "Contents/Info.plist": "da9ebff0b848d9ff1e3e6e5ac545c7270904ceb2a65677095cbb3e400e01919a",
+        "Contents/MacOS/lingxi-resource-desktop": "d0072dbea750dffac45357c595a7ae59a5fbc49dd4f3fe433ce8bdbcabac708d",
+        "Contents/MacOS/lingxi-service": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+        "Contents/Resources/Lingxi.icns": "0951f493d51b3537f2b5826d45e117bba1ead1802c38658e2c0ebb1d7706b4d3",
+        "Contents/Resources/rust-service/build.json": "372c2b88748dcd96e9a74956c13554fb8d0e764638c28bc52b524c3a506473f9",
+        "Contents/_CodeSignature/CodeResources": "94feb01477569084da315e5fb2fa90ff5bd3d25c03861a54a75309a830095bcc"
+      },
+      "exeSha256": "d0072dbea750dffac45357c595a7ae59a5fbc49dd4f3fe433ce8bdbcabac708d",
+      "sidecarSha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+      "buildJsonSha256": "372c2b88748dcd96e9a74956c13554fb8d0e764638c28bc52b524c3a506473f9",
+      "rendererSha256InBuildJson": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+      "rendererMatchesFrozen": true,
+      "crateSourceDigest": "944d284e9bffef3b4797c44f5696c16d9fdc76a12df8f8b0cbb14e0162a317cc",
+      "crateSourceFileCount": 168,
+      "codesignVerifyExit": 0,
+      "codesignSummary": {
+        "Identifier": "Identifier=com.lingxi.app",
+        "Format": "Format=app bundle with Mach-O thin (arm64)",
+        "Signature": "Signature=adhoc",
+        "TeamIdentifier": "TeamIdentifier=not set"
+      },
+      "buildLog": "/private/tmp/r09-t06-release-evidence-build.log",
+      "note": "T02 hidden release 负向用；v3.3 构建后 repo 生成物 81/81 恢复校验通过、delivery 未触碰。",
+      "sourceCandidate": "v3.3 frozen（app tree 97f226bffba064c7b408656c6be941b58f5e6e01b191d5ae6a30f89a1fbd4ccc）",
+      "builtAt": "2026-10-27T00:21:54+0800"
+    },
+    "renderer": {
+      "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+      "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+      "pageCspAssetFix": "connection-csp.js asset: tokens (v3.2)",
+      "v33RendererRebuild": false
+    },
+    "staticGates": {
+      "capabilityAudit": {
+        "evidence": "artifacts/rust-tauri/R09/dev/t06/v33-audit-01",
+        "status": "PASS",
+        "exitCode": 0,
+        "caseCount": 58,
+        "failedCases": [],
+        "gapRemaining": 0,
+        "registeredCommandCount": 73
+      },
+      "releaseAttackSurface": {
+        "evidence": "artifacts/rust-tauri/R09/dev/t06/v33-scan-01",
+        "status": "PASS",
+        "caseCount": 45,
+        "failedCases": [],
+        "artifactChangedDuringScan": false,
+        "aclCommandCount": 72
+      },
+      "releaseSuite": {
+        "evidence": "artifacts/rust-tauri/R09/dev/t06/v33-release-suite-01",
+        "status": "PASS",
+        "exitCode": 0,
+        "caseCount": 51
+      },
+      "capabilityMatrix": {
+        "evidence": "artifacts/rust-tauri/R09/dev/t06/v33-capability-matrix-01",
+        "status": "FAIL",
+        "exitCode": 2,
+        "caseCount": 91,
+        "blockedCaseCount": 21,
+        "note": "FAIL exit 2 仅因 21 个 blocked::runtime.* GUI 项；静态全 PASS"
+      }
+    },
+    "commands": 73,
+    "profile": {
+      "full_keys": [
+        "schema",
+        "generatedAt",
+        "gitHead",
+        "supersedes",
+        "v31RendererChanges",
+        "policy",
+        "delivery",
+        "g1Evidence",
+        "releaseEvidence",
+        "renderer",
+        "staticGates",
+        "v3RustPatchCarriedOver",
+        "deferred",
+        "freeze"
+      ]
+    },
+    "deferred": {
+      "browser-update-full-flow": "部分映射 connection-changed；完整流 deferred",
+      "file_drop_paths": "renderer FIFO 已可用；命令面 deferred",
+      "onboarding_complete": "NOT_IMPLEMENTED（T06-ONBOARD-01）",
+      "t03-file-01-remaining": "read_docx_html/read_xlsx_html/observability_export_begin/write/end/abort（6 条）"
+    },
+    "acceptedRuntimeEvidence": {
+      "t06AcL": "v3.3 hidden ACL PASS_WITH_BLOCKED_WINDOWS exit0/105 cases (dev/t06/.../v33 ACL run by T06); hidden: double app_ready both windowVisible=false; blocked side-effect 35 recorded, not faked"
+    }
+  },
+  "finalGate": {
+    "status": "NOT_RERUN_ON_V311",
+    "reason": "业主同意延后 final-06：剩余延后项仍会红；不冒充 PASS",
+    "lastFormalReceipt": "final-05 (v3.3) FAIL"
+  },
+  "closeoutChecklist": "docs/rust-tauri/R09/R09_CLOSEOUT_CHECKLIST.json",
+  "shellParityResults": "docs/rust-tauri/R09/SHELL_PARITY_RESULTS.json",
+  "handoverCompletenessNote": "handoverCompleteness 35 / priorStageDeferred 43 为 R00 408 叶透镜的承诺/递延视图（非 74 叶重复计数）；gate overall FAIL 时 verifiedPass=0、gaps=[]，不应解读为“35/43 项通过”。",
+  "knownProducerIssues": [
+    {
+      "id": "T08-CTX-EVIDENCE-BIND",
+      "detail": "T08 未绑定门内 T07 native_e2e 的 context-menu case（matchedPrefixCases=0），但门内 T07 PASS 含该 case → 上游证据路径解析缺陷",
+      "owner": "T08",
+      "fixBefore": "R10"
+    },
+    {
+      "id": "T08-DEBUG-GATED",
+      "detail": "T08 commands::debug-commands-gated 将 dev capability 授权（debug_asset_probe/debug_open_onboarding*）判红，未区分 evidence 构建与 delivery 面",
+      "owner": "T08",
+      "fixBefore": "R10"
+    }
+  ],
+  "postGateDocumentation": {
+    "finalGateFinishedAt": "2026-10-27T01:2x+0800",
+    "docsUpdatedAt": "2026-10-27T01:3x+0800",
+    "changedAreas": [
+      "docs/rust-tauri/R09/*（final-05 数字同步）"
+    ],
+    "candidateBinaryChanged": false,
+    "note": "final-05 为工具冻结后正式回执；门后 docs/evidence 包同步，候选二进制未变（delivery ddbd1fad… / G1 27bf075a… / renderer b0a20250…）。"
+  },
+  "postGateDiagnostics": {
+    "t03GuiActions": {
+      "change": "execute/sync→execute/async; restart disconnect tolerance + recovery; stale batch cleanup",
+      "evidence": "/private/tmp/r09-t03-recheck-04（dev，非正式门）",
+      "guiStats": {
+        "executed": 60,
+        "passed": 21,
+        "failed": 28,
+        "blocked": 11,
+        "manual": 3
+      },
+      "formalGateValue": {
+        "passed": 21,
+        "failed": 28,
+        "blocked": 11,
+        "manual": 3
+      },
+      "note": "仍有多类失败：产品/权限面（splash allow 范围、keep-awake IOPMAssertion、shortcut 注册、appearance 截图）与工具面（JSONDecode prefs、通知 delivered 探针 .app bundle、viewer 参数）",
+      "secondWave": {
+        "change": "prefs retry/tolerant JSON; spawn_viewer path arg; delivered probe .app bundle",
+        "devEvidence": "/private/tmp/r09-t03-recheck-05",
+        "guiStats": {
+          "executed": 60,
+          "passed": 22,
+          "failed": 27,
+          "blocked": 11,
+          "manual": 3
+        },
+        "formalGateValue": {
+          "passed": 21,
+          "failed": 28
+        },
+        "note": "仍未正式门重跑；正式回执仍 final-05"
+      }
+    },
+    "t08Producers": {
+      "change": "context-menu capability 模型由 missing 改为 renderer-policy（等价实现+real-behavior）；debug-commands-gated 允许 hooks-only debug_asset_probe 并排除 dev capability",
+      "evidence": "/private/tmp/r09-t08-dev-02（dev，非正式门）",
+      "result": "final-05：context-menu evidence 与 debug-commands-gated 已绿；shell parity 行 context-menu 仍红（口径冲突）",
+      "note": "formal gate final-04 仍记录旧口径；未重跑正式门"
+    }
+  },
+  "goalStatus": "BLOCKED",
+  "blockedReason": "R09 完成条件在当前环境不可达：macos-x64/windows-x64/linux-x64 无真机；仅 ad-hoc 签名（无公证/安装器/更新验证凭据）；真实 TCC/系统授权需人工会话；真实供应商凭据缺失。另 final-05 仍有 T03 28 failed/T07 file-task 硬编码 False/T06 21 runtime blocked/T08 shell 口径冲突+24 能力 pending，需新候选重跑；以上均已登记 BLOCKED.md，交付为未完成+续跑入口，不称 R09 完成或 R10 获准。",
+  "blockedSinceRound": 5,
+  "blockers": "docs/rust-tauri/R09/BLOCKED.md#r09-完成判定blocked2026-10-27round-5",
+  "ownerDecisions": {
+    "date": "2026-10-27",
+    "source": "user conversation (non-programmer wording)",
+    "items": [
+      "OWNER-01 tray repair retired",
+      "OWNER-02 R09 scope = macOS arm64 only; other platforms deferred by owner",
+      "OWNER-03 no formal signing now or future; ad-hoc boundary accepted",
+      "OWNER-04 main window allowed to read splash info/avatar",
+      "OWNER-05 local model provider http://127.0.0.1:1234 model qwen/qwen3.8-27b; ASR deferred",
+      "OWNER-06 TCC manual authorization session started",
+      "OWNER-07 microphone/speech/notification TCC tests skipped by owner (deferred, not verified)"
+    ],
+    "recordPath": "docs/rust-tauri/R09/OWNER_DECISIONS.md",
+    "note": "Scope/签名/平台裁决改变完成判定的对外表述：R09 完成判定仅基于 macOS arm64 可执行证据；不得声称四平台完成或正式分发验证。",
+    "deferredNotVerified": [
+      "microphone TCC authorization",
+      "speech recognition TCC authorization",
+      "notification permission/click",
+      "ASR real recognition (T04-ASR-01)"
+    ],
+    "OWNER-07..12": [
+      "mic/speech/notification skipped",
+      "Word/Excel preview implemented",
+      "onboarding implemented",
+      "visible side-effect tests authorized (deferred execution)",
+      "release file-task auto-click accepted but unimplemented",
+      "remaining tests accepted deferred; commit/push authorized; R10 may start"
+    ]
+  },
+  "stageStatus": "INCOMPLETE_OWNER_APPROVED_DEFERRALS_R10_OPEN",
+  "latestCandidate": {
+    "schema": "lingxi.r09.t06.candidate-handoff.v3.11",
+    "path": "artifacts/rust-tauri/R09/dev/t06/candidate-handoff-v3.11/candidate-handoff.json",
+    "deliveryExeSha256": "8899065e330ca88f22b16ae70cbbad1f4eacefc5c85cdb179b3a75dd40e4cb8b",
+    "rendererDigest": "7adba587d9ab38127f19ee493b481a90300bf70f2c1d12601b9590ff1b29fc4a"
+  },
+  "deferredOwnerApproved": [
+    "T04 mic/speech/notification TCC",
+    "T04 ASR real recognition",
+    "T03 notification click manual",
+    "T07 release file-task auto-click",
+    "T06 visible side-effect full batch (authorized, not executed)",
+    "T08 final candidate rerun",
+    "T05 Chromium PDF runtime",
+    "other three platforms",
+    "formal signing",
+    "final-06 formal gate"
+  ],
+  "r10Admission": {
+    "status": "OWNER_AUTHORIZED_AFTER_THIS_HANDOFF",
+    "basis": "2026-10-27 业主消息：记录剩余未做测试、提交推送并说明可开始 R10",
+    "note": "R09 不宣称正式门 PASS；R10 从本交接继续。"
+  },
+  "updatedAt": "2026-10-27T10:08:15+08:00"
+}

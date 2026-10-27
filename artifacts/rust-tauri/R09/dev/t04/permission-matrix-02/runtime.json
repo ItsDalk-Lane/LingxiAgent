@@ -1,0 +1,13 @@
+{
+ "schema": "lingxi.r09.runtime.v1",
+ "home": "/private/tmp/lingxi-r09-runtime/r09_t04_permission_matrix-18999-1793026917236/home",
+ "tmp": "/private/tmp/lingxi-r09-runtime/r09_t04_permission_matrix-18999-1793026917236/tmp",
+ "serviceBinary": "rust/target/debug/lingxi-service",
+ "serviceSha256": "fbb3d7780478af87f09aa326201d1ab3c412937904bc7899d4c4d1a487961621",
+ "t04Modules": [
+  "permissions.rs",
+  "speech.rs",
+  "remote_boundary.rs",
+  "screenshot.rs"
+ ]
+}

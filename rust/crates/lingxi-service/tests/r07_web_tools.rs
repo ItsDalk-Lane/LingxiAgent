@@ -262,6 +262,7 @@ async fn external(
   "/rate"=>(StatusCode::TOO_MANY_REQUESTS,[("retry-after","2")],Json(json!({"error":"limit"}))).into_response(),
   "/auth-redirect"=>(StatusCode::FOUND,[("location","/should-not-receive-key")]).into_response(),
   "/oversized"=>([("content-type","text/plain"),("content-length","8388609")],"x".repeat(8*1024*1024+1)).into_response(),
+  "/blocked-page"=>(StatusCode::FORBIDDEN,([("content-type","text/html")],"<html><title>Blocked</title><body>CAPTCHA-BLOCK-MARKER</body></html>")).into_response(),
   _ if path.starts_with("/redirect/")=>{let remaining=path.trim_start_matches("/redirect/").parse::<usize>().unwrap();if remaining==0{Json(json!({"done":true})).into_response()}else{(StatusCode::FOUND,[("location",format!("/redirect/{}",remaining-1))]).into_response()}},
   _=>(StatusCode::NOT_FOUND,"unknown fixture").into_response(),
  }
@@ -933,6 +934,68 @@ async fn actual_search_cancel_waits_for_auxiliary_cleanup_and_stops_fallback_cha
         h.external.seen.lock().unwrap().len(),
         1,
         "只有取消前的free尝试"
+    );
+    h.close().await;
+}
+
+/// R09-T05 逐断言：WEB-FETCH A2/A3——阻断页不当正常内容；URL 无效/重定向/网络失败显式错误且不写工作区。
+#[tokio::test]
+async fn web_fetch_blocked_page_invalid_urls_and_redirect_failures_are_explicit_without_writes() {
+    let h = Harness::new().await;
+    let files_before = h
+        .state
+        .storage()
+        .query_one_text("SELECT COUNT(*) FROM session_files", vec![])
+        .await
+        .unwrap();
+    let workspace_before = std::fs::read_dir(&h.home)
+        .unwrap()
+        .map(|entry| entry.unwrap().file_name())
+        .collect::<Vec<_>>();
+    // A2：HTTP 阻断页（403 captcha）必须显式失败，不能当正文/摘要返回。
+    failure(
+        h.run("web_fetch", json!({"url": h.fetch_url("/blocked-page")}))
+            .await,
+        "WEB_FETCH_HTTP_403",
+    );
+    // A3：非法 URL（scheme/凭据/缺 host）与重定向上限显式失败。
+    failure(
+        h.run("web_fetch", json!({"url": "javascript:alert(1)"}))
+            .await,
+        "WEB_FETCH_INVALID_SCHEME",
+    );
+    failure(
+        h.run("web_fetch", json!({"url": "file:///etc/passwd"}))
+            .await,
+        "WEB_FETCH_INVALID_SCHEME",
+    );
+    failure(
+        h.run("web_fetch", json!({"url": "not a url"})).await,
+        "WEB_FETCH_INVALID_URL",
+    );
+    failure(
+        h.run("web_fetch", json!({"url": h.fetch_url("/redirect/6")}))
+            .await,
+        "WEB_FETCH_REDIRECT_LIMIT",
+    );
+    // A3：失败不自动写工作区/不登记会话文件。
+    let files_after = h
+        .state
+        .storage()
+        .query_one_text("SELECT COUNT(*) FROM session_files", vec![])
+        .await
+        .unwrap();
+    assert_eq!(
+        files_after, files_before,
+        "失败的 web_fetch 不得登记会话文件"
+    );
+    let workspace_after = std::fs::read_dir(&h.home)
+        .unwrap()
+        .map(|entry| entry.unwrap().file_name())
+        .collect::<Vec<_>>();
+    assert_eq!(
+        workspace_after, workspace_before,
+        "失败的 web_fetch 不得写工作区"
     );
     h.close().await;
 }

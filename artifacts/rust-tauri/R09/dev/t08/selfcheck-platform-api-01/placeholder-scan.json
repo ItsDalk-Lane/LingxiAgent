@@ -1,0 +1,295 @@
+{
+ "scannedAtUnixMs": 1793028141911,
+ "notImplementedOccurrences": [
+  {
+   "file": "desktop/src-tauri/src/native/errors.rs",
+   "line": 77,
+   "token": "NOT_IMPLEMENTED",
+   "text": "pub const E_NOT_IMPLEMENTED: &str = \"NOT_IMPLEMENTED\";",
+   "category": "constant-definition"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/errors.rs",
+   "line": 77,
+   "token": "NOT_IMPLEMENTED",
+   "text": "pub const E_NOT_IMPLEMENTED: &str = \"NOT_IMPLEMENTED\";",
+   "category": "constant-definition"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/ipc_negative_matrix.rs",
+   "line": 217,
+   "token": "NOT_IMPLEMENTED",
+   "text": "case!(\"ipc::onboarding.rust-runtime\", \"onboarding_complete\", crate::native::errors::E_NOT_IMPLEMENTED, || {",
+   "category": "negative-test-matrix"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/ipc_negative_matrix.rs",
+   "line": 220,
+   "token": "NOT_IMPLEMENTED",
+   "text": "crate::native::errors::E_NOT_IMPLEMENTED,",
+   "category": "negative-test-matrix"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/onboarding.rs",
+   "line": 18,
+   "token": "NOT_IMPLEMENTED",
+   "text": "use super::errors::{deny, HostResult, E_NOT_IMPLEMENTED, E_RELEASE_DISABLED, E_WINDOW_NOT_ALLOWED};",
+   "category": "unregistered-in-required-lists (仅在 T03_T04_PROGRESS §6)",
+   "registrationChecked": {
+    "BLOCKED.md": false,
+    "T06_PROGRESS.md": true
+   }
+  },
+  {
+   "file": "desktop/src-tauri/src/native/onboarding.rs",
+   "line": 61,
+   "token": "NOT_IMPLEMENTED",
+   "text": "E_NOT_IMPLEMENTED,",
+   "category": "unregistered-in-required-lists (仅在 T03_T04_PROGRESS §6)",
+   "registrationChecked": {
+    "BLOCKED.md": false,
+    "T06_PROGRESS.md": true
+   }
+  },
+  {
+   "file": "desktop/src-tauri/src/native/onboarding.rs",
+   "line": 71,
+   "token": "NOT_IMPLEMENTED",
+   "text": "E_NOT_IMPLEMENTED,",
+   "category": "unregistered-in-required-lists (仅在 T03_T04_PROGRESS §6)",
+   "registrationChecked": {
+    "BLOCKED.md": false,
+    "T06_PROGRESS.md": true
+   }
+  },
+  {
+   "file": "desktop/src-tauri/src/native/onboarding.rs",
+   "line": 77,
+   "token": "NOT_IMPLEMENTED",
+   "text": "E_NOT_IMPLEMENTED,",
+   "category": "unregistered-in-required-lists (仅在 T03_T04_PROGRESS §6)",
+   "registrationChecked": {
+    "BLOCKED.md": false,
+    "T06_PROGRESS.md": true
+   }
+  },
+  {
+   "file": "desktop/src-tauri/src/native/screenshot.rs",
+   "line": 19,
+   "token": "NOT_IMPLEMENTED",
+   "text": "use super::errors::{deny, HostResult, E_INVALID_ARGUMENT, E_NOT_IMPLEMENTED, E_PATH_NOT_ABSOLUTE, E_URL_SCHEME_DENIED};",
+   "category": "deferred-command-policy (T04 OQ-04)"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/screenshot.rs",
+   "line": 249,
+   "token": "NOT_IMPLEMENTED",
+   "text": "E_NOT_IMPLEMENTED,",
+   "category": "deferred-command-policy (T04 OQ-04)"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/tray.rs",
+   "line": 16,
+   "token": "NOT_IMPLEMENTED",
+   "text": "//! R09 缺失」——移除是显式登记后的可见差异，不是静默隐藏，也不以 NOT_IMPLEMENTED",
+   "category": "fail-closed (icon missing → explicit deny, no silent continue)"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/tray.rs",
+   "line": 23,
+   "token": "NOT_IMPLEMENTED",
+   "text": "use super::errors::{deny, HostResult, E_ENUM_INVALID, E_NOT_IMPLEMENTED};",
+   "category": "fail-closed (icon missing → explicit deny, no silent continue)"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/tray.rs",
+   "line": 175,
+   "token": "NOT_IMPLEMENTED",
+   "text": "E_NOT_IMPLEMENTED,",
+   "category": "fail-closed (icon missing → explicit deny, no silent continue)"
+  }
+ ],
+ "notImplementedRegistered": [
+  {
+   "file": "desktop/src-tauri/src/native/errors.rs",
+   "line": 77,
+   "token": "NOT_IMPLEMENTED",
+   "text": "pub const E_NOT_IMPLEMENTED: &str = \"NOT_IMPLEMENTED\";",
+   "category": "constant-definition"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/errors.rs",
+   "line": 77,
+   "token": "NOT_IMPLEMENTED",
+   "text": "pub const E_NOT_IMPLEMENTED: &str = \"NOT_IMPLEMENTED\";",
+   "category": "constant-definition"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/ipc_negative_matrix.rs",
+   "line": 217,
+   "token": "NOT_IMPLEMENTED",
+   "text": "case!(\"ipc::onboarding.rust-runtime\", \"onboarding_complete\", crate::native::errors::E_NOT_IMPLEMENTED, || {",
+   "category": "negative-test-matrix"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/ipc_negative_matrix.rs",
+   "line": 220,
+   "token": "NOT_IMPLEMENTED",
+   "text": "crate::native::errors::E_NOT_IMPLEMENTED,",
+   "category": "negative-test-matrix"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/screenshot.rs",
+   "line": 19,
+   "token": "NOT_IMPLEMENTED",
+   "text": "use super::errors::{deny, HostResult, E_INVALID_ARGUMENT, E_NOT_IMPLEMENTED, E_PATH_NOT_ABSOLUTE, E_URL_SCHEME_DENIED};",
+   "category": "deferred-command-policy (T04 OQ-04)"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/screenshot.rs",
+   "line": 249,
+   "token": "NOT_IMPLEMENTED",
+   "text": "E_NOT_IMPLEMENTED,",
+   "category": "deferred-command-policy (T04 OQ-04)"
+  }
+ ],
+ "notImplementedUnregistered": [
+  {
+   "file": "desktop/src-tauri/src/native/onboarding.rs",
+   "line": 18,
+   "token": "NOT_IMPLEMENTED",
+   "text": "use super::errors::{deny, HostResult, E_NOT_IMPLEMENTED, E_RELEASE_DISABLED, E_WINDOW_NOT_ALLOWED};",
+   "category": "unregistered-in-required-lists (仅在 T03_T04_PROGRESS §6)",
+   "registrationChecked": {
+    "BLOCKED.md": false,
+    "T06_PROGRESS.md": true
+   }
+  },
+  {
+   "file": "desktop/src-tauri/src/native/onboarding.rs",
+   "line": 61,
+   "token": "NOT_IMPLEMENTED",
+   "text": "E_NOT_IMPLEMENTED,",
+   "category": "unregistered-in-required-lists (仅在 T03_T04_PROGRESS §6)",
+   "registrationChecked": {
+    "BLOCKED.md": false,
+    "T06_PROGRESS.md": true
+   }
+  },
+  {
+   "file": "desktop/src-tauri/src/native/onboarding.rs",
+   "line": 71,
+   "token": "NOT_IMPLEMENTED",
+   "text": "E_NOT_IMPLEMENTED,",
+   "category": "unregistered-in-required-lists (仅在 T03_T04_PROGRESS §6)",
+   "registrationChecked": {
+    "BLOCKED.md": false,
+    "T06_PROGRESS.md": true
+   }
+  },
+  {
+   "file": "desktop/src-tauri/src/native/onboarding.rs",
+   "line": 77,
+   "token": "NOT_IMPLEMENTED",
+   "text": "E_NOT_IMPLEMENTED,",
+   "category": "unregistered-in-required-lists (仅在 T03_T04_PROGRESS §6)",
+   "registrationChecked": {
+    "BLOCKED.md": false,
+    "T06_PROGRESS.md": true
+   }
+  }
+ ],
+ "failClosed": [
+  {
+   "file": "desktop/src-tauri/src/native/tray.rs",
+   "line": 16,
+   "token": "NOT_IMPLEMENTED",
+   "text": "//! R09 缺失」——移除是显式登记后的可见差异，不是静默隐藏，也不以 NOT_IMPLEMENTED",
+   "category": "fail-closed (icon missing → explicit deny, no silent continue)"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/tray.rs",
+   "line": 23,
+   "token": "NOT_IMPLEMENTED",
+   "text": "use super::errors::{deny, HostResult, E_ENUM_INVALID, E_NOT_IMPLEMENTED};",
+   "category": "fail-closed (icon missing → explicit deny, no silent continue)"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/tray.rs",
+   "line": 175,
+   "token": "NOT_IMPLEMENTED",
+   "text": "E_NOT_IMPLEMENTED,",
+   "category": "fail-closed (icon missing → explicit deny, no silent continue)"
+  }
+ ],
+ "trivialCommands": [],
+ "noopWithoutReason": [],
+ "absentWithoutReason": [
+  "app_ready",
+  "app_ready",
+  "getFileUrl",
+  "getFileUrl",
+  "get_app_version",
+  "get_platform",
+  "get_server_connection_info",
+  "get_server_port",
+  "get_server_token",
+  "onboardingComplete",
+  "onboarding_complete",
+  "tauri",
+  "tauri"
+ ],
+ "uiDeadEntrypoints": [],
+ "capabilityReasonConsumers": [
+  "desktop/src/react/mobile/mobile-platform.ts"
+ ],
+ "deferredCommands": [
+  "commands",
+  "commands",
+  "commands",
+  "owner",
+  "owner",
+  "owner",
+  "reason",
+  "reason",
+  "reason"
+ ],
+ "unregisteredGaps": [
+  {
+   "kind": "NOT_IMPLEMENTED-unregistered",
+   "file": "desktop/src-tauri/src/native/onboarding.rs",
+   "line": 18,
+   "category": "unregistered-in-required-lists (仅在 T03_T04_PROGRESS §6)",
+   "requiredRegistration": "BLOCKED.md / T06_PROGRESS deferred·blocked entry"
+  },
+  {
+   "kind": "NOT_IMPLEMENTED-unregistered",
+   "file": "desktop/src-tauri/src/native/onboarding.rs",
+   "line": 61,
+   "category": "unregistered-in-required-lists (仅在 T03_T04_PROGRESS §6)",
+   "requiredRegistration": "BLOCKED.md / T06_PROGRESS deferred·blocked entry"
+  },
+  {
+   "kind": "NOT_IMPLEMENTED-unregistered",
+   "file": "desktop/src-tauri/src/native/onboarding.rs",
+   "line": 71,
+   "category": "unregistered-in-required-lists (仅在 T03_T04_PROGRESS §6)",
+   "requiredRegistration": "BLOCKED.md / T06_PROGRESS deferred·blocked entry"
+  },
+  {
+   "kind": "NOT_IMPLEMENTED-unregistered",
+   "file": "desktop/src-tauri/src/native/onboarding.rs",
+   "line": 77,
+   "category": "unregistered-in-required-lists (仅在 T03_T04_PROGRESS §6)",
+   "requiredRegistration": "BLOCKED.md / T06_PROGRESS deferred·blocked entry"
+  }
+ ],
+ "summary": {
+  "notImplemented": 13,
+  "registered": 6,
+  "unregistered": 4,
+  "failClosed": 3,
+  "uiDeadEntrypoints": 0,
+  "unregisteredGaps": 4
+ }
+}

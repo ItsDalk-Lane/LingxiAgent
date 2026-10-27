@@ -1,0 +1,26 @@
+
+running 8 tests
+test browser_navigation_a1_back_forward_reload_update_url_title_and_flags ... ok
+test browser_navigation_a2_no_active_view_and_illegal_urls_fail_explicitly ... ok
+test browser_tabs_a1_tab_set_and_active_follow_real_target_changes ... ok
+test browser_tabs_a2_invalid_tab_id_and_close_failure_are_explicit_and_state_unchanged ... ok
+test browser_tool_a1_title_and_snapshot_match_real_navigation ... ok
+test browser_tool_a2_stale_snapshot_reference_fails_explicitly ... ok
+test browser_tool_a3_session_state_and_cookies_never_leak_between_sessions ... ok
+test browser_tool_a4_browser_errors_are_explicit_and_never_touch_another_session ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.24s
+
+warning: variable does not need to be mutable
+   --> crates/lingxi-adapters/tests/r09_t05_assertions.rs:462:9
+    |
+462 |     for mut command in [
+    |         ----^^^^^^^
+    |         |
+    |         help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-adapters` (test "r09_t05_assertions") generated 1 warning (run `cargo fix --test "r09_t05_assertions" -p lingxi-adapters` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/r09_t05_assertions.rs (rust/target/debug/deps/r09_t05_assertions-64abb7cca9a68f97)

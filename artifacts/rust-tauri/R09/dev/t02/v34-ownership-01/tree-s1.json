@@ -1,0 +1,46 @@
+{
+ "label": "s1",
+ "unixMs": 1793062954161,
+ "app": [
+  {
+   "pid": 22468,
+   "ppid": 22413,
+   "pgid": 22327,
+   "command": "/private/tmp/lingxi-r09-t07/evidence-app-gate-v34-20261027-090202.app/Contents/MacOS/lingxi-resource-desktop"
+  }
+ ],
+ "services": [
+  {
+   "pid": 22469,
+   "ppid": 22468,
+   "pgid": 22469,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-22413-1793062951830/home-own-local"
+  }
+ ],
+ "allServices": [
+  {
+   "pid": 21438,
+   "ppid": 1,
+   "pgid": 21437,
+   "command": "bash -c cd /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos && rm -rf /private/tmp/lingxi-r09-owner/home2 && mkdir -p /private/tmp/lingxi-r09-owner/home2 /private/tmp/lingxi-r09-owner/tmp2 && nohup env LINGXI_HOME=/private/tmp/lingxi-r09-owner/home2 TMPDIR=/private/tmp/lingxi-r09-owner/tmp2 TMP=/private/tmp/lingxi-r09-owner/tmp2 TEMP=/private/tmp/lingxi-r09-owner/tmp2 ./Lingxi.app/Contents/MacOS/lingxi-resource-desktop > /private/tmp/lingxi-r09-owner/logs/app-v34.log 2>&1 & echo \"PID=$!\"; sleep 5; ps aux | grep -E \"Lingxi.app/Contents/MacOS/lingxi-resource-desktop|lingxi-service --home /private/tmp/lingxi-r09-owner/home2\" | grep -v grep | awk '{print $2,$11}' | cut -c1-160; echo \"=== computer-use status (new build) ===\"; python3 - <<'PYEOF'\\012import json,urllib.request,time\\012home='/private/tmp/lingxi-r09-owner/home2'\\012try:\\012    inst=json.load(open(home+'/lingxi-service/instance.json')); tok=json.load(open(home+'/lingxi-service/local-token.json'))\\012    bearer=tok.get('token'); port=int(str(inst['bindAddr']).rsplit(':',1)[-1])\\012    req=urllib.request.Request(f'http://127.0.0.1:{port}/lingxi/v1/preferences/computer-use',headers={'Authorization':f'Bearer {bearer}'})\\012    with urllib.request.urlopen(req,timeout=5) as r:\\012        d=json.loads(r.read().decode()); print(json.dumps(d.get('status',{}).get('providers',[{}])[0].get('status',{}),ensure_ascii=False)[:500])\\012except Exception as e: print('status ERR',e)\\012PYEOF\\012date"
+  },
+  {
+   "pid": 21452,
+   "ppid": 21442,
+   "pgid": 21452,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-service --home /private/tmp/lingxi-r09-owner/home2"
+  },
+  {
+   "pid": 22467,
+   "ppid": 22413,
+   "pgid": 22327,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-22413-1793062951830/home-remote"
+  },
+  {
+   "pid": 22469,
+   "ppid": 22468,
+   "pgid": 22469,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-22413-1793062951830/home-own-local"
+  }
+ ]
+}

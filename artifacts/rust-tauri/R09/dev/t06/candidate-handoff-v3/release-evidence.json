@@ -1,0 +1,38 @@
+{
+ "schema": "lingxi.r09.t06.release-evidence.v1",
+ "path": "/private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app",
+ "isolatedTargetDir": "/private/tmp/lingxi-r09-t06-release-evidence-target",
+ "features": [
+  "r09-host",
+  "r09-test-hooks"
+ ],
+ "evidenceBuild": true,
+ "releaseEvidence": true,
+ "appTreeSha256": "f5f37f3b769a93a9cc5e2173341c88444a52b9819ccca9e376632b01f706dedc",
+ "files": {
+  "Contents/Info.plist": "da9ebff0b848d9ff1e3e6e5ac545c7270904ceb2a65677095cbb3e400e01919a",
+  "Contents/MacOS/lingxi-resource-desktop": "92408ccdc1bbc54cb7f367b26639dc5ed6bd590705cf581da2733be44c458be6",
+  "Contents/MacOS/lingxi-service": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+  "Contents/Resources/Lingxi.icns": "0951f493d51b3537f2b5826d45e117bba1ead1802c38658e2c0ebb1d7706b4d3",
+  "Contents/Resources/rust-service/build.json": "e767c3857e20070c1812cf5e0489007737ce135c1a4d9579bca1c29541e36581",
+  "Contents/_CodeSignature/CodeResources": "67d5b6451da27360fc9db880e51cf956de6b84a910dd9e1dea4e8e04bbd66c5b"
+ },
+ "exeSha256": "92408ccdc1bbc54cb7f367b26639dc5ed6bd590705cf581da2733be44c458be6",
+ "sidecarSha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+ "buildJsonSha256": "e767c3857e20070c1812cf5e0489007737ce135c1a4d9579bca1c29541e36581",
+ "rendererSha256InBuildJson": "60a6591c37e81ff2333608c2ada8a582ff947a9401f91c7adb9174dcc1655751",
+ "rendererMatchesFrozen": true,
+ "crateSourceDigest": "b5923974d7498a762683978444be0a7cae9b7cab2c2b12b57062adab0c613aa7",
+ "crateSourceFileCount": 167,
+ "codesignVerifyExit": 0,
+ "codesignSummary": {
+  "Identifier": "Identifier=com.lingxi.app",
+  "Format": "Format=app bundle with Mach-O thin (arm64)",
+  "Signature": "Signature=adhoc",
+  "TeamIdentifier": "TeamIdentifier=not set"
+ },
+ "buildLog": "/private/tmp/r09-t06-release-evidence-build.log",
+ "note": "T02 supervisor/ownership hidden release 负向用；不弹用户可见原生弹窗；v3 构建后 repo 生成物已恢复、delivery 未触碰。",
+ "sourceCandidate": "v3 frozen（app tree 266b1f4bf84e0f9320d7e6adaa39550f42a4c25bf2d1c5ce5c95055adb312a6d）",
+ "builtAt": "2026-10-26T23:44:09+0800"
+}

@@ -70,6 +70,7 @@ pub const STAGE_MAPS: &[(&str, &str)] = &[
     ("R06", include_str!("stage_maps/R06.json")),
     ("R07", include_str!("stage_maps/R07.json")),
     ("R08", include_str!("stage_maps/R08.json")),
+    ("R09", include_str!("stage_maps/R09.json")),
 ];
 
 const USAGE: &str = r#"xtask — Lingxi Rust verification orchestrator (R02-T08)
@@ -99,6 +100,15 @@ subcommands:
                                  codes, platform and tested SHA. Non-zero on
                                  unknown stage, invalid/empty map, missing
                                  evidence, timeout, or any command failure.
+  check-map <STAGE> [--map <FILE>]
+                                 validate the stage map's binding contract
+                                 against the frozen R00 ledgers WITHOUT running
+                                 any command (base scenario set + spec mirrors +
+                                 REQUIRED_SUPPLEMENTAL leaf coverage/mirrors +
+                                 orphan-command rejection). --map reads a map
+                                 file from disk (negative-test fixtures);
+                                 defaults to the embedded stage map. Exit 0 =
+                                 contract valid; non-zero on any violation.
   --help                         print this help and exit 0
 
 notes:
@@ -255,6 +265,7 @@ fn main() -> ExitCode {
                 "docs/rust-tauri/R01/r01_t01_check_ownership.py",
             ],
         ),
+        "check-map" => cmd_check_map(&root, &args[1..]),
         "verify-stage" => cmd_verify_stage(&root, &args[1..]),
         other => {
             eprintln!(
@@ -262,6 +273,85 @@ fn main() -> ExitCode {
                  check-boundaries, verify-stage or --help)\n\n{USAGE}"
             );
             ExitCode::from(2)
+        }
+    }
+}
+
+/// `check-map`：不执行任何命令，只把「阶段图 ↔ R00 冻结原账」的绑定合同
+/// 交给与正式门共用的 cross-check（见 `verify::check_map_contract`）。
+/// `--map` 允许对临时目录里构造的损坏样本求值（R09 地图完整性负例）。
+fn cmd_check_map(root: &Path, rest: &[String]) -> ExitCode {
+    let mut stage: Option<&str> = None;
+    let mut map_path: Option<&str> = None;
+    let mut i = 0;
+    while i < rest.len() {
+        match rest[i].as_str() {
+            "--map" => match rest.get(i + 1) {
+                Some(value) => {
+                    map_path = Some(value);
+                    i += 2;
+                }
+                None => {
+                    eprintln!("error: --map requires a file argument");
+                    return ExitCode::from(2);
+                }
+            },
+            value if stage.is_none() && !value.starts_with("--") => {
+                stage = Some(value);
+                i += 1;
+            }
+            other => {
+                eprintln!("error: unexpected check-map argument {other:?}");
+                return ExitCode::from(2);
+            }
+        }
+    }
+    let Some(stage) = stage else {
+        eprintln!("error: check-map requires a stage id (e.g. check-map R09)");
+        return ExitCode::from(2);
+    };
+    let map_json = match map_path {
+        Some(path) => {
+            let resolved = if Path::new(path).is_absolute() {
+                PathBuf::from(path)
+            } else {
+                root.join(path)
+            };
+            match std::fs::read_to_string(&resolved) {
+                Ok(text) => text,
+                Err(err) => {
+                    eprintln!("error: cannot read map file {}: {err}", resolved.display());
+                    return ExitCode::from(2);
+                }
+            }
+        }
+        None => match STAGE_MAPS.iter().find(|(id, _)| *id == stage) {
+            Some((_, embedded)) => (*embedded).to_string(),
+            None => {
+                let known: Vec<&str> = STAGE_MAPS.iter().map(|(id, _)| *id).collect();
+                eprintln!(
+                    "error: unknown stage {stage:?}; registered stages: {}",
+                    known.join(", ")
+                );
+                return ExitCode::from(2);
+            }
+        },
+    };
+    let map = match parse_stage_map(&map_json) {
+        Ok(map) => map,
+        Err(err) => {
+            eprintln!("error: invalid stage map for {stage}: {err}");
+            return ExitCode::from(2);
+        }
+    };
+    match verify::check_map_contract(&map, root) {
+        Ok(summary) => {
+            println!("check-map {stage} OK {summary}");
+            ExitCode::SUCCESS
+        }
+        Err(err) => {
+            eprintln!("error: stage map {stage} contract invalid: {err}");
+            ExitCode::from(1)
         }
     }
 }

@@ -240,6 +240,41 @@ pref_pair!(
 );
 
 /// 新会话默认权限读面：复用现役规范化默认 auto，坏文件显式失败，不写入偏好。
+/// R09-T03：首次设置完成标记（Electron Node 服务 `/api/preferences/setup-complete`
+/// 的 Rust 等价路由；只写 `setupComplete:true`，其余偏好合并保留）。
+pub async fn setup_complete_route(
+    State(state): State<ServiceState>,
+    body: Result<Json<Value>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(body) = match body {
+        Ok(value) => value,
+        Err(error) => {
+            return (StatusCode::BAD_REQUEST, Json(json!({ "error": error.to_string() })))
+                .into_response()
+        }
+    };
+    if !body.is_object() {
+        return (StatusCode::BAD_REQUEST, Json(json!({ "error": "body must be object" })))
+            .into_response();
+    }
+    let memory = state.memory().clone();
+    let _lock = crate::agents_admin::preferences_locked();
+    let mut root = match memory.read_preferences_root() {
+        Ok(value) => value,
+        Err(message) => {
+            return (StatusCode::INTERNAL_SERVER_ERROR, Json(json!({ "error": message })))
+                .into_response()
+        }
+    };
+    root["setupComplete"] = json!(true);
+    match memory.write_preferences_root(&root) {
+        Ok(()) => Json(json!({ "ok": true, "setupComplete": true })).into_response(),
+        Err(message) => {
+            (StatusCode::INTERNAL_SERVER_ERROR, Json(json!({ "error": message }))).into_response()
+        }
+    }
+}
+
 pub async fn session_permission_default_get_route(State(state): State<ServiceState>) -> Response {
     match state.memory().read_preferences_root() {
         Ok(root) => {

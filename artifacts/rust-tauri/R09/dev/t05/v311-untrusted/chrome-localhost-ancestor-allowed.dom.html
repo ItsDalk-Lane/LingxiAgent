@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>R09-A10-DONE</title>
+<!--
+  R09-T05 A10 真实 Chrome 祖先帧模拟器（由 scripts/rust-tauri/r09_t05.py 提供）。
+
+  包装页代表 Tauri app 主 webview：注入可观测的 `__TAURI_INTERNALS__` canary，
+  再把服务返回的 token 化 HTML 预览放进与 React PreviewRenderer 相同的
+  `<iframe sandbox="allow-scripts" referrerpolicy="no-referrer">`。恶意 iframe 若
+  能拿到父窗口 Tauri 桥或服务 token，会被包装页记录（tauriCalls / probes）。
+
+  包装页自身以不同 Host 提供，用来验证服务 CSP `frame-ancestors` 的真实浏览器行为：
+    - http://tauri.localhost:PORT     → 允许（R09 Tauri 接缝）
+    - http://127.0.0.1:PORT           → 允许（Electron/file 既有基线）
+    - http://evil.tauri.localhost:PORT / http://evil.example:PORT → 拒绝
+  占位符（生产者在服务端替换）：
+    http://127.0.0.1:56821/lingxi/v1/preview/html/pv_145786e5da7d575fd2c63727636ab5a5?previewToken=yD8wpwv0azK6IGLAi3qDMUxAxKUO82tYkqovWV-Omas  服务 POST /lingxi/v1/preview/html 返回的 token 化 URL
+    iframe "iframe" | "img"
+          mode=img 时的 SVG 资源 URL
+-->
+<style>
+  body { font: 14px system-ui; margin: 12px; }
+  iframe { width: 560px; height: 360px; border: 1px solid #888; }
+  #result { white-space: pre-wrap; word-break: break-all; max-height: 320px; overflow: auto; }
+</style>
+<script>
+(function () {
+  "use strict";
+  window.__TAURI_CALLS__ = [];
+  window.__PROBES__ = [];
+  window.__WRAPPER_EVENTS__ = [];
+  function record(call) { window.__TAURI_CALLS__.push(call); }
+  // 模拟 Tauri app 主 frame 的 IPC 注入面：预览 iframe 不应能触达。
+  window.__TAURI_INTERNALS__ = {
+    invoke: function (command, args) { record({ command: command, args: args }); return Promise.reject(new Error("r09-a10-canary")); }
+  };
+  window.__TAURI__ = {
+    core: { invoke: function (command, args) { record({ command: command, args: args }); return Promise.reject(new Error("r09-a10-canary")); } }
+  };
+  window.__TAURI_CANARY_MARKER__ = "unset";
+  window.addEventListener("message", function (event) {
+    window.__PROBES__.push({ origin: event.origin, data: event.data });
+    if (event.data && event.data.kind === "r09-a10-token-request") {
+      // 模拟恶意内容向父窗口索要凭据：这里绝不返回任何 token。
+      window.__WRAPPER_EVENTS__.push({ tokenRequest: "denied" });
+    }
+  });
+  window.addEventListener("securitypolicyviolation", function (event) {
+    window.__WRAPPER_EVENTS__.push({ directive: event.effectiveDirective || "", blockedURI: event.blockedURI || "" });
+  });
+  function finish() {
+    var image = document.getElementById("a10img");
+    var frame = document.getElementById("a10frame");
+    var pre = document.getElementById("result") || document.createElement("pre");
+    pre.id = "result";
+    pre.textContent = JSON.stringify({
+      mode: "iframe",
+      location: location.href,
+      probes: window.__PROBES__,
+      tauriCalls: window.__TAURI_CALLS__,
+      wrapperEvents: window.__WRAPPER_EVENTS__,
+      framePresent: !!frame,
+      image: image ? {
+        src: image.getAttribute("src"),
+        complete: image.complete,
+        naturalWidth: image.naturalWidth,
+        loaded: image.dataset.loaded || null,
+        error: image.dataset.error || null
+      } : null,
+      marker: "R09-A10-DONE"
+    });
+    if (!pre.parentNode) document.body.appendChild(pre);
+    document.title = "R09-A10-DONE";
+  }
+  setTimeout(finish, 6000);
+})();
+</script>
+</head>
+<body>
+<h1>R09-A10 wrapper</h1>
+<!--IFRAME-->
+<iframe id="a10frame" sandbox="allow-scripts" referrerpolicy="no-referrer" src="http://127.0.0.1:56821/lingxi/v1/preview/html/pv_145786e5da7d575fd2c63727636ab5a5?previewToken=yD8wpwv0azK6IGLAi3qDMUxAxKUO82tYkqovWV-Omas"></iframe>
+<!--END-IFRAME-->
+
+<p>R09-A10-WRAPPER</p>
+
+
+<pre id="result">{"mode":"iframe","location":"http://localhost:56819/wrapper?mode=iframe&amp;previewUrl=http%3A%2F%2F127.0.0.1%3A56821%2Flingxi%2Fv1%2Fpreview%2Fhtml%2Fpv_145786e5da7d575fd2c63727636ab5a5%3FpreviewToken%3DyD8wpwv0azK6IGLAi3qDMUxAxKUO82tYkqovWV-Omas","probes":[{"origin":"null","data":{"kind":"r09-a10-preview-alive","href":"http://127.0.0.1:56821/lingxi/v1/preview/html/pv_145786e5da7d575fd2c63727636ab5a5?previewToken=yD8wpwv0azK6IGLAi3qDMUxAxKUO82tYkqovWV-Omas"}},{"origin":"null","data":{"kind":"r09-a10-token-request"}},{"origin":"null","data":{"kind":"r09-a10-preview-report","href":"http://127.0.0.1:56821/lingxi/v1/preview/html/pv_145786e5da7d575fd2c63727636ab5a5?previewToken=yD8wpwv0azK6IGLAi3qDMUxAxKUO82tYkqovWV-Omas","previewTokenFromUrl":"yD8wpwv0azK6IGLAi3qDMUxAxKUO82tYkqovWV-Omas","checks":{"tauriGlobalType":"undefined","tauriInternalsType":"undefined","tauriCanaryInvoke":"not-attempted","parentDocument":"blocked:SecurityError","parentLocationHref":"blocked:SecurityError","parentLocalStorage":"blocked:SecurityError","topDocument":"blocked:SecurityError","topLocalStorage":"blocked:SecurityError","parentTauriInternals":"blocked:SecurityError"},"attempts":[{"name":"tauri-invoke-direct","outcome":"threw","error":"Error"},{"name":"tauri-invoke-parent","outcome":"threw","error":"SecurityError"},{"name":"tauri-global-parent","outcome":"threw","error":"SecurityError"},{"name":"hana-parent","outcome":"threw","error":"SecurityError"},{"name":"fetch-service-api","outcome":"rejected","error":"TypeError"},{"name":"fetch-service-fs","outcome":"rejected","error":"TypeError"},{"name":"fetch-relative-fs","outcome":"rejected","error":"TypeError"},{"name":"fetch-canary-token","outcome":"rejected","error":"TypeError"},{"name":"beacon-canary","outcome":"initiated"},{"name":"image-canary","outcome":"initiated"},{"name":"websocket-canary","outcome":"initiated"},{"name":"popup-canary","outcome":"threw","error":"Error"}],"cspViolations":[],"tokenRequest":"requested"}}],"tauriCalls":[],"wrapperEvents":[{"tokenRequest":"denied"}],"framePresent":true,"image":null,"marker":"R09-A10-DONE"}</pre></body></html>

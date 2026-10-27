@@ -1,0 +1,773 @@
+{
+ "schema": "lingxi.r09.release-attack-surface.v1",
+ "suite": "r09_release_attack_surface",
+ "status": "PASS",
+ "exitCode": 0,
+ "policy": "docs/rust-tauri/R09/R09_COMMAND_POLICY.json",
+ "app": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+ "caseCount": 45,
+ "failedCases": [],
+ "artifactChangedDuringScan": false,
+ "durationSecs": 1.016,
+ "candidate": true,
+ "artifactBefore": {
+  "exists": true,
+  "treeSha256": "97f226bffba064c7b408656c6be941b58f5e6e01b191d5ae6a30f89a1fbd4ccc",
+  "files": {
+   "Contents/Info.plist": {
+    "sha256": "da9ebff0b848d9ff1e3e6e5ac545c7270904ceb2a65677095cbb3e400e01919a",
+    "size": 1222
+   },
+   "Contents/MacOS/lingxi-resource-desktop": {
+    "sha256": "ddbd1fad42a8b172c85204cbba0e621fabd3bf52a0ced95dd0d2a1b06af40543",
+    "size": 59698272
+   },
+   "Contents/MacOS/lingxi-service": {
+    "sha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+    "size": 98056496
+   },
+   "Contents/Resources/Lingxi.icns": {
+    "sha256": "0951f493d51b3537f2b5826d45e117bba1ead1802c38658e2c0ebb1d7706b4d3",
+    "size": 8709
+   },
+   "Contents/Resources/rust-service/build.json": {
+    "sha256": "372c2b88748dcd96e9a74956c13554fb8d0e764638c28bc52b524c3a506473f9",
+    "size": 738
+   },
+   "Contents/_CodeSignature/CodeResources": {
+    "sha256": "94feb01477569084da315e5fb2fa90ff5bd3d25c03861a54a75309a830095bcc",
+    "size": 2920
+   }
+  }
+ },
+ "artifactAfter": {
+  "exists": true,
+  "treeSha256": "97f226bffba064c7b408656c6be941b58f5e6e01b191d5ae6a30f89a1fbd4ccc",
+  "files": {
+   "Contents/Info.plist": {
+    "sha256": "da9ebff0b848d9ff1e3e6e5ac545c7270904ceb2a65677095cbb3e400e01919a",
+    "size": 1222
+   },
+   "Contents/MacOS/lingxi-resource-desktop": {
+    "sha256": "ddbd1fad42a8b172c85204cbba0e621fabd3bf52a0ced95dd0d2a1b06af40543",
+    "size": 59698272
+   },
+   "Contents/MacOS/lingxi-service": {
+    "sha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+    "size": 98056496
+   },
+   "Contents/Resources/Lingxi.icns": {
+    "sha256": "0951f493d51b3537f2b5826d45e117bba1ead1802c38658e2c0ebb1d7706b4d3",
+    "size": 8709
+   },
+   "Contents/Resources/rust-service/build.json": {
+    "sha256": "372c2b88748dcd96e9a74956c13554fb8d0e764638c28bc52b524c3a506473f9",
+    "size": 738
+   },
+   "Contents/_CodeSignature/CodeResources": {
+    "sha256": "94feb01477569084da315e5fb2fa90ff5bd3d25c03861a54a75309a830095bcc",
+    "size": 2920
+   }
+  }
+ },
+ "host": {
+  "path": "Contents/MacOS/lingxi-resource-desktop",
+  "size": 59698272,
+  "sha256": "ddbd1fad42a8b172c85204cbba0e621fabd3bf52a0ced95dd0d2a1b06af40543"
+ },
+ "sidecar": {
+  "path": "Contents/MacOS/lingxi-service",
+  "size": 98056496,
+  "sha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d"
+ },
+ "manifest": {
+  "schemaVersion": 1,
+  "platform": "mac",
+  "arch": "arm64",
+  "target": "aarch64-apple-darwin",
+  "toolchain": "1.98.1",
+  "appVersion": "0.1.43",
+  "binary": "lingxi-service",
+  "sha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+  "contentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+  "sourceSha256": "8e4d2a171a36c197f0093d4f780942aac0ea31655d3e55b69f669f2195edb882",
+  "protocol": {
+   "serverKind": "lingxi-service",
+   "wireProtocolMin": 1,
+   "wireProtocolMax": 1,
+   "dataEpoch": 2
+  },
+  "rendererSha256": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+  "tauri": {
+   "cli": "tauri-cli 2.12.4",
+   "layout": "externalBin+resources"
+  }
+ },
+ "releaseConfig": {
+  "path": "desktop/src-tauri/tauri.release.generated.conf.json",
+  "withGlobalTauri": true,
+  "frontendDist": "../dist-renderer",
+  "devUrl": null,
+  "identifier": "com.lingxi.app",
+  "version": "0.1.43",
+  "bundle": {
+   "active": true,
+   "targets": [
+    "app"
+   ],
+   "icon": [
+    "icons/icon.png"
+   ],
+   "externalBin": [
+    "binaries/lingxi-service"
+   ],
+   "resources": {
+    "resources/rust-service/build.json": "rust-service/build.json"
+   },
+   "macOS": {
+    "signingIdentity": "-",
+    "infoPlist": "Info.plist"
+   }
+  }
+ },
+ "csp": {
+  "text": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' ipc: http://ipc.localhost http://127.0.0.1:* ws://127.0.0.1:*; img-src 'self' data: blob: asset: http://asset.localhost http://127.0.0.1:*; media-src 'self' data: blob: asset: http://asset.localhost http://127.0.0.1:*; font-src 'self' data:; frame-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'",
+  "directives": {
+   "default-src": [
+    "'self'"
+   ],
+   "script-src": [
+    "'self'"
+   ],
+   "style-src": [
+    "'self'",
+    "'unsafe-inline'"
+   ],
+   "connect-src": [
+    "'self'",
+    "ipc:",
+    "http://ipc.localhost",
+    "http://127.0.0.1:*",
+    "ws://127.0.0.1:*"
+   ],
+   "img-src": [
+    "'self'",
+    "data:",
+    "blob:",
+    "asset:",
+    "http://asset.localhost",
+    "http://127.0.0.1:*"
+   ],
+   "media-src": [
+    "'self'",
+    "data:",
+    "blob:",
+    "asset:",
+    "http://asset.localhost",
+    "http://127.0.0.1:*"
+   ],
+   "font-src": [
+    "'self'",
+    "data:"
+   ],
+   "frame-src": [
+    "'self'",
+    "blob:"
+   ],
+   "object-src": [
+    "'none'"
+   ],
+   "base-uri": [
+    "'none'"
+   ],
+   "form-action": [
+    "'none'"
+   ]
+  }
+ },
+ "acl": {
+  "segmentBytes": 55025,
+  "candidateCount": 103,
+  "releaseCommands": [
+   "app_ready",
+   "close_browser_viewer",
+   "copy_file",
+   "file_info",
+   "get_app_version",
+   "get_auto_launch_status",
+   "get_avatar_path",
+   "get_browser_viewer_context",
+   "get_keep_awake_status",
+   "get_platform",
+   "get_server_connection_info",
+   "get_server_port",
+   "get_server_token",
+   "get_service_status",
+   "get_splash_info",
+   "keybindings_reload_global",
+   "keybindings_test_register",
+   "list_skill_files",
+   "onboarding_complete",
+   "open_browser_viewer",
+   "open_external",
+   "open_file",
+   "open_folder",
+   "open_settings",
+   "open_skill_viewer",
+   "quick_chat_hide",
+   "quick_chat_open_session",
+   "quick_chat_open_session_ack",
+   "quick_chat_reload_shortcut",
+   "quick_chat_resize",
+   "quick_chat_shortcut_status",
+   "quick_chat_show",
+   "read_file",
+   "read_file_base64",
+   "read_file_snapshot",
+   "read_skill_file",
+   "reload_main_window",
+   "resource_events",
+   "resource_subscribe",
+   "resource_unsubscribe",
+   "restart_app",
+   "rust_browser_request",
+   "select_files",
+   "select_folder",
+   "select_skill",
+   "set_auto_launch_enabled",
+   "set_browser_connection",
+   "set_keep_awake_enabled",
+   "settings_changed",
+   "show_in_finder",
+   "show_notification",
+   "skill_viewer_close",
+   "skill_viewer_load",
+   "spawn_viewer",
+   "speech_permission_request",
+   "speech_permission_status",
+   "start_drag",
+   "trash_item",
+   "unwatch_file",
+   "unwatch_workspace",
+   "viewer_close",
+   "viewer_request_load",
+   "watch_file",
+   "watch_workspace",
+   "window_close",
+   "window_is_maximized",
+   "window_maximize",
+   "window_minimize",
+   "window_theme_changed",
+   "write_file",
+   "write_file_binary",
+   "write_file_if_unchanged"
+  ],
+  "commandCount": 72,
+  "pluginPermissionIdentifiers": [
+   "core:app:defaultallow-identifierdeny-bundle-typeallow-from-bytesallow-is-checkeddeny-set-checkeddeny-set-enableddeny-is-absolutedeny-set-tooltipdeny-set-visibleallow-inner-sizeallow-outer-sizeallow-is-focusedallow-is-visiblescene_identifierset_overlay_iconallow-set-shadowallow-unmaximizeallow-unminimizedeny-is-closabledeny-set-effectsallow-unregisterallow-get-activepermission_statedeny-get-pendingcom",
+   "core:path:defaultcore:event:defaultcore:window:defaultcore:webview:defaultcore:image:defaultcore:resources:defaultcore:menu:defaultcore:tray:defaultallow-versionallow-nameallow-tauri-versionallow-bundle-typeallow-register-listenerallow-remove-listenerallow-supports-multiple-windowsallow-app-hideallow-app-showbundle_typeallow-default-window-icondefault_window_iconallow-exitallow-fetch-data-store-identifiersfetch_data_store_identifiersidentifierregister_listenerallow-remove-data-storeremove_data_storeremove_listenerallow-set-app-themeset_app_themeallow-set-dock-visibilityset_dock_visibilitysupports_multiple_windowstauri_versiondeny-app-hidedeny-app-showdeny-default-window-icondeny-exitdeny-fetch-data-store-identifiersdeny-identifierdeny-namedeny-register-listenerdeny-remove-data-storedeny-remove-listenerdeny-set-app-themedeny-set-dock-visibilitydeny-supports-multiple-windowsdeny-tauri-versiondeny-versioncore:eventallow-listenallow-unlistenallow-emitallow-emit-todeny-emitdeny-emit-todeny-listendeny-unlistencore:imageallow-newallow-from-pathallow-rgbaallow-sizefrom_bytesfrom_pathdeny-from-bytesdeny-from-pathdeny-rgbadeny-sizecore:menuallow-appendallow-prependallow-insertallow-removeallow-remove-atallow-itemsallow-getallow-popupallow-create-defaultallow-set-as-app-menuallow-set-as-window-menuallow-textallow-set-textallow-set-enabledallow-set-acceleratorallow-set-as-windows-menu-for-nsappallow-set-as-help-menu-for-nsappallow-set-checkedallow-set-iconcreate_defaultis_checkedremove_atset_acceleratorset_as_app_menuset_as_help_menu_for_nsappset_as_window_menuset_as_windows_menu_for_nsappset_checkedset_enableddeny-appenddeny-create-defaultdeny-insertdeny-is-checkeddeny-itemsdeny-popupdeny-prependdeny-removedeny-remove-atdeny-set-acceleratordeny-set-as-app-menudeny-set-as-help-menu-for-nsappdeny-set-as-window-menudeny-set-as-windows-menu-for-nsappdeny-set-icondeny-set-textdeny-textcore:pathallow-resolve-directoryallow-resolveallow-normalizeallow-joinallow-dirnameallow-extnameallow-basenameallow-is-absoluteis_absolutenormalizeresolve_directorydeny-basenamedeny-dirnamedeny-extnamedeny-joindeny-normalizedeny-resolvedeny-resolve-directorycore:resourcesallow-closedeny-closecore:trayallow-get-by-idallow-remove-by-idallow-set-menuallow-set-tooltipallow-set-titleallow-set-visibleallow-set-temp-dir-pathallow-set-icon-as-templateallow-set-icon-with-as-templateallow-set-show-menu-on-left-clickget_by_idremove_by_idset_icon_as_templateset_icon_with_as_templateset_show_menu_on_left_clickset_temp_dir_pathset_titleset_tooltipset_visibledeny-get-by-iddeny-remove-by-iddeny-set-icon-as-templatedeny-set-icon-with-as-templatedeny-set-menudeny-set-show-menu-on-left-clickdeny-set-temp-dir-pathdeny-set-titlecore:webviewallow-get-all-webviewsallow-webview-positionallow-webview-sizeallow-internal-toggle-devtoolsallow-clear-all-browsing-dataclear_all_browsing_dataallow-create-webviewcreate_webviewallow-create-webview-windowcreate_webview_windowinternal_toggle_devtoolsallow-printallow-reparentallow-set-webview-auto-resizeset_webview_auto_resizeallow-set-webview-background-colorset_webview_background_colorallow-set-webview-focusset_webview_focusallow-set-webview-positionset_webview_positionallow-set-webview-sizeallow-set-webview-zoomallow-webview-closewebview_closeallow-webview-hidewebview_hideallow-webview-showwebview_showwebview_sizedeny-clear-all-browsing-datadeny-create-webviewdeny-create-webview-windowdeny-get-all-webviewsdeny-internal-toggle-devtoolsdeny-printdeny-reparentdeny-set-webview-auto-resizedeny-set-webview-background-colordeny-set-webview-focusdeny-set-webview-positiondeny-set-webview-sizedeny-set-webview-zoomdeny-webview-closedeny-webview-hidedeny-webview-positiondeny-webview-showdeny-webview-sizecore:windowallow-get-all-windowsallow-scale-factorallow-inner-positionallow-outer-positionallow-is-fullscreenallow-is-minimizedallow-is-maximizedallow-is-decoratedallow-is-resizableallow-is-maximizableallow-is-minimizableallow-is-closableallow-titleallow-current-monitorallow-primary-monitorallow-monitor-from-pointallow-available-monitorsallow-cursor-positionallow-themeallow-is-always-on-topallow-activity-nameallow-scene-identifierallow-internal-toggle-maximizeactivity_nameavailable_monitorsallow-centerallow-createcurrent_monitorcursor_positionallow-destroyget_all_windowsallow-hideinner_positioninner_sizeinternal_toggle_maximizeis_closableis_decoratedis_focusedis_fullscreenis_maximizableis_maximizedis_minimizableis_minimizedis_resizableis_visibleallow-maximizeallow-minimizemonitor_from_pointouter_positionouter_sizeprimary_monitorallow-request-user-attentionrequest_user_attentionscale_factorallow-set-always-on-bottomset_always_on_bottomallow-set-always-on-topset_always_on_topallow-set-background-colorset_background_colorallow-set-badge-countset_badge_countallow-set-badge-labelset_badge_labelallow-set-closableset_closableallow-set-content-protectedset_content_protectedallow-set-cursor-grabset_cursor_graballow-set-cursor-iconset_cursor_iconallow-set-cursor-positionset_cursor_positionallow-set-cursor-visibleset_cursor_visibleallow-set-decorationsset_decorationsallow-set-effectsset_effectsallow-set-focusset_focusallow-set-focusableset_focusableallow-set-fullscreenset_fullscreenallow-set-fullscreen-on-monitorset_fullscreen_on_monitorallow-set-ignore-cursor-eventsset_ignore_cursor_eventsallow-set-max-sizeset_max_sizeallow-set-maximizableset_maximizableallow-set-min-sizeset_min_sizeallow-set-minimizableset_minimizableallow-set-overlay-iconallow-set-positionset_positionallow-set-progress-barallow-set-resizableset_resizableset_shadowallow-set-simple-fullscreenset_simple_fullscreenallow-set-sizeallow-set-size-constraintsset_size_constraintsallow-set-skip-taskbarallow-set-themeset_themeallow-set-title-bar-styleset_title_bar_styleallow-set-visible-on-all-workspacesset_visible_on_all_workspacesallow-showallow-start-draggingstart_draggingallow-start-resize-draggingstart_resize_draggingallow-toggle-maximizetoggle_maximizeunmaximizeunminimizedeny-activity-namedeny-available-monitorsdeny-centerdeny-createdeny-current-monitordeny-cursor-positiondeny-destroydeny-get-all-windowsdeny-hidedeny-inner-positiondeny-inner-sizedeny-internal-toggle-maximizedeny-is-always-on-topdeny-is-decorateddeny-is-focuseddeny-is-fullscreendeny-is-maximizabledeny-is-maximizeddeny-is-minimizabledeny-is-minimizeddeny-is-resizabledeny-is-visibledeny-maximizedeny-minimizedeny-monitor-from-pointdeny-outer-positiondeny-outer-sizedeny-primary-monitordeny-request-user-attentiondeny-scale-factordeny-scene-identifierdeny-set-always-on-bottomdeny-set-always-on-topdeny-set-background-colordeny-set-badge-countdeny-set-badge-labeldeny-set-closabledeny-set-content-protecteddeny-set-cursor-grabdeny-set-cursor-icondeny-set-cursor-positiondeny-set-cursor-visibledeny-set-decorationsdeny-set-focusdeny-set-focusabledeny-set-fullscreendeny-set-fullscreen-on-monitordeny-set-ignore-cursor-eventsdeny-set-max-sizedeny-set-maximizabledeny-set-min-sizedeny-set-minimizabledeny-set-overlay-icondeny-set-positiondeny-set-progress-bardeny-set-resizabledeny-set-shadowdeny-set-simple-fullscreendeny-set-sizedeny-set-size-constraintsdeny-set-skip-taskbardeny-set-themedeny-set-title-bar-styledeny-set-visible-on-all-workspacesdeny-showdeny-start-draggingdeny-start-resize-draggingdeny-themedeny-titledeny-toggle-maximizedeny-unmaximizedeny-unminimizeallow-messageallow-saveallow-openallow-askallow-confirmdeny-confirmdeny-messagedeny-opendeny-saveglobal-shortcutallow-is-registeredis_registeredallow-registerallow-register-allregister_allunregisterallow-unregister-allunregister_alldeny-is-registereddeny-registerdeny-register-alldeny-unregisterdeny-unregister-allnotificationallow-is-permission-grantedallow-request-permissionallow-notifyallow-register-action-typesallow-cancelallow-get-pendingallow-remove-activeallow-check-permissionsallow-batchallow-list-channelsallow-delete-channelallow-create-channelallow-permission-statecheck_permissionscreate_channeldelete_channelget_activeget_pendingis_permission_grantedlist_channelsregister_action_typesremove_activerequest_permissiondeny-batchdeny-canceldeny-check-permissionsdeny-create-channeldeny-delete-channeldeny-get-activedeny-is-permission-granteddeny-list-channelsdeny-notifydeny-permission-statedeny-register-action-typesdeny-remove-activedeny-request-permissionbrowser-vieweronboardingsplashquick-chatskill-viewer-"
+  ]
+ },
+ "codesign": {
+  "verifyExit": 0,
+  "signature": "adhoc",
+  "display": "Executable=/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop\nIdentifier=com.lingxi.app\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20500 size=116591 flags=0x10002(adhoc,runtime) hashes=3637+3 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=ff593a00d47a9a7dbfd1c5ff0b2d9b5cbd607045\nCandidateCDHashFull sha256=ff593a00d47a9a7dbfd1c5ff0b2d9b5cbd6070458a9d134f615005301419f7c4\nHash choices=sha256\nCMSDigest=ff593a00d47a9a7dbfd1c5ff0b2d9b5cbd6070458a9d134f615005301419f7c4\nCMSDigestType=2\nCDHash=ff593a00d47a9a7dbfd1c5ff0b2d9b5cbd607045\nSignature=adhoc\nInfo.plist entries=16\nTeamIdentifier=not set\nRuntime Version=27.0.0\nSealed Resources version=2 rules=13 files=3\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+ },
+ "forbiddenStringHits": [],
+ "infoPlist": {
+  "CFBundleIdentifier": "com.lingxi.app",
+  "CFBundleExecutable": "lingxi-resource-desktop",
+  "CFBundleShortVersionString": "0.1.43",
+  "NSMicrophoneUsageDescription": "灵犀在你按下录音时使用麦克风采集语音。",
+  "NSSpeechRecognitionUsageDescription": "灵犀使用系统语音识别把你的语音转换为文字。"
+ },
+ "cases": [
+  {
+   "case": "release::artifact-present",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "app": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app"
+   }
+  },
+  {
+   "case": "release::no-wdio-webdriver-symbols",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "release::no-dev-server-url-in-artifacts",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "release::no-devurl-in-artifacts",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "release::no-debug-command-names-in-artifacts",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "release::release-config-present",
+   "ok": true,
+   "actual": 1,
+   "detail": "desktop/src-tauri/tauri.release.generated.conf.json"
+  },
+  {
+   "case": "release::withglobaltauri-matches-policy",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "actual": true,
+    "policy": true,
+    "note": "withGlobalTauri 只暴露 ACL 允许的命令，不绕过 ACL；R09 保留 true 以复用同一 React 产物"
+   }
+  },
+  {
+   "case": "release::frontend-dist-is-product-build",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "actual": "../dist-renderer",
+    "expected": "../dist-renderer"
+   }
+  },
+  {
+   "case": "release::release-config-no-devurl",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "devUrl": null
+   }
+  },
+  {
+   "case": "release::no-remote-domain-ipc-access",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "dangerousRemoteDomainIpcAccess": null,
+    "note": "远程内容 webview 不得获 Tauri IPC；未配置 = 默认拒绝"
+   }
+  },
+  {
+   "case": "release::bundle-external-bin",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "actual": [
+     "binaries/lingxi-service"
+    ],
+    "expected": [
+     "binaries/lingxi-service"
+    ]
+   }
+  },
+  {
+   "case": "release::signing-identity-declared",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "signingIdentity": "-",
+    "note": "ad-hoc '-'（BLOCKED-SIGNING-IDENTITY，不冒充 Developer ID/公证）"
+   }
+  },
+  {
+   "case": "release::embedded-frontend-dist-product",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "distRenderer": true,
+    "distTauriResources": false
+   }
+  },
+  {
+   "case": "release::csp-no-forbidden-tokens",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "release::csp-directives-hardened",
+   "ok": true,
+   "actual": 1,
+   "detail": {}
+  },
+  {
+   "case": "release::acl-segment-extracted",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "bytes": 55025
+   }
+  },
+  {
+   "case": "release::acl-command-surface-nonempty",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "count": 72
+   }
+  },
+  {
+   "case": "release::acl-command-surface-subset-of-policy",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "release::acl-no-release-denied-commands",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "release::acl-no-deferred-commands",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "release::acl-no-dropped-commands",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "release::acl-no-forbidden-command-patterns",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "release::acl-no-shell-http-fs-process-updater-grants",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "shell": 0,
+    "http": 0,
+    "fs": 0,
+    "process": 0,
+    "updater": 0,
+    "devtoolsPermission": 2,
+    "trayPermission": 1,
+    "menuPermission": 1,
+    "genericPluginIds": 0
+   }
+  },
+  {
+   "case": "release::cargo-devtools-feature-off",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tauriFeatures": [
+     "protocol-asset",
+     "image-png",
+     "tray-icon"
+    ],
+    "forbiddenEnabled": []
+   }
+  },
+  {
+   "case": "release::source-no-devtools-toggle",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "release::no-test-control-env-in-artifacts",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "hits": [],
+    "note": "release 二进制不应含仅测试用的 env 注入点（host.rs 自动化 sink）"
+   }
+  },
+  {
+   "case": "release::capabilities-no-debug-command-grants",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "release::capabilities-plugin-grants-minimal",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "allowedLeaves": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ],
+    "illegal": [],
+    "files": {
+     "desktop/src-tauri/capabilities/browser-viewer.json": {
+      "windows": [
+       "browser-viewer"
+      ],
+      "permissionCount": 8,
+      "sha256": "3491304822a3a985b3edb16d6aaaadc51b84db04e1c2b7ee91218a870437cc28"
+     },
+     "desktop/src-tauri/capabilities/main.json": {
+      "windows": [
+       "main"
+      ],
+      "permissionCount": 24,
+      "sha256": "bae4e4129ab97f23518227c07f54d1330ef17f8dadec181742ead7885c94dcb7"
+     },
+     "desktop/src-tauri/capabilities/onboarding.json": {
+      "windows": [
+       "onboarding"
+      ],
+      "permissionCount": 9,
+      "sha256": "954475e7a24649a98c210f6263916065feae66391126e03f267e09c1f9617534"
+     },
+     "desktop/src-tauri/capabilities/quick-chat.json": {
+      "windows": [
+       "quick-chat"
+      ],
+      "permissionCount": 12,
+      "sha256": "696b808acf9f30d312b7110f3cff1d64bb63cc6e93305f0e68b5669169be5881"
+     },
+     "desktop/src-tauri/capabilities/r09-host.json": {
+      "windows": [
+       "main"
+      ],
+      "permissionCount": 44,
+      "sha256": "116f8d397a4557d3b10e76ad59207335282af60c335cf78d6874e8a62b7a5e4b"
+     },
+     "desktop/src-tauri/capabilities/settings.json": {
+      "windows": [
+       "settings"
+      ],
+      "permissionCount": 31,
+      "sha256": "489ec83ee11ca7b8d84285ce147eabaeea0b8a269351bd57fe8081814a7bf402"
+     },
+     "desktop/src-tauri/capabilities/skill-viewer.json": {
+      "windows": [
+       "skill-viewer-*"
+      ],
+      "permissionCount": 6,
+      "sha256": "9f4806491dc1cbe54d850750cb67e4772d1bfc91925558ec5ae5ce7f3409562b"
+     },
+     "desktop/src-tauri/capabilities/splash.json": {
+      "windows": [
+       "splash"
+      ],
+      "permissionCount": 5,
+      "sha256": "c505a46ff140514770f63117069cd5a48217ba480e06d269238cae7a843cb351"
+     },
+     "desktop/src-tauri/capabilities/viewer.json": {
+      "windows": [
+       "viewer-*"
+      ],
+      "permissionCount": 14,
+      "sha256": "db3a39d29714ffc68c6adc13461a73892d30076c5fee612b7d38bd52fb98f8f5"
+     }
+    }
+   }
+  },
+  {
+   "case": "release::sidecar-binary-present",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "path": "Contents/MacOS/lingxi-service"
+   }
+  },
+  {
+   "case": "release::sidecar-macho-format",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "magic": "feedfacf",
+    "cputype": "0x100000c",
+    "expectedCputype": "0x100000c"
+   }
+  },
+  {
+   "case": "release::sidecar-not-shell-script",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "firstBytes": "cffaedfe0c0000010000000002000000"
+   }
+  },
+  {
+   "case": "release::sidecar-build-manifest-fields",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "path": "Contents/Resources/rust-service/build.json",
+    "missingFields": []
+   }
+  },
+  {
+   "case": "release::sidecar-protocol-identity",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "actual": {
+     "serverKind": "lingxi-service",
+     "wireProtocolMin": 1,
+     "wireProtocolMax": 1,
+     "dataEpoch": 2
+    },
+    "expected": {
+     "serverKind": "lingxi-service",
+     "wireProtocolMin": 1,
+     "wireProtocolMax": 1,
+     "dataEpoch": 2
+    }
+   }
+  },
+  {
+   "case": "release::sidecar-content-digest",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "manifestSha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+    "actualSha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+    "shaMatches": false,
+    "manifestContentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+    "actualContentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+    "contentMatches": true,
+    "note": "ad-hoc 签名会改 sha256；内容不变性由 contentSha256 证明"
+   }
+  },
+  {
+   "case": "release::sidecar-build-identity",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "actual": {
+     "platform": "mac",
+     "arch": "arm64",
+     "target": "aarch64-apple-darwin",
+     "binary": "lingxi-service"
+    },
+    "expected": {
+     "platform": "mac",
+     "arch": "arm64",
+     "target": "aarch64-apple-darwin",
+     "binary": "lingxi-service"
+    }
+   }
+  },
+  {
+   "case": "release::bundle-identity",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "identifier": "com.lingxi.app",
+    "executable": "lingxi-resource-desktop",
+    "expectedExecutable": "lingxi-resource-desktop"
+   }
+  },
+  {
+   "case": "release::bundle-version-matches-manifest",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "plistVersion": "0.1.43",
+    "manifestAppVersion": "0.1.43"
+   }
+  },
+  {
+   "case": "release::no-shell-plugin-dependency",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "cargoMentionsShellPlugin": false
+   }
+  },
+  {
+   "case": "release::capabilities-no-generic-shell-http-fs",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "release::process-spawn-sites-match-ledger",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "actual": {
+     "desktop/src-tauri/src/service/instance.rs": 1,
+     "desktop/src-tauri/src/service/manifest.rs": 2,
+     "desktop/src-tauri/src/service/shutdown.rs": 1,
+     "desktop/src-tauri/src/service/supervisor.rs": 1
+    },
+    "expected": {
+     "desktop/src-tauri/src/service/instance.rs": 1,
+     "desktop/src-tauri/src/service/manifest.rs": 2,
+     "desktop/src-tauri/src/service/shutdown.rs": 1,
+     "desktop/src-tauri/src/service/supervisor.rs": 1
+    },
+    "samples": [
+     "reader",
+     "\"/usr/bin/codesign\"",
+     "\"/usr/bin/codesign\"",
+     "\"/bin/ps\"",
+     "&binary"
+    ]
+   }
+  },
+  {
+   "case": "release::no-renderer-controllable-shell-binary",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "hits": [],
+    "samples": [
+     "reader",
+     "\"/usr/bin/codesign\"",
+     "\"/usr/bin/codesign\"",
+     "\"/bin/ps\"",
+     "&binary"
+    ]
+   }
+  },
+  {
+   "case": "release::codesign-verify-strict",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "exitCode": 0,
+    "stderr": ""
+   }
+  },
+  {
+   "case": "release::signing-identity-is-adhoc-as-documented",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "signature": "adhoc",
+    "note": "BLOCKED-SIGNING-IDENTITY：本地 ad-hoc，不冒充正式分发签名/公证"
+   }
+  },
+  {
+   "case": "release::no-electron-runtime-in-bundle",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "release::artifact-stable-during-scan",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "beforeTreeSha256": "97f226bffba064c7b408656c6be941b58f5e6e01b191d5ae6a30f89a1fbd4ccc",
+    "afterTreeSha256": "97f226bffba064c7b408656c6be941b58f5e6e01b191d5ae6a30f89a1fbd4ccc",
+    "hostSha256Now": "ddbd1fad42a8b172c85204cbba0e621fabd3bf52a0ced95dd0d2a1b06af40543",
+    "hostSha256Scanned": "ddbd1fad42a8b172c85204cbba0e621fabd3bf52a0ced95dd0d2a1b06af40543",
+    "note": "构建期产物变化时本证据只代表扫描到的候选版本，不重试伪装稳定"
+   }
+  }
+ ]
+}

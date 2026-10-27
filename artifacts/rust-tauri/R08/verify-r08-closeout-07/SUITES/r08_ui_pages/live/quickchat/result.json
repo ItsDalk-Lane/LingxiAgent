@@ -1,0 +1,156 @@
+{
+  "status": "PASS",
+  "checks": [
+    "actual-production-show-visible-and-compact-bounds",
+    "actual-production-resize-increases-window-and-resizable",
+    "actual-quick-chat-creates-owned-session-and-model-turn",
+    "actual-owned-switch-ACK-focus-main-and-only-then-hide",
+    "same-path-still-requires-real-service-focus",
+    "late-actual-renderer-ACK-cannot-hide-after-timeout",
+    "changed-main-connection-owner-refuses-without-hide",
+    "actual-missing-session-refuses-and-keeps-floating-window",
+    "actual-destroyed-main-window-explicit-failure-keeps-floating"
+  ],
+  "results": [
+    {
+      "ok": true,
+      "requestId": "0ff5a202-931c-406f-884e-4012852096ec",
+      "sessionPath": "native:session-e20d1c38e78e8e14467ac4f462214b0e",
+      "sessionId": "session-e20d1c38e78e8e14467ac4f462214b0e"
+    },
+    {
+      "ok": true,
+      "requestId": "8980feef-9b0f-456a-a66e-4702189a72a5",
+      "sessionPath": "native:session-e20d1c38e78e8e14467ac4f462214b0e",
+      "sessionId": "session-e20d1c38e78e8e14467ac4f462214b0e"
+    },
+    {
+      "ok": false,
+      "requestId": "f927d890-525e-4c3d-ba72-a721a791f4fb",
+      "sessionPath": "native:session-e20d1c38e78e8e14467ac4f462214b0e",
+      "sessionId": "session-e20d1c38e78e8e14467ac4f462214b0e",
+      "code": "QUICK_CHAT_OPEN_TIMEOUT",
+      "message": "主窗口尚未确认打开会话，请重试"
+    },
+    {
+      "ok": false,
+      "requestId": "033ca1a2-a784-42c3-99a7-c9f6b91d62b4",
+      "sessionPath": "native:session-e20d1c38e78e8e14467ac4f462214b0e",
+      "sessionId": "session-e20d1c38e78e8e14467ac4f462214b0e",
+      "code": "QUICK_CHAT_SWITCH_FAILED",
+      "message": "主窗口未能打开该会话"
+    },
+    {
+      "ok": false,
+      "requestId": "1c030cf3-c171-40f8-a42e-7129fb04b676",
+      "sessionPath": "native:session-e20d1c38e78e8e14467ac4f462214b0e",
+      "sessionId": "session-e20d1c38e78e8e14467ac4f462214b0e",
+      "code": "QUICK_CHAT_SWITCH_FAILED",
+      "message": "主窗口未能打开该会话"
+    },
+    {
+      "ok": false,
+      "requestId": null,
+      "sessionPath": null,
+      "sessionId": null,
+      "code": "QUICK_CHAT_MAIN_UNAVAILABLE",
+      "message": "主窗口已关闭，请重新打开后再试"
+    }
+  ],
+  "compact": {
+    "x": 1040,
+    "y": 431,
+    "width": 480,
+    "height": 152
+  },
+  "expanded": {
+    "x": 1040,
+    "y": 431,
+    "width": 480,
+    "height": 600
+  },
+  "sid": "session-e20d1c38e78e8e14467ac4f462214b0e",
+  "logs": [
+    {
+      "window": "main",
+      "message": "[vite] connecting..."
+    },
+    {
+      "window": "main",
+      "message": "[vite] connected."
+    },
+    {
+      "window": "main",
+      "message": "%cElectron Security Warning (Insecure Content-Security-Policy) font-weight: bold; This renderer process has either no Content Security\n  Policy set or a policy with \"unsafe-eval\" enabled. This exposes users of\n  this app to unnecessary security risks.\n\nFor more information and help, consult\nhttps://electronjs.org/docs/tutorial/security.\nThis warning will not show up\nonce the app is packaged."
+    },
+    {
+      "window": "quick",
+      "message": "[vite] connecting..."
+    },
+    {
+      "window": "quick",
+      "message": "[vite] connected."
+    },
+    {
+      "window": "quick",
+      "message": "%cElectron Security Warning (Insecure Content-Security-Policy) font-weight: bold; This renderer process has either no Content Security\n  Policy set or a policy with \"unsafe-eval\" enabled. This exposes users of\n  this app to unnecessary security risks.\n\nFor more information and help, consult\nhttps://electronjs.org/docs/tutorial/security.\nThis warning will not show up\nonce the app is packaged."
+    },
+    {
+      "window": "main",
+      "message": "[has-dbg] called sessionPath= native:session-e20d1c38e78e8e14467ac4f462214b0e sessionId= session-e20d1c38e78e8e14467ac4f462214b0e"
+    },
+    {
+      "window": "main",
+      "message": "[has-dbg] recordsSize= 0 limit= 50"
+    },
+    {
+      "window": "main",
+      "message": "[has-dbg] called sessionPath= native:session-e20d1c38e78e8e14467ac4f462214b0e sessionId= session-e20d1c38e78e8e14467ac4f462214b0e"
+    },
+    {
+      "window": "main",
+      "message": "[has-dbg] recordsSize= 0 limit= 50"
+    },
+    {
+      "window": "main",
+      "message": "[has-dbg] called sessionPath= native:session-e20d1c38e78e8e14467ac4f462214b0e sessionId= session-e20d1c38e78e8e14467ac4f462214b0e"
+    },
+    {
+      "window": "main",
+      "message": "[has-dbg] recordsSize= 0 limit= 50"
+    },
+    {
+      "window": "main",
+      "message": "[has-dbg] called sessionPath= native:session-e20d1c38e78e8e14467ac4f462214b0e sessionId= session-e20d1c38e78e8e14467ac4f462214b0e"
+    },
+    {
+      "window": "main",
+      "message": "[has-dbg] recordsSize= 0 limit= 50"
+    },
+    {
+      "window": "quick",
+      "message": "[quick-chat] 打开完整会话失败： 主窗口尚未确认打开会话，请重试"
+    },
+    {
+      "window": "quick",
+      "message": "[quick-chat] 打开完整会话失败： 主窗口未能打开该会话"
+    },
+    {
+      "window": "main",
+      "message": "[context-ring] failed to load instant compaction experiment: Error: lingxiFetch /api/experiments: 401 Unauthorized"
+    },
+    {
+      "window": "main",
+      "message": "[InputArea] load thinking level failed Error: lingxiFetch /lingxi/v1/session-thinking-level: 401 Unauthorized"
+    },
+    {
+      "window": "quick",
+      "message": "[quick-chat] 打开完整会话失败： 主窗口未能打开该会话"
+    },
+    {
+      "window": "quick",
+      "message": "[quick-chat] 打开完整会话失败： 主窗口已关闭，请重新打开后再试"
+    }
+  ],
+  "modelCalls": 1
+}

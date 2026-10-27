@@ -44,9 +44,14 @@
 //!   additions beyond the incumbent regex are documented), the Electron
 //!   file:// forms (`file://`, `file:///`) and the sandboxed-origin string
 //!   `null` (browsers emit `null` for `file://` pages; an http(s) page can
-//!   never produce it). Everything else — `http://evil.example`, `null`
-//!   forgeries over plain HTTP from remote pages, exotic schemes — is
-//!   rejected with `bad_origin` before authentication.
+//!   never produce it). R09 adds the **Tauri desktop webview origins** as a
+//!   necessary host seam, matched exactly (`tauri://localhost`,
+//!   `http://tauri.localhost`, `https://tauri.localhost` — the fixed
+//!   custom-scheme / reserved-host origins Tauri registers per platform);
+//!   arbitrary `tauri://*` or `*.tauri.localhost` values stay forbidden.
+//!   Everything else — `http://evil.example`, `null` forgeries over plain
+//!   HTTP from remote pages, exotic schemes — is rejected with `bad_origin`
+//!   before authentication.
 
 use std::net::{IpAddr, SocketAddr};
 
@@ -232,6 +237,15 @@ pub fn check_origin(origin_header: Option<&str>) -> OriginVerdict {
         return OriginVerdict::Forbidden;
     }
     if value == "null" || value == "file://" || value == "file:///" {
+        return OriginVerdict::Allowed;
+    }
+    // R09-T01/T02 宿主接缝：Tauri 应用 webview 的固定来源。自定义协议只能由
+    // Tauri 应用自身注册提供；`tauri.localhost` 是保留主机名，普通网页无法
+    // 获得该 Origin。只接受这三个精确值，不做前缀/子域匹配。
+    if matches!(
+        value,
+        "tauri://localhost" | "http://tauri.localhost" | "https://tauri.localhost"
+    ) {
         return OriginVerdict::Allowed;
     }
     for scheme in ["http://", "https://"] {
@@ -426,6 +440,40 @@ mod tests {
         assert_eq!(check_origin(Some("null")), OriginVerdict::Allowed);
         assert_eq!(check_origin(Some("file://")), OriginVerdict::Allowed);
         assert_eq!(check_origin(Some("file:///")), OriginVerdict::Allowed);
+        // R09 宿主接缝：Tauri webview 固定来源（三平台各一形态）。
+        assert_eq!(
+            check_origin(Some("tauri://localhost")),
+            OriginVerdict::Allowed
+        );
+        assert_eq!(
+            check_origin(Some("http://tauri.localhost")),
+            OriginVerdict::Allowed
+        );
+        assert_eq!(
+            check_origin(Some("https://tauri.localhost")),
+            OriginVerdict::Allowed
+        );
+        // 只允许精确来源：任意自定义 scheme / 子域 / 伪装主机都被拒。
+        assert_eq!(
+            check_origin(Some("tauri://evil")),
+            OriginVerdict::Forbidden
+        );
+        assert_eq!(
+            check_origin(Some("tauri://localhost.evil.example")),
+            OriginVerdict::Forbidden
+        );
+        assert_eq!(
+            check_origin(Some("http://evil.tauri.localhost")),
+            OriginVerdict::Forbidden
+        );
+        assert_eq!(
+            check_origin(Some("http://tauri.localhost.evil.example")),
+            OriginVerdict::Forbidden
+        );
+        assert_eq!(
+            check_origin(Some("http://tauri.localhost:8080")),
+            OriginVerdict::Forbidden
+        );
 
         assert_eq!(
             check_origin(Some("http://evil.example")),

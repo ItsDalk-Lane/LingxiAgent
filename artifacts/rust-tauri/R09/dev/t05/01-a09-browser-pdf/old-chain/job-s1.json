@@ -1,0 +1,15 @@
+{
+ "htmlPath": "/Users/study_superior/Desktop/Code/LingxiAgent/tests/migration/r01-t05/samples/s1-long-zh.html",
+ "outputPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-browser-pdf/old-chain/s1-long-zh.pdf",
+ "viewport": {
+  "width": 1280,
+  "height": 900
+ },
+ "printBackground": true,
+ "preferCSSPageSize": true,
+ "pageSize": "A4",
+ "allowJavaScript": false,
+ "embedLingxiFonts": true,
+ "settleMs": 250,
+ "timeoutMs": 60000
+}

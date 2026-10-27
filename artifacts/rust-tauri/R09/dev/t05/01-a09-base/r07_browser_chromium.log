@@ -1,0 +1,91 @@
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 33.67s
+     Running tests/r07_browser_chromium.rs (rust/target/debug/deps/r07_browser_chromium-0681c2f9e0455bec)
+
+running 10 tests
+test fixture_idle_connection_never_invents_a_form_response ... ok
+test password_values_never_enter_normal_or_compact_snapshots_and_stay_in_the_page ... ok
+test page_cannot_move_or_forge_a_snapshot_reference_to_another_element ... ok
+test downloads_are_actual_owned_bytes_and_ack_removes_only_confirmed_guid ... ok
+test trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock ... ok
+test same_real_target_input_snapshot_generations_and_empty_workspace ... ok
+test scope_revoke_interrupts_real_pending_page_and_stale_node_never_launches ... ok
+test permanent_forget_removes_owned_profile_and_rejects_late_scopes ... ok
+test independent_persistent_profiles_auxiliary_locale_and_site_data_cleanup ... FAILED
+test pool_lru_is_bounded_and_idle_reap_keeps_cold_metadata ... ok
+
+failures:
+
+---- independent_persistent_profiles_auxiliary_locale_and_site_data_cleanup stdout ----
+
+thread 'independent_persistent_profiles_auxiliary_locale_and_site_data_cleanup' (25702563) panicked at crates/lingxi-adapters/tests/r07_browser_chromium.rs:233:17:
+真实浏览器命令失败: action=Resume, tab=None, phase=resume_cookies_disabled, owned_root=/private/tmp/lingxi-r09-t05/01-a09-base/tmp/lingxi-browser-0f44d27c366b0e5b40c40182cc02a3c2, controlled_requests=["GET /login HTTP/1.1 -> form", "idle/incomplete -> no response", "idle/incomplete -> no response", "idle/incomplete -> no response", "GET /form HTTP/1.1 -> form", "idle/incomplete -> no response", "GET /form HTTP/1.1 -> form", "idle/incomplete -> no response", "GET /favicon.ico HTTP/1.1 -> form", "GET /favicon.ico HTTP/1.1 -> form", "idle/incomplete -> no response", "GET /form HTTP/1.1 -> form", "idle/incomplete -> no response", "GET /favicon.ico HTTP/1.1 -> form", "GET /echo HTTP/1.1 -> echo", "idle/incomplete -> no response", "idle/incomplete -> no response", "idle/incomplete -> no response", "idle/incomplete -> no response", "idle/incomplete -> no response"], workspaces=Ok([BrowserWorkspace { session_id: "owner-a", session_path: "native:owner-a", execution_node: "fixture-server", running: false, resumable: true, unavailable_reason: None, url: Some("about:blank"), title: Some(""), active_tab_id: Some("520E8C4D303FE1DAB903D7920789C713"), tabs: [BrowserTab { tab_id: "520E8C4D303FE1DAB903D7920789C713", title: "", url: Some("about:blank"), can_go_back: false, can_go_forward: false, created_at: "2026-10-26T13:31:13Z", updated_at: "2026-10-26T13:31:13Z" }], suspended: true, user_takeover: false, revoked: false, visible_capable: false }, BrowserWorkspace { session_id: "owner-b", session_path: "native:owner-b", execution_node: "fixture-server", running: false, resumable: true, unavailable_reason: Some("cookie_policy_changed"), url: Some("http://127.0.0.1:53732/form"), title: Some("Local browser fixture"), active_tab_id: Some("6854E1F25BCAAA3A3AE9F534755FD542"), tabs: [BrowserTab { tab_id: "6854E1F25BCAAA3A3AE9F534755FD542", title: "Local browser fixture", url: Some("http://127.0.0.1:53732/form"), can_go_back: true, can_go_forward: false, created_at: "2026-10-26T13:31:10Z", updated_at: "2026-10-26T13:31:10Z" }], suspended: true, user_takeover: false, revoked: false, visible_capable: false }]), cause=BrowserError { code: "browser_navigation", message: "浏览器导航失败，未回退其他网络路径 [net::ERR_SOCKET_NOT_CONNECTED]", effect_unknown: false }
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/std/src/panicking.rs:679:5
+   1: core::panicking::panic_fmt
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/panicking.rs:80:14
+   2: r07_browser_chromium::execute_checked::{closure#0}
+             at ./tests/r07_browser_chromium.rs:233:17
+   3: r07_browser_chromium::independent_persistent_profiles_auxiliary_locale_and_site_data_cleanup::{closure#0}
+             at ./tests/r07_browser_chromium.rs:461:6
+   4: <core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>> as core::future::future::Future>::poll
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/future/future.rs:133:9
+   5: <core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>> as core::future::future::Future>::poll
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/future/future.rs:133:9
+   6: <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on::<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}::{closure#0}::{closure#0}
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:830:70
+   7: tokio::task::coop::with_budget::<core::task::poll::Poll<()>, <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}::{closure#0}::{closure#0}>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/task/coop/mod.rs:167:5
+   8: tokio::task::coop::budget::<core::task::poll::Poll<()>, <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}::{closure#0}::{closure#0}>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/task/coop/mod.rs:133:5
+   9: <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on::<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}::{closure#0}
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:830:25
+  10: <tokio::runtime::scheduler::current_thread::Context>::enter::<core::task::poll::Poll<()>, <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}::{closure#0}>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:488:19
+  11: <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on::<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:829:44
+  12: <tokio::runtime::scheduler::current_thread::CoreGuard>::enter::<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>::{closure#0}
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:906:68
+  13: <tokio::runtime::context::scoped::Scoped<tokio::runtime::scheduler::Context>>::set::<<tokio::runtime::scheduler::current_thread::CoreGuard>::enter<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>::{closure#0}, (alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>)>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/context/scoped.rs:40:9
+  14: tokio::runtime::context::set_scheduler::<(alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>), <tokio::runtime::scheduler::current_thread::CoreGuard>::enter<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>::{closure#0}>::{closure#0}
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/context.rs:187:38
+  15: <std::thread::local::LocalKey<tokio::runtime::context::Context>>::try_with::<tokio::runtime::context::set_scheduler<(alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>), <tokio::runtime::scheduler::current_thread::CoreGuard>::enter<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>::{closure#0}>::{closure#0}, (alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>)>
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/std/src/thread/local.rs:463:12
+  16: <std::thread::local::LocalKey<tokio::runtime::context::Context>>::with::<tokio::runtime::context::set_scheduler<(alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>), <tokio::runtime::scheduler::current_thread::CoreGuard>::enter<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>::{closure#0}>::{closure#0}, (alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>)>
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/std/src/thread/local.rs:427:20
+  17: tokio::runtime::context::set_scheduler::<(alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>), <tokio::runtime::scheduler::current_thread::CoreGuard>::enter<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>::{closure#0}>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/context.rs:187:17
+  18: <tokio::runtime::scheduler::current_thread::CoreGuard>::enter::<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:906:27
+  19: <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on::<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:817:24
+  20: <tokio::runtime::scheduler::current_thread::CurrentThread>::block_on::<core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>::{closure#0}
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:218:33
+  21: tokio::runtime::context::runtime::enter_runtime::<<tokio::runtime::scheduler::current_thread::CurrentThread>::block_on<core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>::{closure#0}, ()>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/context/runtime.rs:65:16
+  22: <tokio::runtime::scheduler::current_thread::CurrentThread>::block_on::<core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:206:9
+  23: <tokio::runtime::runtime::Runtime>::block_on_inner::<core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/runtime.rs:374:52
+  24: <tokio::runtime::runtime::Runtime>::block_on::<core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/runtime.rs:343:18
+  25: r07_browser_chromium::independent_persistent_profiles_auxiliary_locale_and_site_data_cleanup
+             at ./tests/r07_browser_chromium.rs:547:43
+  26: r07_browser_chromium::independent_persistent_profiles_auxiliary_locale_and_site_data_cleanup::{closure#0}
+             at ./tests/r07_browser_chromium.rs:373:82
+  27: <r07_browser_chromium::independent_persistent_profiles_auxiliary_locale_and_site_data_cleanup::{closure#0} as core::ops::function::FnOnce<()>>::call_once
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/ops/function.rs:250:5
+  28: <fn() -> core::result::Result<(), alloc::string::String> as core::ops::function::FnOnce<()>>::call_once
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/ops/function.rs:250:5
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+
+
+failures:
+    independent_persistent_profiles_auxiliary_locale_and_site_data_cleanup
+
+test result: FAILED. 9 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.47s
+
+error: test failed, to rerun pass `-p lingxi-adapters --test r07_browser_chromium`

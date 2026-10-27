@@ -1,0 +1,38 @@
+{
+  "record": {
+    "actual": null,
+    "appVersion": "0.1.43",
+    "atUnixMs": 1793027060304,
+    "debugBuild": true,
+    "detail": {
+      "exit": {
+        "code": 2,
+        "signal": null,
+        "success": false
+      },
+      "pid": 19912,
+      "stderrTail": [
+        "2026-10-26T15:04:20.301536Z  INFO lingxi_service: data root resolved [token] source=cli ignored_sources=env(LINGXI_HOME)[token]",
+        "2026-10-26T15:04:20.301864Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) [token] [token][user]",
+        "2026-10-26T15:04:20.301952Z  INFO lingxi_service: model plane resolved (credentials never logged) model_plane_source=None providers=0",
+        "2026-10-26T15:04:20.302600Z  INFO lingxi_service: single-writer lock acquired [token] start_nonce=b55b8ac3a5a483df pid=19912 entropy=\"os-random-device\" [token][user]/instance.lock network_mode=loopback",
+        "LINGXI_DATA_EPOCH_BLOCKED reason=unstamped-home-with-data",
+        "[data-epoch] The data safety gate refused startup (unstamped-home-with-data): unrecognized existing data found: runtime-acl-fixture.txt; this data home carries no epoch stamp, and adopting existing data is an explicit cutover action (R08), never an automatic startup decision",
+        "[data-epoch] 数据安全闸拒绝启动（unstamped-home-with-data）：unrecognized existing data found: runtime-acl-fixture.txt; this data home carries no epoch stamp, and adopting existing data is an explicit cutover action (R08), never an automatic startup decision",
+        "[data-epoch] 请保留现场文件，使用维护/恢复流程处理；不要删除未知状态后强行启动。",
+        "",
+        "2026-10-26T15:04:20.302957Z ERROR lingxi_service: data-epoch gate refused startup (exit 2) reason=\"unstamped-home-with-data\" [token]"
+      ]
+    },
+    "expected": null,
+    "fallbackAttempts": 0,
+    "home": "/private/tmp/lingxi-r09-t06-acl-19875-1793027059/home",
+    "message": "Rust service exited before READY (exit code 2)",
+    "nodeFallback": "none",
+    "packaged": false,
+    "reason": "RUST_SERVICE_EXITED_BEFORE_READY",
+    "schema": "lingxi.r09.service-launch-failure.v1"
+  },
+  "recordedAtUnixMs": 1793027060304,
+  "schema": "lingxi.r09.service-launch-failure.v1"
+}

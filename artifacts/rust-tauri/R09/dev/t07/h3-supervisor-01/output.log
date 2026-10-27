@@ -1,0 +1,110 @@
+$ /Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path desktop/src-tauri/Cargo.toml --locked --features r09-host --test service_supervisor -- --nocapture
+--- exit=0 duration=18.08s ---
+
+running 9 tests
+test data_downgrade_env_is_refused ... ok
+test release_builds_refuse_remote_without_spawning ... ok
+test node_server_info_record_blocks_rust_startup ... ok
+test existing_instance_is_reused_and_detached_on_stop ... ok
+test remote_mode_never_spawns_or_touches_local_or_remote_process ... ok
+test runtime_protocol_mismatch_rejects_and_reaps_fake_service ... ok
+test real_service_roundtrip_ready_identity_and_graceful_shutdown ... ok
+test crash_restart_exhausted_is_bounded_and_headless ... ok
+test ready_timeout_kills_spawned_child_and_records_failure ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.73s
+
+   Compiling objc2-exception-helper v0.1.1
+   Compiling objc2 v0.6.4
+   Compiling mac-notification-sys v0.6.15
+   Compiling lingxi-resource-desktop v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri)
+   Compiling objc2-foundation v0.3.2
+   Compiling wry v0.57.1
+   Compiling objc2-core-foundation v0.3.2
+   Compiling block2 v0.6.2
+   Compiling dispatch2 v0.3.1
+   Compiling objc2-core-graphics v0.3.2
+   Compiling objc2-security v0.3.2
+   Compiling objc2-quartz-core v0.3.2
+   Compiling objc2-service-management v0.3.2
+   Compiling os_info v3.15.0
+   Compiling objc2-core-location v0.3.2
+   Compiling trash v5.2.9
+   Compiling objc2-user-notifications v0.3.2
+   Compiling smappservice-rs v0.1.3
+   Compiling auto-launch v0.6.0
+   Compiling notify-rust v4.18.2
+   Compiling objc2-app-kit v0.3.2
+   Compiling objc2-web-kit v0.3.2
+   Compiling tao v0.37.2
+   Compiling muda v0.20.0
+   Compiling window-vibrancy v0.8.1
+   Compiling global-hotkey v0.8.0
+   Compiling rfd v0.16.1
+   Compiling tauri-runtime v2.12.2
+   Compiling tray-icon v0.25.1
+   Compiling tauri-runtime-wry v2.12.3
+   Compiling tauri v2.12.1
+   Compiling tauri-plugin-fs v2.7.1
+   Compiling tauri-plugin-notification v2.7.0
+   Compiling tauri-plugin-single-instance v2.5.4
+   Compiling tauri-plugin-autostart v2.7.0
+   Compiling tauri-plugin-global-shortcut v2.4.1
+   Compiling tauri-plugin-dialog v2.7.3
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 16.84s
+     Running tests/service_supervisor.rs (desktop/src-tauri/target/debug/deps/service_supervisor-44ef66290309bd4e)
+[tauri-diag] {"appVersion":"0.1.43","debugBuild":true,"event":"resolve","home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-downgrade-56966-1793030562647","packaged":false,"platform":"darwin","schema":"lingxi.r09.tauri-launch.v1","unixMs":1793030562649}
+[tauri-diag] {"appVersion":"0.1.43","debugBuild":false,"event":"resolve","home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-remote-release-refusal-56966-1793030562647","packaged":false,"platform":"darwin","schema":"lingxi.r09.tauri-launch.v1","unixMs":1793030562649}
+[tauri-diag] {"appVersion":"0.1.43","debugBuild":true,"event":"resolve","home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-node-server-info-56966-1793030562647","packaged":false,"platform":"darwin","schema":"lingxi.r09.tauri-launch.v1","unixMs":1793030562649}
+[tauri-diag] {"appVersion":"0.1.43","debugBuild":true,"event":"resolve","home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-crash-exhausted-56966-1793030562650","packaged":false,"platform":"darwin","schema":"lingxi.r09.tauri-launch.v1","unixMs":1793030562650}
+[tauri-diag] {"binary":"/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/../../rust/target/debug/lingxi-service","event":"binary","packaged":false,"schema":"lingxi.r09.tauri-launch.v1","unixMs":1793030562650}
+[tauri-diag] {"appVersion":"0.1.43","debugBuild":true,"event":"resolve","home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-roundtrip-56966-1793030562650","packaged":false,"platform":"darwin","schema":"lingxi.r09.tauri-launch.v1","unixMs":1793030562651}
+[tauri-diag] {"binary":"/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/../../rust/target/debug/lingxi-service","event":"binary","packaged":false,"schema":"lingxi.r09.tauri-launch.v1","unixMs":1793030562651}
+[tauri-diagnostics] failure record: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-tauri-launch/7218c38e8c5733a0/failure.json
+[tauri-diagnostics] failure record: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-tauri-launch/bb0a712e78aafdd0/failure.json
+[tauri-diag] {"actual":null,"appVersion":"0.1.43","atUnixMs":1793030562650,"debugBuild":true,"detail":{"path":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-node-server-info-56966-1793030562647/server-info.json"},"event":"service-launch-failed","expected":null,"fallbackAttempts":0,"home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-node-server-info-56966-1793030562647","message":"a legacy Node server record exists in this data root; resolve it before starting the Rust desktop","nodeFallback":"none","packaged":false,"reason":"RUST_DESKTOP_NODE_SERVER_INFO_PRESENT","schema":"lingxi.r09.service-launch-failure.v1","unixMs":1793030562651}
+[tauri-diag] {"actual":null,"appVersion":"0.1.43","atUnixMs":1793030562650,"debugBuild":true,"detail":null,"event":"service-launch-failed","expected":null,"fallbackAttempts":0,"home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-downgrade-56966-1793030562647","message":"Rust desktop refuses LINGXI_ALLOW_DATA_DOWNGRADE; use an explicit recovery workflow","nodeFallback":"none","packaged":false,"reason":"RUST_DESKTOP_DATA_DOWNGRADE_REFUSED","schema":"lingxi.r09.service-launch-failure.v1","unixMs":1793030562651}
+[tauri-diag] {"appVersion":"0.1.43","debugBuild":true,"event":"resolve","home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-timeout-56966-1793030562650","packaged":false,"platform":"darwin","schema":"lingxi.r09.tauri-launch.v1","unixMs":1793030562651}
+[tauri-diagnostics] failure record: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-tauri-launch/62c813691b22e084/failure.json
+[tauri-diag] {"binary":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-timeout-56966-1793030562650/fake-service.sh","event":"binary","packaged":false,"schema":"lingxi.r09.tauri-launch.v1","unixMs":1793030562651}
+[tauri-diag] {"actual":null,"appVersion":"0.1.43","atUnixMs":1793030562650,"debugBuild":false,"detail":null,"event":"service-launch-failed","expected":null,"fallbackAttempts":0,"home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-remote-release-refusal-56966-1793030562647","message":"Rust remote desktop connection is a dev preview; release builds refuse it","nodeFallback":"none","packaged":false,"reason":"REMOTE_REQUIRES_DEV_BUILD","schema":"lingxi.r09.service-launch-failure.v1","unixMs":1793030562651}
+[tauri-diag] {"appVersion":"0.1.43","debugBuild":true,"event":"resolve","home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-runtime-gate-56966-1793030562650","packaged":false,"platform":"darwin","schema":"lingxi.r09.tauri-launch.v1","unixMs":1793030562651}
+[tauri-diag] {"binary":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-runtime-gate-56966-1793030562650/fake-incompatible-service.py","event":"binary","packaged":false,"schema":"lingxi.r09.tauri-launch.v1","unixMs":1793030562651}
+[tauri-diagnostics] crash log: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-tauri-launch/7218c38e8c5733a0/tauri-crash.log
+[tauri-diagnostics] crash log: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-tauri-launch/bb0a712e78aafdd0/tauri-crash.log
+[tauri-diagnostics] crash log: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-tauri-launch/62c813691b22e084/tauri-crash.log
+[tauri-diag] {"args":["--home","/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-runtime-gate-56966-1793030562650"],"binary":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-runtime-gate-56966-1793030562650/fake-incompatible-service.py","event":"spawn","pgid":56972,"pid":56972,"schema":"lingxi.r09.tauri-launch.v1","spawnedAtUnixMs":1793030562651,"unixMs":1793030562652}
+[tauri-diag] {"args":["--home","/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-timeout-56966-1793030562650"],"binary":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-timeout-56966-1793030562650/fake-service.sh","event":"spawn","pgid":56971,"pid":56971,"schema":"lingxi.r09.tauri-launch.v1","spawnedAtUnixMs":1793030562651,"unixMs":1793030562652}
+[tauri-diag] {"args":["--home","/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-crash-exhausted-56966-1793030562650"],"binary":"/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/../../rust/target/debug/lingxi-service","event":"spawn","pgid":56968,"pid":56968,"schema":"lingxi.r09.tauri-launch.v1","spawnedAtUnixMs":1793030562651,"unixMs":1793030562652}
+[tauri-diag] {"args":["--home","/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-roundtrip-56966-1793030562650"],"binary":"/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/../../rust/target/debug/lingxi-service","event":"spawn","pgid":56970,"pid":56970,"schema":"lingxi.r09.tauri-launch.v1","spawnedAtUnixMs":1793030562651,"unixMs":1793030562652}
+[tauri-diag] {"addr":"127.0.0.1:50785","event":"ready","msSinceSpawn":319,"pid":56972,"schema":"lingxi.r09.tauri-launch.v1","unixMs":1793030562971}
+[tauri-diag] {"appVersion":"0.1.43","debugBuild":true,"event":"resolve","home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-remote-local-56966-1793030562650","packaged":false,"platform":"darwin","schema":"lingxi.r09.tauri-launch.v1","unixMs":1793030563003}
+[tauri-diag] {"event":"remote-connect","host":"127.0.0.1","port":50783,"schema":"lingxi.r09.tauri-launch.v1","transport":"http","unixMs":1793030563003}
+[tauri-diag] {"event":"service-ready","host":"127.0.0.1","identity":{"serverId":"server_c-mAxFRoec-rQlRXL1rfUw","studioId":"studio_O1wLOm-5IbKbyO69BN0wWg"},"mode":"remote","port":50783,"schema":"lingxi.r09.tauri-launch.v1","touchedRemote":false,"unixMs":1793030563012}
+[tauri-diag] {"confirmed":false,"event":"shutdown","exit":null,"forceKillWaitMs":0,"graceMs":0,"mode":"remote","ownedPids":[],"residual":[],"schema":"lingxi.r09.tauri-launch.v1","signaled":[],"touchedRemote":false,"unixMs":1793030563012}
+[tauri-diag] {"event":"startup-abort","reason":"RUNTIME_IDENTITY_MISMATCH","schema":"lingxi.r09.tauri-launch.v1","shutdown":{"confirmed":true,"exit":{"code":0,"signal":null,"success":true},"forceKillWaitMs":5000,"graceMs":17000,"mode":"local-owned","ownedPids":[56972],"residual":[],"signaled":["SIGTERM:pid=56972"],"touchedRemote":false},"unixMs":1793030563117}
+[tauri-diagnostics] failure record: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-tauri-launch/1081f3ee6b8942e7/failure.json
+[tauri-diag] {"actual":"wire 1..=3 epoch 2","appVersion":"0.1.43","atUnixMs":1793030563117,"debugBuild":true,"detail":{"instanceId":"0123456789abcdef0123456789abcdef"},"event":"service-launch-failed","expected":"wire 1..=1 epoch 2","fallbackAttempts":0,"home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-runtime-gate-56966-1793030562650","message":"runtime instance record announces an incompatible protocol/data epoch","nodeFallback":"none","packaged":false,"reason":"RUNTIME_IDENTITY_MISMATCH","schema":"lingxi.r09.service-launch-failure.v1","unixMs":1793030563117}
+[tauri-diagnostics] crash log: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-tauri-launch/1081f3ee6b8942e7/tauri-crash.log
+[tauri-diagnostics] failure record: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-crash-exhausted-56966-1793030562650/diagnostics/tauri-launch/failure.json
+[tauri-diagnostics] crash log: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-crash-exhausted-56966-1793030562650/diagnostics/tauri-launch/tauri-crash.log
+[tauri-diag] {"event":"startup-abort","reason":"RUST_SERVICE_READY_TIMEOUT","schema":"lingxi.r09.tauri-launch.v1","shutdown":{"confirmed":true,"exit":{"code":null,"signal":15,"success":false},"forceKillWaitMs":5000,"graceMs":17000,"mode":"local-owned","ownedPids":[56971],"residual":[],"signaled":["SIGTERM:pid=56971"],"touchedRemote":false},"unixMs":1793030563340}
+[tauri-diagnostics] failure record: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-tauri-launch/258db087c43defac/failure.json
+[tauri-diag] {"actual":null,"appVersion":"0.1.43","atUnixMs":1793030563340,"debugBuild":true,"detail":{"pid":56971,"readyPrefix":"LINGXI_SERVICE_READY addr=","stderrTail":[]},"event":"service-launch-failed","expected":null,"fallbackAttempts":0,"home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-r09-supervisor-timeout-56966-1793030562650","message":"Rust service READY timed out after 600ms","nodeFallback":"none","packaged":false,"reason":"RUST_SERVICE_READY_TIMEOUT","schema":"lingxi.r09.service-launch-failure.v1","unixMs":1793030563341}
+[tauri-diagnostics] crash log: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56415-1793030532903/tmp/lingxi-tauri-launch/258db087c43defac/tauri-crash.log
+
+$ /bin/sh -c strings -a /private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E "hana-server" || true
+--- exit=0 duration=0.19s ---
+0
+
+$ /bin/sh -c strings -a /private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E "server/bootstrap" || true
+--- exit=0 duration=0.20s ---
+0
+
+$ /bin/sh -c strings -a /private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E "bundle/index.js" || true
+--- exit=0 duration=0.20s ---
+0
+
+$ /bin/sh -c strings -a /private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E "bridge-sdk-worker" || true
+--- exit=0 duration=0.20s ---
+0

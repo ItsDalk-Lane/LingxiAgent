@@ -3,6 +3,7 @@ use std::{net::SocketAddr, path::Path, time::Duration};
 
 /// 凭证留在宿主；只能访问现行 Rust 服务的三个资源监听入口。
 pub struct ResourceConnection {
+    origin: String,
     base: String,
     token: String,
 }
@@ -43,8 +44,10 @@ impl ResourceConnection {
             .filter(|t| !t.is_empty())
             .ok_or("服务缺少本机凭证")?
             .to_owned();
+        let origin = format!("http://{addr}");
         Ok(Self {
-            base: format!("http://{addr}/lingxi/v1/resource-io"),
+            base: format!("{origin}/lingxi/v1/resource-io"),
+            origin,
             token,
         })
     }
@@ -83,6 +86,67 @@ impl ResourceConnection {
             ));
         }
         Ok(value)
+    }
+
+    /// R09-T03：首次设置完成（POST setup-complete；返回服务确认的 setupComplete）。
+    pub async fn setup_complete(&self) -> Result<Value, String> {
+        let client = reqwest::Client::builder()
+            .timeout(Duration::from_secs(10))
+            .redirect(reqwest::redirect::Policy::none())
+            .build()
+            .map_err(|e| e.to_string())?;
+        let response = client
+            .post(format!("{}/lingxi/v1/preferences/setup-complete", self.origin))
+            .bearer_auth(&self.token)
+            .json(&json!({}))
+            .send()
+            .await
+            .map_err(|_| "无法连接本机设置服务".to_string())?;
+        let status = response.status();
+        let value: Value = response
+            .json()
+            .await
+            .map_err(|_| "设置服务返回无效数据".to_string())?;
+        if !status.is_success() {
+            return Err(format!(
+                "设置服务拒绝（{}）：{}",
+                status.as_u16(),
+                value["error"].as_str().unwrap_or("保存失败")
+            ));
+        }
+        Ok(value)
+    }
+
+    /// R09-T03：DOCX/XLSX 转 HTML（Electron `read-docx-html`/`read-xlsx-html`
+    /// 的 Rust 服务等价物；走本机服务受限 fs 授权根，返回真实 HTML 文本）。
+    pub async fn office_html(&self, kind: &str, file_path: &str) -> Result<Option<String>, String> {
+        if kind != "docx" && kind != "xlsx" {
+            return Err("不支持的 Office 预览类型".into());
+        }
+        let client = reqwest::Client::builder()
+            .timeout(Duration::from_secs(20))
+            .redirect(reqwest::redirect::Policy::none())
+            .build()
+            .map_err(|e| e.to_string())?;
+        let mut url = reqwest::Url::parse(&format!("{}/lingxi/v1/fs/{kind}-html", self.origin))
+            .map_err(|_| "本机文档服务地址无效".to_string())?;
+        url.query_pairs_mut().append_pair("path", file_path);
+        let response = client
+            .get(url)
+            .bearer_auth(&self.token)
+            .send()
+            .await
+            .map_err(|_| "无法连接本机文档服务".to_string())?;
+        let status = response.status();
+        if !status.is_success() {
+            // 与 Electron 一致：解析失败/无效输入返回 null（不伪造 HTML）。
+            return Ok(None);
+        }
+        let html = response
+            .text()
+            .await
+            .map_err(|_| "文档服务返回无效数据".to_string())?;
+        Ok(Some(html))
     }
 
     pub async fn subscribe(&self, path: &str) -> Result<Value, String> {

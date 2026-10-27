@@ -1,0 +1,82 @@
+{
+ "schema": "lingxi.r09.t05.leaf-assertion-cases.v1",
+ "caseNaming": "leaf:<leafId>::a<N>-<slug>（N=原断言序号，从 1 起）",
+ "leaves": {
+  "R00-T02-LA-A67D342381C0": [
+   "leaf:R00-T02-LA-A67D342381C0::a1-tabs-and-active-sync-server-snapshot",
+   "leaf:R00-T02-LA-A67D342381C0::a2-invalid-tab-and-close-failure-explicit"
+  ],
+  "R00-T02-LA-A09B78985A14": [
+   "leaf:R00-T02-LA-A09B78985A14::a1-emergency-stop-revoke-until-new-user-run",
+   "leaf:R00-T02-LA-A09B78985A14::a2-no-legacy-local-instance-and-close-failure-visible"
+  ],
+  "R00-T02-LA-8A45B19A18B4": [
+   "leaf:R00-T02-LA-8A45B19A18B4::a1-real-back-forward-reload-url-title-flags",
+   "leaf:R00-T02-LA-8A45B19A18B4::a2-no-active-view-and-illegal-urls-explicit"
+  ],
+  "R00-T02-LA-7D212CBD9EEF": [
+   "leaf:R00-T02-LA-7D212CBD9EEF::a1-verify-success-persists-only-after-real-success",
+   "leaf:R00-T02-LA-7D212CBD9EEF::a2-verify-reject-no-widened-persistence-visible-error"
+  ],
+  "R00-T02-LA-1809C8E13EA3": [
+   "leaf:R00-T02-LA-1809C8E13EA3::a1-read-prefs-and-running-state-no-write",
+   "leaf:R00-T02-LA-1809C8E13EA3::a2-put-apply-no-widened-write-or-disclosure"
+  ],
+  "R00-T02-LA-03A9E92909C6": [
+   "leaf:R00-T02-LA-03A9E92909C6::a1-clear-site-data-success-and-failure-receipt",
+   "leaf:R00-T02-LA-03A9E92909C6::a2-clear-state-matches-actual-side-effect"
+  ],
+  "R00-T02-LA-ED5FD5B469B8": [
+   "leaf:R00-T02-LA-ED5FD5B469B8::a1-update-prefs-save-and-return-new-state",
+   "leaf:R00-T02-LA-ED5FD5B469B8::a2-apply-failure-400-readback-no-auto-rollback"
+  ],
+  "R00-T02-LA-367052089D11": [
+   "leaf:R00-T02-LA-367052089D11::a1-states-running-resumable-unavailable-projection",
+   "leaf:R00-T02-LA-367052089D11::a2-states-invalid-unauthorized-downstream-explicit"
+  ],
+  "R00-T02-LA-593534A4F2AB": [
+   "leaf:R00-T02-LA-593534A4F2AB::a1-sessions-list-cold-url-retained",
+   "leaf:R00-T02-LA-593534A4F2AB::a2-sessions-invalid-unauthorized-explicit"
+  ],
+  "R00-T02-LA-178C8CBA29C2": [
+   "leaf:R00-T02-LA-178C8CBA29C2::a1-close-session-real-stop-and-state-broadcast",
+   "leaf:R00-T02-LA-178C8CBA29C2::a2-close-invalid-unauthorized-downstream-explicit"
+  ],
+  "R00-T02-LA-F1A5597E3E78": [
+   "leaf:R00-T02-LA-F1A5597E3E78::a1-close-and-revoke-authority-real",
+   "leaf:R00-T02-LA-F1A5597E3E78::a2-revoke-invalid-unknown-explicit"
+  ],
+  "R00-T02-LA-DCD85A04A7E9": [
+   "leaf:R00-T02-LA-DCD85A04A7E9::a1-open-session-explicit-resume-cold-metadata",
+   "leaf:R00-T02-LA-DCD85A04A7E9::a2-open-invalid-unauthorized-downstream-explicit"
+  ],
+  "R00-T02-LA-A30E4BDF2FA2": [
+   "leaf:R00-T02-LA-A30E4BDF2FA2::a1-navigation-title-and-snapshot-match",
+   "leaf:R00-T02-LA-A30E4BDF2FA2::a2-stale-ref-explicit-failure",
+   "leaf:R00-T02-LA-A30E4BDF2FA2::a3-session-a-state-not-leaked-to-b",
+   "leaf:R00-T02-LA-A30E4BDF2FA2::a4-no-session-blocked-or-browser-error-explicit-no-cross-session"
+  ],
+  "R00-T02-LA-FD7A5A76B8EA": [
+   "leaf:R00-T02-LA-FD7A5A76B8EA::a1-fetch-body-and-final-url-session-file",
+   "leaf:R00-T02-LA-FD7A5A76B8EA::a2-blocked-page-not-normal-content",
+   "leaf:R00-T02-LA-FD7A5A76B8EA::a3-invalid-url-redirect-network-error-no-workspace-write"
+  ],
+  "R00-T02-LA-D1B56A275C3A": [
+   "leaf:R00-T02-LA-D1B56A275C3A::a1-search-real-links-and-provider",
+   "leaf:R00-T02-LA-D1B56A275C3A::a2-no-config-not-fake-success",
+   "leaf:R00-T02-LA-D1B56A275C3A::a3-missing-key-rate-limit-failure-explicit"
+  ],
+  "R00-T02-LA-4173A08A51CC": [
+   "leaf:R00-T02-LA-4173A08A51CC::a1-service-side-docx-xlsx-pdf-read",
+   "leaf:R00-T02-LA-4173A08A51CC::a2-service-side-read-failure-explicit"
+  ]
+ },
+ "blockedLeaves": [
+  "R00-T02-LA-13049521EA0C",
+  "R00-T02-LA-6E13E5DF05EB",
+  "R00-T02-LA-8BD3BCC6D725"
+ ],
+ "partialLeaves": [
+  "R00-T02-LA-4173A08A51CC"
+ ]
+}

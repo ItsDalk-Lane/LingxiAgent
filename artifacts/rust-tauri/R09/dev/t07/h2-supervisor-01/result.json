@@ -1,0 +1,13 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t02_supervisor_ready",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 1.591,
+ "caseCount": 5,
+ "casesSha256": "ab15d331165f3af82d01ec639bd2e87b69e351626884a4678e95cfc0ef799803",
+ "commands": [],
+ "logSha256": "7162ae2baacb764b0e74129ff12efda2dff4e4dd110b28b7687d927bd1d55d5e",
+ "finishedAtUnixMs": 1793030172405,
+ "failureDetail": "CANDIDATE_REQUIRED: 需要 LINGXI_R09_T02_RELEASE_APP（v2 delivery .app；T02 禁止自行构建）"
+}

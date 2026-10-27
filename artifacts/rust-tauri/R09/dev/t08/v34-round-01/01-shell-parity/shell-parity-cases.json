@@ -1,0 +1,4532 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t08_shell_parity",
+ "cases": [
+  {
+   "case": "fixed::delivery-file::Contents/Info.plist",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "path": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/Info.plist"
+   }
+  },
+  {
+   "case": "fixed::delivery-sha::Contents/Info.plist",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "expected": "da9ebff0b848d9ff1e3e6e5ac545c7270904ceb2a65677095cbb3e400e01919a",
+    "actual": "da9ebff0b848d9ff1e3e6e5ac545c7270904ceb2a65677095cbb3e400e01919a"
+   }
+  },
+  {
+   "case": "fixed::delivery-file::Contents/MacOS/lingxi-resource-desktop",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "path": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop"
+   }
+  },
+  {
+   "case": "fixed::delivery-sha::Contents/MacOS/lingxi-resource-desktop",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "expected": "41c32b1ab8528a337b702e91d52067c71e77c60f5d8cdcc5a126b33c4ef8658c",
+    "actual": "41c32b1ab8528a337b702e91d52067c71e77c60f5d8cdcc5a126b33c4ef8658c"
+   }
+  },
+  {
+   "case": "fixed::delivery-file::Contents/MacOS/lingxi-service",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "path": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-service"
+   }
+  },
+  {
+   "case": "fixed::delivery-sha::Contents/MacOS/lingxi-service",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "expected": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+    "actual": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d"
+   }
+  },
+  {
+   "case": "fixed::delivery-file::Contents/Resources/Lingxi.icns",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "path": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/Resources/Lingxi.icns"
+   }
+  },
+  {
+   "case": "fixed::delivery-sha::Contents/Resources/Lingxi.icns",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "expected": "0951f493d51b3537f2b5826d45e117bba1ead1802c38658e2c0ebb1d7706b4d3",
+    "actual": "0951f493d51b3537f2b5826d45e117bba1ead1802c38658e2c0ebb1d7706b4d3"
+   }
+  },
+  {
+   "case": "fixed::delivery-file::Contents/Resources/rust-service/build.json",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "path": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/Resources/rust-service/build.json"
+   }
+  },
+  {
+   "case": "fixed::delivery-sha::Contents/Resources/rust-service/build.json",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "expected": "372c2b88748dcd96e9a74956c13554fb8d0e764638c28bc52b524c3a506473f9",
+    "actual": "372c2b88748dcd96e9a74956c13554fb8d0e764638c28bc52b524c3a506473f9"
+   }
+  },
+  {
+   "case": "fixed::delivery-file::Contents/_CodeSignature/CodeResources",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "path": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/_CodeSignature/CodeResources"
+   }
+  },
+  {
+   "case": "fixed::delivery-sha::Contents/_CodeSignature/CodeResources",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "expected": "94feb01477569084da315e5fb2fa90ff5bd3d25c03861a54a75309a830095bcc",
+    "actual": "94feb01477569084da315e5fb2fa90ff5bd3d25c03861a54a75309a830095bcc"
+   }
+  },
+  {
+   "case": "fixed::delivery-app-tree-sha256",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "expected": "b094b15ac7c756a9e5d7a6e11451138785a144ea4a7a9d155a04e07111a4b9da",
+    "actual": "5d0e7982f8c69d391b32c1015f3a65f8edce640b49aef34baddba3a1972da5be"
+   }
+  },
+  {
+   "case": "fixed::receipt::deliveryRelease",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "path": "desktop/src-tauri/.tauri-build/build-receipt-release.json"
+   }
+  },
+  {
+   "case": "fixed::receipt-sha::deliveryRelease",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "expected": "3a050cf91d2ab213742f9b461b25d276611e127a51244be90d62b76b4fef897d",
+    "actual": "3a050cf91d2ab213742f9b461b25d276611e127a51244be90d62b76b4fef897d"
+   }
+  },
+  {
+   "case": "fixed::receipt-features::deliveryRelease",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "expected": [
+     "r09-host"
+    ],
+    "actual": [
+     "r09-host"
+    ]
+   }
+  },
+  {
+   "case": "fixed::receipt-evidence-build::deliveryRelease",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "actual": false
+   }
+  },
+  {
+   "case": "fixed::release-artifacts-recorded",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+    "executableSha256": "41c32b1ab8528a337b702e91d52067c71e77c60f5d8cdcc5a126b33c4ef8658c",
+    "appBundle": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+    "appBundleExists": true
+   }
+  },
+  {
+   "case": "fixed::release-renderer-bound",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9"
+   }
+  },
+  {
+   "case": "fixed::release-theme-bound",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73"
+   }
+  },
+  {
+   "case": "fixed::receipt::evidenceBuild",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "path": "desktop/src-tauri/.tauri-build/build-receipt-debug.json"
+   }
+  },
+  {
+   "case": "fixed::receipt-sha::evidenceBuild",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "expected": "26389ac6236a35b970a059e7dcfe579ebff6da6b9aa5a40907506633b1474f4c",
+    "actual": "26389ac6236a35b970a059e7dcfe579ebff6da6b9aa5a40907506633b1474f4c"
+   }
+  },
+  {
+   "case": "fixed::receipt-features::evidenceBuild",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "expected": [
+     "e2e-test",
+     "r09-host",
+     "r09-test-hooks"
+    ],
+    "actual": [
+     "e2e-test",
+     "r09-host",
+     "r09-test-hooks"
+    ]
+   }
+  },
+  {
+   "case": "fixed::receipt-evidence-build::evidenceBuild",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "actual": true
+   }
+  },
+  {
+   "case": "fixed::evidence-exe-exists",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "path": "desktop/src-tauri/target/debug/lingxi-resource-desktop"
+   }
+  },
+  {
+   "case": "fixed::evidence-exe-sha",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "expected": "0a9a072fff1d77d158c84c8eb3b8c4a0f6c13f21b037e09b18bbfe4573663ecc",
+    "actual": "0a9a072fff1d77d158c84c8eb3b8c4a0f6c13f21b037e09b18bbfe4573663ecc"
+   }
+  },
+  {
+   "case": "fixed::evidence-renderer-bound",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9"
+   }
+  },
+  {
+   "case": "fixed::same-renderer-candidate",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "note": "delivery release 与 G1 evidence 构建绑定同一 renderer/theme 摘要"
+   }
+  },
+  {
+   "case": "fixed::renderer-tree-digest",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "expected": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+    "actual": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+    "files": 644
+   }
+  },
+  {
+   "case": "fixed::renderer-file-count-recorded",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "actual": 644,
+    "note": "v2 handoff 未提供 fileCount，按磁盘实测记录（build-once-bind-once）"
+   }
+  },
+  {
+   "case": "fixed::renderer-theme-present",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "path": "desktop/dist-renderer/lib/theme.js"
+   }
+  },
+  {
+   "case": "fixed::renderer-theme-sha",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "expected": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+    "actual": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73"
+   }
+  },
+  {
+   "case": "fixed::service-protocol",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "actual": {
+     "serverKind": "lingxi-service",
+     "wireProtocolMin": 1,
+     "wireProtocolMax": 1,
+     "dataEpoch": 2
+    },
+    "expected": {
+     "serverKind": "lingxi-service",
+     "wireProtocolMin": 1,
+     "wireProtocolMax": 1,
+     "dataEpoch": 2
+    }
+   }
+  },
+  {
+   "case": "fixed::service-content-digest",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+    "contentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0"
+   }
+  },
+  {
+   "case": "fixed::candidate-handoff-provenance",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "candidateVersion": "v3.4",
+    "source": "artifacts/rust-tauri/R09/dev/t06/candidate-handoff-v3.4/candidate-handoff.json",
+    "handoff": "artifacts/rust-tauri/R09/dev/t06/candidate-handoff-v3.4/candidate-handoff.json",
+    "gitHead": "aac8cb9fe6bb7bfa7a41d75528221136bfe55e50",
+    "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+    "serviceContentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+    "frozenAt": "2026-10-27T09:01:27+0800",
+    "deliveryAppTreeSha256": "b094b15ac7c756a9e5d7a6e11451138785a144ea4a7a9d155a04e07111a4b9da",
+    "evidenceBuildSha256": "0a9a072fff1d77d158c84c8eb3b8c4a0f6c13f21b037e09b18bbfe4573663ecc"
+   }
+  },
+  {
+   "case": "fixed::fixture-v3-anchor",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "actual": "80a8d2c2640e2b2974b299a10f36679bc19daf0911e51f82f0c43399cb32feaa"
+   }
+  },
+  {
+   "case": "fixed::r08-renderer-baseline",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "actual": "3e5339cc92f9f29a30846a101b3e4636d3b4e2d7f896980c57b8f31b129a89ef"
+   }
+  },
+  {
+   "case": "fixed::r08-rust-binary-baseline",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "actual": "b855e5d638aea6605c1b2d634377f230e1b6118e71522eb98a8be841ed10faa0"
+   }
+  },
+  {
+   "case": "fixed::r08-gate-overall-pass",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "overall": "PASS"
+   }
+  },
+  {
+   "case": "fixed::r08-gate-tested-sha",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "expected": "aa99d2ec1dae7f0aef5971bab049734f22fcf7d8",
+    "actual": "aa99d2ec1dae7f0aef5971bab049734f22fcf7d8"
+   }
+  },
+  {
+   "case": "fixed::r08-candidate-binding-stable",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "before": "0f07f2f7a0cf9e8d5660237be6a26666ba314dc04e840a02b9b573d990050dc6",
+    "after": "0f07f2f7a0cf9e8d5660237be6a26666ba314dc04e840a02b9b573d990050dc6"
+   }
+  },
+  {
+   "case": "fixed::r08-ab-parity-cases-nonempty",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "count": 68,
+    "failed": []
+   }
+  },
+  {
+   "case": "fixed::r08-ab-verdict",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "expected": {
+     "tasks": 71,
+     "parity": 68,
+     "recorded": 3,
+     "differs": 0
+    },
+    "actual": {
+     "tasks": 71,
+     "parity": 68,
+     "recorded": 3,
+     "differs": 0
+    },
+    "line": "AB_RESULT tasks=71 parity=68 differs=0 recorded=3 failedA=0 failedB=0 out=/private/tmp/lingxi-r08-verify/r08_t07_ab-61788-1793016143174/out"
+   }
+  },
+  {
+   "case": "evidence::source::r09_t01_react_parity",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "dir": "artifacts/rust-tauri/R09/dev/t01/run-08",
+    "status": "PASS",
+    "need": "PASS"
+   }
+  },
+  {
+   "case": "evidence::source::r09_t02_supervisor_ready",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "dir": "artifacts/rust-tauri/R09/dev/t07/h3-supervisor-01",
+    "status": "PASS",
+    "need": "PASS"
+   }
+  },
+  {
+   "case": "evidence::source::r09_t02_process_ownership",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "dir": "artifacts/rust-tauri/R09/dev/t07/h3-ownership-01",
+    "status": "PASS",
+    "need": "PASS"
+   }
+  },
+  {
+   "case": "evidence::source::r09_t05_browser_pdf",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "dir": "artifacts/rust-tauri/R09/dev/t05/01-a09-per-assertion-final2",
+    "status": "PASS",
+    "need": "PASS"
+   }
+  },
+  {
+   "case": "evidence::source::r09_t05_untrusted_preview",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "dir": "artifacts/rust-tauri/R09/dev/t05/02-a10-preview-final",
+    "status": "PASS",
+    "need": "PASS"
+   }
+  },
+  {
+   "case": "evidence::source::r09_t07_native_e2e",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "dir": "artifacts/rust-tauri/R09/dev/t07/g1-hidden-v34-01",
+    "status": "PASS",
+    "need": "PASS"
+   }
+  },
+  {
+   "case": "evidence::source::r09_t01_release_offline",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "dir": "artifacts/rust-tauri/R09/dev/t01/phase2-release-offline-01",
+    "status": "PASS",
+    "need": "PASS"
+   }
+  },
+  {
+   "case": "evidence::source::r09_t03_native_matrix",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "dir": "artifacts/rust-tauri/R09/dev/t03/native-matrix-02",
+    "status": "FAIL",
+    "need": "ANY"
+   }
+  },
+  {
+   "case": "evidence::source::r09_t03_ipc_negative",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "dir": "artifacts/rust-tauri/R09/dev/t03/ipc-negative-02",
+    "status": "FAIL",
+    "need": "ANY"
+   }
+  },
+  {
+   "case": "evidence::source::r09_t04_permission_matrix",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "dir": "artifacts/rust-tauri/R09/dev/t04/permission-matrix-02",
+    "status": "FAIL",
+    "need": "ANY"
+   }
+  },
+  {
+   "case": "evidence::source::r09_t04_remote_boundary",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "dir": "artifacts/rust-tauri/R09/dev/t04/remote-boundary-02",
+    "status": "FAIL",
+    "need": "ANY"
+   }
+  },
+  {
+   "case": "evidence::source::r09_t06_capability_matrix",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "dir": "artifacts/rust-tauri/R09/dev/t06/v32-capability-matrix-01",
+    "status": "FAIL",
+    "need": "ANY"
+   }
+  },
+  {
+   "case": "evidence::source::r09_t06_release_attack_surface",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "dir": "artifacts/rust-tauri/R09/dev/t06/v32-release-suite-01",
+    "status": "PASS",
+    "need": "PASS"
+   }
+  },
+  {
+   "case": "evidence::source::r09_t07_release_smoke",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "dir": "artifacts/rust-tauri/R09/dev/t07/gate-01-r09_t07_release_smoke",
+    "status": "FAIL",
+    "need": "ANY"
+   }
+  },
+  {
+   "case": "evidence::source::audit_capability",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "dir": "artifacts/rust-tauri/R09/dev/t06/v32-audit-01",
+    "status": "PASS",
+    "need": "PASS"
+   }
+  },
+  {
+   "case": "evidence::source::release_scan",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "dir": "artifacts/rust-tauri/R09/dev/t06/v32-scan-01",
+    "status": "PASS",
+    "need": "PASS"
+   }
+  },
+  {
+   "case": "candidate::no-source-drift-after-release-build",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "newer": [],
+    "note": "非生成的 desktop/src-tauri 源文件晚于该构建 → 需在最终候选重建后重跑证据"
+   }
+  },
+  {
+   "case": "candidate::no-source-drift-after-evidence-build",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "newer": [],
+    "note": "非生成的 desktop/src-tauri 源文件晚于该构建 → 需在最终候选重建后重跑证据"
+   }
+  },
+  {
+   "case": "candidate::renderer-source-stable-since-build",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "newer": [],
+    "note": "renderer 源码晚于 dist 构建 → 需重建 renderer 并重绑证据"
+   }
+  },
+  {
+   "case": "candidate::artifacts-stable-since-freeze",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "freezeEpochMs": 1793062887000,
+    "touched": []
+   }
+  },
+  {
+   "case": "evidence::candidate-binding::r09_t01_react_parity",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "receiptRendererDigest": "d09359bd5bc87071c7e4cfc7fffb99553bc39b1345dd83946dcd14c51f244f31",
+    "activeRendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9"
+   }
+  },
+  {
+   "case": "evidence::candidate-binding::r09_t02_supervisor_ready",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "finishedAtUnixMs": 1793030565709,
+    "freezeEpochMs": 1793062887000,
+    "toleranceMs": 300000,
+    "note": "证据早于本候选冻结窗口 → 旧候选证据（需重跑）"
+   }
+  },
+  {
+   "case": "evidence::candidate-binding::r09_t02_process_ownership",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "finishedAtUnixMs": 1793030577965,
+    "freezeEpochMs": 1793062887000,
+    "toleranceMs": 300000,
+    "note": "证据早于本候选冻结窗口 → 旧候选证据（需重跑）"
+   }
+  },
+  {
+   "case": "evidence::candidate-binding::r09_t05_browser_pdf",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "finishedAtUnixMs": 1793023790590,
+    "freezeEpochMs": 1793062887000,
+    "toleranceMs": 300000,
+    "note": "证据早于本候选冻结窗口 → 旧候选证据（需重跑）"
+   }
+  },
+  {
+   "case": "evidence::candidate-binding::r09_t05_untrusted_preview",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "finishedAtUnixMs": 1793022994896,
+    "freezeEpochMs": 1793062887000,
+    "toleranceMs": 300000,
+    "note": "证据早于本候选冻结窗口 → 旧候选证据（需重跑）"
+   }
+  },
+  {
+   "case": "evidence::candidate-binding::r09_t07_native_e2e",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "finishedAtUnixMs": 1793062932380,
+    "freezeEpochMs": 1793062887000,
+    "toleranceMs": 300000,
+    "note": "证据产生于候选冻结窗口内"
+   }
+  },
+  {
+   "case": "evidence::candidate-binding::r09_t01_release_offline",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "receiptRendererDigest": "d5a24adf33b380a1cc5eff153b3954ccfa79a4a1812481658cea37d2e55b59a0",
+    "activeRendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9"
+   }
+  },
+  {
+   "case": "evidence::candidate-binding::r09_t03_native_matrix",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "finishedAtUnixMs": 1793026885854,
+    "freezeEpochMs": 1793062887000,
+    "toleranceMs": 300000,
+    "note": "证据早于本候选冻结窗口 → 旧候选证据（需重跑）"
+   }
+  },
+  {
+   "case": "evidence::candidate-binding::r09_t03_ipc_negative",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "finishedAtUnixMs": 1793026934845,
+    "freezeEpochMs": 1793062887000,
+    "toleranceMs": 300000,
+    "note": "证据早于本候选冻结窗口 → 旧候选证据（需重跑）"
+   }
+  },
+  {
+   "case": "evidence::candidate-binding::r09_t04_permission_matrix",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "finishedAtUnixMs": 1793026921082,
+    "freezeEpochMs": 1793062887000,
+    "toleranceMs": 300000,
+    "note": "证据早于本候选冻结窗口 → 旧候选证据（需重跑）"
+   }
+  },
+  {
+   "case": "evidence::candidate-binding::r09_t04_remote_boundary",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "finishedAtUnixMs": 1793026938638,
+    "freezeEpochMs": 1793062887000,
+    "toleranceMs": 300000,
+    "note": "证据早于本候选冻结窗口 → 旧候选证据（需重跑）"
+   }
+  },
+  {
+   "case": "evidence::candidate-binding::r09_t06_capability_matrix",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "finishedAtUnixMs": 1793030045604,
+    "freezeEpochMs": 1793062887000,
+    "toleranceMs": 300000,
+    "note": "证据早于本候选冻结窗口 → 旧候选证据（需重跑）"
+   }
+  },
+  {
+   "case": "evidence::candidate-binding::r09_t06_release_attack_surface",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "finishedAtUnixMs": 1793030041586,
+    "freezeEpochMs": 1793062887000,
+    "toleranceMs": 300000,
+    "note": "证据早于本候选冻结窗口 → 旧候选证据（需重跑）"
+   }
+  },
+  {
+   "case": "evidence::candidate-binding::r09_t07_release_smoke",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "finishedAtUnixMs": 1793026381587,
+    "freezeEpochMs": 1793062887000,
+    "toleranceMs": 300000,
+    "note": "证据早于本候选冻结窗口 → 旧候选证据（需重跑）"
+   }
+  },
+  {
+   "case": "evidence::candidate-binding::audit_capability",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "binding": "unbound-receipt",
+    "note": "receipt 无 rendererDigest/finishedAt，无法绑定；按不冒充记录"
+   }
+  },
+  {
+   "case": "evidence::candidate-binding::release_scan",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sourceKind": "dev-fallback",
+    "binding": "unbound-receipt",
+    "note": "receipt 无 rendererDigest/finishedAt，无法绑定；按不冒充记录"
+   }
+  },
+  {
+   "case": "approval::basis::R09-ADJ-HOST-01",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "path": "docs/rust-tauri/R09/IMPLEMENTATION_PLAN.md",
+    "quote": "Tauri webview 无法获得 loopback http 来源",
+    "exists": true,
+    "quoteFound": true
+   }
+  },
+  {
+   "case": "approval::basis::R09-ADJ-HOST-02",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "path": "docs/rust-tauri/R09/BLOCKED.md",
+    "quote": "托盘「修复组件…」原能力在 Tauri 无等价实现",
+    "exists": true,
+    "quoteFound": true
+   }
+  },
+  {
+   "case": "approval::basis::R09-ADJ-HOST-03",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "path": "docs/rust-tauri/R09/T06_PROGRESS.md",
+    "quote": "更新链（GitHub check/自动更新/OTA）属 R10 验收范围",
+    "exists": true,
+    "quoteFound": true
+   }
+  },
+  {
+   "case": "approval::basis::R09-ADJ-HOST-04",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "path": "docs/rust-tauri/R09/T06_PROGRESS.md",
+    "quote": "Tauri/Wry 无稳定页面捕获 API（T04 OQ-04 BLOCKED）",
+    "exists": true,
+    "quoteFound": true
+   }
+  },
+  {
+   "case": "approval::basis::R09-ADJ-HOST-05",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "path": "docs/rust-tauri/R09/IMPLEMENTATION_PLAN.md",
+    "quote": "导航 guard 保持 flag=false 并在卡片层显式降级",
+    "exists": true,
+    "quoteFound": true
+   }
+  },
+  {
+   "case": "approval::basis::R09-ADJ-HOST-06",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "path": "docs/rust-tauri/R09/T03_HOST_CAPABILITY_INVENTORY.md",
+    "quote": "Tauri 无 webUtils 等价",
+    "exists": true,
+    "quoteFound": true
+   }
+  },
+  {
+   "case": "approval::basis::R09-ADJ-HOST-07",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "path": "docs/rust-tauri/R09/T03_T04_PROGRESS.md",
+    "quote": "Rust 服务模式 onboarding completion 现役 Electron 即显式 throw",
+    "exists": true,
+    "quoteFound": true
+   }
+  },
+  {
+   "case": "approval::basis::R09-ADJ-HOST-08",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "path": "docs/rust-tauri/R09/T06_PROGRESS.md",
+    "quote": "T03 下一轮文件能力（docx/xlsx 预览、workspace watch、可观测导出）尚未实现",
+    "exists": true,
+    "quoteFound": true
+   }
+  },
+  {
+   "case": "approval::unique-ids",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "count": 8
+   }
+  },
+  {
+   "case": "inventory::capability-count-50",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "count": 50
+   }
+  },
+  {
+   "case": "inventory::group-union-covers-all",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "mapped": 50,
+    "groups": [
+     "connection-app-info",
+     "dialogs-clipboard-drag-links",
+     "files",
+     "permissions-t04",
+     "quick-chat",
+     "security-t06",
+     "settings",
+     "shell-integration",
+     "updates",
+     "viewers-browser-media",
+     "window-lifecycle"
+    ]
+   }
+  },
+  {
+   "case": "evidence::capability::host:single-instance",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::single-instance."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 2,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:main-window",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix",
+     "r09_t01_react_parity"
+    ],
+    "prefixes": [
+     "leaf::window-lifecycle."
+    ],
+    "cases": [
+     "a01::dom-snapshot-parity",
+     "a01::tauri-loads-embedded-page"
+    ],
+    "matchedPrefixCases": 4,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:window-state",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::window-state."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 3,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:window-controls",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::window-controls."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 2,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:app-lifecycle-quit",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix",
+     "r09_t02_process_ownership",
+     "r09_t07_native_e2e"
+    ],
+    "prefixes": [
+     "leaf::window-lifecycle."
+    ],
+    "cases": [
+     "t02::no-orphan-owned-services",
+     "t02::exit-owned-tree-only",
+     "t07::native-e2e.graceful-exit"
+    ],
+    "matchedPrefixCases": 4,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:app-ready",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix",
+     "r09_t01_react_parity"
+    ],
+    "prefixes": [
+     "leaf::app-ready."
+    ],
+    "cases": [
+     "a01::tauri-boots",
+     "a01::tauri-graceful-exit"
+    ],
+    "matchedPrefixCases": 2,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:theme-sync",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::theme-sync."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 1,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:i18n-main",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::i18n."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 2,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:reload-restart",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::reload-restart."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 2,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:tray",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::tray."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 3,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:global-shortcut",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::global-shortcut."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 3,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:notification",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::notification."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 4,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:keep-awake",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::keep-awake."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 2,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:auto-launch",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::auto-launch."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 2,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:file-dialogs",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::file-dialogs."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 2,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:clipboard-edit-command",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::clipboard-edit."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 1,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:drag-out",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::drag-out."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 1,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:file-drop-paths",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::file-drop."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 1,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:external-open",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::external-open."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 2,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:trash",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::trash."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 1,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:file-text-io",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "audit_capability"
+    ],
+    "prefixes": [],
+    "cases": [
+     "caps::invoke-handler-equals-build-manifest",
+     "caps::each-command-has-permission"
+    ],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:file-watch",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "audit_capability"
+    ],
+    "prefixes": [],
+    "cases": [
+     "caps::invoke-handler-equals-build-manifest",
+     "caps::deferred-commands-not-granted"
+    ],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:docx-xlsx-preview",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [],
+    "prefixes": [],
+    "cases": [],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": null
+   }
+  },
+  {
+   "case": "evidence::capability::host:observability-export",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [],
+    "prefixes": [],
+    "cases": [],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": null
+   }
+  },
+  {
+   "case": "evidence::capability::host:file-url-asset",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t07_native_e2e"
+    ],
+    "prefixes": [],
+    "cases": [
+     "t07::native-e2e.file-url-asset"
+    ],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:detached-viewer",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "audit_capability"
+    ],
+    "prefixes": [],
+    "cases": [
+     "caps::invoke-handler-equals-build-manifest",
+     "caps::each-command-has-permission"
+    ],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:skill-viewer",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "audit_capability"
+    ],
+    "prefixes": [],
+    "cases": [
+     "caps::invoke-handler-equals-build-manifest",
+     "caps::each-command-has-permission"
+    ],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:browser-viewer",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t05_browser_pdf"
+    ],
+    "prefixes": [
+     "leaf:R00-T02-LA-"
+    ],
+    "cases": [],
+    "matchedPrefixCases": 36,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:screenshot-render",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "audit_capability"
+    ],
+    "prefixes": [],
+    "cases": [
+     "caps::deferred-commands-not-granted"
+    ],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:splash",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::splash."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 2,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:onboarding",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::onboarding."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 2,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:settings-window",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::settings-window."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 3,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:settings-broadcast",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::settings-broadcast."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 2,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:quick-chat-window",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::quick-chat."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 2,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:quick-chat-session-handoff",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::quick-chat-handoff."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 2,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:server-connection-info",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t02_supervisor_ready",
+     "r09_t02_process_ownership",
+     "r09_t01_react_parity"
+    ],
+    "prefixes": [],
+    "cases": [
+     "t02::ready-handshake-real",
+     "t02::manifest-protocol-match",
+     "a01::service-identity-parity",
+     "t02::no-orphan-owned-services"
+    ],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:app-info-platform",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t03_native_matrix",
+     "r09_t01_react_parity"
+    ],
+    "prefixes": [
+     "leaf::app-info."
+    ],
+    "cases": [
+     "a01::dom-snapshot-parity"
+    ],
+    "matchedPrefixCases": 1,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:update-github-check",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [],
+    "prefixes": [],
+    "cases": [],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": null
+   }
+  },
+  {
+   "case": "evidence::capability::host:update-auto",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [],
+    "prefixes": [],
+    "cases": [],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": null
+   }
+  },
+  {
+   "case": "evidence::capability::host:update-train-ota",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [],
+    "prefixes": [],
+    "cases": [],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": null
+   }
+  },
+  {
+   "case": "evidence::capability::security:capability-sets",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "audit_capability"
+    ],
+    "prefixes": [],
+    "cases": [
+     "caps::window-union-equals-policy::main",
+     "caps::no-dangerous-plugin-permissions",
+     "caps::window-stacking::main"
+    ],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::security:csp",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "release_scan"
+    ],
+    "prefixes": [],
+    "cases": [
+     "release::csp-directives-hardened",
+     "release::csp-no-forbidden-tokens"
+    ],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::security:command-acl",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "audit_capability"
+    ],
+    "prefixes": [],
+    "cases": [
+     "caps::invoke-handler-equals-build-manifest",
+     "caps::each-command-has-permission",
+     "caps::each-permission-command-registered",
+     "caps::acl-manifest-covers-registered"
+    ],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::security:release-no-test-control",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "audit_capability",
+     "release_scan"
+    ],
+    "prefixes": [],
+    "cases": [
+     "caps::test-hooks-feature-declared",
+     "caps::delivery-release-excludes-test-hooks",
+     "caps::delivery-release-binary-no-test-env",
+     "release::no-test-control-env-in-artifacts"
+    ],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::security:remote-content-isolation",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "release_scan"
+    ],
+    "prefixes": [],
+    "cases": [
+     "release::no-remote-domain-ipc-access",
+     "release::capabilities-no-generic-shell-http-fs"
+    ],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::security:no-arbitrary-shell",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "release_scan"
+    ],
+    "prefixes": [],
+    "cases": [
+     "release::no-shell-plugin-dependency",
+     "release::process-spawn-sites-match-ledger",
+     "release::no-renderer-controllable-shell-binary"
+    ],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::security:token-exposure",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "audit_capability"
+    ],
+    "prefixes": [],
+    "cases": [
+     "caps::protected-commands-window-scoped"
+    ],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:card-frame-navigation-guard",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [],
+    "prefixes": [],
+    "cases": [],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": null
+   }
+  },
+  {
+   "case": "evidence::capability::host:context-menu-policy",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t07_native_e2e"
+    ],
+    "prefixes": [],
+    "cases": [
+     "t07::native-e2e.context-menu-policy"
+    ],
+    "matchedPrefixCases": 0,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::capability::host:speech-permission",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "suites": [
+     "r09_t04_permission_matrix"
+    ],
+    "prefixes": [
+     "leaf::speech."
+    ],
+    "cases": [],
+    "matchedPrefixCases": 6,
+    "missing": [],
+    "failed": [],
+    "passed": true
+   }
+  },
+  {
+   "case": "evidence::a15-renderer-identity::r09_t01_react_parity",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "cases": 3,
+    "missing": [],
+    "failed": []
+   }
+  },
+  {
+   "case": "evidence::a15-boot-dom-projection::r09_t01_react_parity",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "cases": 3,
+    "missing": [],
+    "failed": []
+   }
+  },
+  {
+   "case": "evidence::a15-page-embedding::r09_t01_react_parity",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "cases": 2,
+    "missing": [],
+    "failed": []
+   }
+  },
+  {
+   "case": "evidence::a15-service-identity::r09_t01_react_parity",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "cases": 2,
+    "missing": [],
+    "failed": []
+   }
+  },
+  {
+   "case": "evidence::a15-exit-and-isolation::r09_t01_react_parity",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "cases": 3,
+    "missing": [],
+    "failed": []
+   }
+  },
+  {
+   "case": "evidence::a15-ready-handshake",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "cases": [
+     "t02::ready-handshake-real",
+     "t02::no-fixed-sleep-handshake"
+    ],
+    "missing": [],
+    "failed": []
+   }
+  },
+  {
+   "case": "evidence::a15-identity-health",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "cases": [
+     "t02::manifest-protocol-match",
+     "t02::debug-exit-graceful",
+     "t02::packaged-exit-graceful"
+    ],
+    "missing": [],
+    "failed": []
+   }
+  },
+  {
+   "case": "evidence::a15-protocol-digest-identity-gate",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "cases": [
+     "t02::manifest-protocol-mismatch-rejected",
+     "t02::manifest-digest-mismatch-rejected",
+     "t02::runtime-identity-mismatch-rejected",
+     "t02::injected-protocol-no-service-spawn",
+     "t02::injected-digest-no-service-spawn"
+    ],
+    "missing": [],
+    "failed": []
+   }
+  },
+  {
+   "case": "evidence::a15-exit-ownership",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "cases": [
+     "t02::no-orphan-owned-services",
+     "t02::exit-owned-tree-only",
+     "t02::reused-is-detached",
+     "t02::remote-mode-zero-touch",
+     "t02::packaged-refuses-remote",
+     "t02::pid-reuse-safe"
+    ],
+    "missing": [],
+    "failed": []
+   }
+  },
+  {
+   "case": "evidence::a15-error-surface",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "cases": [
+     "t02::error-surfaced-records",
+     "t02::no-node-fallback-in-release-binary"
+    ],
+    "missing": [],
+    "failed": []
+   }
+  },
+  {
+   "case": "evidence::a15-t05-old-vs-rust",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "checks": 35,
+    "failed": [],
+    "allPass": true
+   }
+  },
+  {
+   "case": "evidence::a15-t05-untrusted-preview-pass",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "PASS"
+   }
+  },
+  {
+   "case": "evidence::a15-t07-g1-hidden",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "cases": [
+     "t07::native-e2e.shell",
+     "t07::native-e2e.graceful-exit",
+     "t07::native-e2e.no-process-residual",
+     "t07::fixtures.deterministic-v3-anchor"
+    ],
+    "missing": []
+   }
+  },
+  {
+   "case": "matrix::capability-rows-50",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "rows": 50
+   }
+  },
+  {
+   "case": "parity::capability::host:app-info-platform",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "parity",
+    "note": "measured=measured::t01::boot-dom-projection"
+   }
+  },
+  {
+   "case": "parity::capability::host:app-lifecycle-quit",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "parity",
+    "note": "measured=measured::t02::exit-ownership"
+   }
+  },
+  {
+   "case": "parity::capability::host:app-ready",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "parity",
+    "note": "measured=measured::t01::boot-dom-projection"
+   }
+  },
+  {
+   "case": "parity::capability::host:auto-launch",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "blocked",
+    "note": "BLOCKED=BLOCKED-SIGNING-IDENTITY"
+   }
+  },
+  {
+   "case": "parity::capability::host:browser-viewer",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:card-frame-navigation-guard",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "recorded",
+    "note": "RECORDED_APPROVALS=R09-ADJ-HOST-05"
+   }
+  },
+  {
+   "case": "parity::capability::host:clipboard-edit-command",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:context-menu-policy",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "R09 未实现（见 A16 缺口）"
+   }
+  },
+  {
+   "case": "parity::capability::host:detached-viewer",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:docx-xlsx-preview",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "recorded",
+    "note": "RECORDED_APPROVALS=R09-ADJ-HOST-08"
+   }
+  },
+  {
+   "case": "parity::capability::host:drag-out",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:external-open",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:file-dialogs",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:file-drop-paths",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:file-text-io",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:file-url-asset",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "plugin/asset protocol 运行期接线缺失（见 A16 缺口）"
+   }
+  },
+  {
+   "case": "parity::capability::host:file-watch",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:global-shortcut",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:i18n-main",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:keep-awake",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:main-window",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "parity",
+    "note": "measured=measured::t01::boot-dom-projection"
+   }
+  },
+  {
+   "case": "parity::capability::host:notification",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "blocked",
+    "note": "BLOCKED=T03-NOTIFY-02"
+   }
+  },
+  {
+   "case": "parity::capability::host:observability-export",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "recorded",
+    "note": "RECORDED_APPROVALS=R09-ADJ-HOST-08"
+   }
+  },
+  {
+   "case": "parity::capability::host:onboarding",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "recorded",
+    "note": "RECORDED_APPROVALS=R09-ADJ-HOST-07（两侧一致显式 NOT_IMPLEMENTED；非换壳差异）"
+   }
+  },
+  {
+   "case": "parity::capability::host:quick-chat-session-handoff",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:quick-chat-window",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:reload-restart",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:screenshot-render",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "recorded",
+    "note": "RECORDED_APPROVALS=R09-ADJ-HOST-04"
+   }
+  },
+  {
+   "case": "parity::capability::host:server-connection-info",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "parity",
+    "note": "measured=measured::t01::service-identity"
+   }
+  },
+  {
+   "case": "parity::capability::host:settings-broadcast",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:settings-window",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:single-instance",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:skill-viewer",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:speech-permission",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "blocked",
+    "note": "BLOCKED=BLOCKED-SYSTEM-PERMISSIONS"
+   }
+  },
+  {
+   "case": "parity::capability::host:splash",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:theme-sync",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:trash",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:tray",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:update-auto",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "recorded",
+    "note": "RECORDED_APPROVALS=R09-ADJ-HOST-03"
+   }
+  },
+  {
+   "case": "parity::capability::host:update-github-check",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "recorded",
+    "note": "RECORDED_APPROVALS=R09-ADJ-HOST-03"
+   }
+  },
+  {
+   "case": "parity::capability::host:update-train-ota",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "recorded",
+    "note": "RECORDED_APPROVALS=R09-ADJ-HOST-03"
+   }
+  },
+  {
+   "case": "parity::capability::host:window-controls",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::host:window-state",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::security:capability-sets",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::security:command-acl",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::security:csp",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::security:no-arbitrary-shell",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::security:release-no-test-control",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "parity",
+    "note": "measured=measured::t01::renderer-identity"
+   }
+  },
+  {
+   "case": "parity::capability::security:remote-content-isolation",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "parity::capability::security:token-exposure",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+   }
+  },
+  {
+   "case": "commands::build-manifest-nonzero",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "count": 73
+   }
+  },
+  {
+   "case": "commands::invoke-handler-equals-build-manifest",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "build": 73,
+    "handler": 73,
+    "handlerWithHooks": 76,
+    "debugOnly": [
+     "debug_asset_probe",
+     "debug_open_onboarding",
+     "debug_open_onboarding_preview"
+    ]
+   }
+  },
+  {
+   "case": "commands::release-set-equals-policy-surface",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "release": 73,
+    "policy": 73,
+    "onlyRelease": [],
+    "onlyPolicy": []
+   }
+  },
+  {
+   "case": "commands::permissions-files-cover-registered",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "missing": []
+   }
+  },
+  {
+   "case": "commands::capabilities-grants-resolve",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "unresolved": [],
+    "onlyGranted": [],
+    "missingGrants": []
+   }
+  },
+  {
+   "case": "commands::debug-commands-gated",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "debugOnly": [
+     "debug_asset_probe",
+     "debug_open_onboarding",
+     "debug_open_onboarding_preview"
+    ],
+    "devCapabilityGrants": [
+     "debug_asset_probe",
+     "debug_open_onboarding",
+     "debug_open_onboarding_preview"
+    ]
+   }
+  },
+  {
+   "case": "commands::all-have-impl-symbol",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "missing": []
+   }
+  },
+  {
+   "case": "parity::command::surface::app_ready",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:app-ready",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::close_browser_viewer",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:browser-viewer",
+    "windows": [
+     "browser-viewer",
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/browser_viewer.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::copy_file",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:file-text-io",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::file_info",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:file-text-io",
+    "windows": [
+     "main",
+     "viewer-*"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::get_app_version",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:app-info-platform",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::get_auto_launch_status",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:auto-launch",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::get_avatar_path",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:splash",
+    "windows": [
+     "main",
+     "onboarding",
+     "splash"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::get_browser_viewer_context",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:browser-viewer",
+    "windows": [
+     "browser-viewer"
+    ],
+    "files": [
+     "desktop/src-tauri/src/browser_viewer.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::get_keep_awake_status",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:keep-awake",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::get_platform",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:app-info-platform",
+    "windows": [
+     "browser-viewer",
+     "main",
+     "onboarding",
+     "quick-chat",
+     "settings",
+     "splash"
+    ],
+    "files": [
+     "desktop/src-tauri/src/commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::get_server_connection_info",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:server-connection-info",
+    "windows": [
+     "main",
+     "onboarding",
+     "quick-chat",
+     "settings",
+     "viewer-*"
+    ],
+    "files": [
+     "desktop/src-tauri/src/commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::get_server_port",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:server-connection-info",
+    "windows": [
+     "main",
+     "onboarding",
+     "quick-chat",
+     "settings",
+     "viewer-*"
+    ],
+    "files": [
+     "desktop/src-tauri/src/commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::get_server_token",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:server-connection-info",
+    "windows": [
+     "main",
+     "onboarding",
+     "quick-chat",
+     "settings",
+     "viewer-*"
+    ],
+    "files": [
+     "desktop/src-tauri/src/commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::get_service_status",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:server-connection-info",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::get_splash_info",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:splash",
+    "windows": [
+     "main",
+     "onboarding",
+     "splash"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::keybindings_reload_global",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:global-shortcut",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::keybindings_test_register",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:global-shortcut",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::list_skill_files",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:skill-viewer",
+    "windows": [
+     "main",
+     "skill-viewer-*"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::onboarding_complete",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:onboarding",
+    "windows": [
+     "onboarding"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::open_browser_viewer",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:browser-viewer",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/browser_viewer.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::open_external",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:external-open",
+    "windows": [
+     "main",
+     "quick-chat",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::open_file",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:external-open",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/files.rs",
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::open_folder",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:external-open",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::open_settings",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:settings-window",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::open_skill_viewer",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:skill-viewer",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::quick_chat_hide",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:quick-chat-window",
+    "windows": [
+     "main",
+     "quick-chat"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::quick_chat_open_session",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:quick-chat-session-handoff",
+    "windows": [
+     "main",
+     "quick-chat"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::quick_chat_open_session_ack",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:quick-chat-session-handoff",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::quick_chat_reload_shortcut",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:global-shortcut",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::quick_chat_resize",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:quick-chat-window",
+    "windows": [
+     "quick-chat"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::quick_chat_shortcut_status",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:global-shortcut",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::quick_chat_show",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:quick-chat-window",
+    "windows": [
+     "main",
+     "quick-chat"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::read_file",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:file-text-io",
+    "windows": [
+     "main",
+     "viewer-*"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::read_file_base64",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:file-text-io",
+    "windows": [
+     "main",
+     "viewer-*"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::read_file_snapshot",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:file-text-io",
+    "windows": [
+     "main",
+     "viewer-*"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::read_skill_file",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:skill-viewer",
+    "windows": [
+     "main",
+     "skill-viewer-*"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::reload_main_window",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:reload-restart",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::resource_events",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:detached-viewer",
+    "windows": [
+     "main",
+     "viewer-*"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::resource_subscribe",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:detached-viewer",
+    "windows": [
+     "main",
+     "viewer-*"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::resource_unsubscribe",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:detached-viewer",
+    "windows": [
+     "main",
+     "viewer-*"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::restart_app",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:reload-restart",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::run_edit_command",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:clipboard-edit-command",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::rust_browser_request",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:browser-viewer",
+    "windows": [
+     "browser-viewer",
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/browser_viewer.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::select_files",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:file-dialogs",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::select_folder",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:file-dialogs",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::select_skill",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:file-dialogs",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::set_auto_launch_enabled",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:auto-launch",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::set_browser_connection",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:browser-viewer",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/browser_viewer.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::set_keep_awake_enabled",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:keep-awake",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::settings_changed",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:settings-broadcast",
+    "windows": [
+     "browser-viewer",
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::show_in_finder",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:external-open",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::show_notification",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:notification",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native/install.rs",
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::skill_viewer_close",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:skill-viewer",
+    "windows": [
+     "skill-viewer-*"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::skill_viewer_load",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:skill-viewer",
+    "windows": [
+     "skill-viewer-*"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::spawn_viewer",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:detached-viewer",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::speech_permission_request",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:speech-permission",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::speech_permission_status",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:speech-permission",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::start_drag",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:drag-out",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/native_commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::trash_item",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:trash",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/files.rs",
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::unwatch_file",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:file-watch",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::unwatch_workspace",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:file-watch",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::viewer_close",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:detached-viewer",
+    "windows": [
+     "viewer-*"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::viewer_request_load",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:detached-viewer",
+    "windows": [
+     "viewer-*"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::watch_file",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:file-watch",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::watch_workspace",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:file-watch",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::window_close",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:window-controls",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::window_is_maximized",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:window-controls",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::window_maximize",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:window-controls",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::window_minimize",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:window-controls",
+    "windows": [
+     "main",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::window_theme_changed",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:theme-sync",
+    "windows": [
+     "browser-viewer",
+     "main",
+     "quick-chat",
+     "settings"
+    ],
+    "files": [
+     "desktop/src-tauri/src/commands.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::write_file",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:file-text-io",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::write_file_binary",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:file-text-io",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "parity::command::surface::write_file_if_unchanged",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "owner": "host:file-text-io",
+    "windows": [
+     "main"
+    ],
+    "files": [
+     "desktop/src-tauri/src/lib.rs"
+    ]
+   }
+  },
+  {
+   "case": "matrix::command-rows-match-policy",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "rows": 73,
+    "policySurface": 73
+   }
+  },
+  {
+   "case": "matrix::commands-assigned-to-capability",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "unassigned": []
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-0DEEE4813B0A",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-1120B2AA320D",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "blocked",
+    "note": "T03 计划中该叶存在 blocked 断言（onboarding 服务路由/DOCX/XLSX 命令缺口，已登记 T03_T04_PROGRESS）；真实动作证据 pending"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-1329EA46F72C",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "excluded_non_host",
+    "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-15DFB1AED8F2",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-15E163FBFBE8",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-1629CDD9EA4F",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "excluded_non_host",
+    "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-173C6332527D",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "excluded_non_host",
+    "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-18FE3FDFF9A5",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-1C41525D379C",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-1D4C7E9C713C",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "excluded_non_host",
+    "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-1E6EDB731186",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-322E02C7F2F9",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-37E6C3B9A7B8",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "blocked",
+    "note": "T03 计划中该叶存在 blocked 断言（onboarding 服务路由/DOCX/XLSX 命令缺口，已登记 T03_T04_PROGRESS）；真实动作证据 pending"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-394DD07D2968",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-429D86C4F952",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "excluded_non_host",
+    "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-57728C0A6D0A",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-58822B6B138B",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-59987671E5AD",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "excluded_non_host",
+    "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-5D5938D61A00",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-6006FD0BF07D",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "excluded_non_host",
+    "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-6774E79F6714",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "blocked",
+    "note": "T03 计划中该叶存在 blocked 断言（onboarding 服务路由/DOCX/XLSX 命令缺口，已登记 T03_T04_PROGRESS）；真实动作证据 pending"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-70B07E378F42",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "excluded_non_host",
+    "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-713E908B7B2F",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "excluded_non_host",
+    "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-8FE26C132D8B",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "excluded_non_host",
+    "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-9350C3E12165",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-98B458390B7E",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-9C679D21A188",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "excluded_non_host",
+    "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-A14D3027C881",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "excluded_non_host",
+    "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-A2E507EBDEF2",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-AC5B6EDA3FBD",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-ACA2C4C1158D",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-B6A97A19F2CB",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-B72A6D3886B7",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-BEC2074CC33C",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-C5AAF360D10F",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "excluded_non_host",
+    "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-CD873C715D96",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "excluded_non_host",
+    "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-D15E0ADC0608",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-D29DE479076C",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-DF4B5168ABB5",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-E6FB08FBBFAA",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-E84F01456B6C",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "blocked",
+    "note": "T03 计划中该叶存在 blocked 断言（onboarding 服务路由/DOCX/XLSX 命令缺口，已登记 T03_T04_PROGRESS）；真实动作证据 pending"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-F5DBF2A80E28",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-F6235778F816",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "excluded_non_host",
+    "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-F9786414DD11",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-FB5C78308878",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "excluded_non_host",
+    "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+   }
+  },
+  {
+   "case": "parity::leaf::R00-T02-LA-FF1B331F1019",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "pending",
+    "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+   }
+  },
+  {
+   "case": "matrix::leaf-rows-46",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "rows": 46
+   }
+  },
+  {
+   "case": "matrix::host-leaf-classification",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "host": 30
+   }
+  },
+  {
+   "case": "a15::no-unapproved-differences",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "unapproved": []
+   }
+  },
+  {
+   "case": "a15::parity-not-yet-complete",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "pendingCount": 59,
+    "sample": [
+     "capability::host:browser-viewer",
+     "capability::host:clipboard-edit-command",
+     "capability::host:context-menu-policy",
+     "capability::host:detached-viewer",
+     "capability::host:drag-out",
+     "capability::host:external-open",
+     "capability::host:file-dialogs",
+     "capability::host:file-drop-paths",
+     "capability::host:file-text-io",
+     "capability::host:file-url-asset",
+     "capability::host:file-watch",
+     "capability::host:global-shortcut",
+     "capability::host:i18n-main",
+     "capability::host:keep-awake",
+     "capability::host:quick-chat-session-handoff",
+     "capability::host:quick-chat-window",
+     "capability::host:reload-restart",
+     "capability::host:settings-broadcast",
+     "capability::host:settings-window",
+     "capability::host:single-instance"
+    ],
+    "note": "pending = 尚无 Tauri 真实行为证据；不得写 PASS"
+   }
+  },
+  {
+   "case": "a15::blocked-items-registered",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "blocked": [
+     "capability::host:auto-launch",
+     "capability::host:notification",
+     "capability::host:speech-permission",
+     "leaf::R00-T02-LA-1120B2AA320D",
+     "leaf::R00-T02-LA-37E6C3B9A7B8",
+     "leaf::R00-T02-LA-6774E79F6714",
+     "leaf::R00-T02-LA-E84F01456B6C"
+    ]
+   }
+  },
+  {
+   "case": "a15::recorded-approvals-have-basis",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "approvals": [
+     "R09-ADJ-HOST-01",
+     "R09-ADJ-HOST-02",
+     "R09-ADJ-HOST-03",
+     "R09-ADJ-HOST-04",
+     "R09-ADJ-HOST-05",
+     "R09-ADJ-HOST-06",
+     "R09-ADJ-HOST-07",
+     "R09-ADJ-HOST-08"
+    ]
+   }
+  },
+  {
+   "case": "evidence::upstream-pass::a15-measured",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "required": [
+     "r09_t01_react_parity",
+     "r09_t02_supervisor_ready",
+     "r09_t02_process_ownership",
+     "r09_t05_browser_pdf",
+     "r09_t05_untrusted_preview",
+     "r09_t07_native_e2e"
+    ],
+    "notPass": []
+   }
+  },
+  {
+   "case": "a15::recorded-rows-reference-approvals",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "unknown": []
+   }
+  },
+  {
+   "case": "isolation::real-home-untouched",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "before": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    },
+    "after": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    }
+   }
+  }
+ ]
+}

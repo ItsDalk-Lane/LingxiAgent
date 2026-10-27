@@ -5936,5 +5936,30 @@
     "zoomOut": "缩小",
     "ungrouped": "未分组",
     "forkBusy": "会话正在生成回复，稍后再试"
+  },
+  "systemPermissions": {
+    "title": "系统权限",
+    "description": "测试版需要在 macOS 系统设置中授权麦克风、语音识别与通知；点下面按钮会弹出系统请求。",
+    "microphone": "麦克风",
+    "speech": "语音识别",
+    "notification": "通知",
+    "request": "请求授权",
+    "testNotification": "发送测试通知",
+    "granted": "已授权",
+    "denied": "被拒绝",
+    "unsupported": "当前环境不支持",
+    "failed": "请求失败",
+    "notRequested": "未请求",
+    "micGranted": "麦克风已授权",
+    "micDenied": "麦克风被拒绝，请到系统设置打开",
+    "micUnsupported": "当前环境不支持麦克风请求",
+    "speechGranted": "语音识别已授权",
+    "speechDenied": "语音识别被拒绝或不可用",
+    "speechResult": "系统语音识别状态已更新",
+    "notificationTitle": "灵犀通知测试",
+    "notificationBody": "看到这条通知，说明通知权限已可用。",
+    "notificationSent": "测试通知已发送",
+    "notificationFailed": "测试通知发送失败",
+    "dismiss": "关闭"
   }
 }

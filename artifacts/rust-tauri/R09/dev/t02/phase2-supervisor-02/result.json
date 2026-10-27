@@ -1,0 +1,94 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t02_supervisor_ready",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 38.841,
+ "caseCount": 13,
+ "casesSha256": "4ce25f06428d6b3afca1e4eee3744e623b6e86068c4d3382cf83ce2ee227cc49",
+ "commands": [
+  {
+   "id": "debug-renderer-build",
+   "argv": [
+    "npm",
+    "run",
+    "build:renderer"
+   ],
+   "exitCode": 0,
+   "durationSecs": 6.833,
+   "logSha256": "8e499cbf6475bbc856eff0d3b649b287c49ff9df75610509b95e4dae8cfdf1ac"
+  },
+  {
+   "id": "debug-theme-build",
+   "argv": [
+    "npm",
+    "run",
+    "build:theme"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.223,
+   "logSha256": "69734aa2840b8ffc562c06057fb84312b421bfddfbd150cdbc8213760c82fbd0"
+  },
+  {
+   "id": "tauri-build-debug",
+   "argv": [
+    "node",
+    "scripts/tauri-build.mjs",
+    "--debug",
+    "--receipt",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t02/phase2-supervisor-02/tauri-build-debug.json"
+   ],
+   "exitCode": 0,
+   "durationSecs": 7.758,
+   "logSha256": "28ca25680937d8826337c641f68e0b1038116c1eb030f6388e12fcb59285b291"
+  },
+  {
+   "id": "release-renderer-build",
+   "argv": [
+    "npm",
+    "run",
+    "build:renderer"
+   ],
+   "exitCode": 0,
+   "durationSecs": 7.321,
+   "logSha256": "bf88f380dc9e25b60681dfd119f364e50727fc4b6023bdab476d8f0c44b69263"
+  },
+  {
+   "id": "release-theme-build",
+   "argv": [
+    "npm",
+    "run",
+    "build:theme"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.253,
+   "logSha256": "0032e1d93dfe5f73d59dadb9589a0dc5692e2c3168d85cbf5c11bd08ca70a8be"
+  },
+  {
+   "id": "service-stage-verify-1",
+   "argv": [
+    "node",
+    "scripts/build-rust-desktop-service.mjs",
+    "--verify"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.167,
+   "logSha256": "fa787f55ed4619ee7a8392564e8b83416c71f9d1e19c8b425eaf62d62439c2a1"
+  },
+  {
+   "id": "tauri-build-release",
+   "argv": [
+    "node",
+    "scripts/tauri-build.mjs",
+    "--receipt",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t02/phase2-supervisor-02/tauri-build-release.json"
+   ],
+   "exitCode": 0,
+   "durationSecs": 8.086,
+   "logSha256": "70172b1b8f58af6a7dfa92745fb4047a5c5e5d4902dfa8209ddb18a2994835bc"
+  }
+ ],
+ "logSha256": "eb0ae34b8a83bf013634c66fdc286de5232fd7138693cacb8ac02c016dd6acae",
+ "finishedAtUnixMs": 1793025107303,
+ "failureDetail": "NameError: name 'reap_home_services' is not defined"
+}

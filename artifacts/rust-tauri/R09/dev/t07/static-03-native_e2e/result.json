@@ -1,0 +1,42 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t07_native_e2e",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 3.153,
+ "caseCount": 11,
+ "casesSha256": "a0fec05de417c7fcf1d8dbe9935762dbfcf4fafbc32a52d8d86ea3bccdf127c3",
+ "commands": [
+  {
+   "id": "t07-fixtures",
+   "argv": [
+    "python3",
+    "-B",
+    "scripts/rust-tauri/r09_t07_fixture.py",
+    "--home",
+    "/private/tmp/lingxi-r09-runtime/r09_t07_native_e2e-11200-1793026187309/home-t07-fixtures",
+    "--evidence",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t07/static-03-native_e2e/fixtures"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.177,
+   "logSha256": "82180c5a483c2020048a2ffef6b6cfb0755aa3f04a8bfa535922c1f274cfbd5c"
+  }
+ ],
+ "logSha256": "bdef9e1f8f2ca47de2d90d56d4b0ef77506a626f9038071b7b4a935f8bca08a5",
+ "finishedAtUnixMs": 1793026190462,
+ "staticOnly": true,
+ "hostFacts": {
+  "os": "27.0.1",
+  "osBuild": "26A434",
+  "arch": "arm64",
+  "kernel": "27.0.0",
+  "hostPlatform": "macos-arm64",
+  "webkit": "22625.1.29.11.28",
+  "display": "Chipset Model: Apple M3 Ultra\n          Resolution: 2560 x 1440 (QHD/WQHD - Wide Quad High Definition)"
+ },
+ "platform": "macos-arm64",
+ "failedCases": [
+  "t07::platform.macos-arm64"
+ ]
+}

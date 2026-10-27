@@ -1,0 +1,9 @@
+{
+ "schema": "lingxi.r09.renderer-digest.v1",
+ "path": "desktop/dist-renderer",
+ "digest": "d09359bd5bc87071c7e4cfc7fffb99553bc39b1345dd83946dcd14c51f244f31",
+ "fileCount": 644,
+ "tauriResourcesDigest": "e98821fb9e24b920bde9fb782ca9555bc2875731ee1820b5c7bb5b9872b55c86",
+ "r08Baseline": "3e5339cc92f9f29a30846a101b3e4636d3b4e2d7f896980c57b8f31b129a89ef",
+ "r08BaselineNote": "T01 接线改变 renderer 源码 → 新摘要；旧基线只作 diff 说明（A01 两侧绑定新摘要）"
+}

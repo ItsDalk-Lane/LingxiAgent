@@ -1,0 +1,54 @@
+{
+ "schema": "lingxi.r09.phase2-release-facts.v1",
+ "releaseBuildReceiptRendererDigest": "d09359bd5bc87071c7e4cfc7fffb99553bc39b1345dd83946dcd14c51f244f31",
+ "releaseBuildReceiptThemeSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+ "rendererBuild": [
+  "npm run build:renderer",
+  "npm run build:theme"
+ ],
+ "manifestRendererSha256": "d09359bd5bc87071c7e4cfc7fffb99553bc39b1345dd83946dcd14c51f244f31",
+ "rendererDigestAligned": true,
+ "appBundle": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+ "layout": {
+  "mainExecutable": "Contents/MacOS/lingxi-resource-desktop",
+  "sidecar": "Contents/MacOS/lingxi-service",
+  "buildJson": "Contents/Resources/rust-service/build.json",
+  "codeSignature": "Contents/_CodeSignature/CodeResources"
+ },
+ "sha256": {
+  "mainExecutable": "8a72d29c6040c55f5f3980a79821bd264f68a62476dfea50e237dab0f210699d",
+  "sidecarActual": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+  "sidecarManifestSha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+  "sidecarContentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0"
+ },
+ "manifest": {
+  "schemaVersion": 1,
+  "platform": "mac",
+  "arch": "arm64",
+  "target": "aarch64-apple-darwin",
+  "toolchain": "1.98.1",
+  "appVersion": "0.1.43",
+  "binary": "lingxi-service",
+  "sha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+  "contentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+  "sourceSha256": "8e4d2a171a36c197f0093d4f780942aac0ea31655d3e55b69f669f2195edb882",
+  "protocol": {
+   "serverKind": "lingxi-service",
+   "wireProtocolMin": 1,
+   "wireProtocolMax": 1,
+   "dataEpoch": 2
+  },
+  "rendererSha256": "d09359bd5bc87071c7e4cfc7fffb99553bc39b1345dd83946dcd14c51f244f31",
+  "tauri": {
+   "cli": "tauri-cli 2.12.4",
+   "layout": "externalBin+resources"
+  }
+ },
+ "signing": {
+  "identity": "adhoc (-)",
+  "teamIdentifier": null,
+  "codesignVerifyDeepStrict": "exit 0",
+  "notarization": "BLOCKED-SIGNING-IDENTITY"
+ },
+ "sizeMiB": 148.23
+}

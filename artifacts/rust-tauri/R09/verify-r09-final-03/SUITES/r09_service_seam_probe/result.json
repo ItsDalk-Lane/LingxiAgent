@@ -1,0 +1,294 @@
+{
+ "schema": "lingxi.r09.service-seam-probe.v1",
+ "serviceBinary": "rust/target/debug/lingxi-service",
+ "serviceSha256": "fbb3d7780478af87f09aa326201d1ab3c412937904bc7899d4c4d1a487961621",
+ "home": "/private/tmp/lingxi-r09-origin-probe/home-87118-1793032844157",
+ "instance": {
+  "serverKind": "lingxi-service",
+  "pid": 87119,
+  "bindAddr": "127.0.0.1:57572",
+  "instanceId": "3da25260608d09fb716b9a507122026c",
+  "homePath": "/private/tmp/lingxi-r09-origin-probe/home-87118-1793032844157"
+ },
+ "cases": [
+  {
+   "case": "seam::health-no-origin",
+   "ok": true,
+   "expectedStatus": 200,
+   "actualStatus": 200,
+   "detail": {
+    "origin": null,
+    "bodyHead": "{\"status\":\"ok\",\"serverKind\":\"lingxi-service\",\"serverVersion\":\"0.0.0\",\"wireProtocolMin\":1,\"wireProtocolMax\":1,\"dataEpoch\":2}",
+    "acao": null
+   }
+  },
+  {
+   "case": "seam::health-allowed-tauri-localhost",
+   "ok": true,
+   "expectedStatus": 200,
+   "actualStatus": 200,
+   "detail": {
+    "origin": "tauri://localhost",
+    "bodyHead": "{\"status\":\"ok\",\"serverKind\":\"lingxi-service\",\"serverVersion\":\"0.0.0\",\"wireProtocolMin\":1,\"wireProtocolMax\":1,\"dataEpoch\":2}",
+    "acao": "tauri://localhost"
+   }
+  },
+  {
+   "case": "seam::health-allowed-http-tauri.localhost",
+   "ok": true,
+   "expectedStatus": 200,
+   "actualStatus": 200,
+   "detail": {
+    "origin": "http://tauri.localhost",
+    "bodyHead": "{\"status\":\"ok\",\"serverKind\":\"lingxi-service\",\"serverVersion\":\"0.0.0\",\"wireProtocolMin\":1,\"wireProtocolMax\":1,\"dataEpoch\":2}",
+    "acao": "http://tauri.localhost"
+   }
+  },
+  {
+   "case": "seam::health-allowed-https-tauri.localhost",
+   "ok": true,
+   "expectedStatus": 200,
+   "actualStatus": 200,
+   "detail": {
+    "origin": "https://tauri.localhost",
+    "bodyHead": "{\"status\":\"ok\",\"serverKind\":\"lingxi-service\",\"serverVersion\":\"0.0.0\",\"wireProtocolMin\":1,\"wireProtocolMax\":1,\"dataEpoch\":2}",
+    "acao": "https://tauri.localhost"
+   }
+  },
+  {
+   "case": "seam::health-forbidden-tauri-evil",
+   "ok": true,
+   "expectedStatus": 403,
+   "actualStatus": 403,
+   "detail": {
+    "origin": "tauri://evil",
+    "bodyHead": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-3b1ea749af457a11b225ce4ad1cf3e0b\"},\"message\":\"transport policy rejected the request\",\"retryable\":false}",
+    "acao": null
+   }
+  },
+  {
+   "case": "seam::health-forbidden-http-evil.tauri.localhost",
+   "ok": true,
+   "expectedStatus": 403,
+   "actualStatus": 403,
+   "detail": {
+    "origin": "http://evil.tauri.localhost",
+    "bodyHead": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-7155481d7af8766dd4913a51806c7515\"},\"message\":\"transport policy rejected the request\",\"retryable\":false}",
+    "acao": null
+   }
+  },
+  {
+   "case": "seam::health-forbidden-http-tauri.localhost:8080",
+   "ok": true,
+   "expectedStatus": 403,
+   "actualStatus": 403,
+   "detail": {
+    "origin": "http://tauri.localhost:8080",
+    "bodyHead": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-3c289f02feee86664114f4b2b74e7473\"},\"message\":\"transport policy rejected the request\",\"retryable\":false}",
+    "acao": null
+   }
+  },
+  {
+   "case": "seam::health-forbidden-http-tauri.localhost.evil.example",
+   "ok": true,
+   "expectedStatus": 403,
+   "actualStatus": 403,
+   "detail": {
+    "origin": "http://tauri.localhost.evil.example",
+    "bodyHead": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-c3103796b6225f707844c5917d0e18c2\"},\"message\":\"transport policy rejected the request\",\"retryable\":false}",
+    "acao": null
+   }
+  },
+  {
+   "case": "seam::preflight-allowed",
+   "ok": true,
+   "expectedStatus": 204,
+   "actualStatus": 204,
+   "detail": {
+    "origin": "tauri://localhost",
+    "bodyHead": "",
+    "acao": "tauri://localhost"
+   }
+  },
+  {
+   "case": "seam::preflight-forbidden",
+   "ok": true,
+   "expectedStatus": 403,
+   "actualStatus": 403,
+   "detail": {
+    "origin": "tauri://evil",
+    "bodyHead": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-fc1c019cb1992c7a241119ecd31d8c54\"},\"message\":\"transport policy rejected the request\",\"retryable\":false}",
+    "acao": null
+   }
+  },
+  {
+   "case": "seam::identity-authenticated-allowed",
+   "ok": true,
+   "expectedStatus": 200,
+   "actualStatus": 200,
+   "detail": {
+    "origin": "tauri://localhost",
+    "bodyHead": "{\"authState\":\"user\",\"capabilities\":[\"bridge\",\"bridge.manage\",\"chat\",\"files\",\"files.read\",\"files.write\",\"providers\",\"providers.manage\",\"resources\",\"resources.read\",\"resources.write\",\"secrets\",\"secrets.write\",\"sessions\",\"sessions.write\",\"settings\",\"settings.read\",\"settings.write\",\"studio\",\"studio.owne",
+    "acao": "tauri://localhost"
+   }
+  },
+  {
+   "case": "seam::identity-authenticated-forbidden-origin",
+   "ok": true,
+   "expectedStatus": 403,
+   "actualStatus": 403,
+   "detail": {
+    "origin": "tauri://evil",
+    "bodyHead": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-456b46cc3c1e1c9d4443dccd59c281e6\"},\"message\":\"transport policy rejected the request\",\"retryable\":false}",
+    "acao": null
+   }
+  },
+  {
+   "case": "seam::shutdown-no-residual",
+   "ok": true,
+   "actualStatus": 1,
+   "detail": {
+    "exitCode": 0,
+    "pid": 87119
+   }
+  }
+ ],
+ "failedCases": [],
+ "status": "PASS",
+ "transcript": [
+  {
+   "case": "seam::health-no-origin",
+   "method": "GET",
+   "path": "/lingxi/v1/health",
+   "origin": null,
+   "status": 200,
+   "headers": {},
+   "bodyHead": "{\"status\":\"ok\",\"serverKind\":\"lingxi-service\",\"serverVersion\":\"0.0.0\",\"wireProtocolMin\":1,\"wireProtocolMax\":1,\"dataEpoch\":2}"
+  },
+  {
+   "case": "seam::health-allowed-tauri-localhost",
+   "method": "GET",
+   "path": "/lingxi/v1/health",
+   "origin": "tauri://localhost",
+   "status": 200,
+   "headers": {
+    "access-control-allow-origin": "tauri://localhost",
+    "access-control-allow-credentials": "true",
+    "access-control-allow-methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+    "vary": "Origin"
+   },
+   "bodyHead": "{\"status\":\"ok\",\"serverKind\":\"lingxi-service\",\"serverVersion\":\"0.0.0\",\"wireProtocolMin\":1,\"wireProtocolMax\":1,\"dataEpoch\":2}"
+  },
+  {
+   "case": "seam::health-allowed-http-tauri.localhost",
+   "method": "GET",
+   "path": "/lingxi/v1/health",
+   "origin": "http://tauri.localhost",
+   "status": 200,
+   "headers": {
+    "access-control-allow-origin": "http://tauri.localhost",
+    "access-control-allow-credentials": "true",
+    "access-control-allow-methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+    "vary": "Origin"
+   },
+   "bodyHead": "{\"status\":\"ok\",\"serverKind\":\"lingxi-service\",\"serverVersion\":\"0.0.0\",\"wireProtocolMin\":1,\"wireProtocolMax\":1,\"dataEpoch\":2}"
+  },
+  {
+   "case": "seam::health-allowed-https-tauri.localhost",
+   "method": "GET",
+   "path": "/lingxi/v1/health",
+   "origin": "https://tauri.localhost",
+   "status": 200,
+   "headers": {
+    "access-control-allow-origin": "https://tauri.localhost",
+    "access-control-allow-credentials": "true",
+    "access-control-allow-methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+    "vary": "Origin"
+   },
+   "bodyHead": "{\"status\":\"ok\",\"serverKind\":\"lingxi-service\",\"serverVersion\":\"0.0.0\",\"wireProtocolMin\":1,\"wireProtocolMax\":1,\"dataEpoch\":2}"
+  },
+  {
+   "case": "seam::health-forbidden-tauri-evil",
+   "method": "GET",
+   "path": "/lingxi/v1/health",
+   "origin": "tauri://evil",
+   "status": 403,
+   "headers": {},
+   "bodyHead": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-3b1ea749af457a11b225ce4ad1cf3e0b\"},\"message\":\"transport policy rejected the request\",\"retryable\":false}"
+  },
+  {
+   "case": "seam::health-forbidden-http-evil.tauri.localhost",
+   "method": "GET",
+   "path": "/lingxi/v1/health",
+   "origin": "http://evil.tauri.localhost",
+   "status": 403,
+   "headers": {},
+   "bodyHead": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-7155481d7af8766dd4913a51806c7515\"},\"message\":\"transport policy rejected the request\",\"retryable\":false}"
+  },
+  {
+   "case": "seam::health-forbidden-http-tauri.localhost:8080",
+   "method": "GET",
+   "path": "/lingxi/v1/health",
+   "origin": "http://tauri.localhost:8080",
+   "status": 403,
+   "headers": {},
+   "bodyHead": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-3c289f02feee86664114f4b2b74e7473\"},\"message\":\"transport policy rejected the request\",\"retryable\":false}"
+  },
+  {
+   "case": "seam::health-forbidden-http-tauri.localhost.evil.example",
+   "method": "GET",
+   "path": "/lingxi/v1/health",
+   "origin": "http://tauri.localhost.evil.example",
+   "status": 403,
+   "headers": {},
+   "bodyHead": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-c3103796b6225f707844c5917d0e18c2\"},\"message\":\"transport policy rejected the request\",\"retryable\":false}"
+  },
+  {
+   "case": "seam::preflight-allowed",
+   "method": "OPTIONS",
+   "path": "/lingxi/v1/health",
+   "origin": "tauri://localhost",
+   "status": 204,
+   "headers": {
+    "access-control-allow-origin": "tauri://localhost",
+    "access-control-allow-credentials": "true",
+    "access-control-allow-methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+    "vary": "Origin"
+   },
+   "bodyHead": ""
+  },
+  {
+   "case": "seam::preflight-forbidden",
+   "method": "OPTIONS",
+   "path": "/lingxi/v1/health",
+   "origin": "tauri://evil",
+   "status": 403,
+   "headers": {},
+   "bodyHead": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-fc1c019cb1992c7a241119ecd31d8c54\"},\"message\":\"transport policy rejected the request\",\"retryable\":false}"
+  },
+  {
+   "case": "seam::identity-authenticated-allowed",
+   "method": "GET",
+   "path": "/lingxi/v1/server/identity",
+   "origin": "tauri://localhost",
+   "status": 200,
+   "headers": {
+    "access-control-allow-origin": "tauri://localhost",
+    "access-control-allow-credentials": "true",
+    "access-control-allow-methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+    "vary": "Origin"
+   },
+   "bodyHead": "{\"authState\":\"user\",\"capabilities\":[\"bridge\",\"bridge.manage\",\"chat\",\"files\",\"files.read\",\"files.write\",\"providers\",\"providers.manage\",\"resources\",\"resources.read\",\"resources.write\",\"secrets\",\"secrets.write\",\"sessions\",\"sessions.write\",\"settings\",\"settings.read\",\"settings.write\",\"studio\",\"studio.owne"
+  },
+  {
+   "case": "seam::identity-authenticated-forbidden-origin",
+   "method": "GET",
+   "path": "/lingxi/v1/server/identity",
+   "origin": "tauri://evil",
+   "status": 403,
+   "headers": {},
+   "bodyHead": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-456b46cc3c1e1c9d4443dccd59c281e6\"},\"message\":\"transport policy rejected the request\",\"retryable\":false}"
+  }
+ ],
+ "note": "真实服务进程 + 真实 HTTP；不使用 mock。CSP frame-ancestors 由 preview.rs 单测与 T05 浏览器探针覆盖。"
+}

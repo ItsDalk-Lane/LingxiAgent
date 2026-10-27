@@ -1,0 +1,309 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t01_react_parity",
+ "cases": [
+  {
+   "case": "a01::candidate-debug-consume-only",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "executable": "/private/tmp/lingxi-r09-t07/evidence-app-gate-v33-20261027-002322/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+    "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+    "features": [
+     "e2e-test",
+     "r09-host",
+     "r09-test-hooks"
+    ],
+    "rendererFiles": 644
+   }
+  },
+  {
+   "case": "a01::renderer-dist-digest-recorded",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "digest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+    "files": 644
+   }
+  },
+  {
+   "case": "a01::business-components-untouched",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "outsideWhitelist": [],
+    "changed": [
+     "desktop/src/modules/connection-csp.js",
+     "desktop/src/modules/platform.js",
+     "desktop/src/react/components/InputArea.tsx",
+     "desktop/src/react/host/desktop-host.ts",
+     "desktop/src/react/stores/session-actions.ts",
+     "desktop/src/react/__tests__/host/r09-t01-tauri-desktop-host.test.tsx",
+     "desktop/src/react/host/tauri-desktop-host.ts",
+     "desktop/src/react/host/tauri-host-capabilities.ts"
+    ]
+   }
+  },
+  {
+   "case": "a01::tauri-build-uses-same-renderer",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "buildRendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+    "features": [
+     "e2e-test",
+     "r09-host",
+     "r09-test-hooks"
+    ],
+    "hostFeature": null
+   }
+  },
+  {
+   "case": "a01::tauri-debug-artifact-built",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": null
+  },
+  {
+   "case": "fixture::electron-home-stamped",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "ready": true,
+    "exit": 0
+   }
+  },
+  {
+   "case": "a01::visible-screenshot::react-parity-electron-tauri",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-05/SUITES/r09_t01_react_parity/visible-react-parity-electron-tauri.png",
+    "exit": 0
+   }
+  },
+  {
+   "case": "a01::electron-boots",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "title": "Lingxi · Rust 预览",
+    "location": "file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/dist-renderer/index.html"
+   }
+  },
+  {
+   "case": "a01::electron-service-identity",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "connectionInfo": {
+     "port": 63656,
+     "token": "[redacted]",
+     "serverNodeKind": "lingxi-service",
+     "serverNodeTransport": "http",
+     "host": null
+    }
+   }
+  },
+  {
+   "case": "a01::tauri-boots",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "title": "Lingxi · Rust 预览",
+    "events": [
+     "host-start",
+     "resolve",
+     "binary",
+     "spawn",
+     "ready",
+     "instance",
+     "identity",
+     "service-ready",
+     "host-service-ready",
+     "window-created",
+     "page-load",
+     "page-load",
+     "app-ready",
+     "dom-projection"
+    ]
+   }
+  },
+  {
+   "case": "a01::tauri-loads-embedded-page",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "pageLoad": {
+     "event": "page-load",
+     "label": "main",
+     "phase": "Started",
+     "schema": "lingxi.r09.tauri-launch.v1",
+     "unixMs": 1793034976665,
+     "url": "tauri://localhost"
+    }
+   }
+  },
+  {
+   "case": "a01::dom-snapshot-parity",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "mismatched": [],
+    "fields": {
+     "title": {
+      "electron": "Lingxi · Rust 预览",
+      "tauri": "Lingxi · Rust 预览"
+     },
+     "platform": {
+      "electron": "darwin",
+      "tauri": "darwin"
+     },
+     "reactRootMounted": {
+      "electron": true,
+      "tauri": true
+     },
+     "rootChildCount": {
+      "electron": 3,
+      "tauri": 3
+     },
+     "bodyTextHash": {
+      "electron": 1065066033,
+      "tauri": 1065066033
+     },
+     "bodyTextLength": {
+      "electron": 121,
+      "tauri": 121
+     }
+    }
+   }
+  },
+  {
+   "case": "a01::service-identity-parity",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "electronHealth": {
+     "status": "ok",
+     "serverKind": "lingxi-service",
+     "serverVersion": "0.0.0",
+     "wireProtocolMin": 1,
+     "wireProtocolMax": 1,
+     "dataEpoch": 2
+    },
+    "tauriHealth": {
+     "status": "ok",
+     "serverKind": "lingxi-service",
+     "serverVersion": "0.0.0",
+     "wireProtocolMin": 1,
+     "wireProtocolMax": 1,
+     "dataEpoch": 2
+    }
+   }
+  },
+  {
+   "case": "a01::no-second-react-entry",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+    "tauriResourcesDigest": "e98821fb9e24b920bde9fb782ca9555bc2875731ee1820b5c7bb5b9872b55c86"
+   }
+  },
+  {
+   "case": "a01::renderer-has-no-resource-ui",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "grepExit": 1,
+    "matches": []
+   }
+  },
+  {
+   "case": "a01::isolated-homes",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "electronHomeServices": 1,
+    "tauriHomeServices": 1,
+    "sampledWhileBothShellsRunning": true
+   }
+  },
+  {
+   "case": "a01::electron-exit",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "exit": 0,
+    "service_residual": []
+   }
+  },
+  {
+   "case": "a01::tauri-graceful-exit",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "exit": 0,
+    "timedOut": false,
+    "service_residual": []
+   }
+  },
+  {
+   "case": "a01::automation-no-modal",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "dialogSink": "/private/tmp/lingxi-r09-runtime/r09_t01_react_parity-2362-1793034968093/raw/dialog-tauri-home-tauri.json",
+    "automation": true
+   }
+  },
+  {
+   "case": "isolation::no-residual-processes",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "killed": [],
+    "residual": [],
+    "marker": "/private/tmp/lingxi-r09-runtime/r09_t01_react_parity-2362-1793034968093"
+   }
+  },
+  {
+   "case": "isolation::real-home-untouched",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "before": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    },
+    "after": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    }
+   }
+  }
+ ]
+}

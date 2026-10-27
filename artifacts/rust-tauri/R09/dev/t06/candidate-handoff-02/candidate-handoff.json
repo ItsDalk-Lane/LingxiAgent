@@ -1,0 +1,624 @@
+{
+ "schema": "lingxi.r09.t06.candidate-handoff.v1",
+ "generatedAt": "2026-10-26T22:58:07+0800",
+ "gitHead": "aac8cb9fe6bb7bfa7a41d75528221136bfe55e50",
+ "policy": {
+  "path": "docs/rust-tauri/R09/R09_COMMAND_POLICY.json",
+  "sha256": "24e260beb6385e3b24d12bc7c1147a2418832707e0ee3694037d9f9a01ff7328"
+ },
+ "delivery": {
+  "app": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+  "appTreeSha256": "2dc38bc36c29fd2c28e9576414dc028bab1b678c1b18557bfe0654d600fe0d0c",
+  "files": {
+   "Contents/Info.plist": {
+    "sha256": "da9ebff0b848d9ff1e3e6e5ac545c7270904ceb2a65677095cbb3e400e01919a",
+    "size": 1222
+   },
+   "Contents/MacOS/lingxi-resource-desktop": {
+    "sha256": "17523a17da7dcf0bd26df5bb952e3303cd7508527de3acbd6fe9ebdd87e16203",
+    "size": 59615584
+   },
+   "Contents/MacOS/lingxi-service": {
+    "sha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+    "size": 98056496
+   },
+   "Contents/Resources/Lingxi.icns": {
+    "sha256": "0951f493d51b3537f2b5826d45e117bba1ead1802c38658e2c0ebb1d7706b4d3",
+    "size": 8709
+   },
+   "Contents/Resources/rust-service/build.json": {
+    "sha256": "40085e84a6bed3f2f4ad9f64d725ba91b19e6518886007f4d01dd9e21f23d353",
+    "size": 738
+   },
+   "Contents/_CodeSignature/CodeResources": {
+    "sha256": "09489029ea2e31c170a9f956fcef0f4021d8a41f881939b2c6384b0c55f019d9",
+    "size": 2920
+   }
+  },
+  "receipt": "desktop/src-tauri/.tauri-build/build-receipt-release.json",
+  "receiptSha256": "3b78a519599bda87b89d75dd17b984e74c1890bab67e0feacac4207581f69b22",
+  "featureList": [
+   "r09-host"
+  ],
+  "evidenceBuild": false,
+  "rendererDigest": "d09359bd5bc87071c7e4cfc7fffb99553bc39b1345dd83946dcd14c51f244f31",
+  "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+  "rendererBuild": [],
+  "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+  "executableSha256": "17523a17da7dcf0bd26df5bb952e3303cd7508527de3acbd6fe9ebdd87e16203",
+  "codesign": {
+   "verifyCommand": "/usr/bin/codesign --verify --deep --strict /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+   "verify": {
+    "command": "/usr/bin/codesign --verify --deep --strict /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+   },
+   "detailsCommand": "/usr/bin/codesign -dv --verbose=4 /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+   "details": {
+    "command": "/usr/bin/codesign -dv --verbose=4 /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": "Executable=/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop\nIdentifier=com.lingxi.app\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20500 size=116431 flags=0x10002(adhoc,runtime) hashes=3632+3 location=embedded\nVersionPlatform=1\nVersionMin=720896\nVersionSDK=1769472\nHash type=sha256 size=32\nCandidateCDHash sha256=569f177b3af75a21fa168d5471bf19871b523b15\nCandidateCDHashFull sha256=569f177b3af75a21fa168d5471bf19871b523b154caa095756e000d0051b5f47\nHash choices=sha256\nCMSDigest=569f177b3af75a21fa168d5471bf19871b523b154caa095756e000d0051b5f47\nCMSDigestType=2\nExecutable Segment base=0\nExecutable Segment limit=53854208\nExecutable Segment flags=0x1\nPage size=16384\nCDHash=569f177b3af75a21fa168d5471bf19871b523b15\nSignature=adhoc\nInfo.plist entries=16\nTeamIdentifier=not set\nRuntime Version=27.0.0\nSealed Resources version=2 rules=13 files=3\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1"
+   },
+   "summary": {
+    "identifier": "Identifier=com.lingxi.app",
+    "signature": "Signature=adhoc",
+    "format": "Format=app bundle with Mach-O thin (arm64)",
+    "teamIdentifier": "TeamIdentifier=not set"
+   }
+  },
+  "service": {
+   "stage": "/Users/study_superior/Desktop/Code/LingxiAgent/dist-rust-service/mac-arm64",
+   "sidecar": "desktop/src-tauri/binaries/lingxi-service-aarch64-apple-darwin",
+   "sidecarSha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+   "resourcesManifest": "desktop/src-tauri/resources/rust-service/build.json",
+   "manifestSha256": "40085e84a6bed3f2f4ad9f64d725ba91b19e6518886007f4d01dd9e21f23d353",
+   "protocol": {
+    "serverKind": "lingxi-service",
+    "wireProtocolMin": 1,
+    "wireProtocolMax": 1,
+    "dataEpoch": 2
+   },
+   "binarySha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+   "contentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0"
+  },
+  "config": {
+   "file": "desktop/src-tauri/tauri.release.generated.conf.json",
+   "generatedSha256": "ab8652fb78a7d40f616ddce812098d5f572692b37c57f3801d2a810603b84313"
+  }
+ },
+ "g1Evidence": {
+  "receipt": "desktop/src-tauri/.tauri-build/build-receipt-debug.json",
+  "receiptSha256": "78a588ce504f876cffbee38b75208676ce2f56d67badaafc55eb60d6f245263d",
+  "mode": "debug",
+  "featureList": [
+   "e2e-test",
+   "r09-host",
+   "r09-test-hooks"
+  ],
+  "evidenceBuild": true,
+  "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/debug/lingxi-resource-desktop",
+  "executableSha256": "c3622805999f1a8871dc8faa1ffebd42ab7a0bd3a61501c8721f1fb0160ba071",
+  "rendererDigest": "d09359bd5bc87071c7e4cfc7fffb99553bc39b1345dd83946dcd14c51f244f31",
+  "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+  "rendererBuild": [],
+  "note": "debug --features r09-host,r09-test-hooks,e2e-test；与交付 release 使用同一 renderer 候选（digest 相同），二进制另行生成"
+ },
+ "capability": {
+  "releaseCommandSurface": [
+   "app_ready",
+   "close_browser_viewer",
+   "copy_file",
+   "file_info",
+   "get_app_version",
+   "get_auto_launch_status",
+   "get_avatar_path",
+   "get_browser_viewer_context",
+   "get_keep_awake_status",
+   "get_platform",
+   "get_server_connection_info",
+   "get_server_port",
+   "get_server_token",
+   "get_service_status",
+   "get_splash_info",
+   "keybindings_reload_global",
+   "keybindings_test_register",
+   "list_skill_files",
+   "onboarding_complete",
+   "open_browser_viewer",
+   "open_external",
+   "open_file",
+   "open_folder",
+   "open_settings",
+   "open_skill_viewer",
+   "quick_chat_hide",
+   "quick_chat_open_session",
+   "quick_chat_open_session_ack",
+   "quick_chat_reload_shortcut",
+   "quick_chat_resize",
+   "quick_chat_shortcut_status",
+   "quick_chat_show",
+   "read_file",
+   "read_file_base64",
+   "read_file_snapshot",
+   "read_skill_file",
+   "reload_main_window",
+   "resource_events",
+   "resource_subscribe",
+   "resource_unsubscribe",
+   "restart_app",
+   "run_edit_command",
+   "rust_browser_request",
+   "select_files",
+   "select_folder",
+   "select_skill",
+   "set_auto_launch_enabled",
+   "set_browser_connection",
+   "set_keep_awake_enabled",
+   "settings_changed",
+   "show_in_finder",
+   "show_notification",
+   "skill_viewer_close",
+   "skill_viewer_load",
+   "spawn_viewer",
+   "speech_permission_request",
+   "speech_permission_status",
+   "start_drag",
+   "trash_item",
+   "unwatch_file",
+   "viewer_close",
+   "viewer_request_load",
+   "watch_file",
+   "window_close",
+   "window_is_maximized",
+   "window_maximize",
+   "window_minimize",
+   "window_theme_changed",
+   "write_file",
+   "write_file_binary",
+   "write_file_if_unchanged"
+  ],
+  "commandCount": 71,
+  "windows": {
+   "main": {
+    "commands": 62,
+    "allowedCommands": [
+     "app_ready",
+     "close_browser_viewer",
+     "copy_file",
+     "file_info",
+     "get_app_version",
+     "get_auto_launch_status",
+     "get_keep_awake_status",
+     "get_platform",
+     "get_server_connection_info",
+     "get_server_port",
+     "get_server_token",
+     "get_service_status",
+     "keybindings_reload_global",
+     "keybindings_test_register",
+     "list_skill_files",
+     "open_browser_viewer",
+     "open_external",
+     "open_file",
+     "open_folder",
+     "open_settings",
+     "open_skill_viewer",
+     "quick_chat_hide",
+     "quick_chat_open_session_ack",
+     "quick_chat_reload_shortcut",
+     "quick_chat_resize",
+     "quick_chat_shortcut_status",
+     "quick_chat_show",
+     "read_file",
+     "read_file_base64",
+     "read_file_snapshot",
+     "read_skill_file",
+     "reload_main_window",
+     "resource_events",
+     "resource_subscribe",
+     "resource_unsubscribe",
+     "restart_app",
+     "run_edit_command",
+     "rust_browser_request",
+     "select_files",
+     "select_folder",
+     "select_skill",
+     "set_auto_launch_enabled",
+     "set_browser_connection",
+     "set_keep_awake_enabled",
+     "settings_changed",
+     "show_in_finder",
+     "show_notification",
+     "spawn_viewer",
+     "speech_permission_request",
+     "speech_permission_status",
+     "start_drag",
+     "trash_item",
+     "unwatch_file",
+     "watch_file",
+     "window_close",
+     "window_is_maximized",
+     "window_maximize",
+     "window_minimize",
+     "window_theme_changed",
+     "write_file",
+     "write_file_binary",
+     "write_file_if_unchanged"
+    ],
+    "pluginLeaves": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ]
+   },
+   "settings": {
+    "commands": 29,
+    "allowedCommands": [
+     "get_app_version",
+     "get_auto_launch_status",
+     "get_keep_awake_status",
+     "get_platform",
+     "get_server_connection_info",
+     "get_server_port",
+     "get_server_token",
+     "keybindings_reload_global",
+     "keybindings_test_register",
+     "open_external",
+     "open_file",
+     "open_folder",
+     "open_settings",
+     "quick_chat_reload_shortcut",
+     "quick_chat_shortcut_status",
+     "restart_app",
+     "run_edit_command",
+     "select_files",
+     "select_folder",
+     "select_skill",
+     "set_auto_launch_enabled",
+     "set_keep_awake_enabled",
+     "settings_changed",
+     "show_in_finder",
+     "window_close",
+     "window_is_maximized",
+     "window_maximize",
+     "window_minimize",
+     "window_theme_changed"
+    ],
+    "pluginLeaves": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ]
+   },
+   "quick-chat": {
+    "commands": 10,
+    "allowedCommands": [
+     "get_platform",
+     "get_server_connection_info",
+     "get_server_port",
+     "get_server_token",
+     "open_external",
+     "quick_chat_hide",
+     "quick_chat_open_session",
+     "quick_chat_resize",
+     "quick_chat_show",
+     "window_theme_changed"
+    ],
+    "pluginLeaves": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ]
+   },
+   "splash": {
+    "commands": 3,
+    "allowedCommands": [
+     "get_avatar_path",
+     "get_platform",
+     "get_splash_info"
+    ],
+    "pluginLeaves": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ]
+   },
+   "onboarding": {
+    "commands": 7,
+    "allowedCommands": [
+     "get_avatar_path",
+     "get_platform",
+     "get_server_connection_info",
+     "get_server_port",
+     "get_server_token",
+     "get_splash_info",
+     "onboarding_complete"
+    ],
+    "pluginLeaves": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ]
+   },
+   "browser-viewer": {
+    "commands": 6,
+    "allowedCommands": [
+     "close_browser_viewer",
+     "get_browser_viewer_context",
+     "get_platform",
+     "rust_browser_request",
+     "settings_changed",
+     "window_theme_changed"
+    ],
+    "pluginLeaves": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ]
+   },
+   "viewer-*": {
+    "commands": 12,
+    "allowedCommands": [
+     "file_info",
+     "get_server_connection_info",
+     "get_server_port",
+     "get_server_token",
+     "read_file",
+     "read_file_base64",
+     "read_file_snapshot",
+     "resource_events",
+     "resource_subscribe",
+     "resource_unsubscribe",
+     "viewer_close",
+     "viewer_request_load"
+    ],
+    "pluginLeaves": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ]
+   },
+   "skill-viewer-*": {
+    "commands": 4,
+    "allowedCommands": [
+     "list_skill_files",
+     "read_skill_file",
+     "skill_viewer_close",
+     "skill_viewer_load"
+    ],
+    "pluginLeaves": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ]
+   }
+  },
+  "deferred": {
+   "R10-update-chain": [
+    "release_check_latest",
+    "get_pending_announcement",
+    "ack_announcement",
+    "get_update_digest_history",
+    "auto_update_check",
+    "auto_update_install",
+    "auto_update_state",
+    "auto_update_set_channel",
+    "train_update_status",
+    "train_update_check",
+    "train_update_apply"
+   ],
+   "T04-screenshot": [
+    "screenshot_render"
+   ],
+   "T03-FILE-01": [
+    "read_docx_html",
+    "read_xlsx_html",
+    "watch_workspace",
+    "unwatch_workspace",
+    "observability_export_begin",
+    "observability_export_write",
+    "observability_export_end",
+    "observability_export_abort"
+   ]
+  },
+  "capturedCapabilities": [
+   "browser-viewer.json",
+   "main.json",
+   "onboarding.json",
+   "quick-chat.json",
+   "r09-host.json",
+   "settings.json",
+   "skill-viewer.json",
+   "splash.json",
+   "viewer.json"
+  ],
+  "capabilitySha256": {
+   "browser-viewer.json": "3491304822a3a985b3edb16d6aaaadc51b84db04e1c2b7ee91218a870437cc28",
+   "main.json": "bae4e4129ab97f23518227c07f54d1330ef17f8dadec181742ead7885c94dcb7",
+   "onboarding.json": "954475e7a24649a98c210f6263916065feae66391126e03f267e09c1f9617534",
+   "quick-chat.json": "696b808acf9f30d312b7110f3cff1d64bb63cc6e93305f0e68b5669169be5881",
+   "r09-host.json": "9dca0363fe469641f46a1ebc6028739dc9f41a2e13953b8578dba6e7b27f65cf",
+   "settings.json": "489ec83ee11ca7b8d84285ce147eabaeea0b8a269351bd57fe8081814a7bf402",
+   "skill-viewer.json": "9f4806491dc1cbe54d850750cb67e4772d1bfc91925558ec5ae5ce7f3409562b",
+   "splash.json": "c505a46ff140514770f63117069cd5a48217ba480e06d269238cae7a843cb351",
+   "viewer.json": "db3a39d29714ffc68c6adc13461a73892d30076c5fee612b7d38bd52fb98f8f5"
+  }
+ },
+ "audit": {
+  "evidence": "artifacts/rust-tauri/R09/dev/t06/audit-05-freeze",
+  "status": "PASS",
+  "exitCode": 0,
+  "caseCount": 55,
+  "failedCases": [],
+  "gapRemaining": 0
+ },
+ "releaseScan": {
+  "evidence": "artifacts/rust-tauri/R09/dev/t06/release-scan-05-freeze",
+  "status": "PASS",
+  "caseCount": 45,
+  "failedCases": [],
+  "artifactChangedDuringScan": false,
+  "aclCommandCount": 70,
+  "csp": {
+   "default-src": [
+    "'self'"
+   ],
+   "script-src": [
+    "'self'"
+   ],
+   "style-src": [
+    "'self'",
+    "'unsafe-inline'"
+   ],
+   "connect-src": [
+    "'self'",
+    "ipc:",
+    "http://ipc.localhost",
+    "http://127.0.0.1:*",
+    "ws://127.0.0.1:*"
+   ],
+   "img-src": [
+    "'self'",
+    "data:",
+    "blob:",
+    "asset:",
+    "http://asset.localhost",
+    "http://127.0.0.1:*"
+   ],
+   "media-src": [
+    "'self'",
+    "data:",
+    "blob:",
+    "asset:",
+    "http://asset.localhost",
+    "http://127.0.0.1:*"
+   ],
+   "font-src": [
+    "'self'",
+    "data:"
+   ],
+   "frame-src": [
+    "'self'",
+    "blob:"
+   ],
+   "object-src": [
+    "'none'"
+   ],
+   "base-uri": [
+    "'none'"
+   ],
+   "form-action": [
+    "'none'"
+   ]
+  }
+ },
+ "capabilityMatrix": {
+  "evidence": "artifacts/rust-tauri/R09/dev/t06/capability-matrix-03",
+  "status": "FAIL",
+  "exitCode": 2,
+  "caseCount": 88,
+  "failedCases": [
+   "blocked::runtime.browser-viewer.negative-matrix",
+   "blocked::runtime.main.negative-matrix",
+   "blocked::runtime.onboarding.negative-matrix",
+   "blocked::runtime.quick-chat.negative-matrix",
+   "blocked::runtime.settings.negative-matrix",
+   "blocked::runtime.skill-viewer-*.negative-matrix",
+   "blocked::runtime.splash.negative-matrix",
+   "blocked::runtime.viewer-*.negative-matrix",
+   "blocked::runtime.browser-viewer.positive-matrix",
+   "blocked::runtime.main.positive-matrix",
+   "blocked::runtime.onboarding.positive-matrix",
+   "blocked::runtime.quick-chat.positive-matrix",
+   "blocked::runtime.settings.positive-matrix",
+   "blocked::runtime.skill-viewer-*.positive-matrix",
+   "blocked::runtime.splash.positive-matrix",
+   "blocked::runtime.viewer-*.positive-matrix",
+   "blocked::runtime.remote-webview-zero-acl",
+   "blocked::runtime.token-not-in-url-or-dom",
+   "blocked::runtime.csp-blocked-remote-script",
+   "blocked::runtime.canary-command-release-absent",
+   "blocked::runtime.debug-command-release-denied"
+  ],
+  "blockedCaseCount": 21,
+  "blockedKind": "BLOCKED_GUI_SMOKE",
+  "gapRemaining": 0
+ },
+ "releaseSuite": {
+  "evidence": "artifacts/rust-tauri/R09/dev/t06/release-surface-04-freeze",
+  "status": "PASS",
+  "exitCode": 0,
+  "cases": 51
+ },
+ "freeze": {
+  "frozenAt": "2026-10-26T22:59:26+0800",
+  "gitHead": "aac8cb9fe6bb7bfa7a41d75528221136bfe55e50",
+  "appTreeSha256": "2dc38bc36c29fd2c28e9576414dc028bab1b678c1b18557bfe0654d600fe0d0c",
+  "files": {
+   "Contents/Info.plist": "da9ebff0b848d9ff1e3e6e5ac545c7270904ceb2a65677095cbb3e400e01919a",
+   "Contents/MacOS/lingxi-resource-desktop": "17523a17da7dcf0bd26df5bb952e3303cd7508527de3acbd6fe9ebdd87e16203",
+   "Contents/MacOS/lingxi-service": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+   "Contents/Resources/Lingxi.icns": "0951f493d51b3537f2b5826d45e117bba1ead1802c38658e2c0ebb1d7706b4d3",
+   "Contents/Resources/rust-service/build.json": "40085e84a6bed3f2f4ad9f64d725ba91b19e6518886007f4d01dd9e21f23d353",
+   "Contents/_CodeSignature/CodeResources": "09489029ea2e31c170a9f956fcef0f4021d8a41f881939b2c6384b0c55f019d9"
+  },
+  "deliveryReceiptSha256": "3b78a519599bda87b89d75dd17b984e74c1890bab67e0feacac4207581f69b22",
+  "g1ReceiptSha256": "78a588ce504f876cffbee38b75208676ce2f56d67badaafc55eb60d6f245263d",
+  "psResidualCount": 0,
+  "rendererBuild": {
+   "deliveryReceipt": [],
+   "rendererBuiltIn": "artifacts/rust-tauri/R09/dev/t06/build-evidence-01/tauri-build-debug.json",
+   "rendererBuildCommands": [
+    "npm run build:renderer",
+    "npm run build:theme"
+   ],
+   "rendererDigest": "d09359bd5bc87071c7e4cfc7fffb99553bc39b1345dd83946dcd14c51f244f31",
+   "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+   "note": "交付 release 构建用 --no-renderer-build（同一 renderer 树摘要由 evidence build 首建并绑定），故 delivery receipt rendererBuild=[]；renderer 构建命令记录在 evidence build receipt。"
+  },
+  "bundleLayout": [
+   "Contents/Info.plist",
+   "Contents/MacOS/lingxi-resource-desktop",
+   "Contents/MacOS/lingxi-service",
+   "Contents/Resources/Lingxi.icns",
+   "Contents/Resources/rust-service/build.json",
+   "Contents/_CodeSignature/CodeResources"
+  ],
+  "scan": {
+   "resultSha256": "4db2467d489eb75cea0af935fd950c9a471b896e018bab1ddfd850d6984bcd16",
+   "status": "PASS"
+  },
+  "audit": {
+   "resultSha256": "e9f5e82a5c0f3b20f2bf3649df1bb3ab17af1274d9968659af28382d524f97e5",
+   "status": "PASS"
+  },
+  "codesign": {
+   "verifyCommand": "/usr/bin/codesign --verify --deep --strict /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+   "verify": {
+    "command": "/usr/bin/codesign --verify --deep --strict /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+   },
+   "detailsCommand": "/usr/bin/codesign -dv --verbose=4 /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+   "details": {
+    "command": "/usr/bin/codesign -dv --verbose=4 /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": "Executable=/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop\nIdentifier=com.lingxi.app\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20500 size=116431 flags=0x10002(adhoc,runtime) hashes=3632+3 location=embedded\nVersionPlatform=1\nVersionMin=720896\nVersionSDK=1769472\nHash type=sha256 size=32\nCandidateCDHash sha256=569f177b3af75a21fa168d5471bf19871b523b15\nCandidateCDHashFull sha256=569f177b3af75a21fa168d5471bf19871b523b154caa095756e000d0051b5f47\nHash choices=sha256\nCMSDigest=569f177b3af75a21fa168d5471bf19871b523b154caa095756e000d0051b5f47\nCMSDigestType=2\nExecutable Segment base=0\nExecutable Segment limit=53854208\nExecutable Segment flags=0x1\nPage size=16384\nCDHash=569f177b3af75a21fa168d5471bf19871b523b15\nSignature=adhoc\nInfo.plist entries=16\nTeamIdentifier=not set\nRuntime Version=27.0.0\nSealed Resources version=2 rules=13 files=3\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1"
+   },
+   "summary": {
+    "identifier": "Identifier=com.lingxi.app",
+    "signature": "Signature=adhoc",
+    "format": "Format=app bundle with Mach-O thin (arm64)",
+    "teamIdentifier": "TeamIdentifier=not set"
+   }
+  },
+  "g1": {
+   "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/debug/lingxi-resource-desktop",
+   "executableSha256": "c3622805999f1a8871dc8faa1ffebd42ab7a0bd3a61501c8721f1fb0160ba071",
+   "features": [
+    "e2e-test",
+    "r09-host",
+    "r09-test-hooks"
+   ],
+   "evidenceBuild": true,
+   "rendererDigest": "d09359bd5bc87071c7e4cfc7fffb99553bc39b1345dd83946dcd14c51f244f31",
+   "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73"
+  }
+ }
+}

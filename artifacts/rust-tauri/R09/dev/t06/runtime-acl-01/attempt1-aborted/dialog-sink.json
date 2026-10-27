@@ -1,0 +1,11 @@
+{
+  "actual": null,
+  "atUnixMs": 1793027060305,
+  "code": "RUST_SERVICE_EXITED_BEFORE_READY",
+  "detailPath": "/private/tmp/lingxi-r09-t06-acl-19875-1793027059/tmp/lingxi-tauri-launch/337052913f6e846c/failure.json",
+  "expected": null,
+  "home": "/private/tmp/lingxi-r09-t06-acl-19875-1793027059/home",
+  "message": "Rust service exited before READY (exit code 2)",
+  "modalShown": false,
+  "schema": "lingxi.r09.host-failure-dialog.v1"
+}

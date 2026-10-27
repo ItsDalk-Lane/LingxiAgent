@@ -5831,5 +5831,30 @@
   },
   "labels": {
     "thinking": "思考"
+  },
+  "systemPermissions": {
+    "title": "システム権限",
+    "description": "このテスト版ではマイク・音声認識・通知の権限が必要です。下のボタンでシステムの確認ダイアログを出します。",
+    "microphone": "マイク",
+    "speech": "音声認識",
+    "notification": "通知",
+    "request": "許可を要求",
+    "testNotification": "テスト通知を送信",
+    "granted": "許可済み",
+    "denied": "拒否",
+    "unsupported": "未対応",
+    "failed": "要求に失敗",
+    "notRequested": "未要求",
+    "micGranted": "マイクを許可しました",
+    "micDenied": "マイクが拒否されました",
+    "micUnsupported": "マイク要求は未対応です",
+    "speechGranted": "音声認識を許可しました",
+    "speechDenied": "音声認識が拒否されました",
+    "speechResult": "権限状態を更新しました",
+    "notificationTitle": "Lingxi 通知テスト",
+    "notificationBody": "この通知が見えれば通知権限は有効です。",
+    "notificationSent": "テスト通知を送信しました",
+    "notificationFailed": "テスト通知の送信に失敗しました",
+    "dismiss": "閉じる"
   }
 }

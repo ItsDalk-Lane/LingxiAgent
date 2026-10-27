@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r09_t05.py", line 1710, in run_suite
+    status, extra = SUITES[suite](producer)
+                    ~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r09_t05.py", line 939, in run_browser_pdf
+    old = _old_chain_s1(p, evidence, chrome)
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r09_t05.py", line 397, in _old_chain_s1
+    probe_source = source / "old" / "probe"
+                   ^^^^^^
+NameError: name 'source' is not defined

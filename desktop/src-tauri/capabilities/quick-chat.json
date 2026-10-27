@@ -1,0 +1,21 @@
+{
+  "identifier": "quick-chat",
+  "description": "R09-T06 收口：快速对话窗口。连接信息/窗口自身 show-hide-resize/会话交接/外链。",
+  "windows": [
+    "quick-chat"
+  ],
+  "permissions": [
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    "allow-get-platform",
+    "allow-get-server-connection-info",
+    "allow-get-server-port",
+    "allow-get-server-token",
+    "allow-open-external",
+    "allow-quick-chat-hide",
+    "allow-quick-chat-open-session",
+    "allow-quick-chat-resize",
+    "allow-quick-chat-show",
+    "allow-window-theme-changed"
+  ]
+}

@@ -1,0 +1,1180 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t06_runtime_acl",
+ "cases": [
+  {
+   "case": "acl::preflight::policy-valid",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "schema": "lingxi.r09.command-policy.v1",
+    "path": "docs/rust-tauri/R09/R09_COMMAND_POLICY.json"
+   }
+  },
+  {
+   "case": "acl::preflight::window-labels-match-policy",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "policy": [
+     "browser-viewer",
+     "main",
+     "onboarding",
+     "quick-chat",
+     "settings",
+     "skill-viewer-*",
+     "splash",
+     "viewer-*"
+    ],
+    "native": [
+     "browser-viewer",
+     "main",
+     "onboarding",
+     "quick-chat",
+     "settings",
+     "skill-viewer-*",
+     "splash",
+     "viewer-*"
+    ]
+   }
+  },
+  {
+   "case": "acl::preflight::matrix-plan-generated",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "allowCases": 141,
+    "denyCases": 467,
+    "perWindow": {
+     "main": 9,
+     "settings": 47,
+     "quick-chat": 66,
+     "splash": 73,
+     "onboarding": 66,
+     "browser-viewer": 70,
+     "viewer-*": 64,
+     "skill-viewer-*": 72
+    }
+   }
+  },
+  {
+   "case": "acl::preflight::candidate-handoff-present",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "path": "artifacts/rust-tauri/R09/dev/t06/candidate-handoff-v3.3/candidate-handoff.json"
+   }
+  },
+  {
+   "case": "acl::preflight::g1-evidence-features",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "features": [
+     "e2e-test",
+     "r09-host",
+     "r09-test-hooks"
+    ],
+    "evidenceBuild": true,
+    "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/debug/lingxi-resource-desktop"
+   }
+  },
+  {
+   "case": "acl::preflight::delivery-release-not-evidence",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "features": [
+     "r09-host"
+    ],
+    "evidenceBuild": false
+   }
+  },
+  {
+   "case": "acl::preflight::renderer-binding-equal",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "delivery": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+    "g1": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+    "note": "同一 renderer 候选（digest 相同），两个生成实例"
+   }
+  },
+  {
+   "case": "acl::preflight::delivery-scan-pass",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": "PASS",
+    "overall": null,
+    "failedCases": []
+   }
+  },
+  {
+   "case": "acl::preflight::release-no-canary-debug-command",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "binary": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+    "hits": {},
+    "note": "A12：release 不得含 test canary/debug 命令名"
+   }
+  },
+  {
+   "case": "acl::preflight::gui-clearance",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "env": "LINGXI_R09_T06_RUNTIME_ACL_CLEARED",
+    "value": "1",
+    "note": "运行期矩阵未 cleared：不会启动 app（无 GUI 自检模式）"
+   }
+  },
+  {
+   "case": "acl::preflight::hidden-only-clearance",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "env": "LINGXI_R09_T06_RUNTIME_ACL_HIDDEN_ONLY",
+    "value": "1",
+    "visibleRiskWindows": {
+     "quick-chat": "quick_chat_show → install::show_quick_chat → window.show()/set_focus（可见）",
+     "onboarding": "debug_open_onboarding: builder visible(false) 后立即 window.show()（可见）",
+     "viewer-*": "spawn_viewer: WebviewWindowBuilder 默认 visible=true（创建即可见）",
+     "browser-viewer": "open_browser_viewer: 创建控制面板窗口后 show（可见）",
+     "skill-viewer-*": "open_skill_viewer: WebviewWindowBuilder 默认 visible=true（创建即可见）"
+    },
+    "note": "hidden-only 批次只启动 hidden 主窗；可见风险窗口记 blocked，避免任何可见窗口"
+   }
+  },
+  {
+   "case": "acl::runtime::app-bundle-ready",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "sourceExe": "/private/tmp/lingxi-r09-evidence/lingxi-resource-desktop-v33-27bf075a",
+    "bundle": {
+     "wrapped": true,
+     "bundle": "/private/tmp/lingxi-r09-t06-acl-99329-1793034300/LingxiRuntimeAcl.app",
+     "sourceExe": "/private/tmp/lingxi-r09-evidence/lingxi-resource-desktop-v33-27bf075a",
+     "sourceSha256": "27bf075a70e57ccca607365276d261eed79764e02b663bfd881df472e51a31b6",
+     "launchExe": "/private/tmp/lingxi-r09-t06-acl-99329-1793034300/LingxiRuntimeAcl.app/Contents/MacOS/lingxi-resource-desktop-v33-27bf075a",
+     "launchSha256": "27bf075a70e57ccca607365276d261eed79764e02b663bfd881df472e51a31b6"
+    },
+    "note": "debug 裸二进制包最小 .app 以满足 macOS NSBundle API；候选 sha 未改"
+   }
+  },
+  {
+   "case": "acl::runtime::wdio-available",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "port": 19535
+   }
+  },
+  {
+   "case": "acl::runtime::wdio-session-created",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "port": 19535,
+    "session": true
+   }
+  },
+  {
+   "case": "acl::runtime::main-window",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "handle": "main",
+    "label": "main"
+   }
+  },
+  {
+   "case": "acl::runtime::hidden-safe-window-subset",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "attempted": [
+     "main"
+    ],
+    "blockedByPolicy": [
+     "browser-viewer",
+     "onboarding",
+     "quick-chat",
+     "settings",
+     "skill-viewer-*",
+     "splash",
+     "viewer-*"
+    ],
+    "note": "hidden-only 批次只对 main 执行矩阵；其余窗口不尝试打开（避免 window.show() 产生可见窗口/挂起）"
+   }
+  },
+  {
+   "case": "acl::window-available::main",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "handle": "main",
+    "note": "startup",
+    "attempts": []
+   }
+  },
+  {
+   "case": "acl::main::app_ready::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "ok"
+   }
+  },
+  {
+   "case": "acl::main::close_browser_viewer::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "ok"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::copy_file",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::debug_asset_probe::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `path` for command `debug_asset_probe`: command debug_asset_probe missing required key path"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::debug_open_onboarding",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::debug_open_onboarding_preview",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::file_info::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `path` for command `file_info`: command file_info missing required key path"
+   }
+  },
+  {
+   "case": "acl::main::get_app_version::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "ok"
+   }
+  },
+  {
+   "case": "acl::main::get_auto_launch_status::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "ok"
+   }
+  },
+  {
+   "case": "acl::main::get_keep_awake_status::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "ok"
+   }
+  },
+  {
+   "case": "acl::main::get_platform::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "ok"
+   }
+  },
+  {
+   "case": "acl::main::get_server_connection_info::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "ok"
+   }
+  },
+  {
+   "case": "acl::main::get_server_port::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "ok"
+   }
+  },
+  {
+   "case": "acl::main::get_server_token::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "ok"
+   }
+  },
+  {
+   "case": "acl::main::get_service_status::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "ok"
+   }
+  },
+  {
+   "case": "acl::main::keybindings_reload_global::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "ok"
+   }
+  },
+  {
+   "case": "acl::main::keybindings_test_register::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `shortcut` for command `keybindings_test_register`: command keybindings_test_register missing required key shortcut"
+   }
+  },
+  {
+   "case": "acl::main::list_skill_files::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `baseDir` for command `list_skill_files`: command list_skill_files missing required key baseDir"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::open_browser_viewer",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::open_external::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `url` for command `open_external`: command open_external missing required key url"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::open_file",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::open_folder",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::open_settings::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "ok"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::open_skill_viewer",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::quick_chat_hide::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "ok"
+   }
+  },
+  {
+   "case": "acl::main::quick_chat_open_session::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `target` for command `quick_chat_open_session`: command quick_chat_open_session missing required key target"
+   }
+  },
+  {
+   "case": "acl::main::quick_chat_open_session_ack::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `result` for command `quick_chat_open_session_ack`: command quick_chat_open_session_ack missing required key result"
+   }
+  },
+  {
+   "case": "acl::main::quick_chat_reload_shortcut::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "ok"
+   }
+  },
+  {
+   "case": "acl::main::quick_chat_shortcut_status::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "ok"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::quick_chat_show",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::read_file::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `path` for command `read_file`: command read_file missing required key path"
+   }
+  },
+  {
+   "case": "acl::main::read_file_base64::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `path` for command `read_file_base64`: command read_file_base64 missing required key path"
+   }
+  },
+  {
+   "case": "acl::main::read_file_snapshot::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `path` for command `read_file_snapshot`: command read_file_snapshot missing required key path"
+   }
+  },
+  {
+   "case": "acl::main::read_skill_file::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `path` for command `read_skill_file`: command read_skill_file missing required key path"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::reload_main_window",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::resource_events::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `since` for command `resource_events`: command resource_events missing required key since"
+   }
+  },
+  {
+   "case": "acl::main::resource_subscribe::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `path` for command `resource_subscribe`: command resource_subscribe missing required key path"
+   }
+  },
+  {
+   "case": "acl::main::resource_unsubscribe::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `subscriptionId` for command `resource_unsubscribe`: command resource_unsubscribe missing required key subscriptionId"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::restart_app",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::run_edit_command::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `command` for command `run_edit_command`: command run_edit_command missing required key command"
+   }
+  },
+  {
+   "case": "acl::main::rust_browser_request::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `target` for command `rust_browser_request`: command rust_browser_request missing required key target"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::select_files",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::select_folder",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::select_skill",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::set_auto_launch_enabled",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::set_browser_connection::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "ok"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::set_keep_awake_enabled",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::settings_changed::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `eventType` for command `settings_changed`: command settings_changed missing required key eventType"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::show_in_finder",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::show_notification",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::spawn_viewer",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::speech_permission_request",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::speech_permission_status::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "ok"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::start_drag",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::trash_item",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::unwatch_file::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `path` for command `unwatch_file`: command unwatch_file missing required key path"
+   }
+  },
+  {
+   "case": "acl::main::unwatch_workspace::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `rootPath` for command `unwatch_workspace`: command unwatch_workspace missing required key rootPath"
+   }
+  },
+  {
+   "case": "acl::main::watch_file::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `path` for command `watch_file`: command watch_file missing required key path"
+   }
+  },
+  {
+   "case": "acl::main::watch_workspace::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `rootPath` for command `watch_workspace`: command watch_workspace missing required key rootPath"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::window_close",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::window_is_maximized::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "ok"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::window_maximize",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::window_minimize",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::window_theme_changed::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "invalid args `theme` for command `window_theme_changed`: command window_theme_changed missing required key theme"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::write_file",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::write_file_binary",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::write_file_if_unchanged",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::get_avatar_path::deny",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "error": "get_avatar_path not allowed on window \"main\", webview \"main\", URL: local\n\nallowed on: [windows: \"onboarding\", URL: local], [windows: \"splash\", URL: local]\n\nreferenced by: capability: onboarding, permission: allow-get-avatar-path || capability: splash, permission: allow-get-avatar-path"
+   }
+  },
+  {
+   "case": "acl::main::get_browser_viewer_context::deny",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "error": "get_browser_viewer_context not allowed on window \"main\", webview \"main\", URL: local\n\nallowed on: [windows: \"browser-viewer\", URL: local]\n\nreferenced by: capability: r09-browser-viewer, permission: allow-get-browser-viewer-context"
+   }
+  },
+  {
+   "case": "acl::main::get_splash_info::deny",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "error": "get_splash_info not allowed on window \"main\", webview \"main\", URL: local\n\nallowed on: [windows: \"onboarding\", URL: local], [windows: \"splash\", URL: local]\n\nreferenced by: capability: onboarding, permission: allow-get-splash-info || capability: splash, permission: allow-get-splash-info"
+   }
+  },
+  {
+   "case": "acl::main::onboarding_complete::deny",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "error": "onboarding_complete not allowed on window \"main\", webview \"main\", URL: local\n\nallowed on: [windows: \"onboarding\", URL: local]\n\nreferenced by: capability: onboarding, permission: allow-onboarding-complete"
+   }
+  },
+  {
+   "case": "acl::main::quick_chat_resize::deny",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "error": "quick_chat_resize not allowed on window \"main\", webview \"main\", URL: local\n\nallowed on: [windows: \"quick-chat\", URL: local]\n\nreferenced by: capability: quick-chat, permission: allow-quick-chat-resize"
+   }
+  },
+  {
+   "case": "acl::main::skill_viewer_close::deny",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "error": "skill_viewer_close not allowed on window \"main\", webview \"main\", URL: local\n\nallowed on: [windows: \"skill-viewer-*\", URL: local]\n\nreferenced by: capability: skill-viewer, permission: allow-skill-viewer-close"
+   }
+  },
+  {
+   "case": "acl::main::skill_viewer_load::deny",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "error": "skill_viewer_load not allowed on window \"main\", webview \"main\", URL: local\n\nallowed on: [windows: \"skill-viewer-*\", URL: local]\n\nreferenced by: capability: skill-viewer, permission: allow-skill-viewer-load"
+   }
+  },
+  {
+   "case": "acl::main::viewer_close::deny",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "error": "viewer_close not allowed on window \"main\", webview \"main\", URL: local\n\nallowed on: [windows: \"viewer-*\", URL: local]\n\nreferenced by: capability: resource-viewer, permission: allow-viewer-close"
+   }
+  },
+  {
+   "case": "acl::main::viewer_request_load::deny",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "error": "viewer_request_load not allowed on window \"main\", webview \"main\", URL: local\n\nallowed on: [windows: \"viewer-*\", URL: local]\n\nreferenced by: capability: resource-viewer, permission: allow-viewer-request-load"
+   }
+  },
+  {
+   "case": "acl::union-equals-policy::main",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "scope": "executed-subset",
+    "allowedCount": 67,
+    "executedAllowCount": 40,
+    "observedAllow": 40,
+    "skippedSideEffect": [
+     "copy_file",
+     "debug_open_onboarding",
+     "debug_open_onboarding_preview",
+     "open_browser_viewer",
+     "open_file",
+     "open_folder",
+     "open_skill_viewer",
+     "quick_chat_show",
+     "reload_main_window",
+     "restart_app",
+     "select_files",
+     "select_folder",
+     "select_skill",
+     "set_auto_launch_enabled",
+     "set_keep_awake_enabled",
+     "show_in_finder",
+     "show_notification",
+     "spawn_viewer",
+     "speech_permission_request",
+     "start_drag",
+     "trash_item",
+     "window_close",
+     "window_maximize",
+     "window_minimize",
+     "write_file",
+     "write_file_binary",
+     "write_file_if_unchanged"
+    ],
+    "aclViolations": [],
+    "denyViolations": [],
+    "domainErrors": [
+     {
+      "command": "debug_asset_probe",
+      "error": "invalid args `path` for command `debug_asset_probe`: command debug_asset_probe missing required key path"
+     },
+     {
+      "command": "file_info",
+      "error": "invalid args `path` for command `file_info`: command file_info missing required key path"
+     },
+     {
+      "command": "keybindings_test_register",
+      "error": "invalid args `shortcut` for command `keybindings_test_register`: command keybindings_test_register missing required key shortcut"
+     },
+     {
+      "command": "list_skill_files",
+      "error": "invalid args `baseDir` for command `list_skill_files`: command list_skill_files missing required key baseDir"
+     },
+     {
+      "command": "open_external",
+      "error": "invalid args `url` for command `open_external`: command open_external missing required key url"
+     },
+     {
+      "command": "quick_chat_open_session",
+      "error": "invalid args `target` for command `quick_chat_open_session`: command quick_chat_open_session missing required key target"
+     },
+     {
+      "command": "quick_chat_open_session_ack",
+      "error": "invalid args `result` for command `quick_chat_open_session_ack`: command quick_chat_open_session_ack missing required key result"
+     },
+     {
+      "command": "read_file",
+      "error": "invalid args `path` for command `read_file`: command read_file missing required key path"
+     },
+     {
+      "command": "read_file_base64",
+      "error": "invalid args `path` for command `read_file_base64`: command read_file_base64 missing required key path"
+     },
+     {
+      "command": "read_file_snapshot",
+      "error": "invalid args `path` for command `read_file_snapshot`: command read_file_snapshot missing required key path"
+     },
+     {
+      "command": "read_skill_file",
+      "error": "invalid args `path` for command `read_skill_file`: command read_skill_file missing required key path"
+     },
+     {
+      "command": "resource_events",
+      "error": "invalid args `since` for command `resource_events`: command resource_events missing required key since"
+     },
+     {
+      "command": "resource_subscribe",
+      "error": "invalid args `path` for command `resource_subscribe`: command resource_subscribe missing required key path"
+     },
+     {
+      "command": "resource_unsubscribe",
+      "error": "invalid args `subscriptionId` for command `resource_unsubscribe`: command resource_unsubscribe missing required key subscriptionId"
+     },
+     {
+      "command": "run_edit_command",
+      "error": "invalid args `command` for command `run_edit_command`: command run_edit_command missing required key command"
+     },
+     {
+      "command": "rust_browser_request",
+      "error": "invalid args `target` for command `rust_browser_request`: command rust_browser_request missing required key target"
+     },
+     {
+      "command": "settings_changed",
+      "error": "invalid args `eventType` for command `settings_changed`: command settings_changed missing required key eventType"
+     },
+     {
+      "command": "unwatch_file",
+      "error": "invalid args `path` for command `unwatch_file`: command unwatch_file missing required key path"
+     },
+     {
+      "command": "unwatch_workspace",
+      "error": "invalid args `rootPath` for command `unwatch_workspace`: command unwatch_workspace missing required key rootPath"
+     },
+     {
+      "command": "watch_file",
+      "error": "invalid args `path` for command `watch_file`: command watch_file missing required key path"
+     },
+     {
+      "command": "watch_workspace",
+      "error": "invalid args `rootPath` for command `watch_workspace`: command watch_workspace missing required key rootPath"
+     },
+     {
+      "command": "window_theme_changed",
+      "error": "invalid args `theme` for command `window_theme_changed`: command window_theme_changed missing required key theme"
+     }
+    ]
+   }
+  },
+  {
+   "case": "blocked::union-equals-policy::main::full-side-effect",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "skippedSideEffect": [
+     "copy_file",
+     "debug_open_onboarding",
+     "debug_open_onboarding_preview",
+     "open_browser_viewer",
+     "open_file",
+     "open_folder",
+     "open_skill_viewer",
+     "quick_chat_show",
+     "reload_main_window",
+     "restart_app",
+     "select_files",
+     "select_folder",
+     "select_skill",
+     "set_auto_launch_enabled",
+     "set_keep_awake_enabled",
+     "show_in_finder",
+     "show_notification",
+     "spawn_viewer",
+     "speech_permission_request",
+     "start_drag",
+     "trash_item",
+     "window_close",
+     "window_maximize",
+     "window_minimize",
+     "write_file",
+     "write_file_binary",
+     "write_file_if_unchanged"
+    ],
+    "reason": "可见/副作用命令需 visible 批次才能纳入 full 并集断言"
+   }
+  },
+  {
+   "case": "acl::token-not-in-url-dom::main",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "probe": {},
+    "tokenRecorded": false
+   }
+  },
+  {
+   "case": "blocked::window-open::settings",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "主窗存活时 open_settings 走 MainModal（不创建 settings 窗口）；host 无独立创建入口 → 需 host patch（T06_GUI_BATCH_NEEDS.json）"
+   }
+  },
+  {
+   "case": "blocked::window-open::quick-chat",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only clearance：该 label 的创建路径会显示窗口（quick_chat_show → install::show_quick_chat → window.show()/set_focus（可见）），本批次禁止打开；需 visible 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::window-open::splash",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "host 当前只在 windows() 声明 splash 规格，没有创建/显示 splash 窗口的命令 → 需 host patch（T06_GUI_BATCH_NEEDS.json）"
+   }
+  },
+  {
+   "case": "blocked::window-open::onboarding",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only clearance：该 label 的创建路径会显示窗口（debug_open_onboarding: builder visible(false) 后立即 window.show()（可见）），本批次禁止打开；需 visible 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::window-open::browser-viewer",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only clearance：该 label 的创建路径会显示窗口（open_browser_viewer: 创建控制面板窗口后 show（可见）），本批次禁止打开；需 visible 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::window-open::viewer-*",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only clearance：该 label 的创建路径会显示窗口（spawn_viewer: WebviewWindowBuilder 默认 visible=true（创建即可见）），本批次禁止打开；需 visible 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::window-open::skill-viewer-*",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only clearance：该 label 的创建路径会显示窗口（open_skill_viewer: WebviewWindowBuilder 默认 visible=true（创建即可见）），本批次禁止打开；需 visible 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::runtime::no-unexpected-child-process",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "processTree": [
+     {
+      "pid": 99330,
+      "ppid": 99329,
+      "comm": "/private/tmp/lingxi-r09-t06-acl-99329-1793034300/LingxiRuntimeAcl.app/Contents/MacOS/lingxi-resource-desktop-v33-27bf075a"
+     },
+     {
+      "pid": 99331,
+      "ppid": 99330,
+      "comm": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service"
+     }
+    ],
+    "unexpected": [],
+    "note": "复用 T03 blocked::ipc::no-child-process-observed 的接口（进程表探针）"
+   }
+  },
+  {
+   "case": "acl::runtime::overall-deadline-met",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "limitSecs": 300.0,
+    "elapsedSecs": 1.4
+   }
+  }
+ ]
+}

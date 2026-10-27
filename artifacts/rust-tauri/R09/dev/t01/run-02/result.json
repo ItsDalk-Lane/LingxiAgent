@@ -1,0 +1,52 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t01_react_parity",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 8.367,
+ "caseCount": 4,
+ "casesSha256": "d1232b9cdcb151c2f6f34babbb059b9799cdf10a00aa8115c1e5da12184ec9b3",
+ "commands": [
+  {
+   "id": "renderer-build",
+   "argv": [
+    "npm",
+    "run",
+    "build:renderer"
+   ],
+   "exitCode": 0,
+   "durationSecs": 6.939,
+   "logSha256": "28f5cf274ebe0dc98c6de1c01e94d712afeb52a119eba6be0ed0ae971d92eb51"
+  },
+  {
+   "id": "git-status",
+   "argv": [
+    "git",
+    "status",
+    "--porcelain",
+    "--",
+    "desktop/src/react",
+    "desktop/src/modules"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.016,
+   "logSha256": "dcb6243c17cccdefca08e0ff13c3cb5e2a282b7df4038b00a6958a0cdeb318ea"
+  },
+  {
+   "id": "tauri-build-debug",
+   "argv": [
+    "node",
+    "scripts/tauri-build.mjs",
+    "--debug",
+    "--receipt",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t01/run-02/tauri-build-debug.json"
+   ],
+   "exitCode": 1,
+   "durationSecs": 0.16,
+   "logSha256": "cd4a256ad93ca1692a49661c95a88490cf22602e9db3d97c6eaa387eb196da0b"
+  }
+ ],
+ "logSha256": "b7f9a94d9a04c24e3d69f3b1b2d688f14f1a5505cc9c6a0cc767bcad490e3fc7",
+ "finishedAtUnixMs": 1793023035603,
+ "failureDetail": "tauri-build-debug failed (exit 1): [tauri-build] ReferenceError: Cannot access 'crateFeatures' before initialization\n    at main (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/tauri-build.mjs:274:19)\n    at file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/tauri-build.mjs:338:22\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:633:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)\n"
+}

@@ -1,0 +1,129 @@
+$ node tests/migration/r01-t05/run_old_chain.mjs --job /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-browser-pdf/old-chain/job-s1.json --log /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-browser-pdf/old-chain/run.log
+--- exit=0 duration=1.26s ---
+{"job":"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-browser-pdf/old-chain/job-s1.json","exit_code":0,"signal":null,"spawn_error":null,"wall_ms":1226,"timed_out":false,"output_exists":true,"output_size":994832}
+
+$ /usr/bin/swiftc -O -o /private/tmp/lingxi-r09-t05/runtime-a09/r09_t05_browser_pdf-25128-1793022588619/bin/pdf_probe /Users/study_superior/Desktop/Code/LingxiAgent/tests/migration/r01-t05/pdf_probe.swift
+--- exit=0 duration=1.48s ---
+
+$ /private/tmp/lingxi-r09-t05/runtime-a09/r09_t05_browser_pdf-25128-1793022588619/bin/pdf_probe /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-browser-pdf/old-chain/s1-long-zh.pdf /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-browser-pdf/old-chain/probe 2
+--- exit=0 duration=5.51s ---
+{"pageCount":74,"allTextSha256":"3071523347e0bf9fd55e2c42806a3f1a555ce7d4e539b9a80840acda35328151"}
+
+$ /Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml -p lingxi-adapters --test r07_pdf_chromium -- --include-ignored --test-threads=1
+--- exit=0 duration=31.80s ---
+
+running 7 tests
+test actual_r01_documents_preserve_fonts_images_pagination_and_js_contract ... ok
+test broken_background_font_and_unfrozen_stylesheet_are_explicit_failures ... ok
+test html_network_frames_and_workers_never_reach_loopback_canary ... ok
+test printing_never_switches_or_clears_the_regular_logged_in_workspace ... ok
+test static_utf8_pdf_is_returned_only_after_confirmed_private_cleanup ... ok
+test total_deadline_and_explicit_cancel_reap_before_returning_failure ... ok
+test two_auxiliary_leases_are_scoped_and_dropped_future_is_cancelled ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 31.59s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s
+     Running tests/r07_pdf_chromium.rs (rust/target/debug/deps/r07_pdf_chromium-499d11c618388529)
+
+$ python3 tests/migration/r01-t05/compare_outputs.py --old-probe /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-browser-pdf/old-chain/probe --new-probe /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-browser-pdf/rust-pdf/r01-quality-14f57134490a739128d7ceddf1874127/s1-long-zh-probe --old-pdf /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-browser-pdf/old-chain/s1-long-zh.pdf --new-pdf /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-browser-pdf/rust-pdf/r01-quality-14f57134490a739128d7ceddf1874127/s1-long-zh.pdf --expect /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-browser-pdf/a09-expect.json --out /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-browser-pdf/a09-compare.json
+--- exit=0 duration=14.02s ---
+{"all_pass": true, "failed": []}
+
+$ /Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml -p lingxi-adapters --test r07_browser_chromium -- --test-threads=1
+--- exit=101 duration=57.23s ---
+
+running 10 tests
+test downloads_are_actual_owned_bytes_and_ack_removes_only_confirmed_guid ... ok
+test fixture_idle_connection_never_invents_a_form_response ... ok
+test independent_persistent_profiles_auxiliary_locale_and_site_data_cleanup ... ok
+test page_cannot_move_or_forge_a_snapshot_reference_to_another_element ... ok
+test password_values_never_enter_normal_or_compact_snapshots_and_stay_in_the_page ... ok
+test permanent_forget_removes_owned_profile_and_rejects_late_scopes ... ok
+test pool_lru_is_bounded_and_idle_reap_keeps_cold_metadata ... ok
+test same_real_target_input_snapshot_generations_and_empty_workspace ... FAILED
+test scope_revoke_interrupts_real_pending_page_and_stale_node_never_launches ... ok
+test trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock ... ok
+
+failures:
+
+---- same_real_target_input_snapshot_generations_and_empty_workspace stdout ----
+
+thread 'same_real_target_input_snapshot_generations_and_empty_workspace' (25858035) panicked at crates/lingxi-adapters/tests/r07_browser_chromium.rs:238:13:
+真实浏览器命令失败: action=Navigate, tab=None, workspaces=Ok([BrowserWorkspace { session_id: "input", session_path: "native:input", execution_node: "fixture-server", running: false, resumable: true, unavailable_reason: Some("browser_remote"), url: Some("http://127.0.0.1:60165/slow"), title: Some("Local browser fixture"), active_tab_id: Some("BCCA208727E62F1667E85270F3EEA6FE"), tabs: [BrowserTab { tab_id: "BCCA208727E62F1667E85270F3EEA6FE", title: "Local browser fixture", url: Some("http://127.0.0.1:60165/slow"), can_go_back: true, can_go_forward: false, created_at: "2026-10-26T13:51:38Z", updated_at: "2026-10-26T13:51:38Z" }], suspended: false, user_takeover: false, revoked: false, visible_capable: false }]), cause=BrowserError { code: "browser_remote", message: "浏览器命令失败: Page.getNavigationHistory (CDP -32000: Not attached to an active page) [method=Page.getNavigationHistory, session=26D1C83F76E10BAFB920BAEC8D7D71B2] [worker_phase=refresh, event_sequence=38]", effect_unknown: false }
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/std/src/panicking.rs:679:5
+   1: core::panicking::panic_fmt
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/panicking.rs:80:14
+   2: r07_browser_chromium::execute_checked::{closure#0}
+             at ./tests/r07_browser_chromium.rs:238:13
+   3: r07_browser_chromium::navigate_checked::{closure#0}
+             at ./tests/r07_browser_chromium.rs:255:47
+   4: r07_browser_chromium::navigate::{closure#0}
+             at ./tests/r07_browser_chromium.rs:245:39
+   5: r07_browser_chromium::same_real_target_input_snapshot_generations_and_empty_workspace::{closure#0}
+             at ./tests/r07_browser_chromium.rs:314:66
+   6: <core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>> as core::future::future::Future>::poll
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/future/future.rs:133:9
+   7: <core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>> as core::future::future::Future>::poll
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/future/future.rs:133:9
+   8: <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on::<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}::{closure#0}::{closure#0}
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:830:70
+   9: tokio::task::coop::with_budget::<core::task::poll::Poll<()>, <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}::{closure#0}::{closure#0}>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/task/coop/mod.rs:167:5
+  10: tokio::task::coop::budget::<core::task::poll::Poll<()>, <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}::{closure#0}::{closure#0}>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/task/coop/mod.rs:133:5
+  11: <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on::<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}::{closure#0}
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:830:25
+  12: <tokio::runtime::scheduler::current_thread::Context>::enter::<core::task::poll::Poll<()>, <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}::{closure#0}>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:488:19
+  13: <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on::<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:829:44
+  14: <tokio::runtime::scheduler::current_thread::CoreGuard>::enter::<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>::{closure#0}
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:906:68
+  15: <tokio::runtime::context::scoped::Scoped<tokio::runtime::scheduler::Context>>::set::<<tokio::runtime::scheduler::current_thread::CoreGuard>::enter<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>::{closure#0}, (alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>)>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/context/scoped.rs:40:9
+  16: tokio::runtime::context::set_scheduler::<(alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>), <tokio::runtime::scheduler::current_thread::CoreGuard>::enter<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>::{closure#0}>::{closure#0}
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/context.rs:187:38
+  17: <std::thread::local::LocalKey<tokio::runtime::context::Context>>::try_with::<tokio::runtime::context::set_scheduler<(alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>), <tokio::runtime::scheduler::current_thread::CoreGuard>::enter<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>::{closure#0}>::{closure#0}, (alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>)>
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/std/src/thread/local.rs:463:12
+  18: <std::thread::local::LocalKey<tokio::runtime::context::Context>>::with::<tokio::runtime::context::set_scheduler<(alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>), <tokio::runtime::scheduler::current_thread::CoreGuard>::enter<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>::{closure#0}>::{closure#0}, (alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>)>
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/std/src/thread/local.rs:427:20
+  19: tokio::runtime::context::set_scheduler::<(alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>), <tokio::runtime::scheduler::current_thread::CoreGuard>::enter<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>::{closure#0}>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/context.rs:187:17
+  20: <tokio::runtime::scheduler::current_thread::CoreGuard>::enter::<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:906:27
+  21: <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on::<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:817:24
+  22: <tokio::runtime::scheduler::current_thread::CurrentThread>::block_on::<core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>::{closure#0}
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:218:33
+  23: tokio::runtime::context::runtime::enter_runtime::<<tokio::runtime::scheduler::current_thread::CurrentThread>::block_on<core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>::{closure#0}, ()>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/context/runtime.rs:65:16
+  24: <tokio::runtime::scheduler::current_thread::CurrentThread>::block_on::<core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:206:9
+  25: <tokio::runtime::runtime::Runtime>::block_on_inner::<core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/runtime.rs:374:52
+  26: <tokio::runtime::runtime::Runtime>::block_on::<core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/runtime.rs:343:18
+  27: r07_browser_chromium::same_real_target_input_snapshot_generations_and_empty_workspace
+             at ./tests/r07_browser_chromium.rs:350:43
+  28: r07_browser_chromium::same_real_target_input_snapshot_generations_and_empty_workspace::{closure#0}
+             at ./tests/r07_browser_chromium.rs:270:75
+  29: <r07_browser_chromium::same_real_target_input_snapshot_generations_and_empty_workspace::{closure#0} as core::ops::function::FnOnce<()>>::call_once
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/ops/function.rs:250:5
+  30: <fn() -> core::result::Result<(), alloc::string::String> as core::ops::function::FnOnce<()>>::call_once
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/ops/function.rs:250:5
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+
+
+failures:
+    same_real_target_input_snapshot_generations_and_empty_workspace
+
+test result: FAILED. 9 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 42.29s
+
+    Blocking waiting for file lock on build directory
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.21s
+     Running tests/r07_browser_chromium.rs (rust/target/debug/deps/r07_browser_chromium-0681c2f9e0455bec)
+error: test failed, to rerun pass `-p lingxi-adapters --test r07_browser_chromium`

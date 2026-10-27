@@ -1,0 +1,47 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t03_native_matrix",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 2.25,
+ "caseCount": 17,
+ "casesSha256": "1fad5c6f7179c0f14a860460803286bab27048e4f38c513c264048d592e2dec6",
+ "commands": [
+  {
+   "id": "build::native-harness",
+   "argv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "rustc",
+    "--test",
+    "--edition",
+    "2021",
+    "--cfg",
+    "r09_standalone_test",
+    "--crate-name",
+    "native_host_harness",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t03/v37-native-01/harness/lib.rs",
+    "-o",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t03/v37-native-01/harness/native_host_harness"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.699,
+   "logSha256": "90d5aab231c421a19b06b79fe2bdf8584db2bfa0d20cfb6b62f1df0343dd2250"
+  },
+  {
+   "id": "test::all",
+   "argv": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t03/v37-native-01/harness/native_host_harness",
+    "--test-threads",
+    "1"
+   ],
+   "exitCode": 101,
+   "durationSecs": 0.324,
+   "logSha256": "8a14ccf090a8871f0af9ac2de9f6999f20ce0382bc6196317135b7fea465520c"
+  }
+ ],
+ "logSha256": "060e386b8d14a8080ca15d86e917c0bbff89c0c6b47bfe2b829938c2d7cafbd6",
+ "finishedAtUnixMs": 1793065524863,
+ "failureDetail": "EvidenceError: test::all failed (exit 101): pired-lease computer_use_action COMPUTER_USE_LEASE_EXPIRED COMPUTER_USE_LEASE_EXPIRED OK\nNEGATIVE_CASE ipc::computer_use.stale-controls computer_use_action COMPUTER_USE_STALE_CONTROLS COMPUTER_USE_STALE_CONTROLS OK\nNEGATIVE_CASE ipc::remote_boundary.self-grant device_grant REMOTE_DEVICE_DENIED REMOTE_DEVICE_DENIED OK\nNEGATIVE_CASE ipc::remote_boundary.ungranted-device device_read REMOTE_DEVICE_DENIED REMOTE_DEVICE_DENIED OK\nNEGATIVE_CASE ipc::computer_use.wrong-lease-id computer_use_stop TOKEN_INVALID TOKEN_INVALID OK\n\nthread 'native::ipc_negative_matrix::tests::negative_matrix_emits_evidence' (27309782) panicked at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/src/native/ipc_negative_matrix.rs:751:9:\n负向矩阵失败: [(\"ipc::onboarding.main-caller\", \"期望拒绝（WINDOW_NOT_ALLOWED），实际通过\")]\nstack backtrace:\n   0: __rustc::rust_begin_unwind\n             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/std/src/panicking.rs:679:5\n   1: core::panicking::panic_fmt\n             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/panicking.rs:80:14\n   2: native_host_harness::native::ipc_negative_matrix::tests::negative_matrix_emits_evidence\n   3: native_host_harness::native::ipc_negative_matrix::tests::negative_matrix_emits_evidence::{closure#0}\n   4: <native_host_harness::native::ipc_negative_matrix::tests::negative_matrix_emits_evidence::{closure#0} as core::ops::function::FnOnce<()>>::call_once\n   5: <fn() -> core::result::Result<(), alloc::string::String> as core::ops::function::FnOnce<()>>::call_once\n             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/ops/function.rs:250:5\nnote: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.\n\n\nfailures:\n    native::ipc_negative_matrix::tests::negative_matrix_all_cases_hold\n    native::ipc_negative_matrix::tests::negative_matrix_emits_evidence\n\ntest result: FAILED. 177 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s\n\n"
+}

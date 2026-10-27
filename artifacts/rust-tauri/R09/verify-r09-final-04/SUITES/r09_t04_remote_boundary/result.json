@@ -1,0 +1,79 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t04_remote_boundary",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 3.7,
+ "caseCount": 24,
+ "casesSha256": "1e18a32dd37470d4d91efd2e4f5992880a876215785eccbc04d87d0e6e6d7aec",
+ "commands": [
+  {
+   "id": "build::native-harness",
+   "argv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "rustc",
+    "--test",
+    "--edition",
+    "2021",
+    "--cfg",
+    "r09_standalone_test",
+    "--crate-name",
+    "native_host_harness",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-04/SUITES/r09_t04_remote_boundary/harness/lib.rs",
+    "-o",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-04/SUITES/r09_t04_remote_boundary/harness/native_host_harness"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.596,
+   "logSha256": "312c297400a25833997225cf60239b5455b9531e49b780c32c6d6a72c6adffaa"
+  },
+  {
+   "id": "test::native::remote_boundary::tests",
+   "argv": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-04/SUITES/r09_t04_remote_boundary/harness/native_host_harness",
+    "--test-threads",
+    "1",
+    "native::remote_boundary::tests"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.101,
+   "logSha256": "fa43e98852954b5ec5d710dd640c1a6adce65c0366d343f82d84c4c0529bb551"
+  },
+  {
+   "id": "test::native::permissions::tests",
+   "argv": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-04/SUITES/r09_t04_remote_boundary/harness/native_host_harness",
+    "--test-threads",
+    "1",
+    "native::permissions::tests"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.006,
+   "logSha256": "35797af49b853297ec46a0b6af4cbc48615b9e22e9281e690e3ff4236510eeaf"
+  },
+  {
+   "id": "test::native::speech::tests",
+   "argv": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-04/SUITES/r09_t04_remote_boundary/harness/native_host_harness",
+    "--test-threads",
+    "1",
+    "native::speech::tests"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.006,
+   "logSha256": "30a3909a57b756c300d3e558857dd4f62e7b63510d946931d055a7fc5bc02992"
+  }
+ ],
+ "logSha256": "ab140e1c23c22585ac83163b9d0a009c79de57ab142e4075da61275181abc125",
+ "finishedAtUnixMs": 1793033305261,
+ "blockedPendingRegistration": [
+  "宿主已注册 + T02 远端模式已实现；双宿主端到端拒绝需真实 GUI 会话（Lead GUI 禁令）",
+  "远端任务实际调用本机麦克风/屏幕的完整链（服务→宿主命令→设备）需 helper 与宿主注册；当前仅策略/鉴权边可验",
+  "任务进行中真实撤销屏幕/麦克风权限并观察采集停止需人工 TCC 操作（BLOCKED-SYSTEM-PERMISSIONS）"
+ ],
+ "blockedKind": "BLOCKED_GUI_SMOKE|BLOCKED_SYSTEM_PERMISSIONS",
+ "serviceBinary": "rust/target/debug/lingxi-service",
+ "serviceSha256": "fbb3d7780478af87f09aa326201d1ab3c412937904bc7899d4c4d1a487961621"
+}

@@ -1,0 +1,6 @@
+{"required_tokens": ["龘","靐","麤","爨","驫","鬱","齉","爩","龗","灪","𠮷",
+  "ROW-001-END","ROW-070-END","ROW-140-END","DOC-END-OMEGA","求根公式","欧拉恒等式",
+  "render","print_to_pdf","跨页长表格"],
+ "required_tokens_new_only": ["𪚥"],
+ "expected_table_rows": 140,
+ "expect_equal_page_count": true}

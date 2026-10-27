@@ -1,0 +1,49 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t01_react_parity",
+ "status": "PASS",
+ "exitCode": 0,
+ "durationSecs": 20.389,
+ "caseCount": 22,
+ "casesSha256": "216a476c48965cb91f7307715931dd3d3464ee9e4dfbd73e860c62c02d5271d0",
+ "commands": [
+  {
+   "id": "git-status",
+   "argv": [
+    "git",
+    "status",
+    "--porcelain",
+    "--",
+    "desktop/src/react",
+    "desktop/src/modules"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.019,
+   "logSha256": "b7abb5874d7a363d1f4575bac4a49be27760beda54021b56615e1eaec82415cd"
+  },
+  {
+   "id": "dist-resource-marker-scan",
+   "argv": [
+    "grep",
+    "-rl",
+    "resource-desktop",
+    "desktop/dist-renderer"
+   ],
+   "exitCode": 1,
+   "durationSecs": 0.831,
+   "logSha256": "1714c9bd02f0c0be1fc3598dcec48ce24de08f2a68ebcd93249beca678c8dfaf"
+  }
+ ],
+ "logSha256": "36086e4a6193f7074b49bf124b93365e6c01c00cf112fefc74c1ba795a476dd5",
+ "finishedAtUnixMs": 1793032512421,
+ "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+ "electronStopped": {
+  "service_residual": []
+ },
+ "tauriStopped": {
+  "timedOut": false,
+  "service_residual": []
+ },
+ "diagnosticsHome": "/private/tmp/lingxi-r09-runtime/r09_t01_react_parity-81780-1793032492032/home-tauri/diagnostics/tauri-launch/events.jsonl",
+ "platform": "macos-arm64"
+}

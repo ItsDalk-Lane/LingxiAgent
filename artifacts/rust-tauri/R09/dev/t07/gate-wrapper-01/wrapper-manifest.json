@@ -1,0 +1,13 @@
+{
+ "schema": "lingxi.r09.t07.gate-wrapper.v1",
+ "purpose": "最终 verify-stage R09 的只读 evidence wrapper（delivery v3.2 骨架 + 冻结 G1 exe 稳定副本）",
+ "wrapperApp": "/private/tmp/lingxi-r09-t07/evidence-app-gate-20261027-000648/Lingxi.app",
+ "deliveryMainExeSha256BeforeReplace": "8e74aa1590969a3bdc24ed3c4789f38c0000c353e05e64f1dce5678317f7c1d5",
+ "frozenG1ExeSha256StableCopy": "030607eebfa2e7d65eedd4de3daf8a19d2958258b1b2d9b3cc68a5750d85888e",
+ "wrapperMainExeSha256AfterAdhocSign": "992f0a7b78bfc6b53a1b3931a591dd11a5631448a504bcc32b85e48df07b02ab",
+ "signExit": 0,
+ "verifyExit": 0,
+ "stableG1Copy": "/private/tmp/lingxi-r09-evidence/lingxi-resource-desktop-030607ee",
+ "handoff": "artifacts/rust-tauri/R09/dev/t06/candidate-handoff-v3.2/candidate-handoff.json",
+ "sidecarBuildJsonSha256": "372c2b88748dcd96e9a74956c13554fb8d0e764638c28bc52b524c3a506473f9"
+}

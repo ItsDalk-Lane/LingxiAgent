@@ -1,0 +1,5 @@
+{
+ "hits": [],
+ "requestCount": 14,
+ "note": "恶意预览/ SVG 的 fetch/ws/beacon/img 外发在 CSP 层被拒绝，loopback canary 必须零命中"
+}

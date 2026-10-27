@@ -1,0 +1,29 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t07_native_e2e",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 4.395,
+ "caseCount": 12,
+ "casesSha256": "634c010f44f59a124ad05a24b217d470645f52d7e6a13a150177b5a439732c2e",
+ "commands": [
+  {
+   "id": "t07-fixtures",
+   "argv": [
+    "python3",
+    "-B",
+    "scripts/rust-tauri/r09_t07_fixture.py",
+    "--home",
+    "/private/tmp/lingxi-r09-runtime/r09_t07_native_e2e-19751-1793027037819/home-t07-fixtures",
+    "--evidence",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t07/g1-hidden-02/fixtures"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.171,
+   "logSha256": "929ee22d57f510111b707e045ed6349e1a5c2d96e4f15eca09da8a37c15938ab"
+  }
+ ],
+ "logSha256": "ea9dd30cb9fc0dc24b4b69d687c392e6a1a05d33cd5ea542611c6f9b3559052f",
+ "finishedAtUnixMs": 1793027042214,
+ "failureDetail": "HTTPError: HTTP Error 500: Internal Server Error"
+}

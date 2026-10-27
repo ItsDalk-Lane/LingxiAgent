@@ -1,0 +1,186 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t03_native_matrix",
+ "cases": [
+  {
+   "case": "isolation::real-home-provided",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": null
+  },
+  {
+   "case": "plan::schema",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "schema": "lingxi.r09.t03-leaf-case-plan.v1"
+   }
+  },
+  {
+   "case": "plan::scope-counts",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sharedLeaves": 46,
+    "hostLeaves": 30,
+    "hostNative": 22,
+    "hostBridge": 8,
+    "serverReactExcluded": 16,
+    "leafAssertions": 60
+   }
+  },
+  {
+   "case": "plan::leaf-set-equals-authoritative-30",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "missing": [],
+    "extra": []
+   }
+  },
+  {
+   "case": "plan::host-class-and-feature-match-authoritative",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "mismatch": []
+   }
+  },
+  {
+   "case": "plan::assertions-60",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "total": 60
+   }
+  },
+  {
+   "case": "plan::assertion-text-verbatim",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "mismatch": []
+   }
+  },
+  {
+   "case": "plan::required-fields",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "issues": []
+   }
+  },
+  {
+   "case": "plan::planned-case-naming",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "violations": []
+   }
+  },
+  {
+   "case": "plan::planned-case-unique",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "unique": 60,
+    "total": 60
+   }
+  },
+  {
+   "case": "plan::every-assertion-has-action-case",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": null
+  },
+  {
+   "case": "plan::manual-has-steps",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "missing": []
+   }
+  },
+  {
+   "case": "plan::blocked-has-reason",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "missing": []
+   }
+  },
+  {
+   "case": "plan::logic-case-references-exist",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "missing": [
+     "ipc::app_ready.splash-caller",
+     "ipc::debug-onboarding.release",
+     "ipc::drag.nul-path",
+     "ipc::drag.relative-path",
+     "ipc::global_shortcut.injection",
+     "ipc::global_shortcut.unknown-key",
+     "ipc::onboarding.rust-runtime",
+     "ipc::open_external.control-char",
+     "ipc::open_external.file-scheme",
+     "ipc::open_external.javascript-scheme",
+     "ipc::open_file.relative-path",
+     "ipc::restart.argv-injection",
+     "ipc::settings_changed.missing-theme",
+     "ipc::settings_changed.unknown-event",
+     "ipc::show_notification.settings-caller",
+     "ipc::theme.control-char",
+     "ipc::window_control.renderer-window-id",
+     "ipc::window_control.viewer-caller"
+    ]
+   }
+  },
+  {
+   "case": "plan::stats-present",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "statuses": {
+     "implemented": 57,
+     "manual": 3
+    },
+    "stats": {
+     "assertionsWithPlannedAction": 60,
+     "implementationStatus": {
+      "implemented": 57,
+      "manual": 3,
+      "blocked": 0
+     }
+    }
+   }
+  },
+  {
+   "case": "plan::gui-gate-envs",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "env": "LINGXI_R09_GUI_CLEARED",
+    "appBinaryEnv": "LINGXI_R09_TAURI_APP",
+    "webdriverPortEnv": "LINGXI_R09_WEBDRIVER_PORT",
+    "manualEvidenceDirEnv": "LINGXI_R09_MANUAL_EVIDENCE_DIR"
+   }
+  }
+ ]
+}

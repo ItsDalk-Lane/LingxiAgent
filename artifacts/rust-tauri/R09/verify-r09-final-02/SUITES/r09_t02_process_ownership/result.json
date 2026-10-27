@@ -1,0 +1,18 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t02_process_ownership",
+ "status": "PASS",
+ "exitCode": 0,
+ "durationSecs": 12.423,
+ "caseCount": 19,
+ "casesSha256": "d5dd691bac245b1bca8dab044bb188ca6e6df1ee9d3a3b30646738e4e067000d",
+ "commands": [],
+ "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+ "finishedAtUnixMs": 1793031946623,
+ "platform": "macos-arm64",
+ "remoteFixture": {
+  "pid": 74356,
+  "port": 53566,
+  "home": "/private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-74355-1793031934200/home-remote"
+ }
+}

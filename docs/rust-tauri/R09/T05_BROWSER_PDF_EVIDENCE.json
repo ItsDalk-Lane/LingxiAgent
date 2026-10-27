@@ -1,0 +1,2049 @@
+{
+  "schema": "lingxi.r09.t05-design.v1",
+  "taskId": "R09-T05",
+  "stage": "R09",
+  "title": "浏览器、PDF 和媒体展示最终接线 — 实现设计调查",
+  "baseCommit": "aac8cb9fe6bb7bfa7a41d75528221136bfe55e50",
+  "branch": "codex/rust-tauri-migration",
+  "investigatedAt": "2026-10-26",
+  "mode": "read-only-source-investigation",
+  "productionChanged": false,
+  "verificationStatement": "本文件全部现状结论来自只读源码/文档取证；本轮未运行任何测试、未启动 GUI、未修改生产代码/配置/阶段图。标注 testExists 的条目只表示仓库中存在该测试，不代表本轮执行通过。 另：调查期间（2026-10-26）观察到工作区存在其它 R09 任务的未提交并发修改（如 rust/crates/lingxi-service/src/transport.rs、preview.rs 的 Tauri origin 接缝），本文件的“现状”结论以 HEAD aac8cb9fe6bb 为准；并发修改未提交、未验证，不作为本设计结论或证据。",
+  "designDocument": "docs/rust-tauri/R09/T05_BROWSER_PDF_DESIGN.md",
+  "acceptanceIds": [
+    "R09-A09",
+    "R09-A10"
+  ],
+  "acceptanceScenarios": {
+    "R09-A09": {
+      "requirement": "REQUIRED",
+      "given": "测试安装未包含Electron",
+      "when": "执行浏览器用户接管及Office PDF输出",
+      "then": "功能可用且产物达标，不暗中调用旧安装",
+      "evidence": "无Electron进程与文件探针",
+      "source": "docs/rust-tauri/R00/ACCEPTANCE_MAP.json:7235-7280"
+    },
+    "R09-A10": {
+      "requirement": "REQUIRED",
+      "given": "SVG/HTML预览含脚本与IPC尝试",
+      "when": "在预览区打开",
+      "then": "不能获得token或原生命令权限；正常预览保留",
+      "evidence": "不可信内容安全测试",
+      "source": "docs/rust-tauri/R00/ACCEPTANCE_MAP.json:7280-7324"
+    }
+  },
+  "currentState": [
+    {
+      "id": "CS-01",
+      "area": "browser-port-contract",
+      "conclusion": "内核已冻结浏览器窄端口 BrowserPort：不向调用方传递窗口/进程/凭据句柄，PDF 能力与浏览器共用同一端口。",
+      "evidence": [
+        "rust/crates/lingxi-kernel/src/browser.rs:90-147",
+        "docs/rust-tauri/R01/ADR-002-browser-host.md:32"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-02",
+      "area": "browser-service-authorization",
+      "conclusion": "服务级授权闸已实现：bridge/phone 主体拒绝、会话必须 active 且 owner 匹配，才生成 BrowserAuthority 行。",
+      "evidence": [
+        "rust/crates/lingxi-service/src/browser.rs:493-537",
+        "rust/crates/lingxi-service/tests/r07_browser_routes.rs:476-547"
+      ],
+      "verification": "source-inspection; testExists"
+    },
+    {
+      "id": "CS-03",
+      "area": "browser-tool-authorization",
+      "conclusion": "模型工具调用绑定真实 Run/attempt/generation/started invocation journal/授权代次，外部来源（bridge/channel/dm）与旧急停后的 Run 一律 BROWSER_REVOKED。",
+      "evidence": [
+        "rust/crates/lingxi-service/src/browser.rs:538-620",
+        "rust/crates/lingxi-service/tests/r07_browser_tools.rs:665-707"
+      ],
+      "verification": "source-inspection; testExists"
+    },
+    {
+      "id": "CS-04",
+      "area": "browser-command-receipts",
+      "conclusion": "命令派发前先 claim 幂等收据（operation -> input digest -> 状态），Confirmed 直接回放、Unknown 不重复执行；并发 active 上限 64；总截止 45s，取消后 5s 清理未确认则返回 BROWSER_CLEANUP_UNCONFIRMED。",
+      "evidence": [
+        "rust/crates/lingxi-service/src/browser.rs:621-747",
+        "rust/crates/lingxi-adapters/src/storage/browser.rs:185-241",
+        "rust/crates/lingxi-adapters/tests/r07_browser_store.rs:62-115"
+      ],
+      "verification": "source-inspection; testExists"
+    },
+    {
+      "id": "CS-05",
+      "area": "browser-output-persistence",
+      "conclusion": "命令回执先持久化 workspace state，再登记截图/下载为会话文件；随后读取当前授权，若已撤销/代次变化则不发布旧 state；成功发布 browser_status 事件。",
+      "evidence": [
+        "rust/crates/lingxi-service/src/browser.rs:748-858",
+        "rust/crates/lingxi-service/tests/r07_browser_routes.rs:666-708"
+      ],
+      "verification": "source-inspection; testExists"
+    },
+    {
+      "id": "CS-06",
+      "area": "browser-screenshot",
+      "conclusion": "截图是视口级 Page.captureScreenshot，PNG magic/IHDR 校验、24MB 预算，登记为 browser-screenshot.png 会话文件。",
+      "evidence": [
+        "rust/crates/lingxi-adapters/src/browser/ops.rs:650-680",
+        "rust/crates/lingxi-service/src/browser.rs:770-787",
+        "rust/crates/lingxi-adapters/tests/r07_browser_chromium.rs:269-352"
+      ],
+      "verification": "source-inspection; testExists"
+    },
+    {
+      "id": "CS-07",
+      "area": "browser-launch",
+      "conclusion": "每工作区独立 Chromium 进程：CDP --remote-debugging-pipe（fd3/fd4、无 TCP 调试口）、独立 user-data-dir、--no-startup-window、--window-size、process_group(0)，不传 no-sandbox，不接受模型/HTTP 启动参数；headless 仅由 LINGXI_BROWSER_HEADLESS=1 开启。",
+      "evidence": [
+        "rust/crates/lingxi-adapters/src/browser/launcher.rs:94-110",
+        "rust/crates/lingxi-adapters/src/browser/launcher.rs:119-220",
+        "rust/crates/lingxi-service/src/browser.rs:1304"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-08",
+      "area": "browser-process-cleanup",
+      "conclusion": "进程回收：可选 Browser.close -> cdp.close -> kill(-pgid, SIGTERM) -> SIGKILL -> 限时 wait；失败返回 cleanup_unknown（effect_unknown），并发 close_all 保留 stopping 状态，Unknown 不改成成功。",
+      "evidence": [
+        "rust/crates/lingxi-adapters/src/browser/launcher.rs:221-318",
+        "rust/crates/lingxi-adapters/src/browser/host.rs:1087-1174",
+        "rust/crates/lingxi-adapters/src/browser/startup_tests.rs:1-501"
+      ],
+      "verification": "source-inspection; testExists"
+    },
+    {
+      "id": "CS-09",
+      "area": "browser-session-isolation",
+      "conclusion": "隔离单位为会话：identity = sha256(execution_node, owner_subject, session_id)，每会话独立进程、profile、downloads 目录（0700），cookie 策略 per-profile；永久 forget 删除自有 profile 并拒绝迟到 scope。",
+      "evidence": [
+        "rust/crates/lingxi-adapters/src/browser/host.rs:158-170",
+        "rust/crates/lingxi-adapters/src/browser/host.rs:847-869",
+        "rust/crates/lingxi-adapters/tests/r07_browser_chromium.rs:372-548",
+        "rust/crates/lingxi-adapters/tests/r07_browser_chromium.rs:757-803"
+      ],
+      "verification": "source-inspection; testExists"
+    },
+    {
+      "id": "CS-10",
+      "area": "browser-tabs-navigation",
+      "conclusion": "标签/导航均为真实 CDP 操作：首个 target newWindow 建真实窗口；CloseTab 等 Target.targetDestroyed 才成功；倒退/前进/刷新与 load 等待均以真实文档事件为准。",
+      "evidence": [
+        "rust/crates/lingxi-adapters/src/browser/ops.rs:71-141",
+        "rust/crates/lingxi-adapters/src/browser/ops.rs:142-239",
+        "rust/crates/lingxi-adapters/src/browser/ops.rs:843-880",
+        "rust/crates/lingxi-adapters/tests/r07_browser_chromium.rs:269-352"
+      ],
+      "verification": "source-inspection; testExists"
+    },
+    {
+      "id": "CS-11",
+      "area": "browser-tab-sync",
+      "conclusion": "活动标签同步以真实页面焦点为准：refresh 读取 document.visibilityState==='visible' && document.hasFocus() 校正 activeTab；target 消失由 refresh 重新枚举 Target.getTargets 收口；CloseTab 显式等待真实 Target.targetDestroyed。",
+      "evidence": [
+        "rust/crates/lingxi-adapters/src/browser/runtime.rs:427-602",
+        "rust/crates/lingxi-adapters/src/browser/ops.rs:863-880"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-12",
+      "area": "browser-user-takeover",
+      "conclusion": "接管命令只允许 human=true；Show/Takeover 执行 Target.activateTarget + Browser.setWindowBounds(normal) 并置 takeover 标志、清空 snapshot ref；takeover 期间 agent 修改页面/滚动/切 tab 被 browser_user_takeover 拒绝；Release 清除标志。",
+      "evidence": [
+        "rust/crates/lingxi-adapters/src/browser/ops.rs:816-843",
+        "rust/crates/lingxi-adapters/src/browser/ops.rs:590-605",
+        "rust/crates/lingxi-adapters/src/browser/host.rs:189-221"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-13",
+      "area": "browser-takeover-native-evidence",
+      "conclusion": "R07 已用真实 OS 输入验证接管通道：Cua 在真实 Chrome 窗口 click/super+a/typeText，AX 读回 agent-initial->human-latest，交还后 snapshot 读到最新值；原始 r7 锁屏 exit101 失败保留不改写。",
+      "evidence": [
+        "docs/rust-tauri/R07/T04_REPORT.md:108-117",
+        "docs/rust-tauri/R07/T04_REPORT.md:78-84"
+      ],
+      "verification": "existing-evidence-not-rerun"
+    },
+    {
+      "id": "CS-14",
+      "area": "browser-emergency-stop",
+      "conclusion": "急停是服务事务：cancel 该会话 in-flight 命令 -> revoke_human_intent 递增 epoch -> port.revoke（取消 PDF 租约、等 busy 归零、进程组回收）-> record_revoke_state（确认才清空 tabs/url；未确认写 BROWSER_CLEANUP_UNCONFIRMED 不可用原因）-> 发布 browser_status revoked。",
+      "evidence": [
+        "rust/crates/lingxi-service/src/browser.rs:905-993",
+        "rust/crates/lingxi-service/src/browser.rs:859-904",
+        "rust/crates/lingxi-adapters/src/browser/host.rs:1261-1346",
+        "rust/crates/lingxi-adapters/tests/r07_browser_store.rs:116-172"
+      ],
+      "verification": "source-inspection; testExists"
+    },
+    {
+      "id": "CS-15",
+      "area": "browser-revocation-release",
+      "conclusion": "急停后只有真实新用户提交（RunOrigin::User root）才 release_for_user_run 产生新 epoch；旧 run/旧审批/旧插话不能解除。",
+      "evidence": [
+        "rust/crates/lingxi-service/src/runs.rs:2836-2852",
+        "rust/crates/lingxi-service/src/browser.rs:191-234",
+        "rust/crates/lingxi-service/tests/r07_browser_tools.rs:787-848",
+        "rust/crates/lingxi-service/tests/r07_browser_tools.rs:1112-1125"
+      ],
+      "verification": "source-inspection; testExists"
+    },
+    {
+      "id": "CS-16",
+      "area": "browser-workspaces",
+      "conclusion": "会话状态来自 live workspaces + 持久 row 合并：非 live 时 running=false、resumable=非空 tabs；revoked 覆盖 takeover，清理未确认时显示明确不可用原因；冷恢复只登记元数据不打开页面。",
+      "evidence": [
+        "rust/crates/lingxi-service/src/browser.rs:994-1057",
+        "rust/crates/lingxi-service/src/browser.rs:1206-1260",
+        "rust/crates/lingxi-service/tests/r07_browser_routes.rs:613-665"
+      ],
+      "verification": "source-inspection; testExists"
+    },
+    {
+      "id": "CS-17",
+      "area": "browser-maintenance",
+      "conclusion": "服务 30s 维护循环：PDF 租约按真实会话归属回收、失活会话撤权/forget、reap_idle 回收不可见空闲工作区、状态同步发布事件；上限 5 个 live 工作区，逐出前必须核实窗口不可见。",
+      "evidence": [
+        "rust/crates/lingxi-service/src/browser.rs:1058-1173",
+        "rust/crates/lingxi-adapters/src/browser/host.rs:754-837",
+        "rust/crates/lingxi-adapters/src/browser/host.rs:1781-1826",
+        "rust/crates/lingxi-service/tests/r07_browser_routes.rs:548-612"
+      ],
+      "verification": "source-inspection; testExists"
+    },
+    {
+      "id": "CS-18",
+      "area": "chromium-discovery",
+      "conclusion": "生产端口仅做 Chromium 发现：LINGXI_CHROMIUM_PATH（绝对且存在）优先，其次 data_home/bundled-bin/chromium/chrome、macOS Google Chrome.app、/usr/bin/chromium*、/usr/bin/google-chrome；缺失显式 UnavailableBrowser 且原因进入 workspace 状态，绝不回落到客户端浏览器。",
+      "evidence": [
+        "rust/crates/lingxi-service/src/browser.rs:1271-1331",
+        "rust/crates/lingxi-service/src/browser.rs:36-78",
+        "rust/crates/lingxi-service/src/browser.rs:1049-1052"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-19",
+      "area": "browser-http-surface",
+      "conclusion": "浏览器 HTTP 面已实现：workspaces/sessions/session-states/open-session/close-session/command/preferences GET+PUT/clear-cookies；close 支持 revoke=true；错误映射稳定。",
+      "evidence": [
+        "rust/crates/lingxi-service/src/browser_routes.rs:14-27",
+        "rust/crates/lingxi-service/src/browser_routes.rs:109-216",
+        "rust/crates/lingxi-service/src/browser_routes.rs:235-248"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-20",
+      "area": "browser-host-ws",
+      "conclusion": "宿主 WS 面只承载 resume：仅本机 owner、单连接（已连接返回 409）、每次命令前复核 principal、5-6s 回执超时；不提供第二套任意浏览器控制通道。",
+      "evidence": [
+        "rust/crates/lingxi-service/src/browser_host.rs:34-73",
+        "rust/crates/lingxi-service/src/browser_host.rs:76-153",
+        "rust/crates/lingxi-service/src/browser_host.rs:155-217"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-21",
+      "area": "browser-tool-manifest",
+      "conclusion": "browser 模型工具：动作白名单含 13 个非人工动作，navigate 只接受 http/https 且无 URL 凭据；审批 scope 绑定真实 tab/currentUrl/executionNode/userTakeover/revoked/summary；注册为 ArgumentAwareBrowser 权限。",
+      "evidence": [
+        "rust/crates/lingxi-service/src/browser_tools.rs:20-60",
+        "rust/crates/lingxi-service/src/browser_tools.rs:61-130",
+        "rust/crates/lingxi-service/src/browser_tools.rs:195-216"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-22",
+      "area": "browser-known-retained-failures",
+      "conclusion": "R07 移交保留了真实浏览器失败（真实 Chromium 弹窗、cookie 后 Resume 导航在锁屏环境未改写），R09 必须重跑并在新候选上保留/修复记录。",
+      "evidence": [
+        "docs/rust-tauri/R07/R07_HANDOFF.json:36-44",
+        "docs/rust-tauri/R07/T07_FAILURE_HISTORY.json:4798-4824"
+      ],
+      "verification": "existing-evidence-not-rerun"
+    },
+    {
+      "id": "CS-23",
+      "area": "pdf-service-types",
+      "conclusion": "PDF job 契约已冻结：html/base_url/assets(PdfAsset)/PdfPrintSettings(英寸纸张与边距)/allow_javascript/viewport/settle/timeout；PdfScope 只含 session/owner/execution node。",
+      "evidence": [
+        "rust/crates/lingxi-kernel/src/browser.rs:37-76",
+        "rust/crates/lingxi-service/src/office_pdf.rs:56-108",
+        "rust/crates/lingxi-service/src/office_pdf.rs:363-374"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-24",
+      "area": "pdf-tool-entry",
+      "conclusion": "PDF 唯一发起面是模型工具 office_html-to-pdf（经真实 Run/网关/审批），无 HTTP 发起路由；工具 schema 与现役字段对齐。",
+      "evidence": [
+        "rust/crates/lingxi-service/src/office_tools.rs:625-747",
+        "rust/crates/lingxi-service/src/office_tools.rs:1188",
+        "rust/crates/lingxi-service/src/lib.rs:8254",
+        "rust/crates/lingxi-service/src/office_routes.rs:1-30"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-25",
+      "area": "pdf-renderer-process",
+      "conclusion": "PDF 由服务启动一次性 headless Chromium（独立 profile <root>/aux/<identity>、独立 DenyProxy），渲染前要求全新无登录资料的隔离进程；与服务聊天浏览器进程分开，进程所有权在 lingxi-service。",
+      "evidence": [
+        "rust/crates/lingxi-adapters/src/browser/host.rs:407-514",
+        "rust/crates/lingxi-adapters/src/browser/host.rs:461-504",
+        "rust/crates/lingxi-adapters/src/browser/pdf.rs:652-706"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-26",
+      "area": "pdf-resource-boundary",
+      "conclusion": "渲染资源边界：HTML 资产必须位于固定 base 目录、去重、MIME/单件/总量预算；页面全部请求经 Fetch 拦截，非冻结 URL DENY；注入 CSP default-src 'none'/connect-src 'none'/sandbox，含 JS 时仅 allow-scripts；生产实现比 R01 spike 的 WS 边界更强。",
+      "evidence": [
+        "rust/crates/lingxi-adapters/src/browser/pdf.rs:213-273",
+        "rust/crates/lingxi-adapters/src/browser/pdf.rs:302-490",
+        "rust/crates/lingxi-adapters/src/browser/pdf.rs:791-800",
+        "docs/rust-tauri/R01/ADR-003-document-renderer.md:82-88"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-27",
+      "area": "pdf-print-and-validation",
+      "conclusion": "打印走真实 Page.printToPDF（ReturnAsStream），有界读流后校验 %PDF-/%%EOF/大小/sha256；超时返回 PDF_TIMEOUT 显式错误，取消/超时均等待外部清理确认后才返回失败。",
+      "evidence": [
+        "rust/crates/lingxi-adapters/src/browser/pdf.rs:590-650",
+        "rust/crates/lingxi-adapters/src/browser/pdf.rs:883-917",
+        "rust/crates/lingxi-adapters/src/browser/pdf.rs:333-339",
+        "rust/crates/lingxi-adapters/src/browser/host.rs:506-514",
+        "rust/crates/lingxi-service/src/office_tools.rs:685-695"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-28",
+      "area": "pdf-fonts-assets",
+      "conclusion": "字体三族 EB Garamond/Noto Serif SC/JetBrains Mono 从 OfficeAssets.themes_dir 白名单注入，任一缺失显式失败；资产目录由服务宿主配置（LINGXI_OFFICE_THEMES 或开发态推导），非请求方可指定。",
+      "evidence": [
+        "rust/crates/lingxi-service/src/office_pdf.rs:251-303",
+        "rust/crates/lingxi-service/src/office_tools.rs:29-34",
+        "rust/crates/lingxi-service/src/host_auxiliary.rs:28-77"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-29",
+      "area": "pdf-production-tests",
+      "conclusion": "生产 PDF 门禁已存在：真实 Chromium 渲染 S1（文本/140 表格行/三族字体/图片/分页/JS 开关/英寸纸张）、网络/Worker/WS/iframe/file:// 到 loopback canary 零命中、超时与取消清理、不干扰已登录工作区。",
+      "evidence": [
+        "rust/crates/lingxi-adapters/tests/r07_pdf_chromium.rs:353-455",
+        "rust/crates/lingxi-adapters/tests/r07_pdf_chromium.rs:502-578",
+        "rust/crates/lingxi-adapters/tests/r07_pdf_chromium.rs:631-695"
+      ],
+      "verification": "source-inspection; testExists"
+    },
+    {
+      "id": "CS-30",
+      "area": "pdf-baseline-missing",
+      "conclusion": "R07 PDF 质量测试依赖 R01 已归档的旧链 probe 基线（artifacts/rust-tauri/R01/T05/a09/new/probe/probe.json），但当前工作区 artifacts/rust-tauri 仅有 R02/R07/R08，R01 证据缺失；R09 A09 必须先重生成并冻结旧链基线。",
+      "evidence": [
+        "rust/crates/lingxi-adapters/tests/r07_pdf_chromium.rs:391-397",
+        "docs/rust-tauri/R07/T05_REPORT.md:42-45"
+      ],
+      "verification": "source-inspection; workspace-listing"
+    },
+    {
+      "id": "CS-31",
+      "area": "r01-samples-tooling",
+      "conclusion": "A09 样本与比对工具链现成：S1-S6 样本、字体来源/许可说明、pdf_probe.swift（PDFKit 页数/文本/墨迹/16x16 网格）、compare_outputs.py（页数/空白页/哨兵/表格行/文本相似度/视觉网格/字体/图片）、旧链 harness/run 脚本与一键 replay 脚本。",
+      "evidence": [
+        "tests/migration/r01-t05/samples/s1-long-zh.html:1",
+        "tests/migration/r01-t05/pdf_probe.swift:1-30",
+        "tests/migration/r01-t05/compare_outputs.py:97-160",
+        "scripts/rust-tauri/r01-t05-replay.sh:97-118"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-32",
+      "area": "media-preview",
+      "conclusion": "图片/视频/SVG 预览：按类型分流 MediaViewer；文件 URL 优先服务资源 content link（loopback token query 仅限 local loopback），否则 Electron getFileUrl 的 file://；SVG 以 <img> 渲染（不执行脚本）。",
+      "evidence": [
+        "desktop/src/react/utils/file-preview.ts:105-140",
+        "desktop/src/react/components/shared/MediaViewer/media-source.ts:20-33",
+        "desktop/src/react/services/resource-url.ts:25-73",
+        "desktop/src/react/services/server-connection.ts:179-181",
+        "desktop/src/react/services/server-connection.ts:766-777",
+        "desktop/preload.cjs:140",
+        "desktop/src/shared/path-to-file-url.cjs:24-41",
+        "desktop/src/react/components/shared/MediaViewer/ImageStage.tsx:26-56"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-33",
+      "area": "html-preview",
+      "conclusion": "HTML 预览：渲染侧 POST /api/preview/html 换取 token 化 URL，sandbox='allow-scripts' iframe；服务侧 10min TTL、32B token、2MB 内容上限、CSP（default-src none、connect-src none、frame-ancestors 'self' file: loopback）、素材域 realpath 收容与跨源 CORP。",
+      "evidence": [
+        "desktop/src/react/components/preview/PreviewRenderer.tsx:115-166",
+        "rust/crates/lingxi-service/src/preview.rs:377-433",
+        "rust/crates/lingxi-service/src/preview.rs:807-846",
+        "rust/crates/lingxi-service/src/preview.rs:848-940",
+        "rust/crates/lingxi-service/tests/r06_t05_preview.rs:73-313"
+      ],
+      "verification": "source-inspection; testExists"
+    },
+    {
+      "id": "CS-34",
+      "area": "preview-frame-ancestors-tauri-gap",
+      "conclusion": "HTML 预览 CSP frame-ancestors 只允许 'self' file: http://127.0.0.1:* http://localhost:*，不包含 Tauri webview 默认 origin（macOS/Linux tauri://localhost、Windows http://tauri.localhost）；Tauri 下嵌入预览会被 CSP 拒绝，需实现期扩展并加负向测试。（调查期间工作区已有其它 R09 任务的未提交修复，未提交/未验证；本结论以 HEAD 为准，T05 须以实际候选重新取证。）",
+      "evidence": [
+        "rust/crates/lingxi-service/src/preview.rs:426-433",
+        "docs/rust-tauri/R01/DEPENDENCY_DECISIONS.md:243"
+      ],
+      "verification": "source-inspection; design-risk"
+    },
+    {
+      "id": "CS-35",
+      "area": "service-origin-policy-tauri-gap",
+      "conclusion": "服务 Origin allowlist 仅允许 http(s) loopback、file://、null；Tauri webview 默认 origin 不在其中，renderer 直连 fetch 在 Tauri 下会 bad_origin。浏览器/预览命令必须宿主代理 HTTP，或由 T02/T06 决策扩展精确 origin。（调查期间工作区已有其它 R09 任务的未提交修复，未提交/未验证；本结论以 HEAD 为准，T05 须以实际候选重新取证。）",
+      "evidence": [
+        "rust/crates/lingxi-service/src/transport.rs:25-52",
+        "rust/crates/lingxi-service/src/transport.rs:224-267",
+        "rust/crates/lingxi-service/src/transport.rs:408-430"
+      ],
+      "verification": "source-inspection; design-risk"
+    },
+    {
+      "id": "CS-36",
+      "area": "office-preview",
+      "conclusion": "DOCX/XLSX 预览走服务 /lingxi/v1/fs/docx-html|xlsx-html（Rust 受限解析器），渲染侧 readRustPreview 选择路由后 dangerouslySetInnerHTML 展示；PDF 预览走 read-base64 -> Blob -> iframe；Markdown 预览有 sanitizer。",
+      "evidence": [
+        "rust/crates/lingxi-service/src/lib.rs:8788-8792",
+        "rust/crates/lingxi-service/src/fsread.rs:198-252",
+        "desktop/src/react/utils/preview-file-content.ts:12-50",
+        "desktop/src/react/components/preview/PreviewRenderer.tsx:657-767",
+        "desktop/src/react/utils/markdown.ts:1110-1119"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-37",
+      "area": "electron-rust-node-viewer",
+      "conclusion": "Electron 现有 Rust-node 浏览器 viewer：主窗口注册不透明 connectionKey，viewer 独立 BrowserWindow 只拿 context，所有浏览器 HTTP 由 main 进程代发（token 不进 viewer）；网页仍在服务控制的 Chromium 窗口。该结构可直接移植为 Tauri 设计。",
+      "evidence": [
+        "desktop/main.cjs:5737-5766",
+        "desktop/src/shared/rust-browser-control.cjs:12-60",
+        "desktop/src/react/browser-viewer/BrowserViewerApp.tsx:46-62",
+        "desktop/src/react/browser-viewer/RustBrowserViewer.tsx:7",
+        "desktop/src/react/services/rust-browser.ts:54-75"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-38",
+      "area": "electron-legacy-viewer",
+      "conclusion": "Electron 旧 Node 连接路径仍以 WebContentsView 嵌入 viewer 窗口（createBrowserViewerWindow、browser-update、browser-go-back/reload/new-tab/switch/close/emergency-stop），是 Electron 退役对象；Tauri 壳只连接 lingxi-service，不实现该路径。",
+      "evidence": [
+        "desktop/main.cjs:3435-3521",
+        "desktop/main.cjs:5800-5864",
+        "desktop/preload.cjs:177-193"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-39",
+      "area": "viewer-ui-behavior",
+      "conclusion": "viewer 控制面板每 2s 轮询 workspaces、动作后立即刷新、显示真实执行节点/状态/接管/暂停/停止/撤销与不可用原因，空态明确；相关 UI 测试存在（native 模式不回落旧 toolbar、缺失 context 报错、空 workspace 可新标签、不可见窗口禁用接管、异服务响应拒绝、卸载后响应忽略）。",
+      "evidence": [
+        "desktop/src/react/browser-viewer/RustBrowserViewer.tsx:17-77",
+        "desktop/src/react/__tests__/browser-viewer/BrowserViewerApp.test.tsx:16-38",
+        "desktop/src/react/__tests__/browser-viewer/RustBrowserViewer.test.tsx:12-52"
+      ],
+      "verification": "source-inspection; testExists"
+    },
+    {
+      "id": "CS-40",
+      "area": "browser-status-events",
+      "conclusion": "browser_status 事件经 app-events 轮询进入统一 WS/app-event 处理器更新 BrowserCard 状态，跨 connection/executionNode 过滤，连接切换清空旧浏览器状态；迟到响应不得覆盖新连接。",
+      "evidence": [
+        "desktop/src/react/services/rust-automation.ts:209-214",
+        "desktop/src/react/services/rust-automation.ts:252",
+        "desktop/src/react/services/ws-message-handler.ts:858-861",
+        "desktop/src/react/stores/browser-slice.ts:46-75",
+        "desktop/src/react/__tests__/services/rust-browser-events-http.test.ts:12-70"
+      ],
+      "verification": "source-inspection; testExists"
+    },
+    {
+      "id": "CS-41",
+      "area": "tauri-host-current",
+      "conclusion": "现有 Tauri 宿主是 R06 资源子集：独立 manifest/独立 workspace、tauri 2.12.1、bundle.active=false、frontendDist=dist-tauri-resources、单 main 窗口、最小 CSP；已有文件读写/watch/资源订阅/只读 viewer/技能 viewer 命令，但没有全量 React 壳、没有浏览器/PDF/预览接线。",
+      "evidence": [
+        "desktop/src-tauri/Cargo.toml:1-36",
+        "desktop/src-tauri/tauri.conf.json:2-14",
+        "desktop/src-tauri/src/lib.rs:530-599",
+        "desktop/src-tauri/src/resource_bridge.rs:10-50",
+        "desktop/src-tauri/capabilities/main.json:1-8",
+        "desktop/src-tauri/capabilities/viewer.json:1-12"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-42",
+      "area": "tauri-e2e-path",
+      "conclusion": "Tauri E2E 路径已存在：tauri-plugin-wdio-webdriver 1.4.0 为 optional 依赖、e2e-test feature 门控，测试用 TAURI_WEBDRIVER_PORT 驱动真实进程；R01 spike 已验证 macOS 只能走嵌入式 wdio（tauri-driver 不支持 macOS）。",
+      "evidence": [
+        "desktop/src-tauri/Cargo.toml:27",
+        "desktop/src-tauri/Cargo.toml:32-33",
+        "desktop/src-tauri/tests/desktop_host.rs:1-20",
+        "desktop/src-tauri/tests/desktop_host.rs:137-190",
+        "docs/rust-tauri/R01/DEPENDENCY_DECISIONS.md:243",
+        "docs/rust-tauri/R01/TAURI_SPIKE_REPORT.md:79-82"
+      ],
+      "verification": "source-inspection; testExists"
+    },
+    {
+      "id": "CS-43",
+      "area": "file-preview-refresh-viewer",
+      "conclusion": "文件预览的资源变化重读/只读派生窗口在两侧都有基础：Electron watch-file/read-file-snapshot/spawn-viewer；Tauri 资源宿主有同语义命令且只读窗口写操作被 main_only 拒绝、读取限于自身文件。",
+      "evidence": [
+        "desktop/main.cjs:6297-6310",
+        "desktop/main.cjs:6394-6471",
+        "desktop/main.cjs:5866-5919",
+        "desktop/src-tauri/src/lib.rs:44-66",
+        "desktop/src-tauri/src/lib.rs:230-289",
+        "desktop/src-tauri/src/lib.rs:382-437"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-44",
+      "area": "r09-ledger",
+      "conclusion": "R09-A09/A10 为 base REQUIRED 场景；execution_task_ids 含 R09-T05 的补充叶共 19 个（浏览器/设置 15 + web 工具 3 + 文件预览 1），当前 R07 结论绑定 Electron 壳与 R07 候选，不能替代 Tauri 安装证据。",
+      "evidence": [
+        "docs/rust-tauri/R00/ACCEPTANCE_MAP.json:7235-7324",
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json:70273",
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json:71295",
+        "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json:107837",
+        "docs/rust-tauri/R07/T04_REPORT.md:20-38"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-45",
+      "area": "r09-blockers",
+      "conclusion": "平台阻塞在 R09 开工时已登记：仅 macOS arm64 真机，macOS x64/Windows x64/Linux x64 无可用机器；无正式 Apple 签名/公证身份；tauri CLI 离线阻塞已解除（BLOCKED-TAURI-CLI-OFFLINE RESOLVED）。",
+      "evidence": [
+        "docs/rust-tauri/R09/BLOCKED.md:8-13",
+        "docs/rust-tauri/R09/BLOCKED.md:16-19",
+        "docs/rust-tauri/R09/START_RECEIPT.md:4-6"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-46",
+      "area": "browser-upload-gap",
+      "conclusion": "生产浏览器面未实现 agent 驱动上传：BrowserAction 枚举与 browser 工具 ACTIONS 均无 upload，adapters 无 DOM.setFileInputFiles；R01 spike 的上传能力未进入 R07 生产实现，属旧链 C16 缺口的保留（ADR-002 要求评估补齐），R09 不得声称已实现。",
+      "evidence": [
+        "rust/crates/lingxi-protocol/src/browser.rs:6-33",
+        "rust/crates/lingxi-service/src/browser_tools.rs:21-35",
+        "docs/rust-tauri/R01/BROWSER_SPIKE_REPORT.md:71",
+        "docs/rust-tauri/R01/BROWSER_SPIKE_REPORT.md:89-93",
+        "docs/rust-tauri/R01/ADR-002-browser-host.md:48-51"
+      ],
+      "verification": "source-inspection"
+    },
+    {
+      "id": "CS-47",
+      "area": "office-plugin-tool-residency",
+      "conclusion": "office/beautify 内置工具注册为 Availability::Deferred（office_tools.rs:1229），而模型声明快照只声明 Availability::Available 且 resident 的目标；本调查未发现 office 工具的 add_model_resident/on-demand 激活路径（对照 browser 工具显式 add_model_resident）。因此 Rust 服务里 office 工具的“真实模型可发现/可调用”未被本轮源码取证证明；A09 证据需用确定性 stub 直接按 wire name（local_name html-to-pdf）派发，并单独登记该产品面风险。",
+      "evidence": [
+        "rust/crates/lingxi-service/src/office_tools.rs:1206-1229",
+        "rust/crates/lingxi-kernel/src/model_exchange.rs:107-116",
+        "rust/crates/lingxi-kernel/src/model_exchange.rs:132",
+        "rust/crates/lingxi-kernel/src/toolcatalog.rs:1812-1827",
+        "rust/crates/lingxi-service/src/browser_tools.rs:204-207",
+        "rust/crates/lingxi-service/src/runs.rs:3477-3500"
+      ],
+      "verification": "source-inspection"
+    }
+  ],
+  "tauriDesign": {
+    "summary": "受控 Chromium 网页窗口保持操作系统级独立顶层窗口；Tauri 提供浏览器控制面板 viewer 窗口与宿主控制桥（凭据只在宿主），PDF 仍由 lingxi-service 以模型工具发起、由服务启动的一次性 Chromium 渲染；媒体/富文本预览走服务 HTTP + 宿主中介的本地文件自定义协议。",
+    "decisions": [
+      {
+        "id": "D1",
+        "title": "不把 Chromium 注入 Tauri 窗口，网页窗口独立",
+        "decision": "采用受控 Chromium 自带 headful 窗口；Tauri 只承载控制面板 viewer。",
+        "rationale": [
+          "ADR-002 明确不引入 wry/Tauri webview 作为浏览器能力承载（docs/rust-tauri/R01/ADR-002-browser-host.md:32）",
+          "wry 封装 WKWebView 覆盖面严格更小：无截图 API/下载完成回调 macOS 路径恒空/WebContext 仅进程级 data dir/无程序化 file input（docs/rust-tauri/R01/BROWSER_SPIKE_REPORT.md:56-63）",
+          "生产已是每会话独立 Chromium 进程 + 原生窗口（rust/crates/lingxi-adapters/src/browser/launcher.rs:119-220，rust/crates/lingxi-adapters/src/browser/host.rs:847-869）",
+          "Electron Rust-node 路径已是 viewer 控制面板 + 服务侧网页窗口（desktop/main.cjs:5753-5766，desktop/src/react/browser-viewer/RustBrowserViewer.tsx:7）"
+        ],
+        "rejectedAlternatives": [
+          "重parent Chromium 窗口进 Tauri 窗口（私有/平台特定 API，IME/焦点/弹窗/下载 UI 异常，跨平台不可行）",
+          "Tauri webview 直接当浏览器（与 ADR-002 冲突且能力缺口无法覆盖）",
+          "外部系统浏览器（不满足会话/标签/接管/截图等价）"
+        ],
+        "evidence": [
+          "docs/rust-tauri/R01/ADR-002-browser-host.md:20-32",
+          "docs/rust-tauri/R01/BROWSER_SPIKE_REPORT.md:56-63",
+          "rust/crates/lingxi-adapters/src/browser/launcher.rs:119-220",
+          "rust/crates/lingxi-adapters/src/browser/ops.rs:94-102",
+          "desktop/main.cjs:5753-5766"
+        ]
+      },
+      {
+        "id": "D2",
+        "title": "viewer 窗口与窗口级最小能力",
+        "decision": "Tauri 新增 label=browser-viewer 的 WebviewWindow，复用 BrowserViewerApp(mode=native)；仅授予 get_browser_viewer_context/rust_browser_request/close_browser_viewer 与主题窗口控制；打开 viewer 不创建空标签，关闭 viewer 不触发 stop/revoke。",
+        "rationale": [
+          "打开 viewer 的现有语义：只加窗口，不替用户建标签（desktop/src/react/services/rust-browser.ts:54-75）",
+          "关闭窗口与浏览器会话回收分离（leaf 130495；Electron 实现 desktop/main.cjs:5847-5850,5764）",
+          "Tauri 按窗口 label 分权已有先例（desktop/src-tauri/capabilities/main.json，viewer.json）"
+        ],
+        "evidence": [
+          "desktop/src/react/browser-viewer/BrowserViewerApp.tsx:46-62",
+          "desktop/src/react/services/rust-browser.ts:54-75",
+          "desktop/main.cjs:5847-5850",
+          "desktop/main.cjs:5753-5766",
+          "desktop/src-tauri/capabilities/viewer.json:1-12",
+          "desktop/src-tauri/src/lib.rs:382-437"
+        ]
+      },
+      {
+        "id": "D3",
+        "title": "宿主控制桥：凭据只留宿主，viewer 拿不透明句柄",
+        "decision": "Tauri 宿主实现 set_browser_connection(main only)、open_browser_viewer(main only)、get_browser_viewer_context(viewer only)、rust_browser_request(main 或当前 viewer 且 session 必须匹配)、close_browser_viewer；HTTP 由宿主 reqwest 以 Bearer token 发出，30s 超时、redirect=error。",
+        "rationale": [
+          "Electron 同构实现的安全属性：main 注册连接，viewer 只拿 connectionKey+sessionPath（desktop/src/shared/rust-browser-control.cjs:12-34，desktop/main.cjs:5737-5751）",
+          "token 不进入 viewer webview，可规避 Tauri origin 不在服务 Origin allowlist 的问题（rust/crates/lingxi-service/src/transport.rs:224-267）"
+        ],
+        "commandSurface": [
+          "open_browser_viewer(target) -> {opened:true}",
+          "set_browser_connection(connection|null) -> connectionKey|null",
+          "get_browser_viewer_context() -> RustBrowserViewerContext|null",
+          "rust_browser_request(target, action, options) -> JSON（actions: back/forward/reload/new_tab/switch_tab/close_tab/show/takeover/release/workspaces/stop/open）",
+          "close_browser_viewer()",
+          "set_browser_connection(null) 时销毁 viewer 并清 target"
+        ],
+        "errorVocabulary": [
+          "browser_connection_changed",
+          "browser_sender_denied",
+          "browser_session_changed",
+          "browser_native_session_required",
+          "browser_action_invalid",
+          "browser_tab_invalid",
+          "browser_url_invalid"
+        ],
+        "evidence": [
+          "desktop/src/shared/rust-browser-control.cjs:12-60",
+          "desktop/main.cjs:514-519",
+          "desktop/main.cjs:5737-5766",
+          "desktop/src/react/services/rust-browser.ts:42-75",
+          "desktop/preload.cjs:177-193"
+        ]
+      },
+      {
+        "id": "D4",
+        "title": "用户接管/焦点/快捷键/输入法",
+        "decision": "接管由服务把真实 Chromium 窗口恢复为 normal 并置 takeover；用户直接在 Chrome 原生窗口输入（IME/快捷键由 Chrome 处理），agent 修改被服务端阻断。接受“用户点击目标窗口完成前台确认”，OS 级前台激活作为可选增强（需 T06 权限评审）。",
+        "rationale": [
+          "服务实现只做 Target.activateTarget + Browser.setWindowBounds(normal)，不保证 OS 应用前台（rust/crates/lingxi-adapters/src/browser/ops.rs:506-539,816-830）",
+          "R07 A07 补验通过真实 Chrome 窗口 click/type + AX 读回完成接管验证（docs/rust-tauri/R07/T04_REPORT.md:108-117）",
+          "takeover 期间 agent 修改被 browser_user_takeover 拒绝（rust/crates/lingxi-adapters/src/browser/ops.rs:590-605）"
+        ],
+        "risks": [
+          "OQ-08：点击“显示/接管”后窗口可能不在最前；不实现 OS 激活时需 viewer 文案/操作引导"
+        ],
+        "evidence": [
+          "rust/crates/lingxi-adapters/src/browser/ops.rs:506-539",
+          "rust/crates/lingxi-adapters/src/browser/ops.rs:590-605",
+          "rust/crates/lingxi-adapters/src/browser/ops.rs:816-843",
+          "docs/rust-tauri/R07/T04_REPORT.md:108-117"
+        ]
+      },
+      {
+        "id": "D5",
+        "title": "tab/焦点同步以服务端 workspace 为唯一事实源",
+        "decision": "viewer 每 2s 轮询 workspaces，动作后立即刷新；活动 tab 由服务端按真实页面焦点校正；无效 tabId/关闭失败由服务返回显式错误且状态不变；viewer 不自行推断标签。",
+        "rationale": [
+          "RustBrowserViewer 现状轮询 2s 与动作后刷新（desktop/src/react/browser-viewer/RustBrowserViewer.tsx:17-46）",
+          "服务 refresh 用 document.hasFocus 校正 active tab（rust/crates/lingxi-adapters/src/browser/runtime.rs:596-602）",
+          "CloseTab 等真实 Target.targetDestroyed 才成功（rust/crates/lingxi-adapters/src/browser/ops.rs:863-880）",
+          "协议校验拒绝非法 tabId（rust/crates/lingxi-protocol/src/browser.rs:130-142），host attach 拒绝过期 tab（rust/crates/lingxi-adapters/src/browser/runtime.rs:614-630）"
+        ],
+        "evidence": [
+          "desktop/src/react/browser-viewer/RustBrowserViewer.tsx:17-77",
+          "rust/crates/lingxi-adapters/src/browser/runtime.rs:427-602",
+          "rust/crates/lingxi-adapters/src/browser/runtime.rs:614-630",
+          "rust/crates/lingxi-adapters/src/browser/ops.rs:863-880",
+          "rust/crates/lingxi-protocol/src/browser.rs:130-142"
+        ]
+      },
+      {
+        "id": "D6",
+        "title": "急停撤权路径",
+        "decision": "viewer 急停 -> 宿主 rust_browser_request('stop') -> POST /lingxi/v1/browser/close-session{revoke:true} -> 服务 close(revoke) 事务；关闭失败必须在 viewer 可见；关闭 viewer 窗口不等于急停。",
+        "rationale": [
+          "服务 close 事务实现（rust/crates/lingxi-service/src/browser.rs:905-993）",
+          "host revoke 取消 PDF 租约、清 takeover、等 busy 归零后回收进程组（rust/crates/lingxi-adapters/src/browser/host.rs:1261-1346）",
+          "旧请求不能再次撤权/解除，新用户提交才释放（rust/crates/lingxi-adapters/tests/r07_browser_store.rs:116-172，r07_browser_tools.rs:787-848）"
+        ],
+        "processAuthorizationPath": [
+          "viewer 按钮 -> 宿主 HTTP -> browser_routes::close -> BrowserService::close(revoke=true)",
+          "claim command 收据（防重复 external action）",
+          "cancel 该会话 in-flight 浏览器命令",
+          "store::revoke_human_intent（epoch++）",
+          "port.revoke：cancel_pdf + 等 busy 归零 + 进程组 SIGTERM/SIGKILL + 确认退出",
+          "record_revoke_state：确认清空 tabs/url；未确认写 BROWSER_CLEANUP_UNCONFIRMED",
+          "publish browser_status revoked；新用户 root Run 触发 release_for_user_run"
+        ],
+        "evidence": [
+          "desktop/src/shared/rust-browser-control.cjs:44-49",
+          "rust/crates/lingxi-service/src/browser_routes.rs:150-180",
+          "rust/crates/lingxi-service/src/browser.rs:905-993",
+          "rust/crates/lingxi-service/src/browser.rs:859-904",
+          "rust/crates/lingxi-adapters/src/browser/host.rs:1261-1346",
+          "rust/crates/lingxi-service/src/runs.rs:2836-2852"
+        ]
+      },
+      {
+        "id": "D7",
+        "title": "会话隔离",
+        "decision": "沿用服务现有每会话独立 Chromium 进程/profile（identity=sha256(node,owner,session)）；viewer 只显示明确 sessionPath 的 workspace；跨连接/跨节点状态不得串用。",
+        "rationale": [
+          "会话隔离实现（rust/crates/lingxi-adapters/src/browser/host.rs:158-170,847-869）",
+          "服务按 owner/节点/会话过滤 workspaces（rust/crates/lingxi-service/src/browser.rs:994-1057）",
+          "renderer 已有 connection scope 过滤（desktop/src/react/stores/browser-slice.ts:46-75）"
+        ],
+        "evidence": [
+          "rust/crates/lingxi-adapters/src/browser/host.rs:158-170",
+          "rust/crates/lingxi-adapters/src/browser/host.rs:847-869",
+          "rust/crates/lingxi-service/src/browser.rs:994-1057",
+          "desktop/src/react/stores/browser-slice.ts:46-75",
+          "rust/crates/lingxi-adapters/tests/r07_browser_chromium.rs:372-548"
+        ]
+      },
+      {
+        "id": "D8",
+        "title": "PDF 任务发起与 renderer 所有权",
+        "decision": "PDF 仍由模型工具 office_html-to-pdf 在真实 Run 内发起，服务调用 BrowserPort::render_pdf 启动一次性 headless Chromium；Tauri 不新增 PDF 命令，不持有/不 kill 渲染进程；产物作为 SessionFile 预览。",
+        "rationale": [
+          "入口唯一为模型工具（rust/crates/lingxi-service/src/office_tools.rs:1188，无 HTTP 路由 rust/crates/lingxi-service/src/lib.rs:8254）",
+          "渲染进程由服务 host 创建和清理（rust/crates/lingxi-adapters/src/browser/host.rs:407-514,506-514）",
+          "超时语义以 PDF_TIMEOUT 显式错误表达（rust/crates/lingxi-adapters/src/browser/pdf.rs:333-339）"
+        ],
+        "evidence": [
+          "rust/crates/lingxi-service/src/office_tools.rs:625-747",
+          "rust/crates/lingxi-service/src/office_tools.rs:1188",
+          "rust/crates/lingxi-service/src/office_pdf.rs:305-374",
+          "rust/crates/lingxi-adapters/src/browser/host.rs:407-514",
+          "rust/crates/lingxi-adapters/src/browser/pdf.rs:652-706"
+        ]
+      },
+      {
+        "id": "D9",
+        "title": "媒体/富文本/文件预览的本地文件边界",
+        "decision": "会话/服务文件走服务 HTTP + token；宿主本地文件（desk 媒体、markdown 相对图片）走宿主中介的 lingxi-local-file:// 自定义协议（路径登记+窗口绑定+短 TTL+批准根+拒绝 symlink/受保护路径），不把 file:// 直接暴露给 webview；HTML 预览保持跨源 token iframe，并把 Tauri origin 加入 frame-ancestors；Tauri app CSP 增加 loopback iframe/media 源。",
+        "rationale": [
+          "服务资源 content link + loopback query token 现状（desktop/src/react/services/resource-url.ts:25-73，desktop/src/react/services/server-connection.ts:179-181,766-777）",
+          "HTML 预览安全模型（desktop/src/react/components/preview/PreviewRenderer.tsx:115-166，rust/crates/lingxi-service/src/preview.rs:377-433）",
+          "Electron 的 file:// 依赖（desktop/preload.cjs:140，desktop/src/shared/path-to-file-url.cjs:24-41）在 Tauri 不可用",
+          "Tauri 现最小 CSP 需扩展（desktop/src-tauri/tauri.conf.json:11）"
+        ],
+        "cspDeltaForTauriShell": {
+          "frame-src": "'self' blob: http://127.0.0.1:* http://localhost:*",
+          "img-src/media-src": "'self' data: blob: http://127.0.0.1:* http://localhost:*",
+          "connect-src": "'self' ipc: http://ipc.localhost（若 renderer 不直连服务则不加 loopback；由 T02 决定）",
+          "frameAncestorsServiceChange": "build_html_preview_csp 的 frame-ancestors 追加 tauri://localhost、http://tauri.localhost（以实测 origin 为准）"
+        },
+        "evidence": [
+          "desktop/src/react/services/resource-url.ts:25-73",
+          "desktop/src/react/components/preview/PreviewRenderer.tsx:115-166",
+          "desktop/src/react/components/preview/PreviewRenderer.tsx:657-689",
+          "rust/crates/lingxi-service/src/preview.rs:377-433",
+          "desktop/preload.cjs:140",
+          "desktop/src/shared/path-to-file-url.cjs:24-41",
+          "desktop/src-tauri/tauri.conf.json:11"
+        ]
+      },
+      {
+        "id": "D10",
+        "title": "Chromium 分发/查找策略（R09 实现 + R10 定稿）",
+        "decision": "R09 实现按“部署提供 Chromium”接线：LINGXI_CHROMIUM_PATH 或安装资源目录/系统浏览器发现，缺失显式 UnavailableBrowser；随包 Chromium 方案（Tauri resources 或安装资源根）为满足“移除 Electron 后仍工作”的推荐最终形态，最终许可/签名/公证/更新通道归 R10 发布决策。不要用 Tauri sidecar/externalBin 承载 Chrome.app 目录。",
+        "options": [
+          {
+            "id": "CHROMIUM-A",
+            "name": "系统 Chrome/Chromium 发现",
+            "pros": "零打包成本、当前代码已支持",
+            "cons": "版本漂移影响打印/字体渲染；Linux 用户可能没有；不满足严格安装可复现"
+          },
+          {
+            "id": "CHROMIUM-B",
+            "name": "随包 Chromium 运行时（Tauri resources/安装资源）",
+            "pros": "安装即工作、版本可冻结；许可与 Electron 同构",
+            "cons": "体积约 400MB 压缩级；嵌套签名/公证/更新通道复杂；macOS Hardened Runtime 权限需配置"
+          },
+          {
+            "id": "CHROMIUM-C",
+            "name": "首启下载/按需安装",
+            "pros": "安装包小",
+            "cons": "网络/校验/磁盘写/离线不可用，不能作为 A09 默认"
+          },
+          {
+            "id": "CHROMIUM-D",
+            "name": "Tauri webview 打印",
+            "pros": "无额外进程",
+            "cons": "异引擎打印语义，ADR-003 已拒绝"
+          }
+        ],
+        "recommendation": "R09 用双路径（安装资源优先、系统路径兜底）完成本机 A09/A10 证据并记录 executable 绝对路径+sha256+Chromium product；R10 发布选 CHROMIUM-B。",
+        "evidence": [
+          "rust/crates/lingxi-service/src/browser.rs:1271-1331",
+          "docs/rust-tauri/R01/ADR-002-browser-host.md:24",
+          "docs/rust-tauri/R01/ADR-002-browser-host.md:41-46",
+          "docs/rust-tauri/R01/ADR-003-document-renderer.md:54-59",
+          "docs/rust-tauri/R01/ADR-003-document-renderer.md:61-67",
+          "docs/rust-tauri/R01/TAURI_SPIKE_REPORT.md:59-77",
+          "docs/rust-tauri/R01/DEPENDENCY_DECISIONS.md:243"
+        ]
+      }
+    ],
+    "electronRemovalPreconditions": [
+      {
+        "id": "E1",
+        "condition": "Tauri 主窗口承载全量 React UI 并实现 PlatformApi 的 browser/file/preview 成员",
+        "gap": "Tauri 资源宿主只有 R06 子集；desktop/src/react/host 下无 Tauri host 实现",
+        "evidence": [
+          "desktop/src-tauri/src/lib.rs:530-599",
+          "desktop/src/react/host/desktop-host.ts:1-40",
+          "desktop/src/react/types.ts:555-625"
+        ],
+        "owner": "R09-T01/T05"
+      },
+      {
+        "id": "E2",
+        "condition": "Tauri webview 到服务 HTTP 可达（origin 策略或宿主代理）",
+        "gap": "服务 Origin allowlist 不含 Tauri origin（transport.rs:224-267）；renderer 大量直连 fetch",
+        "evidence": [
+          "rust/crates/lingxi-service/src/transport.rs:25-52",
+          "rust/crates/lingxi-service/src/transport.rs:224-267",
+          "desktop/src/react/utils/preview-file-content.ts:12-50"
+        ],
+        "owner": "R09-T02/T06（T05 提供需求）"
+      },
+      {
+        "id": "E3",
+        "condition": "HTML 预览 iframe 可嵌入（服务 CSP frame-ancestors 扩展）",
+        "gap": "现 CSP 仅 'self' file: loopback（preview.rs:426-433）",
+        "evidence": [
+          "rust/crates/lingxi-service/src/preview.rs:426-433",
+          "desktop/src/react/components/preview/PreviewRenderer.tsx:159-166"
+        ],
+        "owner": "R09-T05/T06"
+      },
+      {
+        "id": "E4",
+        "condition": "本地文件媒体/markdown 图片在 Tauri 可用（自定义协议/宿主中介）",
+        "gap": "现仅 Electron file://（preload.cjs:140）",
+        "evidence": [
+          "desktop/preload.cjs:140",
+          "desktop/src/shared/path-to-file-url.cjs:24-41",
+          "desktop/src/react/services/resource-url.ts:25-73"
+        ],
+        "owner": "R09-T05"
+      },
+      {
+        "id": "E5",
+        "condition": "PDF 内联预览在 WKWebView/WebView2/WebKitGTK 实测并有回退",
+        "gap": "blob PDF 预览未在 Tauri 验证",
+        "evidence": [
+          "desktop/src/react/components/preview/PreviewRenderer.tsx:657-689",
+          "docs/rust-tauri/R01/DEPENDENCY_DECISIONS.md:243"
+        ],
+        "owner": "R09-T05"
+      },
+      {
+        "id": "E6",
+        "condition": "Tauri viewer 窗口 + 宿主控制桥 + 急停/接管/标签同步",
+        "gap": "Electron 已有 Rust-node 路径，Tauri 未实现",
+        "evidence": [
+          "desktop/main.cjs:5737-5766",
+          "desktop/src/react/browser-viewer/RustBrowserViewer.tsx:7",
+          "desktop/src-tauri/src/lib.rs:382-437"
+        ],
+        "owner": "R09-T05"
+      },
+      {
+        "id": "E7",
+        "condition": "受控 Chromium 与 PDF 字体资产可被服务在安装布局中发现/读取",
+        "gap": "仅路径发现（browser.rs:1280-1298）；字体资产装配需安装布局（host_auxiliary.rs:28-77）",
+        "evidence": [
+          "rust/crates/lingxi-service/src/browser.rs:1280-1298",
+          "rust/crates/lingxi-service/src/host_auxiliary.rs:28-77"
+        ],
+        "owner": "R09-T05 + R10"
+      },
+      {
+        "id": "E8",
+        "condition": "Tauri 壳启动/退出服务并注入 Chromium/Office 资源 env；退出时浏览器/PDF 进程清理",
+        "gap": "T02 范围；T05 消费其接口",
+        "evidence": [
+          "rust/crates/lingxi-service/src/browser.rs:1262-1267",
+          "rust/crates/lingxi-adapters/src/browser/host.rs:1087-1174"
+        ],
+        "owner": "R09-T02/T05"
+      },
+      {
+        "id": "E9",
+        "condition": "A09 无 Electron 探针（安装树/进程树/旧 helper 调用）",
+        "gap": "旧 Electron 生产仍在；测试安装需隔离目录",
+        "evidence": [
+          "docs/rust-tauri/R00/ACCEPTANCE_MAP.json:7235-7280",
+          "desktop/src/office-pdf-helper.cjs:1-22"
+        ],
+        "owner": "R09-T05/T08"
+      },
+      {
+        "id": "E10",
+        "condition": "旧 Node 嵌入式浏览器路径不再被任何连接模式使用",
+        "gap": "Electron 旧路径仍在（main.cjs:3435-3521,5800-5864）",
+        "evidence": [
+          "desktop/main.cjs:3435-3521",
+          "desktop/main.cjs:5800-5864",
+          "desktop/src/react/services/rust-browser.ts:7-9"
+        ],
+        "owner": "R09-T01/T05"
+      },
+      {
+        "id": "E11",
+        "condition": "A10 安全边界：预览不可达 Tauri IPC/服务 token/原生命令；CSP/capabilities 最小化",
+        "gap": "T06 收口；T05 提供测试与 canary",
+        "evidence": [
+          "rust/crates/lingxi-service/src/preview.rs:377-433",
+          "desktop/src-tauri/tauri.conf.json:11",
+          "desktop/src-tauri/capabilities/main.json:1-8"
+        ],
+        "owner": "R09-T05/T06"
+      },
+      {
+        "id": "E12",
+        "condition": "跨平台证据（macOS x64/Windows/Linux）",
+        "gap": "无真机，BLOCKED_PLATFORM",
+        "evidence": [
+          "docs/rust-tauri/R09/BLOCKED.md:8-10"
+        ],
+        "owner": "R09-T07/R10"
+      },
+      {
+        "id": "E13",
+        "condition": "A09 旧链 PDF 基线可复现",
+        "gap": "artifacts/rust-tauri/R01/T05 基线不在工作区",
+        "evidence": [
+          "rust/crates/lingxi-adapters/tests/r07_pdf_chromium.rs:391-397",
+          "docs/rust-tauri/R07/T05_REPORT.md:42-45"
+        ],
+        "owner": "R09-T05"
+      }
+    ],
+    "crossTaskContracts": [
+      {
+        "task": "R09-T01",
+        "need": "全量前端构建产出 index+browser-viewer 入口；PlatformApi 注入 Tauri host",
+        "evidence": [
+          "vite.config.ts:353",
+          "desktop/src/react/types.ts:555-625"
+        ]
+      },
+      {
+        "task": "R09-T02",
+        "need": "服务启动/就绪/退出；注入 Chromium/Office 资源 env；退出关停浏览器/PDF",
+        "evidence": [
+          "rust/crates/lingxi-service/src/browser.rs:1262-1267",
+          "rust/crates/lingxi-adapters/src/browser/host.rs:1087-1174"
+        ]
+      },
+      {
+        "task": "R09-T06",
+        "need": "Tauri CSP/capabilities/自定义协议注册；origin 策略或宿主代理决策",
+        "evidence": [
+          "desktop/src-tauri/tauri.conf.json:11",
+          "rust/crates/lingxi-service/src/transport.rs:224-267"
+        ]
+      },
+      {
+        "task": "R09-T08",
+        "need": "A09/A10 脚本纳入 verify-stage R09 与证据合同",
+        "evidence": [
+          "docs/rust-tauri/R09/START_RECEIPT.md:6-7"
+        ]
+      }
+    ]
+  },
+  "a09Evidence": {
+    "acceptanceId": "R09-A09",
+    "goal": "在未包含 Electron 的 Tauri 测试安装上完成浏览器用户接管与 Office PDF 输出，证明无 Electron 进程/文件、无暗中调用旧安装，PDF 产物达到旧链 A09 判据。",
+    "environment": {
+      "isolationRoot": "/private/tmp/lingxi-r09-t05",
+      "lingxiHome": "/private/tmp/lingxi-r09-t05/home",
+      "testInstall": "Tauri 构建产物（全量壳），与仓库旧 Electron 依赖物理隔离",
+      "oldChainHarness": "独立对照环境，允许使用 node_modules/.bin/electron，但不进入测试安装",
+      "deterministicModelStub": "scripts/rust-tauri/r00-t06-stub-provider.mjs（支持 TOOL:<name>:<json> 指令，:90-108）",
+      "notes": "全部 loopback/本地 fixture；无真实账号、无外网依赖"
+    },
+    "leavesCovered": [
+      "R00-T02-LA-A67D342381C0",
+      "R00-T02-LA-A09B78985A14",
+      "R00-T02-LA-8A45B19A18B4",
+      "R00-T02-LA-13049521EA0C",
+      "R00-T02-LA-6E13E5DF05EB",
+      "R00-T02-LA-7D212CBD9EEF",
+      "R00-T02-LA-1809C8E13EA3",
+      "R00-T02-LA-03A9E92909C6",
+      "R00-T02-LA-ED5FD5B469B8",
+      "R00-T02-LA-367052089D11",
+      "R00-T02-LA-593534A4F2AB",
+      "R00-T02-LA-178C8CBA29C2",
+      "R00-T02-LA-F1A5597E3E78",
+      "R00-T02-LA-DCD85A04A7E9",
+      "R00-T02-LA-A30E4BDF2FA2",
+      "R00-T02-LA-FD7A5A76B8EA",
+      "R00-T02-LA-D1B56A275C3A",
+      "R00-T02-LA-4173A08A51CC",
+      "R00-T02-LA-8BD3BCC6D725"
+    ],
+    "steps": [
+      {
+        "id": "A09-01",
+        "name": "无 Electron 文件/进程探针",
+        "purpose": "证明测试安装不含 Electron、运行期无 Electron 进程",
+        "commandDraft": "find \"$APP_DIR\" \\( -iname '*electron*' -o -iname '*Electron Framework*' \\) -print > no-electron/inventory.txt; ps -axo pid,ppid,command > no-electron/ps-before.txt; pgrep -fl 'Electron Helper' || true; ps -axo pid,ppid,command | grep -Ei 'electron' || true",
+        "passCriteria": [
+          "安装树零 Electron 文件",
+          "操作前后进程树零 Electron 进程",
+          "浏览器/PDF 子进程均为受控 Chromium（记录可执行路径+sha256）"
+        ],
+        "evidence": [
+          "$ART/a09/no-electron/inventory.json",
+          "$ART/a09/no-electron/ps-before.txt",
+          "$ART/a09/no-electron/ps-after.txt"
+        ]
+      },
+      {
+        "id": "A09-02",
+        "name": "Tauri 安装启动 + 服务就绪",
+        "purpose": "真实 Tauri app 启动、WebDriver 可驱动、服务身份与节点一致",
+        "commandDraft": "TAURI_WEBDRIVER_PORT=<isolated> <tauri-app>；WebDriver 建 session；GET /lingxi/v1/health|identity（宿主或直接 HTTP）",
+        "passCriteria": [
+          "主窗口 ready",
+          "服务 serverKind=lingxi-service",
+          "节点 id 与 Tauri 连接一致"
+        ],
+        "evidence": [
+          "$ART/a09/boot/webdriver-session.json",
+          "$ART/a09/boot/identity.json",
+          "$ART/a09/boot/screenshot.png"
+        ]
+      },
+      {
+        "id": "A09-03",
+        "name": "agent 启动真实浏览器并快照",
+        "purpose": "验证 browser 工具真实链路与真实 Chromium 窗口",
+        "commandDraft": "stub provider 收到含 TOOL:browser:{\"action\":\"start\",\"url\":\"http://127.0.0.1:<fixture>\"} 的 chat；随后 snapshot",
+        "passCriteria": [
+          "真实 Chrome 窗口出现（窗口列表/进程）",
+          "workspace running=true、url 匹配",
+          "snapshot 含 fixture 标记"
+        ],
+        "evidence": [
+          "$ART/a09/browser/stub-journal.json",
+          "$ART/a09/browser/workspace.json",
+          "$ART/a09/browser/snapshot.txt",
+          "$ART/a09/browser/window-list.txt"
+        ]
+      },
+      {
+        "id": "A09-04",
+        "name": "viewer 打开/空态/不建标签",
+        "purpose": "覆盖 leaf 6E13E5 与 130495 的窗口语义",
+        "commandDraft": "main 窗口 open_browser_viewer({sessionPath})；另选无浏览器会话重复；记录 tabs 前后",
+        "passCriteria": [
+          "viewer 窗口出现",
+          "空会话显示空态",
+          "打开 viewer 不新增 tab",
+          "关闭 viewer 不触发 stop/revoke"
+        ],
+        "evidence": [
+          "$ART/a09/viewer/open.json",
+          "$ART/a09/viewer/empty-state.png",
+          "$ART/a09/viewer/tabs-before-after.json"
+        ]
+      },
+      {
+        "id": "A09-05",
+        "name": "标签/导航同步",
+        "purpose": "覆盖 leaf A67D34/8A45B1",
+        "commandDraft": "viewer 触发 new_tab/switch_tab/close_tab/back/forward/reload；agent snapshot；无效 tabId 负向",
+        "passCriteria": [
+          "tabs/activeTabId 与服务一致",
+          "非法 tabId 报错且状态不变",
+          "关闭失败不显示已关闭"
+        ],
+        "evidence": [
+          "$ART/a09/tabs/transcript.jsonl"
+        ]
+      },
+      {
+        "id": "A09-06",
+        "name": "浏览器用户接管（OS 输入）",
+        "purpose": "A09 核心：真实用户接管同一 target",
+        "commandDraft": "viewer 显示->接管；断言 workspace userTakeover=true；osascript 真实键入（中文用剪贴板+Cmd+V）；screencapture；交还后 agent snapshot 读回",
+        "passCriteria": [
+          "接管期间 agent 修改被 browser_user_takeover 拒绝",
+          "OS 键入落进同一 target 并被服务快照读回",
+          "交还后 agent 可继续",
+          "target/session 全程一致"
+        ],
+        "evidence": [
+          "$ART/a09/takeover/state.json",
+          "$ART/a09/takeover/typed-readback.txt",
+          "$ART/a09/takeover/blocked-agent.json",
+          "$ART/a09/takeover/screen.png",
+          "$ART/a09/takeover/target-ids.json"
+        ]
+      },
+      {
+        "id": "A09-07",
+        "name": "Office PDF 输出（Tauri 链）",
+        "purpose": "A09 核心：真实工具链产出 PDF",
+        "commandDraft": "stub provider 发 TOOL:html-to-pdf:{\"htmlPath\":\"<abs>/tests/migration/r01-t05/samples/s1-long-zh.html\",\"outputPath\":\"$ART/a09/pdf/r09-s1.pdf\",\"pageSize\":\"A4\",\"printBackground\":true,\"preferCSSPageSize\":true,\"allowJavaScript\":false,\"embedLingxiFonts\":true,\"settleMs\":250,\"timeoutMs\":60000}（wire name=local_name html-to-pdf；stub 见 scripts/rust-tauri/r00-t06-stub-provider.mjs:90-108；真实 Run/审批/网关按正式链）",
+        "passCriteria": [
+          "产物存在且 %PDF-/%%EOF",
+          "sha256 与工具回执一致",
+          "engine=Chromium CDP (…)",
+          "产物可经会话文件/输出路径读回"
+        ],
+        "evidence": [
+          "$ART/a09/pdf/tool-result.json",
+          "$ART/a09/pdf/pdf-meta.json"
+        ],
+        "caution": "office 工具注册为 Availability::Deferred（office_tools.rs:1229），模型声明快照只声明 Available+resident（model_exchange.rs:107-116、toolcatalog.rs:1812-1827）；stub 直接派发只证明工具链可执行，不证明真实模型能自动发现该工具（OQ-16）。"
+      },
+      {
+        "id": "A09-08",
+        "name": "旧链基线重生成（独立对照环境）",
+        "purpose": "R01 基线缺失时冻结对照；不得进入测试安装",
+        "commandDraft": "node tests/migration/r01-t05/run_old_chain.mjs --job <job> --log <log>；记录 Electron 版本与 helper sha256",
+        "passCriteria": [
+          "旧链 exit=0",
+          "旧链 PDF 页数 74、探针可读",
+          "基线文件 sha256 冻结"
+        ],
+        "evidence": [
+          "$ART/a09/pdf/old-chain/"
+        ]
+      },
+      {
+        "id": "A09-09",
+        "name": "PDF 产物比对（A09 判据）",
+        "purpose": "产物达标而不是只看文件存在",
+        "commandDraft": "swiftc -O -o /tmp/pdf_probe tests/migration/r01-t05/pdf_probe.swift; /tmp/pdf_probe <pdf> <outdir> 2; python3 tests/migration/r01-t05/compare_outputs.py --old-probe <old> --new-probe <new> --old-pdf <old.pdf> --new-pdf <new.pdf> --expect <expect.json> --out compare.json",
+        "passCriteria": [
+          "页数相等=74",
+          "140/140 表格行",
+          "无空白页",
+          "三族字体嵌入",
+          "文本相似度>=0.99",
+          "视觉 16x16 网格 max|Δ|<=20",
+          "all_pass=true"
+        ],
+        "evidence": [
+          "$ART/a09/compare/compare.json",
+          "$ART/a09/compare/old/",
+          "$ART/a09/compare/new/"
+        ]
+      },
+      {
+        "id": "A09-10",
+        "name": "无暗中调用旧安装",
+        "purpose": "证明没有回落到旧 Electron 安装/旧 helper",
+        "commandDraft": "PATH 不含旧安装；lsof -p <tauri/service/chromium> 采样；检查 env（无 LINGXI_OFFICE_PDF_HELPER_EXEC 使用）；进程树 executable 全量对比",
+        "passCriteria": [
+          "无旧安装路径 execute/open",
+          "无 Electron helper 进程",
+          "服务 PDF 由 Chromium CDP 渲染"
+        ],
+        "evidence": [
+          "$ART/a09/no-electron/lsof.txt",
+          "$ART/a09/no-electron/env.json"
+        ]
+      },
+      {
+        "id": "A09-11",
+        "name": "19 叶其余能力逐条",
+        "purpose": "A09 范围内其余补充叶覆盖（浏览器设置/会话/搜索/web/文件预览）",
+        "commandDraft": "preferences GET/PUT、clear-cookies、session-states、open/close-session、search verify（确定性替身）、web_fetch/web_search（loopback 替身）、文件预览 text/markdown/docx/xlsx/pdf + 资源变化重读 + 独立 viewer 只读",
+        "passCriteria": [
+          "逐叶 assertions 通过（FEATURE_STAGE_ACCEPTANCE 对应叶）",
+          "失败显式、不伪装成功"
+        ],
+        "evidence": [
+          "$ART/a09/leaves/<leaf-id>.json"
+        ]
+      }
+    ],
+    "samples": [
+      {
+        "path": "tests/migration/r01-t05/samples/s1-long-zh.html",
+        "purpose": "A09 中文长文档 74 页：生僻字三组/140 行跨页表格/图片/代码/SVG+CSS 数学",
+        "source": "tests/migration/r01-t05/samples/"
+      },
+      {
+        "path": "tests/migration/r01-t05/FONTS.md",
+        "purpose": "三族字体来源/许可/子集覆盖",
+        "source": "tests/migration/r01-t05/FONTS.md"
+      },
+      {
+        "path": "tests/migration/r01-t05/pdf_probe.swift",
+        "purpose": "PDFKit 探针（页数/文本/墨迹/网格）",
+        "source": "tests/migration/r01-t05/pdf_probe.swift"
+      },
+      {
+        "path": "tests/migration/r01-t05/compare_outputs.py",
+        "purpose": "双链 A09 判据",
+        "source": "tests/migration/r01-t05/compare_outputs.py:97-160"
+      },
+      {
+        "path": "scripts/rust-tauri/r01-t05-replay.sh",
+        "purpose": "旧链/样本/探针/比对命令样板",
+        "source": "scripts/rust-tauri/r01-t05-replay.sh:97-160"
+      }
+    ],
+    "comparisonMethod": {
+      "oldChainBaseline": "当前工作区 artifacts/rust-tauri/R01/T05 不存在，需用 tests/migration/r01-t05/old_chain_harness.cjs + run_old_chain.mjs 在独立对照环境重生成并冻结（记录 Electron 版本/helper sha256）",
+      "criteria": [
+        "页数 74",
+        "表格行 140/140",
+        "无空白页",
+        "EBGaramond/NotoSerifSC/JetBrainsMono 三族嵌入",
+        "归一化文本相似度>=0.99",
+        "逐页 16x16 亮度网格 max|Δ|<=20",
+        "图片 XObject>=1"
+      ],
+      "knownDiffs": [
+        "preferCSSPageSize=false + CSS @page size 的 KNOWN-DIFF（docs/rust-tauri/R01/PDF_SPIKE_REPORT.md:47）",
+        "旧链 Ext-B 字形缺失（旧链缺陷，不要求候选复现）",
+        "旧链无资源拦截（候选必须保留更强边界）"
+      ]
+    },
+    "artifactsRoot": "artifacts/rust-tauri/R09/T05/a09/",
+    "platformNotes": [
+      "Windows/Linux/macOS x64 无真机：BLOCKED_PLATFORM（docs/rust-tauri/R09/BLOCKED.md:8-10）",
+      "无正式 Developer ID：仅 ad-hoc 本地功能证据（docs/rust-tauri/R09/BLOCKED.md:12）",
+      "锁屏/无辅助功能权限时用户接管记为 ENV_BLOCKED，不得用脚本改 DOM 冒充"
+    ],
+    "evidenceRefs": [
+      "docs/rust-tauri/R00/ACCEPTANCE_MAP.json:7235-7280",
+      "docs/rust-tauri/R07/T04_REPORT.md:20-38",
+      "docs/rust-tauri/R07/T05_REPORT.md:42-46",
+      "docs/rust-tauri/R01/PDF_SPIKE_REPORT.md:54-70",
+      "rust/crates/lingxi-adapters/tests/r07_pdf_chromium.rs:353-455"
+    ]
+  },
+  "a10Evidence": {
+    "acceptanceId": "R09-A10",
+    "goal": "恶意 HTML/SVG（含脚本与 IPC/token/原生命令尝试）在 Tauri 预览区打开后拿不到服务 token 或宿主原生命令权限，正常预览仍保留。",
+    "threatModel": [
+      "HTML 预览运行在跨源(loopback) sandbox iframe（allow-scripts，无 allow-same-origin）：脚本可执行但不能访问 app origin 的 DOM/storage/Tauri IPC",
+      "服务侧 CSP default-src 'none' / connect-src 'none' / frame-src 'none' / worker-src 'none' / object-src 'none'（rust/crates/lingxi-service/src/preview.rs:377-433）",
+      "预览 token 是 10min/单文档令牌，不是服务 bearer token（rust/crates/lingxi-service/src/preview.rs:807-846）",
+      "SVG 经 <img> 加载：脚本不执行、file:// 外链不可读",
+      "docx/xlsx/markdown 渲染路径若存在 HTML 注入面，必须在本项覆盖（OQ-12）"
+    ],
+    "leavesCovered": [
+      "R00-T02-LA-4173A08A51CC",
+      "R00-T02-LA-A30E4BDF2FA2",
+      "R00-T02-LA-A09B78985A14",
+      "R00-T02-LA-8BD3BCC6D725"
+    ],
+    "fixtures": [
+      {
+        "id": "malicious-html",
+        "path": "tests/migration/r09-t05/fixtures/malicious.html",
+        "content": "<script> 尝试 window.__TAURI__/__TAURI_INTERNALS__.invoke、fetch 服务 API、WebSocket/beacon 到 loopback canary、parent.localStorage/top.document、postMessage 索取 token、回显 location.search 中 preview token"
+      },
+      {
+        "id": "malicious-svg",
+        "path": "tests/migration/r09-t05/fixtures/malicious.svg",
+        "content": "<script>/onload/foreignObject、file:///etc/passwd 图片、loopback 外链、内嵌 HTML"
+      },
+      {
+        "id": "benign-html",
+        "path": "tests/migration/r09-t05/fixtures/benign.html",
+        "content": "本地相对图片/CSS/字体，正常渲染对照"
+      },
+      {
+        "id": "benign-svg",
+        "path": "tests/migration/r09-t05/fixtures/benign.svg",
+        "content": "正常 SVG 图形/文本"
+      },
+      {
+        "id": "normal-docx-xlsx-pdf",
+        "path": "tests/migration/r09-t05/fixtures/normal.*",
+        "content": "正常 Office/PDF 预览对照"
+      }
+    ],
+    "steps": [
+      {
+        "id": "A10-01",
+        "name": "启动隔离环境 + loopback canary",
+        "purpose": "记录一切 TCP/HTTP 外发尝试",
+        "commandDraft": "node tests/migration/r09-t05/canary.mjs --port <random-loopback> --log $ART/a10/canary.log；沿用 tests/migration/r01-t05/canary_server.mjs 形态",
+        "passCriteria": [
+          "canary 就绪且绑定 127.0.0.1",
+          "基线零命中"
+        ],
+        "evidence": [
+          "$ART/a10/canary.log"
+        ]
+      },
+      {
+        "id": "A10-02",
+        "name": "恶意 HTML 预览",
+        "purpose": "脚本/IPC/token/网络尝试全部失败且不影响正常显示",
+        "commandDraft": "WebDriver 驱动主窗口打开 malicious.html 预览（文件卡或 openFilePreview 路径）；等待 iframe load；保存 screenshot 与 iframe DOM 快照",
+        "passCriteria": [
+          "iframe 出现（sandbox 跨源）",
+          "canary 零命中",
+          "CSP connect-src 违规记录",
+          "无 Tauri IPC 标记/副作用"
+        ],
+        "evidence": [
+          "$ART/a10/preview/malicious-html.png",
+          "$ART/a10/preview/malicious-html-dom.json",
+          "$ART/a10/canary.log"
+        ]
+      },
+      {
+        "id": "A10-03",
+        "name": "Tauri 原生命令 canary",
+        "purpose": "把‘预览不可达原生命令’从推断变成实测",
+        "commandDraft": "e2e-test feature 下注册 a10_canary_write_marker 命令（release 构建不得包含）；恶意脚本 invoke 该命令；检查 marker 文件",
+        "passCriteria": [
+          "marker 文件不存在",
+          "invoke 返回 undefined/异常",
+          "无宿主命令执行记录"
+        ],
+        "evidence": [
+          "$ART/a10/ipc/marker-absent.txt",
+          "$ART/a10/ipc/invoke-log.json"
+        ]
+      },
+      {
+        "id": "A10-04",
+        "name": "token 暴露面",
+        "purpose": "证明服务 bearer token 不进入预览文档/URL，preview token 不能换服务能力",
+        "commandDraft": "扫描 preview iframe URL/DOM/console/network；用 preview token 调 /lingxi/v1/browser/*、/lingxi/v1/fs/* 必须 401/403/404；扫描 local-token.json 值出现次数",
+        "passCriteria": [
+          "服务 token 出现次数 0",
+          "preview token 越权请求全部拒绝",
+          "预览 URL 只含 previewToken"
+        ],
+        "evidence": [
+          "$ART/a10/tokens/token-scan.json",
+          "$ART/a10/tokens/preview-token-abuse.json"
+        ]
+      },
+      {
+        "id": "A10-05",
+        "name": "恶意 SVG 预览",
+        "purpose": "SVG 脚本/外链/file 读取不可达",
+        "commandDraft": "MediaViewer 打开 malicious.svg；检查无副作用标记、canary 零命中、file:// 图片失败；UI 仍显示或显式错误",
+        "passCriteria": [
+          "脚本未执行（无全局副作用）",
+          "外发 0",
+          "file:// 不可读",
+          "UI 不崩溃"
+        ],
+        "evidence": [
+          "$ART/a10/preview/malicious-svg.png",
+          "$ART/a10/preview/malicious-svg-dom.json"
+        ]
+      },
+      {
+        "id": "A10-06",
+        "name": "正常预览保留",
+        "purpose": "安全测试不得靠禁用功能通过",
+        "commandDraft": "benign HTML/SVG + markdown + docx/xlsx + PDF 逐一打开，断言内容/图片/分页可见",
+        "passCriteria": [
+          "正常渲染",
+          "无 CSP/权限误伤",
+          "PDF 预览路径按 OQ-07 实测结果记录"
+        ],
+        "evidence": [
+          "$ART/a10/preview/benign-*.png",
+          "$ART/a10/preview/benign-dom.json"
+        ]
+      },
+      {
+        "id": "A10-07",
+        "name": "浏览器不可信页对照",
+        "purpose": "验证受控浏览器网页同样拿不到宿主面",
+        "commandDraft": "受控浏览器打开 malicious.html；页面尝试 __TAURI__/file:///服务 API",
+        "passCriteria": [
+          "无 Tauri/服务 token",
+          "服务 API 拒绝（无 bearer）",
+          "页面/宿主边界与 R01 隔离探针一致"
+        ],
+        "evidence": [
+          "$ART/a10/browser/untrusted-page.json"
+        ]
+      },
+      {
+        "id": "A10-08",
+        "name": "服务侧安全回归",
+        "purpose": "复用既有强测试，避免 R09 只测 UI",
+        "commandDraft": "cargo test -p lingxi-service --test r06_t05_preview；cargo test -p lingxi-service --test r07_office_tools；cargo test -p lingxi-adapters --test r07_pdf_chromium -- --include-ignored",
+        "passCriteria": [
+          "CSP/token/素材域/50MB 测试通过",
+          "PDF 资源门禁/WS canary 零命中",
+          "Office 恶意归档拒绝"
+        ],
+        "evidence": [
+          "$ART/a10/regression/*.json"
+        ]
+      },
+      {
+        "id": "A10-09",
+        "name": "发布构建无测试后门/调试端口",
+        "purpose": "canary/wdio 只在 e2e-test 构建",
+        "commandDraft": "release binary strings 探测 a10_canary/wdio 计数=0；netstat 检查 WebDriver 端口（4444/4445/TAURI_WEBDRIVER_PORT 指定值）无监听",
+        "passCriteria": [
+          "release 无 canary/驱动符号",
+          "无 4444/定制端口监听"
+        ],
+        "evidence": [
+          "$ART/a10/ipc/release-strings.txt",
+          "$ART/a10/ipc/listen-ports.txt"
+        ]
+      }
+    ],
+    "passCriteria": [
+      "恶意 HTML/SVG 脚本可运行或不可运行都不产生宿主/服务权限副作用",
+      "服务 bearer token 零出现在预览面",
+      "preview token 无法越权",
+      "正常 HTML/SVG/Markdown/Office/PDF 预览仍可用",
+      "既有服务安全回归全绿"
+    ],
+    "artifactsRoot": "artifacts/rust-tauri/R09/T05/a10/",
+    "evidenceRefs": [
+      "docs/rust-tauri/R00/ACCEPTANCE_MAP.json:7280-7324",
+      "rust/crates/lingxi-service/src/preview.rs:377-433",
+      "rust/crates/lingxi-service/tests/r06_t05_preview.rs:73-313",
+      "rust/crates/lingxi-adapters/tests/r07_pdf_chromium.rs:502-578",
+      "docs/rust-tauri/R07/T04_REPORT.md:120-123"
+    ]
+  },
+  "openQuestions": [
+    {
+      "id": "OQ-01",
+      "question": "Chromium 分发方式与许可：随包运行时 / 依赖系统 Chrome / 首启下载？",
+      "risk": "A09 要求测试安装自身可完成浏览器用户接管与 PDF 输出；现状只有路径发现，无随包实现；随包约 400MB 压缩级，涉及嵌套签名/公证/更新通道；许可虽与 Electron 同构但需随包许可文本。",
+      "options": [
+        "CHROMIUM-A 系统 Chrome/Chromium 发现（当前代码已支持）",
+        "CHROMIUM-B 随包 Chromium 运行时（推荐最终形态）",
+        "CHROMIUM-C 首启下载（兜底）",
+        "CHROMIUM-D Tauri webview 打印（拒绝）"
+      ],
+      "recommendation": "R09 实现按部署供给接线并冻结 executable 路径+sha256+product；R10 发布选 CHROMIUM-B；R09 需把体积/许可/签名/更新登记 OPEN。",
+      "blocking": "partial",
+      "ownerHint": "R09-T05（接线/设计）+ R10（发布决策）",
+      "evidence": [
+        "rust/crates/lingxi-service/src/browser.rs:1271-1331",
+        "docs/rust-tauri/R01/ADR-002-browser-host.md:24,41-46",
+        "docs/rust-tauri/R01/ADR-003-document-renderer.md:54-59"
+      ]
+    },
+    {
+      "id": "OQ-02",
+      "question": "Windows x64 / Linux x64 / macOS x64 未验证：CDP pipe、窗口焦点、PDF 打印语义、预览渲染如何取证？",
+      "risk": "R09 无真机，跨平台 A09/A10 只能 BLOCKED_PLATFORM；交叉编译不等于原生证据；不能把 macOS arm64 结论外推。",
+      "options": [
+        "登记 BLOCKED_PLATFORM 并保留本机证据",
+        "R09-T07/R10 补真机"
+      ],
+      "recommendation": "R09 阶段只出 macOS arm64 证据；其余平台在 R09_HANDOFF.envBlockers 与 BLOCKED 表登记，不写 PASS。",
+      "blocking": "yes",
+      "ownerHint": "业主/环境 + R09-T07 + R10",
+      "evidence": [
+        "docs/rust-tauri/R09/BLOCKED.md:8-10",
+        "docs/rust-tauri/R01/BROWSER_SPIKE_REPORT.md:119-125",
+        "docs/rust-tauri/R01/ADR-003-document-renderer.md:65,79"
+      ]
+    },
+    {
+      "id": "OQ-03",
+      "question": "macOS 仅 CLT（无 Xcode.app）能否完成 Tauri build/bundle（dmg、签名链）？",
+      "risk": "R09 开工仅记录 Xcode CLT 27.0 无 Xcode.app；安装包/签名链未实测；若 bundling 依赖完整 Xcode，只能 dev 产物做功能证据。",
+      "options": [
+        "先做最小 tauri build 冒烟并记录",
+        "用 dev 产物 + 显式边界",
+        "等 Xcode/Developer ID"
+      ],
+      "recommendation": "T01/T07 在实现前先跑最小 build 冒烟；失败则记录边界并用 dev 产物；正式签名保持 BLOCKED。",
+      "blocking": "no",
+      "ownerHint": "R09-T01/T07 + R10",
+      "evidence": [
+        "docs/rust-tauri/R09/START_RECEIPT.md:6",
+        "docs/rust-tauri/R09/BLOCKED.md:12"
+      ]
+    },
+    {
+      "id": "OQ-04",
+      "question": "sidecar 参数限制是否影响浏览器/PDF 接入？",
+      "risk": "Tauri sidecar/externalBin 只适合单文件/triple 后缀/打包期固定参数，不适合 Chrome.app 目录；把 Chromium 当 sidecar 会导致 macOS 签名/更新失败。",
+      "options": [
+        "Chromium 作为 bundle.resources/安装资源根，由服务启动",
+        "系统路径"
+      ],
+      "recommendation": "不要用 Tauri sidecar 承载 Chromium；服务 Rust 侧 Process::launch 拥有进程。Tauri shell 插件能力参数校验仅作用于 JS 调用，不约束 Rust 侧 spawn。",
+      "blocking": "no",
+      "ownerHint": "R09-T05 + R10",
+      "evidence": [
+        "docs/rust-tauri/R01/TAURI_SPIKE_REPORT.md:59-77",
+        "docs/rust-tauri/R01/DEPENDENCY_DECISIONS.md:243",
+        "rust/crates/lingxi-adapters/src/browser/launcher.rs:119-220"
+      ]
+    },
+    {
+      "id": "OQ-05",
+      "question": "token 不落 URL 的边界：服务 bearer token 与 preview/media token 如何区分与验证？",
+      "risk": "媒体/预览为无 Authorization header 的子资源，只能走 loopback query token（现状）；preview token 在 DOM/URL 可见（10min/单文档），若误用服务 token 进 URL 则泄漏面扩大。",
+      "options": [
+        "保持现状 + A10 证明 preview token 越权失败",
+        "宿主代理消除 URL token（后续增强）"
+      ],
+      "recommendation": "服务 bearer token 只经宿主 HTTP；媒体 query token 仅限 local loopback（现有 canUseQueryToken 闸）；A10 扫描服务 token 零出现并证明 preview token 越权拒绝。",
+      "blocking": "no",
+      "ownerHint": "R09-T05（证明）+ R09-T06（可选增强）",
+      "evidence": [
+        "desktop/src/react/services/server-connection.ts:179-181,766-777",
+        "rust/crates/lingxi-service/src/preview.rs:807-846",
+        "desktop/src/shared/rust-browser-control.cjs:35-58"
+      ]
+    },
+    {
+      "id": "OQ-06",
+      "question": "Tauri webview origin 不在服务 Origin allowlist，且 HTML 预览 frame-ancestors 不含 Tauri origin——如何解决？",
+      "risk": "不解决则 Tauri 下 renderer fetch（文件预览/浏览器 UI/设置）全部 bad_origin，HTML 预览 iframe 被 CSP 拒绝；这是 T05/T02/T06 的交界硬阻断。 调查期间工作区已出现并发未提交修改（transport.rs:239-249、preview.rs:430-433，非 HEAD），若候选包含该修改需以候选重新取证并补精确匹配负向用例；不得把未提交修改当作已通过。",
+      "options": [
+        "A 宿主代理关键/全部服务 HTTP（浏览器/预览命令宿主化；全量代理属 T02 架构决策）",
+        "B 服务 origin allowlist 精确追加 tauri://localhost、http://tauri.localhost + frame-ancestors 追加同源（需安全评审与负向测试）",
+        "C Tauri dangerousUseHttpScheme（仍为 tauri.localhost，不解决）"
+      ],
+      "recommendation": "浏览器/预览命令按 D3 宿主代理；通用 renderer fetch 由 T02 决定（宿主代理或精确 origin 扩展）；frame-ancestors 由 T05 服务小改并配负向测试。",
+      "blocking": "yes",
+      "ownerHint": "R09-T02/T05/T06",
+      "evidence": [
+        "rust/crates/lingxi-service/src/transport.rs:25-52,224-267",
+        "rust/crates/lingxi-service/src/preview.rs:426-433",
+        "docs/rust-tauri/R01/DEPENDENCY_DECISIONS.md:243"
+      ]
+    },
+    {
+      "id": "OQ-07",
+      "question": "WKWebView 是否支持 Blob URL PDF 内联预览？",
+      "risk": "Electron/Chromium 可用；Tauri macOS=WKWebView 可能空白，影响 A09 文件预览叶与 Office PDF 产物预览。",
+      "options": [
+        "首测 blob PDF",
+        "宿主落临时只读文件+自定义协议",
+        "独立 viewer 窗口加载",
+        "PDF.js（需依赖决策）"
+      ],
+      "recommendation": "T05 首日冒烟实测；优先原生方案，PDF.js 仅作最后手段且需 R09-T01 依赖决策。",
+      "blocking": "no",
+      "ownerHint": "R09-T05",
+      "evidence": [
+        "desktop/src/react/components/preview/PreviewRenderer.tsx:657-689",
+        "docs/rust-tauri/R01/DEPENDENCY_DECISIONS.md:243"
+      ]
+    },
+    {
+      "id": "OQ-08",
+      "question": "接管后如何把受控 Chromium 窗口带到前台/聚焦？",
+      "risk": "Target.activateTarget + setWindowBounds(normal) 不保证 OS 前台；用户可能看不到网页窗口。",
+      "options": [
+        "接受用户点击确认（最小）",
+        "宿主平台级激活受控可执行（macOS open -a/NSRunningApplication.activate、Windows SetForegroundWindow；需 T06 权限评审）"
+      ],
+      "recommendation": "R09 先接受点击确认并在 viewer 文案引导；OS 激活作为后续增强，必须限定服务确认的受控可执行、不做任意命令面。",
+      "blocking": "no",
+      "ownerHint": "R09-T05（最小）+ R09-T06（增强）",
+      "evidence": [
+        "rust/crates/lingxi-adapters/src/browser/ops.rs:506-539,816-830",
+        "docs/rust-tauri/R07/T04_REPORT.md:108-117"
+      ]
+    },
+    {
+      "id": "OQ-09",
+      "question": "Tauri 安装布局如何让服务找到 Chromium 与 PDF 字体资产？",
+      "risk": "服务只有路径发现与 env 装配；缺资产会导致浏览器 UnavailableBrowser 与 PDF 失败（显式但不可用）。",
+      "options": [
+        "T02 启动服务时注入 LINGXI_CHROMIUM_PATH/LINGXI_OFFICE_*",
+        "安装资源根约定",
+        "R10 打包固化"
+      ],
+      "recommendation": "T02 注入 + 服务显式失败；A09 探针记录路径/版本；R10 固化。",
+      "blocking": "partial",
+      "ownerHint": "R09-T02/T05 + R10",
+      "evidence": [
+        "rust/crates/lingxi-service/src/browser.rs:1280-1298",
+        "rust/crates/lingxi-service/src/host_auxiliary.rs:28-77"
+      ]
+    },
+    {
+      "id": "OQ-10",
+      "question": "Tauri 壳如何处置非 lingxi-service 连接/旧 Node 回退分支？",
+      "risk": "renderer 仍存在 serverNodeKind !== 'lingxi-service' 的 file:// 与旧 viewer 分支；Tauri 若误走该分支会回落 Electron 语义或静默失败。",
+      "options": [
+        "Tauri host 只实现 lingxi-service；其他连接显式报错",
+        "保留只读状态展示但不提供本地浏览器"
+      ],
+      "recommendation": "非 lingxi-service 一律显式 browser_connection_required/unsupported，不回落旧 viewer；A09 负向覆盖远程/异节点不能操作本机浏览器。",
+      "blocking": "no",
+      "ownerHint": "R09-T01/T05",
+      "evidence": [
+        "desktop/src/react/services/rust-browser.ts:7-9",
+        "desktop/src/react/services/resource-url.ts:25-73",
+        "desktop/src/react/browser-viewer/BrowserViewerApp.tsx:46-62"
+      ]
+    },
+    {
+      "id": "OQ-11",
+      "question": "R01 旧链 PDF 基线缺失，A09 如何比对？",
+      "risk": "R07 质量门禁依赖 artifacts/rust-tauri/R01/T05/...（当前工作区无 R01 证据），直接跑 r07_pdf_chromium 会失败。",
+      "options": [
+        "独立对照环境重生成旧链基线并冻结",
+        "只做候选链自证不对比（不满足 A09 对照要求）"
+      ],
+      "recommendation": "用 tests/migration/r01-t05 脚本在独立对照环境重生成并冻结旧链基线（记录 Electron 版本/helper sha256），再 compare；旧链只在对照环境运行，不进入测试安装。",
+      "blocking": "partial",
+      "ownerHint": "R09-T05",
+      "evidence": [
+        "rust/crates/lingxi-adapters/tests/r07_pdf_chromium.rs:391-397",
+        "docs/rust-tauri/R07/T05_REPORT.md:42-45",
+        "scripts/rust-tauri/r01-t05-replay.sh:97-118"
+      ]
+    },
+    {
+      "id": "OQ-12",
+      "question": "docx/xlsx/markdown 预览是否存在 HTML 注入面（app origin 内 dangerouslySetInnerHTML）？",
+      "risk": "docx/xlsx 用 dangerouslySetInnerHTML 渲染服务解析出的 HTML；markdown 有 sanitizer。若解析器不转义，恶意文档可在 app origin 执行脚本，从而触达 Tauri IPC。",
+      "options": [
+        "A10 增加恶意 docx/xlsx/markdown 用例；实测后修复/隔离",
+        "改为 sandbox iframe 渲染 Office HTML（成本更高）"
+      ],
+      "recommendation": "T05 A10 必须覆盖；若可注入则修复解析器或在隔离 iframe 渲染；不在本调查中改代码。",
+      "blocking": "no",
+      "ownerHint": "R09-T05（测试）+ T05/T06（修复）",
+      "evidence": [
+        "desktop/src/react/components/preview/PreviewRenderer.tsx:755-767",
+        "desktop/src/react/utils/markdown.ts:1110-1119",
+        "rust/crates/lingxi-service/src/fsread.rs:198-252"
+      ]
+    },
+    {
+      "id": "OQ-13",
+      "question": "e2e-test canary/WebDriver 是否会进入发布构建？",
+      "risk": "A10 需要测试命令 canary 与 wdio 驱动；release 必须无后门/无调试端口。",
+      "options": [
+        "feature 门控 + release strings/端口探测（R01 A12 先例）"
+      ],
+      "recommendation": "canary/wdio 只在 e2e-test feature；A10-09 对 release 产物做 strings 计数与端口探测。",
+      "blocking": "no",
+      "ownerHint": "R09-T05/T06",
+      "evidence": [
+        "desktop/src-tauri/Cargo.toml:27,32-33",
+        "docs/rust-tauri/R01/DEPENDENCY_DECISIONS.md:243"
+      ]
+    },
+    {
+      "id": "OQ-14",
+      "question": "Tauri 崩溃/强杀后服务与 Chromium/PDF 进程如何回收？",
+      "risk": "Tauri 崩溃可能留下服务与 Chromium 窗口；未实测进程树回收。",
+      "options": [
+        "A09/A10 增加宿主 SIGKILL 后进程树探针",
+        "服务侧已有进程组清理（需实测）"
+      ],
+      "recommendation": "T02/T05 增加宿主任意退出后回收证据；服务 shutdown/close_all 已实现（browser.rs:1262-1267、host.rs:1087-1174），用实测证明。",
+      "blocking": "no",
+      "ownerHint": "R09-T02/T05",
+      "evidence": [
+        "rust/crates/lingxi-service/src/browser.rs:1262-1267",
+        "rust/crates/lingxi-adapters/src/browser/host.rs:1087-1174"
+      ]
+    },
+    {
+      "id": "OQ-15",
+      "question": "R07 保留的真实 Chromium 弹窗/cookie 后 Resume 失败如何在 R09 收口？",
+      "risk": "R07 HANDOFF 明确保留 t07BrowserFailures；R09 若不复测就声称浏览器保真，属于把历史失败当已解释。",
+      "options": [
+        "A09 重跑并保留/修复记录",
+        "维持失败但显式登记"
+      ],
+      "recommendation": "R09 A09 重跑；失败保留原始回执并在 T05 报告登记，修好则用新候选证据关闭。",
+      "blocking": "no",
+      "ownerHint": "R09-T05",
+      "evidence": [
+        "docs/rust-tauri/R07/R07_HANDOFF.json:36-44",
+        "docs/rust-tauri/R07/T07_FAILURE_HISTORY.json:4798-4824"
+      ]
+    },
+    {
+      "id": "OQ-16",
+      "question": "office/pdf 工具在 Rust 服务中是否对真实模型可发现/可调用（Deferred 且无 resident 激活路径）？",
+      "risk": "office 工具注册为 Availability::Deferred（office_tools.rs:1229）；模型声明快照只声明 Available+resident（model_exchange.rs:107-116、toolcatalog.rs:1812-1827）。本调查未发现 office 工具的 add_model_resident/on-demand 激活路径。A09 用确定性 stub 直接发 tool_call 可证明真实工具链可执行，但不能证明真实模型能发现并调用该工具；若确缺失，Office PDF 功能在产品面不可用（功能回归）。",
+      "options": [
+        "A09 记录 stub 直接派发口径，另行产品面复核",
+        "为 office 工具补 resident/on-demand 激活（需评估工具声明面/权限）"
+      ],
+      "recommendation": "A09 证据必须注明“stub 直接派发”；把模型可发现性作为 R09 产品面/门禁风险另测，必要时补 on-demand 激活或 resident 注册。",
+      "blocking": "partial",
+      "ownerHint": "R09-T05 证据口径 + R09 产品面复核",
+      "evidence": [
+        "rust/crates/lingxi-service/src/office_tools.rs:1206-1229",
+        "rust/crates/lingxi-kernel/src/model_exchange.rs:107-116",
+        "rust/crates/lingxi-kernel/src/toolcatalog.rs:1812-1827",
+        "rust/crates/lingxi-service/src/browser_tools.rs:204-207"
+      ]
+    }
+  ],
+  "leafCoverage": [
+    {
+      "leafId": "R00-T02-LA-A67D342381C0",
+      "featureId": "F-D14-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-BROWSER-TABS-A67D34",
+      "coverage": "A09-03/04/05：真实 tabs 同步 + 无效 tabId + 关闭失败不显示已关闭",
+      "source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json:70273",
+      "when": "在可见浏览器新建、切换或关闭标签",
+      "then": "会话对应的标签集合和活动标签在 viewer 同步，服务端快照跟随变化",
+      "assertions": [
+        "会话对应的标签集合和活动标签在 viewer 同步，服务端快照跟随变化",
+        "无效 tabId 不执行；关闭失败不得显示已关闭"
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-A09B78985A14",
+      "featureId": "F-D14-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-BROWSER-EMERGENCY-STOP-A09B78",
+      "coverage": "A09-04/05 + D6 急停路径；viewer 关闭不误记急停；无会话旧实例在 Tauri 路径不可达并以空态/显式不可用替代",
+      "source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json:71295",
+      "when": "在可见浏览器点击紧急停止",
+      "then": "有会话时 server BrowserManager 关闭浏览器并撤销 Agent 授权至下一条消息",
+      "assertions": [
+        "有会话时 server BrowserManager 关闭浏览器并撤销 Agent 授权至下一条消息",
+        "无会话旧实例仅本地销毁；关闭失败应可见，不得只隐藏窗口"
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-8A45B19A18B4",
+      "featureId": "F-D14-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-BROWSER-NAVIGATION-8A45B1",
+      "coverage": "A09-05：back/forward/reload/地址/非法 URL 负向",
+      "source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "when": "在可见浏览器后退、前进、刷新或输入地址",
+      "then": "活动会话 WebContents 导航并更新地址和可用状态",
+      "assertions": [
+        "活动会话 WebContents 导航并更新地址和可用状态",
+        "无活动 view 不执行；非法地址不加载"
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-13049521EA0C",
+      "featureId": "F-D14-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-CLOSE-BROWSER-VIEWER-130495",
+      "coverage": "A09-04：关闭 viewer 窗口与会话清理分离",
+      "source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "when": "关闭可见浏览器窗口",
+      "then": "viewer 窗口关闭；会话浏览器清理应按已有会话策略另验",
+      "assertions": [
+        "viewer 窗口关闭；会话浏览器清理应按已有会话策略另验",
+        "关闭窗口不能误记为急停撤权"
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-6E13E5DF05EB",
+      "featureId": "F-D14-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-BROWSER-VIEWER-6E13E5",
+      "coverage": "A09-04：指定会话标签、允许 URL 新开标签、空态、非法 URL、不建空标签",
+      "source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "when": "打开可见浏览器查看器",
+      "then": "窗口显示指定会话标签；传入允许 URL 时新开标签，空会话显示空态",
+      "assertions": [
+        "窗口显示指定会话标签；传入允许 URL 时新开标签，空会话显示空态",
+        "非法 URL 不加载；打开窗口本身不创建空标签"
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-7D212CBD9EEF",
+      "featureId": "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-SEARCH-VERIFY-POST-7D212C",
+      "coverage": "A09-11：搜索供应商验证（确定性替身），成功才保存、失败不保存",
+      "source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "when": "用户验证搜索供应商",
+      "then": "外部验证成功后保存选定 provider/key，失败不保存",
+      "assertions": [
+        "成功时核对：外部验证成功后保存选定 provider/key，失败不保存",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-1809C8E13EA3",
+      "featureId": "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-BROWSER--1809C8",
+      "coverage": "A09-11：读取偏好 + 运行中状态，不改设置",
+      "source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "when": "用户读取浏览器偏好",
+      "then": "返回浏览器设置及运行中 BrowserManager 状态，不改动设置",
+      "assertions": [
+        "成功：执行“读取浏览器偏好”后，返回浏览器设置及运行中 BrowserManager 状态，不改动设置",
+        "拒绝/边界：engine.getBrowserPreferences/setBrowserPreferences；PUT 后调用 applyBrowserPreferences；不应错误扩大写入或披露范围"
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-03A9E92909C6",
+      "featureId": "F-D14-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-BROWSER-CLEAR-C-03A9E9",
+      "coverage": "A09-11：清站点资料成功/失败真实回执",
+      "source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "when": "用户清除内置浏览器站点资料",
+      "then": "清除 Cookie 与站点数据后返回成功，失败时返回错误",
+      "assertions": [
+        "执行“清除内置浏览器站点资料”后核对：清除 Cookie 与站点数据后返回成功，失败时返回错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-ED5FD5B469B8",
+      "featureId": "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-BROWSER--ED5FD5",
+      "coverage": "A09-11：更新偏好部分失败读回真实状态，不假设回滚",
+      "source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "when": "用户更新浏览器偏好",
+      "then": "保存浏览器设置及运行中 BrowserManager 状态并返回新状态",
+      "assertions": [
+        "成功：执行“更新浏览器偏好”后，保存浏览器设置及运行中 BrowserManager 状态并返回新状态",
+        "应用失败返回 400 时读回已保存偏好与运行中浏览器状态，不假设自动回滚"
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-367052089D11",
+      "featureId": "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-BROWSER-SESSION-STATES-367052",
+      "coverage": "A09-11：session-states active/resumable/unavailable",
+      "source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "when": "用户查看浏览器会话状态",
+      "then": "返回活跃、可恢复或不可用状态",
+      "assertions": [
+        "给定目标与相应权限，执行“查看浏览器会话状态”后核对：返回活跃、可恢复或不可用状态",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-593534A4F2AB",
+      "featureId": "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-BROWSER-SESSIONS-593534",
+      "coverage": "A09-11：workspaces 会话列表 + 冷恢复网址",
+      "source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "when": "用户查看已运行浏览器会话",
+      "then": "返回 BrowserManager 当前浏览器会话列表",
+      "assertions": [
+        "给定目标与相应权限，执行“查看已运行浏览器会话”后核对：返回 BrowserManager 当前浏览器会话列表",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-178C8CBA29C2",
+      "featureId": "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-BROWSER-CLOSE-SESSION-C-178C8C",
+      "coverage": "A09-11：close-session 关闭并广播状态",
+      "source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "when": "用户关闭会话浏览器",
+      "then": "会话浏览器关闭并广播状态",
+      "assertions": [
+        "给定目标与相应权限，执行“关闭会话浏览器”后核对：会话浏览器关闭并广播状态",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-F1A5597E3E78",
+      "featureId": "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-BROWSER-CLOSE-SESSION-R-F1A559",
+      "coverage": "A09-11：close-session revoke=true 撤权 + 广播",
+      "source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "when": "用户关闭并撤销浏览器授权",
+      "then": "会话浏览器关闭且该会话的浏览器授权被撤销",
+      "assertions": [
+        "给定目标与相应权限，执行“关闭并撤销浏览器授权”后核对：会话浏览器关闭且该会话的浏览器授权被撤销",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-DCD85A04A7E9",
+      "featureId": "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-BROWSER-OPEN-SESSION-DCD85A",
+      "coverage": "A09-11：open-session 恢复并让 viewer 显示该会话；失败空态",
+      "source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "when": "用户打开会话浏览器",
+      "then": "尝试恢复选定会话浏览器并让查看器显示该会话；恢复失败可显示空态",
+      "assertions": [
+        "给定目标与相应权限，执行“打开会话浏览器”后核对：尝试恢复选定会话浏览器并让查看器显示该会话；恢复失败可显示空态",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-A30E4BDF2FA2",
+      "featureId": "F-D14-TOOL-TOOL-BROWSER-A30E4B",
+      "coverage": "A09-03/05/06/11：browser 工具主要分支、会话隔离、过期 ref、显式失败",
+      "source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "when": "分别调用 browser 的主要分支，并从会话、文件/状态或外部结果读回",
+      "then": "按会话隔离的浏览器完成动作，返回快照/图片/状态并记录操作；可见模式有远控状态。",
+      "assertions": [
+        "导航后标题或快照匹配",
+        "过期ref明确失败",
+        "会话A状态不泄给B",
+        "无会话、过期元素ref、阻断网页或浏览器错误显式失败，不误操作另一会话。"
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-FD7A5A76B8EA",
+      "featureId": "F-D14-TOOL-TOOL-WEB-FETCH-FD7A5A",
+      "coverage": "A09-11：web_fetch 正文/最终 URL/阻断页/失败显式（loopback 替身）",
+      "source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "when": "分别调用 web_fetch 的主要分支，并从会话、文件/状态或外部结果读回",
+      "then": "返回页面/接口正文、最终URL或提取摘要，供会话引用。",
+      "assertions": [
+        "正文与URL对应",
+        "阻断页不当正常内容",
+        "URL无效、重定向/网络失败或受限内容给错误；不自动写工作区。"
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-D1B56A275C3A",
+      "featureId": "F-D14-TOOL-TOOL-WEB-SEARCH-D1B56A",
+      "coverage": "A09-11：web_search 标题/链接/摘要/供应商，未配置不假成功（确定性替身）",
+      "source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "when": "分别调用 web_search 的主要分支，并从会话、文件/状态或外部结果读回",
+      "then": "返回标题、链接、摘要及供应商信息，结果可在会话中引用。",
+      "assertions": [
+        "结果含真实链接",
+        "无配置不假成功",
+        "未配置/缺key、限流/服务故障显式失败，不伪造搜索命中。"
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-4173A08A51CC",
+      "featureId": "F-D09-UI_BEHAVIOR-UI-BEHAVIOR-FILE-PREVIEW-4173A0",
+      "coverage": "A09-11 + A10-06：text/markdown/Office 预览、资源变化重读、只读 viewer；A10 恶意内容隔离",
+      "source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json:107837",
+      "when": "从书桌/资源打开文件预览并等待外部改动",
+      "then": "文本/Markdown/Office 等显示相应预览；资源改变事件后重读；可派生只读窗口",
+      "assertions": [
+        "文本/Markdown/Office 等显示相应预览；资源改变事件后重读；可派生只读窗口",
+        "二进制/过大文件显示信息卡；读取失败错误；独立 viewer 不回写主编辑状态"
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-8BD3BCC6D725",
+      "featureId": "F-D14-UI-UI-SETTINGS-BROWSER-8BD3BC",
+      "coverage": "A09-11：设置页浏览器逐动作真实状态；失败不伪装空数据",
+      "source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+      "when": "逐一执行 UI 动作矩阵记录的自动加载与可见控件",
+      "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+      "assertions": [
+        "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+        "自动从设置快照或 GET 读取浏览器偏好：成功核对 Cookie 与开标签行为呈现；空态/未初始化核对 prefs null 时控件禁用；错误/无权限核对 读取失败 toast",
+        "Cookie 接受开关和 Agent 打开行为：成功核对 乐观更新后以服务端结果回写快照；空态/未初始化核对 prefs 尚无数据时禁用；错误/无权限核对 失败回滚旧值并 toast",
+        "清除 Cookie：成功核对 成功 toast；空态/未初始化核对 无适用空态；错误/无权限核对 失败 toast；清理中按钮禁用"
+      ]
+    }
+  ],
+  "blockingRisksTop3": [
+    {
+      "rank": 1,
+      "risk": "Tauri origin/CSP 双重阻断",
+      "detail": "服务 Origin allowlist 不含 Tauri origin（transport.rs:224-267），HTML 预览 frame-ancestors 不含 Tauri origin（preview.rs:426-433）；不解决则 Tauri 下文件预览/服务 fetch/HTML 预览不可用，A09 leaf 4173A0 与 A10 无法通过。",
+      "owner": "R09-T02/T05/T06"
+    },
+    {
+      "rank": 2,
+      "risk": "Chromium 分发/签名/打包未定稿",
+      "detail": "无随包实现、无正式签名身份、CLT-only 构建未验（browser.rs:1280-1298，R09/BLOCKED.md:12，START_RECEIPT:6）；A09 发布形态不可复现。",
+      "owner": "R09-T05 + R10"
+    },
+    {
+      "rank": 3,
+      "risk": "跨平台与旧链基线缺失",
+      "detail": "Windows/Linux/macOS x64 无真机（BLOCKED.md:8-10）；R01 旧链 PDF 基线不在工作区（r07_pdf_chromium.rs:391-397）；A09 对照需先独立环境重生成。",
+      "owner": "R09-T07/R10 + R09-T05"
+    }
+  ],
+  "references": [
+    "docs/rust-tauri/R01/ADR-002-browser-host.md",
+    "docs/rust-tauri/R01/ADR-003-document-renderer.md",
+    "docs/rust-tauri/R01/BROWSER_SPIKE_REPORT.md",
+    "docs/rust-tauri/R01/PDF_SPIKE_REPORT.md",
+    "docs/rust-tauri/R01/TAURI_SPIKE_REPORT.md",
+    "docs/rust-tauri/R01/DEPENDENCY_DECISIONS.md",
+    "docs/rust-tauri/R07/T04_REPORT.md",
+    "docs/rust-tauri/R07/T05_REPORT.md",
+    "docs/rust-tauri/R07/T07_FAILURE_HISTORY.json",
+    "docs/rust-tauri/R07/R07_HANDOFF.json",
+    "docs/rust-tauri/R09/START_RECEIPT.md",
+    "docs/rust-tauri/R09/BLOCKED.md",
+    "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+    "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+    "tests/migration/r01-t05/",
+    "scripts/rust-tauri/r01-t05-replay.sh",
+    "scripts/rust-tauri/r00-t06-stub-provider.mjs",
+    "desktop/main.cjs",
+    "desktop/preload.cjs",
+    "desktop/src/shared/rust-browser-control.cjs",
+    "desktop/src/react/browser-viewer/",
+    "desktop/src/react/services/rust-browser.ts",
+    "desktop/src/react/components/preview/PreviewRenderer.tsx",
+    "desktop/src-tauri/",
+    "rust/crates/lingxi-kernel/src/browser.rs",
+    "rust/crates/lingxi-service/src/browser.rs",
+    "rust/crates/lingxi-service/src/browser_routes.rs",
+    "rust/crates/lingxi-service/src/browser_host.rs",
+    "rust/crates/lingxi-service/src/browser_tools.rs",
+    "rust/crates/lingxi-service/src/preview.rs",
+    "rust/crates/lingxi-service/src/office_tools.rs",
+    "rust/crates/lingxi-service/src/office_pdf.rs",
+    "rust/crates/lingxi-service/src/transport.rs",
+    "rust/crates/lingxi-adapters/src/browser/"
+  ],
+  "workspaceConcurrentChanges": [
+    {
+      "observedAt": "2026-10-26",
+      "committed": false,
+      "notOwnedByThisTask": true,
+      "path": "rust/crates/lingxi-service/src/transport.rs",
+      "lines": "239-249,443-470（工作区）",
+      "summary": "并发修改在 check_origin 精确允许 tauri://localhost、http://tauri.localhost、https://tauri.localhost，并加负向测试；不在 HEAD aac8cb9 中。",
+      "relation": "对应本文件 OQ-06 的服务侧 origin 缺口"
+    },
+    {
+      "observedAt": "2026-10-26",
+      "committed": false,
+      "notOwnedByThisTask": true,
+      "path": "rust/crates/lingxi-service/src/preview.rs",
+      "lines": "430-433,947-948（工作区）",
+      "summary": "并发修改把三个 Tauri origin 追加到 HTML 预览 CSP frame-ancestors；不在 HEAD aac8cb9 中。",
+      "relation": "对应本文件 OQ-06 / CS-34 的 frame-ancestors 缺口"
+    }
+  ],
+  "leafLedgerSource": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json（supplemental_scenarios 中 execution_task_ids 含 R09-T05 的 19 叶；字段 id/feature_id/when/then/assertions 逐字）"
+}

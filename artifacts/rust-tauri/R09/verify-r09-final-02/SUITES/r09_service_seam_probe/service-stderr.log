@@ -1,0 +1,20 @@
+2026-10-26T16:28:27.202002Z  INFO lingxi_service: data root resolved [token] source=cli ignored_sources=env(LINGXI_HOME)[token]
+2026-10-26T16:28:27.203243Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) [token] [token]
+2026-10-26T16:28:27.203388Z  INFO lingxi_service: model plane resolved (credentials never logged) model_plane_source=None providers=0
+2026-10-26T16:28:27.206905Z  INFO lingxi_service: single-writer lock acquired [token] start_nonce=0783279e08f3580b pid=76548 entropy="os-random-device" lock=/private/tmp/lingxi-r09-origin-probe/home-76541-1793032104394/lingxi-service/instance.lock network_mode=loopback
+2026-10-26T16:28:27.220616Z  INFO lingxi_service: data-epoch gate passed [token] decision=ProceedStampedNew(EpochStamp { format: V2, minimum_reader_epoch: 2, committed_data_epoch: 2, last_version: Some("0.0.0") })
+2026-10-26T16:28:27.297671Z  INFO lingxi_adapters::storage::run_store: run database migrated db=/private/tmp/lingxi-r09-origin-probe/home-76541-1793032104394/lingxi-service/data/runs.db applied=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28] version=28
+2026-10-26T16:28:27.331990Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded local_token_file=/private/tmp/lingxi-r09-origin-probe/home-76541-1793032104394/lingxi-service/local-token.json run_database=/private/tmp/lingxi-r09-origin-probe/home-76541-1793032104394/lingxi-service/data/runs.db
+2026-10-26T16:28:27.344701Z  INFO lingxi_service: instance record published (atomic write) record=/private/tmp/lingxi-r09-origin-probe/home-76541-1793032104394/lingxi-service/instance.json bind_addr=127.0.0.1:54195
+LINGXI_TRANSPORT_REJECTED request_id="req-e556814968fbd1b53ab0518b39bc8cb1" method=GET path=/lingxi/v1/health status=403 reason=bad_origin origin=tauri://evil host=127.0.0.1:54195 remote=127.0.0.1:54200
+LINGXI_TRANSPORT_REJECTED request_id="req-1806f1203920e04c41cb1f5b72d624de" method=GET path=/lingxi/v1/health status=403 reason=bad_origin origin=http://evil.tauri.localhost host=127.0.0.1:54195 remote=127.0.0.1:54201
+LINGXI_TRANSPORT_REJECTED request_id="req-527f04998e4a25c72fdc5186ec1fa92b" method=GET path=/lingxi/v1/health status=403 reason=bad_origin origin=http://tauri.localhost:8080 host=127.0.0.1:54195 remote=127.0.0.1:54202
+LINGXI_TRANSPORT_REJECTED request_id="req-99b7641b4de845481b8ff9ae10339338" method=GET path=/lingxi/v1/health status=403 reason=bad_origin origin=http://tauri.localhost.evil.example host=127.0.0.1:54195 remote=127.0.0.1:54203
+LINGXI_TRANSPORT_REJECTED request_id="req-dcbf53bf5e58ede1dff4e0e161568c9c" method=OPTIONS path=/lingxi/v1/health status=403 reason=bad_origin origin=tauri://evil host=127.0.0.1:54195 remote=127.0.0.1:54205
+2026-10-26T16:28:27.381936Z  INFO lingxi_service: request handled request_id="req-ffa7273a6f62dddc9b0d7294678c4898" method=GET path=/lingxi/v1/server/identity status=200
+LINGXI_TRANSPORT_REJECTED request_id="req-ca9cf74245265fd0db27b23cea4344ac" method=GET path=/lingxi/v1/server/identity status=403 reason=bad_origin origin=tauri://evil host=127.0.0.1:54195 remote=127.0.0.1:54207
+2026-10-26T16:28:27.382500Z  INFO lingxi_service: request handled request_id="req-ca9cf74245265fd0db27b23cea4344ac" method=GET path=/lingxi/v1/server/identity status=403
+2026-10-26T16:28:27.382752Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-10-26T16:28:27.387569Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-10-26T16:28:27.387883Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-10-26T16:28:27.387949Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

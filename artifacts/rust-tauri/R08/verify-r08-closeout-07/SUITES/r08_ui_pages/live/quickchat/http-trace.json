@@ -1,0 +1,27 @@
+[
+  {
+    "method": "POST",
+    "path": "/lingxi/v1/agents",
+    "status": 200
+  },
+  {
+    "method": "PUT",
+    "path": "/lingxi/v1/agents/quick-a/config",
+    "status": 200
+  },
+  {
+    "method": "POST",
+    "path": "/lingxi/v1/sessions",
+    "status": 201
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/preferences/session-permission-default",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/preferences/session-permission-default",
+    "status": 200
+  }
+]

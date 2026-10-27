@@ -1,0 +1,76 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t01_react_parity",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 111.587,
+ "caseCount": 18,
+ "casesSha256": "7c17c3cc8175d542e352d5659b2a9a628554d4557c088bc09dbdbece74ffbec2",
+ "commands": [
+  {
+   "id": "renderer-build-1",
+   "argv": [
+    "npm",
+    "run",
+    "build:renderer"
+   ],
+   "exitCode": 0,
+   "durationSecs": 7.053,
+   "logSha256": "41aac824c137a69524fc60ba50fe59182eb0f062058814c707d353756145f78e"
+  },
+  {
+   "id": "tauri-build-debug-1",
+   "argv": [
+    "node",
+    "scripts/tauri-build.mjs",
+    "--debug",
+    "--receipt",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t01/run-06/tauri-build-debug.json"
+   ],
+   "exitCode": 0,
+   "durationSecs": 86.15,
+   "logSha256": "e4e608a333ba69f4872be742186ed0ebd6ee2dc127a63e1b4c3192297084efe7"
+  },
+  {
+   "id": "git-status",
+   "argv": [
+    "git",
+    "status",
+    "--porcelain",
+    "--",
+    "desktop/src/react",
+    "desktop/src/modules"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.018,
+   "logSha256": "dcb6243c17cccdefca08e0ff13c3cb5e2a282b7df4038b00a6958a0cdeb318ea"
+  },
+  {
+   "id": "dist-resource-marker-scan",
+   "argv": [
+    "grep",
+    "-rl",
+    "resource-desktop",
+    "desktop/dist-renderer"
+   ],
+   "exitCode": 1,
+   "durationSecs": 0.775,
+   "logSha256": "1ef3c35a90d56b9779a0e7f52e62dc02392c9d12022d35faed719d9911ed2400"
+  }
+ ],
+ "logSha256": "2c904b2974654d69f73b94cf3c5d5280435ed2c917c994668480b696262d8409",
+ "finishedAtUnixMs": 1793023400457,
+ "rendererDigest": "b647fe90773e2d4269ecfc8de659c596270b73cd70e4ed7520e51074a16a5528",
+ "electronStopped": {
+  "service_residual": []
+ },
+ "tauriStopped": {
+  "timedOut": false,
+  "service_residual": []
+ },
+ "diagnosticsHome": "/private/tmp/lingxi-r09-runtime/r09_t01_react_parity-46469-1793023288870/home-tauri/diagnostics/tauri-launch/events.jsonl",
+ "platform": "macos-arm64",
+ "failedCases": [
+  "a01::dom-snapshot-parity"
+ ]
+}

@@ -1,0 +1,11 @@
+{
+  "actual": null,
+  "atUnixMs": 1793024813744,
+  "code": "RUST_SERVICE_CRASH_RESTART_EXHAUSTED",
+  "detailPath": "/private/tmp/lingxi-r09-phase1-automation/home/diagnostics/tauri-launch/failure.json",
+  "expected": null,
+  "home": "/private/tmp/lingxi-r09-phase1-automation/home",
+  "message": "Rust service crashed 2 times; not restarting again",
+  "modalShown": false,
+  "schema": "lingxi.r09.host-failure-dialog.v1"
+}

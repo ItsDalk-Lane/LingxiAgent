@@ -1,0 +1,19 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t02_process_ownership",
+ "status": "PASS",
+ "exitCode": 0,
+ "durationSecs": 10.928,
+ "caseCount": 13,
+ "casesSha256": "ffeaadf6a4a7f496436ab7706b5b85504f48ae35f8b6a2ea5650d40f1bef0346",
+ "commands": [],
+ "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+ "finishedAtUnixMs": 1793063931066,
+ "hiddenOnly": true,
+ "pendingVisible": [
+  "ownership-release-refuses-remote",
+  "ownership-pid-reuse",
+  "ownership-packaged-exit-graceful"
+ ],
+ "note": "hidden-only 子集：只对已执行 debug hidden cases 判定；pendingVisible 不冒充通过"
+}

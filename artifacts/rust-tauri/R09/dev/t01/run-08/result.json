@@ -1,0 +1,84 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t01_react_parity",
+ "status": "PASS",
+ "exitCode": 0,
+ "durationSecs": 32.088,
+ "caseCount": 18,
+ "casesSha256": "a7b244dd74f5be1a5b04fb78d8ad15d794b75dcc3191b6d634938f25558a6f84",
+ "commands": [
+  {
+   "id": "renderer-build-1",
+   "argv": [
+    "npm",
+    "run",
+    "build:renderer"
+   ],
+   "exitCode": 0,
+   "durationSecs": 6.836,
+   "logSha256": "b609c4a7521cd15531499eec857d06f2e76aed5db44593cfcf8fe1cc53324adc"
+  },
+  {
+   "id": "theme-build-1",
+   "argv": [
+    "npm",
+    "run",
+    "build:theme"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.222,
+   "logSha256": "7181cb88d480e5589d9c4f0c19e0b03205a238784dd7d0e24cd4ab891a8b6d96"
+  },
+  {
+   "id": "tauri-build-debug-1",
+   "argv": [
+    "node",
+    "scripts/tauri-build.mjs",
+    "--debug",
+    "--receipt",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t01/run-08/tauri-build-debug.json"
+   ],
+   "exitCode": 0,
+   "durationSecs": 7.124,
+   "logSha256": "3372c1ee92024a621825db6f5ccdc2be3ce49194569f56eaefbd24386d4e2038"
+  },
+  {
+   "id": "git-status",
+   "argv": [
+    "git",
+    "status",
+    "--porcelain",
+    "--",
+    "desktop/src/react",
+    "desktop/src/modules"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.017,
+   "logSha256": "10d87646af3e12f2b2463ed08456dfb3d4c2db12097c7583f7dc3788ebcb09a0"
+  },
+  {
+   "id": "dist-resource-marker-scan",
+   "argv": [
+    "grep",
+    "-rl",
+    "resource-desktop",
+    "desktop/dist-renderer"
+   ],
+   "exitCode": 1,
+   "durationSecs": 0.724,
+   "logSha256": "725da0f8ac1fab16c6579e354904f4da50bdfb1bc1064cfeeac6fcdbbc4be5d7"
+  }
+ ],
+ "logSha256": "b3d1f717a9b6ce2292aa7d30cbfff5a058385fc2eab54c8512e54dccc46d0a35",
+ "finishedAtUnixMs": 1793023981068,
+ "rendererDigest": "d09359bd5bc87071c7e4cfc7fffb99553bc39b1345dd83946dcd14c51f244f31",
+ "electronStopped": {
+  "service_residual": []
+ },
+ "tauriStopped": {
+  "timedOut": false,
+  "service_residual": []
+ },
+ "diagnosticsHome": "/private/tmp/lingxi-r09-runtime/r09_t01_react_parity-72877-1793023948980/home-tauri/diagnostics/tauri-launch/events.jsonl",
+ "platform": "macos-arm64"
+}

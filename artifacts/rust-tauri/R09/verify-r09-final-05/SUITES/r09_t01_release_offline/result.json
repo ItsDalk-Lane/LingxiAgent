@@ -1,0 +1,105 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t01_release_offline",
+ "status": "PASS",
+ "exitCode": 0,
+ "durationSecs": 6.083,
+ "caseCount": 20,
+ "casesSha256": "0760aa164ddc512dcbf2f31ea7f7213e6d0d4263a78eee9fb7c1a6a1ece913f3",
+ "commands": [
+  {
+   "id": "strings-devUrl",
+   "argv": [
+    "/bin/sh",
+    "-c",
+    "strings -a /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E \"devUrl\" || true"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.182,
+   "logSha256": "8e8d8b560925c1aeb6f057e603696e243bfc0b62f48a9e4e639d6284198f0ee9"
+  },
+  {
+   "id": "strings-localhost5173",
+   "argv": [
+    "/bin/sh",
+    "-c",
+    "strings -a /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E \"localhost:5173\" || true"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.181,
+   "logSha256": "3fac1c704d6c52c9775fe666bbccf471b4bf9f9cd84b75c4805373e03db34bc7"
+  },
+  {
+   "id": "strings-1275173",
+   "argv": [
+    "/bin/sh",
+    "-c",
+    "strings -a /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E \"127\\\\.0\\\\.0\\\\.1:5173\" || true"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.18,
+   "logSha256": "34511f4476ae83f70f54c2d68b47cb4c90c61e1d1c0e6b178bf7f36ca50e0b6d"
+  },
+  {
+   "id": "strings-disttauri",
+   "argv": [
+    "/bin/sh",
+    "-c",
+    "strings -a /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E \"dist-tauri-resources\" || true"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.181,
+   "logSha256": "eed5ab1633626b696479407951ea9240ae4718bd10696171f4d4531df6db6005"
+  },
+  {
+   "id": "strings-wdio",
+   "argv": [
+    "/bin/sh",
+    "-c",
+    "strings -a /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E \"wdio|webdriver\" || true"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.182,
+   "logSha256": "8832dd02f9b15a80f628abfffd0fc673d38bea50decfed030b16d8187867f484"
+  },
+  {
+   "id": "codesign-verify",
+   "argv": [
+    "codesign",
+    "--verify",
+    "--deep",
+    "--strict",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.073,
+   "logSha256": "d7983e8747259381f2bf2c1f202edecdac5a73485429836a6d4e091586da5df6"
+  },
+  {
+   "id": "codesign-details",
+   "argv": [
+    "codesign",
+    "-dv",
+    "--verbose=2",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.008,
+   "logSha256": "5bea94e7c09091acc09a84b44b883e1314731d2c67cfea005bbaa9e8271d6177"
+  }
+ ],
+ "logSha256": "c9b7e285c053785ce550eefefa2277f114e77a792d66af9ef0be082891f316e5",
+ "finishedAtUnixMs": 1793034996430,
+ "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+ "serviceManifest": {
+  "protocol": {
+   "serverKind": "lingxi-service",
+   "wireProtocolMin": 1,
+   "wireProtocolMax": 1,
+   "dataEpoch": 2
+  }
+ },
+ "codesign": null,
+ "platform": "macos-arm64",
+ "signingBoundary": "ad-hoc only; formal signing/notarization BLOCKED-SIGNING-IDENTITY"
+}

@@ -5835,5 +5835,30 @@
     "zoomOut": "Zoom out",
     "ungrouped": "Ungrouped",
     "forkBusy": "This session is generating a reply — try again later"
+  },
+  "systemPermissions": {
+    "title": "System permissions",
+    "description": "This test build needs macOS permission for microphone, speech recognition and notifications. The buttons below trigger the real system prompts.",
+    "microphone": "Microphone",
+    "speech": "Speech recognition",
+    "notification": "Notifications",
+    "request": "Request",
+    "testNotification": "Send test notification",
+    "granted": "Granted",
+    "denied": "Denied",
+    "unsupported": "Unsupported",
+    "failed": "Request failed",
+    "notRequested": "Not requested",
+    "micGranted": "Microphone granted",
+    "micDenied": "Microphone denied; enable it in System Settings",
+    "micUnsupported": "Microphone request unsupported here",
+    "speechGranted": "Speech recognition granted",
+    "speechDenied": "Speech recognition denied/unavailable",
+    "speechResult": "Speech permission state updated",
+    "notificationTitle": "Lingxi notification test",
+    "notificationBody": "If you see this, notifications are working.",
+    "notificationSent": "Test notification sent",
+    "notificationFailed": "Test notification failed",
+    "dismiss": "Dismiss"
   }
 }

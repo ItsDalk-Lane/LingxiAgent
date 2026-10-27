@@ -1,0 +1,81 @@
+{
+  "schema": "lingxi.r09.tauri-build.v1",
+  "mode": "release",
+  "evidenceBuild": false,
+  "builtAtUnixMs": 1793026234321,
+  "cacheHit": false,
+  "command": [
+    "tauri",
+    "build",
+    "--config",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/tauri.release.generated.conf.json",
+    "--features",
+    "r09-host",
+    "--bundles",
+    "app"
+  ],
+  "rendererBuild": [
+    "npm run build:renderer",
+    "npm run build:theme"
+  ],
+  "inputs": {
+    "mode": "release",
+    "crateSourceDigest": "f8e7491b80e2e240343a71d716b0412aa451e5d08919cb598058599d62725cf6",
+    "crateSourceFileCount": 163,
+    "rendererDigest": "d5a24adf33b380a1cc5eff153b3954ccfa79a4a1812481658cea37d2e55b59a0",
+    "rendererFileCount": 644,
+    "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+    "themeBundleBytes": 5187,
+    "configTemplateSha256": "d3fd98976bafbe7adbc45ada2094b915a07178425b94691407b2beeeeada2ec8",
+    "packageVersion": "0.1.43",
+    "tauriCli": "tauri-cli 2.12.4",
+    "toolchain": "1.98.1",
+    "target": "aarch64-apple-darwin",
+    "serviceManifestSha256": "bb73f7f2df49f0bd6b1f776db6dfe7e60a9c6276f13a5eaa0bc3d15d33eca8d3",
+    "serviceBuildJsonSha256": "3602cde843e103e80e12c2f055875923e83af11128fc81e71d0cb0e17fdb72dd",
+    "features": [
+      "r09-host"
+    ],
+    "evidenceBuild": false,
+    "hostFeature": "r09-host",
+    "hostFeatureEffects": [
+      "service-supervisor",
+      "product-react-window",
+      "host-boot-commands"
+    ]
+  },
+  "config": {
+    "file": "desktop/src-tauri/tauri.release.generated.conf.json",
+    "generatedSha256": "ab8652fb78a7d40f616ddce812098d5f572692b37c57f3801d2a810603b84313"
+  },
+  "themeBundle": {
+    "path": "lib/theme.js",
+    "sha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+    "bytes": 5187
+  },
+  "artifacts": {
+    "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+    "executableSha256": "8c26577e33b6ecbe28295782728d006bc4bc6767543c13a30f58ab7dfb2c4cbe",
+    "appBundle": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+    "appBundleExists": true
+  },
+  "service": {
+    "stage": "/Users/study_superior/Desktop/Code/LingxiAgent/dist-rust-service/mac-arm64",
+    "sidecar": "desktop/src-tauri/binaries/lingxi-service-aarch64-apple-darwin",
+    "sidecarSha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+    "resourcesManifest": "desktop/src-tauri/resources/rust-service/build.json",
+    "manifestSha256": "bb73f7f2df49f0bd6b1f776db6dfe7e60a9c6276f13a5eaa0bc3d15d33eca8d3",
+    "protocol": {
+      "serverKind": "lingxi-service",
+      "wireProtocolMin": 1,
+      "wireProtocolMax": 1,
+      "dataEpoch": 2
+    },
+    "binarySha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+    "contentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0"
+  },
+  "codesign": {
+    "details": "",
+    "verify": ""
+  }
+}

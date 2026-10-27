@@ -1815,6 +1815,85 @@ fn signal_group(root: u32, signal: &str) -> bool {
         .unwrap_or(false)
 }
 
+/// 独立地图合同预检（`xtask check-map`）：只校验「阶段图 ↔ R00 冻结原账」
+/// 的绑定合同，不执行任何命令、不写证据、不启动门禁运行。
+///
+/// R09 地图完整性负例（缺叶/删整任务/改写原断言/孤儿命令）用它在**不重编译、
+/// 不改仓库**（损坏样本放临时目录）的前提下得到真实非零失败；它与
+/// `verify-stage` 复用同一套 cross-check 函数，因此负例通过即证明正式门
+/// 使用的就是这套校验，而不是另造一条宽松通道。
+pub fn check_map_contract(map: &StageMap, repo_root: &Path) -> Result<Value, String> {
+    let expected = cross_check_supplemental_coverage(map, repo_root)?;
+    check_base_scenario_set(map, repo_root)?;
+
+    let mut executed_commands = std::collections::BTreeSet::new();
+    for scenario in &map.scenarios {
+        for reference in &scenario.command_refs {
+            executed_commands.insert(reference.clone());
+        }
+    }
+    for leaf in &map.supplemental_leaves {
+        for reference in &leaf.evidence_command_refs {
+            executed_commands.insert(reference.clone());
+        }
+    }
+    // 注册但无人引用的命令永远不会被执行——「命令注册即验收」是假绿通道。
+    let orphan_commands: Vec<String> = map
+        .commands
+        .iter()
+        .map(|command| command.key.clone())
+        .filter(|key| !executed_commands.contains(key))
+        .collect();
+    if !orphan_commands.is_empty() {
+        return Err(format!(
+            "stage map for {} registers {} command(s) that no scenario/leaf references \
+             (an orphan command would never run): {:?}",
+            map.stage,
+            orphan_commands.len(),
+            orphan_commands
+        ));
+    }
+    // 「缺产物」合同：命令/叶声明的证据必须可物化并与合同指向一致；没有
+    // evidencePaths 的命令成功与否都不可消费，等于空口 PASS。
+    for command in &map.commands {
+        if command.evidence_paths.is_empty() {
+            return Err(format!(
+                "command {:?} declares no evidencePaths — its success leaves no                  materialized evidence the gate could consume",
+                command.key
+            ));
+        }
+    }
+    for leaf in &map.supplemental_leaves {
+        if let Some(contract) = leaf.assertion_contract.as_ref() {
+            if !leaf
+                .evidence_paths
+                .iter()
+                .any(|declared| declared == &contract.evidence_path)
+            {
+                return Err(format!(
+                    "supplemental leaf {:?} assertionContract evidencePath {:?} is not                      among its declared evidencePaths {:?} — the gate would read a path                      the leaf never declared",
+                    leaf.id, contract.evidence_path, leaf.evidence_paths
+                ));
+            }
+        }
+    }
+
+    Ok(json!({
+        "stage": map.stage,
+        "baseScenarios": map.scenarios.len(),
+        "commands": map.commands.len(),
+        "executedCommands": executed_commands.len(),
+        "supplementalLeaves": map.supplemental_leaves.len(),
+        "r00SupplementalLeaves": expected.len(),
+        "leafAssertionContracts": map
+            .supplemental_leaves
+            .iter()
+            .filter(|leaf| leaf.assertion_contract.is_some())
+            .count(),
+        "specMirrors": map.scenarios.iter().filter(|s| s.spec_mirror.is_some()).count(),
+    }))
+}
+
 /// Runs the full stage: unique commands in first-reference order, then the
 /// scenario roll-up. Returns the result JSON (not yet written to disk).
 pub fn verify_stage(

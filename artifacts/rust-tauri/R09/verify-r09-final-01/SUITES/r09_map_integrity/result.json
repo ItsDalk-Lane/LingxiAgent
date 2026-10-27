@@ -1,0 +1,13 @@
+{
+ "schema": "lingxi.r09.map-integrity.v1",
+ "suite": "r09_map_integrity",
+ "status": "FAIL",
+ "detail": "failed cases: ['map::incomplete-assertion-coverage-rejected']",
+ "caseCount": 19,
+ "failedCases": [
+  "map::incomplete-assertion-coverage-rejected"
+ ],
+ "mapSha256": "13c10094dcefcc8f0b0844ec27aefc42a47d3a69f963539992276d34bfaefc87",
+ "evidence": "map-integrity-cases.json",
+ "durationSecs": 2.118
+}

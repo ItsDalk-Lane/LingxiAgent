@@ -1,0 +1,94 @@
+{
+  "schema": "lingxi.r09.t06.candidate-handoff.v3.11",
+  "generatedAt": "2026-10-27T10:07:49+08:00",
+  "supersedes": "candidate-handoff-v3.5（后续：Office 预览/首次设置/Renderer 权限卡 parity/最终可见批次）",
+  "delivery": {
+    "app": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+    "appTreeSha256": "6a63e81966d6821329d0e75873b4a5ca1b24d6acab51d91ac2cb62295753644d",
+    "files": {
+      "Contents/Info.plist": "da9ebff0b848d9ff1e3e6e5ac545c7270904ceb2a65677095cbb3e400e01919a",
+      "Contents/MacOS/lingxi-resource-desktop": "8899065e330ca88f22b16ae70cbbad1f4eacefc5c85cdb179b3a75dd40e4cb8b",
+      "Contents/MacOS/lingxi-service": "c2555237a964bec30a3cac5abc1cf328400832d0a4620be402207e528e31b41b",
+      "Contents/Resources/rust-service/build.json": "8d090d4e4e83a823d5d23ae5e4d2b97bbad1796f5fbba3f8422c4b46f9f174f1",
+      "Contents/_CodeSignature/CodeResources": "84f0590a7f86c263d5452968027622d1785dbbf69303c331744006c6f2e6a1e1"
+    },
+    "receipt": "desktop/src-tauri/.tauri-build/build-receipt-release.json",
+    "receiptSha256": "f8d33772f8474b1fdd079fcba91dbf52201f7dcd6b4d9e8a7d617c512f3bab4e",
+    "executable": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+    "executableSha256": "8899065e330ca88f22b16ae70cbbad1f4eacefc5c85cdb179b3a75dd40e4cb8b",
+    "rendererDigest": "7adba587d9ab38127f19ee493b481a90300bf70f2c1d12601b9590ff1b29fc4a",
+    "featureList": [
+      "r09-host"
+    ],
+    "evidenceBuild": false
+  },
+  "g1Evidence": {
+    "executable": "desktop/src-tauri/target/debug/lingxi-resource-desktop",
+    "executableSha256": "1fc8b00cb342eddd80dda11cef054d5f788675a65bd52df4e19992505d96dd66",
+    "receipt": "desktop/src-tauri/.tauri-build/build-receipt-debug.json",
+    "receiptSha256": "81909fd6af171f6ff7288493da0816c4081491f7d86746f9f8e4279bdcac6328",
+    "featureList": [
+      "e2e-test",
+      "r09-host",
+      "r09-test-hooks"
+    ],
+    "evidenceBuild": true,
+    "rendererDigest": "7adba587d9ab38127f19ee493b481a90300bf70f2c1d12601b9590ff1b29fc4a",
+    "wrapperApp": "/private/tmp/lingxi-r09-t07/evidence-app-gate-v311-20261027-100346.app"
+  },
+  "policy": {
+    "path": "docs/rust-tauri/R09/R09_COMMAND_POLICY.json",
+    "sha256": "1a60659ac680f76c8f8f13e6c96bf6670b77caa0e748332bb537015c3c2ba91a"
+  },
+  "staticGates": {
+    "capabilityAudit": {
+      "evidence": "artifacts/rust-tauri/R09/dev/t06/v311-audit-01",
+      "status": "PASS",
+      "caseCount": 58,
+      "registeredCommands": 75
+    },
+    "releaseAttackSurface": {
+      "evidence": "artifacts/rust-tauri/R09/dev/t06/v311-scan-01",
+      "status": "PASS",
+      "caseCount": 45
+    },
+    "releaseAttackSuite": {
+      "evidence": "artifacts/rust-tauri/R09/dev/t06/v311-release-suite-01",
+      "status": "PASS",
+      "caseCount": 51
+    }
+  },
+  "suites": {
+    "t01ReactParity": "PASS (v311-parity-01, 22 cases)",
+    "t01ReleaseOffline": "PASS (v310-release-offline-01, 20 cases)",
+    "t02SupervisorReady": "PASS (v311-supervisor-01, 10 cases)",
+    "t02ProcessOwnership": "PASS (v311-ownership-01, 13 cases)",
+    "t03NativeMatrix": "FAIL (v39-native-03: 34 passed/23 failed/3 blocked/3 manual)",
+    "t05BrowserPdf": "FAIL (v311-browser-pdf: Chromium PDF runtime)",
+    "t05UntrustedPreview": "PASS (v311-untrusted, 53 cases)",
+    "t06RuntimeAcl": "PASS_WITH_BLOCKED_WINDOWS (runtime-acl-v311-01: 107 cases/35 blocked)",
+    "t07NativeE2e": "PASS (g1-hidden-v311-01, 30 cases)",
+    "t07ReleaseSmoke": "FAIL (v39-release-smoke-01: release.file-task 未实现自动点击)",
+    "t08Parity": "NOT_RERUN (final-05 ceiling 60/25; candidate renderer 变更待重跑)"
+  },
+  "changes": [
+    "T03: read_docx_html/read_xlsx_html 宿主命令经服务 fs 路由真实转换（T03 4 用例 PASS）",
+    "T03: onboarding setup-complete 服务路由 + 宿主命令（main/onboarding caller），4 用例 PASS",
+    "T04: 主窗口系统权限卡（Electron/Tauri 同构；T01 DOM 投影排除宿主状态节点）",
+    "T06: 命令面 73→75；deferred 名单同步"
+  ],
+  "deferredOwnerApproved": [
+    "T04 麦克风/语音识别/通知 TCC 授权与撤销",
+    "T04 ASR 真实识别",
+    "T03 通知点击人工项",
+    "T07 交付版文件任务自动点击验收（实现未完成）",
+    "T06 可见副作用 full 并集批次（业主已授权，未执行）",
+    "T08 同内核 A/B 在最终候选上重跑",
+    "T05 Chromium PDF（运行时/发行物）",
+    "其他三平台与正式签名（此前业主决定）"
+  ],
+  "freeze": {
+    "desktopTauriFrozen": true,
+    "psResidual": 0
+  }
+}

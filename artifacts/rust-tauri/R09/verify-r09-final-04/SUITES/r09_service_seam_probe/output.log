@@ -1,0 +1,13 @@
+[PASS] seam::health-no-origin
+[PASS] seam::health-allowed-tauri-localhost
+[PASS] seam::health-allowed-http-tauri.localhost
+[PASS] seam::health-allowed-https-tauri.localhost
+[PASS] seam::health-forbidden-tauri-evil
+[PASS] seam::health-forbidden-http-evil.tauri.localhost
+[PASS] seam::health-forbidden-http-tauri.localhost:8080
+[PASS] seam::health-forbidden-http-tauri.localhost.evil.example
+[PASS] seam::preflight-allowed
+[PASS] seam::preflight-forbidden
+[PASS] seam::identity-authenticated-allowed
+[PASS] seam::identity-authenticated-forbidden-origin
+[PASS] seam::shutdown-no-residual

@@ -1,0 +1,104 @@
+$ node tests/migration/r01-t05/run_old_chain.mjs --job /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-02/SUITES/r09_t05_browser_pdf/old-chain/job-s1.json --log /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-02/SUITES/r09_t05_browser_pdf/old-chain/run.log
+--- exit=0 duration=0.93s ---
+{"job":"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-02/SUITES/r09_t05_browser_pdf/old-chain/job-s1.json","exit_code":0,"signal":null,"spawn_error":null,"wall_ms":902,"timed_out":false,"output_exists":true,"output_size":994832}
+
+$ /usr/bin/swiftc -O -o /private/tmp/lingxi-r09-runtime/r09_t05_browser_pdf-75656-1793032048360/bin/pdf_probe /Users/study_superior/Desktop/Code/LingxiAgent/tests/migration/r01-t05/pdf_probe.swift
+--- exit=0 duration=0.93s ---
+
+$ /private/tmp/lingxi-r09-runtime/r09_t05_browser_pdf-75656-1793032048360/bin/pdf_probe /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-02/SUITES/r09_t05_browser_pdf/old-chain/s1-long-zh.pdf /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-02/SUITES/r09_t05_browser_pdf/old-chain/probe 2
+--- exit=0 duration=4.79s ---
+{"pageCount":74,"allTextSha256":"3071523347e0bf9fd55e2c42806a3f1a555ce7d4e539b9a80840acda35328151"}
+
+$ /Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml -p lingxi-adapters --test r07_pdf_chromium -- --include-ignored --test-threads=1
+--- exit=101 duration=15.81s ---
+
+running 7 tests
+test actual_r01_documents_preserve_fonts_images_pagination_and_js_contract ... FAILED
+test broken_background_font_and_unfrozen_stylesheet_are_explicit_failures ... ok
+test html_network_frames_and_workers_never_reach_loopback_canary ... ok
+test printing_never_switches_or_clears_the_regular_logged_in_workspace ... ok
+test static_utf8_pdf_is_returned_only_after_confirmed_private_cleanup ... ok
+test total_deadline_and_explicit_cancel_reap_before_returning_failure ... ok
+test two_auxiliary_leases_are_scoped_and_dropped_future_is_cancelled ... ok
+
+failures:
+
+---- actual_r01_documents_preserve_fonts_images_pagination_and_js_contract stdout ----
+PDF_EVIDENCE /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-02/SUITES/r09_t05_browser_pdf/rust-pdf/r01-quality-1df121f168fb5b12488863991f90ae27
+
+thread 'actual_r01_documents_preserve_fonts_images_pagination_and_js_contract' (26667244) panicked at crates/lingxi-adapters/tests/r07_pdf_chromium.rs:182:14:
+called `Result::unwrap()` on an `Err` value: BrowserError { code: "browser_remote", message: "浏览器命令失败: Page.getNavigationHistory (CDP -32000: Not attached to an active page) [method=Page.getNavigationHistory, session=6AAAD092351DDCA20841E953CCA10288] [worker_phase=refresh, event_sequence=22]", effect_unknown: false }
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/std/src/panicking.rs:679:5
+   1: core::panicking::panic_fmt
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/panicking.rs:80:14
+   2: core::result::unwrap_failed
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/result.rs:1870:5
+   3: <core::result::Result<lingxi_kernel::browser::PdfRendered, lingxi_kernel::browser::BrowserError>>::unwrap
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/result.rs:1231:23
+   4: <r07_pdf_chromium::Fixture>::render::{closure#0}
+             at ./tests/r07_pdf_chromium.rs:182:14
+   5: r07_pdf_chromium::actual_r01_documents_preserve_fonts_images_pagination_and_js_contract::{closure#0}
+             at ./tests/r07_pdf_chromium.rs:355:68
+   6: <core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>> as core::future::future::Future>::poll
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/future/future.rs:133:9
+   7: <core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>> as core::future::future::Future>::poll
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/future/future.rs:133:9
+   8: <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on::<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}::{closure#0}::{closure#0}
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:830:70
+   9: tokio::task::coop::with_budget::<core::task::poll::Poll<()>, <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}::{closure#0}::{closure#0}>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/task/coop/mod.rs:167:5
+  10: tokio::task::coop::budget::<core::task::poll::Poll<()>, <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}::{closure#0}::{closure#0}>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/task/coop/mod.rs:133:5
+  11: <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on::<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}::{closure#0}
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:830:25
+  12: <tokio::runtime::scheduler::current_thread::Context>::enter::<core::task::poll::Poll<()>, <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}::{closure#0}>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:488:19
+  13: <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on::<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:829:44
+  14: <tokio::runtime::scheduler::current_thread::CoreGuard>::enter::<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>::{closure#0}
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:906:68
+  15: <tokio::runtime::context::scoped::Scoped<tokio::runtime::scheduler::Context>>::set::<<tokio::runtime::scheduler::current_thread::CoreGuard>::enter<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>::{closure#0}, (alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>)>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/context/scoped.rs:40:9
+  16: tokio::runtime::context::set_scheduler::<(alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>), <tokio::runtime::scheduler::current_thread::CoreGuard>::enter<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>::{closure#0}>::{closure#0}
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/context.rs:187:38
+  17: <std::thread::local::LocalKey<tokio::runtime::context::Context>>::try_with::<tokio::runtime::context::set_scheduler<(alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>), <tokio::runtime::scheduler::current_thread::CoreGuard>::enter<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>::{closure#0}>::{closure#0}, (alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>)>
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/std/src/thread/local.rs:463:12
+  18: <std::thread::local::LocalKey<tokio::runtime::context::Context>>::with::<tokio::runtime::context::set_scheduler<(alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>), <tokio::runtime::scheduler::current_thread::CoreGuard>::enter<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>::{closure#0}>::{closure#0}, (alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>)>
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/std/src/thread/local.rs:427:20
+  19: tokio::runtime::context::set_scheduler::<(alloc::boxed::Box<tokio::runtime::scheduler::current_thread::Core>, core::option::Option<()>), <tokio::runtime::scheduler::current_thread::CoreGuard>::enter<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>::{closure#0}>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/context.rs:187:17
+  20: <tokio::runtime::scheduler::current_thread::CoreGuard>::enter::<<tokio::runtime::scheduler::current_thread::CoreGuard>::block_on<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>::{closure#0}, core::option::Option<()>>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:906:27
+  21: <tokio::runtime::scheduler::current_thread::CoreGuard>::block_on::<core::pin::Pin<&mut core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:817:24
+  22: <tokio::runtime::scheduler::current_thread::CurrentThread>::block_on::<core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>::{closure#0}
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:218:33
+  23: tokio::runtime::context::runtime::enter_runtime::<<tokio::runtime::scheduler::current_thread::CurrentThread>::block_on<core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>::{closure#0}, ()>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/context/runtime.rs:65:16
+  24: <tokio::runtime::scheduler::current_thread::CurrentThread>::block_on::<core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:206:9
+  25: <tokio::runtime::runtime::Runtime>::block_on_inner::<core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/runtime.rs:374:52
+  26: <tokio::runtime::runtime::Runtime>::block_on::<core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/runtime.rs:343:18
+  27: r07_pdf_chromium::actual_r01_documents_preserve_fonts_images_pagination_and_js_contract
+             at ./tests/r07_pdf_chromium.rs:453:26
+  28: r07_pdf_chromium::actual_r01_documents_preserve_fonts_images_pagination_and_js_contract::{closure#0}
+             at ./tests/r07_pdf_chromium.rs:353:81
+  29: <r07_pdf_chromium::actual_r01_documents_preserve_fonts_images_pagination_and_js_contract::{closure#0} as core::ops::function::FnOnce<()>>::call_once
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/ops/function.rs:250:5
+  30: <fn() -> core::result::Result<(), alloc::string::String> as core::ops::function::FnOnce<()>>::call_once
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/ops/function.rs:250:5
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+
+
+failures:
+    actual_r01_documents_preserve_fonts_images_pagination_and_js_contract
+
+test result: FAILED. 6 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 14.72s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/r07_pdf_chromium.rs (rust/target/debug/deps/r07_pdf_chromium-499d11c618388529)
+error: test failed, to rerun pass `-p lingxi-adapters --test r07_pdf_chromium`

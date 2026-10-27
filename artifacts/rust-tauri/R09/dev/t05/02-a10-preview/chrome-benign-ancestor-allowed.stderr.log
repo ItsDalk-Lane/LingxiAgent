@@ -1,0 +1,15 @@
+Trying to load the allocator multiple times. This is *not* supported.
+[7656:25750526:1026/214052.732767:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[7656:25750526:1026/214052.733078:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[7656:25750526:1026/214052.733145:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[7656:25750526:1026/214052.733214:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[7656:25750526:1026/214052.733265:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[7656:25750526:1026/214052.733328:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[7656:25750526:1026/214052.733383:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[7639:25750468:1026/214053.401776:ERROR:components/password_manager/core/browser/password_store/login_database_async_helper.cc:100] Encryption is not available.
+[7639:25750466:1026/214053.402201:ERROR:components/password_manager/core/browser/password_store/login_database_async_helper.cc:100] Encryption is not available.
+[7656:25750526:1026/214053.431750:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[7639:25750473:1026/214053.490727:ERROR:base/process/process_mac.cc:45] task_policy_set TASK_CATEGORY_POLICY: (os/kern) invalid argument (4)
+[7639:25750473:1026/214053.490738:ERROR:base/process/process_mac.cc:90] task_policy_set TASK_SUPPRESSION_POLICY: (os/kern) invalid argument (4)
+[7639:25750473:1026/214053.493283:ERROR:base/process/process_mac.cc:45] task_policy_set TASK_CATEGORY_POLICY: (os/kern) invalid argument (4)
+[7639:25750473:1026/214053.493295:ERROR:base/process/process_mac.cc:90] task_policy_set TASK_SUPPRESSION_POLICY: (os/kern) invalid argument (4)

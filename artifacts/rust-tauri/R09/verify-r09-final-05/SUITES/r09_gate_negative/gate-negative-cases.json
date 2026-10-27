@@ -1,0 +1,88 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_gate_negative",
+ "cases": [
+  {
+   "case": "gate-negative::zero-cases-fails",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "exit": 2,
+    "receiptStatus": "FAIL"
+   }
+  },
+  {
+   "case": "gate-negative::failed-case-fails",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "exit": 2,
+    "failedCases": [
+     "probe::will-fail"
+    ]
+   }
+  },
+  {
+   "case": "gate-negative::ignored-tests-rejected",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "error": "probe-dirty: 存在 ignored/skipped 测试（1），不得当通过"
+   }
+  },
+  {
+   "case": "gate-negative::cargo-zero-match-rejected",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "error": "probe-zero-match: 未解析到 cargo test 汇总行（零匹配/输出被截断不可当通过）"
+   }
+  },
+  {
+   "case": "gate-negative::clean-run-passes",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "exit": 0,
+    "summary": {
+     "summaries": 2,
+     "passed": 7
+    }
+   }
+  },
+  {
+   "case": "gate-negative::cases-schema-correct",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "schema": "lingxi.leaf-case-results.v1",
+    "cases": [
+     {
+      "case": "probe::one",
+      "ok": true,
+      "actual": 1,
+      "expect": 1,
+      "detail": null
+     },
+     {
+      "case": "probe::two",
+      "ok": true,
+      "actual": 1,
+      "expect": 1,
+      "detail": {
+       "what": "second"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "case": "gate-negative::tool-restored-after-negatives",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "exit": 0
+   }
+  }
+ ]
+}

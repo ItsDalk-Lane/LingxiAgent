@@ -1,0 +1,38 @@
+[
+  {
+    "case": 0,
+    "outcome": "PDF_ASSET_LOAD_FAILED: 文档所需资源未成功加载",
+    "requestLines": [],
+    "tcpConnections": 0
+  },
+  {
+    "case": 1,
+    "outcome": "PDF_ASSET_LOAD_FAILED: 文档所需资源未成功加载",
+    "requestLines": [],
+    "tcpConnections": 0
+  },
+  {
+    "case": 2,
+    "outcome": "printed",
+    "requestLines": [],
+    "tcpConnections": 0
+  },
+  {
+    "case": 3,
+    "outcome": "printed",
+    "requestLines": [],
+    "tcpConnections": 0
+  },
+  {
+    "case": 4,
+    "outcome": "printed",
+    "requestLines": [],
+    "tcpConnections": 0
+  },
+  {
+    "case": 5,
+    "outcome": "PDF_RESOURCE_FORBIDDEN: 文档请求了未冻结的资源或额外页面",
+    "requestLines": [],
+    "tcpConnections": 0
+  }
+]

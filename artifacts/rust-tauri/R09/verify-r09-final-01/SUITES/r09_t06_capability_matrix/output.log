@@ -1,0 +1,4 @@
+$ python3 -B scripts/rust-tauri/r09_capability_audit.py --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-01/SUITES/r09_t06_capability_matrix/capability-audit
+--- exit=0 duration=0.85s ---
+registered=73 manifest=73 permissions=152 capabilities=9 windowPatterns=8 policy=yes devOnlyCommands=['debug_asset_probe', 'debug_open_onboarding', 'debug_open_onboarding_preview']
+r09_capability_audit: status=PASS cases=58 failed=[] gaps=0

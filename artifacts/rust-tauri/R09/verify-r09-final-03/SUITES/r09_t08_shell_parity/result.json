@@ -1,0 +1,276 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t08_shell_parity",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 2.89,
+ "caseCount": 342,
+ "casesSha256": "7319949d284dd31755269b87e6441906c92796908798be4f8317c9f545a038a3",
+ "commands": [],
+ "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+ "finishedAtUnixMs": 1793032901606,
+ "outputs": {
+  "matrix": "parity-matrix.json",
+  "shellParityResultsDraft": "SHELL_PARITY_RESULTS.r09_t08_shell_parity.json",
+  "casesCopy": "shell-parity-cases.json"
+ },
+ "fixedHashes": {
+  "rustServiceSha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+  "rustServiceContentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+  "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+  "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+  "fixturesManifestSha256": "80a8d2c2640e2b2974b299a10f36679bc19daf0911e51f82f0c43399cb32feaa",
+  "electronBaselineReceipt": {
+   "path": "artifacts/rust-tauri/R08/verify-r08-closeout-08/verify-stage-result.json",
+   "testedSha": "aa99d2ec1dae7f0aef5971bab049734f22fcf7d8",
+   "candidateSourceDigest": "0f07f2f7a0cf9e8d5660237be6a26666ba314dc04e840a02b9b573d990050dc6",
+   "ab": {
+    "tasks": 71,
+    "parity": 68,
+    "recorded": 3,
+    "differs": 0
+   }
+  },
+  "tauriCandidateReceipt": {
+   "deliveryAppTreeSha256": "97f226bffba064c7b408656c6be941b58f5e6e01b191d5ae6a30f89a1fbd4ccc",
+   "hostExeSha256": "ddbd1fad42a8b172c85204cbba0e621fabd3bf52a0ced95dd0d2a1b06af40543",
+   "evidenceBuildSha256": "27bf075a70e57ccca607365276d261eed79764e02b663bfd881df472e51a31b6",
+   "featuresDelivery": [
+    "r09-host"
+   ],
+   "featuresEvidence": [
+    "e2e-test",
+    "r09-host",
+    "r09-test-hooks"
+   ]
+  }
+ },
+ "paritySummary": {
+  "measured": {
+   "parity": 13
+  },
+  "capabilities": {
+   "parity": 6,
+   "blocked": 3,
+   "pending": 33,
+   "recorded": 8
+  },
+  "leaves": {
+   "pending": 26,
+   "blocked": 4,
+   "excluded_non_host": 16
+  },
+  "pendingCount": 59,
+  "blockedCount": 7,
+  "unapprovedDifferences": []
+ },
+ "evidenceProvenance": {
+  "r09_t01_react_parity": {
+   "sourceKind": "in-gate",
+   "dir": "artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t01_react_parity",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t02_supervisor_ready": {
+   "sourceKind": "in-gate",
+   "dir": "artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t02_supervisor_ready",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t02_process_ownership": {
+   "sourceKind": "in-gate",
+   "dir": "artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t02_process_ownership",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t05_browser_pdf": {
+   "sourceKind": "in-gate",
+   "dir": "artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t05_browser_pdf",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t05_untrusted_preview": {
+   "sourceKind": "in-gate",
+   "dir": "artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t05_untrusted_preview",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t07_native_e2e": {
+   "sourceKind": "in-gate",
+   "dir": "artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t07_native_e2e",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t01_release_offline": {
+   "sourceKind": "in-gate",
+   "dir": "artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t01_release_offline",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t03_native_matrix": {
+   "sourceKind": "in-gate",
+   "dir": "artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t03_native_matrix",
+   "status": "FAIL",
+   "exitCode": 2
+  },
+  "r09_t03_ipc_negative": {
+   "sourceKind": "in-gate",
+   "dir": "artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t03_ipc_negative",
+   "status": "FAIL",
+   "exitCode": 2
+  },
+  "r09_t04_permission_matrix": {
+   "sourceKind": "in-gate",
+   "dir": "artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t04_permission_matrix",
+   "status": "FAIL",
+   "exitCode": 2
+  },
+  "r09_t04_remote_boundary": {
+   "sourceKind": "in-gate",
+   "dir": "artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t04_remote_boundary",
+   "status": "FAIL",
+   "exitCode": 2
+  },
+  "r09_t06_capability_matrix": {
+   "sourceKind": "in-gate",
+   "dir": "artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t06_capability_matrix",
+   "status": "FAIL",
+   "exitCode": 2
+  },
+  "r09_t06_release_attack_surface": {
+   "sourceKind": "in-gate",
+   "dir": "artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t06_release_attack_surface",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t07_release_smoke": {
+   "sourceKind": "in-gate",
+   "dir": "artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t07_release_smoke",
+   "status": "FAIL",
+   "exitCode": 2
+  },
+  "audit_capability": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t06/v32-audit-01",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "release_scan": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t06/v32-scan-01",
+   "status": "PASS",
+   "exitCode": 0
+  }
+ },
+ "candidate": {
+  "candidateVersion": "v3.3",
+  "source": "artifacts/rust-tauri/R09/dev/t06/candidate-handoff-v3.3/candidate-handoff.json",
+  "handoff": "artifacts/rust-tauri/R09/dev/t06/candidate-handoff-v3.3/candidate-handoff.json",
+  "gitHead": "aac8cb9fe6bb7bfa7a41d75528221136bfe55e50",
+  "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+  "serviceContentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+  "frozenAt": "2026-10-27T00:22:09+0800",
+  "deliveryAppTreeSha256": "97f226bffba064c7b408656c6be941b58f5e6e01b191d5ae6a30f89a1fbd4ccc",
+  "evidenceBuildSha256": "27bf075a70e57ccca607365276d261eed79764e02b663bfd881df472e51a31b6"
+ },
+ "sourceDrift": {
+  "crateSource": {
+   "sourceFileCount": 88,
+   "sourceFingerprint": "95e2c5fb39e7db4360e4a979948922fecbe868a7d3358af6c82a73a11db39f5a",
+   "generatedFileCount": 80,
+   "release": {
+    "sourceFingerprint": "95e2c5fb39e7db4360e4a979948922fecbe868a7d3358af6c82a73a11db39f5a",
+    "receipt": "desktop/src-tauri/.tauri-build/build-receipt-release.json",
+    "mtimeOnlyTouches": [
+     "Cargo.lock"
+    ],
+    "builtAtUnixMs": 1793031631428,
+    "receiptCrateDigest": "03b55518c9a0a5144ebfb29d15ac0caf47bd9bb4713971024c7100fa69921283",
+    "receiptCrateFileCount": 168,
+    "filesNewerThanReceipt": []
+   },
+   "evidence": {
+    "sourceFingerprint": "95e2c5fb39e7db4360e4a979948922fecbe868a7d3358af6c82a73a11db39f5a",
+    "receipt": "desktop/src-tauri/.tauri-build/build-receipt-debug.json",
+    "mtimeOnlyTouches": [
+     "Cargo.lock"
+    ],
+    "builtAtUnixMs": 1793031665042,
+    "receiptCrateDigest": "0214a25281735c65f4e707f754f753f4321479a652d6bb40d438dfc4bb94a934",
+    "receiptCrateFileCount": 165,
+    "filesNewerThanReceipt": []
+   }
+  },
+  "renderer": {
+   "distNewestMtime": 1793029972.1337142,
+   "sourcesNewerThanDist": []
+  },
+  "freezeEpochMs": 1793031729000,
+  "artifactsTouchedAfterFreeze": []
+ },
+ "note": "A15 在 pending/blocked 清零前不得宣称对照成立；本回执如实红。",
+ "failedCases": [
+  "evidence::capability::host:context-menu-policy",
+  "parity::capability::host:browser-viewer",
+  "parity::capability::host:clipboard-edit-command",
+  "parity::capability::host:context-menu-policy",
+  "parity::capability::host:detached-viewer",
+  "parity::capability::host:drag-out",
+  "parity::capability::host:external-open",
+  "parity::capability::host:file-dialogs",
+  "parity::capability::host:file-drop-paths",
+  "parity::capability::host:file-text-io",
+  "parity::capability::host:file-url-asset",
+  "parity::capability::host:file-watch",
+  "parity::capability::host:global-shortcut",
+  "parity::capability::host:i18n-main",
+  "parity::capability::host:keep-awake",
+  "parity::capability::host:quick-chat-session-handoff",
+  "parity::capability::host:quick-chat-window",
+  "parity::capability::host:reload-restart",
+  "parity::capability::host:settings-broadcast",
+  "parity::capability::host:settings-window",
+  "parity::capability::host:single-instance",
+  "parity::capability::host:skill-viewer",
+  "parity::capability::host:splash",
+  "parity::capability::host:theme-sync",
+  "parity::capability::host:trash",
+  "parity::capability::host:tray",
+  "parity::capability::host:window-controls",
+  "parity::capability::host:window-state",
+  "parity::capability::security:capability-sets",
+  "parity::capability::security:command-acl",
+  "parity::capability::security:csp",
+  "parity::capability::security:no-arbitrary-shell",
+  "parity::capability::security:remote-content-isolation",
+  "parity::capability::security:token-exposure",
+  "commands::debug-commands-gated",
+  "parity::leaf::R00-T02-LA-0DEEE4813B0A",
+  "parity::leaf::R00-T02-LA-15DFB1AED8F2",
+  "parity::leaf::R00-T02-LA-15E163FBFBE8",
+  "parity::leaf::R00-T02-LA-18FE3FDFF9A5",
+  "parity::leaf::R00-T02-LA-1C41525D379C",
+  "parity::leaf::R00-T02-LA-1E6EDB731186",
+  "parity::leaf::R00-T02-LA-322E02C7F2F9",
+  "parity::leaf::R00-T02-LA-394DD07D2968",
+  "parity::leaf::R00-T02-LA-57728C0A6D0A",
+  "parity::leaf::R00-T02-LA-58822B6B138B",
+  "parity::leaf::R00-T02-LA-5D5938D61A00",
+  "parity::leaf::R00-T02-LA-9350C3E12165",
+  "parity::leaf::R00-T02-LA-98B458390B7E",
+  "parity::leaf::R00-T02-LA-A2E507EBDEF2",
+  "parity::leaf::R00-T02-LA-AC5B6EDA3FBD",
+  "parity::leaf::R00-T02-LA-ACA2C4C1158D",
+  "parity::leaf::R00-T02-LA-B6A97A19F2CB",
+  "parity::leaf::R00-T02-LA-B72A6D3886B7",
+  "parity::leaf::R00-T02-LA-BEC2074CC33C",
+  "parity::leaf::R00-T02-LA-D15E0ADC0608",
+  "parity::leaf::R00-T02-LA-D29DE479076C",
+  "parity::leaf::R00-T02-LA-DF4B5168ABB5",
+  "parity::leaf::R00-T02-LA-E6FB08FBBFAA",
+  "parity::leaf::R00-T02-LA-F5DBF2A80E28",
+  "parity::leaf::R00-T02-LA-F9786414DD11",
+  "parity::leaf::R00-T02-LA-FF1B331F1019",
+  "a15::parity-not-yet-complete"
+ ]
+}

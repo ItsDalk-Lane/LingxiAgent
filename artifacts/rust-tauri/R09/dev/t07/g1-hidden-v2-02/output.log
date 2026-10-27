@@ -1,0 +1,6 @@
+$ python3 -B scripts/rust-tauri/r09_t07_fixture.py --home /private/tmp/lingxi-r09-runtime/r09_t07_native_e2e-29018-1793028299893/home-t07-fixtures --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t07/g1-hidden-v2-02/fixtures
+--- exit=0 duration=0.17s ---
+{"deterministic": true, "anchorMatchesV3Base": true, "stagedTreeDigest": "3bbb5d4bacb8af51dbcf46f5d947b9a6480e963252afac4b93a14b9cee996f8a", "longSessionMessages": 1000, "toolCardSessions": 3, "evidence": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t07/g1-hidden-v2-02/fixtures/fixtures-manifest.json"}
+
+
+[producer-error] wdio script error: {'available': True, 'error': 'TypeError: Load failed', 'ok': False, 'url': 'asset://localhost/%2Fprivate%2Ftmp%2Flingxi-r09-runtime%2Fr09_t07_native_e2e-29018-1793028299893%2Ftmp%2Ft07-asset-fixture.txt'}

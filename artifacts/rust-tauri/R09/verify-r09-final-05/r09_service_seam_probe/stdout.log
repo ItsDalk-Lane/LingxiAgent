@@ -1,0 +1,14 @@
+[PASS] seam::health-no-origin: origin=None expected=200 got=200
+[PASS] seam::health-allowed-tauri-localhost: origin=tauri://localhost expected=200 got=200
+[PASS] seam::health-allowed-http-tauri.localhost: origin=http://tauri.localhost expected=200 got=200
+[PASS] seam::health-allowed-https-tauri.localhost: origin=https://tauri.localhost expected=200 got=200
+[PASS] seam::health-forbidden-tauri-evil: origin=tauri://evil expected=403 got=403
+[PASS] seam::health-forbidden-http-evil.tauri.localhost: origin=http://evil.tauri.localhost expected=403 got=403
+[PASS] seam::health-forbidden-http-tauri.localhost:8080: origin=http://tauri.localhost:8080 expected=403 got=403
+[PASS] seam::health-forbidden-http-tauri.localhost.evil.example: origin=http://tauri.localhost.evil.example expected=403 got=403
+[PASS] seam::preflight-allowed: origin=tauri://localhost expected=204 got=204
+[PASS] seam::preflight-forbidden: origin=tauri://evil expected=403 got=403
+[PASS] seam::identity-authenticated-allowed: origin=tauri://localhost expected=200 got=200
+[PASS] seam::identity-authenticated-forbidden-origin: origin=tauri://evil expected=403 got=403
+[PASS] seam::shutdown-no-residual exit=0 alive=False
+origin seam probe: status=PASS cases=13 failed=[]

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "serverId": "server_Axn2yeYZwLR3eZBHn0_Txw",
+  "studioId": "studio_L1NZpfUORbP9EbZF4DBluw",
+  "account": {
+    "userId": "user_local",
+    "username": "local",
+    "displayName": "Local User",
+    "passwordSalt": null,
+    "passwordHash": null,
+    "passwordAlgorithm": null
+  },
+  "network": {
+    "mode": "loopback",
+    "listenHost": "127.0.0.1",
+    "listenPort": 0,
+    "publicBaseUrl": null
+  },
+  "webSessions": [],
+  "defaultThinkingLevel": "medium",
+  "sessionThinkingLevels": {},
+  "audit": []
+}

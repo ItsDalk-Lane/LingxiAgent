@@ -1332,6 +1332,10 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
     ) {
         return RoutePolicy::LocalOnly;
     }
+    // R09-T03：首次设置完成标记（本机 owner 写面；bearer 即边界）。
+    if p == "/lingxi/v1/preferences/setup-complete" {
+        return RoutePolicy::LocalOnly;
+    }
     // R06 收口：独立改前存档 restore 面（现役 /api/checkpoints/:id/restore
     // 把存档字节写回存档记录的绝对路径；route-security 里该族落 /api/
     // 兜底 STUDIO_OWNER——Rust 无 studio 面，按既有口径取最严格档

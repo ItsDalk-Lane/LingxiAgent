@@ -1,0 +1,27 @@
+suite r09_t05_browser_pdf: FAIL r07-pdf-chromium failed (exit 101): :future::Future<Output = ()>>>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:206:9
+  25: <tokio::runtime::runtime::Runtime>::block_on_inner::<core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/runtime.rs:374:52
+  26: <tokio::runtime::runtime::Runtime>::block_on::<core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>
+             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/runtime.rs:343:18
+  27: r07_pdf_chromium::actual_r01_documents_preserve_fonts_images_pagination_and_js_contract
+             at ./tests/r07_pdf_chromium.rs:453:26
+  28: r07_pdf_chromium::actual_r01_documents_preserve_fonts_images_pagination_and_js_contract::{closure#0}
+             at ./tests/r07_pdf_chromium.rs:353:81
+  29: <r07_pdf_chromium::actual_r01_documents_preserve_fonts_images_pagination_and_js_contract::{closure#0} as core::ops::function::FnOnce<()>>::call_once
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/ops/function.rs:250:5
+  30: <fn() -> core::result::Result<(), alloc::string::String> as core::ops::function::FnOnce<()>>::call_once
+             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/ops/function.rs:250:5
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+
+
+failures:
+    actual_r01_documents_preserve_fonts_images_pagination_and_js_contract
+
+test result: FAILED. 6 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 14.72s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/r07_pdf_chromium.rs (rust/target/debug/deps/r07_pdf_chromium-499d11c618388529)
+error: test failed, to rerun pass `-p lingxi-adapters --test r07_pdf_chromium`
+
+suite r09_t05_browser_pdf: status=FAIL exit=2 cases=10 failed=[]

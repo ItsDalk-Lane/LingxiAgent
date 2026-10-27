@@ -1,0 +1,35 @@
+2026-10-26T17:20:25.240201Z  INFO lingxi_service: data root resolved [token] source=cli ignored_sources=env(LINGXI_HOME)[token]
+2026-10-26T17:20:25.240555Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) [token] [token][user]
+2026-10-26T17:20:25.240650Z  INFO lingxi_service: model plane resolved (credentials never logged) model_plane_source=None providers=0
+2026-10-26T17:20:25.241167Z  INFO lingxi_service: single-writer lock acquired [token] start_nonce=00a3197dcde529e7 pid=5535 entropy="os-random-device" [token][user]/instance.lock network_mode=loopback
+2026-10-26T17:20:25.253654Z  INFO lingxi_service: data-epoch gate passed [token] decision=ProceedStampedNew(EpochStamp { format: V2, minimum_reader_epoch: 2, committed_data_epoch: 2, last_version: Some("0.0.0") })
+2026-10-26T17:20:25.318960Z  INFO lingxi_adapters::storage::run_store: run database migrated [token][user]/data/runs.db applied=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28] version=28
+2026-10-26T17:20:25.341406Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded [token][user]/local-token.json [token][user]/data/runs.db
+2026-10-26T17:20:25.354590Z  INFO lingxi_service: instance record published (atomic write) [token][user]/instance.json bind_addr=127.0.0.1:64335
+2026-10-26T17:20:25.396267Z  INFO lingxi_service: request handled request_id="req-c78b22c23db0f70bb4b709230447f4e7" method=GET [token] status=200
+2026-10-26T17:20:25.397607Z  INFO lingxi_service: request handled request_id="req-5ead8805c741462faf8a9e15e22b6952" method=PUT [token] status=200
+2026-10-26T17:20:25.405959Z  INFO lingxi_service: request handled request_id="req-c8da267bf686d1dcaddc44e24f6c1b72" method=GET [token] status=200
+2026-10-26T17:20:25.406714Z  INFO lingxi_service: request handled request_id="req-d8178c118ee052e8a331df5299cd042a" method=PUT [token] status=400
+2026-10-26T17:20:25.407350Z  INFO lingxi_service: request handled request_id="req-5ccc74c2e54cb8bd24307fff0e50ba36" method=PUT [token] status=400
+2026-10-26T17:20:25.407856Z  INFO lingxi_service: request handled request_id="req-05bc36cc9b2e000e7e0fb256609d3356" method=PUT [token] status=400
+2026-10-26T17:20:25.408691Z  INFO lingxi_service: request handled request_id="req-afffaba26248cfeb34c7643487af64c5" method=PUT [token] status=200
+2026-10-26T17:20:25.409279Z  INFO lingxi_service: request handled request_id="req-e8d86d5ffedf954e47c28441430bd1d3" method=GET path=/lingxi/v1/app-events status=200
+2026-10-26T17:20:25.410017Z  INFO lingxi_service: request handled request_id="req-b992894d9fbc14c3415228db221086eb" method=POST [token] status=200
+2026-10-26T17:20:25.417911Z  INFO lingxi_service: request handled request_id="req-39241d89a59a77e773601cdb78ee9497" method=GET [token] status=200
+2026-10-26T17:20:25.418511Z  INFO lingxi_service: request handled request_id="req-814ebcdb56877cb0fb5178e492e9c428" method=GET path=/lingxi/v1/app-events status=200
+2026-10-26T17:20:25.419038Z  INFO lingxi_service: request handled request_id="req-ba2d2276bc93de39d6e44bba5c160fc1" method=GET path=/lingxi/v1/app-events status=200
+2026-10-26T17:20:25.419833Z  INFO lingxi_service: request handled request_id="req-ec2e4d5059924efccb0c5deb0cc24f8e" method=DELETE [token] status=200
+2026-10-26T17:20:25.427772Z  INFO lingxi_service: request handled request_id="req-abf2fde1b5c4c3d9e3751669df247212" method=GET [token] status=200
+2026-10-26T17:20:25.428355Z  INFO lingxi_service: request handled request_id="req-3f1b7ad2caaca2ed79fd5cada4c6b16c" method=GET path=/lingxi/v1/app-events status=200
+2026-10-26T17:20:25.428863Z  INFO lingxi_service: request handled request_id="req-371e23a6fd94aadc417fcdcd91ca8e1c" method=POST [token] status=400
+2026-10-26T17:20:25.429372Z  INFO lingxi_service: request handled request_id="req-e0692d3b2b6a18cd55d33699d37f27ae" method=DELETE [token] status=400
+2026-10-26T17:20:25.437242Z  INFO lingxi_service: request handled request_id="req-b95c19c7b33b0b659dd87896d9b3d834" method=POST [token] status=400
+2026-10-26T17:20:25.437804Z  INFO lingxi_service: request handled request_id="req-e52af2126f286ff9067eb35a70d10bb0" method=POST [token] status=400
+2026-10-26T17:20:25.438319Z  INFO lingxi_service: request handled request_id="req-c832dd8fd0423d6a0709422e3f14eb8f" method=GET path=/lingxi/v1/app-events status=200
+2026-10-26T17:20:25.438755Z  INFO lingxi_service: request handled request_id="req-09d5fd89b752cb3074a3537ba3e8faf6" method=GET path=/lingxi/v1/app-events status=200
+LINGXI_AUTH_REJECTED request_id="req-26a9f782b8274d9a9e09ca85d7afd59c" method=GET [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64357
+2026-10-26T17:20:25.439234Z  INFO lingxi_service: request handled request_id="req-26a9f782b8274d9a9e09ca85d7afd59c" method=GET [token] status=401
+2026-10-26T17:20:25.439481Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-10-26T17:20:25.443176Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-10-26T17:20:25.443390Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-10-26T17:20:25.443450Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

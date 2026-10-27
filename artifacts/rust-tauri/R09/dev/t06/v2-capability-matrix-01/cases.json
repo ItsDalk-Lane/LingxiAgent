@@ -1,0 +1,1084 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t06_capability_matrix",
+ "cases": [
+  {
+   "case": "isolation::real-home-provided",
+   "ok": true,
+   "actual": 1,
+   "detail": null
+  },
+  {
+   "case": "static::policy-file-present",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "path": "docs/rust-tauri/R09/R09_COMMAND_POLICY.json"
+   }
+  },
+  {
+   "case": "static::audit-ran",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "build::evidence-receipt-present",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "receipt": "artifacts/rust-tauri/R09/dev/t06/build-evidence-01/tauri-build-debug.json",
+    "present": true,
+    "mode": "debug",
+    "evidenceBuild": true,
+    "features": [
+     "r09-host",
+     "r09-test-hooks"
+    ],
+    "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/debug/lingxi-resource-desktop",
+    "executableSha256": "f6555ef08c367e8c42b8963900a2de8fa0c021ca0b52461954faccd50cd3d678",
+    "appBundle": null,
+    "rendererDigest": "d09359bd5bc87071c7e4cfc7fffb99553bc39b1345dd83946dcd14c51f244f31",
+    "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73"
+   }
+  },
+  {
+   "case": "build::evidence-build-marked-test-hooks",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "features": [
+     "r09-host",
+     "r09-test-hooks"
+    ],
+    "evidenceBuild": true
+   }
+  },
+  {
+   "case": "build::delivery-receipt-present",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "receipt": "desktop/src-tauri/.tauri-build/build-receipt-release.json",
+    "present": true,
+    "mode": "release",
+    "evidenceBuild": false,
+    "features": [
+     "r09-host"
+    ],
+    "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+    "executableSha256": "63250ddb00c92536424ecefc07b55079d7ee4d3a1c3445ac9336105678a7a278",
+    "appBundle": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+    "rendererDigest": "c0a5719f9e9ddd79b71eb0a440a78479aac3489a2679898121b2db633adf150b",
+    "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73"
+   }
+  },
+  {
+   "case": "build::delivery-release-no-test-hooks",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "features": [
+     "r09-host"
+    ],
+    "evidenceBuild": false
+   }
+  },
+  {
+   "case": "static::caps::registered-commands-nonzero",
+   "ok": true,
+   "actual": 1,
+   "detail": [
+    "app_ready",
+    "close_browser_viewer",
+    "copy_file",
+    "file_info",
+    "get_app_version",
+    "get_auto_launch_status",
+    "get_avatar_path",
+    "get_browser_viewer_context",
+    "get_keep_awake_status",
+    "get_platform",
+    "get_server_connection_info",
+    "get_server_port",
+    "get_server_token",
+    "get_service_status",
+    "get_splash_info",
+    "keybindings_reload_global",
+    "keybindings_test_register",
+    "list_skill_files",
+    "onboarding_complete",
+    "open_browser_viewer",
+    "open_external",
+    "open_file",
+    "open_folder",
+    "open_settings",
+    "open_skill_viewer",
+    "quick_chat_hide",
+    "quick_chat_open_session",
+    "quick_chat_open_session_ack",
+    "quick_chat_reload_shortcut",
+    "quick_chat_resize",
+    "quick_chat_shortcut_status",
+    "quick_chat_show",
+    "read_file",
+    "read_file_base64",
+    "read_file_snapshot",
+    "read_skill_file",
+    "reload_main_window",
+    "resource_events",
+    "resource_subscribe",
+    "resource_unsubscribe",
+    "restart_app",
+    "run_edit_command",
+    "rust_browser_request",
+    "select_files",
+    "select_folder",
+    "select_skill",
+    "set_auto_launch_enabled",
+    "set_browser_connection",
+    "set_keep_awake_enabled",
+    "settings_changed",
+    "show_in_finder",
+    "show_notification",
+    "skill_viewer_close",
+    "skill_viewer_load",
+    "spawn_viewer",
+    "speech_permission_request",
+    "speech_permission_status",
+    "start_drag",
+    "trash_item",
+    "unwatch_file",
+    "viewer_close",
+    "viewer_request_load",
+    "watch_file",
+    "window_close",
+    "window_is_maximized",
+    "window_maximize",
+    "window_minimize",
+    "window_theme_changed",
+    "write_file",
+    "write_file_binary",
+    "write_file_if_unchanged"
+   ]
+  },
+  {
+   "case": "static::caps::invoke-handler-equals-build-manifest",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "onlyInvokeHandler": [],
+    "onlyBuildManifest": []
+   }
+  },
+  {
+   "case": "static::caps::each-command-has-permission",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "missingPermission": []
+   }
+  },
+  {
+   "case": "static::caps::each-permission-command-registered",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "orphanPermissionCommands": []
+   }
+  },
+  {
+   "case": "static::caps::acl-manifest-covers-registered",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "missingFromAcl": []
+   }
+  },
+  {
+   "case": "static::caps::capability-windows-nonempty",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "r09-browser-viewer": [
+     "browser-viewer"
+    ],
+    "resource-main": [
+     "main"
+    ],
+    "onboarding": [
+     "onboarding"
+    ],
+    "quick-chat": [
+     "quick-chat"
+    ],
+    "r09-host": [
+     "main"
+    ],
+    "settings": [
+     "settings"
+    ],
+    "skill-viewer": [
+     "skill-viewer-*"
+    ],
+    "splash": [
+     "splash"
+    ],
+    "resource-viewer": [
+     "viewer-*"
+    ]
+   }
+  },
+  {
+   "case": "static::caps::capability-windows-no-remote-content-label",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "static::caps::policy-schema-valid",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "static::caps::policy-window-labels-match-native",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "onlyNative": [],
+    "onlyPolicy": []
+   }
+  },
+  {
+   "case": "static::caps::dev-only-capability-grants-only-dev-commands",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "presentDevCapabilities": [],
+    "devGranted": [],
+    "undeclared": []
+   }
+  },
+  {
+   "case": "static::caps::window-union-equals-policy::browser-viewer",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "commandWindows": [
+     "r09-browser-viewer"
+    ],
+    "extraPrivilege": [],
+    "missingUndeclared": [],
+    "declaredPending": []
+   }
+  },
+  {
+   "case": "static::caps::window-plugin-permissions::browser-viewer",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "actual": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ],
+    "allowed": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ],
+    "extraPluginPermissions": []
+   }
+  },
+  {
+   "case": "static::caps::window-denied-commands::browser-viewer",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "static::caps::window-union-equals-policy::main",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "commandWindows": [
+     "r09-host",
+     "resource-main"
+    ],
+    "extraPrivilege": [],
+    "missingUndeclared": [],
+    "declaredPending": []
+   }
+  },
+  {
+   "case": "static::caps::window-plugin-permissions::main",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "actual": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ],
+    "allowed": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ],
+    "extraPluginPermissions": []
+   }
+  },
+  {
+   "case": "static::caps::window-denied-commands::main",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "static::caps::window-union-equals-policy::onboarding",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "commandWindows": [
+     "onboarding"
+    ],
+    "extraPrivilege": [],
+    "missingUndeclared": [],
+    "declaredPending": []
+   }
+  },
+  {
+   "case": "static::caps::window-plugin-permissions::onboarding",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "actual": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ],
+    "allowed": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ],
+    "extraPluginPermissions": []
+   }
+  },
+  {
+   "case": "static::caps::window-denied-commands::onboarding",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "static::caps::window-union-equals-policy::quick-chat",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "commandWindows": [
+     "quick-chat"
+    ],
+    "extraPrivilege": [],
+    "missingUndeclared": [],
+    "declaredPending": []
+   }
+  },
+  {
+   "case": "static::caps::window-plugin-permissions::quick-chat",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "actual": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ],
+    "allowed": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ],
+    "extraPluginPermissions": []
+   }
+  },
+  {
+   "case": "static::caps::window-denied-commands::quick-chat",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "static::caps::window-union-equals-policy::settings",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "commandWindows": [
+     "settings"
+    ],
+    "extraPrivilege": [],
+    "missingUndeclared": [],
+    "declaredPending": []
+   }
+  },
+  {
+   "case": "static::caps::window-plugin-permissions::settings",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "actual": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ],
+    "allowed": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ],
+    "extraPluginPermissions": []
+   }
+  },
+  {
+   "case": "static::caps::window-denied-commands::settings",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "static::caps::window-union-equals-policy::skill-viewer-*",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "commandWindows": [
+     "skill-viewer"
+    ],
+    "extraPrivilege": [],
+    "missingUndeclared": [],
+    "declaredPending": []
+   }
+  },
+  {
+   "case": "static::caps::window-plugin-permissions::skill-viewer-*",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "actual": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ],
+    "allowed": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ],
+    "extraPluginPermissions": []
+   }
+  },
+  {
+   "case": "static::caps::window-denied-commands::skill-viewer-*",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "static::caps::window-union-equals-policy::splash",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "commandWindows": [
+     "splash"
+    ],
+    "extraPrivilege": [],
+    "missingUndeclared": [],
+    "declaredPending": []
+   }
+  },
+  {
+   "case": "static::caps::window-plugin-permissions::splash",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "actual": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ],
+    "allowed": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ],
+    "extraPluginPermissions": []
+   }
+  },
+  {
+   "case": "static::caps::window-denied-commands::splash",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "static::caps::window-union-equals-policy::viewer-*",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "commandWindows": [
+     "resource-viewer"
+    ],
+    "extraPrivilege": [],
+    "missingUndeclared": [],
+    "declaredPending": []
+   }
+  },
+  {
+   "case": "static::caps::window-plugin-permissions::viewer-*",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "actual": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ],
+    "allowed": [
+     "core:event:allow-listen",
+     "core:event:allow-unlisten"
+    ],
+    "extraPluginPermissions": []
+   }
+  },
+  {
+   "case": "static::caps::window-denied-commands::viewer-*",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "static::caps::no-dangerous-plugin-permissions",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "static::caps::capabilities-reference-known-permissions",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "static::caps::window-stacking::main",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "capabilities": [
+     "resource-main",
+     "r09-host"
+    ],
+    "minCapabilities": 2
+   }
+  },
+  {
+   "case": "static::caps::gap-ledger-pending-implementation",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "declared": [],
+    "actual": [],
+    "onlyDeclared": [],
+    "onlyActual": []
+   }
+  },
+  {
+   "case": "static::caps::gap-ledger-pending-window-grants",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "declared": {},
+    "actual": {}
+   }
+  },
+  {
+   "case": "static::caps::protected-commands-window-scoped",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "static::caps::release-denied-commands-not-granted",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "hits": [],
+    "devOnly": [
+     "debug_open_onboarding",
+     "debug_open_onboarding_preview"
+    ],
+    "note": "debug 命令只允许出现在 devOnlyCapabilities 排除的 capability 中"
+   }
+  },
+  {
+   "case": "static::caps::debug-commands-declared-dev-only",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "debugInvokeCommands": [
+     "debug_open_onboarding",
+     "debug_open_onboarding_preview"
+    ],
+    "declaredDevOnly": [
+     "debug_open_onboarding",
+     "debug_open_onboarding_preview"
+    ]
+   }
+  },
+  {
+   "case": "static::caps::deferred-commands-not-granted",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "deferred": [
+     "ack_announcement",
+     "auto_update_check",
+     "auto_update_install",
+     "auto_update_set_channel",
+     "auto_update_state",
+     "get_pending_announcement",
+     "get_update_digest_history",
+     "observability_export_abort",
+     "observability_export_begin",
+     "observability_export_end",
+     "observability_export_write",
+     "read_docx_html",
+     "read_xlsx_html",
+     "release_check_latest",
+     "screenshot_render",
+     "train_update_apply",
+     "train_update_check",
+     "train_update_status",
+     "unwatch_workspace",
+     "watch_workspace"
+    ],
+    "granted": []
+   }
+  },
+  {
+   "case": "static::caps::dropped-commands-not-registered",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "static::caps::forbidden-commands-absent",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "static::caps::wdio-feature-gated",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "optional": true,
+    "featureGate": true
+   }
+  },
+  {
+   "case": "static::caps::tauri-crate-no-devtools-feature",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tauriFeatures": [
+     "protocol-asset",
+     "image-png",
+     "tray-icon"
+    ],
+    "forbiddenEnabled": []
+   }
+  },
+  {
+   "case": "static::caps::no-devtools-control-in-source",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "static::caps::release-config-has-no-dev-url",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "releaseConfigPresent": true
+   }
+  },
+  {
+   "case": "static::caps::with-global-tauri-matches-policy",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "actual": true,
+    "policy": true,
+    "note": "withGlobalTauri 只暴露 ACL 允许的命令，不是 ACL 绕过；T06 R09 保留 true 以复用同一 React 产物"
+   }
+  },
+  {
+   "case": "static::caps::no-dev-port-in-production-config",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "static::caps::test-hooks-feature-declared",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "feature": "r09-test-hooks",
+    "note": "测试注入点必须由该 Cargo feature 编译门控"
+   }
+  },
+  {
+   "case": "static::caps::delivery-release-excludes-test-hooks",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "receipt": "desktop/src-tauri/.tauri-build/build-receipt-release.json",
+    "evidenceBuild": false,
+    "features": [
+     "r09-host"
+    ],
+    "forbiddenFeature": null
+   }
+  },
+  {
+   "case": "static::caps::delivery-release-binary-no-test-env",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "binary": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+    "hits": [],
+    "note": "交付 release 二进制不得含测试注入 env 名/调试符号（A12）"
+   }
+  },
+  {
+   "case": "static::caps::asset-protocol-scope-confined",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "configs": {
+     "tauri.conf.json": {
+      "present": true,
+      "enable": true,
+      "scope": [
+       "$HOME/.lingxi/**",
+       "$HOME/.lingxi-dev/**",
+       "$HOME/.hanako-dev/**",
+       "$TEMP/**"
+      ]
+     },
+     "tauri.release.conf.json": {
+      "present": true,
+      "enable": true,
+      "scope": [
+       "$HOME/.lingxi/**",
+       "$HOME/.lingxi-dev/**",
+       "$HOME/.hanako-dev/**",
+       "$TEMP/**"
+      ]
+     },
+     "tauri.dev.conf.json": {
+      "present": true,
+      "enable": true,
+      "scope": [
+       "$HOME/.lingxi/**",
+       "$HOME/.lingxi-dev/**",
+       "$HOME/.hanako-dev/**",
+       "$TEMP/**"
+      ]
+     }
+    },
+    "violations": [],
+    "allowedEntries": [
+     "$HOME/.hanako-dev/**",
+     "$HOME/.lingxi-dev/**",
+     "$HOME/.lingxi/**",
+     "$TEMP/**"
+    ],
+    "note": "静态 scope 仅标准 LINGXI_HOME/$TEMP；实际 home 与 home 外 workspace 运行时 add（host.rs 单测校验越界拒绝）"
+   }
+  },
+  {
+   "case": "static::caps::base-config-csp-asset",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "imgSrc": [
+     "'self'",
+     "data:",
+     "asset:",
+     "http://asset.localhost"
+    ],
+    "mediaSrc": [
+     "'self'",
+     "data:",
+     "blob:",
+     "asset:",
+     "http://asset.localhost"
+    ],
+    "note": "基础配置（dev/合并前）也必须允许 asset，否则 getFileUrl/img 预览被 CSP 拒"
+   }
+  },
+  {
+   "case": "static::caps::base-window-devtools-disabled",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "windowsWithDevtools": [],
+    "note": "v2 Patch §2：release 不得有 devtools 右键/菜单入口；基础窗口显式 devtools=false"
+   }
+  },
+  {
+   "case": "static::gap-ledger-empty",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "remaining": 0,
+    "pendingImplementation": [],
+    "pendingWindowGrants": {}
+   }
+  },
+  {
+   "case": "static::audit-exit-code-zero",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "exitCode": 0,
+    "status": "PASS",
+    "failedCases": []
+   }
+  },
+  {
+   "case": "static::runtime-matrix-plan-generated",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "positive": 134,
+    "negative": 450
+   }
+  },
+  {
+   "case": "blocked::runtime.browser-viewer.negative-matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "browser-viewer: 67 条白名单外命令必须全部被 ACL 拒绝",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "blocked::runtime.main.negative-matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "main: 10 条白名单外命令必须全部被 ACL 拒绝",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "blocked::runtime.onboarding.negative-matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "onboarding: 66 条白名单外命令必须全部被 ACL 拒绝",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "blocked::runtime.quick-chat.negative-matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "quick-chat: 63 条白名单外命令必须全部被 ACL 拒绝",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "blocked::runtime.settings.negative-matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "settings: 44 条白名单外命令必须全部被 ACL 拒绝",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "blocked::runtime.skill-viewer-*.negative-matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "skill-viewer-*: 69 条白名单外命令必须全部被 ACL 拒绝",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "blocked::runtime.splash.negative-matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "splash: 70 条白名单外命令必须全部被 ACL 拒绝",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "blocked::runtime.viewer-*.negative-matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "viewer-*: 61 条白名单外命令必须全部被 ACL 拒绝",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "blocked::runtime.browser-viewer.positive-matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "browser-viewer: allowedCommands 正路径（真实 renderer 调用 + 驱动互证）",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "blocked::runtime.main.positive-matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "main: allowedCommands 正路径（真实 renderer 调用 + 驱动互证）",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "blocked::runtime.onboarding.positive-matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "onboarding: allowedCommands 正路径（真实 renderer 调用 + 驱动互证）",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "blocked::runtime.quick-chat.positive-matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "quick-chat: allowedCommands 正路径（真实 renderer 调用 + 驱动互证）",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "blocked::runtime.settings.positive-matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "settings: allowedCommands 正路径（真实 renderer 调用 + 驱动互证）",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "blocked::runtime.skill-viewer-*.positive-matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "skill-viewer-*: allowedCommands 正路径（真实 renderer 调用 + 驱动互证）",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "blocked::runtime.splash.positive-matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "splash: allowedCommands 正路径（真实 renderer 调用 + 驱动互证）",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "blocked::runtime.viewer-*.positive-matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "viewer-*: allowedCommands 正路径（真实 renderer 调用 + 驱动互证）",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "blocked::runtime.remote-webview-zero-acl",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "远程内容 webview 调用任一自定义命令必须 100% 拒绝（不加入任何 capability）",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "blocked::runtime.token-not-in-url-or-dom",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "viewer/browser-viewer 拿到的上下文不含服务 token；token 不出现在 URL/query/DOM",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "blocked::runtime.csp-blocked-remote-script",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "注入远程 <script>/unsafe-eval/外链 frame 的预览页必须被 CSP 阻止（无 violation 放行）",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "blocked::runtime.canary-command-release-absent",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "e2e canary 命令只在 debug/e2e-test 构建存在；release 调用返回 command not found",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "blocked::runtime.debug-command-release-denied",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "debug_open_onboarding(_preview) 在 release 任何窗口均不可调用",
+    "unblock": "Lead 明确 cleared GUI 后由 T07 原生 E2E/wdio 执行"
+   }
+  },
+  {
+   "case": "isolation::real-home-untouched",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "before": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    },
+    "after": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    }
+   }
+  }
+ ]
+}

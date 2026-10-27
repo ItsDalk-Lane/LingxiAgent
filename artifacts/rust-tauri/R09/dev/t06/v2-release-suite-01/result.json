@@ -1,0 +1,32 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t06_release_attack_surface",
+ "status": "PASS",
+ "exitCode": 0,
+ "durationSecs": 3.459,
+ "caseCount": 51,
+ "casesSha256": "29a5245c108b01c13156fbca6c8cb5da5434b46ee7b02cf53be2650234c2d4b3",
+ "commands": [
+  {
+   "id": "release::attack-surface-scan",
+   "argv": [
+    "python3",
+    "-B",
+    "scripts/rust-tauri/r09_release_attack_surface.py",
+    "--evidence",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t06/v2-release-suite-01/release-scan"
+   ],
+   "exitCode": 0,
+   "durationSecs": 1.097,
+   "logSha256": "10b03d2565f6b5918aa5295228ff412285d95e08530022299cd596c787ba0ad6"
+  }
+ ],
+ "logSha256": "10b03d2565f6b5918aa5295228ff412285d95e08530022299cd596c787ba0ad6",
+ "finishedAtUnixMs": 1793028190466,
+ "scannerExitCode": 0,
+ "scannerStatus": "PASS",
+ "failedCases": [],
+ "artifactChangedDuringScan": false,
+ "releaseScanReceipt": "release-scan/result.json",
+ "note": "只读扫描产物字节；未启动 app/GUI/安装包"
+}

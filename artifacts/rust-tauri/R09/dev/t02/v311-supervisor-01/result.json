@@ -1,0 +1,21 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t02_supervisor_ready",
+ "status": "PASS",
+ "exitCode": 0,
+ "durationSecs": 4.916,
+ "caseCount": 10,
+ "casesSha256": "5b5c415b5f852aed3d6e3af8cc6f98ff13184e96dfaa4870a2ad1a8205dca2d9",
+ "commands": [],
+ "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+ "finishedAtUnixMs": 1793066808689,
+ "hiddenOnly": true,
+ "pendingVisible": [
+  "supervisor-release-positive",
+  "supervisor-injected-protocol",
+  "supervisor-injected-digest",
+  "supervisor-runtime-identity",
+  "no-node-fallback-in-release-binary"
+ ],
+ "note": "hidden-only 子集：只对已执行 debug hidden cases 判定；pendingVisible 不冒充通过"
+}

@@ -1,0 +1,388 @@
+$ /Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path desktop/src-tauri/Cargo.toml --locked --features r09-host,e2e-test --test service_supervisor -- --nocapture
+--- exit=0 duration=33.99s ---
+
+running 9 tests
+test release_builds_refuse_remote_without_spawning ... ok
+test data_downgrade_env_is_refused ... ok
+test node_server_info_record_blocks_rust_startup ... ok
+test existing_instance_is_reused_and_detached_on_stop ... ok
+test remote_mode_never_spawns_or_touches_local_or_remote_process ... ok
+test real_service_roundtrip_ready_identity_and_graceful_shutdown ... ok
+test runtime_protocol_mismatch_rejects_and_reaps_fake_service ... ok
+test crash_restart_exhausted_is_bounded_and_headless ... ok
+test ready_timeout_kills_spawned_child_and_records_failure ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.75s
+
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling serde_core v1.0.229
+   Compiling cfg-if v1.0.5
+   Compiling libc v0.2.190
+   Compiling find-msvc-tools v0.1.15
+   Compiling shlex v2.0.1
+   Compiling itoa v1.0.18
+   Compiling memchr v2.8.3
+   Compiling litemap v0.8.3
+   Compiling writeable v0.6.4
+   Compiling utf8_iter v1.0.4
+   Compiling siphasher v1.0.4
+   Compiling zmij v1.0.23
+   Compiling log v0.4.34
+   Compiling icu_properties_data v2.4.0
+   Compiling icu_normalizer_data v2.4.0
+   Compiling fastrand v2.5.0
+   Compiling stable_deref_trait v1.2.1
+   Compiling objc2-encode v4.1.0
+   Compiling getrandom v0.4.3
+   Compiling serde v1.0.229
+   Compiling bytes v1.12.1
+   Compiling smallvec v1.16.4
+   Compiling thiserror v2.0.21
+   Compiling cc v1.10.0
+   Compiling objc2 v0.6.4
+   Compiling num-conv v0.2.2
+   Compiling time-core v0.1.9
+   Compiling powerfmt v0.2.1
+   Compiling autocfg v1.5.1
+   Compiling bitflags v2.13.2
+   Compiling phf_shared v0.13.1
+   Compiling base64 v0.23.1
+   Compiling winnow v1.0.4
+   Compiling typeid v1.0.3
+   Compiling serde_json v1.0.151
+   Compiling strsim v0.11.1
+   Compiling ident_case v1.0.1
+   Compiling parking_lot_core v0.9.12
+   Compiling http v1.5.0
+   Compiling toml_writer v1.1.3+spec-1.1.0
+   Compiling phf_generator v0.13.1
+   Compiling erased-serde v0.4.11
+   Compiling aho-corasick v1.1.5
+   Compiling fnv v1.0.7
+   Compiling new_debug_unreachable v1.0.6
+   Compiling toml_parser v1.1.5+spec-1.1.0
+   Compiling phf_codegen v0.13.1
+   Compiling scopeguard v1.2.0
+   Compiling regex-syntax v0.8.11
+   Compiling web-time v1.1.0
+   Compiling equivalent v1.0.3
+   Compiling alloc-no-stdlib v3.0.0
+   Compiling precomputed-hash v0.1.1
+   Compiling lock_api v0.4.14
+   Compiling hashbrown v0.17.1
+   Compiling quick-xml v0.42.0
+   Compiling anyhow v1.0.104
+   Compiling percent-encoding v2.3.2
+   Compiling alloc-stdlib v0.3.0
+   Compiling dtoa v1.0.11
+   Compiling brotli-decompressor v6.2.0
+   Compiling dunce v1.0.5
+   Compiling same-file v1.0.6
+   Compiling dtoa-short v0.3.5
+   Compiling form_urlencoded v1.2.2
+   Compiling selectors v0.38.0
+   Compiling walkdir v2.5.0
+   Compiling tendril v0.5.1
+   Compiling indexmap v1.9.3
+   Compiling dyn-clone v1.0.20
+   Compiling glob v0.3.4
+   Compiling camino v1.2.6
+   Compiling indexmap v2.14.2
+   Compiling ctor v1.0.13
+   Compiling servo_arc v0.4.3
+   Compiling hashbrown v0.12.3
+   Compiling deranged v0.5.9
+   Compiling schemars v0.8.22
+   Compiling bit-vec v0.8.0
+   Compiling rustc-hash v2.1.3
+   Compiling tauri-utils v2.10.2
+   Compiling foldhash v0.2.0
+   Compiling base64 v0.21.7
+   Compiling option-ext v0.2.0
+   Compiling version_check v0.9.5
+   Compiling bit-set v0.8.0
+   Compiling once_cell v1.21.4
+   Compiling simd-adler32 v0.3.10
+   Compiling heck v0.5.0
+   Compiling brotli v9.1.0
+   Compiling pin-project-lite v0.2.17
+   Compiling adler2 v2.0.1
+   Compiling crc32fast v1.5.3
+   Compiling time-macros v0.2.32
+   Compiling generic-array v0.14.7
+   Compiling fdeflate v0.3.7
+   Compiling crossbeam-utils v0.8.23
+   Compiling typenum v1.20.1
+   Compiling miniz_oxide v0.9.1
+   Compiling objc2-exception-helper v0.1.1
+   Compiling miniz_oxide v0.8.9
+   Compiling dirs-sys v0.5.0
+   Compiling syn v3.0.9
+   Compiling syn v2.0.119
+   Compiling string_cache_codegen v0.6.1
+   Compiling time v0.3.55
+   Compiling dirs v7.0.0
+   Compiling regex-automata v0.4.18
+   Compiling socket2 v0.6.5
+   Compiling parking_lot v0.12.5
+   Compiling mio v1.2.4
+   Compiling raw-window-handle v0.6.2
+   Compiling cookie v0.18.2
+   Compiling core-foundation-sys v0.8.7
+   Compiling getrandom v0.3.4
+   Compiling string_cache v0.9.0
+   Compiling num-traits v0.2.19
+   Compiling core-foundation v0.10.1
+   Compiling futures-core v0.3.34
+   Compiling foreign-types-shared v0.3.1
+   Compiling web_atoms v0.2.6
+   Compiling cpufeatures v0.2.17
+   Compiling byteorder v1.5.0
+   Compiling muda v0.20.0
+   Compiling semver v1.0.28
+   Compiling tauri-runtime v2.12.2
+   Compiling tauri-runtime-wry v2.12.3
+   Compiling mime v0.3.17
+   Compiling tray-icon v0.25.1
+   Compiling pxfm v0.1.30
+   Compiling tracing-core v0.1.36
+   Compiling flate2 v1.1.10
+   Compiling byteorder-lite v0.1.0
+   Compiling serde_spanned v1.1.2
+   Compiling toml_datetime v1.1.2+spec-1.1.0
+   Compiling uuid v1.29.0
+   Compiling rustc_version v0.4.1
+   Compiling toml v1.1.8+spec-1.1.0
+   Compiling crossbeam-channel v0.5.17
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling cfb v0.14.0
+   Compiling digest v0.10.7
+   Compiling png v0.18.1
+   Compiling core-graphics-types v0.2.0
+   Compiling serde-untagged v0.1.9
+   Compiling sha2 v0.10.9
+   Compiling bytemuck v1.25.2
+   Compiling http-body v1.1.0
+   Compiling embed_plist v1.2.2
+   Compiling http-range v0.1.6
+   Compiling objc2-foundation v0.3.2
+   Compiling tower-service v0.3.3
+   Compiling futures-task v0.3.34
+   Compiling slab v0.4.12
+   Compiling regex v1.13.1
+   Compiling httparse v1.10.1
+   Compiling infer v0.22.0
+   Compiling embed-resource v3.0.12
+   Compiling futures-util v0.3.34
+   Compiling sync_wrapper v1.0.2
+   Compiling wry v0.57.1
+   Compiling tower-layer v0.3.3
+   Compiling zerocopy v0.8.63
+   Compiling ico v0.6.0
+   Compiling try-lock v0.2.5
+   Compiling cfg_aliases v0.2.2
+   Compiling atomic-waker v1.1.2
+   Compiling tauri-winres v0.3.7
+   Compiling httpdate v1.0.3
+   Compiling want v0.3.2
+   Compiling http-body-util v0.1.5
+   Compiling nix v0.31.3
+   Compiling futures-channel v0.3.34
+   Compiling mac-notification-sys v0.6.15
+   Compiling ipnet v2.12.2
+   Compiling ref-cast v1.0.27
+   Compiling rustix v1.1.5
+   Compiling const-oid v0.10.2
+   Compiling rand_core v0.9.5
+   Compiling cpufeatures v0.3.1
+   Compiling errno v0.3.14
+   Compiling unicode-segmentation v1.13.3
+   Compiling ryu v1.0.23
+   Compiling rfd v0.16.1
+   Compiling moxcms v0.8.1
+   Compiling objc2-core-foundation v0.3.2
+   Compiling block2 v0.6.2
+   Compiling objc2-javascript-core v0.3.2
+   Compiling serde_path_to_error v0.1.20
+   Compiling serde_derive_internals v0.29.1
+   Compiling hybrid-array v0.4.15
+   Compiling dirs v6.0.0
+   Compiling matchit v0.8.4
+   Compiling base64 v0.22.1
+   Compiling open v5.4.4
+   Compiling dispatch2 v0.3.1
+   Compiling synstructure v0.14.0
+   Compiling darling_core v0.24.1
+   Compiling serde_derive_internals v0.30.0
+   Compiling block-buffer v0.12.1
+   Compiling crypto-common v0.2.2
+   Compiling phf_macros v0.13.1
+   Compiling derive_more-impl v2.1.1
+   Compiling schemars_derive v0.8.22
+   Compiling serialize-to-javascript-impl v0.1.2
+   Compiling tracing-attributes v0.1.31
+   Compiling serde_derive v1.0.229
+   Compiling zerofrom-derive v0.1.8
+   Compiling yoke-derive v0.8.4
+   Compiling zerovec-derive v0.11.7
+   Compiling displaydoc v0.2.7
+   Compiling thiserror-impl v2.0.21
+   Compiling cssparser-macros v0.7.1
+   Compiling tokio-macros v2.7.2
+   Compiling foreign-types-macros v0.2.4
+   Compiling serde_repr v0.1.21
+   Compiling ref-cast-impl v1.0.27
+   Compiling schemars_derive v1.2.3
+   Compiling async-trait v0.1.92
+   Compiling objc2-core-text v0.3.2
+   Compiling objc2-core-graphics v0.3.2
+   Compiling objc2-core-video v0.3.2
+   Compiling objc2-security v0.3.2
+   Compiling digest v0.11.3
+   Compiling foreign-types v0.5.0
+   Compiling sha1 v0.11.0
+   Compiling sha2 v0.11.0
+   Compiling tokio v1.53.1
+   Compiling phf v0.13.1
+   Compiling tempfile v3.27.0
+   Compiling derive_more v2.1.1
+   Compiling tracing v0.1.44
+   Compiling zerofrom v0.1.8
+   Compiling darling_macro v0.24.1
+   Compiling core-graphics v0.25.0
+   Compiling cssparser v0.37.0
+   Compiling darling v0.24.1
+   Compiling yoke v0.8.4
+   Compiling axum-core v0.5.6
+   Compiling markup5ever v0.39.0
+   Compiling image v0.25.10
+   Compiling html5ever v0.39.0
+   Compiling serde_with_macros v3.24.0
+   Compiling ppv-lite86 v0.2.21
+   Compiling rand_chacha v0.9.0
+   Compiling zerovec v0.11.9
+   Compiling zerotrie v0.2.5
+   Compiling rand v0.9.5
+   Compiling serde_with v3.24.0
+   Compiling dpi v0.1.2
+   Compiling jsonptr v0.7.1
+   Compiling plist v1.10.3
+   Compiling keyboard-types v0.8.3
+   Compiling serialize-to-javascript v0.1.2
+   Compiling keyboard-types v0.7.0
+   Compiling serde_urlencoded v0.7.1
+   Compiling schemars v1.2.3
+   Compiling cargo-platform v0.1.9
+   Compiling cargo_toml v1.0.1
+   Compiling swift-rs v1.0.9
+   Compiling cargo_metadata v0.19.2
+   Compiling json-patch v4.2.0
+   Compiling dom_query v0.28.0
+   Compiling tinystr v0.8.5
+   Compiling potential_utf v0.1.6
+   Compiling icu_collections v2.4.0
+   Compiling icu_locale_core v2.4.0
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling tower v0.5.3
+   Compiling hyper v1.12.0
+   Compiling icu_provider v2.4.0
+   Compiling icu_properties v2.4.0
+   Compiling icu_normalizer v2.4.0
+   Compiling hyper-util v0.1.21
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling axum v0.8.9
+   Compiling urlpattern v0.6.0
+   Compiling tower-http v0.6.11
+   Compiling reqwest v0.13.5
+   Compiling objc2-cloud-kit v0.3.2
+   Compiling objc2-quartz-core v0.3.2
+   Compiling objc2-core-image v0.3.2
+   Compiling objc2-core-data v0.3.2
+   Compiling objc2-service-management v0.3.2
+   Compiling os_info v3.15.0
+   Compiling objc2-core-location v0.3.2
+   Compiling trash v5.2.9
+   Compiling objc2-user-notifications v0.3.2
+   Compiling smappservice-rs v0.1.3
+   Compiling notify-rust v4.18.2
+   Compiling auto-launch v0.6.0
+   Compiling objc2-app-kit v0.3.2
+   Compiling tauri-plugin v2.7.2
+   Compiling tauri-build v2.7.2
+   Compiling tauri-codegen v2.7.4
+   Compiling tauri v2.12.1
+   Compiling tauri-macros v2.7.4
+   Compiling tauri-plugin-fs v2.7.1
+   Compiling tauri-plugin-dialog v2.7.3
+   Compiling tauri-plugin-notification v2.7.0
+   Compiling tauri-plugin-autostart v2.7.0
+   Compiling tauri-plugin-wdio-webdriver v1.4.0
+   Compiling tauri-plugin-global-shortcut v2.4.1
+   Compiling lingxi-resource-desktop v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri)
+   Compiling objc2-web-kit v0.3.2
+   Compiling tao v0.37.2
+   Compiling window-vibrancy v0.8.1
+   Compiling global-hotkey v0.8.0
+   Compiling tauri-plugin-single-instance v2.5.4
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 32.79s
+     Running tests/service_supervisor.rs (/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/t02-supervisor-cargo-target/debug/deps/service_supervisor-6bddcde3941bdf5b)
+[tauri-diag] {"appVersion":"0.1.43","debugBuild":true,"event":"resolve","home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-node-server-info-4718-1793035046445","packaged":false,"platform":"darwin","schema":"lingxi.r09.tauri-launch.v1","unixMs":1793035046448}
+[tauri-diag] {"appVersion":"0.1.43","debugBuild":true,"event":"resolve","home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-downgrade-4718-1793035046445","packaged":false,"platform":"darwin","schema":"lingxi.r09.tauri-launch.v1","unixMs":1793035046448}
+[tauri-diag] {"appVersion":"0.1.43","debugBuild":false,"event":"resolve","home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-remote-release-refusal-4718-1793035046445","packaged":false,"platform":"darwin","schema":"lingxi.r09.tauri-launch.v1","unixMs":1793035046448}
+[tauri-diagnostics] failure record: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-tauri-launch/937b433360020512/failure.json
+[tauri-diagnostics] failure record: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-tauri-launch/e1e6ca76bd38d2b6/failure.json
+[tauri-diag] {"actual":null,"appVersion":"0.1.43","atUnixMs":1793035046449,"debugBuild":false,"detail":null,"event":"service-launch-failed","expected":null,"fallbackAttempts":0,"home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-remote-release-refusal-4718-1793035046445","message":"Rust remote desktop connection is a dev preview; release builds refuse it","nodeFallback":"none","packaged":false,"reason":"REMOTE_REQUIRES_DEV_BUILD","schema":"lingxi.r09.service-launch-failure.v1","unixMs":1793035046449}
+[tauri-diag] {"actual":null,"appVersion":"0.1.43","atUnixMs":1793035046449,"debugBuild":true,"detail":{"path":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-node-server-info-4718-1793035046445/server-info.json"},"event":"service-launch-failed","expected":null,"fallbackAttempts":0,"home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-node-server-info-4718-1793035046445","message":"a legacy Node server record exists in this data root; resolve it before starting the Rust desktop","nodeFallback":"none","packaged":false,"reason":"RUST_DESKTOP_NODE_SERVER_INFO_PRESENT","schema":"lingxi.r09.service-launch-failure.v1","unixMs":1793035046449}
+[tauri-diagnostics] failure record: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-tauri-launch/fdc02a18326224d6/failure.json
+[tauri-diag] {"actual":null,"appVersion":"0.1.43","atUnixMs":1793035046449,"debugBuild":true,"detail":null,"event":"service-launch-failed","expected":null,"fallbackAttempts":0,"home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-downgrade-4718-1793035046445","message":"Rust desktop refuses LINGXI_ALLOW_DATA_DOWNGRADE; use an explicit recovery workflow","nodeFallback":"none","packaged":false,"reason":"RUST_DESKTOP_DATA_DOWNGRADE_REFUSED","schema":"lingxi.r09.service-launch-failure.v1","unixMs":1793035046450}
+[tauri-diagnostics] crash log: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-tauri-launch/937b433360020512/tauri-crash.log
+[tauri-diag] {"appVersion":"0.1.43","debugBuild":true,"event":"resolve","home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-crash-exhausted-4718-1793035046449","packaged":false,"platform":"darwin","schema":"lingxi.r09.tauri-launch.v1","unixMs":1793035046450}
+[tauri-diagnostics] crash log: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-tauri-launch/fdc02a18326224d6/tauri-crash.log
+[tauri-diag] {"appVersion":"0.1.43","debugBuild":true,"event":"resolve","home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-roundtrip-4718-1793035046449","packaged":false,"platform":"darwin","schema":"lingxi.r09.tauri-launch.v1","unixMs":1793035046450}
+[tauri-diag] {"binary":"/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/../../rust/target/debug/lingxi-service","event":"binary","packaged":false,"schema":"lingxi.r09.tauri-launch.v1","unixMs":1793035046450}
+[tauri-diagnostics] crash log: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-tauri-launch/e1e6ca76bd38d2b6/tauri-crash.log
+[tauri-diag] {"binary":"/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/../../rust/target/debug/lingxi-service","event":"binary","packaged":false,"schema":"lingxi.r09.tauri-launch.v1","unixMs":1793035046450}
+[tauri-diag] {"appVersion":"0.1.43","debugBuild":true,"event":"resolve","home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-runtime-gate-4718-1793035046449","packaged":false,"platform":"darwin","schema":"lingxi.r09.tauri-launch.v1","unixMs":1793035046450}
+[tauri-diag] {"appVersion":"0.1.43","debugBuild":true,"event":"resolve","home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-timeout-4718-1793035046449","packaged":false,"platform":"darwin","schema":"lingxi.r09.tauri-launch.v1","unixMs":1793035046450}
+[tauri-diag] {"binary":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-timeout-4718-1793035046449/fake-service.sh","event":"binary","packaged":false,"schema":"lingxi.r09.tauri-launch.v1","unixMs":1793035046451}
+[tauri-diag] {"binary":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-runtime-gate-4718-1793035046449/fake-incompatible-service.py","event":"binary","packaged":false,"schema":"lingxi.r09.tauri-launch.v1","unixMs":1793035046451}
+[tauri-diag] {"args":["--home","/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-runtime-gate-4718-1793035046449"],"binary":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-runtime-gate-4718-1793035046449/fake-incompatible-service.py","event":"spawn","pgid":4722,"pid":4722,"schema":"lingxi.r09.tauri-launch.v1","spawnedAtUnixMs":1793035046451,"unixMs":1793035046451}
+[tauri-diag] {"args":["--home","/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-timeout-4718-1793035046449"],"binary":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-timeout-4718-1793035046449/fake-service.sh","event":"spawn","pgid":4724,"pid":4724,"schema":"lingxi.r09.tauri-launch.v1","spawnedAtUnixMs":1793035046451,"unixMs":1793035046451}
+[tauri-diag] {"args":["--home","/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-crash-exhausted-4718-1793035046449"],"binary":"/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/../../rust/target/debug/lingxi-service","event":"spawn","pgid":4723,"pid":4723,"schema":"lingxi.r09.tauri-launch.v1","spawnedAtUnixMs":1793035046450,"unixMs":1793035046453}
+[tauri-diag] {"args":["--home","/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-roundtrip-4718-1793035046449"],"binary":"/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/../../rust/target/debug/lingxi-service","event":"spawn","pgid":4721,"pid":4721,"schema":"lingxi.r09.tauri-launch.v1","spawnedAtUnixMs":1793035046450,"unixMs":1793035046453}
+[tauri-diag] {"addr":"127.0.0.1:63808","event":"ready","msSinceSpawn":324,"pid":4722,"schema":"lingxi.r09.tauri-launch.v1","unixMs":1793035046776}
+[tauri-diag] {"appVersion":"0.1.43","debugBuild":true,"event":"resolve","home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-remote-local-4718-1793035046450","packaged":false,"platform":"darwin","schema":"lingxi.r09.tauri-launch.v1","unixMs":1793035046798}
+[tauri-diag] {"event":"remote-connect","host":"127.0.0.1","port":63805,"schema":"lingxi.r09.tauri-launch.v1","transport":"http","unixMs":1793035046798}
+[tauri-diag] {"event":"service-ready","host":"127.0.0.1","identity":{"serverId":"server_WXCMY19dK-st8455lkX76w","studioId":"studio_TDu5wcJ_1YKhKTae86X1lg"},"mode":"remote","port":63805,"schema":"lingxi.r09.tauri-launch.v1","touchedRemote":false,"unixMs":1793035046804}
+[tauri-diag] {"confirmed":false,"event":"shutdown","exit":null,"forceKillWaitMs":0,"graceMs":0,"mode":"remote","ownedPids":[],"residual":[],"schema":"lingxi.r09.tauri-launch.v1","signaled":[],"touchedRemote":false,"unixMs":1793035046804}
+[tauri-diag] {"event":"startup-abort","reason":"RUNTIME_IDENTITY_MISMATCH","schema":"lingxi.r09.tauri-launch.v1","shutdown":{"confirmed":true,"exit":{"code":0,"signal":null,"success":true},"forceKillWaitMs":5000,"graceMs":17000,"mode":"local-owned","ownedPids":[4722],"residual":[],"signaled":["SIGTERM:pid=4722"],"touchedRemote":false},"unixMs":1793035046928}
+[tauri-diagnostics] failure record: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-tauri-launch/a230e806d568189b/failure.json
+[tauri-diag] {"actual":"wire 1..=3 epoch 2","appVersion":"0.1.43","atUnixMs":1793035046928,"debugBuild":true,"detail":{"instanceId":"0123456789abcdef0123456789abcdef"},"event":"service-launch-failed","expected":"wire 1..=1 epoch 2","fallbackAttempts":0,"home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-runtime-gate-4718-1793035046449","message":"runtime instance record announces an incompatible protocol/data epoch","nodeFallback":"none","packaged":false,"reason":"RUNTIME_IDENTITY_MISMATCH","schema":"lingxi.r09.service-launch-failure.v1","unixMs":1793035046929}
+[tauri-diagnostics] crash log: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-tauri-launch/a230e806d568189b/tauri-crash.log
+[tauri-diagnostics] failure record: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-crash-exhausted-4718-1793035046449/diagnostics/tauri-launch/failure.json
+[tauri-diagnostics] crash log: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-crash-exhausted-4718-1793035046449/diagnostics/tauri-launch/tauri-crash.log
+[tauri-diag] {"event":"startup-abort","reason":"RUST_SERVICE_READY_TIMEOUT","schema":"lingxi.r09.tauri-launch.v1","shutdown":{"confirmed":true,"exit":{"code":null,"signal":15,"success":false},"forceKillWaitMs":5000,"graceMs":17000,"mode":"local-owned","ownedPids":[4724],"residual":[],"signaled":["SIGTERM:pid=4724"],"touchedRemote":false},"unixMs":1793035047161}
+[tauri-diagnostics] failure record: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-tauri-launch/fbfc7b5eee1d9a02/failure.json
+[tauri-diag] {"actual":null,"appVersion":"0.1.43","atUnixMs":1793035047161,"debugBuild":true,"detail":{"pid":4724,"readyPrefix":"LINGXI_SERVICE_READY addr=","stderrTail":[]},"event":"service-launch-failed","expected":null,"fallbackAttempts":0,"home":"/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-r09-supervisor-timeout-4718-1793035046449","message":"Rust service READY timed out after 600ms","nodeFallback":"none","packaged":false,"reason":"RUST_SERVICE_READY_TIMEOUT","schema":"lingxi.r09.service-launch-failure.v1","unixMs":1793035047161}
+[tauri-diagnostics] crash log: /private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-2717-1793035002092/tmp/lingxi-tauri-launch/fbfc7b5eee1d9a02/tauri-crash.log
+
+$ /bin/sh -c strings -a /private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E "hana-server" || true
+--- exit=0 duration=0.18s ---
+0
+
+$ /bin/sh -c strings -a /private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E "server/bootstrap" || true
+--- exit=0 duration=0.18s ---
+0
+
+$ /bin/sh -c strings -a /private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E "bundle/index.js" || true
+--- exit=0 duration=0.18s ---
+0
+
+$ /bin/sh -c strings -a /private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E "bridge-sdk-worker" || true
+--- exit=0 duration=0.18s ---
+0

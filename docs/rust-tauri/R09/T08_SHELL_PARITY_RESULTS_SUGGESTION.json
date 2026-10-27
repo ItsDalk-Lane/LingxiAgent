@@ -1,0 +1,501 @@
+{
+ "schema": "lingxi.r09.shell-parity.v1",
+ "stage": "R09",
+ "status": "DRAFT_T08_V32_SELFCHECK_PENDING_GUI_EVIDENCE",
+ "generatedAt": "2026-10-27T00:08:39+0800",
+ "candidate": {
+  "candidateVersion": "v3.2",
+  "source": "artifacts/rust-tauri/R09/dev/t06/candidate-handoff-v3.2/candidate-handoff.json",
+  "frozenAt": "2026-10-26T23:54:50+0800",
+  "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9"
+ },
+ "note": "T08 生产者建议填充内容（v3.2 候选 + T07 hidden H1/H2/H3 已绑定；Lead 汇总后覆盖 docs/rust-tauri/R09/SHELL_PARITY_RESULTS.json）。pending/blocked 未清零前不得引用为 A15/A16 全面成立；最终以正式门 in-gate 重跑为准。",
+ "methodology": {
+  "variableUnderTest": "desktop host only (Electron host vs Tauri host)",
+  "heldConstant": [
+   "same Rust service (sidecar 55d6edb15cb9…, contentSha256 73471fbf…, wire 1..=1 dataEpoch 2)",
+   "same React renderer build (rendererDigest b0a20250b3d1… / theme 455d963912bb…)",
+   "same deterministic fixtures (R08 v3Base anchor 80a8d2c2…)",
+   "same protocol/data epoch (wire 1..=1, data epoch 2)"
+  ],
+  "aSide": "R08 verified Electron host baseline (verify-r08-closeout-08 PASS; 71 A/B=68 parity+3 recorded+0 differs)",
+  "bSide": "R09 v3.2 frozen Tauri candidate（appTree 2008b71f48e9… / exe 8e74aa159096… / G1 030607eebfa2…）",
+  "harness": "scripts/rust-tauri/r09_t08.py --suite r09_t08_shell_parity（只读聚合，无 GUI/无构建）",
+  "recordedApprovalsRule": "任何宿主差异必须登记 basis 可校验的 RECORDED_APPROVALS；未批准差异使 A15 FAIL",
+  "evidenceMode": "同门优先；dev 自检回退并记录 sourceKind；旧候选证据 candidate-binding 显式红"
+ },
+ "fixedHashes": {
+  "rustServiceSha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+  "rustServiceContentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+  "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+  "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+  "fixturesManifestSha256": "80a8d2c2640e2b2974b299a10f36679bc19daf0911e51f82f0c43399cb32feaa",
+  "electronBaselineReceipt": {
+   "path": "artifacts/rust-tauri/R08/verify-r08-closeout-08/verify-stage-result.json",
+   "testedSha": "aa99d2ec1dae7f0aef5971bab049734f22fcf7d8",
+   "candidateSourceDigest": "0f07f2f7a0cf9e8d5660237be6a26666ba314dc04e840a02b9b573d990050dc6",
+   "ab": {
+    "tasks": 71,
+    "parity": 68,
+    "recorded": 3,
+    "differs": 0
+   }
+  },
+  "tauriCandidateReceipt": {
+   "deliveryAppTreeSha256": "2008b71f48e98b09d73e5c028b82dbead9a4eefd454132487ee441ee4a8470e2",
+   "hostExeSha256": "8e74aa1590969a3bdc24ed3c4789f38c0000c353e05e64f1dce5678317f7c1d5",
+   "evidenceBuildSha256": "030607eebfa2e7d65eedd4de3daf8a19d2958258b1b2d9b3cc68a5750d85888e",
+   "featuresDelivery": [
+    "r09-host"
+   ],
+   "featuresEvidence": [
+    "e2e-test",
+    "r09-host",
+    "r09-test-hooks"
+   ]
+  }
+ },
+ "tasks": [
+  {
+   "taskId": "R09-A15",
+   "aSide": "R08 Electron host baseline + 同窗 T01 A/B",
+   "bSide": "R09 v3.2 Tauri candidate",
+   "verdict": "PARTIAL_PENDING_GUI_EVIDENCE",
+   "measuredParityRows": 13,
+   "capabilityParity": 6,
+   "capabilityRecorded": 8,
+   "capabilityPending": 33,
+   "capabilityBlocked": 3,
+   "leafPending": 26,
+   "leafBlocked": 4,
+   "leafExcludedNonHost": 16,
+   "commandSurface": 73,
+   "unapprovedDifferences": 0
+  }
+ ],
+ "recordedApprovals": [
+  {
+   "id": "R09-ADJ-HOST-01",
+   "diff": "主页面来源：Electron=file://<repo>/desktop/dist-renderer/index.html ｜ Tauri=tauri://localhost（嵌入式自定义协议）",
+   "basisPath": "docs/rust-tauri/R09/IMPLEMENTATION_PLAN.md",
+   "basisQuote": "Tauri webview 无法获得 loopback http 来源",
+   "affected": [
+    "host:main-window",
+    "host:app-ready",
+    "host:server-connection-info"
+   ]
+  },
+  {
+   "id": "R09-ADJ-HOST-02",
+   "diff": "托盘菜单：Electron 第 4 项「修复组件…」在 Tauri 无等价实现，按 Lead 裁决移除（4 项菜单：show/settings/—/quit），不保留 no-op",
+   "basisPath": "docs/rust-tauri/R09/BLOCKED.md",
+   "basisQuote": "托盘「修复组件…」原能力在 Tauri 无等价实现",
+   "affected": [
+    "host:tray"
+   ]
+  },
+  {
+   "id": "R09-ADJ-HOST-03",
+   "diff": "更新链（GitHub release 检查 / 自动更新 / OTA 列车）R09 未实现：Tauri 命令面 deferred，UI 显式无更新状态",
+   "basisPath": "docs/rust-tauri/R09/T06_PROGRESS.md",
+   "basisQuote": "更新链（GitHub check/自动更新/OTA）属 R10 验收范围",
+   "affected": [
+    "host:update-github-check",
+    "host:update-auto",
+    "host:update-train-ota"
+   ]
+  },
+  {
+   "id": "R09-ADJ-HOST-04",
+   "diff": "页截图捕获（screenshot_render）R09 未实现：Tauri/Wry 无稳定捕获 API，命令 deferred",
+   "basisPath": "docs/rust-tauri/R09/T06_PROGRESS.md",
+   "basisQuote": "Tauri/Wry 无稳定页面捕获 API（T04 OQ-04 BLOCKED）",
+   "affected": [
+    "host:screenshot-render"
+   ]
+  },
+  {
+   "id": "R09-ADJ-HOST-05",
+   "diff": "卡片帧导航 guard：Tauri/Wry 无 will-frame-navigate 等价，flag 保持 false，HTTP 卡片降级为仅同源（显式降级，不假安全）",
+   "basisPath": "docs/rust-tauri/R09/IMPLEMENTATION_PLAN.md",
+   "basisQuote": "导航 guard 保持 flag=false 并在卡片层显式降级",
+   "affected": [
+    "host:card-frame-navigation-guard"
+   ]
+  },
+  {
+   "id": "R09-ADJ-HOST-06",
+   "diff": "拖入文件路径：Electron preload getFilePath(webUtils.getPathForFile)；Tauri 无等价，File 对象不暴露路径，改走原生 drop 适配层（file_drop 校验绝对路径）",
+   "basisPath": "docs/rust-tauri/R09/T03_HOST_CAPABILITY_INVENTORY.md",
+   "basisQuote": "Tauri 无 webUtils 等价",
+   "affected": [
+    "host:file-drop-paths"
+   ]
+  },
+  {
+   "id": "R09-ADJ-HOST-07",
+   "diff": "onboarding_complete：Electron(Rust 服务模式) 与 Tauri 均显式 NOT_IMPLEMENTED（服务无 setup-complete 等价路由）——两侧行为一致，非换壳引入的差异",
+   "basisPath": "docs/rust-tauri/R09/T03_T04_PROGRESS.md",
+   "basisQuote": "Rust 服务模式 onboarding completion 现役 Electron 即显式 throw",
+   "affected": [
+    "host:onboarding"
+   ]
+  },
+  {
+   "id": "R09-ADJ-HOST-08",
+   "diff": "文件能力（DOCX/XLSX 预览、workspace watch、可观测导出）R09 未实现：命令面 deferred（T03-FILE-01），UI 调用显式受限",
+   "basisPath": "docs/rust-tauri/R09/T06_PROGRESS.md",
+   "basisQuote": "T03 下一轮文件能力（docx/xlsx 预览、workspace watch、可观测导出）尚未实现",
+   "affected": [
+    "host:docx-xlsx-preview",
+    "host:observability-export",
+    "host:file-watch"
+   ]
+  }
+ ],
+ "summary": {
+  "totalCapabilities": 50,
+  "capabilityParity": 6,
+  "recorded": 8,
+  "differs": 0,
+  "pending": 59,
+  "blocked": 7,
+  "commandSurface": 73,
+  "platformApi": {
+   "totalMembers": 109,
+   "realExecutable": 76,
+   "conditionalInjection": 1,
+   "explicitNoop": 0,
+   "absentOptionalWithReason": 5,
+   "restrictedWithReason": 28,
+   "silentUndefined": 0
+  },
+  "hostPlaceholders": {
+   "notImplemented": 13,
+   "registered": 10,
+   "unregistered": 0,
+   "failClosed": 3,
+   "uiDeadEntrypoints": 0,
+   "unregisteredGaps": 0
+  },
+  "leafCoverage": {
+   "total": 74,
+   "bound": 15,
+   "pending": 59,
+   "a15SharedLeaves": {
+    "total": 46,
+    "excludedNonHost": 16,
+    "blocked": 4,
+    "pending": 26
+   }
+  },
+  "platformMatrix": {
+   "macos-arm64": "AVAILABLE（v3.2 自检实跑；GUI 批次待 clear）",
+   "macos-x64": "BLOCKED_PLATFORM",
+   "windows-x64": "BLOCKED_PLATFORM",
+   "linux-x64": "BLOCKED_PLATFORM"
+  }
+ },
+ "leafParity": [
+  {
+   "leafId": "R00-T02-LA-0DEEE4813B0A",
+   "hostClass": "HOST_NATIVE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-1120B2AA320D",
+   "hostClass": "HOST_NATIVE",
+   "status": "blocked",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-1329EA46F72C",
+   "hostClass": "SERVER_REACT",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-15DFB1AED8F2",
+   "hostClass": "HOST_NATIVE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-15E163FBFBE8",
+   "hostClass": "HOST_NATIVE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-1629CDD9EA4F",
+   "hostClass": "SERVER_REACT",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-173C6332527D",
+   "hostClass": "SERVER_REACT",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-18FE3FDFF9A5",
+   "hostClass": "HOST_BRIDGE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-1C41525D379C",
+   "hostClass": "HOST_NATIVE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-1D4C7E9C713C",
+   "hostClass": "SERVER_REACT",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-1E6EDB731186",
+   "hostClass": "HOST_NATIVE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-322E02C7F2F9",
+   "hostClass": "HOST_NATIVE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-37E6C3B9A7B8",
+   "hostClass": "HOST_NATIVE",
+   "status": "blocked",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-394DD07D2968",
+   "hostClass": "HOST_BRIDGE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-429D86C4F952",
+   "hostClass": "SERVER_REACT",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-57728C0A6D0A",
+   "hostClass": "HOST_NATIVE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-58822B6B138B",
+   "hostClass": "HOST_NATIVE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-59987671E5AD",
+   "hostClass": "SERVER_REACT",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-5D5938D61A00",
+   "hostClass": "HOST_NATIVE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-6006FD0BF07D",
+   "hostClass": "SERVER_REACT",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-6774E79F6714",
+   "hostClass": "HOST_BRIDGE",
+   "status": "blocked",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-70B07E378F42",
+   "hostClass": "SERVER_REACT",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-713E908B7B2F",
+   "hostClass": "SERVER_REACT",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-8FE26C132D8B",
+   "hostClass": "SERVER_REACT",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-9350C3E12165",
+   "hostClass": "HOST_NATIVE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-98B458390B7E",
+   "hostClass": "HOST_BRIDGE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-9C679D21A188",
+   "hostClass": "SERVER_REACT",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-A14D3027C881",
+   "hostClass": "SERVER_REACT",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-A2E507EBDEF2",
+   "hostClass": "HOST_NATIVE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-AC5B6EDA3FBD",
+   "hostClass": "HOST_NATIVE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-ACA2C4C1158D",
+   "hostClass": "HOST_NATIVE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-B6A97A19F2CB",
+   "hostClass": "HOST_NATIVE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-B72A6D3886B7",
+   "hostClass": "HOST_NATIVE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-BEC2074CC33C",
+   "hostClass": "HOST_BRIDGE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-C5AAF360D10F",
+   "hostClass": "SERVER_REACT",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-CD873C715D96",
+   "hostClass": "SERVER_REACT",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-D15E0ADC0608",
+   "hostClass": "HOST_BRIDGE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-D29DE479076C",
+   "hostClass": "HOST_NATIVE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-DF4B5168ABB5",
+   "hostClass": "HOST_NATIVE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-E6FB08FBBFAA",
+   "hostClass": "HOST_BRIDGE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-E84F01456B6C",
+   "hostClass": "HOST_NATIVE",
+   "status": "blocked",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-F5DBF2A80E28",
+   "hostClass": "HOST_BRIDGE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-F6235778F816",
+   "hostClass": "SERVER_REACT",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-F9786414DD11",
+   "hostClass": "HOST_NATIVE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-FB5C78308878",
+   "hostClass": "SERVER_REACT",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-FF1B331F1019",
+   "hostClass": "HOST_NATIVE",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  }
+ ],
+ "unapprovedDifferences": [],
+ "blocked": 7,
+ "pending": 59,
+ "evidence": "artifacts/rust-tauri/R09/dev/t08/v32-round-01/{01-shell-parity,02-host-completeness}/",
+ "v32Resolved": [
+  "页面 meta CSP asset 修复（H1 root cause）进入 renderer b0a20250…；静态门 audit 58（含 page-meta-csp-allows-asset）/scan 45/release suite 51 PASS",
+  "T07 hidden v3.2 全部 PASS 并绑定：H1 g1-hidden-v32-02（30 cases，file-url-asset img onload/context-menu/shell/IME/选区/DPI/焦点/graceful/ps-clean）、H2 h2-supervisor-02(10)/h2-ownership-02(13)、H3 release hidden h3-supervisor-01(31)/h3-ownership-01(19)；T02 语义证据（READY/graceful/协议·摘要·身份拒绝/no-node-fallback/owned+remote/reused/remote zero-touch/pid-reuse/no-orphan）已用 v3.2 hidden 证据复核",
+  "A16 file-url-asset a16Ok=True（real-behavior）；6 能力族 renderer wired（browser-viewer 细粒度按 T05 显式受限）；命令面 73",
+  "onboarding T06-ONBOARD-01 已登记；占位扫描 unregisteredGaps=0；PlatformApi 76 real/0 noop/5 absent/28 restricted/0 silent（期望差 1：onAutoUpdateState 分类）"
+ ],
+ "pendingBeforePASS": [
+  "T01 react_parity/release_offline v3.2 证据（可见批次：LINGXI_R09_T01_VISIBLE=1 + delivery/wrapper env；T07 hidden H1/H2/H3 与 file-url/context-menu 已绑定）",
+  "T03 native_matrix v3.2 证据（visible 分支：LINGXI_R09_GUI_CLEARED=1 + gate wrapper + webdriver + manual dir；8 blocked 断言 exit2 已登记）",
+  "T05/T04 v3.2 证据重跑（非 host-core 生产者，owner/Lead 安排：T05 服务侧 Chrome、T04 TCC 人工）",
+  "T06 运行期 ACL side-effect 批次（blocked::allow-side-effect::*，等 visible）",
+  "visible 5 次启动（V1 release_offline/V2 G2/V3 react_parity 双壳/V4 T03 gui-actions）与 A16 剩余 25 个能力运行期证据 + T03 26 叶",
+  "manual 3 条（拖出 Finder/托盘菜单语言/通知点击聚焦）人工观察"
+ ],
+ "knownGateBlockingReds": [
+  "T07 r09_t07_release_smoke：release.file-task PENDING（delivery 无 hooks/wdio）→ 正式门也 exit2；保留红不绿洗",
+  "T03 r09_t03_native_matrix：8 blocked 真实系统动作断言（已登记 T06_GUI_BATCH_NEEDS/T03_T04_PROGRESS）",
+  "T06 r09_t06_capability_matrix：blocked::runtime.*/allow-side-effect::*（副作用动作等 visible）",
+  "T04 TCC/helper/ASR/截图：BLOCKED-SYSTEM-PERMISSIONS/BLOCKED-REAL-PROVIDER/OQ-04 已登记"
+ ]
+}

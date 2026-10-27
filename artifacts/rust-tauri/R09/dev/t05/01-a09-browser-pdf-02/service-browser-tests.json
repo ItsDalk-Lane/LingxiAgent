@@ -1,0 +1,98 @@
+{
+ "r07_browser_routes": {
+  "tests": {
+   "concurrent_and_repeated_shutdown_waiters_preserve_failure_and_panic_results": true,
+   "partial_external_configuration_is_rolled_back_and_unconfirmed_rollback_is_explicit_unknown": true,
+   "partial_preferences_preserve_unknown_fields_and_external_cookie_failure_is_not_success": true,
+   "unknown_external_revoke_receipt_never_repeats_the_stop_or_reopens_content": true,
+   "actual_http_command_replay_changed_input_and_emergency_receipt_never_repeat_external_actions": true,
+   "screenshot_registers_a_real_png_session_file_and_http_content_preserves_its_type_and_bytes": true,
+   "repeated_download_after_unknown_ack_reuses_actual_delivered_file_and_receipt": true,
+   "archive_and_permanent_delete_reclaim_only_the_actual_session_browser_before_success": true,
+   "restart_restores_cold_metadata_and_confirmed_receipt_without_automatically_opening_a_page": true,
+   "chat_device_reads_state_but_only_explicit_remote_admin_controls_the_actual_service_node": true
+  },
+  "result": {
+   "passed": 10,
+   "failed": 0,
+   "ignored": 0
+  }
+ },
+ "r07_browser_tools": {
+  "tests": {
+   "undeclared_materialize_is_refused_without_dispatch_and_actual_run_finishes": true,
+   "external_unknown_effect_is_persisted_and_never_reported_as_success": true,
+   "actual_run_cancellation_reaches_external_cleanup_and_settles_both_records": true,
+   "actual_navigation_waits_for_approval_and_dispatches_exact_reviewed_url": true,
+   "page_change_and_foreign_tab_invalidate_approval_before_external_dispatch": true,
+   "actual_readonly_snapshot_persists_receipt_but_write_never_dispatches": true,
+   "new_actual_user_submission_releases_emergency_stop_with_a_new_epoch": true,
+   "actual_model_and_tool_echo_foreign_file_marker_without_pinning_or_blocking_fork": true,
+   "screenshot_owned_file_materializes_into_exact_read_pixels_without_granting_other_sessions": true,
+   "unconfirmed_http_emergency_keeps_last_page_and_live_process_explicitly_unknown": true,
+   "actual_service_interleaving_keeps_new_http_emergency_over_earlier_accepted_steer": true,
+   "confirmed_http_emergency_persists_empty_cold_state_across_restart_and_new_user_start": true,
+   "accepted_real_websocket_steer_reauthorizes_only_current_run_and_old_request_never_lifts_later_stop": true
+  },
+  "result": {
+   "passed": 13,
+   "failed": 0,
+   "ignored": 0
+  }
+ },
+ "r07_web_tools": {
+  "tests": {
+   "public_fetch_proxy_pin_limitation_is_explicit_without_sending_any_request": true,
+   "actual_search_cancel_waits_for_auxiliary_cleanup_and_stops_fallback_chain": true,
+   "auto_records_each_real_http_attempt_then_all_three_browser_page_diagnostics": true,
+   "auto_all_failed_is_explicit_and_fixed_provider_never_silently_falls_back": true,
+   "provider_auth_redirect_and_rate_limit_keep_real_error_diagnostics": true,
+   "all_five_http_providers_use_real_gateway_and_distinct_authentication": true,
+   "public_fetch_keeps_five_hop_guard_and_registers_readable_full_session_file": true,
+   "verification_real_http_masks_same_provider_and_only_persists_after_success": true
+  },
+  "result": {
+   "passed": 8,
+   "failed": 0,
+   "ignored": 0
+  }
+ },
+ "r07_office_tools": {
+  "tests": {
+   "office::cancelled_pdf_waits_for_actual_external_cleanup_and_never_registers_a_file": true,
+   "office::cover_requires_confirmation_and_preserves_markdown_and_actual_image": true,
+   "office::pdf_private_asset_is_refused_before_any_external_renderer_call": true,
+   "office::apply_cover_candidate_target_applies_existing_image_through_real_approval": true,
+   "office::capabilities_and_cover_style_guide_deliver_real_catalog_content": true,
+   "office::guide_state_is_owned_by_the_actual_session_and_plugin_toggle_is_effective": true,
+   "office::read_only_and_live_toggle_revocation_prevent_cover_writes": true,
+   "office::real_document_worker_reads_docx_xlsx_and_paged_pdf_without_changing_inputs": true,
+   "office::pdf_collects_authorized_assets_and_three_bundled_fonts_then_registers_real_file": true,
+   "office::actual_http_apply_preserves_old_shape_and_refuses_self_reported_identity": true,
+   "office::bundled_preset_apply_uses_real_gallery_bytes_and_rejects_unknown_presets": true,
+   "office::background_cover_job_refuses_to_apply_after_document_changed": true,
+   "office::background_cover_job_completes_with_real_media_and_applies_frozen_write": true,
+   "office::background_cover_fixed_actions_honor_live_revocation_and_cancel_before_apply": true,
+   "office::remote_cover_clients_cannot_turn_absolute_paths_into_local_owner_authority": true
+  },
+  "result": {
+   "passed": 15,
+   "failed": 0,
+   "ignored": 0
+  }
+ },
+ "r06_t05_preview": {
+  "tests": {
+   "serve_preview_token_gate_expiry_and_csp": true,
+   "create_preview_identity_ttl_and_errors": true,
+   "asset_over_50mb_refused": true,
+   "asset_scope_rewrite_base_inject_and_serve_gates": true,
+   "preview_route_faces_and_public_token_gate": true
+  },
+  "result": {
+   "passed": 5,
+   "failed": 0,
+   "ignored": 0
+  }
+ }
+}

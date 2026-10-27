@@ -1,0 +1,22 @@
+{
+ "mode": "debug",
+ "artifacts": {
+  "executable": "/private/tmp/lingxi-r09-t07/evidence-app-gate-v34-20261027-090202.app/Contents/MacOS/lingxi-resource-desktop",
+  "executableSha256": "b8f6ee09bb5d21b33394635101f071cf00ba9363048ec7fd72084fd00c99259d",
+  "appBundle": null
+ },
+ "inputs": {
+  "features": [
+   "e2e-test",
+   "r09-host",
+   "r09-test-hooks"
+  ],
+  "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9"
+ },
+ "service": null,
+ "candidate": {
+  "source": "env",
+  "mode": "debug",
+  "executableSha256": "b8f6ee09bb5d21b33394635101f071cf00ba9363048ec7fd72084fd00c99259d"
+ }
+}

@@ -68,6 +68,20 @@ function assertHostTarget(host, platform = process.platform, arch = process.arch
   }
 }
 
+// 服务自身公告的协议/数据版本（`lingxi-service --version`，main.rs:224-233）。
+// 构建清单里的 protocol 只能来自这里，不得手写常量（设计 §4.4 / Q-04）。
+function readServiceProtocol(binary, env = process.env) {
+  const output = execFileSync(binary, ['--version'], { encoding: 'utf8', env, timeout: 30000 });
+  const match = /^(\S+)\s+\S+\s+wire-protocol\s+(\d+)\.\.=(\d+)\s+data-epoch\s+(\d+)\s*$/m.exec(output.trim());
+  if (!match) throw new Error(`lingxi-service --version has no parseable protocol identity: ${JSON.stringify(output)}`);
+  return {
+    serverKind: match[1],
+    wireProtocolMin: Number(match[2]),
+    wireProtocolMax: Number(match[3]),
+    dataEpoch: Number(match[4]),
+  };
+}
+
 function stageDirectory(root = ROOT, platform = process.platform, arch = process.arch) {
   return path.join(root, 'dist-rust-service', `${rustServicePlatformTag(platform)}-${arch}`);
 }
@@ -78,6 +92,15 @@ function verifyStage({ root = ROOT, platform = process.platform, arch = process.
     throw new Error(`no prebuilt Rust service at ${directory}; run npm run build:rust-service on this platform`);
   }
   const result = verifyRustServiceDirectory({ directory, platform, arch });
+  if (!result.manifest.protocol || typeof result.manifest.protocol !== 'object') {
+    throw new Error(`Rust service stage is missing the protocol identity required by the Tauri host: ${directory}`);
+  }
+  const announced = readServiceProtocol(result.binary);
+  for (const key of ['serverKind', 'wireProtocolMin', 'wireProtocolMax', 'dataEpoch']) {
+    if (result.manifest.protocol[key] !== announced[key]) {
+      throw new Error(`Rust service stage protocol.${key} does not match the staged binary announcement`);
+    }
+  }
   const currentSource = rustSourceDigest(path.join(root, 'rust'));
   if (result.manifest.sourceSha256 !== currentSource
       || result.manifest.toolchain !== pinnedToolchain(root)
@@ -130,10 +153,12 @@ function buildStage({ root = ROOT, platform = process.platform, arch = process.a
     const binaryBytes = fs.readFileSync(path.join(temp, filename));
     const sha256 = crypto.createHash('sha256').update(binaryBytes).digest('hex');
     const contentSha256 = rustServiceContentDigest(binaryBytes, platform);
+    const protocol = readServiceProtocol(path.join(temp, filename), env);
     fs.writeFileSync(path.join(temp, 'build.json'), `${JSON.stringify({
       schemaVersion: 1, platform: rustServicePlatformTag(platform), arch,
       target: host, toolchain, appVersion: version,
       binary: filename, sha256, contentSha256, sourceSha256: sourceBefore,
+      protocol,
     }, null, 2)}\n`, { flag: 'wx' });
     verifyRustServiceDirectory({ directory: temp, platform, arch });
     if (fs.existsSync(backup)) throw new Error(`previous Rust service backup still exists: ${backup}`);
@@ -167,4 +192,4 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   }
 }
 
-export { assertHostTarget, pinnedToolchain, rustSourceDigest, stageDirectory, verifyStage, buildStage };
+export { assertHostTarget, pinnedToolchain, readServiceProtocol, rustSourceDigest, stageDirectory, verifyStage, buildStage };

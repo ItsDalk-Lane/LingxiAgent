@@ -1,0 +1,79 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t07_release_smoke",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 6.859,
+ "caseCount": 22,
+ "casesSha256": "762c5981734e69854a87e3bfee39a7d3e18e35855da1eaed463832822ced10a6",
+ "commands": [
+  {
+   "id": "strings-release-wdio",
+   "argv": [
+    "/bin/sh",
+    "-c",
+    "strings -a /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E \"wdio|webdriver\" || true"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.208,
+   "logSha256": "bb7550d1320f39734288bdc84a8d759a0703b4e9e82639699ea40c323975c6ec"
+  },
+  {
+   "id": "strings-release-devurl",
+   "argv": [
+    "/bin/sh",
+    "-c",
+    "strings -a /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E \"devUrl\" || true"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.201,
+   "logSha256": "e07e0e03173521faa983ec8c8901ffb4790fb79fa692a12eda2c646950646397"
+  },
+  {
+   "id": "strings-release-5173",
+   "argv": [
+    "/bin/sh",
+    "-c",
+    "strings -a /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E \"localhost:5173\" || true"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.201,
+   "logSha256": "fedb7e32ffb182e425fcde874ac6bd49a64833f6c51a934978507e69ffbba792"
+  },
+  {
+   "id": "codesign-verify",
+   "argv": [
+    "codesign",
+    "--verify",
+    "--deep",
+    "--strict",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.081,
+   "logSha256": "554e48264422045e40557827c7310f5c515741bf4296a891e81d4d7f60a596a2"
+  }
+ ],
+ "logSha256": "794c3796569f76170a831e6295f223a22f6f663b31c6624a98e28cef39a7e79b",
+ "finishedAtUnixMs": 1793032155930,
+ "hostFacts": {
+  "os": "27.0.1",
+  "osBuild": "26A434",
+  "arch": "arm64",
+  "kernel": "27.0.0",
+  "hostPlatform": "macos-arm64",
+  "webkit": "22625.1.29.11.28",
+  "display": "Chipset Model: Apple M3 Ultra\n          Resolution: 2560 x 1440 (QHD/WQHD - Wide Quad High Definition)"
+ },
+ "pending": [
+  "文件任务命令面（T06）",
+  "长会话夹具（A13 工具卡）",
+  "window-state 恢复（T06）"
+ ],
+ "platform": "macos-arm64",
+ "blockedPlatforms": [
+  "macos-x64",
+  "windows-x64",
+  "linux-x64"
+ ]
+}

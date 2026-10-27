@@ -1,0 +1,38 @@
+{
+ "schema": "lingxi.r09.t06.release-evidence.v1",
+ "path": "/private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app",
+ "isolatedTargetDir": "/private/tmp/lingxi-r09-t06-release-evidence-target",
+ "features": [
+  "r09-host",
+  "r09-test-hooks"
+ ],
+ "evidenceBuild": true,
+ "releaseEvidence": true,
+ "appTreeSha256": "b02a93747b5f35aea00ae841b765001687e6eadbb54010b7f4bafbe6f0b90a65",
+ "files": {
+  "Contents/Info.plist": "da9ebff0b848d9ff1e3e6e5ac545c7270904ceb2a65677095cbb3e400e01919a",
+  "Contents/MacOS/lingxi-resource-desktop": "e8ecf05512ad817d4d213155a75881ca09599e1244d6323ae525b18db013a558",
+  "Contents/MacOS/lingxi-service": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+  "Contents/Resources/Lingxi.icns": "0951f493d51b3537f2b5826d45e117bba1ead1802c38658e2c0ebb1d7706b4d3",
+  "Contents/Resources/rust-service/build.json": "372c2b88748dcd96e9a74956c13554fb8d0e764638c28bc52b524c3a506473f9",
+  "Contents/_CodeSignature/CodeResources": "94feb01477569084da315e5fb2fa90ff5bd3d25c03861a54a75309a830095bcc"
+ },
+ "exeSha256": "e8ecf05512ad817d4d213155a75881ca09599e1244d6323ae525b18db013a558",
+ "sidecarSha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+ "buildJsonSha256": "372c2b88748dcd96e9a74956c13554fb8d0e764638c28bc52b524c3a506473f9",
+ "rendererSha256InBuildJson": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+ "rendererMatchesFrozen": true,
+ "crateSourceDigest": "14efdac47acbdecfcca391d16fd71bd45dd73ddac074406a45c8413044a12cec",
+ "crateSourceFileCount": 168,
+ "codesignVerifyExit": 0,
+ "codesignSummary": {
+  "Identifier": "Identifier=com.lingxi.app",
+  "Format": "Format=app bundle with Mach-O thin (arm64)",
+  "Signature": "Signature=adhoc",
+  "TeamIdentifier": "TeamIdentifier=not set"
+ },
+ "buildLog": "/private/tmp/r09-t06-release-evidence-build.log",
+ "note": "T02 supervisor/ownership hidden release 负向用；v3.2 构建后 repo 生成物已恢复、delivery 未触碰。",
+ "sourceCandidate": "v3.2 frozen（app tree 2008b71f48e98b09d73e5c028b82dbead9a4eefd454132487ee441ee4a8470e2）",
+ "builtAt": "2026-10-26T23:54:36+0800"
+}

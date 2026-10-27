@@ -1,0 +1,29 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t07_native_e2e",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 122.152,
+ "caseCount": 10,
+ "casesSha256": "82479de95963f28deb11c9d08cba36e39091b247abbffc55e8add3d48a436c14",
+ "commands": [
+  {
+   "id": "t07-fixtures",
+   "argv": [
+    "python3",
+    "-B",
+    "scripts/rust-tauri/r09_t07_fixture.py",
+    "--home",
+    "/private/tmp/lingxi-r09-runtime/r09_t07_native_e2e-18580-1793026859414/home-t07-fixtures",
+    "--evidence",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t07/g1-hidden-01/fixtures"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.176,
+   "logSha256": "40f138bea29d882c5c15ff27daccee36bf11465be2c202a1fd3ca87578678ad1"
+  }
+ ],
+ "logSha256": "49369250a4110b1a496481454d47fcac12ee5160bea8489acd3634b9213d9e96",
+ "finishedAtUnixMs": 1793026981566,
+ "failureDetail": "wdio WebDriver 未就绪（port=19465）：app 是否以 e2e-test 构建并带 TAURI_WEBDRIVER_PORT？"
+}

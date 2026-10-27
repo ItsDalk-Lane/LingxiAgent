@@ -1,0 +1,86 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t01_react_parity",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 47.249,
+ "caseCount": 2,
+ "casesSha256": "3542a2392fa68cd4375af1a69f54d08ff802c971ea05853466c6848272d7595e",
+ "commands": [
+  {
+   "id": "renderer-build-1",
+   "argv": [
+    "npm",
+    "run",
+    "build:renderer"
+   ],
+   "exitCode": 0,
+   "durationSecs": 7.014,
+   "logSha256": "33a9278798a27b3f654dbcffd7f8990bd781213114165c8a18eb675e2520bf9a"
+  },
+  {
+   "id": "tauri-build-debug-1",
+   "argv": [
+    "node",
+    "scripts/tauri-build.mjs",
+    "--debug",
+    "--receipt",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t01/run-04/tauri-build-debug.json"
+   ],
+   "exitCode": 0,
+   "durationSecs": 15.524,
+   "logSha256": "f81b59c17ae4c4690c3121a0b0b9155795be1b0d433ba8305edd3c789259ebb1"
+  },
+  {
+   "id": "renderer-build-2",
+   "argv": [
+    "npm",
+    "run",
+    "build:renderer"
+   ],
+   "exitCode": 0,
+   "durationSecs": 7.372,
+   "logSha256": "908217d0e0e46d333b20022c27b2a03510b5459b4b62d20c7e783434afd3d9f9"
+  },
+  {
+   "id": "tauri-build-debug-2",
+   "argv": [
+    "node",
+    "scripts/tauri-build.mjs",
+    "--debug",
+    "--receipt",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t01/run-04/tauri-build-debug.json"
+   ],
+   "exitCode": 0,
+   "durationSecs": 5.469,
+   "logSha256": "a831d2065508c1c15263067193575c89918f662dec0d56babfd6b60efbd1363f"
+  },
+  {
+   "id": "renderer-build-3",
+   "argv": [
+    "npm",
+    "run",
+    "build:renderer"
+   ],
+   "exitCode": 0,
+   "durationSecs": 7.132,
+   "logSha256": "793f6e7f7f4ac3d4539227394356b25014c5fc21706085a5d7ff4620f6c0cc0a"
+  },
+  {
+   "id": "tauri-build-debug-3",
+   "argv": [
+    "node",
+    "scripts/tauri-build.mjs",
+    "--debug",
+    "--receipt",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t01/run-04/tauri-build-debug.json"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.183,
+   "logSha256": "d57b27520273197432e20b3254929e82f823392cabe6060fbf0c3ecd4ba894f4"
+  }
+ ],
+ "logSha256": "cb1061b40b5ac756b412daba85912955a0b4ab1768b646b1aa6185ab660d4ecc",
+ "finishedAtUnixMs": 1793023176078,
+ "failureDetail": "renderer artifact kept changing during Tauri build (concurrent writer): {'attempt': 3, 'before': 'b647fe90773e2d4269ecfc8de659c596270b73cd70e4ed7520e51074a16a5528', 'after': 'b647fe90773e2d4269ecfc8de659c596270b73cd70e4ed7520e51074a16a5528', 'recorded': '7cd1c3520cc5616e1cd93f28bd4e1f0f60f529a8838d86dafdba1ee5e9a989ca', 'fileCount': 642}"
+}

@@ -1,0 +1,56 @@
+{
+ "projection": {
+  "bodyText": "聊天 会话地图 频道 还没有对话哦 ✿ 书桌 对话文件 工作台 项目技能 过滤 时间 书桌还空空的呢 书桌是助手日常巡检的工作台，也是每次对话的默认目录 去设置里指定一个文件夹吧 前往设置 运行信息 选择工作台 记忆 发送 未配置模型 已连接",
+  "bodyTextHash": 1065066033,
+  "bodyTextLength": 121,
+  "errors": [
+   {
+    "line": 1,
+    "message": "SyntaxError: Unexpected token '<'",
+    "resource": null,
+    "source": "tauri://localhost/lib/theme.js",
+    "stack": null,
+    "type": "error"
+   }
+  ],
+  "hasHana": false,
+  "hasTauri": true,
+  "hostErrors": [],
+  "location": "tauri://localhost",
+  "platform": "darwin",
+  "reactRootMounted": true,
+  "resources": [],
+  "rootChildCount": 3,
+  "rootPath": [
+   "DIV#.app-shell",
+   "DIV#.connection-status.connected",
+   "DIV#.toast-container"
+  ],
+  "tauriInvoke": true,
+  "title": "Lingxi · Rust 预览"
+ },
+ "pageLoad": {
+  "event": "page-load",
+  "label": "main",
+  "phase": "Started",
+  "schema": "lingxi.r09.tauri-launch.v1",
+  "unixMs": 1793023750684,
+  "url": "tauri://localhost"
+ },
+ "events": [
+  "host-start",
+  "resolve",
+  "binary",
+  "spawn",
+  "ready",
+  "instance",
+  "identity",
+  "service-ready",
+  "host-service-ready",
+  "window-created",
+  "page-load",
+  "page-load",
+  "app-ready",
+  "dom-projection"
+ ]
+}

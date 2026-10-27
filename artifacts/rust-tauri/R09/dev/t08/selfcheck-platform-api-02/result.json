@@ -1,0 +1,385 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t08_host_completeness",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 8.435,
+ "caseCount": 301,
+ "casesSha256": "f0515e22349745e65eff7d2df15150c46c99f7b8b74e423ac7f9bb9805c3fac9",
+ "commands": [],
+ "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+ "finishedAtUnixMs": 1793028195684,
+ "outputs": {
+  "hostMatrix": "host-matrix.json",
+  "placeholderScan": "placeholder-scan.json",
+  "casesCopy": "host-cases.json"
+ },
+ "hostSummary": {
+  "capabilities": {
+   "total": 50,
+   "a16Ok": 21,
+   "failed": [
+    "host:app-lifecycle-quit",
+    "host:browser-viewer",
+    "host:clipboard-edit-command",
+    "host:detached-viewer",
+    "host:drag-out",
+    "host:external-open",
+    "host:file-dialogs",
+    "host:file-drop-paths",
+    "host:file-text-io",
+    "host:file-url-asset",
+    "host:file-watch",
+    "host:global-shortcut",
+    "host:i18n-main",
+    "host:keep-awake",
+    "host:main-window",
+    "host:onboarding",
+    "host:quick-chat-session-handoff",
+    "host:quick-chat-window",
+    "host:reload-restart",
+    "host:settings-broadcast",
+    "host:settings-window",
+    "host:single-instance",
+    "host:skill-viewer",
+    "host:splash",
+    "host:theme-sync",
+    "host:trash",
+    "host:tray",
+    "host:window-controls",
+    "host:window-state"
+   ]
+  },
+  "commands": {
+   "total": 71,
+   "fourSetRegistered": 71,
+   "runtimeAcl": "blocked_registered_by_T06"
+  },
+  "entrypoints": {
+   "total": 37,
+   "hostRelevant": 9,
+   "nonHost": 28
+  },
+  "leaves": {
+   "total": 74,
+   "byStatus": {
+    "bound": 15,
+    "pending_gui": 23,
+    "blocked": 12,
+    "excluded_non_host": 16,
+    "manual_pending": 4,
+    "evidence_green_unbound": 4
+   },
+   "originalAssertions": 168
+  },
+  "placeholders": {
+   "unregisteredGaps": [
+    {
+     "kind": "NOT_IMPLEMENTED-unregistered",
+     "file": "desktop/src-tauri/src/native/onboarding.rs",
+     "line": 18,
+     "category": "unregistered-in-required-lists (仅在 T03_T04_PROGRESS §6)",
+     "requiredRegistration": "BLOCKED.md / T06_PROGRESS deferred·blocked entry"
+    },
+    {
+     "kind": "NOT_IMPLEMENTED-unregistered",
+     "file": "desktop/src-tauri/src/native/onboarding.rs",
+     "line": 61,
+     "category": "unregistered-in-required-lists (仅在 T03_T04_PROGRESS §6)",
+     "requiredRegistration": "BLOCKED.md / T06_PROGRESS deferred·blocked entry"
+    },
+    {
+     "kind": "NOT_IMPLEMENTED-unregistered",
+     "file": "desktop/src-tauri/src/native/onboarding.rs",
+     "line": 71,
+     "category": "unregistered-in-required-lists (仅在 T03_T04_PROGRESS §6)",
+     "requiredRegistration": "BLOCKED.md / T06_PROGRESS deferred·blocked entry"
+    },
+    {
+     "kind": "NOT_IMPLEMENTED-unregistered",
+     "file": "desktop/src-tauri/src/native/onboarding.rs",
+     "line": 77,
+     "category": "unregistered-in-required-lists (仅在 T03_T04_PROGRESS §6)",
+     "requiredRegistration": "BLOCKED.md / T06_PROGRESS deferred·blocked entry"
+    }
+   ],
+   "notImplementedRegistered": [
+    {
+     "file": "desktop/src-tauri/src/native/errors.rs",
+     "line": 77,
+     "token": "NOT_IMPLEMENTED",
+     "text": "pub const E_NOT_IMPLEMENTED: &str = \"NOT_IMPLEMENTED\";",
+     "category": "constant-definition"
+    },
+    {
+     "file": "desktop/src-tauri/src/native/errors.rs",
+     "line": 77,
+     "token": "NOT_IMPLEMENTED",
+     "text": "pub const E_NOT_IMPLEMENTED: &str = \"NOT_IMPLEMENTED\";",
+     "category": "constant-definition"
+    },
+    {
+     "file": "desktop/src-tauri/src/native/ipc_negative_matrix.rs",
+     "line": 217,
+     "token": "NOT_IMPLEMENTED",
+     "text": "case!(\"ipc::onboarding.rust-runtime\", \"onboarding_complete\", crate::native::errors::E_NOT_IMPLEMENTED, || {",
+     "category": "negative-test-matrix"
+    },
+    {
+     "file": "desktop/src-tauri/src/native/ipc_negative_matrix.rs",
+     "line": 220,
+     "token": "NOT_IMPLEMENTED",
+     "text": "crate::native::errors::E_NOT_IMPLEMENTED,",
+     "category": "negative-test-matrix"
+    },
+    {
+     "file": "desktop/src-tauri/src/native/screenshot.rs",
+     "line": 19,
+     "token": "NOT_IMPLEMENTED",
+     "text": "use super::errors::{deny, HostResult, E_INVALID_ARGUMENT, E_NOT_IMPLEMENTED, E_PATH_NOT_ABSOLUTE, E_URL_SCHEME_DENIED};",
+     "category": "deferred-command-policy (T04 OQ-04)"
+    },
+    {
+     "file": "desktop/src-tauri/src/native/screenshot.rs",
+     "line": 249,
+     "token": "NOT_IMPLEMENTED",
+     "text": "E_NOT_IMPLEMENTED,",
+     "category": "deferred-command-policy (T04 OQ-04)"
+    }
+   ],
+   "notImplementedUnregistered": [
+    {
+     "file": "desktop/src-tauri/src/native/onboarding.rs",
+     "line": 18,
+     "token": "NOT_IMPLEMENTED",
+     "text": "use super::errors::{deny, HostResult, E_NOT_IMPLEMENTED, E_RELEASE_DISABLED, E_WINDOW_NOT_ALLOWED};",
+     "category": "unregistered-in-required-lists (仅在 T03_T04_PROGRESS §6)",
+     "registrationChecked": {
+      "BLOCKED.md": false,
+      "T06_PROGRESS.md": true
+     }
+    },
+    {
+     "file": "desktop/src-tauri/src/native/onboarding.rs",
+     "line": 61,
+     "token": "NOT_IMPLEMENTED",
+     "text": "E_NOT_IMPLEMENTED,",
+     "category": "unregistered-in-required-lists (仅在 T03_T04_PROGRESS §6)",
+     "registrationChecked": {
+      "BLOCKED.md": false,
+      "T06_PROGRESS.md": true
+     }
+    },
+    {
+     "file": "desktop/src-tauri/src/native/onboarding.rs",
+     "line": 71,
+     "token": "NOT_IMPLEMENTED",
+     "text": "E_NOT_IMPLEMENTED,",
+     "category": "unregistered-in-required-lists (仅在 T03_T04_PROGRESS §6)",
+     "registrationChecked": {
+      "BLOCKED.md": false,
+      "T06_PROGRESS.md": true
+     }
+    },
+    {
+     "file": "desktop/src-tauri/src/native/onboarding.rs",
+     "line": 77,
+     "token": "NOT_IMPLEMENTED",
+     "text": "E_NOT_IMPLEMENTED,",
+     "category": "unregistered-in-required-lists (仅在 T03_T04_PROGRESS §6)",
+     "registrationChecked": {
+      "BLOCKED.md": false,
+      "T06_PROGRESS.md": true
+     }
+    }
+   ],
+   "failClosed": [
+    {
+     "file": "desktop/src-tauri/src/native/tray.rs",
+     "line": 16,
+     "token": "NOT_IMPLEMENTED",
+     "text": "//! R09 缺失」——移除是显式登记后的可见差异，不是静默隐藏，也不以 NOT_IMPLEMENTED",
+     "category": "fail-closed (icon missing → explicit deny, no silent continue)"
+    },
+    {
+     "file": "desktop/src-tauri/src/native/tray.rs",
+     "line": 23,
+     "token": "NOT_IMPLEMENTED",
+     "text": "use super::errors::{deny, HostResult, E_ENUM_INVALID, E_NOT_IMPLEMENTED};",
+     "category": "fail-closed (icon missing → explicit deny, no silent continue)"
+    },
+    {
+     "file": "desktop/src-tauri/src/native/tray.rs",
+     "line": 175,
+     "token": "NOT_IMPLEMENTED",
+     "text": "E_NOT_IMPLEMENTED,",
+     "category": "fail-closed (icon missing → explicit deny, no silent continue)"
+    }
+   ],
+   "deferredCommands": [
+    "commands",
+    "commands",
+    "commands",
+    "owner",
+    "owner",
+    "owner",
+    "reason",
+    "reason",
+    "reason"
+   ],
+   "uiDeadEntrypoints": []
+  },
+  "platform": {
+   "macos-arm64": "AVAILABLE",
+   "macos-x64": "BLOCKED_PLATFORM",
+   "windows-x64": "BLOCKED_PLATFORM",
+   "linux-x64": "BLOCKED_PLATFORM"
+  }
+ },
+ "evidenceProvenance": {
+  "r09_t01_react_parity": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t01/run-08",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t01_release_offline": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t01/run-release-03",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t02_supervisor_ready": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t02/phase2-supervisor-03",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t02_process_ownership": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t02/phase2-ownership-02",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t03_native_matrix": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-02/r09_t03_native_matrix",
+   "status": "FAIL",
+   "exitCode": 2
+  },
+  "r09_t03_ipc_negative": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-02/r09_t03_ipc_negative",
+   "status": "FAIL",
+   "exitCode": 2
+  },
+  "r09_t04_permission_matrix": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-02/r09_t04_permission_matrix",
+   "status": "FAIL",
+   "exitCode": 2
+  },
+  "r09_t04_remote_boundary": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-02/r09_t04_remote_boundary",
+   "status": "FAIL",
+   "exitCode": 2
+  },
+  "r09_t05_browser_pdf": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t05/01-a09-per-assertion-final2",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t05_untrusted_preview": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t05/02-a10-preview-final",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t06_capability_matrix": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t06/capability-matrix-04",
+   "status": "FAIL",
+   "exitCode": 2
+  },
+  "r09_t06_release_attack_surface": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t06/release-surface-04-freeze",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t07_native_e2e": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t07/g1-hidden-04",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t07_release_smoke": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t07/static-03-release_smoke",
+   "status": "FAIL",
+   "exitCode": 2
+  },
+  "audit_capability": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t06/audit-05-freeze",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "release_scan": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t06/release-scan-05-freeze",
+   "status": "PASS",
+   "exitCode": 0
+  }
+ },
+ "note": "A16 真实缺口必须保持红；能力/命令/入口/叶级明细见 host-matrix.json。",
+ "failedCases": [
+  "fixed::delivery-sha::Contents/MacOS/lingxi-resource-desktop",
+  "fixed::delivery-sha::Contents/Resources/rust-service/build.json",
+  "fixed::delivery-sha::Contents/_CodeSignature/CodeResources",
+  "fixed::delivery-app-tree-sha256",
+  "fixed::receipt-sha::deliveryRelease",
+  "fixed::release-artifacts-recorded",
+  "fixed::release-renderer-bound",
+  "fixed::receipt-sha::evidenceBuild",
+  "fixed::evidence-exe-sha",
+  "fixed::evidence-renderer-bound",
+  "fixed::same-renderer-candidate",
+  "fixed::renderer-tree-digest",
+  "evidence::capability::host:file-url-asset",
+  "evidence::capability::host:context-menu-policy",
+  "scan::absent-members-have-reasons",
+  "host::no-unregistered-placement-gaps",
+  "host::capability::host:app-lifecycle-quit",
+  "host::capability::host:browser-viewer",
+  "host::capability::host:clipboard-edit-command",
+  "host::capability::host:detached-viewer",
+  "host::capability::host:drag-out",
+  "host::capability::host:external-open",
+  "host::capability::host:file-dialogs",
+  "host::capability::host:file-drop-paths",
+  "host::capability::host:file-text-io",
+  "host::capability::host:file-url-asset",
+  "host::capability::host:file-watch",
+  "host::capability::host:global-shortcut",
+  "host::capability::host:i18n-main",
+  "host::capability::host:keep-awake",
+  "host::capability::host:main-window",
+  "host::capability::host:onboarding",
+  "host::capability::host:quick-chat-session-handoff",
+  "host::capability::host:quick-chat-window",
+  "host::capability::host:reload-restart",
+  "host::capability::host:settings-broadcast",
+  "host::capability::host:settings-window",
+  "host::capability::host:single-instance",
+  "host::capability::host:skill-viewer",
+  "host::capability::host:splash",
+  "host::capability::host:theme-sync",
+  "host::capability::host:trash",
+  "host::capability::host:tray",
+  "host::capability::host:window-controls",
+  "host::capability::host:window-state"
+ ]
+}

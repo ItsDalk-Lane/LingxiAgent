@@ -1,0 +1,6 @@
+# R09 Tauri 宿主构建产物与生成配置（不入库；来源可复算，见 scripts/tauri-build.mjs）
+/binaries/
+/resources/
+/tauri.release.generated.conf.json
+/tauri.debug.generated.conf.json
+/.tauri-build/

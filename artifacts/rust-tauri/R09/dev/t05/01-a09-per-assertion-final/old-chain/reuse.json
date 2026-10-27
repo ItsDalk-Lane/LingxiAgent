@@ -1,0 +1,8 @@
+{
+ "reused": true,
+ "sourceDir": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/old-chain-baseline",
+ "sourceManifestSha256": "22ca1779470c5073c3b48523e470267aa295e14c08d9a3c6fe7400b901fbfa4b",
+ "pdfSha256": "10828bf50c38601dcf6de46f45c5ed07a1823c450e25b90ac92f4307578728de",
+ "pageCount": 74,
+ "reason": "本地重构期间避免并行启动 Electron 影响 T01 renderer digest 窗口；门禁正式运行（未设置 LINGXI_T05_REUSE_OLD_CHAIN_BASELINE）仍会真实重生成"
+}

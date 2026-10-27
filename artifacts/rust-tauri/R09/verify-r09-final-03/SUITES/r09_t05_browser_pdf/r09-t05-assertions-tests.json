@@ -1,0 +1,18 @@
+{
+ "tests": {
+  "browser_navigation_a1_back_forward_reload_update_url_title_and_flags": true,
+  "browser_navigation_a2_no_active_view_and_illegal_urls_fail_explicitly": true,
+  "browser_tabs_a1_tab_set_and_active_follow_real_target_changes": true,
+  "browser_tabs_a2_invalid_tab_id_and_close_failure_are_explicit_and_state_unchanged": true,
+  "browser_tool_a1_title_and_snapshot_match_real_navigation": true,
+  "browser_tool_a2_stale_snapshot_reference_fails_explicitly": true,
+  "browser_tool_a3_session_state_and_cookies_never_leak_between_sessions": true,
+  "browser_tool_a4_browser_errors_are_explicit_and_never_touch_another_session": true
+ },
+ "result": {
+  "passed": 8,
+  "failed": 0,
+  "ignored": 0
+ },
+ "serial": true
+}

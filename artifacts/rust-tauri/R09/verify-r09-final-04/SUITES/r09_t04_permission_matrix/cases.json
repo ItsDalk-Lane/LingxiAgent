@@ -1,0 +1,506 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t04_permission_matrix",
+ "cases": [
+  {
+   "case": "native::permissions-unit-tests",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "passed": 9
+   }
+  },
+  {
+   "case": "native::speech-unit-tests",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "passed": 9
+   }
+  },
+  {
+   "case": "native::remote_boundary-unit-tests",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "passed": 6
+   }
+  },
+  {
+   "case": "native::screenshot-unit-tests",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "passed": 5
+   }
+  },
+  {
+   "case": "leaf::computer-use.lease-requires-approval",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::permissions::tests::lease_requires_real_approval_and_permissions",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::computer-use.remote-session-denied",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::permissions::tests::remote_sessions_can_never_start_leases",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::computer-use.lease-expiry-and-controls",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::permissions::tests::actions_are_gated_by_lease_expiry_permissions_and_controls",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::computer-use.revoke-invalidates-lease",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::permissions::tests::stop_revoke_and_app_exit_invalidate_leases",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::computer-use.permission-query-read-only",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::permissions::tests::query_is_read_only_and_window_gated",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::computer-use.request-terminal-no-reprompt",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::permissions::tests::request_only_prompts_in_not_determined_and_user_gesture_window",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::computer-use.platform-linux-preview",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::permissions::tests::platform_and_caller_gates",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::speech.permission-state-mapping",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::speech::tests::raw_status_mapping_matches_electron",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::speech.request-single-flight",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::speech::tests::request_policy_first_terminal_devshell_and_single_flight",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::speech.dispose-fail-closed",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::speech::tests::dispose_settles_as_bridge_unavailable_and_late_callbacks_are_dropped",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::speech.revoked-during-recording",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::speech::tests::revocation_during_recording_stops_and_reports",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::speech.cancel-timeout-not-success",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::speech::tests::cancel_and_timeout_never_count_as_success",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::speech.ui-states",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::speech::tests::ui_states_cover_first_denied_restricted_missing_cancel",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::screenshot.theme-and-save-policy",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::screenshot::tests::theme_table_matches_incumbent_six_themes",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::screenshot.preview-vs-save-shape",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::screenshot::tests::file_names_and_result_shapes",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "service::identity",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "instance": {
+     "serverKind": "lingxi-service",
+     "pid": 92921,
+     "bindAddr": "127.0.0.1:59338",
+     "instanceId": "aec15f3e59f52bb7bc1fb0c5c12ed61d"
+    }
+   }
+  },
+  {
+   "case": "leaf::computer-use.prefs-read",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 200,
+    "bodyHead": "{\"selectedProviderId\":\"macos:cua\",\"settings\":{\"allow_windows_input_injection\":false,\"app_approvals\":[],\"enabled\":false,\"provider_by_platform\":{\"darwin\":\"macos:cua\",\"linux\":\"mock\",\"win32\":\"windows:uia\"}},\"status\":{\"activeLease\":null,\"enabled\":false,\"platform\":\"darwin\",\"providers\":[{\"providerId\":\"macos:cua\",\"status\":{\"available\":false,\"permissionSubject\":\"service_process\",\"permissions\":[{\"granted\":t"
+   }
+  },
+  {
+   "case": "leaf::computer-use.permission-subject-and-names",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "permissionNames": [
+     "accessibility",
+     "screenRecording"
+    ],
+    "subject": "service_process"
+   }
+  },
+  {
+   "case": "leaf::computer-use.prefs-update",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "putStatus": 200,
+    "putBody": "{\"ok\":true,\"settings\":{\"allow_windows_input_injection\":false,\"app_approvals\":[],\"enabled\":true,\"provider_by_platform\":{\"darwin\":\"macos:cua\",\"linux\":\"mock\",\"win32\":\"windows:uia\"}}}"
+   }
+  },
+  {
+   "case": "leaf::computer-use.prefs-update-invalid-bounded",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": [
+    {
+     "payload": {
+      "settings": {
+       "enabled": "yes"
+      }
+     },
+     "status": 400
+    },
+    {
+     "payload": {
+      "settings": {
+       "enabled": true,
+       "app_approvals": []
+      }
+     },
+     "status": 400
+    },
+    {
+     "payload": {
+      "settings": {}
+     },
+     "status": 400
+    }
+   ]
+  },
+  {
+   "case": "leaf::computer-use.prefs-restore",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": null
+  },
+  {
+   "case": "leaf::computer-use.approve-app",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "approveStatus": 200,
+    "approvals": [
+     {
+      "appId": "com.apple.TextEdit",
+      "appName": "TextEdit",
+      "approvedAt": "2026-10-26T16:48:14.163Z",
+      "providerId": "macos:cua",
+      "scope": "app"
+     }
+    ],
+    "event": {
+     "atUnixMs": 1793033294163,
+     "payload": {
+      "appId": "com.apple.TextEdit",
+      "providerId": "macos:cua"
+     },
+     "seq": 3,
+     "source": "server",
+     "type": "computer-use-settings-changed"
+    }
+   }
+  },
+  {
+   "case": "leaf::computer-use.revoke-app",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "revokeStatus": 200,
+    "approvals": [],
+    "event": {
+     "atUnixMs": 1793033294173,
+     "payload": {
+      "appId": "com.apple.TextEdit",
+      "providerId": "macos:cua"
+     },
+     "seq": 4,
+     "source": "server",
+     "type": "computer-use-settings-changed"
+    }
+   }
+  },
+  {
+   "case": "leaf::computer-use.approval-invalid-body",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": [
+    {
+     "status": 400
+    },
+    {
+     "status": 400
+    }
+   ]
+  },
+  {
+   "case": "leaf::computer-use.request-permissions-negative",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "mismatchStatus": 400,
+    "arrayStatus": 400,
+    "unexpectedEvent": null
+   }
+  },
+  {
+   "case": "leaf::computer-use.unauthenticated-denied",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 401
+   }
+  },
+  {
+   "case": "leaf::computer-use.engine-unavailable-honest",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "providerStatus": {
+     "available": false,
+     "permissionSubject": "service_process",
+     "permissions": [
+      {
+       "granted": true,
+       "name": "accessibility"
+      },
+      {
+       "granted": true,
+       "name": "screenRecording"
+      }
+     ],
+     "reason": "computer_control_engine_unavailable"
+    }
+   }
+  },
+  {
+   "case": "service::terminated-no-residual",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "exitCode": 0,
+    "pid": 92921
+   }
+  },
+  {
+   "case": "t04::binding-plan-cases-observed-and-pass",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "missing": [],
+    "failed": []
+   }
+  },
+  {
+   "case": "t04::binding-plan-shape",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "leaves": 9,
+    "bindable": [
+     "R00-T02-LA-EF9EEE38D8F6",
+     "R00-T02-LA-6E8307F57F42",
+     "R00-T02-LA-3FA31D4C3100",
+     "R00-T02-LA-38B14B7B34BD"
+    ],
+    "assertionGroups": 20
+   }
+  },
+  {
+   "case": "blocked::tcc.real-prompt-and-revoke",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "真实 TCC 授权弹窗与撤销-恢复演练需人工在系统设置操作（BLOCKED-SYSTEM-PERMISSIONS）"
+   }
+  },
+  {
+   "case": "blocked::computer-use.helper-real-input",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "服务报告 computer_control_engine_unavailable 且无输入注入 helper：点击/输入/按键/滚动真实生效在 helper 实现前不可验"
+   }
+  },
+  {
+   "case": "blocked::screenshot.capture-execution",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "Tauri/Wry 无稳定页面捕获 API（OQ-04），捕获执行 BLOCKED；仅策略层可验"
+   }
+  },
+  {
+   "case": "blocked::asr.real-recognition-result",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "真实语音识别结果需 ASR 供应商/本地识别链（BLOCKED-REAL-PROVIDER；服务 system-speech-recognition 显式 refusal）"
+   }
+  },
+  {
+   "case": "blocked::speech.packaged-tcc-prompt",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "打包壳真实 Speech TCC 弹窗需正式签名身份 + 人工操作（BLOCKED-SIGNING-IDENTITY / BLOCKED-SYSTEM-PERMISSIONS）"
+   }
+  },
+  {
+   "case": "blocked::permission-matrix.linux-preview",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "Linux Preview 负向真机不可用（BLOCKED-PLATFORM-LINUX-X64）；本机只验证 Rust 状态机返回 unsupported"
+   }
+  },
+  {
+   "case": "blocked::permission-matrix.registered-host-e2e",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "T04 命令已注册（T06 收口）；端到端 invoke + TCC 桥需真实 GUI 会话 + 人工 TCC（Lead GUI 禁令 / BLOCKED_SYSTEM_PERMISSIONS）"
+   }
+  },
+  {
+   "case": "isolation::real-home-untouched",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "before": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    },
+    "after": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    }
+   }
+  }
+ ]
+}

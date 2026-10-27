@@ -1,0 +1,26 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t07_release_smoke",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 23.294,
+ "caseCount": 5,
+ "casesSha256": "08173714d5d555b613e77303fd88e4f6da906144c3b51ebcafdc7d3aa586bb1a",
+ "commands": [
+  {
+   "id": "tauri-build-release",
+   "argv": [
+    "node",
+    "scripts/tauri-build.mjs",
+    "--receipt",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t07/static-01-r09_t07_release_smoke/tauri-build-release.json"
+   ],
+   "exitCode": 1,
+   "durationSecs": 21.273,
+   "logSha256": "47d81e9f579b7cea6d70e71297272ee953180f77e2f13e0b3cf0d0837b2df1c7"
+  }
+ ],
+ "logSha256": "e858aa1c7a35a50238fa97a7ed4aecea73afde651859833647bbad4c7064afa8",
+ "finishedAtUnixMs": 1793026166354,
+ "failureDetail": "tauri-build-release failed (exit 1): i-plugin-notification v2.7.0\n   Compiling lingxi-resource-desktop v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri)\nerror[E0597]: `commands` does not live long enough\n  --> build.rs:85:68\n   |\n 3 |     let mut commands: Vec<&str> = vec![\n   |         ------------ binding `commands` declared here\n...\n85 |             .app_manifest(tauri_build::AppManifest::new().commands(&commands)),\n   |                           -----------------------------------------^^^^^^^^^-\n   |                           |                                        |\n   |                           |                                        borrowed value does not live long enough\n   |                           argument requires that `commands` is borrowed for `'static`\n...\n88 | }\n   | - `commands` dropped here while still borrowed\n\nFor more information about this error, try `rustc --explain E0597`.\nerror: could not compile `lingxi-resource-desktop` (build script) due to 1 previous error\nwarning: build failed, waiting for other jobs to finish...\nfailed to build app: failed to build app\n       Error failed to build app: failed to build app\n[tauri-build] Error: Command failed: /Users/study_superior/Desktop/Code/LingxiAgent/node_modules/.bin/tauri build --config /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/tauri.release.generated.conf.json --features r09-host --bundles app\n    at genericNodeError (node:internal/errors:985:15)\n    at wrappedFn (node:internal/errors:539:14)\n    at checkExecSyncError (node:child_process:925:11)\n    at execFileSync (node:child_process:961:15)\n    at main (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/tauri-build.mjs:345:3)\n    at file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/tauri-build.mjs:386:22\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:633:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)\n"
+}

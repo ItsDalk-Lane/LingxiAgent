@@ -1,0 +1,61 @@
+{
+ "schema": "lingxi.r09.t05.old-chain-baseline.v1",
+ "note": "R09-T05 A09 旧链对照基线：Electron 42.8.1 生产 office-pdf-helper 在独立对照环境重生成；旧链只作对照，不进 Tauri 测试安装。",
+ "environment": {
+  "platform": "macos-arm64",
+  "electron": "42.8.1 (node_modules/electron)",
+  "isolation": {
+   "HOME": "/private/tmp/lingxi-r09-t05/old-chain-01/home",
+   "TMPDIR": "/private/tmp/lingxi-r09-t05/old-chain-01/tmp",
+   "R01_T05_OLD_TMP": "/private/tmp/lingxi-r09-t05/old-chain-01/old-tmp",
+   "LINGXI_RENDERER_DIST": "desktop/src"
+  },
+  "network": "loopback-only 预留 proxy（127.0.0.1:18382，未启用外部网络）",
+  "sample": "tests/migration/r01-t05/samples/s1-long-zh.html",
+  "job": "job-s1.json（A4 / printBackground / preferCSSPageSize / allowJavaScript=false / embedLingxiFonts / settle 250ms）"
+ },
+ "output": {
+  "pdf": "old/s1-long-zh.pdf",
+  "pdfSha256": "10828bf50c38601dcf6de46f45c5ed07a1823c450e25b90ac92f4307578728de",
+  "pdfBytes": 994832,
+  "pageCount": 74
+ },
+ "crossCheckVsR01FrozenHistory": {
+  "r01Commit": "15fa0cee3^",
+  "r01OldProbeGitBlobSha1": "76db4518c2d0a662be4666bd0e9b9b0ce46b5e4f",
+  "pageCountEqual": true,
+  "perPageLumaGridMaxAbsDiff": 0.0,
+  "textLengthFrozen": 91198,
+  "textLengthRegenerated": 91198,
+  "allEquivalent": true
+ },
+ "restoredR01FrozenBaselineProvenance": [
+  {
+   "path": "artifacts/rust-tauri/R01/T05/a09/new/probe/probe.json",
+   "gitBlobSha1": "69744cb4c6974cc8bb9603a2f8704c5cb388309a",
+   "sha256": "6ff9527f0a2f1e0d73b9c18bcb5dde6bb0a877b3c76d4c79c49c6a9af00503d4"
+  },
+  {
+   "path": "artifacts/rust-tauri/R01/T05/a09/new/probe/text.txt",
+   "gitBlobSha1": "12bab09e5f8557bb28f29b5c80300c9ec022bb60",
+   "sha256": "aed576b3ab4629f9a4e8092765b7205ec3552d231536d4cc65a065c1de5fd5ec"
+  },
+  {
+   "path": "artifacts/rust-tauri/R01/T05/a09/old/probe/probe.json",
+   "gitBlobSha1": "76db4518c2d0a662be4666bd0e9b9b0ce46b5e4f",
+   "sha256": "b117fc1833ab2fc97c5fde390089f192e1134a520139aa90902ff5fd7b47e58f"
+  },
+  {
+   "path": "artifacts/rust-tauri/R01/T05/a09/old/probe/text.txt",
+   "gitBlobSha1": "afa556f924254ef224ed3e9cf0eecde8d76e9127",
+   "sha256": "3071523347e0bf9fd55e2c42806a3f1a555ce7d4e539b9a80840acda35328151"
+  }
+ ],
+ "noteOnRestoredFiles": "以上 R01 文件是从 git 历史恢复的未跟踪工作区文件（兼容性恢复），非 R09 候选实现；R07 判据不变。",
+ "files": {
+  "job-s1.json": "93a1d376a0b813f19cc8fef5f6d822898447ed4227356d7c70048cc337937bdf",
+  "old/s1-long-zh.pdf": "10828bf50c38601dcf6de46f45c5ed07a1823c450e25b90ac92f4307578728de",
+  "old/probe/probe.json": "9f107f0aa3e15221c53052fa1d8421fa80acae9127f03ba3a8505b611e906798",
+  "old/probe/text.txt": "3071523347e0bf9fd55e2c42806a3f1a555ce7d4e539b9a80840acda35328151"
+ }
+}

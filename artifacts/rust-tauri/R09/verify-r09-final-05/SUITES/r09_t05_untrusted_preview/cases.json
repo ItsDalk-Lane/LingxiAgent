@@ -1,0 +1,617 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t05_untrusted_preview",
+ "cases": [
+  {
+   "case": "a10::chromium-installed",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "candidates": [
+     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+     "/Applications/Chromium.app/Contents/MacOS/Chromium",
+     "/usr/bin/chromium",
+     "/usr/bin/chromium-browser",
+     "/usr/bin/google-chrome"
+    ]
+   }
+  },
+  {
+   "case": "a10::environment-recorded",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "platform": "macos-arm64",
+    "chromePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "chromeVersion": "Google Chrome 155.0.8059.85",
+    "chromeSha256": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d",
+    "python": "3.14.3",
+    "isolation": {
+     "LINGXI_HOME": "/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-6680-1793035342551/home",
+     "TMPDIR": "/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-6680-1793035342551/tmp"
+    }
+   }
+  },
+  {
+   "case": "a10::real-service-ready-isolated-home",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "addr": "127.0.0.1:65430",
+    "home": "/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-6680-1793035342551/home",
+    "tokenFile": "/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-6680-1793035342551/home/lingxi-service/local-token.json",
+    "tokenLength": 32,
+    "note": "token 只用于宿主 HTTP 请求，不写入证据"
+   }
+  },
+  {
+   "case": "a10::origin-allowed::tauri://localhost",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 200,
+    "origin": "tauri://localhost"
+   }
+  },
+  {
+   "case": "a10::origin-allowed::http://tauri.localhost",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 200,
+    "origin": "http://tauri.localhost"
+   }
+  },
+  {
+   "case": "a10::origin-allowed::https://tauri.localhost",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 200,
+    "origin": "https://tauri.localhost"
+   }
+  },
+  {
+   "case": "a10::origin-forged-rejected::tauri://evil",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 403,
+    "origin": "tauri://evil"
+   }
+  },
+  {
+   "case": "a10::origin-forged-rejected::tauri://localhost.evil.example",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 403,
+    "origin": "tauri://localhost.evil.example"
+   }
+  },
+  {
+   "case": "a10::origin-forged-rejected::http://evil.tauri.localhost",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 403,
+    "origin": "http://evil.tauri.localhost"
+   }
+  },
+  {
+   "case": "a10::origin-forged-rejected::http://tauri.localhost.evil.example",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 403,
+    "origin": "http://tauri.localhost.evil.example"
+   }
+  },
+  {
+   "case": "a10::origin-forged-rejected::http://tauri.localhost:8080",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 403,
+    "origin": "http://tauri.localhost:8080"
+   }
+  },
+  {
+   "case": "a10::origin-forged-rejected::http://127.0.0.1.evil.example",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 403,
+    "origin": "http://127.0.0.1.evil.example"
+   }
+  },
+  {
+   "case": "a10::origin-exact-match-not-wildcard",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "allowed": 3,
+    "forged": 6
+   }
+  },
+  {
+   "case": "a10::malicious-html-preview-created",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 200,
+    "body": "{\"expiresAt\":1793035947230,\"id\":\"pv_efb47adf7cb98d27e6a950da934cba41\",\"previewUrl\":\"http://127.0.0.1:65430/lingxi/v1/preview/html/pv_efb47adf7cb98d27e6a950da934cba41?previewToken=VXHoiyoP7Dm64FrlUZPW6"
+   }
+  },
+  {
+   "case": "a10::preview-served-with-csp",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 200,
+    "csp": "default-src 'none'; base-uri 'self'; form-action 'none'; object-src 'none'; connect-src 'none'; script-src 'unsafe-inline' https:; style-src 'unsafe-inline' https:; font-src https: data:; img-src 'self' https: data: blob:; media-src 'self' https: data: blob:; frame-ancestors 'self' file: http://127.0.0.1:* http://localhost:* tauri: http://tauri.localhost https://tauri.localhost",
+    "referrerPolicy": "no-referrer"
+   }
+  },
+  {
+   "case": "a10::csp-frame-ancestors-includes-exact-tauri-origins",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "frameAncestors": "frame-ancestors 'self' file: http://127.0.0.1:* http://localhost:* tauri: http://tauri.localhost https://tauri.localhost",
+    "tokens": [
+     "'self'",
+     "file:",
+     "http://127.0.0.1:*",
+     "http://localhost:*",
+     "tauri:",
+     "http://tauri.localhost",
+     "https://tauri.localhost"
+    ]
+   }
+  },
+  {
+   "case": "a10::service-bearer-token-not-in-preview",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "previewBytes": 6848
+   }
+  },
+  {
+   "case": "a10::preview-token-cannot-call-browser-api",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 401,
+    "body": "{\"code\":\"unauthorized\",\"details\":{\"causeId\":\"auth.invalid_credential\",\"reason\":\"invalid_credential\",\"requestId\":\"req-e3c"
+   }
+  },
+  {
+   "case": "a10::preview-token-cannot-read-other-preview",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 404
+   }
+  },
+  {
+   "case": "a10::no-bearer-cannot-read-fs",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 401
+   }
+  },
+  {
+   "case": "a10::preview-forged-ancestor-origin-header-rejected",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 403
+   }
+  },
+  {
+   "case": "chrome::process-tree-cleaned::loopback-ancestor-allowed",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "timedOut": false,
+    "leftover": [],
+    "profile": "/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-6680-1793035342551/chrome-profile-loopback-ancestor-allowed",
+    "keychainMock": "--use-mock-keychain"
+   }
+  },
+  {
+   "case": "chrome::process-tree-cleaned::localhost-ancestor-allowed",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "timedOut": false,
+    "leftover": [],
+    "profile": "/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-6680-1793035342551/chrome-profile-localhost-ancestor-allowed",
+    "keychainMock": "--use-mock-keychain"
+   }
+  },
+  {
+   "case": "chrome::process-tree-cleaned::tauri-custom-port-ancestor",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "timedOut": false,
+    "leftover": [],
+    "profile": "/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-6680-1793035342551/chrome-profile-tauri-custom-port-ancestor",
+    "keychainMock": "--use-mock-keychain"
+   }
+  },
+  {
+   "case": "chrome::process-tree-cleaned::evil-tauri-ancestor-denied",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "timedOut": false,
+    "leftover": [],
+    "profile": "/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-6680-1793035342551/chrome-profile-evil-tauri-ancestor-denied",
+    "keychainMock": "--use-mock-keychain"
+   }
+  },
+  {
+   "case": "chrome::process-tree-cleaned::evil-example-ancestor-denied",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "timedOut": false,
+    "leftover": [],
+    "profile": "/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-6680-1793035342551/chrome-profile-evil-example-ancestor-denied",
+    "keychainMock": "--use-mock-keychain"
+   }
+  },
+  {
+   "case": "a10::allowed-ancestor-iframe-loaded-and-script-ran",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "aliveReports": 1,
+    "chromeExit": 0,
+    "note": "祖先帧 127.0.0.1:*（CSP 显式允许）；恶意 iframe 内联脚本执行并以 postMessage 自证"
+   }
+  },
+  {
+   "case": "a10::loopback-ancestor-baselines-retained",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "loopback": 1,
+    "localhost": 1,
+    "note": "127.0.0.1:* 与 localhost:* 均为既有基线来源，正常预览不被误伤"
+   }
+  },
+  {
+   "case": "a10::csp-host-source-no-port-matches-default-port-only",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "probes": 0,
+    "note": "CSP `http://tauri.localhost` 无端口 → 只匹配默认端口；真实 Tauri origin 无端口；本机非特权端口无法绑 80，故 Tauri 真机 webview 帧嵌入留 T06/T07 验证"
+   }
+  },
+  {
+   "case": "a10::preview-iframe-cannot-see-tauri-bridge",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "tauriGlobalType": "undefined",
+    "tauriInternalsType": "undefined"
+   }
+  },
+  {
+   "case": "a10::preview-iframe-cannot-read-parent-top-dom-storage",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "parentDocument": "blocked:SecurityError",
+    "parentLocationHref": "blocked:SecurityError",
+    "parentLocalStorage": "blocked:SecurityError",
+    "topDocument": "blocked:SecurityError",
+    "topLocalStorage": "blocked:SecurityError"
+   }
+  },
+  {
+   "case": "a10::preview-parent-tauri-invoke-not-reachable",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "parentTauriInternals": "blocked:SecurityError"
+   }
+  },
+  {
+   "case": "a10::preview-csp-violations-recorded",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "directives": [],
+    "count": 0,
+    "fetchRejections": [
+     "fetch-service-api",
+     "fetch-service-fs",
+     "fetch-relative-fs",
+     "fetch-canary-token"
+    ],
+    "note": "CSP connect-src 'none' 拦截；违规事件或 fetch 拒绝任一可证"
+   }
+  },
+  {
+   "case": "a10::preview-external-connect-attempts-all-blocked",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "fetch-service-api": [
+     "rejected"
+    ],
+    "fetch-service-fs": [
+     "rejected"
+    ],
+    "fetch-relative-fs": [
+     "rejected"
+    ],
+    "fetch-canary-token": [
+     "rejected"
+    ],
+    "beacon-canary": [
+     "initiated"
+    ],
+    "websocket-canary": [
+     "initiated"
+    ],
+    "image-canary": [
+     "initiated"
+    ],
+    "popup-canary": [
+     "threw"
+    ]
+   }
+  },
+  {
+   "case": "a10::preview-token-echo-limited-to-own-document",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "tokenLength": 43
+   }
+  },
+  {
+   "case": "a10::wrapper-tauri-canary-zero-invocations",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "calls": []
+   }
+  },
+  {
+   "case": "a10::wrapper-denied-token-request",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "tokenRequests": 1
+   }
+  },
+  {
+   "case": "a10::frame-ancestors-denied::evil.tauri.localhost",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "probes": 0,
+    "chromeExit": 0,
+    "note": "伪造祖先帧下 token 化预览未被加载（CSP frame-ancestors）"
+   }
+  },
+  {
+   "case": "a10::frame-ancestors-denied::evil.example",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "probes": 0,
+    "chromeExit": 0,
+    "note": "伪造祖先帧下 token 化预览未被加载（CSP frame-ancestors）"
+   }
+  },
+  {
+   "case": "chrome::process-tree-cleaned::svg-img-malicious",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "timedOut": false,
+    "leftover": [],
+    "profile": "/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-6680-1793035342551/chrome-profile-svg-img-malicious",
+    "keychainMock": "--use-mock-keychain"
+   }
+  },
+  {
+   "case": "a10::svg-img-rendered-no-script-execution",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "image": {
+     "src": "http://127.0.0.1:65411/asset/malicious.svg",
+     "complete": true,
+     "naturalWidth": 320,
+     "loaded": "1",
+     "error": null
+    },
+    "scriptProbes": 0,
+    "note": "SVG 经 <img> 渲染；未出现 r09-a10-svg-script-ran 副作用"
+   }
+  },
+  {
+   "case": "chrome::process-tree-cleaned::svg-img-benign",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "timedOut": false,
+    "leftover": [],
+    "profile": "/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-6680-1793035342551/chrome-profile-svg-img-benign",
+    "keychainMock": "--use-mock-keychain"
+   }
+  },
+  {
+   "case": "a10::benign-svg-img-loads",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "image": {
+     "src": "http://127.0.0.1:65411/asset/benign.svg",
+     "complete": true,
+     "naturalWidth": 320,
+     "loaded": "1",
+     "error": null
+    }
+   }
+  },
+  {
+   "case": "a10::benign-html-preview-created",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 200
+   }
+  },
+  {
+   "case": "chrome::process-tree-cleaned::benign-ancestor-allowed",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "timedOut": false,
+    "leftover": [],
+    "profile": "/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-6680-1793035342551/chrome-profile-benign-ancestor-allowed",
+    "keychainMock": "--use-mock-keychain"
+   }
+  },
+  {
+   "case": "a10::benign-html-preview-iframe-loads",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "reports": 1,
+    "chromeExit": 0
+   }
+  },
+  {
+   "case": "a10::loopback-canary-zero-hits",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "hits": 0,
+    "sample": []
+   }
+  },
+  {
+   "case": "a10::svg-script-probes-zero-hits",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "hits": 0
+   }
+  },
+  {
+   "case": "a10::preview-service-regression-green",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "result": {
+     "passed": 5,
+     "failed": 0,
+     "ignored": 0
+    }
+   }
+  },
+  {
+   "case": "a10::pdf-resource-gate-canary-zero",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "result": {
+     "passed": 1,
+     "failed": 0,
+     "ignored": 0
+    }
+   }
+  },
+  {
+   "case": "a10::service-shutdown-exit-clean",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "returncode": 0
+   }
+  },
+  {
+   "case": "isolation::real-home-untouched",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "before": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    },
+    "after": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    }
+   }
+  }
+ ]
+}

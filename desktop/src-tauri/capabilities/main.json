@@ -1,11 +1,12 @@
 {
   "identifier": "resource-main",
-  "description": "本地文件操作主窗口，不授予前端 shell 或任意 HTTP 权限。",
+  "description": "R09-T06 收口：本地文件/技能/资源操作主窗口。插件权限仅 core:event listen/unlisten leaf；无 shell/http/fs 泛化权限。",
   "windows": [
     "main"
   ],
   "permissions": [
-    "core:default",
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
     "allow-select-files",
     "allow-select-folder",
     "allow-read-file",

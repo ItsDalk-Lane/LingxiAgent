@@ -1,0 +1,95 @@
+{
+  "schema": "lingxi.r09.t06.candidate-handoff.v3.5",
+  "generatedAt": "2026-10-27T09:1x+0800",
+  "gitHead": "aac8cb9fe6bb7bfa7a41d75528221136bfe55e50",
+  "supersedes": "candidate-handoff-v3.4（T04 主窗口系统权限卡片 renderer 变更）",
+  "policy": {
+    "path": "docs/rust-tauri/R09/R09_COMMAND_POLICY.json",
+    "sha256": "d8ad27d19b0963fee4f1f2422dd695f7d013192ffaae190bc0d667b0f0925132",
+    "commandCount": 73
+  },
+  "delivery": {
+    "app": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+    "appTreeSha256": "593d9d7fa8611cc10707952d3cbb4a7c3cef45667a55ba23525c2404b53e80bf",
+    "files": {
+      "Contents/Info.plist": "da9ebff0b848d9ff1e3e6e5ac545c7270904ceb2a65677095cbb3e400e01919a",
+      "Contents/MacOS/lingxi-resource-desktop": "a401a8c49f286d2373055c52e434191ecf8c3236c9d8396a4712f61d2cceb674",
+      "Contents/MacOS/lingxi-service": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+      "Contents/Resources/Lingxi.icns": "0951f493d51b3537f2b5826d45e117bba1ead1802c38658e2c0ebb1d7706b4d3",
+      "Contents/Resources/rust-service/build.json": "bb02e7b3b978c324e2960739ff862d1641c5bfb9e646c935c04ff70f6fad7ae5",
+      "Contents/_CodeSignature/CodeResources": "26c97725caee41fedce5a5cc498601ff4993caf64b528d457520cb4c157d8dfa"
+    },
+    "receipt": "desktop/src-tauri/.tauri-build/build-receipt-release.json",
+    "receiptSha256": "fd2838b901fd061514fe10c617e545c89ad30bebbb334425322e9a8787f41d81",
+    "featureList": [
+      "r09-host"
+    ],
+    "evidenceBuild": false,
+    "rendererDigest": "6f84c46cfe603ef6c281974a63807eb1f0edf19e04b4f7c81b07efeea0fd47e8",
+    "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+    "executable": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+    "executableSha256": "a401a8c49f286d2373055c52e434191ecf8c3236c9d8396a4712f61d2cceb674",
+    "codesign": {
+      "verify": {
+        "exitCode": 0
+      }
+    }
+  },
+  "g1Evidence": {
+    "executable": "desktop/src-tauri/target/debug/lingxi-resource-desktop",
+    "executableSha256": "da30a8623e55f56b6d8264d7474b09f6953f43285ed0109c847e4cfc17cffbe8",
+    "receipt": "desktop/src-tauri/.tauri-build/build-receipt-debug.json",
+    "receiptSha256": "068b10168005242d1aa8c97e98c97894add78f0c13d39072b79c041e009e6aa0",
+    "featureList": [
+      "e2e-test",
+      "r09-host",
+      "r09-test-hooks"
+    ],
+    "evidenceBuild": true,
+    "rendererDigest": "6f84c46cfe603ef6c281974a63807eb1f0edf19e04b4f7c81b07efeea0fd47e8",
+    "stableCopy": "/private/tmp/lingxi-r09-evidence/lingxi-resource-desktop-v35-da30a862"
+  },
+  "renderer": {
+    "rendererDigest": "6f84c46cfe603ef6c281974a63807eb1f0edf19e04b4f7c81b07efeea0fd47e8",
+    "rebuild": true
+  },
+  "staticGates": {
+    "capabilityAudit": {
+      "evidence": "artifacts/rust-tauri/R09/dev/t06/v35-audit-01",
+      "status": "PASS",
+      "exitCode": 0,
+      "caseCount": 58
+    },
+    "releaseAttackSurface": {
+      "evidence": "artifacts/rust-tauri/R09/dev/t06/v35-scan-01",
+      "status": "PASS",
+      "caseCount": 45
+    },
+    "releaseAttackSuite": {
+      "evidence": "artifacts/rust-tauri/R09/dev/t06/v35-release-suite-01",
+      "status": "PASS",
+      "exitCode": 0,
+      "caseCount": 51
+    },
+    "capabilityMatrix": {
+      "evidence": "artifacts/rust-tauri/R09/dev/t06/v35-capability-matrix-01",
+      "status": "FAIL",
+      "exitCode": 2,
+      "note": "仅 21 blocked::runtime.*"
+    }
+  },
+  "changes": [
+    "T04: main-window SystemPermissionsCard（mic getUserMedia / speech host command / notification test）",
+    "speechPermissionStatus/Request fragment wiring",
+    "locale keys ×5；T01 whitelist 更新"
+  ],
+  "releaseEvidence": {
+    "note": "v3.5 未重建 release-evidence hooks bundle；候选交付二进制已变，最终门可用 delivery smoke + hidden 证据，T02 release 负向沿用 v3.3 bundle 需在门内验证",
+    "v33BundlePath": "/private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app"
+  },
+  "freeze": {
+    "desktopTauriFrozen": true,
+    "psResidual": 0,
+    "guiLaunched": false
+  }
+}

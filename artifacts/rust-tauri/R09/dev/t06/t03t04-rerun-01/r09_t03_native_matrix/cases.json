@@ -1,0 +1,835 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t03_native_matrix",
+ "cases": [
+  {
+   "case": "isolation::real-home-provided",
+   "ok": true,
+   "actual": 1,
+   "detail": null
+  },
+  {
+   "case": "native::all-unit-tests",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "passed": 179,
+    "testResultLine": "test result: ok. 179 passed; 0 failed"
+   }
+  },
+  {
+   "case": "leaf::window-controls.caller-authorized",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::window_controls::tests::only_main_and_settings_may_control_windows",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::window-controls.state-broadcast",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::window_controls::tests::toggle_and_event_names_match_incumbent",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::window-state.sanitize-visible",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::window_state::tests::visible_position_is_preserved_across_displays",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::window-state.offscreen-recenter",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::window_state::tests::offscreen_position_is_recentered_on_primary",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::window-state.persisted-path",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::window_state::tests::persistence_path_is_home_adjacent",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::app-ready.idempotent",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::app_ready::tests::ready_is_idempotent_and_hidden_at_login_stays_hidden",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::app-ready.timeout-fallback",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::app_ready::tests::init_timeout_forces_show_unless_hidden_at_login",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::reload-restart.main-only",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::reload_restart::tests::reload_is_main_only",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::reload-restart.reentry-guard",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::reload_restart::tests::restart_guard_blocks_reentry_and_updates",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::window-lifecycle.close-to-tray",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::window_lifecycle::tests::close_hides_unless_quitting_or_updating",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::window-lifecycle.owned-only-cleanup",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::window_lifecycle::tests::service_ownership_decides_termination",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::window-lifecycle.window-all-closed",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::window_lifecycle::tests::window_all_closed_respects_tray_availability",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::single-instance.home-scoped",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::single_instance::tests::lock_namespace_is_home_scoped",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::single-instance.second-instance-plan",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::single_instance::tests::second_instance_prefers_main_then_onboarding",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::tray.menu-model",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::tray::tests::menu_has_four_items_without_unsupported_repair",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::tray.locale-rebuild",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::tray::tests::menu_labels_follow_locale",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::tray.icon-candidates",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::tray::tests::icon_candidates_follow_platform_rules",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::global-shortcut.registration-unavailable",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::global_shortcut::tests::registration_result_shapes_are_stable",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::global-shortcut.max-three-groups",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::global_shortcut::tests::shortcut_selection_uses_override_then_legacy_then_default",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::global-shortcut.test-register-cleanup",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::global_shortcut::tests::test_register_plan_always_cleans_up",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::notification.focus-suppression",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::notification::tests::focus_policy_normalization",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::notification.receipt-not-delivery",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::notification::tests::receipts_distinguish_shown_from_unconfirmed",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::notification.avatar-sanitized",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::notification::tests::agent_id_and_avatar_paths_are_sanitized",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::notification.click-focus-support-matrix",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::notification::tests::click_focus_is_explicitly_unsupported",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::keep-awake.state-machine",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::keep_awake::tests::enable_starts_blocker_and_is_idempotent",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::keep-awake.failure-not-fake",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::keep_awake::tests::start_failure_never_reports_enabled",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::auto-launch.opened-at-login",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::auto_launch::tests::opened_at_login_rules_per_platform",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::auto-launch.unsupported-platform",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::auto_launch::tests::platform_support_matches_incumbent",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::file-dialogs.cancel-shapes",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::file_dialogs::tests::cancel_results_match_incumbent_shapes",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::file-dialogs.skill-extension",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::file_dialogs::tests::skill_selection_rules",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::clipboard-edit.allowlist",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::clipboard_edit::tests::allowed_set_is_exactly_four",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::external-open.web-only",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::external_open::tests::external_open_only_web_schemes",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::external-open.receipt-shape",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::external_open::tests::caller_policy_and_receipt_shape",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::drag-out.shapes",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::drag_out::tests::single_and_multiple_shapes",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::file-drop.native-paths",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::file_drop::tests::drop_paths_are_native_absolute_and_deduped",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::trash.absolute-only",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::trash::tests::path_resolution_matches_incumbent",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::settings-window.main-modal-first",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::settings_window::tests::main_modal_preferred_when_main_alive",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::settings-window.crashed-main-fallback",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::settings_window::tests::crashed_main_falls_back_to_settings_window",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::settings-broadcast.side-effects",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::settings_broadcast::tests::side_effects_are_not_optional",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::settings-broadcast.whitelist",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::settings_broadcast::tests::unknown_events_are_rejected",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::quick-chat.grow-only",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::quick_chat::tests::chat_mode_is_grow_only",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::quick-chat.bounds-restore",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::quick_chat::tests::resolve_bounds_restores_and_sanitizes",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::quick-chat-handoff.ack-target-match",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::quick_chat_handoff::tests::ack_must_match_request_and_session",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::quick-chat-handoff.focus-before-hide",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::quick_chat_handoff::tests::focus_must_be_confirmed_before_hiding",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::theme-sync.quick-chat-transparent",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::theme_sync::tests::sync_plan_themes_caller_window_only_and_quick_chat_transparent",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::i18n.locale-resolution",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::i18n::tests::locale_resolution_matches_incumbent",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::i18n.tray-locale-rebuild",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::i18n::tests::locale_change_rebuilds_tray_menu",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::app-info.platform-literal",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::app_info::tests::tauri_naming_is_mapped_not_passed_through",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::splash.sender-and-page-gate",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::splash::tests::page_url_whitelist",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::splash.avatar-path-scope",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::splash::tests::avatar_segments_and_paths_are_home_scoped",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::onboarding.rust-service-unsupported",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::onboarding::tests::rust_service_is_explicitly_unsupported",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::onboarding.preview-no-write",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "native::onboarding::tests::debug_commands_are_debug_only_and_preview_has_no_side_effects",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "parity::theme-table-vs-registry",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "registry": {
+     "warm-paper": "#F8F4ED",
+     "midnight": "#3B4A54",
+     "high-contrast": "#FAF8F7",
+     "grass-aroma": "#F5F8F3",
+     "contemplation": "#F3F5F7",
+     "absolutely": "#F4F3EE",
+     "delve": "#FFFFFF",
+     "deep-think": "#FCFCFD",
+     "new-warm-paper": "#F5EFE4",
+     "midnight-contrast": "#26343D",
+     "coral": "#FDF6EC"
+    },
+    "module": {
+     "warm-paper": "#F8F4ED",
+     "midnight": "#3B4A54",
+     "high-contrast": "#FAF8F7",
+     "grass-aroma": "#F5F8F3",
+     "contemplation": "#F3F5F7",
+     "absolutely": "#F4F3EE",
+     "delve": "#FFFFFF",
+     "deep-think": "#FCFCFD",
+     "new-warm-paper": "#F5EFE4",
+     "midnight-contrast": "#26343D",
+     "coral": "#FDF6EC"
+    }
+   }
+  },
+  {
+   "case": "parity::theme-defaults",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "defaultTheme": "warm-paper"
+   }
+  },
+  {
+   "case": "parity::tray-i18n-five-locales",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "module": {
+     "zh": {
+      "show": "显示 灵犀",
+      "settings": "设置",
+      "repair_artifacts": "修复组件…",
+      "quit": "退出",
+      "notification_ready": "通知已就绪"
+     },
+     "zh-TW": {
+      "show": "顯示 靈犀",
+      "settings": "設定",
+      "repair_artifacts": "修復元件…",
+      "quit": "結束",
+      "notification_ready": "通知已就緒"
+     },
+     "ja": {
+      "show": "Lingxi を表示",
+      "settings": "設定",
+      "repair_artifacts": "コンポーネントを修復…",
+      "quit": "終了",
+      "notification_ready": "通知が有効になりました"
+     },
+     "ko": {
+      "show": "Lingxi 표시",
+      "settings": "설정",
+      "repair_artifacts": "구성 요소 복구…",
+      "quit": "종료",
+      "notification_ready": "알림이 준비되었어요"
+     },
+     "en": {
+      "show": "Show Lingxi",
+      "settings": "Settings",
+      "repair_artifacts": "Repair Components…",
+      "quit": "Quit",
+      "notification_ready": "Notifications enabled"
+     }
+    },
+    "locales": {
+     "zh": {
+      "show": "显示 灵犀",
+      "settings": "设置",
+      "repair_artifacts": "修复组件…",
+      "quit": "退出",
+      "notification_ready": "通知已就绪"
+     },
+     "zh-TW": {
+      "show": "顯示 靈犀",
+      "settings": "設定",
+      "repair_artifacts": "修復元件…",
+      "quit": "結束",
+      "notification_ready": "通知已就緒"
+     },
+     "ja": {
+      "show": "Lingxi を表示",
+      "settings": "設定",
+      "repair_artifacts": "コンポーネントを修復…",
+      "quit": "終了",
+      "notification_ready": "通知が有効になりました"
+     },
+     "ko": {
+      "show": "Lingxi 표시",
+      "settings": "설정",
+      "repair_artifacts": "구성 요소 복구…",
+      "quit": "종료",
+      "notification_ready": "알림이 준비되었어요"
+     },
+     "en": {
+      "show": "Show Lingxi",
+      "settings": "Settings",
+      "repair_artifacts": "Repair Components…",
+      "quit": "Quit",
+      "notification_ready": "Notifications enabled"
+     }
+    }
+   }
+  },
+  {
+   "case": "parity::quick-chat-constants",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "QUICK_CHAT_WIDTH": 480,
+    "QUICK_CHAT_COMPACT_HEIGHT": 142,
+    "QUICK_CHAT_CHAT_HEIGHT": 520,
+    "QUICK_CHAT_MIN_WIDTH": 360,
+    "QUICK_CHAT_MIN_HEIGHT": 118
+   }
+  },
+  {
+   "case": "parity::screenshot-constants",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "quick_chat_width": 480,
+    "quick_chat_compact_height": 142,
+    "quick_chat_chat_height": 520,
+    "quick_chat_min_width": 360,
+    "quick_chat_min_height": 118,
+    "screenshot_scale": 2,
+    "screenshot_max_segment": 4000,
+    "screenshot_margin": 96,
+    "screenshot_themes": {
+     "solarized-light": {
+      "width": 460,
+      "background": "#F8F5ED"
+     },
+     "solarized-dark": {
+      "width": 460,
+      "background": "#002B36"
+     },
+     "solarized-light-desktop": {
+      "width": 880,
+      "background": "#F8F5ED"
+     },
+     "solarized-dark-desktop": {
+      "width": 880,
+      "background": "#002B36"
+     },
+     "sakura-light": {
+      "width": 460,
+      "background": "#8ABDCE"
+     },
+     "sakura-light-desktop": {
+      "width": 880,
+      "background": "#8ABDCE"
+     }
+    }
+   }
+  },
+  {
+   "case": "parity::screenshot-themes-vs-electron",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "module": {
+     "solarized-light": {
+      "width": 460,
+      "background": "#F8F5ED"
+     },
+     "solarized-dark": {
+      "width": 460,
+      "background": "#002B36"
+     },
+     "solarized-light-desktop": {
+      "width": 880,
+      "background": "#F8F5ED"
+     },
+     "solarized-dark-desktop": {
+      "width": 880,
+      "background": "#002B36"
+     },
+     "sakura-light": {
+      "width": 460,
+      "background": "#8ABDCE"
+     },
+     "sakura-light-desktop": {
+      "width": 880,
+      "background": "#8ABDCE"
+     }
+    },
+    "electron": {
+     "solarized-light": {
+      "width": 460,
+      "background": "#F8F5ED"
+     },
+     "solarized-dark": {
+      "width": 460,
+      "background": "#002B36"
+     },
+     "solarized-light-desktop": {
+      "width": 880,
+      "background": "#F8F5ED"
+     },
+     "solarized-dark-desktop": {
+      "width": 880,
+      "background": "#002B36"
+     },
+     "sakura-light": {
+      "width": 460,
+      "background": "#8ABDCE"
+     },
+     "sakura-light-desktop": {
+      "width": 880,
+      "background": "#8ABDCE"
+     }
+    }
+   }
+  },
+  {
+   "case": "parity::window-state-defaults",
+   "ok": true,
+   "actual": 1,
+   "detail": null
+  },
+  {
+   "case": "static::no-shell-spawn-in-native-modules",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "hits": []
+   }
+  },
+  {
+   "case": "static::every-capability-module-has-tests",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "modules": 34,
+    "missingTests": []
+   }
+  },
+  {
+   "case": "blocked::native::tray-created-with-real-icon",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "托盘图标创建/双击/右键菜单需 host-core 合并 native::tray 注册并在真实 GUI 会话观察"
+   }
+  },
+  {
+   "case": "blocked::native::global-shortcut-registered-by-os",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "全局快捷键 OS 注册/冲突/合成 CGEvent 触发需已注册宿主 + 辅助功能授权"
+   }
+  },
+  {
+   "case": "blocked::native::notification-real-delivery",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "系统通知真实投递与点击聚焦需已注册宿主 + 通知权限；click 回调 OQ-03 未解决"
+   }
+  },
+  {
+   "case": "blocked::native::dialog-real-panel",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "原生文件/目录面板与取消路径需已注册宿主（Cmd+period cancel:）"
+   }
+  },
+  {
+   "case": "blocked::native::drag-drop-real-move",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "拖出到 Finder / Finder 拖入需真实 GUI 会话"
+   }
+  },
+  {
+   "case": "blocked::native::auto-launch-real-toggle",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "开机自启动真实 enable/disable 受 BLOCKED-SIGNING-IDENTITY 限制"
+   }
+  },
+  {
+   "case": "blocked::native::keep-awake-real-assertion",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "IOPMAssertion 真实生效需 pmset 探针 + 已注册宿主"
+   }
+  },
+  {
+   "case": "blocked::native::window-controls-real-maximize",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "窗口真实最小化/最大化/Restore 事件需已注册宿主窗口"
+   }
+  },
+  {
+   "case": "isolation::real-home-untouched",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "before": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    },
+    "after": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,1000 @@
+{
+  "schema": "lingxi.r09.command-policy.v1",
+  "stage": "R09-T06",
+  "purpose": "R09 Tauri 逐窗口命令/插件权限意图白名单（A11/A12 的权威策略）。本文件是**意图**，不是当前 capabilities 的镜像：audit 将 capabilities 展开并集与本文件比较，越权（actual - allowed）一律报红，不允许用本文件吸收当前配置；未注册/未授权的缺口单独登记在 gapLedger 并由 audit 逐条核对，不得静默消失。",
+  "authority": [
+    {
+      "source": "docs/rust-tauri/R09/T03_HOST_CAPABILITY_INVENTORY.json",
+      "role": "50 能力/91 命令清单与每个能力的 permissionScope（窗口最小化范围）"
+    },
+    {
+      "source": "docs/rust-tauri/R09/T03_HOST_CAPABILITY_INVENTORY.md §4/§6/§7",
+      "role": "Tauri 目标命令名、R09-T06 收口设计输入"
+    },
+    {
+      "source": "docs/rust-tauri/R09/T03_T04_PROGRESS.md §4",
+      "role": "按窗口 capability 分组草案（main/settings/quick-chat/browser-viewer/viewer/skill-viewer/splash/onboarding）"
+    },
+    {
+      "source": "docs/rust-tauri/R09/T05_PROGRESS.md §7",
+      "role": "browser-viewer 5 命令契约与 main/viewer 权限分组"
+    },
+    {
+      "source": "docs/rust-tauri/R09/T01_T02_HOST_SERVICE_DESIGN.md §3.6",
+      "role": "CSP/withGlobalTauri 接缝与 token 交付面"
+    },
+    {
+      "source": "docs/rust-tauri/R09/IMPLEMENTATION_PLAN.md D5/D8/D9",
+      "role": "sidecar 固定二进制、asset scope、四集合一致裁决"
+    },
+    {
+      "source": "desktop/src-tauri/src/native/window_labels.rs",
+      "role": "窗口 label 角色/glob 的唯一来源（audit 逐字比对）"
+    },
+    {
+      "source": "desktop/src-tauri/src/native/install.rs INVOKE_COMMANDS",
+      "role": "新增命令名唯一清单（注册面）"
+    },
+    {
+      "source": "docs/rust-tauri/R09/HOST_V2_PATCHES.md",
+      "role": "T08 v2：renderer host 片段合并/右键策略/getFileUrl asset 接线 + main 窗口 allow-* 补齐（T06 执行 Rust 侧）"
+    },
+    {
+      "source": "desktop/main.cjs:3403,490-507,5869-5920,6141+,6444-6460（Electron 契约）",
+      "role": "T06 v3 Rust patch：viewer 窗口 URL/viewer-closed 数字 id/show-skill-viewer overlay 事件/workspace-changed 轮询实现"
+    }
+  ],
+  "independence": "allowedCommands 由上述意图来源手工推导。capabilities/*.json / gen/schemas / build.rs 只作为被审计对象读取，绝不由其自动生成白名单；gapLedger 只登记“意图已定但实现未到”的缺口，越权集合永远不会进入 gapLedger。",
+  "closeout": {
+    "A11-static": "所有窗口 actualCommands == allowedCommands、actualPluginPermissions ⊆ allowedPluginPermissions、gapLedger 为空（当前 73 条命令面 / 8 窗口）",
+    "A11-runtime": "GUI 解禁后由 r09_t07/r09_t06 运行期套件执行逐窗口负向 invoke 矩阵（本文件 windows 即矩阵期望来源）",
+    "A12": "release .app 无 wdio/webdriver/dev 端口/devtools 控制面/测试 env 注入；sidecar 固定二进制且 build.json 三摘要一致"
+  },
+  "windowLabels": {
+    "main": {
+      "role": "主窗口（index.html）",
+      "source": "native/window_labels.rs MAIN"
+    },
+    "settings": {
+      "role": "设置窗口（settings.html）",
+      "source": "native/window_labels.rs SETTINGS"
+    },
+    "quick-chat": {
+      "role": "快速对话窗口（quick-chat.html）",
+      "source": "native/window_labels.rs QUICK_CHAT"
+    },
+    "browser-viewer": {
+      "role": "浏览器控制面板窗口（browser-viewer.html?mode=native），不含远程网页内容",
+      "source": "native/window_labels.rs BROWSER_VIEWER"
+    },
+    "splash": {
+      "role": "启动画面（splash.html）",
+      "source": "native/window_labels.rs SPLASH"
+    },
+    "onboarding": {
+      "role": "引导窗口（onboarding.html）",
+      "source": "native/window_labels.rs ONBOARDING"
+    },
+    "viewer-*": {
+      "role": "派生只读文件预览窗口（viewer-window.html），只读自身文件",
+      "source": "native/window_labels.rs VIEWER_PREFIX"
+    },
+    "skill-viewer-*": {
+      "role": "技能只读窗口，只读自身解压目录",
+      "source": "native/window_labels.rs SKILL_VIEWER_PREFIX"
+    }
+  },
+  "pluginPermissionBaseline": {
+    "leaves": [
+      "core:event:allow-listen",
+      "core:event:allow-unlisten"
+    ],
+    "rule": "renderer 只使用 invoke + event.listen（tauri-desktop-host.ts），插件权限仅授予 core:event 的 listen/unlisten leaf；不使用 core:default 聚合（它含 tray/menu/webview/devtools 等 renderer 不需要的权限）。emit 不在 renderer 使用；宿主内部 emit 不需要 renderer 权限。",
+    "core:default": "禁止：聚合授予 core:tray:default（托盘创建/移除）、core:menu:default（菜单创建/弹窗/set-as-app-menu）、core:webview:default（含 core:webview:allow-internal-toggle-devtools）。",
+    "remote-content": "远程/预览网页内容所在 webview 不加入任何 capability（windows 列表不得匹配远程 label），因此零插件权限、零自定义命令。"
+  },
+  "windows": {
+    "main": {
+      "capabilityGroup": "main",
+      "sources": [
+        "host:file-dialogs",
+        "host:file-text-io",
+        "host:file-watch",
+        "host:docx-xlsx-preview",
+        "host:observability-export",
+        "host:detached-viewer",
+        "host:skill-viewer",
+        "host:external-open",
+        "host:trash",
+        "host:clipboard-edit-command",
+        "host:drag-out",
+        "host:app-ready",
+        "host:window-controls",
+        "host:theme-sync",
+        "host:app-info-platform",
+        "host:reload-restart",
+        "host:app-lifecycle-quit",
+        "host:settings-window",
+        "host:settings-broadcast",
+        "host:global-shortcut",
+        "host:notification",
+        "host:quick-chat-window",
+        "host:quick-chat-session-handoff",
+        "host:keep-awake",
+        "host:auto-launch",
+        "host:server-connection-info",
+        "host:browser-viewer",
+        "host:speech-permission"
+      ],
+      "allowedCommands": [
+        "app_ready",
+        "close_browser_viewer",
+        "copy_file",
+        "file_info",
+        "get_app_version",
+        "get_auto_launch_status",
+        "get_avatar_path",
+        "get_keep_awake_status",
+        "get_platform",
+        "get_server_connection_info",
+        "get_server_port",
+        "get_server_token",
+        "get_service_status",
+        "get_splash_info",
+        "keybindings_reload_global",
+        "keybindings_test_register",
+        "list_skill_files",
+        "onboarding_complete",
+        "open_browser_viewer",
+        "open_external",
+        "open_file",
+        "open_folder",
+        "open_settings",
+        "open_skill_viewer",
+        "quick_chat_hide",
+        "quick_chat_open_session",
+        "quick_chat_open_session_ack",
+        "quick_chat_reload_shortcut",
+        "quick_chat_shortcut_status",
+        "quick_chat_show",
+        "read_docx_html",
+        "read_file",
+        "read_file_base64",
+        "read_file_snapshot",
+        "read_skill_file",
+        "read_xlsx_html",
+        "reload_main_window",
+        "resource_events",
+        "resource_subscribe",
+        "resource_unsubscribe",
+        "restart_app",
+        "run_edit_command",
+        "rust_browser_request",
+        "select_files",
+        "select_folder",
+        "select_skill",
+        "set_auto_launch_enabled",
+        "set_browser_connection",
+        "set_keep_awake_enabled",
+        "settings_changed",
+        "show_in_finder",
+        "show_notification",
+        "spawn_viewer",
+        "speech_permission_request",
+        "speech_permission_status",
+        "start_drag",
+        "trash_item",
+        "unwatch_file",
+        "unwatch_workspace",
+        "watch_file",
+        "watch_workspace",
+        "window_close",
+        "window_is_maximized",
+        "window_maximize",
+        "window_minimize",
+        "window_theme_changed",
+        "write_file",
+        "write_file_binary",
+        "write_file_if_unchanged"
+      ],
+      "allowedPluginPermissions": [
+        "core:event:allow-listen",
+        "core:event:allow-unlisten"
+      ],
+      "deniedCommands": [
+        "debug_open_onboarding",
+        "debug_open_onboarding_preview",
+        "skill_viewer_load",
+        "skill_viewer_close",
+        "viewer_request_load",
+        "viewer_close",
+        "get_browser_viewer_context"
+      ],
+      "notes": "主窗口是唯一同时持有服务 bearer token 交付、文件读写、浏览器控制、重启/重载的窗口；token 类命令仍由代码侧 main-only 二次校验。"
+    },
+    "settings": {
+      "capabilityGroup": "settings",
+      "sources": [
+        "host:file-dialogs",
+        "host:external-open",
+        "host:clipboard-edit-command",
+        "host:settings-window",
+        "host:settings-broadcast",
+        "host:reload-restart",
+        "host:global-shortcut",
+        "host:keep-awake",
+        "host:auto-launch",
+        "host:observability-export",
+        "host:server-connection-info",
+        "host:app-info-platform",
+        "host:window-controls",
+        "host:theme-sync"
+      ],
+      "allowedCommands": [
+        "get_app_version",
+        "get_auto_launch_status",
+        "get_keep_awake_status",
+        "get_platform",
+        "get_server_connection_info",
+        "get_server_port",
+        "get_server_token",
+        "keybindings_reload_global",
+        "keybindings_test_register",
+        "open_external",
+        "open_file",
+        "open_folder",
+        "open_settings",
+        "quick_chat_reload_shortcut",
+        "quick_chat_shortcut_status",
+        "restart_app",
+        "run_edit_command",
+        "select_files",
+        "select_folder",
+        "select_skill",
+        "set_auto_launch_enabled",
+        "set_keep_awake_enabled",
+        "settings_changed",
+        "show_in_finder",
+        "window_close",
+        "window_is_maximized",
+        "window_maximize",
+        "window_minimize",
+        "window_theme_changed"
+      ],
+      "allowedPluginPermissions": [
+        "core:event:allow-listen",
+        "core:event:allow-unlisten"
+      ],
+      "deniedCommands": [
+        "reload_main_window",
+        "quick_chat_show",
+        "quick_chat_hide",
+        "quick_chat_resize",
+        "quick_chat_open_session",
+        "quick_chat_open_session_ack",
+        "show_notification",
+        "read_file",
+        "read_file_snapshot",
+        "read_file_base64",
+        "file_info",
+        "write_file",
+        "write_file_binary",
+        "copy_file",
+        "write_file_if_unchanged",
+        "trash_item",
+        "start_drag",
+        "watch_file",
+        "unwatch_file",
+        "watch_workspace",
+        "unwatch_workspace",
+        "spawn_viewer",
+        "viewer_request_load",
+        "viewer_close",
+        "open_skill_viewer",
+        "list_skill_files",
+        "read_skill_file",
+        "skill_viewer_load",
+        "skill_viewer_close",
+        "debug_open_onboarding",
+        "debug_open_onboarding_preview"
+      ],
+      "notes": "设置窗只做设置读写与系统集成开关，不下放主窗文件全量 IO/预览/浏览器控制。"
+    },
+    "quick-chat": {
+      "capabilityGroup": "quick-chat",
+      "sources": [
+        "host:quick-chat-window",
+        "host:quick-chat-session-handoff",
+        "host:server-connection-info",
+        "host:app-info-platform",
+        "host:theme-sync",
+        "host:external-open"
+      ],
+      "allowedCommands": [
+        "get_platform",
+        "get_server_connection_info",
+        "get_server_port",
+        "get_server_token",
+        "open_external",
+        "quick_chat_hide",
+        "quick_chat_open_session",
+        "quick_chat_resize",
+        "quick_chat_show",
+        "window_theme_changed"
+      ],
+      "allowedPluginPermissions": [
+        "core:event:allow-listen",
+        "core:event:allow-unlisten"
+      ],
+      "deniedCommands": [
+        "settings_changed",
+        "show_notification",
+        "read_file",
+        "write_file",
+        "open_settings",
+        "restart_app",
+        "reload_main_window",
+        "get_browser_viewer_context",
+        "rust_browser_request",
+        "debug_open_onboarding",
+        "debug_open_onboarding_preview"
+      ],
+      "notes": "快聊窗最小面：连接信息（或 port/token 回退）用于本地 WS、窗口自身 show/hide/resize、会话交接、外链打开。"
+    },
+    "splash": {
+      "capabilityGroup": "splash",
+      "sources": [
+        "host:splash",
+        "host:app-info-platform"
+      ],
+      "allowedCommands": [
+        "get_avatar_path",
+        "get_platform",
+        "get_splash_info"
+      ],
+      "allowedPluginPermissions": [
+        "core:event:allow-listen",
+        "core:event:allow-unlisten"
+      ],
+      "deniedCommands": [
+        "onboarding_complete",
+        "get_server_connection_info",
+        "get_server_port",
+        "get_server_token",
+        "open_external",
+        "debug_open_onboarding",
+        "debug_open_onboarding_preview"
+      ],
+      "notes": "启动画面只读 splash 数据/头像与平台；完成引导属 onboarding 窗口。"
+    },
+    "onboarding": {
+      "capabilityGroup": "onboarding",
+      "sources": [
+        "host:onboarding",
+        "host:splash",
+        "host:server-connection-info",
+        "host:app-info-platform"
+      ],
+      "allowedCommands": [
+        "get_avatar_path",
+        "get_platform",
+        "get_server_connection_info",
+        "get_server_port",
+        "get_server_token",
+        "get_splash_info",
+        "onboarding_complete"
+      ],
+      "allowedPluginPermissions": [
+        "core:event:allow-listen",
+        "core:event:allow-unlisten"
+      ],
+      "deniedCommands": [
+        "open_external",
+        "settings_changed",
+        "open_settings",
+        "restart_app",
+        "watch_file",
+        "write_file",
+        "debug_open_onboarding_preview"
+      ],
+      "notes": "引导窗完成首设、读 splash 信息、连本地服务。debug 命令只在 dev capability（release 不存在）。"
+    },
+    "browser-viewer": {
+      "capabilityGroup": "browser-viewer",
+      "sources": [
+        "host:browser-viewer",
+        "host:settings-broadcast",
+        "host:theme-sync",
+        "host:app-info-platform"
+      ],
+      "allowedCommands": [
+        "close_browser_viewer",
+        "get_browser_viewer_context",
+        "get_platform",
+        "rust_browser_request",
+        "settings_changed",
+        "window_theme_changed"
+      ],
+      "allowedPluginPermissions": [
+        "core:event:allow-listen",
+        "core:event:allow-unlisten"
+      ],
+      "deniedCommands": [
+        "set_browser_connection",
+        "open_browser_viewer",
+        "get_server_connection_info",
+        "get_server_port",
+        "get_server_token",
+        "read_file",
+        "write_file",
+        "open_external",
+        "debug_open_onboarding",
+        "debug_open_onboarding_preview"
+      ],
+      "notes": "控制面板只拿不透明 connectionKey；服务 token 只在主窗宿主 state，面板无 token/文件/任意 HTTP。browserGoBack 等 API 由 rust_browser_request 的 12 项 action 白名单承载，不单独注册命令。"
+    },
+    "viewer-*": {
+      "capabilityGroup": "viewer",
+      "sources": [
+        "host:file-text-io",
+        "host:file-watch",
+        "host:detached-viewer",
+        "host:server-connection-info"
+      ],
+      "allowedCommands": [
+        "file_info",
+        "get_server_connection_info",
+        "get_server_port",
+        "get_server_token",
+        "read_file",
+        "read_file_base64",
+        "read_file_snapshot",
+        "resource_events",
+        "resource_subscribe",
+        "resource_unsubscribe",
+        "viewer_close",
+        "viewer_request_load"
+      ],
+      "allowedPluginPermissions": [
+        "core:event:allow-listen",
+        "core:event:allow-unlisten"
+      ],
+      "deniedCommands": [
+        "write_file",
+        "write_file_binary",
+        "copy_file",
+        "write_file_if_unchanged",
+        "trash_item",
+        "start_drag",
+        "open_file",
+        "open_folder",
+        "show_in_finder",
+        "open_external",
+        "open_skill_viewer",
+        "debug_open_onboarding",
+        "debug_open_onboarding_preview"
+      ],
+      "notes": "只读窗口：只读自身文件 + 服务资源事件 + 自身关闭；token 仅用于自己窗口的 ResourceIO WS（受保护命令）。"
+    },
+    "skill-viewer-*": {
+      "capabilityGroup": "skill-viewer",
+      "sources": [
+        "host:skill-viewer"
+      ],
+      "allowedCommands": [
+        "list_skill_files",
+        "read_skill_file",
+        "skill_viewer_close",
+        "skill_viewer_load"
+      ],
+      "allowedPluginPermissions": [
+        "core:event:allow-listen",
+        "core:event:allow-unlisten"
+      ],
+      "deniedCommands": [
+        "open_skill_viewer",
+        "write_file",
+        "read_file",
+        "open_file",
+        "open_external",
+        "debug_open_onboarding",
+        "debug_open_onboarding_preview"
+      ],
+      "notes": "技能只读窗只读自身解压目录（Rust zip 实现，禁止 exec unzip/powershell）。"
+    }
+  },
+  "stackingWindows": {
+    "main": {
+      "minCapabilities": 2,
+      "reason": "A11/OQ-10 要求显式构造同一 webview 命中多条 capability 的叠加场景；main 至少命中 baseline+资源两条，展开并集必须等于本策略。"
+    }
+  },
+  "protectedCommands": {
+    "get_server_connection_info": {
+      "windows": [
+        "main",
+        "settings",
+        "quick-chat",
+        "onboarding",
+        "viewer-*"
+      ],
+      "reason": "返回服务 bearer token；按窗口最小化，禁止 URL/query/localStorage 交付"
+    },
+    "get_server_port": {
+      "windows": [
+        "main",
+        "settings",
+        "quick-chat",
+        "onboarding",
+        "viewer-*"
+      ],
+      "reason": "与 token 同组连接面；R06 兼容命令，最终应并入 connection-info（R10 收敛）"
+    },
+    "get_server_token": {
+      "windows": [
+        "main",
+        "settings",
+        "quick-chat",
+        "onboarding",
+        "viewer-*"
+      ],
+      "reason": "原始 token 交付面；新代码只应使用 connection-info，保留命令仅为现役 renderer 兼容"
+    },
+    "open_external": {
+      "windows": [
+        "main",
+        "settings",
+        "quick-chat"
+      ],
+      "reason": "URL 启动器：仅 http/https，必须回执"
+    },
+    "open_file": {
+      "windows": [
+        "main",
+        "settings"
+      ],
+      "reason": "默认应用启动任意绝对路径"
+    },
+    "open_folder": {
+      "windows": [
+        "main",
+        "settings"
+      ],
+      "reason": "Finder/资源管理器打开目录"
+    },
+    "show_in_finder": {
+      "windows": [
+        "main",
+        "settings"
+      ],
+      "reason": "文件浏览器定位"
+    },
+    "start_drag": {
+      "windows": [
+        "main"
+      ],
+      "reason": "拖出文件"
+    },
+    "trash_item": {
+      "windows": [
+        "main"
+      ],
+      "reason": "破坏性文件操作"
+    },
+    "reload_main_window": {
+      "windows": [
+        "main"
+      ],
+      "reason": "生命周期控制"
+    },
+    "restart_app": {
+      "windows": [
+        "main",
+        "settings"
+      ],
+      "reason": "整壳重启（含服务退出清理）"
+    },
+    "onboarding_complete": {
+      "windows": [
+        "main",
+        "onboarding"
+      ],
+      "reason": "完成设置标记：main（承载首设/测试可见路径）+ onboarding 专属窗口；Electron 无 sender 校验，Tauri 收紧为可信本地窗口。"
+    },
+    "set_auto_launch_enabled": {
+      "windows": [
+        "main",
+        "settings"
+      ],
+      "reason": "系统登录项持久化"
+    },
+    "write_file": {
+      "windows": [
+        "main"
+      ],
+      "reason": "任意绝对路径写入"
+    },
+    "write_file_binary": {
+      "windows": [
+        "main"
+      ],
+      "reason": "任意绝对路径二进制写入"
+    },
+    "write_file_if_unchanged": {
+      "windows": [
+        "main"
+      ],
+      "reason": "CAS 文件写入"
+    },
+    "copy_file": {
+      "windows": [
+        "main"
+      ],
+      "reason": "文件复制（拒绝 symlink 由实现保证）"
+    },
+    "set_browser_connection": {
+      "windows": [
+        "main"
+      ],
+      "reason": "建立浏览器控制连接（仅 main，返回不透明 connectionKey）"
+    },
+    "open_browser_viewer": {
+      "windows": [
+        "main"
+      ],
+      "reason": "创建 viewer 窗口"
+    },
+    "rust_browser_request": {
+      "windows": [
+        "main",
+        "browser-viewer"
+      ],
+      "reason": "服务浏览器代理；action 白名单 + sessionPath 校验 + 无重定向"
+    },
+    "close_browser_viewer": {
+      "windows": [
+        "main",
+        "browser-viewer"
+      ],
+      "reason": "关闭 viewer；绝不发 stop/revoke"
+    }
+  },
+  "releaseDeniedCommands": [
+    "debug_asset_probe",
+    "debug_open_onboarding",
+    "debug_open_onboarding_preview"
+  ],
+  "devOnlyCommands": [
+    "debug_asset_probe",
+    "debug_open_onboarding",
+    "debug_open_onboarding_preview"
+  ],
+  "devOnlyCapabilities": {
+    "identifiers": [
+      "r09-test-hooks"
+    ],
+    "fileLocation": "desktop/src-tauri/capabilities-test/r09-test-hooks.json（不在 capabilities/，构建 wrapper 仅 --features r09-test-hooks 时 stage）",
+    "windows": [
+      "main",
+      "onboarding"
+    ],
+    "grantedCommands": [
+      "debug_open_onboarding",
+      "debug_open_onboarding_preview"
+    ],
+    "releaseBuildRule": "交付 release 构建 `--features r09-host`（无 r09-test-hooks）：build.rs 不生成 debug 命令权限、wrapper 不 stage 该 capability；release ACL/二进制不得出现 debug 命令名或 test env 名。",
+    "note": "A03/A04 负向证据使用带 hooks 的 evidence 构建（文档/回执标注非交付产物）；A12/A14 使用交付 release。"
+  },
+  "gapLedger": {
+    "note": "R09-T06 收口后的缺口账本：pendingImplementation / pendingWindowGrants 必须为空；audit 以“缺失集合 == 账本”严格比对，越权集合永远不允许登记进来。若后续新增意图命令但未实现，必须先登记缺口并保持 audit 非 PASS。",
+    "generatedAt": "2026-10-26",
+    "pendingImplementation": {},
+    "pendingWindowGrants": {}
+  },
+  "deferredCommands": {
+    "R10-update-chain": {
+      "commands": [
+        "release_check_latest",
+        "get_pending_announcement",
+        "ack_announcement",
+        "get_update_digest_history",
+        "auto_update_check",
+        "auto_update_install",
+        "auto_update_state",
+        "auto_update_set_channel",
+        "train_update_status",
+        "train_update_check",
+        "train_update_apply"
+      ],
+      "reason": "更新链（GitHub check/自动更新/OTA）属 R10 验收范围；R09 不提前授予 release 权限，避免未审计更新通道进入攻击面。",
+      "owner": "R10"
+    },
+    "T04-screenshot": {
+      "commands": [
+        "screenshot_render"
+      ],
+      "reason": "Tauri/Wry 无稳定页面捕获 API（T04 OQ-04 BLOCKED）；策略层已实现但无真实命令，R09 不注册不授予。",
+      "owner": "T04-OQ-04"
+    },
+    "T03-FILE-01": {
+      "commands": [
+        "observability_export_begin",
+        "observability_export_write",
+        "observability_export_end",
+        "observability_export_abort"
+      ],
+      "reason": "T03 下一轮文件能力（可观测导出）尚未实现；docx/xlsx 预览已在 v3.6 实现（read_docx_html/read_xlsx_html 已注册并授予），watch_workspace/unwatch_workspace 已在 T06 v3 实现。",
+      "owner": "T03-FILE-01"
+    }
+  },
+  "droppedCommands": {
+    "close_browser": "无生产消费者（R06 preload 未暴露，仅 web/mobile 定义）；T05 裁决不迁移，不注册。",
+    "browser_go_back": "T05 最终契约收敛为 rust_browser_request + 12 项 action 白名单；不单独注册为命令。",
+    "browser_go_forward": "同上（rust_browser_request action）。",
+    "browser_reload": "同上（rust_browser_request action）。",
+    "browser_new_tab": "同上（rust_browser_request action）。",
+    "browser_switch_tab": "同上（rust_browser_request action）。",
+    "browser_close_tab": "同上（rust_browser_request action）。",
+    "browser_emergency_stop": "同上（rust_browser_request action）。",
+    "sync_window_theme": "T03 清点用名；host-core 实际注册/渲染层消费名为 window_theme_changed（R06 既有），本策略采用 window_theme_changed。"
+  },
+  "namingDecisions": {
+    "window_theme_changed": {
+      "inventoryName": "sync_window_theme",
+      "decision": "采用 host-core 既有注册名 window_theme_changed；T03 清单的 sync_window_theme 视为别名，不另注册",
+      "source": "desktop/src-tauri/build.rs + desktop/src/react/host/tauri-desktop-host.ts:161"
+    },
+    "get_server_token/get_server_port": {
+      "decision": "R06 兼容命令保留（现役 renderer viewer-resource-events 直接使用），与 get_server_connection_info 同属受保护连接面；R10 收敛为单一 connection-info",
+      "source": "desktop/src/viewer-resource-events.ts:53-55"
+    }
+  },
+  "forbiddenCommandPatterns": [
+    "^shell_",
+    "^shell$",
+    "^exec_",
+    "^eval_",
+    "^execute_",
+    "^run_command$",
+    "^spawn_process$",
+    "^pty_",
+    "^webdriver_",
+    "^wdio_",
+    "^e2e_",
+    "^test_control_"
+  ],
+  "forbiddenCommands": [
+    "shell_open",
+    "shell_execute",
+    "execute_script",
+    "eval_js",
+    "spawn_process",
+    "read_any_file",
+    "write_any_file"
+  ],
+  "testControl": {
+    "feature": "r09-test-hooks",
+    "releaseMustReject": [
+      "LINGXI_R09_AUTOMATION",
+      "LINGXI_R09_HOST_DIALOG_SINK",
+      "LINGXI_R09_GUI_SMOKE"
+    ],
+    "releaseMustRejectSymbols": [
+      "__r09HostErrors",
+      "__r09Errors",
+      "__r09Resources",
+      "dom-projection"
+    ],
+    "rule": "测试注入点（隐藏窗口/Accessory/抑制弹窗/通知/DOM 投影/自动化 env sink/debug 命令）只在 r09-test-hooks feature 下编译；交付 release 只 --features r09-host，二进制/ACL 不得含其 env 名、符号或命令名（A12）。证据构建显式 --features r09-host,r09-test-hooks 并在构建回执 inputs.features/evidenceBuild 标注。"
+  },
+  "securityBaseline": {
+    "releaseArtifact": {
+      "bundle": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+      "hostBinary": "Contents/MacOS/lingxi-resource-desktop",
+      "sidecarBinary": "Contents/MacOS/lingxi-service",
+      "sidecarManifest": "Contents/Resources/rust-service/build.json",
+      "platformTag": "mac",
+      "arch": "arm64",
+      "targetTriple": "aarch64-apple-darwin"
+    },
+    "sidecar": {
+      "externalBin": [
+        "binaries/lingxi-service"
+      ],
+      "requiredManifestFields": [
+        "schemaVersion",
+        "platform",
+        "arch",
+        "target",
+        "toolchain",
+        "appVersion",
+        "binary",
+        "sha256",
+        "contentSha256",
+        "sourceSha256",
+        "protocol"
+      ],
+      "requiredProtocol": {
+        "serverKind": "lingxi-service",
+        "wireProtocolMin": 1,
+        "wireProtocolMax": 1,
+        "dataEpoch": 2
+      },
+      "allowedArguments": [
+        "--home",
+        "<LINGXI_HOME>"
+      ],
+      "noShellPlugin": true
+    },
+    "releaseConfig": {
+      "files": [
+        "desktop/src-tauri/tauri.release.conf.json",
+        "desktop/src-tauri/tauri.release.generated.conf.json"
+      ],
+      "withGlobalTauri": true,
+      "frontendDist": "../dist-renderer",
+      "forbiddenKeys": [
+        "devUrl",
+        "dangerousRemoteDomainIpcAccess"
+      ],
+      "cspAllowedSources": {
+        "default-src": [
+          "'self'"
+        ],
+        "script-src": [
+          "'self'"
+        ],
+        "style-src": [
+          "'self'",
+          "'unsafe-inline'"
+        ],
+        "connect-src": [
+          "'self'",
+          "ipc:",
+          "http://ipc.localhost",
+          "http://127.0.0.1:*",
+          "ws://127.0.0.1:*"
+        ],
+        "img-src": [
+          "'self'",
+          "data:",
+          "blob:",
+          "asset:",
+          "http://asset.localhost",
+          "http://127.0.0.1:*"
+        ],
+        "media-src": [
+          "'self'",
+          "data:",
+          "blob:",
+          "asset:",
+          "http://asset.localhost",
+          "http://127.0.0.1:*"
+        ],
+        "font-src": [
+          "'self'",
+          "data:"
+        ],
+        "frame-src": [
+          "'self'",
+          "blob:"
+        ],
+        "object-src": [
+          "'none'"
+        ],
+        "base-uri": [
+          "'none'"
+        ],
+        "form-action": [
+          "'none'"
+        ]
+      },
+      "cspForbiddenSubstrings": [
+        "unsafe-eval",
+        "localhost:5173",
+        "127.0.0.1:5173",
+        "http://localhost:*",
+        "https://"
+      ],
+      "assetProtocol": {
+        "expectedEnabled": true,
+        "expectedStaticScope": [
+          "$HOME/.lingxi/**",
+          "$HOME/.lingxi-dev/**",
+          "$HOME/.hanako-dev/**",
+          "$TEMP/**"
+        ],
+        "rule": "scope 只允许 $HOME 下三个标准 LINGXI_HOME + $TEMP；实际 LINGXI_HOME 与 home 外 workspace 由 Rust setup 运行时 allow_directory（逐项校验，不得 /** 全盘）。"
+      },
+      "remoteContentRule": "远程网页内容不得获 Tauri IPC：config 不得设置 app.security.dangerousRemoteDomainIpcAccess；远程内容只在跨源 iframe（sandbox）或服务控制的独立 Chromium 中出现；任何远程 label 不加入 capability。"
+    },
+    "forbiddenArtifactStrings": [
+      {
+        "token": "wdio",
+        "caseInsensitive": true,
+        "reason": "WebDriver/测试控制面不得进入 release"
+      },
+      {
+        "token": "webdriver",
+        "caseInsensitive": true,
+        "reason": "WebDriver/测试控制面不得进入 release"
+      },
+      {
+        "token": "tauri-plugin-wdio",
+        "caseInsensitive": true,
+        "reason": "wdio 插件符号"
+      },
+      {
+        "token": "localhost:5173",
+        "caseInsensitive": true,
+        "reason": "Vite dev server"
+      },
+      {
+        "token": "127.0.0.1:5173",
+        "caseInsensitive": true,
+        "reason": "Vite dev server"
+      },
+      {
+        "token": "devUrl",
+        "caseInsensitive": false,
+        "reason": "dev 构建配置不得嵌入 release"
+      },
+      {
+        "token": "debug_open_onboarding",
+        "caseInsensitive": false,
+        "reason": "debug 命令不得进入 release"
+      }
+    ],
+    "devtools": {
+      "cargoFeaturesForbidden": [
+        "devtools"
+      ],
+      "sourceForbiddenPatterns": [
+        "open_devtools",
+        "toggle_devtools",
+        "set_inspectable",
+        "with_devtools"
+      ],
+      "aclPermissionForbidden": [
+        "core:webview:allow-internal-toggle-devtools",
+        "core:webview:deny-internal-toggle-devtools"
+      ]
+    },
+    "shellSurface": {
+      "noShellPlugin": true,
+      "noRendererControllableArgv": true,
+      "expectedProcessSpawnSites": {
+        "desktop/src-tauri/src/service/instance.rs": 1,
+        "desktop/src-tauri/src/service/manifest.rs": 2,
+        "desktop/src-tauri/src/service/shutdown.rs": 1,
+        "desktop/src-tauri/src/service/supervisor.rs": 1
+      },
+      "spawnSiteNotes": {
+        "service/instance.rs": "Windows 私读 reader（固定安装路径，参数仅 --read-private-runtime-json <home> <name>）",
+        "service/manifest.rs": "/usr/bin/codesign 固定二进制定点验签（参数由构建清单推导，非 renderer 输入）",
+        "service/shutdown.rs": "/bin/ps 只读进程表诊断（A04 探针）",
+        "service/supervisor.rs": "固定 sidecar 二进制（build.json 校验通过后 spawn；参数只有 --home <LINGXI_HOME>）"
+      },
+      "forbiddenFixedBinaries": [
+        "/bin/sh",
+        "/bin/bash",
+        "/bin/zsh",
+        "/usr/bin/env",
+        "powershell",
+        "unzip"
+      ],
+      "testOnlyAllowed": "#[cfg(test)] 内的 /bin/sh -c sleep 等测试脚手架不算生产命令面（扫描前剥离测试模块）"
+    },
+    "deliveryBuild": {
+      "features": [
+        "r09-host"
+      ],
+      "evidenceBuildFeatures": [
+        "r09-host",
+        "r09-test-hooks"
+      ],
+      "receipt": "desktop/src-tauri/.tauri-build/build-receipt-release.json",
+      "rule": "交付 release 回执 evidenceBuild=false 且 inputs.features 不含 r09-test-hooks；证据构建回执 evidenceBuild=true 不得用于 A12/A14 交付扫描。"
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+ "schema": "lingxi.r09.t06.release-evidence.v1",
+ "path": "/private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app",
+ "isolatedTargetDir": "/private/tmp/lingxi-r09-t06-release-evidence-target",
+ "features": [
+  "r09-host",
+  "r09-test-hooks"
+ ],
+ "evidenceBuild": true,
+ "releaseEvidence": true,
+ "appTreeSha256": "48993e01213ab4e4715c4c77e90f819cd646b6037ffe4f530b57d26b79641341",
+ "files": {
+  "Contents/Info.plist": "da9ebff0b848d9ff1e3e6e5ac545c7270904ceb2a65677095cbb3e400e01919a",
+  "Contents/MacOS/lingxi-resource-desktop": "d0072dbea750dffac45357c595a7ae59a5fbc49dd4f3fe433ce8bdbcabac708d",
+  "Contents/MacOS/lingxi-service": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+  "Contents/Resources/Lingxi.icns": "0951f493d51b3537f2b5826d45e117bba1ead1802c38658e2c0ebb1d7706b4d3",
+  "Contents/Resources/rust-service/build.json": "372c2b88748dcd96e9a74956c13554fb8d0e764638c28bc52b524c3a506473f9",
+  "Contents/_CodeSignature/CodeResources": "94feb01477569084da315e5fb2fa90ff5bd3d25c03861a54a75309a830095bcc"
+ },
+ "exeSha256": "d0072dbea750dffac45357c595a7ae59a5fbc49dd4f3fe433ce8bdbcabac708d",
+ "sidecarSha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+ "buildJsonSha256": "372c2b88748dcd96e9a74956c13554fb8d0e764638c28bc52b524c3a506473f9",
+ "rendererSha256InBuildJson": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+ "rendererMatchesFrozen": true,
+ "crateSourceDigest": "944d284e9bffef3b4797c44f5696c16d9fdc76a12df8f8b0cbb14e0162a317cc",
+ "crateSourceFileCount": 168,
+ "codesignVerifyExit": 0,
+ "codesignSummary": {
+  "Identifier": "Identifier=com.lingxi.app",
+  "Format": "Format=app bundle with Mach-O thin (arm64)",
+  "Signature": "Signature=adhoc",
+  "TeamIdentifier": "TeamIdentifier=not set"
+ },
+ "buildLog": "/private/tmp/r09-t06-release-evidence-build.log",
+ "note": "T02 hidden release 负向用；v3.3 构建后 repo 生成物 81/81 恢复校验通过、delivery 未触碰。",
+ "sourceCandidate": "v3.3 frozen（app tree 97f226bffba064c7b408656c6be941b58f5e6e01b191d5ae6a30f89a1fbd4ccc）",
+ "builtAt": "2026-10-27T00:21:54+0800"
+}

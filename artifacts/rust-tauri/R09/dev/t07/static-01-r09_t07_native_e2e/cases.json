@@ -1,0 +1,38 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t07_native_e2e",
+ "cases": [
+  {
+   "case": "t07::platform.macos-arm64-recorded",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "os": "27.0.1",
+    "osBuild": "26A434",
+    "arch": "arm64",
+    "kernel": "27.0.0",
+    "hostPlatform": "macos-arm64",
+    "webkit": "22625.1.29.11.28",
+    "display": "Chipset Model: Apple M3 Ultra\n          Resolution: 2560 x 1440 (QHD/WQHD - Wide Quad High Definition)"
+   }
+  },
+  {
+   "case": "r09_t07_native_e2e::producer",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "error": "KeyError: 'anchorExpected'"
+   }
+  },
+  {
+   "case": "isolation::no-residual-processes",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "killed": [],
+    "residual": [],
+    "marker": "/private/tmp/lingxi-r09-runtime/r09_t07_native_e2e-9505-1793026140942"
+   }
+  }
+ ]
+}

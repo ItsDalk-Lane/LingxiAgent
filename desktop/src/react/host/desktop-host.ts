@@ -13,9 +13,10 @@
 
 import type { PlatformApi } from '../types';
 import { createElectronDesktopHost } from './electron-desktop-host';
+import { createTauriDesktopHost } from './tauri-desktop-host';
 import { createWebDesktopHost } from './web-desktop-host';
 
-export type DesktopHostKind = 'electron' | 'web' | 'mobile';
+export type DesktopHostKind = 'electron' | 'tauri' | 'web' | 'mobile';
 
 export interface DesktopHost {
   readonly kind: DesktopHostKind;
@@ -30,6 +31,7 @@ let currentHost: DesktopHost | null = null;
 // 不会返回已过期的缓存宿主。生产环境桥身份稳定，仅解析一次。
 let lastHana: PlatformApi | null = null;
 let lastPlatform: PlatformApi | null = null;
+let lastTauri: unknown = null;
 
 class BasicDesktopHost implements DesktopHost {
   constructor(
@@ -47,10 +49,12 @@ function snapshotBridgeIdentity(): void {
   if (typeof window === 'undefined') {
     lastHana = null;
     lastPlatform = null;
+    lastTauri = null;
     return;
   }
   lastHana = window.hana ?? null;
   lastPlatform = window.platform ?? null;
+  lastTauri = window.__TAURI__ ?? null;
 }
 
 export function installDesktopHost(host: DesktopHost): void {
@@ -73,9 +77,10 @@ export function installDesktopHostApi(
 }
 
 /**
- * 返回当前宿主，永不为 undefined。按 window.hana / window.platform 的
- * 当前身份解析并缓存；桥身份不变时直接返回缓存宿主：
+ * 返回当前宿主，永不为 undefined。按 window.hana / window.__TAURI__ /
+ * window.platform 的当前身份解析并缓存；桥身份不变时直接返回缓存宿主：
  * window.hana 存在 → Electron 宿主（优先，preload 桥为唯一全能力来源）；
+ * 否则 window.__TAURI__ 存在 → Tauri 宿主（R09-T01，withGlobalTauri 全局桥）；
  * 否则 window.platform 存在 → 收编既有别名（platform.js 的 Electron 抢先
  * 安装 / 显式 installDesktopHost / 旧测试桩）；
  * 否则 → 惰性创建 Web 受限宿主并写 window.platform 别名。
@@ -88,11 +93,24 @@ export function getDesktopHost(): DesktopHost {
     return currentHost;
   }
   const hana = window.hana ?? null;
+  const tauri = window.__TAURI__ ?? null;
   const platform = window.platform ?? null;
-  if (currentHost && hana === lastHana && platform === lastPlatform) return currentHost;
+  if (
+    currentHost
+    && hana === lastHana
+    && tauri === lastTauri
+    && platform === lastPlatform
+  ) {
+    return currentHost;
+  }
   let host: DesktopHost;
   if (hana) {
     host = createElectronDesktopHost(hana);
+  } else if (tauri) {
+    host = createTauriDesktopHost(tauri);
+    // 兼容旧读取：React 启动前可能还有代码经 window.platform 取值；
+    // 与 Electron 分支一样安装别名（业务代码仍必须经 DesktopHost）。
+    window.platform = host.api;
   } else if (platform) {
     // 收编既有 platform 对象：显式安装的宿主已被快照短路返回，这里只可能是
     // platform.js 的 Electron 抢先别名（会与 hana 同体，走不到本分支）或外部测试桩。

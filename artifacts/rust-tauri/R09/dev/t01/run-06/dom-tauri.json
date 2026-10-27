@@ -1,0 +1,41 @@
+{
+ "projection": {
+  "bodyTextHash": 4283697155,
+  "bodyTextLength": 56,
+  "hasHana": false,
+  "hasTauri": true,
+  "location": "tauri://localhost",
+  "platform": "darwin",
+  "reactRootMounted": true,
+  "rootChildCount": 1,
+  "rootPath": [
+   "DIV#."
+  ],
+  "tauriInvoke": true,
+  "title": "Lingxi · Rust 预览"
+ },
+ "pageLoad": {
+  "event": "page-load",
+  "label": "main",
+  "phase": "Started",
+  "schema": "lingxi.r09.tauri-launch.v1",
+  "unixMs": 1793023391988,
+  "url": "tauri://localhost"
+ },
+ "events": [
+  "host-start",
+  "resolve",
+  "binary",
+  "spawn",
+  "ready",
+  "instance",
+  "identity",
+  "service-ready",
+  "host-service-ready",
+  "window-created",
+  "page-load",
+  "page-load",
+  "app-ready",
+  "dom-projection"
+ ]
+}

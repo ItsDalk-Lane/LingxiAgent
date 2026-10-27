@@ -1,0 +1,75 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t05_browser_pdf",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 27.411,
+ "caseCount": 10,
+ "casesSha256": "7b36c76ea25d5907054249fcdae2b8cca09783796eb6cff71261678a519223e9",
+ "commands": [
+  {
+   "id": "old-chain-s1",
+   "argv": [
+    "node",
+    "tests/migration/r01-t05/run_old_chain.mjs",
+    "--job",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-02/SUITES/r09_t05_browser_pdf/old-chain/job-s1.json",
+    "--log",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-02/SUITES/r09_t05_browser_pdf/old-chain/run.log"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.928,
+   "logSha256": "588cf83c8182685b496a90b11fb5633fe4d60aa91399f808b594825ccd008a44"
+  },
+  {
+   "id": "build-pdf-probe",
+   "argv": [
+    "/usr/bin/swiftc",
+    "-O",
+    "-o",
+    "/private/tmp/lingxi-r09-runtime/r09_t05_browser_pdf-75656-1793032048360/bin/pdf_probe",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/tests/migration/r01-t05/pdf_probe.swift"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.925,
+   "logSha256": "0eb738c27f01690b007fff4323f109c6b5d4a39d3798a8e43f1285067be0c287"
+  },
+  {
+   "id": "old-chain-probe",
+   "argv": [
+    "/private/tmp/lingxi-r09-runtime/r09_t05_browser_pdf-75656-1793032048360/bin/pdf_probe",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-02/SUITES/r09_t05_browser_pdf/old-chain/s1-long-zh.pdf",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-02/SUITES/r09_t05_browser_pdf/old-chain/probe",
+    "2"
+   ],
+   "exitCode": 0,
+   "durationSecs": 4.79,
+   "logSha256": "b4576e320687d582a5e50b790fc4bf7bb81cce6bd735b9ebe8f8f7b2ef1d0eae"
+  },
+  {
+   "id": "r07-pdf-chromium",
+   "argv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "-p",
+    "lingxi-adapters",
+    "--test",
+    "r07_pdf_chromium",
+    "--",
+    "--include-ignored",
+    "--test-threads=1"
+   ],
+   "exitCode": 101,
+   "durationSecs": 15.815,
+   "logSha256": "e84bb80c16aca8dc00a42aebab251de05d2e2682a11f060439e02596161f6eac"
+  }
+ ],
+ "logSha256": "ecdffda006c20a3148fa094ccb89acedec715111a2936c8f3153bca1126c6ec9",
+ "finishedAtUnixMs": 1793032075771,
+ "failureDetail": "r07-pdf-chromium failed (exit 101): :future::Future<Output = ()>>>\n             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/scheduler/current_thread/mod.rs:206:9\n  25: <tokio::runtime::runtime::Runtime>::block_on_inner::<core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>\n             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/runtime.rs:374:52\n  26: <tokio::runtime::runtime::Runtime>::block_on::<core::pin::Pin<&mut dyn core::future::future::Future<Output = ()>>>\n             at /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/runtime/runtime.rs:343:18\n  27: r07_pdf_chromium::actual_r01_documents_preserve_fonts_images_pagination_and_js_contract\n             at ./tests/r07_pdf_chromium.rs:453:26\n  28: r07_pdf_chromium::actual_r01_documents_preserve_fonts_images_pagination_and_js_contract::{closure#0}\n             at ./tests/r07_pdf_chromium.rs:353:81\n  29: <r07_pdf_chromium::actual_r01_documents_preserve_fonts_images_pagination_and_js_contract::{closure#0} as core::ops::function::FnOnce<()>>::call_once\n             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/ops/function.rs:250:5\n  30: <fn() -> core::result::Result<(), alloc::string::String> as core::ops::function::FnOnce<()>>::call_once\n             at /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/ops/function.rs:250:5\nnote: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.\n\n\nfailures:\n    actual_r01_documents_preserve_fonts_images_pagination_and_js_contract\n\ntest result: FAILED. 6 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 14.72s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s\n     Running tests/r07_pdf_chromium.rs (rust/target/debug/deps/r07_pdf_chromium-499d11c618388529)\nerror: test failed, to rerun pass `-p lingxi-adapters --test r07_pdf_chromium`\n"
+}

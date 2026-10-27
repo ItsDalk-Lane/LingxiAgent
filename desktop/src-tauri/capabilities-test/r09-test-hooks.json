@@ -1,0 +1,15 @@
+{
+  "identifier": "r09-test-hooks",
+  "description": "R09-T06 D11：仅证据构建（--features r09-host,r09-test-hooks）使用的测试命令 capability；交付 release 不含。",
+  "windows": [
+    "main",
+    "onboarding"
+  ],
+  "permissions": [
+    "allow-debug-asset-probe",
+    "allow-debug-open-onboarding",
+    "allow-debug-open-onboarding-preview",
+    "core:event:allow-listen",
+    "core:event:allow-unlisten"
+  ]
+}

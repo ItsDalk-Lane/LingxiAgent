@@ -8385,6 +8385,10 @@ pub fn build_router(state: ServiceState) -> Router {
                 .put(automation::notification_preferences_put_route),
         )
         .route(
+            "/lingxi/v1/preferences/setup-complete",
+            post(userprefs::setup_complete_route),
+        )
+        .route(
             "/lingxi/v1/automation/status",
             get(automation::status_route),
         )

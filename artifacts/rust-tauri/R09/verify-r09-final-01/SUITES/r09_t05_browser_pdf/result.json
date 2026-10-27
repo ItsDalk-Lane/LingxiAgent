@@ -1,0 +1,53 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t05_browser_pdf",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 11.731,
+ "caseCount": 8,
+ "casesSha256": "2bf3358fce2ef3de78fb8c0cc7350e80bb236a21bddb4087e12db0369ea0a0fd",
+ "commands": [
+  {
+   "id": "old-chain-s1",
+   "argv": [
+    "node",
+    "tests/migration/r01-t05/run_old_chain.mjs",
+    "--job",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-01/SUITES/r09_t05_browser_pdf/old-chain/job-s1.json",
+    "--log",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-01/SUITES/r09_t05_browser_pdf/old-chain/run.log"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.936,
+   "logSha256": "f4ae26bb86a591e5bafaa050a4bc9a293416ca6353ad369b1aa2081c01b68ebe"
+  },
+  {
+   "id": "build-pdf-probe",
+   "argv": [
+    "/usr/bin/swiftc",
+    "-O",
+    "-o",
+    "/private/tmp/lingxi-r09-runtime/r09_t05_browser_pdf-61800-1793031122736/bin/pdf_probe",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/tests/migration/r01-t05/pdf_probe.swift"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.943,
+   "logSha256": "9c0876abc7ae83da7150046ecfe937a720e6024d85697e179375d231457c12a0"
+  },
+  {
+   "id": "old-chain-probe",
+   "argv": [
+    "/private/tmp/lingxi-r09-runtime/r09_t05_browser_pdf-61800-1793031122736/bin/pdf_probe",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-01/SUITES/r09_t05_browser_pdf/old-chain/s1-long-zh.pdf",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-01/SUITES/r09_t05_browser_pdf/old-chain/probe",
+    "2"
+   ],
+   "exitCode": 0,
+   "durationSecs": 4.77,
+   "logSha256": "76f937241a426177aba6086efe65e73e56745d7ea769add024ff7118768a6b8c"
+  }
+ ],
+ "logSha256": "1da30b71735ce335e23b659ac1d60535ac932429f74b165aafbd14d290a201c1",
+ "finishedAtUnixMs": 1793031134468,
+ "failureDetail": "NameError: name 'source' is not defined"
+}

@@ -1,0 +1,1240 @@
+{
+ "schema": "lingxi.r09.t03-leaf-case-plan.v1",
+ "generatedFrom": {
+  "ledger": "docs/rust-tauri/R09/R09_LEAF_LEDGER.json",
+  "fsa": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+  "classification": "docs/rust-tauri/R09/T03_T04_PROGRESS.md §9",
+  "producer": "scripts/rust-tauri/r09_t03.py / r09_gui_actions.py"
+ },
+ "scope": {
+  "sharedLeaves": 46,
+  "hostLeaves": 30,
+  "hostNative": 22,
+  "hostBridge": 8,
+  "serverReactExcluded": 16,
+  "leafAssertions": 60
+ },
+ "stats": {
+  "assertionsWithPlannedAction": 60,
+  "implementationStatus": {
+   "implemented": 57,
+   "manual": 3,
+   "blocked": 0
+  }
+ },
+ "guiGate": {
+  "env": "LINGXI_R09_GUI_CLEARED",
+  "appBinaryEnv": "LINGXI_R09_TAURI_APP",
+  "webdriverPortEnv": "LINGXI_R09_WEBDRIVER_PORT",
+  "manualEvidenceDirEnv": "LINGXI_R09_MANUAL_EVIDENCE_DIR"
+ },
+ "manualOnlyAssertions": [
+  {
+   "leafId": "R00-T02-LA-15DFB1AED8F2",
+   "assertionIndex": 1,
+   "case": "leaf:R00-T02-LA-15DFB1AED8F2::a1-drag-out-single-multi",
+   "steps": "人工用鼠标从书桌树拖出单/多文件到 Finder，录屏+目标目录列表证据"
+  },
+  {
+   "leafId": "R00-T02-LA-BEC2074CC33C",
+   "assertionIndex": 1,
+   "case": "leaf:R00-T02-LA-BEC2074CC33C::a1-locale-switch-tray-labels",
+   "steps": "切换语言后截图托盘菜单（右键）+ 重启后再次截图；与 locale 文案表逐项对照"
+  },
+  {
+   "leafId": "R00-T02-LA-DF4B5168ABB5",
+   "assertionIndex": 1,
+   "case": "leaf:R00-T02-LA-DF4B5168ABB5::a1-notification-delivered-and-click-focus",
+   "steps": "手动点击通知中心通知，观察主窗获得焦点并截图/lsappinfo 前台记录"
+  }
+ ],
+ "blockedAssertions": [],
+ "neededHostSurface": [],
+ "leaves": [
+  {
+   "leafId": "R00-T02-LA-37E6C3B9A7B8",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-READ-DOCX-HTML-37E6C3",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:docx-xlsx-preview"
+   ],
+   "then": "DOCX 转 HTML 后在预览中显示",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "DOCX 转 HTML 后在预览中显示",
+     "existingLogicCases": [],
+     "plannedActionCase": "leaf:R00-T02-LA-37E6C3B9A7B8::a1-docx-preview-render",
+     "requiredObservation": "invoke read_docx_html(绝对 .docx) 返回 HTML → 预览窗/CGWindowList 出现内容；DOM 校验表格/段落文本",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "仅绝对普通文件且 <=20MB；解析失败返回 null/信息卡",
+     "existingLogicCases": [],
+     "plannedActionCase": "leaf:R00-T02-LA-37E6C3B9A7B8::a2-docx-preview-invalid-input",
+     "requiredObservation": "相对路径/不存在/>20MB/symlink 输入返回 null/信息卡，无新预览窗口、无文件写",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-E84F01456B6C",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-READ-XLSX-HTML-E84F01",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:docx-xlsx-preview"
+   ],
+   "then": "首工作表转换为转义 HTML 表格",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "首工作表转换为转义 HTML 表格",
+     "existingLogicCases": [],
+     "plannedActionCase": "leaf:R00-T02-LA-E84F01456B6C::a1-xlsx-preview-render",
+     "requiredObservation": "invoke read_xlsx_html 返回转义 HTML 表格（DOM/内容校验，&lt;script&gt; 被转义），预览窗出现",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "仅绝对普通文件且 <=20MB；空表或解析失败返回 null",
+     "existingLogicCases": [],
+     "plannedActionCase": "leaf:R00-T02-LA-E84F01456B6C::a2-xlsx-preview-invalid",
+     "requiredObservation": "空表/相对路径/>20MB/解析失败返回 null，无预览窗口、无文件写",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-0DEEE4813B0A",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-DETACHED-VIEWER-0DEEE4",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:detached-viewer"
+   ],
+   "then": "新 BrowserWindow 按窗口 ID 拉取文件载荷并显示，关闭后清除 pinned 状态",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "新 BrowserWindow 按窗口 ID 拉取文件载荷并显示，关闭后清除 pinned 状态",
+     "existingLogicCases": [],
+     "plannedActionCase": "leaf:R00-T02-LA-0DEEE4813B0A::a1-spawn-viewer-window",
+     "requiredObservation": "CGWindowList 出现 label=viewer-* 的新窗口且标题=文件标题；关闭后窗口消失且 pinned 状态清理（再次 viewer_request_load 返回 null）",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "载荷缺失或来源窗口关闭时返回空；派生窗不回写主预览文件",
+     "existingLogicCases": [],
+     "plannedActionCase": "leaf:R00-T02-LA-0DEEE4813B0A::a2-viewer-missing-payload",
+     "requiredObservation": "对已关闭 windowId 调 viewer_request_load 返回 null；viewer 窗口内写回预览文件被拒绝（命令错误/文件 mtime/sha 不变）",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-15DFB1AED8F2",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-START-DRAG-15DFB1",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:drag-out"
+   ],
+   "then": "Electron 原生拖拽携带单个或多个路径",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "Electron 原生拖拽携带单个或多个路径",
+     "existingLogicCases": [
+      "leaf::drag-out.shapes",
+      "ipc::drag.relative-path",
+      "ipc::drag.nul-path"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-15DFB1AED8F2::a1-drag-out-single-multi",
+     "requiredObservation": "调用 start_drag 后观察系统 drag session（AX/lsappinfo）或人工：拖到 Finder/聊天区后目标收到 1 个/多个文件；文件内容 sha 不变",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "manual",
+     "manualSteps": "人工用鼠标从书桌树拖出单/多文件到 Finder，录屏+目标目录列表证据",
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "不存在路径或目标拒收时不应声称文件已移动",
+     "existingLogicCases": [
+      "ipc::drag.relative-path"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-15DFB1AED8F2::a2-drag-out-missing-target",
+     "requiredObservation": "不存在/相对路径被宿主拒绝（错误码 PATH_NOT_ABSOLUTE/INVALID_ARGUMENT），无 drag session、目标无新文件",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-15E163FBFBE8",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-CHANGED-15E163",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:settings-broadcast"
+   ],
+   "then": "主窗、设置窗、浏览器查看器收到同类变更并刷新相关显示",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "主窗、设置窗、浏览器查看器收到同类变更并刷新相关显示",
+     "existingLogicCases": [
+      "leaf::settings-broadcast.side-effects",
+      "ipc::settings_changed.missing-theme"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-15E163FBFBE8::a1-settings-broadcast-fanout",
+     "requiredObservation": "设置窗 invoke settings_changed(theme-changed) → 主窗与 browser-viewer（若开）窗口截图亮度变化、设置窗不崩；主窗收到事件（DOM 断言）",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "广播事件不表示底层保存成功；消失窗口不能阻断其他窗口",
+     "existingLogicCases": [
+      "leaf::settings-broadcast.whitelist",
+      "ipc::settings_changed.unknown-event"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-15E163FBFBE8::a2-settings-broadcast-missing-window",
+     "requiredObservation": "关闭 browser-viewer 后广播仍成功、主窗收到；未知事件名返回 ENUM_INVALID 且无窗口状态变化",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-18FE3FDFF9A5",
+   "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-APPEARAN-18FE3F",
+   "hostClass": "HOST_BRIDGE",
+   "capabilities": [
+    "host:theme-sync"
+   ],
+   "then": "返回主题/字体等外观状态，不改动设置",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "成功：执行“读取外观偏好”后，返回主题/字体等外观状态，不改动设置",
+     "existingLogicCases": [
+      "leaf::theme-sync.quick-chat-transparent"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-18FE3FDFF9A5::a1-appearance-read-no-write",
+     "requiredObservation": "GET /lingxi/v1/preferences/appearance 前后一致；主窗窗口截图亮度≈保存主题背景色（证明宿主应用了外观）",
+     "needsVisibleGUI": true,
+     "blockedReason": "HOST_BRIDGE：读取/持久化在 server，宿主只应用窗口外观；断言中的“读取”部分需 server/React 证据配合",
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "拒绝/边界：engine.getAppearance/setAppearance；PUT 接受 appearance 包裹或扁平 patch，发外观事件；不应错误扩大写入或披露范围",
+     "existingLogicCases": [
+      "ipc::theme.control-char"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-18FE3FDFF9A5::a2-appearance-invalid-write",
+     "requiredObservation": "PUT 非法 body/未知 theme 被拒绝（400/宿主回落默认），主窗外观不因非法输入改变（截图 hash 不变），无越权写入（GET 前后一致）",
+     "needsVisibleGUI": true,
+     "blockedReason": "HOST_BRIDGE：写入校验属 server/React；宿主侧只证非法 theme 不改变窗口外观",
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-1C41525D379C",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-DEBUG-OPEN-ONBOARDING-1C4152",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:onboarding"
+   ],
+   "then": "仅打开或聚焦引导窗口",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "仅打开或聚焦引导窗口",
+     "existingLogicCases": [
+      "leaf::onboarding.preview-no-write"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-1C41525D379C::a1-onboarding-open-focus",
+     "requiredObservation": "debug 构建 invoke debug_open_onboarding 后 onboarding 窗口出现（CGWindowList），重复调用只聚焦不新建（窗口数不变），主窗仍在",
+     "needsVisibleGUI": true,
+     "blockedReason": "debug 命令仅 debug 构建（release 不存在）；Rust 模式 onboarding 窗口生命周期需 debug 构建",
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "不代表完成引导或写用户配置",
+     "existingLogicCases": [
+      "leaf::onboarding.rust-service-unsupported"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-1C41525D379C::a2-onboarding-open-no-complete",
+     "requiredObservation": "打开/聚焦 onboarding 后 setupComplete 仍 false（服务 GET 校验）、home 配置摘要不变",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-1E6EDB731186",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-DEBUG-OPEN-ONBOARDING-PREVIEW-1E6EDB",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:onboarding"
+   ],
+   "then": "预览窗显示引导步骤",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "预览窗显示引导步骤",
+     "existingLogicCases": [],
+     "plannedActionCase": "leaf:R00-T02-LA-1E6EDB731186::a1-onboarding-preview-shows-steps",
+     "requiredObservation": "invoke debug_open_onboarding_preview → onboarding 窗口 URL 含 ?preview=1（webdriver handle/eval 或窗口标题），DOM 有引导步骤；截图证据",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "preview 模式不调 API、不写配置，不能算首次使用完成",
+     "existingLogicCases": [
+      "leaf::onboarding.preview-no-write",
+      "ipc::debug-onboarding.release"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-1E6EDB731186::a2-onboarding-preview-no-side-effects",
+     "requiredObservation": "preview 调 API 计数不变（服务 app-events 无 setup 事件）、home 摘要不变、setupComplete=false；release 构建无 debug 命令（不注册）",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-322E02C7F2F9",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-RELOAD-MAIN-WINDOW-322E02",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:reload-restart"
+   ],
+   "then": "主窗/设置窗/viewer 从激活目录重载",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "主窗/设置窗/viewer 从激活目录重载",
+     "existingLogicCases": [
+      "leaf::reload-restart.main-only"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-322E02C7F2F9::a1-reload-main-window",
+     "requiredObservation": "invoke reload_main_window 后同一窗口 webview 导航（DOM readyState 完成、performance.navigation/时间戳变化），进程 PID 不变",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "仅内部刷新，不能代表更新验签/应用成功",
+     "existingLogicCases": [
+      "leaf::reload-restart.reentry-guard"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-322E02C7F2F9::a2-reload-not-update-success",
+     "requiredObservation": "reload 后 build/version 标识不变（get_app_version、build.json sha 不变），无更新验签事件（app-events 无 auto-update 记录）",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-394DD07D2968",
+   "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-KEYBINDI-394DD0",
+   "hostClass": "HOST_BRIDGE",
+   "capabilities": [
+    "host:global-shortcut"
+   ],
+   "then": "保存快捷键映射并返回新状态",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "成功：执行“更新快捷键偏好”后，保存快捷键映射并返回新状态",
+     "existingLogicCases": [
+      "leaf::global-shortcut.registration-unavailable",
+      "leaf::global-shortcut.max-three-groups"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-394DD07D2968::a1-keybindings-update-registered",
+     "requiredObservation": "PUT keybindings（server）后 invoke keybindings_reload_global 返回 ok；合成新快捷键 CGEvent → quick-chat 窗口出现（CGWindowList）",
+     "needsVisibleGUI": true,
+     "blockedReason": "HOST_BRIDGE：持久化在 server；宿主侧证“保存后 OS 注册并可用”",
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "拒绝/边界：engine.getKeybindings/setKeybindings；PUT 接受 keybindings 包裹或扁平 patch；无效 body/平台拒绝；不应错误扩大写入或披露范围",
+     "existingLogicCases": [
+      "ipc::global_shortcut.injection",
+      "ipc::global_shortcut.unknown-key"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-394DD07D2968::a2-keybindings-invalid-body",
+     "requiredObservation": "无效 keybindings body/非法快捷键被拒绝，既有注册保持可用（合成旧快捷键仍拉起快聊），无越权写",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-57728C0A6D0A",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-SETTINGS-57728C",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:settings-window"
+   ],
+   "then": "创建或聚焦设置窗，切到指定标签",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "创建或聚焦设置窗，切到指定标签",
+     "existingLogicCases": [
+      "leaf::settings-window.main-modal-first"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-57728C0A6D0A::a1-open-settings-window-focus",
+     "requiredObservation": "主窗存活时 open_settings(tab=keybindings) → 主窗聚焦并收到 open-settings-modal（DOM modal 出现+activeTab=keybindings）；独立窗场景创建 settings 窗口",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "不代表页内配置已保存",
+     "existingLogicCases": [
+      "leaf::settings-window.crashed-main-fallback"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-57728C0A6D0A::a2-open-settings-not-saved",
+     "requiredObservation": "打开设置后服务配置快照 sha/GET 值不变（未发生保存）；关闭设置窗主窗仍可用",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-58822B6B138B",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-WINDOW-READINESS-58822B",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:main-window",
+    "host:app-ready",
+    "host:window-state",
+    "host:app-lifecycle-quit"
+   ],
+   "then": "splash/onboarding 关闭后主窗显示",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "splash/onboarding 关闭后主窗显示",
+     "existingLogicCases": [
+      "leaf::app-ready.idempotent",
+      "leaf::window-lifecycle.window-all-closed",
+      "ipc::app_ready.splash-caller"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-58822B6B138B::a1-window-readiness-main-after-splash",
+     "requiredObservation": "启动 debug 应用后观察：splash 窗口先出现后关闭（CGWindowList 时间序列），主窗在 app_ready 后可见；进程树含自有 service",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "服务或 renderer 未就绪时不能提前报主窗可用",
+     "existingLogicCases": [
+      "leaf::app-ready.timeout-fallback",
+      "leaf::window-lifecycle.activate-recreate"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-58822B6B138B::a2-window-readiness-not-early",
+     "requiredObservation": "服务未 ready 时主窗不可见/不响应（splash 仍在，webview main 未 show）；30s 兜底仅在超时后强显（可观测 show 时间戳）",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-5D5938D61A00",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-GLOBAL-SHORTCUT-5D5938",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:global-shortcut"
+   ],
+   "then": "有效组合被 OS 注册并可拉起快捷聊天；冲突反馈不可注册",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "有效组合被 OS 注册并可拉起快捷聊天；冲突反馈不可注册",
+     "existingLogicCases": [
+      "leaf::global-shortcut.test-register-cleanup",
+      "leaf::global-shortcut.registration-unavailable"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-5D5938D61A00::a1-shortcut-register-and-trigger",
+     "requiredObservation": "keybindings_test_register 返回 ok；合成 CGEvent Alt+Space → quick-chat 窗口出现且聚焦（CGWindowList+isFrontmost）",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "已被占用或无权限时不得保存成可用状态",
+     "existingLogicCases": [
+      "leaf::global-shortcut.registration-unavailable",
+      "ipc::global_shortcut.injection"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-5D5938D61A00::a2-shortcut-conflict-unavailable",
+     "requiredObservation": "先用系统注册占用键（辅助进程/另一注册），宿主 reload 返回 ok:false + failures，且未保存为可用；释放后重新注册成功",
+     "needsVisibleGUI": true,
+     "blockedReason": "构造真实占用需辅助进程（可用本套件自身第二快捷键注册模拟）",
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-9350C3E12165",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-APP-RESTART-9350C3",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:reload-restart",
+    "host:app-lifecycle-quit"
+   ],
+   "then": "应用按既定退出/重启路径重新启动",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "应用按既定退出/重启路径重新启动",
+     "existingLogicCases": [
+      "leaf::reload-restart.reentry-guard"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-9350C3E12165::a1-restart-process-identity",
+     "requiredObservation": "invoke restart_app 后旧 PID 退出、新 PID 启动且 argv/env 与宿主一致（ps 探针）；服务重启正常",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "未保存状态或退出受阻时应明确提示，不以按钮点击当作已重启",
+     "existingLogicCases": [
+      "ipc::restart.argv-injection"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-9350C3E12165::a2-restart-blocked-explicit",
+     "requiredObservation": "退出受阻/未保存状态时 restart 返回错误且进程仍在（PID 不变）；不以返回 ok 冒充已重启",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-98B458390B7E",
+   "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-KEYBINDI-98B458",
+   "hostClass": "HOST_BRIDGE",
+   "capabilities": [
+    "host:global-shortcut"
+   ],
+   "then": "返回快捷键映射，不改动设置",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "成功：执行“读取快捷键偏好”后，返回快捷键映射，不改动设置",
+     "existingLogicCases": [
+      "leaf::global-shortcut.max-three-groups"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-98B458390B7E::a1-keybindings-read-effective",
+     "requiredObservation": "读取快捷键偏好返回映射；宿主启动时按映射注册：合成偏好中的快捷键 → 快聊窗口出现；偏好未变（PUT 计数不变）",
+     "needsVisibleGUI": true,
+     "blockedReason": "HOST_BRIDGE：读取/持久化在 server；宿主证“按偏好注册生效”",
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "拒绝/边界：engine.getKeybindings/setKeybindings；PUT 接受 keybindings 包裹或扁平 patch；不应错误扩大写入或披露范围",
+     "existingLogicCases": [
+      "ipc::global_shortcut.unknown-key"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-98B458390B7E::a2-keybindings-read-invalid",
+     "requiredObservation": "非法/缺失偏好回落默认且不写偏好（GET 前后一致），默认键仍可用",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-A2E507EBDEF2",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-AUTO-LAUNCH-A2E507",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:auto-launch"
+   ],
+   "then": "读取/修改 OS 登录项并回显真实状态",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "读取/修改 OS 登录项并回显真实状态",
+     "existingLogicCases": [
+      "leaf::auto-launch.opened-at-login",
+      "leaf::auto-launch.unsupported-platform"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-A2E507EBDEF2::a1-autolaunch-read-toggle",
+     "requiredObservation": "invoke get_auto_launch_status 返回系统真实值；set true 后 LaunchAgent plist 文件存在（ls），set false 后消失；状态回读一致",
+     "needsVisibleGUI": true,
+     "blockedReason": "mac 自启动受 BLOCKED-SIGNING-IDENTITY（ad-hoc）影响，失败时如实报 supported/enabled 实际值",
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "平台不支持或写入失败应显示未生效",
+     "existingLogicCases": [
+      "leaf::auto-launch.opened-at-login"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-A2E507EBDEF2::a2-autolaunch-write-failure",
+     "requiredObservation": "写入失败/平台不支持时返回 supported:false 或真实未启用值，不报已生效",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-AC5B6EDA3FBD",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-GET-SPLASH-INFO-AC5B6E",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:splash"
+   ],
+   "then": "显示启动所需名称/头像等资料",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "显示启动所需名称/头像等资料",
+     "existingLogicCases": [
+      "leaf::splash.sender-and-page-gate",
+      "leaf::splash.avatar-path-scope"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-AC5B6EDA3FBD::a1-splash-info-avatar",
+     "requiredObservation": "启动时 splash 窗口出现（CGWindowList）且 app-events/服务日志无异常；invoke get_splash_info/get_avatar_path 返回 agentName/头像路径，头像文件存在且 <15MB、格式匹配",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "配置读取失败按启动回退显示，不代表修改配置",
+     "existingLogicCases": [
+      "leaf::splash.sender-and-page-gate"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-AC5B6EDA3FBD::a2-splash-info-fallback",
+     "requiredObservation": "移除/损坏 config 后 get_splash_info 返回默认回退（agentName:null, locale:zh-CN, yuan:lingxi），home 文件摘要不变",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-ACA2C4C1158D",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-EXTERNAL-ACA2C4",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:external-open"
+   ],
+   "then": "仅 http/https 交由系统浏览器打开",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "仅 http/https 交由系统浏览器打开",
+     "existingLogicCases": [
+      "leaf::external-open.web-only",
+      "ipc::open_external.javascript-scheme"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-ACA2C4C1158D::a1-open-external-http",
+     "requiredObservation": "invoke open_external(https://example.com) 返回 ok:true；ps 出现系统浏览器进程（或 lsappinfo 前台变化），主窗位置/URL 不变",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "空/无效/其他协议拒绝，无本地窗口导航",
+     "existingLogicCases": [
+      "ipc::open_external.file-scheme",
+      "ipc::open_external.control-char",
+      "ipc::open_file.relative-path"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-ACA2C4C1158D::a2-open-external-invalid",
+     "requiredObservation": "javascript/file/data/畸形 URL 返回 ok:false 且无浏览器进程、无本地导航（主窗 location 不变）",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-B6A97A19F2CB",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-SETTINGS-MODAL-B6A97A",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:settings-window",
+    "host:settings-broadcast"
+   ],
+   "then": "主界面设置弹窗打开并切到目标 tab",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "主界面设置弹窗打开并切到目标 tab",
+     "existingLogicCases": [
+      "leaf::settings-window.main-modal-first"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-B6A97A19F2CB::a1-settings-modal-open-tab",
+     "requiredObservation": "主窗存在时 open_settings(theme) → 主窗聚焦、DOM modal 出现且 activeTab=theme（截图）",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "未知 tab 应有明确默认页，不代表任何设置已保存",
+     "existingLogicCases": [
+      "leaf::settings-window.tab-validation"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-B6A97A19F2CB::a2-settings-modal-unknown-tab",
+     "requiredObservation": "未知 tab（如 unknown-tab）打开有明确默认页（agent），服务配置无写入（GET 前后一致）",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-B72A6D3886B7",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-KEEP-AWAKE-B72A6D",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:keep-awake"
+   ],
+   "then": "系统 powerSaveBlocker 状态与开关结果一致",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "系统 powerSaveBlocker 状态与开关结果一致",
+     "existingLogicCases": [
+      "leaf::keep-awake.state-machine",
+      "leaf::keep-awake.failure-not-fake"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-B72A6D3886B7::a1-keepawake-on-off-assertion",
+     "requiredObservation": "set true 后 `pmset -g assertions` 出现 PreventUserIdleSleep 断言属主=宿主 pid；set false 后消失；状态回读一致",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "不支持或启动失败不应假报已启用",
+     "existingLogicCases": [
+      "leaf::keep-awake.failure-not-fake"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-B72A6D3886B7::a2-keepawake-unsupported",
+     "requiredObservation": "启动失败/平台不支持时 enabled=false/active=false（真实 pmset 无断言），不假报已启用",
+     "needsVisibleGUI": true,
+     "blockedReason": "Linux 平台阻塞；mac 需 IOPMAssertion 失败注入",
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-BEC2074CC33C",
+   "featureId": "F-D23-UI_BEHAVIOR-UI-BEHAVIOR-FIVE-LANGUAGE-BEC207",
+   "hostClass": "HOST_BRIDGE",
+   "capabilities": [
+    "host:i18n-main"
+   ],
+   "then": "zh/en/ja/ko/zh-TW 文案随偏好更新且重启保留",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "zh/en/ja/ko/zh-TW 文案随偏好更新且重启保留",
+     "existingLogicCases": [
+      "leaf::i18n.locale-resolution",
+      "leaf::i18n.tray-locale-rebuild"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-BEC2074CC33C::a1-locale-switch-tray-labels",
+     "requiredObservation": "settings_changed(locale-changed, ja) 后托盘菜单标签=日文（AX/菜单截图），主窗 i18n 文案切换（DOM）；重启后仍为 ja（偏好保留）",
+     "needsVisibleGUI": true,
+     "blockedReason": "托盘菜单读取需 AX/录屏；AX 不可用时降级为人工截图证据",
+     "implementationStatus": "manual",
+     "manualSteps": "切换语言后截图托盘菜单（右键）+ 重启后再次截图；与 locale 文案表逐项对照",
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "缺失翻译按既有回退，不应混成新语言支持",
+     "existingLogicCases": [
+      "leaf::i18n.locale-resolution"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-BEC2074CC33C::a2-locale-fallback-no-new-language",
+     "requiredObservation": "缺失翻译/未知 locale 回落既有语言（zh/en 等），不显示未支持新语言；托盘标签对应回退语言",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-D15E0ADC0608",
+   "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-NOTIFICA-D15E0A",
+   "hostClass": "HOST_BRIDGE",
+   "capabilities": [
+    "host:notification"
+   ],
+   "then": "保存通知设置并返回新状态",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "成功：执行“更新通知偏好”后，保存通知设置并返回新状态",
+     "existingLogicCases": [
+      "leaf::notification.focus-suppression"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-D15E0ADC0608::a1-notification-prefs-update-bridge",
+     "requiredObservation": "PUT 通知偏好 when_unfocused（server）→ 广播后主窗聚焦时 show_notification 返回 shown:false reason=hana_focused、通知中心无新投递（swift delivered 查询）",
+     "needsVisibleGUI": true,
+     "blockedReason": "HOST_BRIDGE：持久化在 server；宿主证策略行为随偏好变化",
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "拒绝/边界：engine.getNotificationPreferences/setNotificationPreferences；PUT 接受 notifications 包裹或扁平 patch；无效 body/平台拒绝；不应错误扩大写入或披露范围",
+     "existingLogicCases": [
+      "leaf::notification.receipt-not-delivery"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-D15E0ADC0608::a2-notification-prefs-invalid",
+     "requiredObservation": "无效 notifications body 被拒绝，宿主策略保持原行为（通知投递/抑制结果与前的 GET 一致），无越权写入",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-D29DE479076C",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-WINDOW-THEME-CHANGED-D29DE4",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:theme-sync"
+   ],
+   "then": "主窗及派生窗口收到主题消息并重新绘制",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "主窗及派生窗口收到主题消息并重新绘制",
+     "existingLogicCases": [
+      "leaf::theme-sync.quick-chat-transparent"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-D29DE479076C::a1-theme-broadcast-redraw",
+     "requiredObservation": "settings_changed(theme-changed, midnight) → 主窗截图平均亮度显著下降（dark），quick-chat 窗口保持透明背景；窗口不重建（PID/窗口数不变）",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "主题同步不代表偏好已持久化",
+     "existingLogicCases": [
+      "leaf::theme-sync.quick-chat-transparent"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-D29DE479076C::a2-theme-no-persistence-claim",
+     "requiredObservation": "仅广播不写偏好时 GET appearance 不变；窗口重载后回落到持久化主题（证广播≠持久化）",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-DF4B5168ABB5",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SHOW-NOTIFICATION-DF4B51",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:notification"
+   ],
+   "then": "未聚焦且 OS 支持时弹通知；点击通知聚焦主窗",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "未聚焦且 OS 支持时弹通知；点击通知聚焦主窗",
+     "existingLogicCases": [
+      "leaf::notification.receipt-not-delivery",
+      "leaf::notification.click-focus-support-matrix"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-DF4B5168ABB5::a1-notification-delivered-and-click-focus",
+     "requiredObservation": "invoke show_notification → swift UNUserNotificationCenter delivered 列表出现标题/正文；点击通知后主窗 isFrontmost（lsappinfo/osascript）",
+     "needsVisibleGUI": true,
+     "blockedReason": "点击需人工或 AX 自动化；mac 点击聚焦实现已落地待真实点击验证（T03-NOTIFY-02）",
+     "implementationStatus": "manual",
+     "manualSteps": "手动点击通知中心通知，观察主窗获得焦点并截图/lsappinfo 前台记录",
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "主窗聚焦可抑制；OS 不支持返回 shown:false",
+     "existingLogicCases": [
+      "leaf::notification.focus-suppression",
+      "leaf::notification.receipt-not-delivery"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-DF4B5168ABB5::a2-notification-suppressed-or-unsupported",
+     "requiredObservation": "主窗聚焦时 when_unfocused 通知被抑制（shown:false/hana_focused，delivered 无新增）；OS 不支持时 shown:false/unsupported",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-E6FB08FBBFAA",
+   "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-NOTIFICA-E6FB08",
+   "hostClass": "HOST_BRIDGE",
+   "capabilities": [
+    "host:notification"
+   ],
+   "then": "返回通知设置，不改动设置",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "成功：执行“读取通知偏好”后，返回通知设置，不改动设置",
+     "existingLogicCases": [
+      "leaf::notification.focus-suppression"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-E6FB08FBBFAA::a1-notification-prefs-read",
+     "requiredObservation": "GET 通知偏好返回当前值且服务数据不变（前后 GET 相同）；宿主按该偏好决定抑制（观测 delivered 列表）",
+     "needsVisibleGUI": true,
+     "blockedReason": "HOST_BRIDGE：读取在 server；宿主证按读到的偏好执行策略",
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "拒绝/边界：engine.getNotificationPreferences/setNotificationPreferences；PUT 接受 notifications 包裹或扁平 patch；不应错误扩大写入或披露范围",
+     "existingLogicCases": [
+      "ipc::show_notification.settings-caller"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-E6FB08FBBFAA::a2-notification-prefs-read-invalid",
+     "requiredObservation": "非法/缺失偏好回落默认（always）且不写偏好；非主窗调用通知命令被拒绝",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-F5DBF2A80E28",
+   "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-APPEARAN-F5DBF2",
+   "hostClass": "HOST_BRIDGE",
+   "capabilities": [
+    "host:theme-sync"
+   ],
+   "then": "保存主题/字体等外观状态并返回新状态",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "成功：执行“更新外观偏好”后，保存主题/字体等外观状态并返回新状态",
+     "existingLogicCases": [
+      "leaf::theme-sync.quick-chat-transparent"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-F5DBF2A80E28::a1-appearance-update-window-theme",
+     "requiredObservation": "PUT appearance(theme=midnight)（server）+ settings_changed(theme-changed) → 主窗截图亮度变化=midnight 背景；quick-chat 透明保持",
+     "needsVisibleGUI": true,
+     "blockedReason": "HOST_BRIDGE：持久化在 server；宿主证“保存后窗口外观更新+广播”",
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "拒绝/边界：engine.getAppearance/setAppearance；PUT 接受 appearance 包裹或扁平 patch，发外观事件；无效 body/平台拒绝；不应错误扩大写入或披露范围",
+     "existingLogicCases": [
+      "ipc::theme.control-char"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-F5DBF2A80E28::a2-appearance-update-invalid",
+     "requiredObservation": "非法 appearance body/未知 theme 被拒绝，窗口外观与偏好均不变（截图 hash+GET 一致），无越权扩大写入",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-F9786414DD11",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-WINDOW-CONTROLS-F97864",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:window-controls"
+   ],
+   "then": "仅调用者所属 BrowserWindow 发生相应状态变化",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "仅调用者所属 BrowserWindow 发生相应状态变化",
+     "existingLogicCases": [
+      "leaf::window-controls.caller-authorized",
+      "ipc::window_control.renderer-window-id"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-F9786414DD11::a1-window-controls-caller-only",
+     "requiredObservation": "从设置窗 invoke window_maximize → 设置窗 bounds=maximized，主窗 bounds 不变；window_minimize 只最小化调用窗；renderer 传 windowId 被拒绝",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "无所属窗口时无操作；不同平台标题栏形态不同",
+     "existingLogicCases": [
+      "ipc::window_control.viewer-caller",
+      "leaf::window-controls.state-broadcast"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-F9786414DD11::a2-window-controls-no-window",
+     "requiredObservation": "无所属窗口/只读窗口调用被拒绝且无窗口状态变化；maximize/unmaximize 事件在主窗 DOM 可观测",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-FF1B331F1019",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-SWITCH-TAB-FF1B33",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:settings-window"
+   ],
+   "then": "SettingsContent activeTab 更新并渲染目标页",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "SettingsContent activeTab 更新并渲染目标页",
+     "existingLogicCases": [
+      "leaf::settings-window.main-modal-first"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-FF1B331F1019::a1-settings-tab-activation",
+     "requiredObservation": "在主窗 open_settings→modal 后点/切 keybindings tab，DOM activeTab=keybindings 且对应面板渲染（截图）",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "标签不存在时不得记作已执行页内动作",
+     "existingLogicCases": [
+      "leaf::settings-window.tab-validation"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-FF1B331F1019::a2-settings-unknown-tab-no-action",
+     "requiredObservation": "未知 tab 不渲染任何已知面板/不记作已执行页内动作；服务配置无写入",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-1120B2AA320D",
+   "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-ONBOARDING-COMPLETE-1120B2",
+   "hostClass": "HOST_NATIVE",
+   "capabilities": [
+    "host:onboarding"
+   ],
+   "then": "server PreferencesManager 持久化后打开主窗口并注册快捷键",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "server PreferencesManager 持久化后打开主窗口并注册快捷键",
+     "existingLogicCases": [
+      "leaf::onboarding.rust-service-unsupported",
+      "ipc::onboarding.rust-runtime"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-1120B2AA320D::a1-onboarding-complete-open-main",
+     "requiredObservation": "调用 onboarding_complete 后：真实 Rust 服务模式下返回明确 NOT_IMPLEMENTED（现役 Electron 同语义）；若产品补路由，则进程表新主窗+快捷键注册后合成快捷键可拉起快聊",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "保存失败不得提前进入主界面",
+     "existingLogicCases": [
+      "leaf::onboarding.preview-no-write"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-1120B2AA320D::a2-onboarding-complete-save-failure",
+     "requiredObservation": "server 返回非 ok/setupComplete!=true 时主窗不出现（CGWindowList 无 main）、配置未被写（home 摘要不变）",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  },
+  {
+   "leafId": "R00-T02-LA-6774E79F6714",
+   "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-SETUP-CO-6774E7",
+   "hostClass": "HOST_BRIDGE",
+   "capabilities": [
+    "host:onboarding"
+   ],
+   "then": "持久设置 setupComplete=true；后续启动不再进入初设流程",
+   "assertions": [
+    {
+     "assertionIndex": 1,
+     "assertionText": "成功：执行“标记初次设置完成”后，持久设置 setupComplete=true；后续启动不再进入初设流程",
+     "existingLogicCases": [
+      "leaf::onboarding.rust-service-unsupported"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-6774E79F6714::a1-setup-complete-followup-launch",
+     "requiredObservation": "设置 setupComplete 后再次启动不进入 onboarding（CGWindowList 无 onboarding、主窗直接出现）；服务 GET setupComplete=true",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    },
+    {
+     "assertionIndex": 2,
+     "assertionText": "拒绝/边界：manager 不可用时 500；不应错误扩大写入或披露范围",
+     "existingLogicCases": [
+      "ipc::onboarding.rust-runtime"
+     ],
+     "plannedActionCase": "leaf:R00-T02-LA-6774E79F6714::a2-setup-complete-manager-unavailable",
+     "requiredObservation": "manager 不可用时返回明确 5xx/错误，主窗不出现、无配置写入",
+     "needsVisibleGUI": true,
+     "blockedReason": null,
+     "implementationStatus": "implemented",
+     "manualSteps": null,
+     "neededHostSurface": null
+    }
+   ]
+  }
+ ]
+}

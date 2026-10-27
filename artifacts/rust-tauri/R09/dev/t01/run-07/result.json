@@ -1,0 +1,73 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t01_react_parity",
+ "status": "PASS",
+ "exitCode": 0,
+ "durationSecs": 24.606,
+ "caseCount": 18,
+ "casesSha256": "15b36fdfc0bdb2232e251ae60010d953d4a332652c77be7fb4e8f681a5bc1e72",
+ "commands": [
+  {
+   "id": "renderer-build-1",
+   "argv": [
+    "npm",
+    "run",
+    "build:renderer"
+   ],
+   "exitCode": 0,
+   "durationSecs": 7.481,
+   "logSha256": "756779b106004b334f182f098df9286f69638f5e11693272680c31c0f9b88e6e"
+  },
+  {
+   "id": "tauri-build-debug-1",
+   "argv": [
+    "node",
+    "scripts/tauri-build.mjs",
+    "--debug",
+    "--receipt",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t01/run-07/tauri-build-debug.json"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.175,
+   "logSha256": "3d5c81a066171b1c423998540a9f3033ca88e32f24b7490832edc0bbea4c5834"
+  },
+  {
+   "id": "git-status",
+   "argv": [
+    "git",
+    "status",
+    "--porcelain",
+    "--",
+    "desktop/src/react",
+    "desktop/src/modules"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.068,
+   "logSha256": "6700e28dafce40dfa1857a07ba881e6f42a43e97b5781e27c29c5fb3beaf674c"
+  },
+  {
+   "id": "dist-resource-marker-scan",
+   "argv": [
+    "grep",
+    "-rl",
+    "resource-desktop",
+    "desktop/dist-renderer"
+   ],
+   "exitCode": 1,
+   "durationSecs": 0.738,
+   "logSha256": "60aa72b5a419d98d4d76721e9c2b0f5b3a3ae4500b0ffe08b8db73c6b1268860"
+  }
+ ],
+ "logSha256": "a8c34da44fa21429a798c36710edebbea72f4b9852d663d23e707db1001184c1",
+ "finishedAtUnixMs": 1793023758256,
+ "rendererDigest": "ba066de8e74d87221ccb974d635aca0590f7fdd873ea3805ac5d085e5bdedbc1",
+ "electronStopped": {
+  "service_residual": []
+ },
+ "tauriStopped": {
+  "timedOut": false,
+  "service_residual": []
+ },
+ "diagnosticsHome": "/private/tmp/lingxi-r09-runtime/r09_t01_react_parity-54318-1793023733650/home-tauri/diagnostics/tauri-launch/events.jsonl",
+ "platform": "macos-arm64"
+}

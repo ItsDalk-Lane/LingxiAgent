@@ -274,8 +274,11 @@ function isAbortError(err: unknown): boolean {
 }
 
 function isDesktopShell(): boolean {
-  // R08-T02：经宿主边界判断 Electron 壳（宿主 kind），不再直读 window.hana。
-  return typeof window !== 'undefined' && getDesktopHost().kind === 'electron';
+  // R08-T02：经宿主边界判断原生桌面壳（宿主 kind），不再直读 window.hana。
+  // R09-T01：Tauri 宿主与 Electron 同属原生桌面壳（输入焦点恢复等行为一致）。
+  if (typeof window === 'undefined') return false;
+  const kind = getDesktopHost().kind;
+  return kind === 'electron' || kind === 'tauri';
 }
 
 function shouldRestoreInputFocus(path: string | null): boolean {

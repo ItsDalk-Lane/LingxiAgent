@@ -427,7 +427,9 @@ pub fn build_html_preview_csp(asset_base_url: Option<&str>) -> String {
         format!("font-src {}", font_sources.join(" ")),
         format!("img-src {}", image_sources.join(" ")),
         format!("media-src {}", media_sources.join(" ")),
-        "frame-ancestors 'self' file: http://127.0.0.1:* http://localhost:*".to_string(),
+        // R09 宿主接缝：Tauri 桌面 webview 可以嵌入 token 化预览（固定来源，
+        // 与 transport Origin 白名单同一组精确值）；electron/文件来源保留。
+        "frame-ancestors 'self' file: http://127.0.0.1:* http://localhost:* tauri: http://tauri.localhost https://tauri.localhost".to_string(),
     ]
     .join("; ")
 }
@@ -942,7 +944,8 @@ mod tests {
              connect-src 'none'; script-src 'unsafe-inline' https:; \
              style-src 'unsafe-inline' https:; font-src https: data:; \
              img-src 'self' https: data: blob:; media-src 'self' https: data: blob:; \
-             frame-ancestors 'self' file: http://127.0.0.1:* http://localhost:*"
+             frame-ancestors 'self' file: http://127.0.0.1:* http://localhost:* \
+             tauri: http://tauri.localhost https://tauri.localhost"
         );
     }
 

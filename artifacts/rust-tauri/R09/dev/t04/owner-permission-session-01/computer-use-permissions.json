@@ -1,0 +1,44 @@
+{
+  "source": "computer-use status via local service",
+  "capturedAtUnixMs": 1793062684528,
+  "payload": {
+    "selectedProviderId": "macos:cua",
+    "settings": {
+      "allow_windows_input_injection": false,
+      "app_approvals": [],
+      "enabled": false,
+      "provider_by_platform": {
+        "darwin": "macos:cua",
+        "linux": "mock",
+        "win32": "windows:uia"
+      }
+    },
+    "status": {
+      "activeLease": null,
+      "enabled": false,
+      "platform": "darwin",
+      "providers": [
+        {
+          "providerId": "macos:cua",
+          "status": {
+            "available": false,
+            "permissionSubject": "service_process",
+            "permissions": [
+              {
+                "granted": true,
+                "name": "accessibility"
+              },
+              {
+                "granted": true,
+                "name": "screenRecording"
+              }
+            ],
+            "reason": "computer_control_engine_unavailable"
+          }
+        }
+      ],
+      "selectedProviderId": "macos:cua",
+      "supported": true
+    }
+  }
+}

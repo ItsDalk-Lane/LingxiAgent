@@ -148,6 +148,13 @@ impl Process {
             .stdin(Stdio::null())
             .stdout(Stdio::null())
             .stderr(Stdio::null());
+        // R09-T05 自动化边界：无钥匙串访问会话下，Chrome 的 "Chrome Safe Storage"
+        // 会弹 macOS 系统钥匙串窗口并阻塞自动化。仅当**测试 harness 显式**设置
+        // `LINGXI_BROWSER_TEST_NO_KEYCHAIN=1` 时启用 mock keychain；生产/真实用户
+        // 会话不设置该变量，cookie 加密语义保持真实默认，不静默改变。
+        if std::env::var_os("LINGXI_BROWSER_TEST_NO_KEYCHAIN").is_some() {
+            cmd.arg("--use-mock-keychain");
+        }
         if headless {
             cmd.arg("--headless=new");
         }

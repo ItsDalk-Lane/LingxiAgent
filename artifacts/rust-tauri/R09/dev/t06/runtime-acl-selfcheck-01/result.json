@@ -1,0 +1,35 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t06_runtime_acl",
+ "status": "RUNTIME_ACL_NOT_CLEARED",
+ "exitCode": 2,
+ "caseCount": 21,
+ "failedCases": [
+  "acl::preflight::gui-clearance",
+  "blocked::runtime::browser-viewer::matrix",
+  "blocked::runtime::main::matrix",
+  "blocked::runtime::onboarding::matrix",
+  "blocked::runtime::quick-chat::matrix",
+  "blocked::runtime::settings::matrix",
+  "blocked::runtime::skill-viewer-*::matrix",
+  "blocked::runtime::splash::matrix",
+  "blocked::runtime::viewer-*::matrix",
+  "blocked::runtime::remote-webview-zero-acl",
+  "blocked::runtime::canary-debug-command-absent",
+  "blocked::runtime::debug-command-release-denied"
+ ],
+ "blockedCases": [
+  "blocked::runtime::browser-viewer::matrix",
+  "blocked::runtime::main::matrix",
+  "blocked::runtime::onboarding::matrix",
+  "blocked::runtime::quick-chat::matrix",
+  "blocked::runtime::settings::matrix",
+  "blocked::runtime::skill-viewer-*::matrix",
+  "blocked::runtime::splash::matrix",
+  "blocked::runtime::viewer-*::matrix",
+  "blocked::runtime::remote-webview-zero-acl",
+  "blocked::runtime::canary-debug-command-absent",
+  "blocked::runtime::debug-command-release-denied"
+ ],
+ "clearanceEnv": "LINGXI_R09_T06_RUNTIME_ACL_CLEARED"
+}

@@ -1,0 +1,225 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t01_release_offline",
+ "cases": [
+  {
+   "case": "a02::release-binary-built",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "appBundle": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+    "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+    "executableSha256": "434397235739620c5a55742a6d805a1d3f5871861f2cc9b42662ad8fe9bfec3d",
+    "features": [
+     "r09-host"
+    ],
+    "serviceProtocol": {
+     "serverKind": "lingxi-service",
+     "wireProtocolMin": 1,
+     "wireProtocolMax": 1,
+     "dataEpoch": 2
+    }
+   }
+  },
+  {
+   "case": "a02::no-devurl-in-release-binary",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "devUrl": 0,
+    "localhost5173": 0,
+    "1270015173": 0,
+    "dist-tauri-resources": 0,
+    "wdio": 0
+   }
+  },
+  {
+   "case": "a02::no-test-plugins-in-release-binary",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "devUrl": 0,
+    "localhost5173": 0,
+    "1270015173": 0,
+    "dist-tauri-resources": 0,
+    "wdio": 0
+   }
+  },
+  {
+   "case": "a02::adhoc-signature-verified",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "signing": "adhoc",
+    "notarization": "BLOCKED-SIGNING-IDENTITY"
+   }
+  },
+  {
+   "case": "a02::no-vite-5173-listener",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "lsofBefore": ""
+   }
+  },
+  {
+   "case": "a02::canary-zero-connections",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "connections": 0
+   }
+  },
+  {
+   "case": "a02::webview-loads-embedded",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "pageLoad": {
+     "event": "page-load",
+     "label": "main",
+     "phase": "Started",
+     "schema": "lingxi.r09.tauri-launch.v1",
+     "unixMs": 1793024200447,
+     "url": "tauri://localhost"
+    }
+   }
+  },
+  {
+   "case": "a02::ui-boots",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "events": [
+     "resolve",
+     "manifest",
+     "binary",
+     "spawn",
+     "ready",
+     "instance",
+     "identity",
+     "service-ready",
+     "host-service-ready",
+     "window-created",
+     "page-load",
+     "page-load",
+     "app-ready",
+     "signal",
+     "shutdown",
+     "shutdown-complete"
+    ]
+   }
+  },
+  {
+   "case": "a02::env-cannot-redirect",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "injected": "VITE_DEV_URL=http://127.0.0.1:5173",
+    "pageLoad": {
+     "event": "page-load",
+     "label": "main",
+     "phase": "Started",
+     "schema": "lingxi.r09.tauri-launch.v1",
+     "unixMs": 1793024200447,
+     "url": "tauri://localhost"
+    }
+   }
+  },
+  {
+   "case": "a02::no-5173-sockets",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "lsof": ""
+   }
+  },
+  {
+   "case": "a02::service-ready-manifest",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "manifest": {
+     "appVersion": "0.1.43",
+     "binary": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-service",
+     "contentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+     "event": "manifest",
+     "protocol": "lingxi-service wire 1..=1 data-epoch 2",
+     "rendererSha256": "d5a24adf33b380a1cc5eff153b3954ccfa79a4a1812481658cea37d2e55b59a0",
+     "schema": "lingxi.r09.tauri-launch.v1",
+     "sha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+     "signedMutation": true,
+     "target": "aarch64-apple-darwin",
+     "toolchain": "1.98.1",
+     "unixMs": 1793024200166
+    },
+    "readyMsSinceSpawn": 102
+   }
+  },
+  {
+   "case": "a02::graceful-exit",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "stopped": {
+     "exit": 0,
+     "timedOut": false,
+     "serviceResidual": []
+    },
+    "shutdown": {
+     "confirmed": true,
+     "event": "shutdown",
+     "exit": {
+      "code": 0,
+      "signal": null,
+      "success": true
+     },
+     "forceKillWaitMs": 5000,
+     "graceMs": 17000,
+     "mode": "local-owned",
+     "ownedPids": [
+      84849
+     ],
+     "residual": [],
+     "schema": "lingxi.r09.tauri-launch.v1",
+     "signaled": [
+      "SIGTERM:pid=84849"
+     ],
+     "touchedRemote": false,
+     "unixMs": 1793024202374
+    }
+   }
+  },
+  {
+   "case": "a02::home-stamped",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "home": "/private/tmp/lingxi-r09-runtime/r09_t01_release_offline-84695-1793024189443/home-release"
+   }
+  },
+  {
+   "case": "a02::no-node-server-info",
+   "ok": true,
+   "actual": 1,
+   "detail": null
+  },
+  {
+   "case": "isolation::real-home-untouched",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "before": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    },
+    "after": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    }
+   }
+  }
+ ]
+}

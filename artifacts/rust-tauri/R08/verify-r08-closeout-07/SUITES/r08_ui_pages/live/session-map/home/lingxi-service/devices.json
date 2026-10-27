@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "devices": [
+    {
+      "schemaVersion": 1,
+      "deviceId": "device_18ff2c3231b2ca2ecfc9b1d05e81405d",
+      "userId": "foreign-map-owner",
+      "displayName": "CLI",
+      "deviceKind": "cli",
+      "status": "active",
+      "trustState": "lan",
+      "createdAtUnixMs": 1793015130202,
+      "lastSeenAtUnixMs": 1793015133833
+    },
+    {
+      "schemaVersion": 1,
+      "deviceId": "device_8dbd250223b66835ed46eb286cd13e62",
+      "userId": "no-chat-map-owner",
+      "displayName": "CLI",
+      "deviceKind": "cli",
+      "status": "active",
+      "trustState": "lan",
+      "createdAtUnixMs": 1793015135057,
+      "lastSeenAtUnixMs": 1793015136274
+    }
+  ],
+  "createdAtUnixMs": 1793015129759,
+  "updatedAtUnixMs": 1793015136274
+}

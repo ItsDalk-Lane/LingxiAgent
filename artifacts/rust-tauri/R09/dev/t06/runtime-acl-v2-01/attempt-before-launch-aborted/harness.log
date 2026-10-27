@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r09_t06_runtime_acl.py", line 1020, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r09_t06_runtime_acl.py", line 1007, in main
+    port = int(port_arg) if port_arg is not None else int(os.environ.get("TAURI_WEBDRIVER_PORT", "19465"))
+           ~~~^^^^^^^^^^
+TypeError: int() argument must be a string, a bytes-like object or a real number, not 'PosixPath'

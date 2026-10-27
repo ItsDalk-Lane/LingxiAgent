@@ -1,0 +1,16 @@
+{
+ "processes": [
+  {
+   "pid": "53257",
+   "command": "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python -B scripts/rust-tauri/r09_t06_runtime_acl.py --evidence artifacts/rust-tauri/R09/dev/t06/runtime-acl-v32-01 --app /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/debug/lingxi-resource-desktop --wdio-port 19491"
+  },
+  {
+   "pid": "53266",
+   "command": "/private/tmp/lingxi-r09-t06-acl-53257-1793030150/LingxiRuntimeAcl.app/Contents/MacOS/lingxi-resource-desktop"
+  },
+  {
+   "pid": "53268",
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-t06-acl-53257-1793030150/home"
+  }
+ ]
+}

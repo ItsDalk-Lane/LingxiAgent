@@ -1,0 +1,442 @@
+{
+  "schema": "lingxi.r09.progress.v1",
+  "stage": "R09",
+  "stageStatus": "INCOMPLETE_BLOCKED_PENDING_RUNTIME_EVIDENCE",
+  "startedAt": "2026-10-26",
+  "branch": "codex/rust-tauri-migration",
+  "baseHead": "aac8cb9fe6bb7bfa7a41d75528221136bfe55e50",
+  "taskbook": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R09_Tauri桌面宿主、原生能力与跨平台集成.md",
+  "frozenLedger": {
+    "tasks": 8,
+    "baseScenarios": 16,
+    "dedupedSupplementalLeaves": 74,
+    "originalAssertions": 168,
+    "t03t07SharedLeaves": 46,
+    "t05Leaves": 19,
+    "t04Leaves": 9
+  },
+  "mapContract": {
+    "map": "rust/crates/xtask/src/stage_maps/R09.json",
+    "mapSha256": "13c10094dcefcc8f0b0844ec27aefc42a47d3a69f963539992276d34bfaefc87",
+    "inputs": "rust/crates/xtask/src/stage_maps/R09_INPUTS.json",
+    "inputsSha256": "e85d9106f9544de3c03f00a985c6d1bd76d1914be4fb7001008fe4f61156c160",
+    "generator": "scripts/rust-tauri/r09_stage_inputs.py",
+    "generatorSha256": "ead0415938cde5d24973d06df343b2ca03ba974d67fe9915062e6c843bcc3391",
+    "checkCommand": "python3 -B scripts/rust-tauri/r09_stage_inputs.py --check",
+    "checkResult": "exit 0 (digest match + whole-graph byte match)",
+    "commands": 21,
+    "leadProbeCommands": [
+      "r09_map_integrity",
+      "r09_service_seam_probe",
+      "r09_capability_audit"
+    ],
+    "note": "A10 seam probe; A11 capability audit (PENDING_POLICY); A15 pins map-integrity(19)+gate-negative(7) cases; 15/74 T05 leaves bound to r09_t05_browser_pdf cases.json with per-assertion cases; 59 pending",
+    "leafContracts": 15
+  },
+  "machineLedger": {
+    "path": "docs/rust-tauri/R09/R09_LEAF_LEDGER.json",
+    "sha256": "49dd904d478d6d3797a8066ab979a85ef84b3fd09f30dc3453ade46bca4b585c",
+    "leafCount": 74,
+    "assertionCount": 168,
+    "status": "PLANNED (0 EVIDENCED)"
+  },
+  "xtaskRegistration": {
+    "main": "rust/crates/xtask/src/main.rs (STAGE_MAPS + check-map subcommand)",
+    "runnerIdentity": "rust/crates/xtask/src/runner_identity.rs (R09.json/R09_INPUTS.json embedded + inventory)",
+    "verify": "rust/crates/xtask/src/verify.rs (pub fn check_map_contract)",
+    "checkMapCommand": "~/.cargo/bin/rustup run 1.98.1 cargo run --manifest-path rust/Cargo.toml -p xtask -- check-map R09"
+  },
+  "gateRuns": [
+    {
+      "evidence": "artifacts/rust-tauri/R09/verify-r09-map-red-01",
+      "overall": "FAIL",
+      "note": "map-only red baseline before r09_map_integrity command existed"
+    },
+    {
+      "evidence": "artifacts/rust-tauri/R09/verify-r09-map-red-02",
+      "overall": "FAIL",
+      "expectedRed": true,
+      "commands": "18 total: 2 PASS (r09_inputs_check, r09_map_integrity) / 16 FAIL (producer NOT_IMPLEMENTED exit 2)",
+      "scenarios": "16/16 FAIL",
+      "leaves": "74/74 BLOCKED",
+      "candidateSourceBindingStable": true,
+      "platform": "macos aarch64"
+    },
+    {
+      "evidence": "artifacts/rust-tauri/R09/verify-r09-final-04/verify-stage-result.json",
+      "overall": "FAIL",
+      "candidateStable": true,
+      "candidateSourceDigest": "3bc4a35a1b975de178f3936634481d8453edd93b6acec8cfab1f991b0d9ebc84",
+      "commandsPass": 13,
+      "commandsTotal": 21,
+      "supplementalLeaves": 74,
+      "leafPass": 15,
+      "leafBlocked": 59,
+      "leafFail": 0,
+      "scenariosPass": 6,
+      "scenariosTotal": 16,
+      "postGateFixes": [
+        "T06 ACL harness dynamic handoff + diagnostics archive; rerun runtime-acl-v33-02 PASS_WITH_BLOCKED_WINDOWS / blocked 35",
+        "docs corrected for independent review findings"
+      ]
+    },
+    {
+      "evidence": "artifacts/rust-tauri/R09/verify-r09-final-05/verify-stage-result.json",
+      "overall": "FAIL",
+      "candidateStable": true,
+      "candidateSourceDigest": "d1c7da140ec4bc93572d797f088f9938b729bd44f00336e08baf9eca55b6865d",
+      "commandsPass": 13,
+      "commandsTotal": 21,
+      "supplementalLeaves": 74,
+      "leafPass": 15,
+      "leafBlocked": 59,
+      "leafFail": 0,
+      "scenariosPass": 6,
+      "scenariosTotal": 16,
+      "note": "工具冻结后重跑；T03 21/28/11/3；T08 context-menu evidence+debug-gated 转绿、shell context-menu 口径冲突"
+    }
+  ],
+  "mapIntegrityProbe": {
+    "script": "scripts/rust-tauri/r09_map_integrity.py",
+    "scriptSha256": "0996000221e610e7c00de5c779d084634dfc377ad94ac296cad83e862439a78b",
+    "cases": 19,
+    "standaloneEvidence": "/private/tmp/r09-map-integrity-probe-03",
+    "standaloneResult": "PASS 19/19",
+    "negativeFamilies": [
+      "dropped-leaf",
+      "deleted-task-share (T04 9)",
+      "deleted-shared-task-share (T03/T07 46)",
+      "unknown-leaf",
+      "rewritten-original-assertion",
+      "base-mirror-drift",
+      "orphan-command",
+      "missing-command",
+      "empty-scenario",
+      "incomplete-assertion-coverage",
+      "missing-evidence-paths (缺产物)",
+      "source-drift",
+      "source-tree-restored",
+      "restored-map-valid"
+    ]
+  },
+  "tasks": {
+    "R09-T01": {
+      "status": "IN_PROGRESS",
+      "deliverable": "desktop/src-tauri React host + DesktopHost-Tauri + dev/release configs",
+      "producer": "scripts/rust-tauri/r09_t01.py",
+      "suites": [
+        "r09_t01_react_parity",
+        "r09_t01_release_offline"
+      ]
+    },
+    "R09-T02": {
+      "status": "IN_PROGRESS",
+      "deliverable": "service supervisor + readiness handshake + local/remote mode",
+      "producer": "scripts/rust-tauri/r09_t02.py",
+      "suites": [
+        "r09_t02_supervisor_ready",
+        "r09_t02_process_ownership"
+      ]
+    },
+    "R09-T03": {
+      "status": "PLANNED",
+      "deliverable": "DesktopHost capabilities + host capability matrix",
+      "producer": "scripts/rust-tauri/r09_t03.py",
+      "suites": [
+        "r09_t03_native_matrix",
+        "r09_t03_ipc_negative"
+      ],
+      "leaves": 46
+    },
+    "R09-T04": {
+      "status": "PLANNED",
+      "deliverable": "voice/screen/accessibility permissions + status UI",
+      "producer": "scripts/rust-tauri/r09_t04.py",
+      "suites": [
+        "r09_t04_permission_matrix",
+        "r09_t04_remote_boundary"
+      ],
+      "leaves": 9
+    },
+    "R09-T05": {
+      "status": "IN_PROGRESS",
+      "deliverable": "browser Tauri visible host + independent PDF chain + media/rich text",
+      "producer": "scripts/rust-tauri/r09_t05.py",
+      "suites": [
+        "r09_t05_browser_pdf",
+        "r09_t05_untrusted_preview"
+      ],
+      "leaves": 19
+    },
+    "R09-T06": {
+      "status": "PLANNED",
+      "deliverable": "capability/CSP/custom command closure + release attack surface",
+      "producer": "scripts/rust-tauri/r09_t06.py",
+      "suites": [
+        "r09_t06_capability_matrix",
+        "r09_t06_release_attack_surface"
+      ]
+    },
+    "R09-T07": {
+      "status": "BLOCKED_PARTIAL",
+      "deliverable": "native E2E 4-platform + release smoke",
+      "producer": "scripts/rust-tauri/r09_t07.py",
+      "suites": [
+        "r09_t07_native_e2e",
+        "r09_t07_release_smoke"
+      ],
+      "blockedPlatforms": [
+        "macos-x64",
+        "windows-x64",
+        "linux-x64"
+      ],
+      "availablePlatforms": [
+        "macos-arm64"
+      ]
+    },
+    "R09-T08": {
+      "status": "PLANNED",
+      "deliverable": "R09_REPORT.md + R09_HANDOFF.json + SHELL_PARITY_RESULTS.json",
+      "producer": "scripts/rust-tauri/r09_t08.py",
+      "suites": [
+        "r09_t08_shell_parity",
+        "r09_t08_host_completeness"
+      ]
+    }
+  },
+  "toolchain": {
+    "rust": "1.98.1 via ~/.cargo/bin/rustup run (PATH default Homebrew 1.93.0 does not honor rust-toolchain.toml)",
+    "node": "v24.16.0",
+    "python": "3.14.3",
+    "tauriCrate": "2.12.1",
+    "tauriCli": "pending install @tauri-apps/cli 2.12.4 (pinned)"
+  },
+  "platformAvailability": {
+    "macos-arm64": "AVAILABLE",
+    "macos-x64": "BLOCKED_PLATFORM",
+    "windows-x64": "BLOCKED_PLATFORM",
+    "linux-x64": "BLOCKED_PLATFORM"
+  },
+  "blockers": "docs/rust-tauri/R09/BLOCKED.md",
+  "nextActions": [
+    "R09 收口：交付 READY_FOR_REVIEW + 明确阻塞（R10 不授予）",
+    "R10 前置：DOCX/XLSX 宿主命令与 onboarding 服务路由实现；补齐 T03 manual 3 条与 25 能力运行期证据；三平台真机与正式签名凭据；renderer 确定性与 Chromium 分发决策",
+    "保留最终门回执 artifacts/rust-tauri/R09/verify-r09-final-04 与 R09_HANDOFF/R09_REPORT/SHELL_PARITY_RESULTS/CLOSEOUT_CHECKLIST 一并移交"
+  ],
+  "evidenceRoot": "artifacts/rust-tauri/R09/",
+  "formalGateCommand": "~/.cargo/bin/rustup run 1.98.1 cargo run --manifest-path rust/Cargo.toml -p xtask -- verify-stage R09 --evidence artifacts/rust-tauri/R09/verify-r09-final-05",
+  "designInvestigations": {
+    "T01_T02": {
+      "md": "docs/rust-tauri/R09/T01_T02_HOST_SERVICE_DESIGN.md",
+      "mdSha256": "12c69b7e8c229a8a0799382b674ea5d15b3594d00bdd4d1f0c59d1bc23238c55",
+      "evidence": "docs/rust-tauri/R09/T01_T02_HOST_SERVICE_EVIDENCE.json",
+      "evidenceSha256": "7dda51155a61cde43615f5f3b59a97d1a016b7b310f984492957fdc82f4113ba",
+      "status": "READ_ONLY_DESIGN (582 lines; 28 contracts; A01-A04 evidence plan)"
+    },
+    "T03": {
+      "json": "docs/rust-tauri/R09/T03_HOST_CAPABILITY_INVENTORY.json",
+      "jsonSha256": "42de0bdfa11db5e2435478b5e29d0edcd979b374082f2b146a853acd54c04373",
+      "md": "docs/rust-tauri/R09/T03_HOST_CAPABILITY_INVENTORY.md",
+      "mdSha256": "62bb89dfc21bb6498c2994defb18f6d1092db9f1902cfd3d9d70685f603abefc",
+      "status": "READ_ONLY_INVENTORY (50 capabilities / 110 API members mapped / 91 custom commands / 14 OQs)"
+    },
+    "T05": {
+      "md": "docs/rust-tauri/R09/T05_BROWSER_PDF_DESIGN.md",
+      "mdSha256": "576598d6aa924d1b6aba40f52585997861c27ec935183dbedde8ee1fef635165",
+      "evidence": "docs/rust-tauri/R09/T05_BROWSER_PDF_EVIDENCE.json",
+      "evidenceSha256": "e5f7bd5656afcc31d9a94adb53edf8985d81a725838d700c4cee045105db3028",
+      "status": "READ_ONLY_DESIGN (518 lines; A09/A10 plan; 19-leaf appendix)"
+    },
+    "implementationPlan": "docs/rust-tauri/R09/IMPLEMENTATION_PLAN.md",
+    "implementationPlanSha256": "18d9f38569f5ab2d51b4872b4c7cdb850b62b58b1e698d25d1faa3a05d25a79e"
+  },
+  "serviceSeam": {
+    "originCsp": {
+      "files": [
+        "rust/crates/lingxi-service/src/transport.rs",
+        "rust/crates/lingxi-service/src/preview.rs"
+      ],
+      "allowedOrigins": [
+        "tauri://localhost",
+        "http://tauri.localhost",
+        "https://tauri.localhost"
+      ],
+      "tests": "cargo test -p lingxi-service --lib -- origin_policy_allowlist lan_browser_origin csp_baseline => 3 passed / 0 failed (exit 0)",
+      "candidateStatus": "UNCOMMITTED_WORKSPACE_CHANGE_NOT_YET_IN_FORMAL_GATE",
+      "rationale": "necessary host seam: Tauri webview cannot present loopback http origin; exact match only; malicious scheme/subdomain/port still Forbidden"
+    }
+  },
+  "probes": [
+    {
+      "id": "tauri-bundle-probe-01",
+      "command": "cd desktop/src-tauri && ../../node_modules/.bin/tauri build --debug --bundles app --config /private/tmp/tauri-bundle-probe.conf.json",
+      "exitCode": 0,
+      "result": "Built and bundled .app (32.49 MiB) on macOS 27.0.1 arm64 with CLT 27.0 (no Xcode.app)",
+      "signature": "linker-signed adhoc; codesign -v --strict exit 1 -> release wrapper must set bundle.macOS.signingIdentity='-' and re-verify",
+      "evidence": "artifacts/rust-tauri/R09/probes/tauri-bundle-probe-01/",
+      "resolvesRisk": "R-01"
+    }
+  ],
+  "activeWorkstreams": [
+    {
+      "owner": "r09-host-core",
+      "tasks": [
+        "R09-T01",
+        "R09-T02"
+      ],
+      "writeScope": "desktop/src-tauri/**, DesktopHost-Tauri, tauri configs+wrapper, build.json identity, scripts/rust-tauri/r09_t01.py,r09_t02.py",
+      "status": "RUNNING"
+    },
+    {
+      "owner": "r09-browser",
+      "tasks": [
+        "R09-T05"
+      ],
+      "writeScope": "browser/PDF service + viewer bridge (no lib.rs), r09_t05.py, evidence",
+      "status": "RUNNING"
+    }
+  ],
+  "updatedAt": "2026-10-27T01:3x+0800",
+  "infrastructure": {
+    "capabilityAudit": {
+      "script": "scripts/rust-tauri/r09_capability_audit.py",
+      "scriptSha256": "4ac3ae367e2e89f7c87ff2c329a9f1b27b2f5c47db2b3f784081a0a11caa8200",
+      "purpose": "T06 A11/A12 static half: invoke_handler/build.rs/permissions/capabilities/ACL/release-config consistency + per-window union + dangerous-permission denylist + wdio gating",
+      "currentState": "PENDING_POLICY (44 registered == 44 manifest == 44 permissions; policy file not yet authored, exit 3; not a PASS)",
+      "policyPath": "docs/rust-tauri/R09/R09_COMMAND_POLICY.json"
+    },
+    "gateNegativeProbe": {
+      "script": "scripts/rust-tauri/r09_gate_negative_probe.py",
+      "sha256": "6e51f5808f3da3a06ef9fe41891df50c60f140b0618cba51e224afc893eb9fd4",
+      "cases": 7,
+      "status": "PASS",
+      "evidence": "/private/tmp/r09-gate-negative-01",
+      "covers": [
+        "zero-cases",
+        "failed-case",
+        "ignored-tests-rejected",
+        "cargo-zero-match-rejected",
+        "clean-run-passes",
+        "cases-schema-correct",
+        "tool-restored-after-negatives"
+      ],
+      "producerGuard": "r09_producer.py finish() now fails suites with zero cases (zero-match guard) and adds require_no_skips()"
+    }
+  },
+  "deliveries": {
+    "T05": {
+      "status": "SERVICE_SIDE_EVIDENCE_PASS; LEAF_ASSERTION_CASES_IN_PROGRESS; 4 leaves blocked pending T01/T06",
+      "suites": {
+        "r09_t05_browser_pdf": {
+          "status": "PASS",
+          "exit": 0,
+          "cases": 71,
+          "evidence": "artifacts/rust-tauri/R09/dev/t05/01-a09-browser-pdf-final/"
+        },
+        "r09_t05_untrusted_preview": {
+          "status": "PASS",
+          "exit": 0,
+          "cases": 53,
+          "evidence": "artifacts/rust-tauri/R09/dev/t05/02-a10-preview-final/"
+        }
+      },
+      "keyFacts": [
+        "old-chain S1 regenerated 994832B/74p; R01 frozen probe per-page grid |delta|=0.0; text sha match",
+        "old vs rust compare 35/35 all_pass (74p/140 rows/similarity 0.99910/grid 7.15/3 font families)",
+        "real Chrome browser 10/10, PDF 7/7 serial (parallel PDF_CAPACITY = MAX_LEASES=2 test-config, red log kept)",
+        "A10 origin 3 allowed/6 forged rejected; malicious preview script runs but no Tauri bridge/parent access/no exfiltration canary; frame-ancestors forged ancestor blocked",
+        "keychain prompt automation boundary fixed via --use-mock-keychain for tests only; product launcher default unchanged"
+      ],
+      "blockedLeaves": [
+        "R00-T02-LA-13049521EA0C",
+        "R00-T02-LA-6E13E5DF05EB",
+        "R00-T02-LA-8BD3BCC6D725",
+        "R00-T02-LA-4173A08A51CC"
+      ],
+      "docs": "docs/rust-tauri/R09/T05_PROGRESS.md",
+      "leafBinding": {
+        "bound": 15,
+        "pending": 59,
+        "producer": "r09_t05_browser_pdf",
+        "evidenceFile": "cases.json",
+        "mapping": "docs/rust-tauri/R09/T05_PROGRESS.md §6",
+        "blockedLeaves": [
+          "R00-T02-LA-13049521EA0C",
+          "R00-T02-LA-6E13E5DF05EB",
+          "R00-T02-LA-8BD3BCC6D725",
+          "R00-T02-LA-4173A08A51CC"
+        ],
+        "evidence": "artifacts/rust-tauri/R09/dev/t05/01-a09-per-assertion-final2/",
+        "cases": "36 leaf:* cases PASS (suites PASS 70 cases)"
+      }
+    },
+    "T03_T04": {
+      "status": "MODULES_READY; REGISTRATION_PENDING_HOST_CORE; PRODUCERS_RED_PENDING_REGISTRATION",
+      "files": "desktop/src-tauri/src/native/ (37 files ~12.1k lines) + tauri-host-capabilities.ts + r09_t03.py/r09_t04.py",
+      "verification": {
+        "pureLogicTests": "179/179 PASS (standalone rustc harness)",
+        "tempCrateTauriPlugins": "cargo check 0; 182 tests PASS",
+        "tsc": "exit 0",
+        "suites": {
+          "r09_t03_native_matrix": "exit 2: 64 PASS + 8 blocked",
+          "r09_t03_ipc_negative": "exit 2: 50 PASS + 3 blocked",
+          "r09_t04_permission_matrix": "exit 2: 33 PASS + 7 blocked",
+          "r09_t04_remote_boundary": "exit 2: 20 PASS + 3 blocked"
+        }
+      },
+      "registration": "desktop/src-tauri/src/native/install.rs + docs/rust-tauri/R09/T03_T04_REGISTRATION.md (Cargo deps/lib.rs/build.rs/capabilities/Info.plist; merge order)",
+      "decisions": {
+        "OQ-03": "mac UNUserNotificationCenter delegate implemented; real click focus pending post-registration verification (T03-NOTIFY-02)",
+        "tray-repair": "menu item removed (no equivalent); recorded T03-REPAIR-02 in BLOCKED.md"
+      },
+      "docs": "docs/rust-tauri/R09/T03_T04_PROGRESS.md"
+    },
+    "T01_T02": {
+      "status": "LAUNCH_CHAIN_WORKS; T01 REMAINING BLOCKER = renderer first-render error (DOM parity red); T02 supervisor unit tests green",
+      "launchFacts": [
+        "host-start→resolve→spawn→ready(118ms)→instance→identity(146ms)→service-ready→window-created(358ms)→page-load→app-ready→SIGTERM exit0 no residual",
+        "isolated homes equal (1 service each), real home untouched, electron/tauri service identity parity"
+      ],
+      "producers": [
+        "scripts/rust-tauri/r09_t01.py",
+        "scripts/rust-tauri/r09_t02.py"
+      ],
+      "evidence": "artifacts/rust-tauri/R09/dev/t01/run-06 (17/18 cases PASS; dom-snapshot-parity FAIL)",
+      "diagnosis": "Tauri #react-root only child = bare DIV + bodyTextLength 56 = ErrorBoundary render fallback ('Something went wrong / An unexpected error occurred. / Retry'); first render throws under Tauri",
+      "next": "instrument renderer error capture (debug) → fix root cause → DOM parity green → merge native/ registration"
+    }
+  },
+  "blockersActive": [
+    "BLOCKED-PLATFORM-MACOS-X64",
+    "BLOCKED-PLATFORM-WINDOWS-X64",
+    "BLOCKED-PLATFORM-LINUX-X64",
+    "BLOCKED-SYSTEM-PERMISSIONS",
+    "BLOCKED-SIGNING-IDENTITY",
+    "T03-REPAIR-02",
+    "T03-NOTIFY-02",
+    "ENV-KEYCHAIN-PROMPT"
+  ],
+  "programNotes": {
+    "serviceLibRegression": "706/709 PASS; 3 failures = 'MCP 原始只读目录不可用' env-dependent, unrelated to origin/CSP seam (evidence artifacts/rust-tauri/R09/probes/service-lib-regression-01/)"
+  },
+  "knownBlockers": [
+    "T03 8 blocked+3 manual",
+    "T04 TCC/helper/screenshot/ASR",
+    "T06 21 runtime ACL side-effect blocked",
+    "T07 release file-task PENDING",
+    "T08 25 capability runtime evidence pending",
+    "macos-x64/windows-x64/linux-x64 no machine",
+    "ad-hoc signing only",
+    "real provider credentials missing"
+  ],
+  "independentReview": {
+    "status": "COMPLETED_WITH_FINDINGS",
+    "findingsCount": 14,
+    "high": 3,
+    "medium": 7,
+    "low": 4,
+    "independentReviewPassed": false,
+    "correctionsApplied": true,
+    "note": "findings corrected in docs/evidence; R09 incomplete, no pass"
+  }
+}

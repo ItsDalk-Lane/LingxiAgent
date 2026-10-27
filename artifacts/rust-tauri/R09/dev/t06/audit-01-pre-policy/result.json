@@ -1,0 +1,12 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_capability_audit",
+ "status": "FAIL",
+ "exitCode": 2,
+ "caseCount": 22,
+ "failedCases": [
+  "caps::policy-present",
+  "caps::no-dev-port-in-production-config"
+ ],
+ "audit": "capability-audit.json"
+}

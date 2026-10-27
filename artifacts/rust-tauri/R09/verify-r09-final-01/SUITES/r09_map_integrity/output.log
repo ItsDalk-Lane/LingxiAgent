@@ -1,0 +1,54 @@
+$ /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/xtask check-map R09
+  exit=0
+  check-map R09 OK {"baseScenarios":16,"commands":21,"executedCommands":21,"leafAssertionContracts":15,"r00SupplementalLeaves":74,"specMirrors":16,"stage":"R09","supplementalLeaves":74}
+$ /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/xtask check-map R09 --map /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r09-map-integrity-hrbz0mbv/01-dropped-leaf-rejected.json
+  exit=1
+  error: stage map R09 contract invalid: stage map for R09 drops 1 REQUIRED_SUPPLEMENTAL leaf scenario(s) that the R00 acceptance ledger binds to this stage: ["R00-T02-LA-03A9E92909C6"] — required leaves may not be filtered out of the stage gate (R13-F01)
+[PASS] 删 1 个补充叶 -> exit=1
+$ /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/xtask check-map R09 --map /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r09-map-integrity-hrbz0mbv/02-deleted-task-share-rejected.json
+  exit=1
+  error: stage map R09 contract invalid: stage map for R09 drops 9 REQUIRED_SUPPLEMENTAL leaf scenario(s) that the R00 acceptance ledger binds to this stage: ["R00-T02-LA-38B14B7B34BD", "R00-T02-LA-3FA31D4C3100", "R00-T02-LA-54DC0A05A0DE", "R00-T02-LA-6E8307F57F42", "R00-T02-LA-CA446FE1DB71", "R00-T02-LA-D2575672A18D", "R00-T02-LA-D34F2D718CF3", "R00-T02-LA-EF9EEE38D8F6", "R00-T02-LA-FD5B420182C6"] — required leaves may not be filtered out of the stage gate (R13-F01)
+[PASS] 删整任务份额（R09-T04 全部 9 叶） -> exit=1
+$ /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/xtask check-map R09 --map /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r09-map-integrity-hrbz0mbv/03-deleted-shared-task-share-rejected.json
+  exit=1
+  error: stage map R09 contract invalid: stage map for R09 drops 46 REQUIRED_SUPPLEMENTAL leaf scenario(s) that the R00 acceptance ledger binds to this stage: ["R00-T02-LA-0DEEE4813B0A", "R00-T02-LA-1120B2AA320D", "R00-T02-LA-1329EA46F72C", "R00-T02-LA-15DFB1AED8F2", "R00-T02-LA-15E163FBFBE8", "R00-T02-LA-1629CDD9EA4F", "R00-T02-LA-173C6332527D", "R00-T02-LA-18FE3FDFF9A5", "R00-T02-LA-1C41525D379C", "R00-T02-LA-1D4C7E9C713C", "R00-T02-LA-1E6EDB731186", "R00-T02-LA-322E02C7F2F9", "R00-T02-LA-37E6C3B9A7B8", "R00-T02-LA-394DD07D2968", "R00-T02-LA-429D86C4F952", "R00-T02-LA-57728C0A6D0A", "R00-T02-LA-58822B6B138B", "R00-T02-LA-59987671E5AD", "R00-T02-LA-5D5938D61A00", "R00-T02-LA-6006FD0BF07D", "R00-T02-LA-6774E79F6714", "R00-T02-LA-70B07E378F42", "R00-T02-LA-713E908B7B2F", "R00-T02-LA-8FE26C132D8B", "R00-T02-LA-9350C3E12165", "R00-T02-LA-98B458390B7E", "R00-T02-LA-9C679D21A188", "R00-T02-LA-A14D3027C881", "R00-T02-LA-A2E507EBDEF2", "R00-T02-LA-AC5B6EDA3FBD", "R00-T02-LA-ACA2C4C1158D", "R00-T02-LA-B6A97A19F2CB", "R00-T02-LA-B72A6D3886B7", "R00-T02-LA-BEC2074CC33C", "R00-T02-LA-C5AAF360D10F", "R00-T02-LA-CD873C715D96", "R00-T02-LA-D15E0ADC0608", "R00-T02-LA-D29DE479076C", "R00-T02-LA-DF4B5168ABB5", "R00-T02-LA-E6FB08FBBFAA", "R00-T02-LA-E84F01456B6C", "R00-T02-LA-F5DBF2A80E28", "R00-T02-LA-F6235778F816", "R00-T02-LA-F9786414DD11", "R00-T02-LA-FB5C78308878", "R00-T02-LA-FF1B331F1019"] — required leaves may not be filtered out of the stage gate (R13-F01)
+[PASS] 删共享任务组（T03/T07 46 叶） -> exit=1
+$ /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/xtask check-map R09 --map /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r09-map-integrity-hrbz0mbv/04-unknown-leaf-rejected.json
+  exit=1
+  error: stage map R09 contract invalid: stage map for R09 declares 1 supplemental leaf scenario(s) unknown to the R00 acceptance ledger: ["R00-T02-LA-PROBE-UNKNOWN-000"] — only R00-bound leaves belong in the gate
+[PASS] 编造账外叶 -> exit=1
+$ /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/xtask check-map R09 --map /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r09-map-integrity-hrbz0mbv/05-rewritten-original-assertion-rejected.json
+  exit=1
+  error: stage map R09 contract invalid: supplemental leaf R00-T02-LA-03A9E92909C6 mirrors an R00 record that does not match the ledgers — the stage map may not re-bind or re-grade an R00 obligation (R14-F01): r00Assertions map=["执行“清除内置浏览器站点资料”后核对：清除 Cookie 与站点数据后返回成功，失败时返回错误（已被放宽）", "失败、冲突或拒绝时核对返回的状态与实际副作用一致（已被放宽）"] (2 entries) r00=["执行“清除内置浏览器站点资料”后核对：清除 Cookie 与站点数据后返回成功，失败时返回错误", "失败、冲突或拒绝时核对返回的状态与实际副作用一致"] (2 entries)
+[PASS] 改写叶原断言 -> exit=1
+$ /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/xtask check-map R09 --map /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r09-map-integrity-hrbz0mbv/06-base-mirror-drift-rejected.json
+  exit=1
+  error: stage map R09 contract invalid: base scenario "R09-A01" specMirror drifted from the R00 ledger: then: map="只需启动一次即可" r00="核心页面和服务行为一致，无重写第二套业务组件"
+[PASS] 改写基础场景镜像 -> exit=1
+$ /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/xtask check-map R09 --map /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r09-map-integrity-hrbz0mbv/07-orphan-command-rejected.json
+  exit=1
+  error: stage map R09 contract invalid: stage map for R09 registers 1 command(s) that no scenario/leaf references (an orphan command would never run): ["r09_probe_orphan"]
+[PASS] 孤儿命令（注册不引用） -> exit=1
+$ /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/xtask check-map R09 --map /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r09-map-integrity-hrbz0mbv/08-missing-command-rejected.json
+  exit=2
+  error: invalid stage map for R09: stage map invalid: scenario "R09-A01" references unknown command "r09_inputs_check"
+[PASS] 场景引用未注册命令 -> exit=2
+$ /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/xtask check-map R09 --map /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r09-map-integrity-hrbz0mbv/09-empty-scenario-rejected.json
+  exit=2
+  error: invalid stage map for R09: stage map invalid: scenario "R09-A01" commandRefs must not be empty (a scenario bound to no test is a hole in the map, not a pass)
+[PASS] 空绑定场景 -> exit=2
+$ /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/xtask check-map R09 --map /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r09-map-integrity-hrbz0mbv/10-incomplete-assertion-coverage-rejected.json
+  exit=2
+  error: invalid stage map for R09: stage map invalid: supplemental leaf "R00-T02-LA-03A9E92909C6" original assertion #0 references unpinned case "leaf:R00-T02-LA-03A9E92909C6::a1-clear-site-data-success-and-failure-receipt"
+[FAIL] 逐断言覆盖不完整 -> exit=2
+$ /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/xtask check-map R09 --map /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r09-map-integrity-hrbz0mbv/11-missing-evidence-paths-rejected.json
+  exit=2
+  error: invalid stage map for R09: stage map invalid: command "r09_service_seam_probe" evidencePaths must not be empty (missing evidence must be a hard failure, never a pass)
+[PASS] 命令无产物声明（缺产物） -> exit=2
+$ /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/xtask check-map R09
+  exit=2
+  error: stale xtask binary: source inventory differs; added=["stage_maps/_r09_map_integrity_drift_probe.json"], missing=[]
+$ /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/xtask check-map R09
+  exit=0
+  check-map R09 OK {"baseScenarios":16,"commands":21,"executedCommands":21,"leafAssertionContracts":15,"r00SupplementalLeaves":74,"specMirrors":16,"stage":"R09","supplementalLeaves":74}
+map file sha256=13c10094dcefcc8f0b0844ec27aefc42a47d3a69f963539992276d34bfaefc87 unchanged=True

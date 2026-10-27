@@ -958,3 +958,102 @@ async fn partial_external_configuration_is_rolled_back_and_unconfirmed_rollback_
     assert_eq!(h.port.settings.lock().unwrap().len(), count + 4);
     h.close(true).await;
 }
+
+/// R09-T05 逐断言：1809C8/367052/593534/178C8C——读取偏好与会话投影只读且真实；
+/// 无效输入/未授权显式错误；普通关闭（revoke=false）走真实 Stop 并广播状态、不撤权。
+#[tokio::test]
+async fn preferences_and_session_projection_are_read_only_and_close_without_revoke_is_real() {
+    let h = Harness::boot(None).await;
+    h.session("s").await;
+    h.command("s", "open-for-projection", "new_tab").await;
+    let disk = std::fs::read(h.home.join("user/preferences.json")).unwrap();
+    let settings_before = h.port.settings.lock().unwrap().len();
+    let (status, prefs) = h
+        .request(reqwest::Method::GET, "/lingxi/v1/preferences/browser", None)
+        .await;
+    assert_eq!(status, 200, "{prefs}");
+    assert_eq!(prefs["browser"]["acceptCookies"], false);
+    assert_eq!(prefs["browser"]["agentOpenBehavior"], "new_tab");
+    assert_eq!(
+        h.port.settings.lock().unwrap().len(),
+        settings_before,
+        "读取偏好不得写外部 BrowserManager 设置"
+    );
+    assert_eq!(
+        std::fs::read(h.home.join("user/preferences.json")).unwrap(),
+        disk,
+        "读取偏好不得改磁盘偏好"
+    );
+    let node = h.get("/lingxi/v1/me").await["serverId"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let states = h.get("/lingxi/v1/browser/session-states").await;
+    assert_eq!(states["native:s"]["running"], true);
+    assert_eq!(states["native:s"]["executionNode"], node);
+    assert!(states["native:s"]["url"].is_string());
+    let sessions = h.get("/lingxi/v1/browser/sessions").await;
+    assert!(sessions["native:s"].is_string(), "会话目录保留可恢复网址");
+    // 无效/未授权输入必须显式错误，且不派发外部动作。
+    let calls_before = h.port.commands.lock().unwrap().len();
+    for body in [
+        json!({"sessionPath":"native:missing","requestId":"missing-session","action":"new_tab"}),
+        json!({"sessionPath":"not-a-resolvable-path","requestId":"bad-path","action":"new_tab"}),
+        json!({"requestId":"no-session-path","action":"new_tab"}),
+    ] {
+        let (status, _) = h
+            .request(
+                reqwest::Method::POST,
+                "/lingxi/v1/browser/command",
+                Some(body),
+            )
+            .await;
+        assert!(
+            !(200..300).contains(&status),
+            "无效输入必须显式失败（不呈现成功结果）"
+        );
+    }
+    for path in [
+        "/lingxi/v1/browser/open-session",
+        "/lingxi/v1/browser/close-session",
+    ] {
+        for body in [
+            json!({"sessionPath":"native:missing"}),
+            json!({"sessionPath":"not-a-resolvable-path"}),
+        ] {
+            let (status, _) = h.request(reqwest::Method::POST, path, Some(body)).await;
+            assert!(!(200..300).contains(&status), "{path} 无效输入必须显式失败");
+        }
+    }
+    assert_eq!(
+        h.port.commands.lock().unwrap().len(),
+        calls_before,
+        "无效输入不得派发外部动作"
+    );
+    // 普通关闭（revoke=false）：真实 Stop、状态投影 running=false、不撤权、重放不重复外部动作。
+    let revokes_before = h.port.revokes.lock().unwrap().len();
+    let close_body = json!({"sessionPath":"native:s","requestId":"close-no-revoke"});
+    let closed = h
+        .post("/lingxi/v1/browser/close-session", close_body.clone())
+        .await;
+    assert_eq!(closed["ok"], true, "{closed}");
+    assert_eq!(closed["sessions"]["native:s"]["running"], false);
+    assert_eq!(
+        h.port.revokes.lock().unwrap().len(),
+        revokes_before,
+        "普通关闭不得误记为急停撤权"
+    );
+    {
+        let calls = h.port.commands.lock().unwrap();
+        assert_eq!(calls.last().unwrap().1.action, BrowserAction::Stop);
+    }
+    let external_before_replay = h.port.commands.lock().unwrap().len();
+    let replay = h.post("/lingxi/v1/browser/close-session", close_body).await;
+    assert_eq!(replay["ok"], true);
+    assert_eq!(
+        h.port.commands.lock().unwrap().len(),
+        external_before_replay,
+        "关闭重放只读原收据，不重复派发外部 Stop"
+    );
+    h.close(true).await;
+}

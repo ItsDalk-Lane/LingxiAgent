@@ -1,0 +1,7 @@
+{
+ "csp": "default-src 'none'; base-uri 'self'; form-action 'none'; object-src 'none'; connect-src 'none'; script-src 'unsafe-inline' https:; style-src 'unsafe-inline' https:; font-src https: data:; img-src 'self' https: data: blob:; media-src 'self' https: data: blob:; frame-ancestors 'self' file: http://127.0.0.1:* http://localhost:* tauri: http://tauri.localhost https://tauri.localhost",
+ "frameAncestors": "frame-ancestors 'self' file: http://127.0.0.1:* http://localhost:* tauri: http://tauri.localhost https://tauri.localhost",
+ "previewId": "pv_3faf501ebf3e78438594ab7a1995e3be",
+ "expiresAt": 1793023583562,
+ "previewTokenLength": 43
+}

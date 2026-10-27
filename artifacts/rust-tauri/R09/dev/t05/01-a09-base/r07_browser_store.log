@@ -1,0 +1,11 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.07s
+     Running tests/r07_browser_store.rs (rust/target/debug/deps/r07_browser_store-5ccfed6a9257c897)
+
+running 3 tests
+test downloads_can_confirm_unknown_once_without_overwriting_actual_receipt ... ok
+test emergency_stop_requires_new_actual_user_run_and_old_request_replay_cannot_revoke_again ... ok
+test actual_receipts_deduplicate_reject_changed_input_and_recover_unknown_without_reexecution ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+

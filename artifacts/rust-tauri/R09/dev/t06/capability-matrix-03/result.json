@@ -1,0 +1,144 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t06_capability_matrix",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 3.024,
+ "caseCount": 88,
+ "casesSha256": "4cbc20446b34225c5cda50e71d1d6587252424defe3d55b28f5c3e7f501abd3e",
+ "commands": [
+  {
+   "id": "static::capability-audit",
+   "argv": [
+    "python3",
+    "-B",
+    "scripts/rust-tauri/r09_capability_audit.py",
+    "--evidence",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t06/capability-matrix-03/capability-audit"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.737,
+   "logSha256": "9296e204d2661225276b207af2e3d6b0086d04778c1116848f812357cc7547fa"
+  }
+ ],
+ "logSha256": "9296e204d2661225276b207af2e3d6b0086d04778c1116848f812357cc7547fa",
+ "finishedAtUnixMs": 1793026673322,
+ "failedCases": [
+  "blocked::runtime.browser-viewer.negative-matrix",
+  "blocked::runtime.main.negative-matrix",
+  "blocked::runtime.onboarding.negative-matrix",
+  "blocked::runtime.quick-chat.negative-matrix",
+  "blocked::runtime.settings.negative-matrix",
+  "blocked::runtime.skill-viewer-*.negative-matrix",
+  "blocked::runtime.splash.negative-matrix",
+  "blocked::runtime.viewer-*.negative-matrix",
+  "blocked::runtime.browser-viewer.positive-matrix",
+  "blocked::runtime.main.positive-matrix",
+  "blocked::runtime.onboarding.positive-matrix",
+  "blocked::runtime.quick-chat.positive-matrix",
+  "blocked::runtime.settings.positive-matrix",
+  "blocked::runtime.skill-viewer-*.positive-matrix",
+  "blocked::runtime.splash.positive-matrix",
+  "blocked::runtime.viewer-*.positive-matrix",
+  "blocked::runtime.remote-webview-zero-acl",
+  "blocked::runtime.token-not-in-url-or-dom",
+  "blocked::runtime.csp-blocked-remote-script",
+  "blocked::runtime.canary-command-release-absent",
+  "blocked::runtime.debug-command-release-denied"
+ ],
+ "blockedCases": [
+  {
+   "case": "blocked::runtime.browser-viewer.negative-matrix",
+   "reason": "browser-viewer: 451 条白名单外命令必须全部被 ACL 拒绝"
+  },
+  {
+   "case": "blocked::runtime.main.negative-matrix",
+   "reason": "main: 451 条白名单外命令必须全部被 ACL 拒绝"
+  },
+  {
+   "case": "blocked::runtime.onboarding.negative-matrix",
+   "reason": "onboarding: 451 条白名单外命令必须全部被 ACL 拒绝"
+  },
+  {
+   "case": "blocked::runtime.quick-chat.negative-matrix",
+   "reason": "quick-chat: 451 条白名单外命令必须全部被 ACL 拒绝"
+  },
+  {
+   "case": "blocked::runtime.settings.negative-matrix",
+   "reason": "settings: 451 条白名单外命令必须全部被 ACL 拒绝"
+  },
+  {
+   "case": "blocked::runtime.skill-viewer-*.negative-matrix",
+   "reason": "skill-viewer-*: 451 条白名单外命令必须全部被 ACL 拒绝"
+  },
+  {
+   "case": "blocked::runtime.splash.negative-matrix",
+   "reason": "splash: 451 条白名单外命令必须全部被 ACL 拒绝"
+  },
+  {
+   "case": "blocked::runtime.viewer-*.negative-matrix",
+   "reason": "viewer-*: 451 条白名单外命令必须全部被 ACL 拒绝"
+  },
+  {
+   "case": "blocked::runtime.browser-viewer.positive-matrix",
+   "reason": "browser-viewer: allowedCommands 正路径（真实 renderer 调用 + 驱动互证）"
+  },
+  {
+   "case": "blocked::runtime.main.positive-matrix",
+   "reason": "main: allowedCommands 正路径（真实 renderer 调用 + 驱动互证）"
+  },
+  {
+   "case": "blocked::runtime.onboarding.positive-matrix",
+   "reason": "onboarding: allowedCommands 正路径（真实 renderer 调用 + 驱动互证）"
+  },
+  {
+   "case": "blocked::runtime.quick-chat.positive-matrix",
+   "reason": "quick-chat: allowedCommands 正路径（真实 renderer 调用 + 驱动互证）"
+  },
+  {
+   "case": "blocked::runtime.settings.positive-matrix",
+   "reason": "settings: allowedCommands 正路径（真实 renderer 调用 + 驱动互证）"
+  },
+  {
+   "case": "blocked::runtime.skill-viewer-*.positive-matrix",
+   "reason": "skill-viewer-*: allowedCommands 正路径（真实 renderer 调用 + 驱动互证）"
+  },
+  {
+   "case": "blocked::runtime.splash.positive-matrix",
+   "reason": "splash: allowedCommands 正路径（真实 renderer 调用 + 驱动互证）"
+  },
+  {
+   "case": "blocked::runtime.viewer-*.positive-matrix",
+   "reason": "viewer-*: allowedCommands 正路径（真实 renderer 调用 + 驱动互证）"
+  },
+  {
+   "case": "blocked::runtime.remote-webview-zero-acl",
+   "reason": "远程内容 webview 调用任一自定义命令必须 100% 拒绝（不加入任何 capability）"
+  },
+  {
+   "case": "blocked::runtime.token-not-in-url-or-dom",
+   "reason": "viewer/browser-viewer 拿到的上下文不含服务 token；token 不出现在 URL/query/DOM"
+  },
+  {
+   "case": "blocked::runtime.csp-blocked-remote-script",
+   "reason": "注入远程 <script>/unsafe-eval/外链 frame 的预览页必须被 CSP 阻止（无 violation 放行）"
+  },
+  {
+   "case": "blocked::runtime.canary-command-release-absent",
+   "reason": "e2e canary 命令只在 debug/e2e-test 构建存在；release 调用返回 command not found"
+  },
+  {
+   "case": "blocked::runtime.debug-command-release-denied",
+   "reason": "debug_open_onboarding(_preview) 在 release 任何窗口均不可调用"
+  }
+ ],
+ "blockedCaseCount": 21,
+ "blockedKind": "BLOCKED_GUI_SMOKE",
+ "blockedReason": "运行期逐窗口 invoke 负向/正路径矩阵需要 Tauri GUI + wdio；Lead 明确 cleared 前禁止启动 Tauri app/安装包",
+ "policySha256": "24e260beb6385e3b24d12bc7c1147a2418832707e0ee3694037d9f9a01ff7328",
+ "auditStatus": "PASS",
+ "auditExitCode": 0,
+ "gapRemaining": 0,
+ "runtimeMatrixPlan": "runtime-matrix-plan.json",
+ "note": "静态半边已真实执行；套件因运行期矩阵 blocked 保持 exit 2（门真红）"
+}

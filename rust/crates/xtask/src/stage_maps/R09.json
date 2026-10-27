@@ -1,0 +1,3439 @@
+{
+  "schemaVersion": 1,
+  "stage": "R09",
+  "resultVersion": "lingxi.xtask.verify-stage.v1",
+  "defaultTimeoutSecs": 3600,
+  "commands": {
+    "r09_service_seam_probe": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_service_seam_probe.py",
+        "--evidence",
+        "{EVIDENCE}/SUITES/r09_service_seam_probe"
+      ],
+      "timeoutSecs": 300,
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_service_seam_probe/result.json",
+        "{EVIDENCE}/SUITES/r09_service_seam_probe/output.log"
+      ]
+    },
+    "r09_capability_audit": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_capability_audit.py",
+        "--evidence",
+        "{EVIDENCE}/SUITES/r09_capability_audit"
+      ],
+      "timeoutSecs": 300,
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_capability_audit/result.json",
+        "{EVIDENCE}/SUITES/r09_capability_audit/output.log",
+        "{EVIDENCE}/SUITES/r09_capability_audit/cases.json"
+      ]
+    },
+    "r09_gate_negative": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_gate_negative_probe.py",
+        "--evidence",
+        "{EVIDENCE}/SUITES/r09_gate_negative"
+      ],
+      "timeoutSecs": 300,
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_gate_negative/result.json",
+        "{EVIDENCE}/SUITES/r09_gate_negative/output.log",
+        "{EVIDENCE}/SUITES/r09_gate_negative/gate-negative-cases.json"
+      ]
+    },
+    "r09_map_integrity": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_map_integrity.py",
+        "--evidence",
+        "{EVIDENCE}/SUITES/r09_map_integrity"
+      ],
+      "timeoutSecs": 600,
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_map_integrity/result.json",
+        "{EVIDENCE}/SUITES/r09_map_integrity/output.log",
+        "{EVIDENCE}/SUITES/r09_map_integrity/map-integrity-cases.json"
+      ]
+    },
+    "r09_inputs_check": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_stage_inputs.py",
+        "--check",
+        "--evidence",
+        "{EVIDENCE}/R09_INPUTS"
+      ],
+      "timeoutSecs": 180,
+      "evidencePaths": [
+        "{EVIDENCE}/R09_INPUTS/inputs-check.json"
+      ]
+    },
+    "r09_t01_react_parity": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_suites.py",
+        "--suite",
+        "r09_t01_react_parity",
+        "--evidence",
+        "{EVIDENCE}/SUITES/r09_t01_react_parity"
+      ],
+      "timeoutSecs": 3600,
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t01_react_parity/result.json",
+        "{EVIDENCE}/SUITES/r09_t01_react_parity/output.log"
+      ]
+    },
+    "r09_t01_release_offline": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_suites.py",
+        "--suite",
+        "r09_t01_release_offline",
+        "--evidence",
+        "{EVIDENCE}/SUITES/r09_t01_release_offline"
+      ],
+      "timeoutSecs": 3600,
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t01_release_offline/result.json",
+        "{EVIDENCE}/SUITES/r09_t01_release_offline/output.log"
+      ]
+    },
+    "r09_t02_supervisor_ready": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_suites.py",
+        "--suite",
+        "r09_t02_supervisor_ready",
+        "--evidence",
+        "{EVIDENCE}/SUITES/r09_t02_supervisor_ready"
+      ],
+      "timeoutSecs": 3600,
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t02_supervisor_ready/result.json",
+        "{EVIDENCE}/SUITES/r09_t02_supervisor_ready/output.log"
+      ]
+    },
+    "r09_t02_process_ownership": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_suites.py",
+        "--suite",
+        "r09_t02_process_ownership",
+        "--evidence",
+        "{EVIDENCE}/SUITES/r09_t02_process_ownership"
+      ],
+      "timeoutSecs": 3600,
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t02_process_ownership/result.json",
+        "{EVIDENCE}/SUITES/r09_t02_process_ownership/output.log"
+      ]
+    },
+    "r09_t03_native_matrix": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_suites.py",
+        "--suite",
+        "r09_t03_native_matrix",
+        "--evidence",
+        "{EVIDENCE}/SUITES/r09_t03_native_matrix"
+      ],
+      "timeoutSecs": 3600,
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t03_native_matrix/result.json",
+        "{EVIDENCE}/SUITES/r09_t03_native_matrix/output.log"
+      ]
+    },
+    "r09_t03_ipc_negative": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_suites.py",
+        "--suite",
+        "r09_t03_ipc_negative",
+        "--evidence",
+        "{EVIDENCE}/SUITES/r09_t03_ipc_negative"
+      ],
+      "timeoutSecs": 3600,
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t03_ipc_negative/result.json",
+        "{EVIDENCE}/SUITES/r09_t03_ipc_negative/output.log"
+      ]
+    },
+    "r09_t04_permission_matrix": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_suites.py",
+        "--suite",
+        "r09_t04_permission_matrix",
+        "--evidence",
+        "{EVIDENCE}/SUITES/r09_t04_permission_matrix"
+      ],
+      "timeoutSecs": 3600,
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t04_permission_matrix/result.json",
+        "{EVIDENCE}/SUITES/r09_t04_permission_matrix/output.log"
+      ]
+    },
+    "r09_t04_remote_boundary": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_suites.py",
+        "--suite",
+        "r09_t04_remote_boundary",
+        "--evidence",
+        "{EVIDENCE}/SUITES/r09_t04_remote_boundary"
+      ],
+      "timeoutSecs": 3600,
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t04_remote_boundary/result.json",
+        "{EVIDENCE}/SUITES/r09_t04_remote_boundary/output.log"
+      ]
+    },
+    "r09_t05_browser_pdf": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_suites.py",
+        "--suite",
+        "r09_t05_browser_pdf",
+        "--evidence",
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf"
+      ],
+      "timeoutSecs": 3600,
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/result.json",
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/output.log"
+      ]
+    },
+    "r09_t05_untrusted_preview": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_suites.py",
+        "--suite",
+        "r09_t05_untrusted_preview",
+        "--evidence",
+        "{EVIDENCE}/SUITES/r09_t05_untrusted_preview"
+      ],
+      "timeoutSecs": 3600,
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_untrusted_preview/result.json",
+        "{EVIDENCE}/SUITES/r09_t05_untrusted_preview/output.log"
+      ]
+    },
+    "r09_t06_capability_matrix": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_suites.py",
+        "--suite",
+        "r09_t06_capability_matrix",
+        "--evidence",
+        "{EVIDENCE}/SUITES/r09_t06_capability_matrix"
+      ],
+      "timeoutSecs": 3600,
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t06_capability_matrix/result.json",
+        "{EVIDENCE}/SUITES/r09_t06_capability_matrix/output.log"
+      ]
+    },
+    "r09_t06_release_attack_surface": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_suites.py",
+        "--suite",
+        "r09_t06_release_attack_surface",
+        "--evidence",
+        "{EVIDENCE}/SUITES/r09_t06_release_attack_surface"
+      ],
+      "timeoutSecs": 3600,
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t06_release_attack_surface/result.json",
+        "{EVIDENCE}/SUITES/r09_t06_release_attack_surface/output.log"
+      ]
+    },
+    "r09_t07_native_e2e": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_suites.py",
+        "--suite",
+        "r09_t07_native_e2e",
+        "--evidence",
+        "{EVIDENCE}/SUITES/r09_t07_native_e2e"
+      ],
+      "timeoutSecs": 3600,
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t07_native_e2e/result.json",
+        "{EVIDENCE}/SUITES/r09_t07_native_e2e/output.log"
+      ]
+    },
+    "r09_t07_release_smoke": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_suites.py",
+        "--suite",
+        "r09_t07_release_smoke",
+        "--evidence",
+        "{EVIDENCE}/SUITES/r09_t07_release_smoke"
+      ],
+      "timeoutSecs": 3600,
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t07_release_smoke/result.json",
+        "{EVIDENCE}/SUITES/r09_t07_release_smoke/output.log"
+      ]
+    },
+    "r09_t08_shell_parity": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_suites.py",
+        "--suite",
+        "r09_t08_shell_parity",
+        "--evidence",
+        "{EVIDENCE}/SUITES/r09_t08_shell_parity"
+      ],
+      "timeoutSecs": 3600,
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t08_shell_parity/result.json",
+        "{EVIDENCE}/SUITES/r09_t08_shell_parity/output.log"
+      ]
+    },
+    "r09_t08_host_completeness": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r09_suites.py",
+        "--suite",
+        "r09_t08_host_completeness",
+        "--evidence",
+        "{EVIDENCE}/SUITES/r09_t08_host_completeness"
+      ],
+      "timeoutSecs": 3600,
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t08_host_completeness/result.json",
+        "{EVIDENCE}/SUITES/r09_t08_host_completeness/output.log"
+      ]
+    }
+  },
+  "scenarios": [
+    {
+      "id": "R09-A01",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "r09_inputs_check",
+        "r09_t01_react_parity",
+        "r09_t01_release_offline"
+      ],
+      "specMirror": {
+        "name": "同一React产物可运行",
+        "given": "固定R08 React代码与Rust协议",
+        "when": "分别在Electron与Tauri启动",
+        "then": "核心页面和服务行为一致，无重写第二套业务组件",
+        "evidence": "前端构建与功能对照",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R09-T01"
+        ],
+        "featureIds": [],
+        "ledgerStatus": "NOT_STARTED"
+      },
+      "note": "命令全绿只证明套件通过；逐断言合同缺位时该场景不得判正式完成。"
+    },
+    {
+      "id": "R09-A02",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "r09_t01_react_parity",
+        "r09_t01_release_offline"
+      ],
+      "specMirror": {
+        "name": "生产不依赖开发服务器",
+        "given": "关闭Vite和开发环境",
+        "when": "启动release安装产物",
+        "then": "本地界面可加载，不请求开发端口",
+        "evidence": "网络与启动探针",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R09-T01"
+        ],
+        "featureIds": [],
+        "ledgerStatus": "NOT_STARTED"
+      },
+      "note": "命令全绿只证明套件通过；逐断言合同缺位时该场景不得判正式完成。"
+    },
+    {
+      "id": "R09-A03",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "r09_t02_supervisor_ready",
+        "r09_t02_process_ownership"
+      ],
+      "specMirror": {
+        "name": "错误二进制明确拒绝",
+        "given": "包内Rust服务协议版本不兼容",
+        "when": "启动Tauri",
+        "then": "明确报版本错误，不能启动第二旧服务兜底",
+        "evidence": "启动负向测试",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R09-T02"
+        ],
+        "featureIds": [],
+        "ledgerStatus": "NOT_STARTED"
+      },
+      "note": "命令全绿只证明套件通过；逐断言合同缺位时该场景不得判正式完成。"
+    },
+    {
+      "id": "R09-A04",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "r09_t02_supervisor_ready",
+        "r09_t02_process_ownership"
+      ],
+      "specMirror": {
+        "name": "退出清理只影响自有进程",
+        "given": "本地与远端服务同时存在",
+        "when": "彻底退出本地客户端",
+        "then": "自有树按策略关闭，远端不受影响",
+        "evidence": "进程所有权探针",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R09-T02"
+        ],
+        "featureIds": [],
+        "ledgerStatus": "NOT_STARTED"
+      },
+      "note": "命令全绿只证明套件通过；逐断言合同缺位时该场景不得判正式完成。"
+    },
+    {
+      "id": "R09-A05",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "r09_t03_native_matrix",
+        "r09_t03_ipc_negative"
+      ],
+      "specMirror": {
+        "name": "用户动作真实生效",
+        "given": "安装包运行在目标OS",
+        "when": "依次执行托盘/快捷键/通知/拖放/文件选择",
+        "then": "行为与现役要求一致，非只触发mock回调",
+        "evidence": "系统级录屏和自动测试",
+        "environment": "各目标操作系统",
+        "taskIds": [
+          "R09-T03"
+        ],
+        "featureIds": [
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-APP-RESTART-9350C3",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-AUTO-LAUNCH-A2E507",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-DEBUG-OPEN-ONBOARDING-1C4152",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-DEBUG-OPEN-ONBOARDING-PREVIEW-1E6EDB",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-DETACHED-VIEWER-0DEEE4",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-GET-SPLASH-INFO-AC5B6E",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-GLOBAL-SHORTCUT-5D5938",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-KEEP-AWAKE-B72A6D",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-ONBOARDING-COMPLETE-1120B2",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-EXTERNAL-ACA2C4",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-SETTINGS-57728C",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-SETTINGS-MODAL-B6A97A",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-READ-DOCX-HTML-37E6C3",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-READ-XLSX-HTML-E84F01",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-RELOAD-MAIN-WINDOW-322E02",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-CHANGED-15E163",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-SWITCH-TAB-FF1B33",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SHOW-NOTIFICATION-DF4B51",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-START-DRAG-15DFB1",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-WINDOW-CONTROLS-F97864",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-WINDOW-READINESS-58822B",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-WINDOW-THEME-CHANGED-D29DE4",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-COMMANDS-COMMANDS-1D4C7E",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-PUT-1629CD",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ENV-DEPS-SYSTEM-ENV-DEPS-READ-CD873C",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ENV-DEPS-SYSTEM-ENV-DEPS-REFRESH-173C63",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-APPEARAN-18FE3F",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-APPEARAN-F5DBF2",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-KEYBINDI-394DD0",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-KEYBINDI-98B458",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-LEGACY-G-70B07E",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-NOTIFICA-D15E0A",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-NOTIFICA-E6FB08",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-SETUP-CO-6774E7",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-SIDEBAR--8FE26C",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-SIDEBAR--FB5C78",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-WORKSPAC-599876",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-WORKSPAC-C5AAF3",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SETTINGS-SNAPSHOT-SETTINGS-SNAPS-F62357",
+          "F-D23-UI-UI-SETTINGS-ENVDEPS-713E90",
+          "F-D23-UI-UI-SETTINGS-GENERAL-A14D30",
+          "F-D23-UI-UI-SETTINGS-INTERFACE-1329EA",
+          "F-D23-UI-UI-SETTINGS-KEYBINDINGS-9C679D",
+          "F-D23-UI-UI-SETTINGS-ME-6006FD",
+          "F-D23-UI_BEHAVIOR-UI-BEHAVIOR-FIVE-LANGUAGE-BEC207"
+        ],
+        "ledgerStatus": "NOT_STARTED"
+      },
+      "note": "命令全绿只证明套件通过；逐断言合同缺位时该场景不得判正式完成。"
+    },
+    {
+      "id": "R09-A06",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "r09_t03_native_matrix",
+        "r09_t03_ipc_negative"
+      ],
+      "specMirror": {
+        "name": "不可信参数无法执行任意命令",
+        "given": "IPC收到畸形路径/URL/命令样式参数",
+        "when": "请求宿主操作",
+        "then": "按类型/scope拒绝，不转成任意shell执行",
+        "evidence": "IPC负向测试",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R09-T03"
+        ],
+        "featureIds": [
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-APP-RESTART-9350C3",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-AUTO-LAUNCH-A2E507",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-DEBUG-OPEN-ONBOARDING-1C4152",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-DEBUG-OPEN-ONBOARDING-PREVIEW-1E6EDB",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-DETACHED-VIEWER-0DEEE4",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-GET-SPLASH-INFO-AC5B6E",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-GLOBAL-SHORTCUT-5D5938",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-KEEP-AWAKE-B72A6D",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-ONBOARDING-COMPLETE-1120B2",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-EXTERNAL-ACA2C4",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-SETTINGS-57728C",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-SETTINGS-MODAL-B6A97A",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-READ-DOCX-HTML-37E6C3",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-READ-XLSX-HTML-E84F01",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-RELOAD-MAIN-WINDOW-322E02",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-CHANGED-15E163",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-SWITCH-TAB-FF1B33",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SHOW-NOTIFICATION-DF4B51",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-START-DRAG-15DFB1",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-WINDOW-CONTROLS-F97864",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-WINDOW-READINESS-58822B",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-WINDOW-THEME-CHANGED-D29DE4",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-COMMANDS-COMMANDS-1D4C7E",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-PUT-1629CD",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ENV-DEPS-SYSTEM-ENV-DEPS-READ-CD873C",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ENV-DEPS-SYSTEM-ENV-DEPS-REFRESH-173C63",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-APPEARAN-18FE3F",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-APPEARAN-F5DBF2",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-KEYBINDI-394DD0",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-KEYBINDI-98B458",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-LEGACY-G-70B07E",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-NOTIFICA-D15E0A",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-NOTIFICA-E6FB08",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-SETUP-CO-6774E7",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-SIDEBAR--8FE26C",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-SIDEBAR--FB5C78",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-WORKSPAC-599876",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-WORKSPAC-C5AAF3",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SETTINGS-SNAPSHOT-SETTINGS-SNAPS-F62357",
+          "F-D23-UI-UI-SETTINGS-ENVDEPS-713E90",
+          "F-D23-UI-UI-SETTINGS-GENERAL-A14D30",
+          "F-D23-UI-UI-SETTINGS-INTERFACE-1329EA",
+          "F-D23-UI-UI-SETTINGS-KEYBINDINGS-9C679D",
+          "F-D23-UI-UI-SETTINGS-ME-6006FD",
+          "F-D23-UI_BEHAVIOR-UI-BEHAVIOR-FIVE-LANGUAGE-BEC207"
+        ],
+        "ledgerStatus": "NOT_STARTED"
+      },
+      "note": "命令全绿只证明套件通过；逐断言合同缺位时该场景不得判正式完成。"
+    },
+    {
+      "id": "R09-A07",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "r09_t04_permission_matrix",
+        "r09_t04_remote_boundary"
+      ],
+      "specMirror": {
+        "name": "撤销权限后不继续采集",
+        "given": "录音或屏幕采集中在系统撤销权限",
+        "when": "继续任务",
+        "then": "采集停止并报准确错误，无后台继续录制",
+        "evidence": "系统权限实测",
+        "environment": "真实安装的目标OS",
+        "taskIds": [
+          "R09-T04"
+        ],
+        "featureIds": [
+          "F-D15-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SCREENSHOT-RENDER-54DC0A",
+          "F-D15-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SPEECH-PERMISSION-D34F2D",
+          "F-D15-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-COMPUTER-USE-AP-38B14B",
+          "F-D15-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-COMPUTER-USE-AP-3FA31D",
+          "F-D15-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-COMPUTER-USE-RE-CA446F",
+          "F-D15-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-ASR-TRANSCRIBE-POST-FD5B42",
+          "F-D15-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-COMPUTER-6E8307",
+          "F-D15-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-COMPUTER-EF9EEE",
+          "F-D15-TOOL-TOOL-COMPUTER-D25756"
+        ],
+        "ledgerStatus": "NOT_STARTED"
+      },
+      "note": "命令全绿只证明套件通过；逐断言合同缺位时该场景不得判正式完成。"
+    },
+    {
+      "id": "R09-A08",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "r09_t04_permission_matrix",
+        "r09_t04_remote_boundary"
+      ],
+      "specMirror": {
+        "name": "远端任务不能自动读取本机设备",
+        "given": "桌面连接远端服务且未授权本机采集",
+        "when": "远端请求麦克风/屏幕数据",
+        "then": "拒绝或要求明确本机授权，不能静默获取",
+        "evidence": "远端边界测试",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R09-T04"
+        ],
+        "featureIds": [
+          "F-D15-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SCREENSHOT-RENDER-54DC0A",
+          "F-D15-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SPEECH-PERMISSION-D34F2D",
+          "F-D15-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-COMPUTER-USE-AP-38B14B",
+          "F-D15-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-COMPUTER-USE-AP-3FA31D",
+          "F-D15-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-COMPUTER-USE-RE-CA446F",
+          "F-D15-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-ASR-TRANSCRIBE-POST-FD5B42",
+          "F-D15-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-COMPUTER-6E8307",
+          "F-D15-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-COMPUTER-EF9EEE",
+          "F-D15-TOOL-TOOL-COMPUTER-D25756"
+        ],
+        "ledgerStatus": "NOT_STARTED"
+      },
+      "note": "命令全绿只证明套件通过；逐断言合同缺位时该场景不得判正式完成。"
+    },
+    {
+      "id": "R09-A09",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "r09_t05_browser_pdf",
+        "r09_t05_untrusted_preview"
+      ],
+      "specMirror": {
+        "name": "移除Electron后能力仍工作",
+        "given": "测试安装未包含Electron",
+        "when": "执行浏览器用户接管及Office PDF输出",
+        "then": "功能可用且产物达标，不暗中调用旧安装",
+        "evidence": "无Electron进程与文件探针",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R09-T05"
+        ],
+        "featureIds": [
+          "F-D09-UI_BEHAVIOR-UI-BEHAVIOR-FILE-PREVIEW-4173A0",
+          "F-D14-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-BROWSER-EMERGENCY-STOP-A09B78",
+          "F-D14-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-BROWSER-NAVIGATION-8A45B1",
+          "F-D14-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-BROWSER-TABS-A67D34",
+          "F-D14-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-CLOSE-BROWSER-VIEWER-130495",
+          "F-D14-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-BROWSER-VIEWER-6E13E5",
+          "F-D14-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-BROWSER-CLEAR-C-03A9E9",
+          "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-SEARCH-VERIFY-POST-7D212C",
+          "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-BROWSER--1809C8",
+          "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-BROWSER--ED5FD5",
+          "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-BROWSER-CLOSE-SESSION-C-178C8C",
+          "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-BROWSER-CLOSE-SESSION-R-F1A559",
+          "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-BROWSER-OPEN-SESSION-DCD85A",
+          "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-BROWSER-SESSION-STATES-367052",
+          "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-BROWSER-SESSIONS-593534",
+          "F-D14-TOOL-TOOL-BROWSER-A30E4B",
+          "F-D14-TOOL-TOOL-WEB-FETCH-FD7A5A",
+          "F-D14-TOOL-TOOL-WEB-SEARCH-D1B56A",
+          "F-D14-UI-UI-SETTINGS-BROWSER-8BD3BC"
+        ],
+        "ledgerStatus": "NOT_STARTED"
+      },
+      "note": "命令全绿只证明套件通过；逐断言合同缺位时该场景不得判正式完成。"
+    },
+    {
+      "id": "R09-A10",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "r09_t05_browser_pdf",
+        "r09_t05_untrusted_preview",
+        "r09_service_seam_probe"
+      ],
+      "specMirror": {
+        "name": "恶意预览内容无宿主权限",
+        "given": "SVG/HTML预览含脚本与IPC尝试",
+        "when": "在预览区打开",
+        "then": "不能获得token或原生命令权限；正常预览保留",
+        "evidence": "不可信内容安全测试",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R09-T05"
+        ],
+        "featureIds": [
+          "F-D09-UI_BEHAVIOR-UI-BEHAVIOR-FILE-PREVIEW-4173A0",
+          "F-D14-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-BROWSER-EMERGENCY-STOP-A09B78",
+          "F-D14-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-BROWSER-NAVIGATION-8A45B1",
+          "F-D14-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-BROWSER-TABS-A67D34",
+          "F-D14-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-CLOSE-BROWSER-VIEWER-130495",
+          "F-D14-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-BROWSER-VIEWER-6E13E5",
+          "F-D14-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-BROWSER-CLEAR-C-03A9E9",
+          "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-SEARCH-VERIFY-POST-7D212C",
+          "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-BROWSER--1809C8",
+          "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-BROWSER--ED5FD5",
+          "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-BROWSER-CLOSE-SESSION-C-178C8C",
+          "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-BROWSER-CLOSE-SESSION-R-F1A559",
+          "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-BROWSER-OPEN-SESSION-DCD85A",
+          "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-BROWSER-SESSION-STATES-367052",
+          "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-BROWSER-SESSIONS-593534",
+          "F-D14-TOOL-TOOL-BROWSER-A30E4B",
+          "F-D14-TOOL-TOOL-WEB-FETCH-FD7A5A",
+          "F-D14-TOOL-TOOL-WEB-SEARCH-D1B56A",
+          "F-D14-UI-UI-SETTINGS-BROWSER-8BD3BC"
+        ],
+        "ledgerStatus": "NOT_STARTED"
+      },
+      "note": "命令全绿只证明套件通过；逐断言合同缺位时该场景不得判正式完成。"
+    },
+    {
+      "id": "R09-A11",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "r09_t06_capability_matrix",
+        "r09_t06_release_attack_surface",
+        "r09_capability_audit"
+      ],
+      "specMirror": {
+        "name": "capability叠加不意外扩权",
+        "given": "同webview被多个capability命中",
+        "when": "请求敏感命令集合",
+        "then": "最终权限与白名单完全一致，越权集合为空",
+        "evidence": "配置展开与运行负向测试",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R09-T06"
+        ],
+        "featureIds": [],
+        "ledgerStatus": "NOT_STARTED"
+      },
+      "note": "命令全绿只证明套件通过；逐断言合同缺位时该场景不得判正式完成。"
+    },
+    {
+      "id": "R09-A12",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "r09_t06_capability_matrix",
+        "r09_t06_release_attack_surface"
+      ],
+      "specMirror": {
+        "name": "生产无测试控制面",
+        "given": "release包已安装",
+        "when": "扫描监听端口并调用测试命令",
+        "then": "测试WebDriver/任意Rust执行接口不可达",
+        "evidence": "产物级负向探针",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R09-T06"
+        ],
+        "featureIds": [],
+        "ledgerStatus": "NOT_STARTED"
+      },
+      "note": "命令全绿只证明套件通过；逐断言合同缺位时该场景不得判正式完成。"
+    },
+    {
+      "id": "R09-A13",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "r09_t07_native_e2e",
+        "r09_t07_release_smoke"
+      ],
+      "specMirror": {
+        "name": "中文输入和卡片交互可用",
+        "given": "真实Tauri应用加载长会话",
+        "when": "中文IME输入、选择引用、展开工具卡并切换窗口",
+        "then": "内容不丢、焦点正确、卡片可展开、无异常滚动",
+        "evidence": "原生E2E与必要手工视频",
+        "environment": "四组目标平台/架构",
+        "taskIds": [
+          "R09-T07"
+        ],
+        "featureIds": [
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-APP-RESTART-9350C3",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-AUTO-LAUNCH-A2E507",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-DEBUG-OPEN-ONBOARDING-1C4152",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-DEBUG-OPEN-ONBOARDING-PREVIEW-1E6EDB",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-DETACHED-VIEWER-0DEEE4",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-GET-SPLASH-INFO-AC5B6E",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-GLOBAL-SHORTCUT-5D5938",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-KEEP-AWAKE-B72A6D",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-ONBOARDING-COMPLETE-1120B2",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-EXTERNAL-ACA2C4",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-SETTINGS-57728C",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-SETTINGS-MODAL-B6A97A",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-READ-DOCX-HTML-37E6C3",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-READ-XLSX-HTML-E84F01",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-RELOAD-MAIN-WINDOW-322E02",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-CHANGED-15E163",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-SWITCH-TAB-FF1B33",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SHOW-NOTIFICATION-DF4B51",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-START-DRAG-15DFB1",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-WINDOW-CONTROLS-F97864",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-WINDOW-READINESS-58822B",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-WINDOW-THEME-CHANGED-D29DE4",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-COMMANDS-COMMANDS-1D4C7E",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-PUT-1629CD",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ENV-DEPS-SYSTEM-ENV-DEPS-READ-CD873C",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ENV-DEPS-SYSTEM-ENV-DEPS-REFRESH-173C63",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-APPEARAN-18FE3F",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-APPEARAN-F5DBF2",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-KEYBINDI-394DD0",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-KEYBINDI-98B458",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-LEGACY-G-70B07E",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-NOTIFICA-D15E0A",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-NOTIFICA-E6FB08",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-SETUP-CO-6774E7",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-SIDEBAR--8FE26C",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-SIDEBAR--FB5C78",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-WORKSPAC-599876",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-WORKSPAC-C5AAF3",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SETTINGS-SNAPSHOT-SETTINGS-SNAPS-F62357",
+          "F-D23-UI-UI-SETTINGS-ENVDEPS-713E90",
+          "F-D23-UI-UI-SETTINGS-GENERAL-A14D30",
+          "F-D23-UI-UI-SETTINGS-INTERFACE-1329EA",
+          "F-D23-UI-UI-SETTINGS-KEYBINDINGS-9C679D",
+          "F-D23-UI-UI-SETTINGS-ME-6006FD",
+          "F-D23-UI_BEHAVIOR-UI-BEHAVIOR-FIVE-LANGUAGE-BEC207"
+        ],
+        "ledgerStatus": "NOT_STARTED"
+      },
+      "note": "命令全绿只证明套件通过；逐断言合同缺位时该场景不得判正式完成。"
+    },
+    {
+      "id": "R09-A14",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "r09_t07_native_e2e",
+        "r09_t07_release_smoke"
+      ],
+      "specMirror": {
+        "name": "测试版通过仍需release验证",
+        "given": "测试构建native E2E已通过",
+        "when": "安装不含测试插件的release包",
+        "then": "启动/连接/文件任务可用，权限一致",
+        "evidence": "release冒烟记录",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R09-T07"
+        ],
+        "featureIds": [
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-APP-RESTART-9350C3",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-AUTO-LAUNCH-A2E507",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-DEBUG-OPEN-ONBOARDING-1C4152",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-DEBUG-OPEN-ONBOARDING-PREVIEW-1E6EDB",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-DETACHED-VIEWER-0DEEE4",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-GET-SPLASH-INFO-AC5B6E",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-GLOBAL-SHORTCUT-5D5938",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-KEEP-AWAKE-B72A6D",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-ONBOARDING-COMPLETE-1120B2",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-EXTERNAL-ACA2C4",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-SETTINGS-57728C",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-SETTINGS-MODAL-B6A97A",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-READ-DOCX-HTML-37E6C3",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-READ-XLSX-HTML-E84F01",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-RELOAD-MAIN-WINDOW-322E02",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-CHANGED-15E163",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-SWITCH-TAB-FF1B33",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SHOW-NOTIFICATION-DF4B51",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-START-DRAG-15DFB1",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-WINDOW-CONTROLS-F97864",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-WINDOW-READINESS-58822B",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-WINDOW-THEME-CHANGED-D29DE4",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-COMMANDS-COMMANDS-1D4C7E",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-PUT-1629CD",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ENV-DEPS-SYSTEM-ENV-DEPS-READ-CD873C",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ENV-DEPS-SYSTEM-ENV-DEPS-REFRESH-173C63",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-APPEARAN-18FE3F",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-APPEARAN-F5DBF2",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-KEYBINDI-394DD0",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-KEYBINDI-98B458",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-LEGACY-G-70B07E",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-NOTIFICA-D15E0A",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-NOTIFICA-E6FB08",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-SETUP-CO-6774E7",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-SIDEBAR--8FE26C",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-SIDEBAR--FB5C78",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-WORKSPAC-599876",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-WORKSPAC-C5AAF3",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SETTINGS-SNAPSHOT-SETTINGS-SNAPS-F62357",
+          "F-D23-UI-UI-SETTINGS-ENVDEPS-713E90",
+          "F-D23-UI-UI-SETTINGS-GENERAL-A14D30",
+          "F-D23-UI-UI-SETTINGS-INTERFACE-1329EA",
+          "F-D23-UI-UI-SETTINGS-KEYBINDINGS-9C679D",
+          "F-D23-UI-UI-SETTINGS-ME-6006FD",
+          "F-D23-UI_BEHAVIOR-UI-BEHAVIOR-FIVE-LANGUAGE-BEC207"
+        ],
+        "ledgerStatus": "NOT_STARTED"
+      },
+      "note": "命令全绿只证明套件通过；逐断言合同缺位时该场景不得判正式完成。"
+    },
+    {
+      "id": "R09-A15",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "r09_t08_shell_parity",
+        "r09_t08_host_completeness",
+        "r09_map_integrity",
+        "r09_gate_negative"
+      ],
+      "specMirror": {
+        "name": "同内核同前端对照成立",
+        "given": "对照双方hash已固定",
+        "when": "运行宿主功能回归",
+        "then": "差异只来自宿主，未混入模型或数据变更",
+        "evidence": "构建摘要与A/B结果",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R09-T08"
+        ],
+        "featureIds": [],
+        "ledgerStatus": "NOT_STARTED"
+      },
+      "note": "命令全绿只证明套件通过；逐断言合同缺位时该场景不得判正式完成。",
+      "assertionContract": {
+        "producerCommand": "r09_map_integrity",
+        "evidencePath": "{EVIDENCE}/SUITES/r09_map_integrity/map-integrity-cases.json",
+        "cases": [
+          {
+            "case": "map::contract-valid",
+            "expect": 1
+          },
+          {
+            "case": "map::base-scenario-set-16-equal-r00",
+            "expect": 1
+          },
+          {
+            "case": "map::deduped-leaf-coverage-74-equal-r00",
+            "expect": 1
+          },
+          {
+            "case": "map::original-assertions-168-verbatim",
+            "expect": 1
+          },
+          {
+            "case": "map::task-share-counts",
+            "expect": 1
+          },
+          {
+            "case": "map::dropped-leaf-rejected",
+            "expect": 1
+          },
+          {
+            "case": "map::deleted-task-share-rejected",
+            "expect": 1
+          },
+          {
+            "case": "map::deleted-shared-task-share-rejected",
+            "expect": 1
+          },
+          {
+            "case": "map::unknown-leaf-rejected",
+            "expect": 1
+          },
+          {
+            "case": "map::rewritten-original-assertion-rejected",
+            "expect": 1
+          },
+          {
+            "case": "map::base-mirror-drift-rejected",
+            "expect": 1
+          },
+          {
+            "case": "map::orphan-command-rejected",
+            "expect": 1
+          },
+          {
+            "case": "map::missing-command-rejected",
+            "expect": 1
+          },
+          {
+            "case": "map::empty-scenario-rejected",
+            "expect": 1
+          },
+          {
+            "case": "map::incomplete-assertion-coverage-rejected",
+            "expect": 1
+          },
+          {
+            "case": "map::missing-evidence-paths-rejected",
+            "expect": 1
+          },
+          {
+            "case": "map::source-drift-rejected",
+            "expect": 1
+          },
+          {
+            "case": "map::source-tree-restored",
+            "expect": 1
+          },
+          {
+            "case": "map::restored-map-valid",
+            "expect": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "R09-A16",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "r09_t08_shell_parity",
+        "r09_t08_host_completeness"
+      ],
+      "specMirror": {
+        "name": "宿主功能无占位",
+        "given": "遍历R00所有原生动作入口",
+        "when": "检查实际调用与结果",
+        "then": "每项真实可执行；未实现项会阻断而非隐藏",
+        "evidence": "宿主矩阵与追踪",
+        "environment": "本机隔离环境；外部协议使用确定性替身",
+        "taskIds": [
+          "R09-T08"
+        ],
+        "featureIds": [],
+        "ledgerStatus": "NOT_STARTED"
+      },
+      "note": "命令全绿只证明套件通过；逐断言合同缺位时该场景不得判正式完成。"
+    }
+  ],
+  "supplementalLeafScenarios": [
+    {
+      "id": "R00-T02-LA-03A9E92909C6",
+      "featureId": "F-D14-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-BROWSER-CLEAR-C-03A9E9",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "full_original_behavior",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R01-T04",
+        "R07-T04",
+        "R09-T05"
+      ],
+      "r00ExecutionStageIds": [
+        "R01",
+        "R07",
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "清除 Cookie 与站点数据后返回成功，失败时返回错误",
+      "r00Assertions": [
+        "执行“清除内置浏览器站点资料”后核对：清除 Cookie 与站点数据后返回成功，失败时返回错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径 + 负路径/失败分支真实观察），机器核对案例文件。",
+      "assertionContract": {
+        "producerCommand": "r09_t05_browser_pdf",
+        "evidencePath": "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json",
+        "cases": [
+          {
+            "case": "leaf:R00-T02-LA-03A9E92909C6::a1-clear-site-data-success-and-failure-receipt",
+            "expect": 1
+          },
+          {
+            "case": "leaf:R00-T02-LA-03A9E92909C6::a2-clear-state-matches-actual-side-effect",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf:R00-T02-LA-03A9E92909C6::a1-clear-site-data-success-and-failure-receipt"
+        ],
+        [
+          "leaf:R00-T02-LA-03A9E92909C6::a2-clear-state-matches-actual-side-effect"
+        ]
+      ]
+    },
+    {
+      "id": "R00-T02-LA-0DEEE4813B0A",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-DETACHED-VIEWER-0DEEE4",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "新 BrowserWindow 按窗口 ID 拉取文件载荷并显示，关闭后清除 pinned 状态",
+      "r00Assertions": [
+        "新 BrowserWindow 按窗口 ID 拉取文件载荷并显示，关闭后清除 pinned 状态",
+        "载荷缺失或来源窗口关闭时返回空；派生窗不回写主预览文件"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-1120B2AA320D",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-ONBOARDING-COMPLETE-1120B2",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "server PreferencesManager 持久化后打开主窗口并注册快捷键",
+      "r00Assertions": [
+        "server PreferencesManager 持久化后打开主窗口并注册快捷键",
+        "保存失败不得提前进入主界面"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-13049521EA0C",
+      "featureId": "F-D14-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-CLOSE-BROWSER-VIEWER-130495",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R01-T04",
+        "R07-T04",
+        "R09-T05"
+      ],
+      "r00ExecutionStageIds": [
+        "R01",
+        "R07",
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "viewer 窗口关闭；会话浏览器清理应按已有会话策略另验",
+      "r00Assertions": [
+        "viewer 窗口关闭；会话浏览器清理应按已有会话策略另验",
+        "关闭窗口不能误记为急停撤权"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-1329EA46F72C",
+      "featureId": "F-D23-UI-UI-SETTINGS-INTERFACE-1329EA",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+      "r00Assertions": [
+        "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+        "打开页从浏览器状态读取外观，并读取侧栏及工作区回退配置：成功核对 主题/字体/纸纹/落叶先从浏览器本地外观状态显示，本页挂载不 GET /api/preferences/appearance；侧栏和工作区回退分别 GET 并展示。；空态/未初始化核对 数据未就绪时控件禁用或保持占位；错误/无权限核对 读取失败不伪装默认值",
+        "主题、字体卡、纸纹与落叶外观选择：成功核对 主题、字体、纸纹和落叶通过 appearance 偏好与本地外观状态更新；对应变更向桌面壳广播 settings-changed；这些外观按钮不调用 autoSaveConfig，也不触发助手 config GET。；空态/未初始化核对 无适用空态；错误/无权限核对 外观同步保存失败仅 console.warn，不自动回滚当前外观，也无错误 toast；IPC 通知失败不能冒充目标设置已同步。",
+        "聊天布局、阅读宽度/字号滑杆、紧凑模式及行距等编辑器排版：成功核对 每项排版独立保存、界面即时变化；聊天布局和编辑器排版先广播，保存失败时再广播回滚，桌面壳据事件更新对应状态。；经 autoSaveConfig 的保存成功后立即重读助手 config 快照。；editor 与 chat 控件各发独立 PUT：editor 写全局 preferences，chat 写该助手 config.yaml；两者成功后各由 helper GET 合成视图。；空态/未初始化核对 配置缺失使用显式默认；错误/无权限核对 保存失败恢复旧值；通知失败或保存失败不能冒充目标配置已完成。；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；editor 或 chat 各自 PUT 成功但后续 GET 失败时仍可能显示保存失败；分别读回全局 preferences 与该助手 config.yaml 判定实际写入，不能把两个独立请求当成原子操作。",
+        "硬件加速与工作区文件回退开关：成功核对 下次启动/会话工作区策略更新；硬件加速改变广播 settings-changed，桌面壳据事件更新对应状态。；经 autoSaveConfig 的保存成功后立即重读助手 config 快照。；硬件加速分支经每助手接口落到全局 preferences；工作区文件回退走单独接口。；该字段经每助手接口分流到全局 preferences。；空态/未初始化核对 不支持系统应显示边界；错误/无权限核对 失败恢复旧状态；通知失败或保存失败不能冒充目标配置已完成。；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。",
+        "侧栏单行模式：成功核对 侧栏行高模式生效并跨窗口同步；侧栏模式保存后广播 settings-changed，桌面壳据事件更新对应状态。；空态/未初始化核对 无适用空态；错误/无权限核对 PUT 失败恢复旧值，toast；通知失败或保存失败不能冒充目标配置已完成。",
+        "语言和时区选择：成功核对 语言即时切换且时区保存；经 autoSaveConfig 的保存成功后立即重读助手 config 快照。；该字段经每助手接口分流到全局 preferences。；空态/未初始化核对 无效 locale 回退已支持语言；错误/无权限核对 语言 autoSaveConfig 返回 false 时仍可调用 i18n.load 并显示成功 toast，可能与失败提示同现；时区保存失败由 helper 显示错误 toast。；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；该控件请求每助手 config 接口，但所涉字段由服务端归入全局 preferences；PUT 成功但后续 config GET 失败时可能显示保存失败，实际写入可能已生效。"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-15DFB1AED8F2",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-START-DRAG-15DFB1",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "Electron 原生拖拽携带单个或多个路径",
+      "r00Assertions": [
+        "Electron 原生拖拽携带单个或多个路径",
+        "不存在路径或目标拒收时不应声称文件已移动"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-15E163FBFBE8",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-CHANGED-15E163",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "主窗、设置窗、浏览器查看器收到同类变更并刷新相关显示",
+      "r00Assertions": [
+        "主窗、设置窗、浏览器查看器收到同类变更并刷新相关显示",
+        "广播事件不表示底层保存成功；消失窗口不能阻断其他窗口"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-1629CDD9EA4F",
+      "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-PUT-1629CD",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "写 user.md 并重建 system prompt",
+      "r00Assertions": [
+        "成功时核对：写 user.md 并重建 system prompt",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-173C6332527D",
+      "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ENV-DEPS-SYSTEM-ENV-DEPS-REFRESH-173C63",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "强制重探并返回新报告",
+      "r00Assertions": [
+        "成功时核对：强制重探并返回新报告",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-178C8CBA29C2",
+      "featureId": "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-BROWSER-CLOSE-SESSION-C-178C8C",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "full_original_behavior",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R01-T04",
+        "R07-T04",
+        "R09-T05"
+      ],
+      "r00ExecutionStageIds": [
+        "R01",
+        "R07",
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "会话浏览器关闭并广播状态",
+      "r00Assertions": [
+        "给定目标与相应权限，执行“关闭会话浏览器”后核对：会话浏览器关闭并广播状态",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径 + 负路径/失败分支真实观察），机器核对案例文件。",
+      "assertionContract": {
+        "producerCommand": "r09_t05_browser_pdf",
+        "evidencePath": "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json",
+        "cases": [
+          {
+            "case": "leaf:R00-T02-LA-178C8CBA29C2::a1-close-session-real-stop-and-state-broadcast",
+            "expect": 1
+          },
+          {
+            "case": "leaf:R00-T02-LA-178C8CBA29C2::a2-close-invalid-unauthorized-downstream-explicit",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf:R00-T02-LA-178C8CBA29C2::a1-close-session-real-stop-and-state-broadcast"
+        ],
+        [
+          "leaf:R00-T02-LA-178C8CBA29C2::a2-close-invalid-unauthorized-downstream-explicit"
+        ]
+      ]
+    },
+    {
+      "id": "R00-T02-LA-1809C8E13EA3",
+      "featureId": "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-BROWSER--1809C8",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "full_original_behavior",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R01-T04",
+        "R07-T04",
+        "R09-T05"
+      ],
+      "r00ExecutionStageIds": [
+        "R01",
+        "R07",
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回浏览器设置及运行中 BrowserManager 状态，不改动设置",
+      "r00Assertions": [
+        "成功：执行“读取浏览器偏好”后，返回浏览器设置及运行中 BrowserManager 状态，不改动设置",
+        "拒绝/边界：engine.getBrowserPreferences/setBrowserPreferences；PUT 后调用 applyBrowserPreferences；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径 + 负路径/失败分支真实观察），机器核对案例文件。",
+      "assertionContract": {
+        "producerCommand": "r09_t05_browser_pdf",
+        "evidencePath": "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json",
+        "cases": [
+          {
+            "case": "leaf:R00-T02-LA-1809C8E13EA3::a1-read-prefs-and-running-state-no-write",
+            "expect": 1
+          },
+          {
+            "case": "leaf:R00-T02-LA-1809C8E13EA3::a2-put-apply-no-widened-write-or-disclosure",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf:R00-T02-LA-1809C8E13EA3::a1-read-prefs-and-running-state-no-write"
+        ],
+        [
+          "leaf:R00-T02-LA-1809C8E13EA3::a2-put-apply-no-widened-write-or-disclosure"
+        ]
+      ]
+    },
+    {
+      "id": "R00-T02-LA-18FE3FDFF9A5",
+      "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-APPEARAN-18FE3F",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回主题/字体等外观状态，不改动设置",
+      "r00Assertions": [
+        "成功：执行“读取外观偏好”后，返回主题/字体等外观状态，不改动设置",
+        "拒绝/边界：engine.getAppearance/setAppearance；PUT 接受 appearance 包裹或扁平 patch，发外观事件；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-1C41525D379C",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-DEBUG-OPEN-ONBOARDING-1C4152",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "仅打开或聚焦引导窗口",
+      "r00Assertions": [
+        "仅打开或聚焦引导窗口",
+        "不代表完成引导或写用户配置"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-1D4C7E9C713C",
+      "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-COMMANDS-COMMANDS-1D4C7E",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "从 registry 返回名称、别名、说明、权限、作用域和来源；未就绪返回 503",
+      "r00Assertions": [
+        "给定目标与相应权限，执行“查看可用斜杠命令”后核对：从 registry 返回名称、别名、说明、权限、作用域和来源；未就绪返回 503",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-1E6EDB731186",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-DEBUG-OPEN-ONBOARDING-PREVIEW-1E6EDB",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "预览窗显示引导步骤",
+      "r00Assertions": [
+        "预览窗显示引导步骤",
+        "preview 模式不调 API、不写配置，不能算首次使用完成"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-322E02C7F2F9",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-RELOAD-MAIN-WINDOW-322E02",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "主窗/设置窗/viewer 从激活目录重载",
+      "r00Assertions": [
+        "主窗/设置窗/viewer 从激活目录重载",
+        "仅内部刷新，不能代表更新验签/应用成功"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-367052089D11",
+      "featureId": "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-BROWSER-SESSION-STATES-367052",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "full_original_behavior",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R01-T04",
+        "R07-T04",
+        "R09-T05"
+      ],
+      "r00ExecutionStageIds": [
+        "R01",
+        "R07",
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回活跃、可恢复或不可用状态",
+      "r00Assertions": [
+        "给定目标与相应权限，执行“查看浏览器会话状态”后核对：返回活跃、可恢复或不可用状态",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径 + 负路径/失败分支真实观察），机器核对案例文件。",
+      "assertionContract": {
+        "producerCommand": "r09_t05_browser_pdf",
+        "evidencePath": "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json",
+        "cases": [
+          {
+            "case": "leaf:R00-T02-LA-367052089D11::a1-states-running-resumable-unavailable-projection",
+            "expect": 1
+          },
+          {
+            "case": "leaf:R00-T02-LA-367052089D11::a2-states-invalid-unauthorized-downstream-explicit",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf:R00-T02-LA-367052089D11::a1-states-running-resumable-unavailable-projection"
+        ],
+        [
+          "leaf:R00-T02-LA-367052089D11::a2-states-invalid-unauthorized-downstream-explicit"
+        ]
+      ]
+    },
+    {
+      "id": "R00-T02-LA-37E6C3B9A7B8",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-READ-DOCX-HTML-37E6C3",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "DOCX 转 HTML 后在预览中显示",
+      "r00Assertions": [
+        "DOCX 转 HTML 后在预览中显示",
+        "仅绝对普通文件且 <=20MB；解析失败返回 null/信息卡"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-38B14B7B34BD",
+      "featureId": "F-D15-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-COMPUTER-USE-AP-38B14B",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T04"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "更新应用批准设置并发送设置变更事件；不支持的平台返回明确错误",
+      "r00Assertions": [
+        "执行“撤销电脑操作应用批准”后核对：更新应用批准设置并发送设置变更事件；不支持的平台返回明确错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-394DD07D2968",
+      "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-KEYBINDI-394DD0",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "保存快捷键映射并返回新状态",
+      "r00Assertions": [
+        "成功：执行“更新快捷键偏好”后，保存快捷键映射并返回新状态",
+        "拒绝/边界：engine.getKeybindings/setKeybindings；PUT 接受 keybindings 包裹或扁平 patch；无效 body/平台拒绝；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-3FA31D4C3100",
+      "featureId": "F-D15-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-COMPUTER-USE-AP-3FA31D",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T04"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "更新应用批准设置并发送设置变更事件；不支持的平台返回明确错误",
+      "r00Assertions": [
+        "执行“批准电脑操作应用”后核对：更新应用批准设置并发送设置变更事件；不支持的平台返回明确错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-4173A08A51CC",
+      "featureId": "F-D09-UI_BEHAVIOR-UI-BEHAVIOR-FILE-PREVIEW-4173A0",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R04-T04",
+        "R06-T05",
+        "R09-T05"
+      ],
+      "r00ExecutionStageIds": [
+        "R04",
+        "R06",
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "文本/Markdown/Office 等显示相应预览；资源改变事件后重读；可派生只读窗口",
+      "r00Assertions": [
+        "文本/Markdown/Office 等显示相应预览；资源改变事件后重读；可派生只读窗口",
+        "二进制/过大文件显示信息卡；读取失败错误；独立 viewer 不回写主编辑状态"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-429D86C4F952",
+      "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回共享 user.md 内容",
+      "r00Assertions": [
+        "成功时核对：返回共享 user.md 内容",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-54DC0A05A0DE",
+      "featureId": "F-D15-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SCREENSHOT-RENDER-54DC0A",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T04"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "preview 返回 base64 不写盘；保存模式产生 PNG 文件与路径",
+      "r00Assertions": [
+        "preview 返回 base64 不写盘；保存模式产生 PNG 文件与路径",
+        "未知主题或捕获失败返回 success:false；保存目录由参数决定"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-57728C0A6D0A",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-SETTINGS-57728C",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "创建或聚焦设置窗，切到指定标签",
+      "r00Assertions": [
+        "创建或聚焦设置窗，切到指定标签",
+        "不代表页内配置已保存"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-58822B6B138B",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-WINDOW-READINESS-58822B",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "splash/onboarding 关闭后主窗显示",
+      "r00Assertions": [
+        "splash/onboarding 关闭后主窗显示",
+        "服务或 renderer 未就绪时不能提前报主窗可用"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-593534A4F2AB",
+      "featureId": "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-BROWSER-SESSIONS-593534",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "full_original_behavior",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R01-T04",
+        "R07-T04",
+        "R09-T05"
+      ],
+      "r00ExecutionStageIds": [
+        "R01",
+        "R07",
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回 BrowserManager 当前浏览器会话列表",
+      "r00Assertions": [
+        "给定目标与相应权限，执行“查看已运行浏览器会话”后核对：返回 BrowserManager 当前浏览器会话列表",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径 + 负路径/失败分支真实观察），机器核对案例文件。",
+      "assertionContract": {
+        "producerCommand": "r09_t05_browser_pdf",
+        "evidencePath": "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json",
+        "cases": [
+          {
+            "case": "leaf:R00-T02-LA-593534A4F2AB::a1-sessions-list-cold-url-retained",
+            "expect": 1
+          },
+          {
+            "case": "leaf:R00-T02-LA-593534A4F2AB::a2-sessions-invalid-unauthorized-explicit",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf:R00-T02-LA-593534A4F2AB::a1-sessions-list-cold-url-retained"
+        ],
+        [
+          "leaf:R00-T02-LA-593534A4F2AB::a2-sessions-invalid-unauthorized-explicit"
+        ]
+      ]
+    },
+    {
+      "id": "R00-T02-LA-59987671E5AD",
+      "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-WORKSPAC-599876",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回按 workspace 与 surface 保存的界面状态，不改动设置",
+      "r00Assertions": [
+        "成功：执行“读取工作区界面状态”后，返回按 workspace 与 surface 保存的界面状态，不改动设置",
+        "拒绝/边界：GET query.workspace/surface 必填且合法；PUT body.workspace/surface/state，按空间及界面隔离；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-5D5938D61A00",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-GLOBAL-SHORTCUT-5D5938",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "有效组合被 OS 注册并可拉起快捷聊天；冲突反馈不可注册",
+      "r00Assertions": [
+        "有效组合被 OS 注册并可拉起快捷聊天；冲突反馈不可注册",
+        "已被占用或无权限时不得保存成可用状态"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-6006FD0BF07D",
+      "featureId": "F-D23-UI-UI-SETTINGS-ME-6006FD",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+      "r00Assertions": [
+        "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+        "打开个人资料页从已载入的设置状态显示姓名与资料：成功核对 姓名、资料和头像沿用设置容器已载入的数据；本页挂载不新增 HTTP 读取。；空态/未初始化核对 settingsConfig 尚未就绪时姓名和资料输入保持初始空值，之后 store 更新才填入。；错误/无权限核对 设置容器初始化失败可保留旧/空数据；MeTab 挂载自身没有读取失败 toast。",
+        "头像上传裁剪、保存姓名和个人资料：成功核对 用户头像裁剪确认后 POST /api/avatar/user 并刷新头像；姓名和个人资料分别保存到其对应配置。；姓名或资料保存成功后重读当前助手设置。；空态/未初始化核对 取消文件选择或裁剪不上传，姓名/资料未改也不因此产生头像请求。；无 agentId/resourceKey 时 loadSettingsConfig 不请求；经验未启用时不 GET experience。；错误/无权限核对 头像上传失败显示其自身错误；姓名/资料写入失败按各自路径提示。写入成功后的 loadSettingsConfig 内部吞读取异常并更新错误状态，读失败不回滚写入成功提示，不能称设置视图已刷新。"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-6774E79F6714",
+      "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-SETUP-CO-6774E7",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "持久设置 setupComplete=true；后续启动不再进入初设流程",
+      "r00Assertions": [
+        "成功：执行“标记初次设置完成”后，持久设置 setupComplete=true；后续启动不再进入初设流程",
+        "拒绝/边界：manager 不可用时 500；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-6E13E5DF05EB",
+      "featureId": "F-D14-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-BROWSER-VIEWER-6E13E5",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R01-T04",
+        "R07-T04",
+        "R09-T05"
+      ],
+      "r00ExecutionStageIds": [
+        "R01",
+        "R07",
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "窗口显示指定会话标签；传入允许 URL 时新开标签，空会话显示空态",
+      "r00Assertions": [
+        "窗口显示指定会话标签；传入允许 URL 时新开标签，空会话显示空态",
+        "非法 URL 不加载；打开窗口本身不创建空标签"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-6E8307F57F42",
+      "featureId": "F-D15-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-COMPUTER-6E8307",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T04"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "保存电脑操作 provider/权限配置并返回新状态",
+      "r00Assertions": [
+        "成功：执行“更新电脑操作偏好”后，保存电脑操作 provider/权限配置并返回新状态",
+        "拒绝/边界：GET 组装平台能力；PUT Linux Preview 拒绝，settings 包裹或扁平 patch，调用 updateComputerUseSettings 并广播；无效 body/平台拒绝；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-70B07E378F42",
+      "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-LEGACY-G-70B07E",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "仅旧值 false 时比较后删除；其他当前值原样保留，返回是否改动",
+      "r00Assertions": [
+        "成功：执行“清理旧 GPU 安全模式偏好”后，仅旧值 false 时比较后删除；其他当前值原样保留，返回是否改动",
+        "拒绝/边界：需 settings.write；仅供本机桌面启动数据闸门；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-713E908B7B2F",
+      "featureId": "F-D23-UI-UI-SETTINGS-ENVDEPS-713E90",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+      "r00Assertions": [
+        "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+        "打开页自动读取系统依赖状态：成功核对 已安装/缺失/项目缺失分区；空态/未初始化核对 无 report 时 checking；缺失列表可以为空；错误/无权限核对 请求失败专门 loadFailed 行，不误判缺失",
+        "点击刷新重新检测：成功核对 刷新报告并重画分区；空态/未初始化核对 刷新中禁按钮；错误/无权限核对 失败 loadFailed 行"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-7D212CBD9EEF",
+      "featureId": "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-SEARCH-VERIFY-POST-7D212C",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "full_original_behavior",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R01-T04",
+        "R07-T04",
+        "R09-T05"
+      ],
+      "r00ExecutionStageIds": [
+        "R01",
+        "R07",
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "外部验证成功后保存选定 provider/key，失败不保存",
+      "r00Assertions": [
+        "成功时核对：外部验证成功后保存选定 provider/key，失败不保存",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径 + 负路径/失败分支真实观察），机器核对案例文件。",
+      "assertionContract": {
+        "producerCommand": "r09_t05_browser_pdf",
+        "evidencePath": "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json",
+        "cases": [
+          {
+            "case": "leaf:R00-T02-LA-7D212CBD9EEF::a1-verify-success-persists-only-after-real-success",
+            "expect": 1
+          },
+          {
+            "case": "leaf:R00-T02-LA-7D212CBD9EEF::a2-verify-reject-no-widened-persistence-visible-error",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf:R00-T02-LA-7D212CBD9EEF::a1-verify-success-persists-only-after-real-success"
+        ],
+        [
+          "leaf:R00-T02-LA-7D212CBD9EEF::a2-verify-reject-no-widened-persistence-visible-error"
+        ]
+      ]
+    },
+    {
+      "id": "R00-T02-LA-8A45B19A18B4",
+      "featureId": "F-D14-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-BROWSER-NAVIGATION-8A45B1",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "full_original_behavior",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R01-T04",
+        "R07-T04",
+        "R09-T05"
+      ],
+      "r00ExecutionStageIds": [
+        "R01",
+        "R07",
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "活动会话 WebContents 导航并更新地址和可用状态",
+      "r00Assertions": [
+        "活动会话 WebContents 导航并更新地址和可用状态",
+        "无活动 view 不执行；非法地址不加载"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径 + 负路径/失败分支真实观察），机器核对案例文件。",
+      "assertionContract": {
+        "producerCommand": "r09_t05_browser_pdf",
+        "evidencePath": "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json",
+        "cases": [
+          {
+            "case": "leaf:R00-T02-LA-8A45B19A18B4::a1-real-back-forward-reload-url-title-flags",
+            "expect": 1
+          },
+          {
+            "case": "leaf:R00-T02-LA-8A45B19A18B4::a2-no-active-view-and-illegal-urls-explicit",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf:R00-T02-LA-8A45B19A18B4::a1-real-back-forward-reload-url-title-flags"
+        ],
+        [
+          "leaf:R00-T02-LA-8A45B19A18B4::a2-no-active-view-and-illegal-urls-explicit"
+        ]
+      ]
+    },
+    {
+      "id": "R00-T02-LA-8BD3BCC6D725",
+      "featureId": "F-D14-UI-UI-SETTINGS-BROWSER-8BD3BC",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R01-T04",
+        "R07-T04",
+        "R09-T05"
+      ],
+      "r00ExecutionStageIds": [
+        "R01",
+        "R07",
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+      "r00Assertions": [
+        "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+        "自动从设置快照或 GET 读取浏览器偏好：成功核对 Cookie 与开标签行为呈现；空态/未初始化核对 prefs null 时控件禁用；错误/无权限核对 读取失败 toast",
+        "Cookie 接受开关和 Agent 打开行为：成功核对 乐观更新后以服务端结果回写快照；空态/未初始化核对 prefs 尚无数据时禁用；错误/无权限核对 失败回滚旧值并 toast",
+        "清除 Cookie：成功核对 成功 toast；空态/未初始化核对 无适用空态；错误/无权限核对 失败 toast；清理中按钮禁用"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-8FE26C132D8B",
+      "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-SIDEBAR--8FE26C",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回分组/显示状态，不改动设置",
+      "r00Assertions": [
+        "成功：执行“读取侧栏偏好”后，返回分组/显示状态，不改动设置",
+        "拒绝/边界：engine.getSidebarUiPrefs/setSidebarUiPrefs；PUT 使用 sidebarUi 包裹或扁平 patch；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-9350C3E12165",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-APP-RESTART-9350C3",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "应用按既定退出/重启路径重新启动",
+      "r00Assertions": [
+        "应用按既定退出/重启路径重新启动",
+        "未保存状态或退出受阻时应明确提示，不以按钮点击当作已重启"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-98B458390B7E",
+      "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-KEYBINDI-98B458",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回快捷键映射，不改动设置",
+      "r00Assertions": [
+        "成功：执行“读取快捷键偏好”后，返回快捷键映射，不改动设置",
+        "拒绝/边界：engine.getKeybindings/setKeybindings；PUT 接受 keybindings 包裹或扁平 patch；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-9C679D21A188",
+      "featureId": "F-D23-UI-UI-SETTINGS-KEYBINDINGS-9C679D",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+      "r00Assertions": [
+        "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+        "打开页自动加载并过滤快捷键目录：成功核对 快捷键目录按已保存绑定显示，并对全局组合独立做系统占用探测；打开页不触发保存后重注册。；空态/未初始化核对 搜索无匹配显示空搜索态；错误/无权限核对 加载失败 toast，不能当空目录",
+        "录制、增加、删除单个绑定：成功核对 绑定保存并更新可用性；单项绑定保存后广播 keybindings-changed，桌面壳据事件更新对应状态。；空态/未初始化核对 未录到有效组合不保存；错误/无权限核对 服务端 PUT 成功后若全局快捷键重载失败，前端回滚显示旧绑定，但服务端新绑定可能已持久化；冲突提示与保存失败分开核。；通知失败或保存失败不能冒充目标配置已完成。",
+        "恢复某命令和全部默认绑定：成功核对 默认值恢复并重画目录；恢复默认绑定保存后广播 keybindings-changed，桌面壳据事件更新对应状态。；恢复全部时重载全局快捷键注册。；空态/未初始化核对 无自定义值可无变化；错误/无权限核对 单条恢复复用 saveCommandBindings：全局快捷键重载返回 ok:false 会抛错并回滚本地显示，但 PUT 已可能持久化。全部恢复的 keybindingsReloadGlobal 只 await 不检查返回 ok:false，返回失败对象仍会广播并提示恢复成功；若 IPC 抛错才进 catch 回滚本地，服务端默认值仍可能持久化。"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-A09B78985A14",
+      "featureId": "F-D14-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-BROWSER-EMERGENCY-STOP-A09B78",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "full_original_behavior",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R01-T04",
+        "R07-T04",
+        "R09-T05"
+      ],
+      "r00ExecutionStageIds": [
+        "R01",
+        "R07",
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "有会话时 server BrowserManager 关闭浏览器并撤销 Agent 授权至下一条消息",
+      "r00Assertions": [
+        "有会话时 server BrowserManager 关闭浏览器并撤销 Agent 授权至下一条消息",
+        "无会话旧实例仅本地销毁；关闭失败应可见，不得只隐藏窗口"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径 + 负路径/失败分支真实观察），机器核对案例文件。",
+      "assertionContract": {
+        "producerCommand": "r09_t05_browser_pdf",
+        "evidencePath": "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json",
+        "cases": [
+          {
+            "case": "leaf:R00-T02-LA-A09B78985A14::a1-emergency-stop-revoke-until-new-user-run",
+            "expect": 1
+          },
+          {
+            "case": "leaf:R00-T02-LA-A09B78985A14::a2-no-legacy-local-instance-and-close-failure-visible",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf:R00-T02-LA-A09B78985A14::a1-emergency-stop-revoke-until-new-user-run"
+        ],
+        [
+          "leaf:R00-T02-LA-A09B78985A14::a2-no-legacy-local-instance-and-close-failure-visible"
+        ]
+      ]
+    },
+    {
+      "id": "R00-T02-LA-A14D3027C881",
+      "featureId": "F-D23-UI-UI-SETTINGS-GENERAL-A14D30",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+      "r00Assertions": [
+        "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+        "自动读取开机启动、快速聊天与通知偏好：成功核对 三个设置组显示当前值；空态/未初始化核对 加载前控件禁用/占位；错误/无权限核对 开机启动状态 GET 失败置 null 并隐藏开关；其他偏好按各自来源处理，不能统一断言保留快照或 toast。",
+        "开机启动与保持唤醒开关：成功核对 OS 启动状态和配置保存；保持唤醒先保存 keep_awake 配置，成功后调用桌面 IPC。；经 autoSaveConfig 的保存成功后立即重读助手 config 快照。；keep_awake 经每助手接口分流到全局 preferences。；保持唤醒 IPC 成功时无六路设置重读。；空态/未初始化核对 平台不支持时禁用或显示不可用；错误/无权限核对 开机启动 IPC 设置失败恢复旧开关但无 toast；保持唤醒保存失败显示 toast，两项分别断言。；保持唤醒配置保存失败不调用 IPC，IPC 异常时回写旧配置。；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；该控件请求每助手 config 接口，但所涉字段由服务端归入全局 preferences；PUT 成功但后续 config GET 失败时可能显示保存失败，实际写入可能已生效。；保持唤醒 IPC 抛错时回写旧 keep_awake 后重读六项设置，经验启用时再读经验；loadSettingsConfig 自身吞读错，只记设置错误状态。",
+        "快速聊天复用时长：成功核对 保存后按分钟显示；快聊复用时长 PUT 成功后广播 quick-chat-preferences-changed，桌面壳据事件更新对应状态。；空态/未初始化核对 未加载偏好不提交；错误/无权限核对 失败回滚/提示；通知失败或保存失败不能冒充目标配置已完成。",
+        "聊天、定时任务、巡检完成通知策略：成功核对 三个独立通知字段持久化；空态/未初始化核对 未加载不提交；错误/无权限核对 失败恢复旧设置"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-A2E507EBDEF2",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-AUTO-LAUNCH-A2E507",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "读取/修改 OS 登录项并回显真实状态",
+      "r00Assertions": [
+        "读取/修改 OS 登录项并回显真实状态",
+        "平台不支持或写入失败应显示未生效"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-A30E4BDF2FA2",
+      "featureId": "F-D14-TOOL-TOOL-BROWSER-A30E4B",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "full_original_behavior",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R01-T04",
+        "R07-T04",
+        "R09-T05"
+      ],
+      "r00ExecutionStageIds": [
+        "R01",
+        "R07",
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "按会话隔离的浏览器完成动作，返回快照/图片/状态并记录操作；可见模式有远控状态。",
+      "r00Assertions": [
+        "导航后标题或快照匹配",
+        "过期ref明确失败",
+        "会话A状态不泄给B",
+        "无会话、过期元素ref、阻断网页或浏览器错误显式失败，不误操作另一会话。"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径 + 负路径/失败分支真实观察），机器核对案例文件。",
+      "assertionContract": {
+        "producerCommand": "r09_t05_browser_pdf",
+        "evidencePath": "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json",
+        "cases": [
+          {
+            "case": "leaf:R00-T02-LA-A30E4BDF2FA2::a1-navigation-title-and-snapshot-match",
+            "expect": 1
+          },
+          {
+            "case": "leaf:R00-T02-LA-A30E4BDF2FA2::a2-stale-ref-explicit-failure",
+            "expect": 1
+          },
+          {
+            "case": "leaf:R00-T02-LA-A30E4BDF2FA2::a3-session-a-state-not-leaked-to-b",
+            "expect": 1
+          },
+          {
+            "case": "leaf:R00-T02-LA-A30E4BDF2FA2::a4-no-session-blocked-or-browser-error-explicit-no-cross-session",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf:R00-T02-LA-A30E4BDF2FA2::a1-navigation-title-and-snapshot-match"
+        ],
+        [
+          "leaf:R00-T02-LA-A30E4BDF2FA2::a2-stale-ref-explicit-failure"
+        ],
+        [
+          "leaf:R00-T02-LA-A30E4BDF2FA2::a3-session-a-state-not-leaked-to-b"
+        ],
+        [
+          "leaf:R00-T02-LA-A30E4BDF2FA2::a4-no-session-blocked-or-browser-error-explicit-no-cross-session"
+        ]
+      ]
+    },
+    {
+      "id": "R00-T02-LA-A67D342381C0",
+      "featureId": "F-D14-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-BROWSER-TABS-A67D34",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "full_original_behavior",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R01-T04",
+        "R07-T04",
+        "R09-T05"
+      ],
+      "r00ExecutionStageIds": [
+        "R01",
+        "R07",
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "会话对应的标签集合和活动标签在 viewer 同步，服务端快照跟随变化",
+      "r00Assertions": [
+        "会话对应的标签集合和活动标签在 viewer 同步，服务端快照跟随变化",
+        "无效 tabId 不执行；关闭失败不得显示已关闭"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径 + 负路径/失败分支真实观察），机器核对案例文件。",
+      "assertionContract": {
+        "producerCommand": "r09_t05_browser_pdf",
+        "evidencePath": "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json",
+        "cases": [
+          {
+            "case": "leaf:R00-T02-LA-A67D342381C0::a1-tabs-and-active-sync-server-snapshot",
+            "expect": 1
+          },
+          {
+            "case": "leaf:R00-T02-LA-A67D342381C0::a2-invalid-tab-and-close-failure-explicit",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf:R00-T02-LA-A67D342381C0::a1-tabs-and-active-sync-server-snapshot"
+        ],
+        [
+          "leaf:R00-T02-LA-A67D342381C0::a2-invalid-tab-and-close-failure-explicit"
+        ]
+      ]
+    },
+    {
+      "id": "R00-T02-LA-AC5B6EDA3FBD",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-GET-SPLASH-INFO-AC5B6E",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "显示启动所需名称/头像等资料",
+      "r00Assertions": [
+        "显示启动所需名称/头像等资料",
+        "配置读取失败按启动回退显示，不代表修改配置"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-ACA2C4C1158D",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-EXTERNAL-ACA2C4",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "仅 http/https 交由系统浏览器打开",
+      "r00Assertions": [
+        "仅 http/https 交由系统浏览器打开",
+        "空/无效/其他协议拒绝，无本地窗口导航"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-B6A97A19F2CB",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-SETTINGS-MODAL-B6A97A",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "主界面设置弹窗打开并切到目标 tab",
+      "r00Assertions": [
+        "主界面设置弹窗打开并切到目标 tab",
+        "未知 tab 应有明确默认页，不代表任何设置已保存"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-B72A6D3886B7",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-KEEP-AWAKE-B72A6D",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "系统 powerSaveBlocker 状态与开关结果一致",
+      "r00Assertions": [
+        "系统 powerSaveBlocker 状态与开关结果一致",
+        "不支持或启动失败不应假报已启用"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-BEC2074CC33C",
+      "featureId": "F-D23-UI_BEHAVIOR-UI-BEHAVIOR-FIVE-LANGUAGE-BEC207",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "zh/en/ja/ko/zh-TW 文案随偏好更新且重启保留",
+      "r00Assertions": [
+        "zh/en/ja/ko/zh-TW 文案随偏好更新且重启保留",
+        "缺失翻译按既有回退，不应混成新语言支持"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-C5AAF360D10F",
+      "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-WORKSPAC-C5AAF3",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "保存按 workspace 与 surface 保存的界面状态并返回新状态",
+      "r00Assertions": [
+        "成功：执行“更新工作区界面状态”后，保存按 workspace 与 surface 保存的界面状态并返回新状态",
+        "拒绝/边界：GET query.workspace/surface 必填且合法；PUT body.workspace/surface/state，按空间及界面隔离；无效 body/平台拒绝；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-CA446FE1DB71",
+      "featureId": "F-D15-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-COMPUTER-USE-RE-CA446F",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T04"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "调用系统权限申请并返回结果；Linux Preview 返回不支持错误",
+      "r00Assertions": [
+        "执行“申请电脑操作系统权限”后核对：调用系统权限申请并返回结果；Linux Preview 返回不支持错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-CD873C715D96",
+      "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ENV-DEPS-SYSTEM-ENV-DEPS-READ-CD873C",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "读取缓存报告或 refresh=1 强制重探",
+      "r00Assertions": [
+        "成功时核对：读取缓存报告或 refresh=1 强制重探",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-D15E0ADC0608",
+      "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-NOTIFICA-D15E0A",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "保存通知设置并返回新状态",
+      "r00Assertions": [
+        "成功：执行“更新通知偏好”后，保存通知设置并返回新状态",
+        "拒绝/边界：engine.getNotificationPreferences/setNotificationPreferences；PUT 接受 notifications 包裹或扁平 patch；无效 body/平台拒绝；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-D1B56A275C3A",
+      "featureId": "F-D14-TOOL-TOOL-WEB-SEARCH-D1B56A",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "full_original_behavior",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R01-T04",
+        "R07-T04",
+        "R09-T05"
+      ],
+      "r00ExecutionStageIds": [
+        "R01",
+        "R07",
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回标题、链接、摘要及供应商信息，结果可在会话中引用。",
+      "r00Assertions": [
+        "结果含真实链接",
+        "无配置不假成功",
+        "未配置/缺key、限流/服务故障显式失败，不伪造搜索命中。"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径 + 负路径/失败分支真实观察），机器核对案例文件。",
+      "assertionContract": {
+        "producerCommand": "r09_t05_browser_pdf",
+        "evidencePath": "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json",
+        "cases": [
+          {
+            "case": "leaf:R00-T02-LA-D1B56A275C3A::a1-search-real-links-and-provider",
+            "expect": 1
+          },
+          {
+            "case": "leaf:R00-T02-LA-D1B56A275C3A::a2-no-config-not-fake-success",
+            "expect": 1
+          },
+          {
+            "case": "leaf:R00-T02-LA-D1B56A275C3A::a3-missing-key-rate-limit-failure-explicit",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf:R00-T02-LA-D1B56A275C3A::a1-search-real-links-and-provider"
+        ],
+        [
+          "leaf:R00-T02-LA-D1B56A275C3A::a2-no-config-not-fake-success"
+        ],
+        [
+          "leaf:R00-T02-LA-D1B56A275C3A::a3-missing-key-rate-limit-failure-explicit"
+        ]
+      ]
+    },
+    {
+      "id": "R00-T02-LA-D2575672A18D",
+      "featureId": "F-D15-TOOL-TOOL-COMPUTER-D25756",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T04"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "start获授权租约；get_app_state给无障碍/截图；点击/输入/按键/滚动真实作用于指定应用；stop释放。",
+      "r00Assertions": [
+        "批准前无输入动作",
+        "获批应用发生预期改变",
+        "撤权后控制失败",
+        "无宿主、未批准、租约失效或控件过期时拒绝；远端会话不得借本机应用权限。"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-D29DE479076C",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-WINDOW-THEME-CHANGED-D29DE4",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "主窗及派生窗口收到主题消息并重新绘制",
+      "r00Assertions": [
+        "主窗及派生窗口收到主题消息并重新绘制",
+        "主题同步不代表偏好已持久化"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-D34F2D718CF3",
+      "featureId": "F-D15-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SPEECH-PERMISSION-D34F2D",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T04"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "打包壳可显示系统授权弹窗，返回授权状态",
+      "r00Assertions": [
+        "打包壳可显示系统授权弹窗，返回授权状态",
+        "未知 webContents 拒绝；开发壳不弹 TCC，既有终结状态不重复弹"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-DCD85A04A7E9",
+      "featureId": "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-BROWSER-OPEN-SESSION-DCD85A",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "full_original_behavior",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R01-T04",
+        "R07-T04",
+        "R09-T05"
+      ],
+      "r00ExecutionStageIds": [
+        "R01",
+        "R07",
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "尝试恢复选定会话浏览器并让查看器显示该会话；恢复失败可显示空态",
+      "r00Assertions": [
+        "给定目标与相应权限，执行“打开会话浏览器”后核对：尝试恢复选定会话浏览器并让查看器显示该会话；恢复失败可显示空态",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径 + 负路径/失败分支真实观察），机器核对案例文件。",
+      "assertionContract": {
+        "producerCommand": "r09_t05_browser_pdf",
+        "evidencePath": "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json",
+        "cases": [
+          {
+            "case": "leaf:R00-T02-LA-DCD85A04A7E9::a1-open-session-explicit-resume-cold-metadata",
+            "expect": 1
+          },
+          {
+            "case": "leaf:R00-T02-LA-DCD85A04A7E9::a2-open-invalid-unauthorized-downstream-explicit",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf:R00-T02-LA-DCD85A04A7E9::a1-open-session-explicit-resume-cold-metadata"
+        ],
+        [
+          "leaf:R00-T02-LA-DCD85A04A7E9::a2-open-invalid-unauthorized-downstream-explicit"
+        ]
+      ]
+    },
+    {
+      "id": "R00-T02-LA-DF4B5168ABB5",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SHOW-NOTIFICATION-DF4B51",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "未聚焦且 OS 支持时弹通知；点击通知聚焦主窗",
+      "r00Assertions": [
+        "未聚焦且 OS 支持时弹通知；点击通知聚焦主窗",
+        "主窗聚焦可抑制；OS 不支持返回 shown:false"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-E6FB08FBBFAA",
+      "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-NOTIFICA-E6FB08",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回通知设置，不改动设置",
+      "r00Assertions": [
+        "成功：执行“读取通知偏好”后，返回通知设置，不改动设置",
+        "拒绝/边界：engine.getNotificationPreferences/setNotificationPreferences；PUT 接受 notifications 包裹或扁平 patch；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-E84F01456B6C",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-READ-XLSX-HTML-E84F01",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "首工作表转换为转义 HTML 表格",
+      "r00Assertions": [
+        "首工作表转换为转义 HTML 表格",
+        "仅绝对普通文件且 <=20MB；空表或解析失败返回 null"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-ED5FD5B469B8",
+      "featureId": "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-BROWSER--ED5FD5",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "full_original_behavior",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R01-T04",
+        "R07-T04",
+        "R09-T05"
+      ],
+      "r00ExecutionStageIds": [
+        "R01",
+        "R07",
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "保存浏览器设置及运行中 BrowserManager 状态并返回新状态",
+      "r00Assertions": [
+        "成功：执行“更新浏览器偏好”后，保存浏览器设置及运行中 BrowserManager 状态并返回新状态",
+        "应用失败返回 400 时读回已保存偏好与运行中浏览器状态，不假设自动回滚"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径 + 负路径/失败分支真实观察），机器核对案例文件。",
+      "assertionContract": {
+        "producerCommand": "r09_t05_browser_pdf",
+        "evidencePath": "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json",
+        "cases": [
+          {
+            "case": "leaf:R00-T02-LA-ED5FD5B469B8::a1-update-prefs-save-and-return-new-state",
+            "expect": 1
+          },
+          {
+            "case": "leaf:R00-T02-LA-ED5FD5B469B8::a2-apply-failure-400-readback-no-auto-rollback",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf:R00-T02-LA-ED5FD5B469B8::a1-update-prefs-save-and-return-new-state"
+        ],
+        [
+          "leaf:R00-T02-LA-ED5FD5B469B8::a2-apply-failure-400-readback-no-auto-rollback"
+        ]
+      ]
+    },
+    {
+      "id": "R00-T02-LA-EF9EEE38D8F6",
+      "featureId": "F-D15-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-COMPUTER-EF9EEE",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T04"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回电脑操作 provider/权限配置，不改动设置",
+      "r00Assertions": [
+        "成功：执行“读取电脑操作偏好”后，返回电脑操作 provider/权限配置，不改动设置",
+        "拒绝/边界：GET 组装平台能力；PUT Linux Preview 拒绝，settings 包裹或扁平 patch，调用 updateComputerUseSettings 并广播；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-F1A5597E3E78",
+      "featureId": "F-D14-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-BROWSER-CLOSE-SESSION-R-F1A559",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "full_original_behavior",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R01-T04",
+        "R07-T04",
+        "R09-T05"
+      ],
+      "r00ExecutionStageIds": [
+        "R01",
+        "R07",
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "会话浏览器关闭且该会话的浏览器授权被撤销",
+      "r00Assertions": [
+        "给定目标与相应权限，执行“关闭并撤销浏览器授权”后核对：会话浏览器关闭且该会话的浏览器授权被撤销",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径 + 负路径/失败分支真实观察），机器核对案例文件。",
+      "assertionContract": {
+        "producerCommand": "r09_t05_browser_pdf",
+        "evidencePath": "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json",
+        "cases": [
+          {
+            "case": "leaf:R00-T02-LA-F1A5597E3E78::a1-close-and-revoke-authority-real",
+            "expect": 1
+          },
+          {
+            "case": "leaf:R00-T02-LA-F1A5597E3E78::a2-revoke-invalid-unknown-explicit",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf:R00-T02-LA-F1A5597E3E78::a1-close-and-revoke-authority-real"
+        ],
+        [
+          "leaf:R00-T02-LA-F1A5597E3E78::a2-revoke-invalid-unknown-explicit"
+        ]
+      ]
+    },
+    {
+      "id": "R00-T02-LA-F5DBF2A80E28",
+      "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-APPEARAN-F5DBF2",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "保存主题/字体等外观状态并返回新状态",
+      "r00Assertions": [
+        "成功：执行“更新外观偏好”后，保存主题/字体等外观状态并返回新状态",
+        "拒绝/边界：engine.getAppearance/setAppearance；PUT 接受 appearance 包裹或扁平 patch，发外观事件；无效 body/平台拒绝；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-F6235778F816",
+      "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SETTINGS-SNAPSHOT-SETTINGS-SNAPS-F62357",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回配置、人格、偏好、接入及 bridge 状态",
+      "r00Assertions": [
+        "成功时核对：返回配置、人格、偏好、接入及 bridge 状态",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-F9786414DD11",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-WINDOW-CONTROLS-F97864",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "仅调用者所属 BrowserWindow 发生相应状态变化",
+      "r00Assertions": [
+        "仅调用者所属 BrowserWindow 发生相应状态变化",
+        "无所属窗口时无操作；不同平台标题栏形态不同"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-FB5C78308878",
+      "featureId": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-SIDEBAR--FB5C78",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "保存分组/显示状态并返回新状态",
+      "r00Assertions": [
+        "成功：执行“更新侧栏偏好”后，保存分组/显示状态并返回新状态",
+        "拒绝/边界：engine.getSidebarUiPrefs/setSidebarUiPrefs；PUT 使用 sidebarUi 包裹或扁平 patch；无效 body/平台拒绝；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-FD5B420182C6",
+      "featureId": "F-D15-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-ASR-TRANSCRIBE-POST-FD5B42",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T04"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回识别结果，取消/超时不能记成功",
+      "r00Assertions": [
+        "成功时核对：返回识别结果，取消/超时不能记成功",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    },
+    {
+      "id": "R00-T02-LA-FD7A5A76B8EA",
+      "featureId": "F-D14-TOOL-TOOL-WEB-FETCH-FD7A5A",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "full_original_behavior",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R01-T04",
+        "R07-T04",
+        "R09-T05"
+      ],
+      "r00ExecutionStageIds": [
+        "R01",
+        "R07",
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回页面/接口正文、最终URL或提取摘要，供会话引用。",
+      "r00Assertions": [
+        "正文与URL对应",
+        "阻断页不当正常内容",
+        "URL无效、重定向/网络失败或受限内容给错误；不自动写工作区。"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [
+        "r09_t05_browser_pdf"
+      ],
+      "evidencePaths": [
+        "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json"
+      ],
+      "evidenceRequired": "逐断言专属案例全覆盖（正路径 + 负路径/失败分支真实观察），机器核对案例文件。",
+      "assertionContract": {
+        "producerCommand": "r09_t05_browser_pdf",
+        "evidencePath": "{EVIDENCE}/SUITES/r09_t05_browser_pdf/cases.json",
+        "cases": [
+          {
+            "case": "leaf:R00-T02-LA-FD7A5A76B8EA::a1-fetch-body-and-final-url-session-file",
+            "expect": 1
+          },
+          {
+            "case": "leaf:R00-T02-LA-FD7A5A76B8EA::a2-blocked-page-not-normal-content",
+            "expect": 1
+          },
+          {
+            "case": "leaf:R00-T02-LA-FD7A5A76B8EA::a3-invalid-url-redirect-network-error-no-workspace-write",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "leaf:R00-T02-LA-FD7A5A76B8EA::a1-fetch-body-and-final-url-session-file"
+        ],
+        [
+          "leaf:R00-T02-LA-FD7A5A76B8EA::a2-blocked-page-not-normal-content"
+        ],
+        [
+          "leaf:R00-T02-LA-FD7A5A76B8EA::a3-invalid-url-redirect-network-error-no-workspace-write"
+        ]
+      ]
+    },
+    {
+      "id": "R00-T02-LA-FF1B331F1019",
+      "featureId": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-SWITCH-TAB-FF1B33",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "basisKind": "required_behavior_pending",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R09-T03",
+        "R09-T07"
+      ],
+      "r00ExecutionStageIds": [
+        "R09"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "SettingsContent activeTab 更新并渲染目标页",
+      "r00Assertions": [
+        "SettingsContent activeTab 更新并渲染目标页",
+        "标签不存在时不得记作已执行页内动作"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
+    }
+  ],
+  "inputDigestSha256": "32abe989f00b19a031ffce3f6b7d8528cb59abdd15e65ca81aeeab93b8ecfac3"
+}

@@ -1,0 +1,6 @@
+suite probe_zero_cases: status=FAIL exit=2 cases=0 failed=[]
+zero-case producer exit=2 status=FAIL
+suite probe_failed_case: status=FAIL exit=2 cases=3 failed=['probe::will-fail']
+suite probe_passing: status=PASS exit=0 cases=3 failed=[]
+suite probe_restored: status=PASS exit=0 cases=2 failed=[]
+r09_gate_negative: status=PASS cases=7 failed=[]

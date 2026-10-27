@@ -1,0 +1,1680 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t03_native_matrix",
+ "cases": [
+  {
+   "case": "isolation::real-home-provided",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": null
+  },
+  {
+   "case": "plan::schema",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "schema": "lingxi.r09.t03-leaf-case-plan.v1"
+   }
+  },
+  {
+   "case": "plan::scope-counts",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sharedLeaves": 46,
+    "hostLeaves": 30,
+    "hostNative": 22,
+    "hostBridge": 8,
+    "serverReactExcluded": 16,
+    "leafAssertions": 60
+   }
+  },
+  {
+   "case": "plan::leaf-set-equals-authoritative-30",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "missing": [],
+    "extra": []
+   }
+  },
+  {
+   "case": "plan::host-class-and-feature-match-authoritative",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "mismatch": []
+   }
+  },
+  {
+   "case": "plan::assertions-60",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "total": 60
+   }
+  },
+  {
+   "case": "plan::assertion-text-verbatim",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "mismatch": []
+   }
+  },
+  {
+   "case": "plan::required-fields",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "issues": []
+   }
+  },
+  {
+   "case": "plan::planned-case-naming",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "violations": []
+   }
+  },
+  {
+   "case": "plan::planned-case-unique",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "unique": 60,
+    "total": 60
+   }
+  },
+  {
+   "case": "plan::every-assertion-has-action-case",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": null
+  },
+  {
+   "case": "plan::manual-has-steps",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "missing": []
+   }
+  },
+  {
+   "case": "plan::blocked-has-reason",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "missing": []
+   }
+  },
+  {
+   "case": "plan::logic-case-references-exist",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "missing": [
+     "ipc::app_ready.splash-caller",
+     "ipc::debug-onboarding.release",
+     "ipc::drag.nul-path",
+     "ipc::drag.relative-path",
+     "ipc::global_shortcut.injection",
+     "ipc::global_shortcut.unknown-key",
+     "ipc::onboarding.rust-runtime",
+     "ipc::open_external.control-char",
+     "ipc::open_external.file-scheme",
+     "ipc::open_external.javascript-scheme",
+     "ipc::open_file.relative-path",
+     "ipc::restart.argv-injection",
+     "ipc::settings_changed.missing-theme",
+     "ipc::settings_changed.unknown-event",
+     "ipc::show_notification.settings-caller",
+     "ipc::theme.control-char",
+     "ipc::window_control.renderer-window-id",
+     "ipc::window_control.viewer-caller"
+    ]
+   }
+  },
+  {
+   "case": "plan::stats-present",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "statuses": {
+     "implemented": 49,
+     "blocked_pending_service": 4,
+     "manual": 3,
+     "blocked_pending_command": 4
+    },
+    "stats": {
+     "assertionsWithPlannedAction": 60,
+     "implementationStatus": {
+      "implemented": 49,
+      "manual": 3,
+      "blocked": 8
+     }
+    }
+   }
+  },
+  {
+   "case": "plan::gui-gate-envs",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "env": "LINGXI_R09_GUI_CLEARED",
+    "appBinaryEnv": "LINGXI_R09_TAURI_APP",
+    "webdriverPortEnv": "LINGXI_R09_WEBDRIVER_PORT",
+    "manualEvidenceDirEnv": "LINGXI_R09_MANUAL_EVIDENCE_DIR"
+   }
+  },
+  {
+   "case": "native::all-unit-tests",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "passed": 179,
+    "testResultLine": "test result: ok. 179 passed; 0 failed"
+   }
+  },
+  {
+   "case": "leaf::window-controls.caller-authorized",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::window_controls::tests::only_main_and_settings_may_control_windows",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::window-controls.state-broadcast",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::window_controls::tests::toggle_and_event_names_match_incumbent",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::window-state.sanitize-visible",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::window_state::tests::visible_position_is_preserved_across_displays",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::window-state.offscreen-recenter",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::window_state::tests::offscreen_position_is_recentered_on_primary",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::window-state.persisted-path",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::window_state::tests::persistence_path_is_home_adjacent",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::app-ready.idempotent",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::app_ready::tests::ready_is_idempotent_and_hidden_at_login_stays_hidden",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::app-ready.timeout-fallback",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::app_ready::tests::init_timeout_forces_show_unless_hidden_at_login",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::reload-restart.main-only",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::reload_restart::tests::reload_is_main_only",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::reload-restart.reentry-guard",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::reload_restart::tests::restart_guard_blocks_reentry_and_updates",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::window-lifecycle.close-to-tray",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::window_lifecycle::tests::close_hides_unless_quitting_or_updating",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::window-lifecycle.owned-only-cleanup",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::window_lifecycle::tests::service_ownership_decides_termination",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::window-lifecycle.window-all-closed",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::window_lifecycle::tests::window_all_closed_respects_tray_availability",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::window-lifecycle.activate-recreate",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::window_lifecycle::tests::activate_recreates_only_after_service_ready",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::single-instance.home-scoped",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::single_instance::tests::lock_namespace_is_home_scoped",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::single-instance.second-instance-plan",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::single_instance::tests::second_instance_prefers_main_then_onboarding",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::tray.menu-model",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::tray::tests::menu_has_four_items_without_unsupported_repair",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::tray.locale-rebuild",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::tray::tests::menu_labels_follow_locale",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::tray.icon-candidates",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::tray::tests::icon_candidates_follow_platform_rules",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::global-shortcut.registration-unavailable",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::global_shortcut::tests::registration_result_shapes_are_stable",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::global-shortcut.max-three-groups",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::global_shortcut::tests::shortcut_selection_uses_override_then_legacy_then_default",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::global-shortcut.test-register-cleanup",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::global_shortcut::tests::test_register_plan_always_cleans_up",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::notification.focus-suppression",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::notification::tests::focus_policy_normalization",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::notification.receipt-not-delivery",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::notification::tests::receipts_distinguish_shown_from_unconfirmed",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::notification.avatar-sanitized",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::notification::tests::agent_id_and_avatar_paths_are_sanitized",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::notification.click-focus-support-matrix",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::notification::tests::click_focus_is_explicitly_unsupported",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::keep-awake.state-machine",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::keep_awake::tests::enable_starts_blocker_and_is_idempotent",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::keep-awake.failure-not-fake",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::keep_awake::tests::start_failure_never_reports_enabled",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::auto-launch.opened-at-login",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::auto_launch::tests::opened_at_login_rules_per_platform",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::auto-launch.unsupported-platform",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::auto_launch::tests::platform_support_matches_incumbent",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::file-dialogs.cancel-shapes",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::file_dialogs::tests::cancel_results_match_incumbent_shapes",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::file-dialogs.skill-extension",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::file_dialogs::tests::skill_selection_rules",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::clipboard-edit.allowlist",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::clipboard_edit::tests::allowed_set_is_exactly_four",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::external-open.web-only",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::external_open::tests::external_open_only_web_schemes",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::external-open.receipt-shape",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::external_open::tests::caller_policy_and_receipt_shape",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::drag-out.shapes",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::drag_out::tests::single_and_multiple_shapes",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::file-drop.native-paths",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::file_drop::tests::drop_paths_are_native_absolute_and_deduped",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::trash.absolute-only",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::trash::tests::path_resolution_matches_incumbent",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::settings-window.main-modal-first",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::settings_window::tests::main_modal_preferred_when_main_alive",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::settings-window.crashed-main-fallback",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::settings_window::tests::crashed_main_falls_back_to_settings_window",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::settings-window.tab-validation",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::settings_window::tests::tab_validation_is_syntactic",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::settings-broadcast.side-effects",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::settings_broadcast::tests::side_effects_are_not_optional",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::settings-broadcast.whitelist",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::settings_broadcast::tests::unknown_events_are_rejected",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::quick-chat.grow-only",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::quick_chat::tests::chat_mode_is_grow_only",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::quick-chat.bounds-restore",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::quick_chat::tests::resolve_bounds_restores_and_sanitizes",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::quick-chat-handoff.ack-target-match",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::quick_chat_handoff::tests::ack_must_match_request_and_session",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::quick-chat-handoff.focus-before-hide",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::quick_chat_handoff::tests::focus_must_be_confirmed_before_hiding",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::theme-sync.quick-chat-transparent",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::theme_sync::tests::sync_plan_themes_caller_window_only_and_quick_chat_transparent",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::i18n.locale-resolution",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::i18n::tests::locale_resolution_matches_incumbent",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::i18n.tray-locale-rebuild",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::i18n::tests::locale_change_rebuilds_tray_menu",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::app-info.platform-literal",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::app_info::tests::tauri_naming_is_mapped_not_passed_through",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::splash.sender-and-page-gate",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::splash::tests::page_url_whitelist",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::splash.avatar-path-scope",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::splash::tests::avatar_segments_and_paths_are_home_scoped",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::onboarding.rust-service-unsupported",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::onboarding::tests::rust_service_is_explicitly_unsupported",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::onboarding.preview-no-write",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::onboarding::tests::debug_commands_are_debug_only_and_preview_has_no_side_effects",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "parity::theme-table-vs-registry",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "registry": {
+     "warm-paper": "#F8F4ED",
+     "midnight": "#3B4A54",
+     "high-contrast": "#FAF8F7",
+     "grass-aroma": "#F5F8F3",
+     "contemplation": "#F3F5F7",
+     "absolutely": "#F4F3EE",
+     "delve": "#FFFFFF",
+     "deep-think": "#FCFCFD",
+     "new-warm-paper": "#F5EFE4",
+     "midnight-contrast": "#26343D",
+     "coral": "#FDF6EC"
+    },
+    "module": {
+     "warm-paper": "#F8F4ED",
+     "midnight": "#3B4A54",
+     "high-contrast": "#FAF8F7",
+     "grass-aroma": "#F5F8F3",
+     "contemplation": "#F3F5F7",
+     "absolutely": "#F4F3EE",
+     "delve": "#FFFFFF",
+     "deep-think": "#FCFCFD",
+     "new-warm-paper": "#F5EFE4",
+     "midnight-contrast": "#26343D",
+     "coral": "#FDF6EC"
+    }
+   }
+  },
+  {
+   "case": "parity::theme-defaults",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "defaultTheme": "warm-paper"
+   }
+  },
+  {
+   "case": "parity::tray-i18n-five-locales",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "module": {
+     "zh": {
+      "show": "显示 灵犀",
+      "settings": "设置",
+      "repair_artifacts": "修复组件…",
+      "quit": "退出",
+      "notification_ready": "通知已就绪"
+     },
+     "zh-TW": {
+      "show": "顯示 靈犀",
+      "settings": "設定",
+      "repair_artifacts": "修復元件…",
+      "quit": "結束",
+      "notification_ready": "通知已就緒"
+     },
+     "ja": {
+      "show": "Lingxi を表示",
+      "settings": "設定",
+      "repair_artifacts": "コンポーネントを修復…",
+      "quit": "終了",
+      "notification_ready": "通知が有効になりました"
+     },
+     "ko": {
+      "show": "Lingxi 표시",
+      "settings": "설정",
+      "repair_artifacts": "구성 요소 복구…",
+      "quit": "종료",
+      "notification_ready": "알림이 준비되었어요"
+     },
+     "en": {
+      "show": "Show Lingxi",
+      "settings": "Settings",
+      "repair_artifacts": "Repair Components…",
+      "quit": "Quit",
+      "notification_ready": "Notifications enabled"
+     }
+    },
+    "locales": {
+     "zh": {
+      "show": "显示 灵犀",
+      "settings": "设置",
+      "repair_artifacts": "修复组件…",
+      "quit": "退出",
+      "notification_ready": "通知已就绪"
+     },
+     "zh-TW": {
+      "show": "顯示 靈犀",
+      "settings": "設定",
+      "repair_artifacts": "修復元件…",
+      "quit": "結束",
+      "notification_ready": "通知已就緒"
+     },
+     "ja": {
+      "show": "Lingxi を表示",
+      "settings": "設定",
+      "repair_artifacts": "コンポーネントを修復…",
+      "quit": "終了",
+      "notification_ready": "通知が有効になりました"
+     },
+     "ko": {
+      "show": "Lingxi 표시",
+      "settings": "설정",
+      "repair_artifacts": "구성 요소 복구…",
+      "quit": "종료",
+      "notification_ready": "알림이 준비되었어요"
+     },
+     "en": {
+      "show": "Show Lingxi",
+      "settings": "Settings",
+      "repair_artifacts": "Repair Components…",
+      "quit": "Quit",
+      "notification_ready": "Notifications enabled"
+     }
+    }
+   }
+  },
+  {
+   "case": "parity::quick-chat-constants",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "QUICK_CHAT_WIDTH": 480,
+    "QUICK_CHAT_COMPACT_HEIGHT": 142,
+    "QUICK_CHAT_CHAT_HEIGHT": 520,
+    "QUICK_CHAT_MIN_WIDTH": 360,
+    "QUICK_CHAT_MIN_HEIGHT": 118
+   }
+  },
+  {
+   "case": "parity::screenshot-constants",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "quick_chat_width": 480,
+    "quick_chat_compact_height": 142,
+    "quick_chat_chat_height": 520,
+    "quick_chat_min_width": 360,
+    "quick_chat_min_height": 118,
+    "screenshot_scale": 2,
+    "screenshot_max_segment": 4000,
+    "screenshot_margin": 96,
+    "screenshot_themes": {
+     "solarized-light": {
+      "width": 460,
+      "background": "#F8F5ED"
+     },
+     "solarized-dark": {
+      "width": 460,
+      "background": "#002B36"
+     },
+     "solarized-light-desktop": {
+      "width": 880,
+      "background": "#F8F5ED"
+     },
+     "solarized-dark-desktop": {
+      "width": 880,
+      "background": "#002B36"
+     },
+     "sakura-light": {
+      "width": 460,
+      "background": "#8ABDCE"
+     },
+     "sakura-light-desktop": {
+      "width": 880,
+      "background": "#8ABDCE"
+     }
+    }
+   }
+  },
+  {
+   "case": "parity::screenshot-themes-vs-electron",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "module": {
+     "solarized-light": {
+      "width": 460,
+      "background": "#F8F5ED"
+     },
+     "solarized-dark": {
+      "width": 460,
+      "background": "#002B36"
+     },
+     "solarized-light-desktop": {
+      "width": 880,
+      "background": "#F8F5ED"
+     },
+     "solarized-dark-desktop": {
+      "width": 880,
+      "background": "#002B36"
+     },
+     "sakura-light": {
+      "width": 460,
+      "background": "#8ABDCE"
+     },
+     "sakura-light-desktop": {
+      "width": 880,
+      "background": "#8ABDCE"
+     }
+    },
+    "electron": {
+     "solarized-light": {
+      "width": 460,
+      "background": "#F8F5ED"
+     },
+     "solarized-dark": {
+      "width": 460,
+      "background": "#002B36"
+     },
+     "solarized-light-desktop": {
+      "width": 880,
+      "background": "#F8F5ED"
+     },
+     "solarized-dark-desktop": {
+      "width": 880,
+      "background": "#002B36"
+     },
+     "sakura-light": {
+      "width": 460,
+      "background": "#8ABDCE"
+     },
+     "sakura-light-desktop": {
+      "width": 880,
+      "background": "#8ABDCE"
+     }
+    }
+   }
+  },
+  {
+   "case": "parity::window-state-defaults",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": null
+  },
+  {
+   "case": "static::no-shell-spawn-in-native-modules",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "hits": []
+   }
+  },
+  {
+   "case": "static::every-capability-module-has-tests",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "modules": 34,
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-0DEEE4813B0A::a1-spawn-viewer-window",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "invoke": {}
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-0DEEE4813B0A::a2-viewer-missing-payload",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "ValueError: not enough values to unpack (expected 2, got 1)"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-1120B2AA320D::a1-onboarding-complete-open-main",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "Rust 服务无 /api/preferences/setup-complete 等价路由（T03-ONBOARD-01）；Node legacy 服务不在 Tauri 生产链",
+    "neededHostSurface": null
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-1120B2AA320D::a2-onboarding-complete-save-failure",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "同上：需要可注入失败的 setup 路由（宿主/服务未提供）",
+    "neededHostSurface": null
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-15DFB1AED8F2::a1-drag-out-single-multi",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "manual": true,
+    "payload": {
+     "reason": "未提供 LINGXI_R09_MANUAL_EVIDENCE_DIR"
+    },
+    "steps": "人工用鼠标从书桌树拖出单/多文件到 Finder，录屏+目标目录列表证据"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-15DFB1AED8F2::a2-drag-out-missing-target",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "invoke": {},
+    "windowsBefore": 1
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-15E163FBFBE8::a1-settings-broadcast-fanout",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync -> HTTP 500: {\"value\":{\"error\":\"javascript error\",\"message\":\"done is not a function. (In 'done({ok:false, error: String(e)})', 'done' is undefined)\",\"stacktrace\":\"\"}}"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-15E163FBFBE8::a2-settings-broadcast-missing-window",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "invoke": {},
+    "windowsBefore": 1
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-18FE3FDFF9A5::a1-appearance-read-no-write",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "before": {
+     "appearance": {}
+    },
+    "after": {
+     "appearance": {}
+    },
+    "screenshot": null,
+    "avg": {
+     "ok": false
+    }
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-18FE3FDFF9A5::a2-appearance-invalid-write",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "invoke": {},
+    "hashBefore": null,
+    "hashAfter": null
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-1C41525D379C::a1-onboarding-open-focus",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "first": {},
+    "second": {},
+    "before": 1,
+    "after": 2
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-1C41525D379C::a2-onboarding-open-no-complete",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-1E6EDB731186::a1-onboarding-preview-shows-steps",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "invoke": {},
+    "screenshots": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-1E6EDB731186::a2-onboarding-preview-no-side-effects",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-322E02C7F2F9::a1-reload-main-window",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync -> HTTP 500: {\"value\":{\"error\":\"javascript error\",\"message\":\"done is not a function. (In 'done({ok:false, error: String(e)})', 'done' is undefined)\",\"stacktrace\":\"\"}}"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-322E02C7F2F9::a2-reload-not-update-success",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "versionBefore": {},
+    "versionAfter": {},
+    "newEvents": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-37E6C3B9A7B8::a1-docx-preview-render",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "宿主命令 read_docx_html 未注册（T03-FILE-01 未实现；T06 命令面缺失项）",
+    "neededHostSurface": "read_docx_html"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-37E6C3B9A7B8::a2-docx-preview-invalid-input",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "同上命令缺失",
+    "neededHostSurface": "read_docx_html"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-394DD07D2968::a1-keybindings-update-registered",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "reload": {},
+    "shortcutPosted": true,
+    "quickChatWindow": null,
+    "restore": 200
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-394DD07D2968::a2-keybindings-invalid-body",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "invalid": {},
+    "shortcutPosted": true,
+    "window": null,
+    "prefsUnchanged": true
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-57728C0A6D0A::a1-open-settings-window-focus",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync -> HTTP 500: {\"value\":{\"error\":\"javascript error\",\"message\":\"done is not a function. (In 'done({ok:false, error: String(e)})', 'done' is undefined)\",\"stacktrace\":\"\"}}"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-57728C0A6D0A::a2-open-settings-not-saved",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-58822B6B138B::a1-window-readiness-main-after-splash",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "firstMainAt": 1793033220.043,
+    "instanceCreatedAt": 1793033219.0989387,
+    "splashSeen": false,
+    "timeline": [
+     {
+      "at": 1793033223.734,
+      "windows": [
+       {
+        "name": "Lingxi · Rust 预览",
+        "onscreen": true,
+        "number": 24276
+       }
+      ]
+     },
+     {
+      "at": 1793033223.958,
+      "windows": [
+       {
+        "name": "Lingxi · Rust 预览",
+        "onscreen": true,
+        "number": 24276
+       }
+      ]
+     },
+     {
+      "at": 1793033224.182,
+      "windows": [
+       {
+        "name": "Lingxi · Rust 预览",
+        "onscreen": true,
+        "number": 24276
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-58822B6B138B::a2-window-readiness-not-early",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "firstSnapshot": [
+     {
+      "name": "Lingxi · Rust 预览",
+      "onscreen": true,
+      "number": 24276
+     }
+    ],
+    "serviceChildren": [
+     {
+      "pid": 92463,
+      "ppid": 92461,
+      "command": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/../../rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t03_native_matrix-92370-1793033216588/home"
+     }
+    ]
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-5D5938D61A00::a1-shortcut-register-and-trigger",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "test": {},
+    "reload": {},
+    "posted": true,
+    "window": null
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-5D5938D61A00::a2-shortcut-conflict-unavailable",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "first": {},
+    "second": {},
+    "malformed": {},
+    "note": "真实系统占用需第二进程注册；self=true 证明已被本应用占用而非可新建"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-6774E79F6714::a1-setup-complete-followup-launch",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "Rust 服务无 setup-complete 路由（T03-ONBOARD-01）",
+    "neededHostSurface": null
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-6774E79F6714::a2-setup-complete-manager-unavailable",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "需要可注入失败的 server setup 路由",
+    "neededHostSurface": null
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-9350C3E12165::a1-restart-process-identity",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "RemoteDisconnected: Remote end closed connection without response"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-9350C3E12165::a2-restart-blocked-explicit",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync 不可达: <urlopen error [Errno 61] Connection refused>"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-98B458390B7E::a1-keybindings-read-effective",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync 不可达: <urlopen error [Errno 61] Connection refused>"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-98B458390B7E::a2-keybindings-read-invalid",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync 不可达: <urlopen error [Errno 61] Connection refused>"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A2E507EBDEF2::a1-autolaunch-read-toggle",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync 不可达: <urlopen error [Errno 61] Connection refused>"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A2E507EBDEF2::a2-autolaunch-write-failure",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync 不可达: <urlopen error [Errno 61] Connection refused>"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-AC5B6EDA3FBD::a1-splash-info-avatar",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync 不可达: <urlopen error [Errno 61] Connection refused>"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-AC5B6EDA3FBD::a2-splash-info-fallback",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync 不可达: <urlopen error [Errno 61] Connection refused>"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-ACA2C4C1158D::a1-open-external-http",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 27472423-a967-4688-8325-7289228e904e not found\",\"stacktrace\":\"\"}}"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-ACA2C4C1158D::a2-open-external-invalid",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 27472423-a967-4688-8325-7289228e904e not found\",\"stacktrace\":\"\"}}"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-B6A97A19F2CB::a1-settings-modal-open-tab",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 27472423-a967-4688-8325-7289228e904e not found\",\"stacktrace\":\"\"}}"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-B6A97A19F2CB::a2-settings-modal-unknown-tab",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-B72A6D3886B7::a1-keepawake-on-off-assertion",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 27472423-a967-4688-8325-7289228e904e not found\",\"stacktrace\":\"\"}}"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-B72A6D3886B7::a2-keepawake-unsupported",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 27472423-a967-4688-8325-7289228e904e not found\",\"stacktrace\":\"\"}}"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-BEC2074CC33C::a1-locale-switch-tray-labels",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "manual": true,
+    "payload": {
+     "reason": "未提供 LINGXI_R09_MANUAL_EVIDENCE_DIR"
+    },
+    "steps": "切换语言后截图托盘菜单（右键）+ 重启后再次截图；与 locale 文案表逐项对照"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-BEC2074CC33C::a2-locale-fallback-no-new-language",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 27472423-a967-4688-8325-7289228e904e not found\",\"stacktrace\":\"\"}}"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-D15E0ADC0608::a1-notification-prefs-update-bridge",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 27472423-a967-4688-8325-7289228e904e not found\",\"stacktrace\":\"\"}}"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-D15E0ADC0608::a2-notification-prefs-invalid",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "invalid": 200,
+    "prefsUnchanged": true
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-D29DE479076C::a1-theme-broadcast-redraw",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 27472423-a967-4688-8325-7289228e904e not found\",\"stacktrace\":\"\"}}"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-D29DE479076C::a2-theme-no-persistence-claim",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 27472423-a967-4688-8325-7289228e904e not found\",\"stacktrace\":\"\"}}"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-DF4B5168ABB5::a1-notification-delivered-and-click-focus",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "manual": true,
+    "payload": {
+     "reason": "未提供 LINGXI_R09_MANUAL_EVIDENCE_DIR"
+    },
+    "steps": "手动点击通知中心通知，观察主窗获得焦点并截图/lsappinfo 前台记录"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-DF4B5168ABB5::a2-notification-suppressed-or-unsupported",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 27472423-a967-4688-8325-7289228e904e not found\",\"stacktrace\":\"\"}}"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-E6FB08FBBFAA::a1-notification-prefs-read",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 27472423-a967-4688-8325-7289228e904e not found\",\"stacktrace\":\"\"}}"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-E6FB08FBBFAA::a2-notification-prefs-read-invalid",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 27472423-a967-4688-8325-7289228e904e not found\",\"stacktrace\":\"\"}}"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-E84F01456B6C::a1-xlsx-preview-render",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "宿主命令 read_xlsx_html 未注册（T03-FILE-01 未实现）",
+    "neededHostSurface": "read_xlsx_html"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-E84F01456B6C::a2-xlsx-preview-invalid",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "同上命令缺失",
+    "neededHostSurface": "read_xlsx_html"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-F5DBF2A80E28::a1-appearance-update-window-theme",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 27472423-a967-4688-8325-7289228e904e not found\",\"stacktrace\":\"\"}}"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-F5DBF2A80E28::a2-appearance-update-invalid",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "invalid": 200,
+    "prefsUnchanged": false
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-F9786414DD11::a1-window-controls-caller-only",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 27472423-a967-4688-8325-7289228e904e not found\",\"stacktrace\":\"\"}}"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-F9786414DD11::a2-window-controls-no-window",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 27472423-a967-4688-8325-7289228e904e not found\",\"stacktrace\":\"\"}}"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-FF1B331F1019::a1-settings-tab-activation",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "HarnessError: WebDriver POST /session/27472423-a967-4688-8325-7289228e904e/execute/sync -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 27472423-a967-4688-8325-7289228e904e not found\",\"stacktrace\":\"\"}}"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-FF1B331F1019::a2-settings-unknown-tab-no-action",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "error": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+   }
+  },
+  {
+   "case": "gui::app-shutdown-clean",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "exitCode": null,
+    "residualPids": []
+   }
+  },
+  {
+   "case": "isolation::real-home-untouched",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "before": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    },
+    "after": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,34 @@
+{
+ "mode": "release",
+ "artifacts": {
+  "executable": "/private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+  "executableSha256": "d0072dbea750dffac45357c595a7ae59a5fbc49dd4f3fe433ce8bdbcabac708d",
+  "appBundle": "/private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app"
+ },
+ "inputs": {
+  "features": [
+   "r09-host"
+  ],
+  "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9"
+ },
+ "service": {
+  "stage": "/Users/study_superior/Desktop/Code/LingxiAgent/dist-rust-service/mac-arm64",
+  "sidecar": "desktop/src-tauri/binaries/lingxi-service-aarch64-apple-darwin",
+  "sidecarSha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+  "resourcesManifest": "desktop/src-tauri/resources/rust-service/build.json",
+  "manifestSha256": "372c2b88748dcd96e9a74956c13554fb8d0e764638c28bc52b524c3a506473f9",
+  "protocol": {
+   "serverKind": "lingxi-service",
+   "wireProtocolMin": 1,
+   "wireProtocolMax": 1,
+   "dataEpoch": 2
+  },
+  "binarySha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+  "contentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0"
+ },
+ "candidate": {
+  "source": "env",
+  "mode": "release",
+  "executableSha256": "d0072dbea750dffac45357c595a7ae59a5fbc49dd4f3fe433ce8bdbcabac708d"
+ }
+}

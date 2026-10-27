@@ -1,0 +1,17 @@
+{
+  "identifier": "r09-browser-viewer",
+  "description": "R09-T06 收口：浏览器控制面板。仅不透明 viewer 上下文/白名单动作转发/关闭自己；无 token/文件/任意 HTTP。",
+  "windows": [
+    "browser-viewer"
+  ],
+  "permissions": [
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    "allow-close-browser-viewer",
+    "allow-get-browser-viewer-context",
+    "allow-get-platform",
+    "allow-rust-browser-request",
+    "allow-settings-changed",
+    "allow-window-theme-changed"
+  ]
+}

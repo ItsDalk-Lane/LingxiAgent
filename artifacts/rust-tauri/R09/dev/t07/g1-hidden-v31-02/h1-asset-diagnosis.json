@@ -1,0 +1,67 @@
+{
+ "schema": "lingxi.r09.t07.h1-asset-diagnosis.v1",
+ "failure": "<img src=convertFileSrc(path)> onerror（asset protocol 未加载）",
+ "runEvidence": "artifacts/rust-tauri/R09/dev/t07/g1-hidden-v31-02",
+ "wrapper": {
+  "path": "/private/tmp/lingxi-r09-t07/evidence-app-v31-20261026-234821/Lingxi.app",
+  "deliveryExeSha256": "248a8e346e526b18b7657c8edd5b7068061bd6c8645105aa129d6ae965ade8b8",
+  "g1ExeBeforeSign": "54f93eacb6cd54e671c947c315042072bdcffc6e35f78e620a65128f8293f180",
+  "wrapperMainAfterAdhocSign": "ac729159dbf9e8cbcf373aaed907f69a2475add1f9e8fc2d1463887be9a54a52",
+  "signVerifyExit": [
+   0,
+   0
+  ]
+ },
+ "assetUrl": "asset://localhost/%2Fprivate%2Ftmp%2Flingxi-r09-runtime%2Fr09_t07_native_e2e-47015-1793029733889%2Fhome-native-e2e%2Ft07-asset-probe.png",
+ "fileFacts": {
+  "path": "/private/tmp/lingxi-r09-runtime/r09_t07_native_e2e-47015-1793029733889/home-native-e2e/t07-asset-probe.png",
+  "exists": true,
+  "size": 70,
+  "pngValid": true,
+  "isolatedHome": "/private/tmp/lingxi-r09-runtime/r09_t07_native_e2e-47015-1793029733889/home-native-e2e",
+  "launchEnv": "LINGXI_HOME=<home>; TMPDIR=<producer.tmp>; LINGXI_R09_AUTOMATION=1; LINGXI_R09_HOST_DIALOG_SINK=<sink>; TAURI_WEBDRIVER_PORT=<random>"
+ },
+ "configFacts": {
+  "baseTauriConf": "desktop/src-tauri/tauri.conf.json: security.csp img-src/media-src 含 asset:/http://asset.localhost；assetProtocol={enable:true,scope:[$HOME/.lingxi/**,$HOME/.lingxi-dev/**,$HOME/.hanako-dev/**,$TEMP/**]}",
+  "releaseConf": "同 assetProtocol；CSP img-src/media-src 含 asset:/http://asset.localhost",
+  "debugGeneratedConf": "desktop/src-tauri/tauri.debug.generated.conf.json: 同 CSP/assetProtocol（文件内容已核对）",
+  "debugReceipt": {
+   "command": "tauri build --config .../tauri.debug.generated.conf.json --features r09-host,r09-test-hooks,e2e-test --debug --no-bundle",
+   "features": [
+    "e2e-test",
+    "r09-host",
+    "r09-test-hooks"
+   ],
+   "configTemplateSha256": "febd9ef1d3e3b316699e77e3133831d991df14faaeb8c177af3602ad4b446ae2"
+  },
+  "cargoFeatures": [
+   "protocol-asset",
+   "image-png",
+   "tray-icon"
+  ],
+  "runtimeScopeCode": "desktop/src-tauri/src/host.rs: install_asset_protocol_scope(app,&home) 在 setup 创建窗口前调用 app.asset_protocol_scope().allow_directory(home,true)；app log 无 allow 失败"
+ },
+ "g1ExeStaticStrings": {
+  "csp": "img-src 'self' data: blob: asset: http://asset.localhost http://127.0.0.1:*（embedded）",
+  "scopeStringsPresent": [
+   "$HOME/.lingxi/**",
+   "$HOME/.lingxi-dev/**",
+   "$HOME/.hanako-dev/**",
+   "$TEMP/**"
+  ],
+  "assetProtocolJSONLiteral": "未作为明文 JSON key 出现（Tauri embedded config 为序列化结构，不能凭 strings 判定 enable；需 T06 运行期打印 app.config().app.security.asset_protocol 或 asset_protocol_scope 实际 roots）"
+ },
+ "appLog": "[native] LINGXI_HOME 非标准目录：跳过 single-instance 插件（隔离 home 允许并行）\n[tauri-diag] {\"appVersion\":\"0.1.43\",\"currentExe\":\"/private/tmp/lingxi-r09-t07/evidence-app-v31-20261026-234821/Lingxi.app/Contents/MacOS/lingxi-resource-desktop\",\"debugBuild\":true,\"event\":\"host-start\",\"home\":\"/private/tmp/lingxi-r09-runtime/r09_t07_native_e2e-47015-1793029733889/home-native-e2e\",\"packaged\":false,\"pid\":47047,\"platform\":\"darwin\",\"schema\":\"lingxi.r09.tauri-launch.v1\",\"unixMs\":1793029735714}\n[tauri-diag] {\"appVersion\":\"0.1.43\",\"debugBuild\":true,\"event\":\"resolve\",\"home\":\"/private/tmp/lingxi-r09-runtime/r09_t07_native_e2e-47015-1793029733889/home-native-e2e\",\"packaged\":false,\"platform\":\"darwin\",\"schema\":\"lingxi.r09.tauri-launch.v1\",\"unixMs\":1793029735715}\n[tauri-diag] {\"binary\":\"/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service\",\"event\":\"binary\",\"packaged\":false,\"schema\":\"lingxi.r09.tauri-launch.v1\",\"unixMs\":1793029735715}\n[tauri-diag] {\"args\":[\"--home\",\"/private/tmp/lingxi-r09-runtime/r09_t07_native_e2e-47015-1793029733889/home-native-e2e\"],\"binary\":\"/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service\",\"event\":\"spawn\",\"pgid\":47048,\"pid\":47048,\"schema\":\"lingxi.r09.tauri-launch.v1\",\"spawnedAtUnixMs\":1793029735715,\"unixMs\":1793029735716}\n",
+ "hypotheses": [
+  "Tauri 2.12 运行时 asset_protocol_scope allow_directory(home) 未对已存在/后续 img 请求生效（scope 对象或 canonical path 问题）→ 需 T06 打印实际 scope roots 并尝试 allow_file(path)",
+  "debug/embedded 配置实际 assetProtocol.enable=false 或 scope 为空（strings 不能证明；需运行期 config dump）",
+  "macOS wrapper .app 形态下 asset custom scheme 注册异常（debug exe 在 delivery 骨架中运行；建议同 exe 直接以裸二进制启动对照，注意裸二进制会因 UNUserNotificationCenter 无 bundle 崩溃——需 automation/跳过 notification 后对照）",
+  "URL 编码/路径 canonical（/private/tmp symlink? /private/tmp 本身真实）→ 建议 T06 用 Rust 单测直接 asset_protocol_scope().is_allowed_directory 判文件"
+ ],
+ "requestedFromT06": [
+  "运行期 config/scope roots 打印",
+  "allow_file 补充或 scope 匹配单测",
+  "asset protocol handler 是否注册（release vs debug）",
+  "如需重出 G1 evidence（renderer 不变，可 --no-renderer-build）"
+ ]
+}

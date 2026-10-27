@@ -1,0 +1,16 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_release_attack_surface",
+ "status": "FAIL",
+ "exitCode": 2,
+ "caseCount": 46,
+ "failedCases": [
+  "release::csp-no-forbidden-tokens",
+  "release::csp-directives-hardened",
+  "release::acl-no-devtools-permission-grant",
+  "release::acl-no-tray-menu-renderer-grants",
+  "release::no-test-control-env-in-artifacts"
+ ],
+ "artifactChangedDuringScan": false,
+ "details": "scan-details.json"
+}

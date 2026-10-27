@@ -1,0 +1,762 @@
+{
+ "schema": "lingxi.r09.capability-audit.v1",
+ "suite": "r09_capability_audit",
+ "status": "FAIL",
+ "registeredCommands": [
+  "R09",
+  "T01",
+  "T02",
+  "T05",
+  "boot",
+  "browser_viewer::close_browser_viewer",
+  "browser_viewer::get_browser_viewer_context",
+  "browser_viewer::open_browser_viewer",
+  "browser_viewer::rust_browser_request",
+  "browser_viewer::set_browser_connection",
+  "commands::app_ready",
+  "commands::get_app_version",
+  "commands::get_platform",
+  "commands::get_server_connection_info",
+  "commands::get_server_port",
+  "commands::get_server_token",
+  "commands::get_service_status",
+  "commands::open_external",
+  "commands::window_close",
+  "commands::window_is_maximized",
+  "commands::window_maximize",
+  "commands::window_minimize",
+  "commands::window_theme_changed",
+  "copy_file",
+  "file_info",
+  "list_skill_files",
+  "main",
+  "open_file",
+  "open_skill_viewer",
+  "read_file",
+  "read_file_base64",
+  "read_file_snapshot",
+  "read_skill_file",
+  "renderer",
+  "resource_events",
+  "resource_subscribe",
+  "resource_unsubscribe",
+  "run_edit_command",
+  "select_files",
+  "select_folder",
+  "skill_viewer_close",
+  "skill_viewer_load",
+  "spawn_viewer",
+  "trash_item",
+  "unwatch_file",
+  "viewer",
+  "viewer_close",
+  "viewer_request_load",
+  "watch_file",
+  "write_file",
+  "write_file_binary",
+  "write_file_if_unchanged"
+ ],
+ "manifestCommands": [
+  "app_ready",
+  "close_browser_viewer",
+  "copy_file",
+  "file_info",
+  "get_app_version",
+  "get_browser_viewer_context",
+  "get_platform",
+  "get_server_connection_info",
+  "get_server_port",
+  "get_server_token",
+  "get_service_status",
+  "list_skill_files",
+  "open_browser_viewer",
+  "open_external",
+  "open_file",
+  "open_skill_viewer",
+  "read_file",
+  "read_file_base64",
+  "read_file_snapshot",
+  "read_skill_file",
+  "resource_events",
+  "resource_subscribe",
+  "resource_unsubscribe",
+  "run_edit_command",
+  "rust_browser_request",
+  "select_files",
+  "select_folder",
+  "set_browser_connection",
+  "skill_viewer_close",
+  "skill_viewer_load",
+  "spawn_viewer",
+  "trash_item",
+  "unwatch_file",
+  "viewer_close",
+  "viewer_request_load",
+  "watch_file",
+  "window_close",
+  "window_is_maximized",
+  "window_maximize",
+  "window_minimize",
+  "window_theme_changed",
+  "write_file",
+  "write_file_binary",
+  "write_file_if_unchanged"
+ ],
+ "capabilities": {
+  "r09-browser-viewer": [
+   "browser-viewer"
+  ],
+  "resource-main": [
+   "main"
+  ],
+  "r09-host": [
+   "main"
+  ],
+  "skill-viewer": [
+   "skill-viewer-*"
+  ],
+  "resource-viewer": [
+   "viewer-*"
+  ]
+ },
+ "permissionCommands": [
+  "app_ready",
+  "close_browser_viewer",
+  "copy_file",
+  "file_info",
+  "get_app_version",
+  "get_browser_viewer_context",
+  "get_platform",
+  "get_server_connection_info",
+  "get_server_port",
+  "get_server_token",
+  "get_service_status",
+  "list_skill_files",
+  "open_browser_viewer",
+  "open_external",
+  "open_file",
+  "open_skill_viewer",
+  "read_file",
+  "read_file_base64",
+  "read_file_snapshot",
+  "read_skill_file",
+  "resource_events",
+  "resource_subscribe",
+  "resource_unsubscribe",
+  "run_edit_command",
+  "rust_browser_request",
+  "select_files",
+  "select_folder",
+  "set_browser_connection",
+  "skill_viewer_close",
+  "skill_viewer_load",
+  "spawn_viewer",
+  "trash_item",
+  "unwatch_file",
+  "viewer_close",
+  "viewer_request_load",
+  "watch_file",
+  "window_close",
+  "window_is_maximized",
+  "window_maximize",
+  "window_minimize",
+  "window_theme_changed",
+  "write_file",
+  "write_file_binary",
+  "write_file_if_unchanged"
+ ],
+ "expandedPerWindow": {
+  "browser-viewer": {
+   "capabilities": [
+    "r09-browser-viewer"
+   ],
+   "commands": [
+    "close_browser_viewer",
+    "get_browser_viewer_context",
+    "rust_browser_request"
+   ]
+  },
+  "main": {
+   "capabilities": [
+    "resource-main",
+    "r09-host"
+   ],
+   "commands": [
+    "app_ready",
+    "close_browser_viewer",
+    "copy_file",
+    "file_info",
+    "get_app_version",
+    "get_platform",
+    "get_server_connection_info",
+    "get_server_port",
+    "get_server_token",
+    "get_service_status",
+    "list_skill_files",
+    "open_browser_viewer",
+    "open_external",
+    "open_file",
+    "open_skill_viewer",
+    "read_file",
+    "read_file_base64",
+    "read_file_snapshot",
+    "read_skill_file",
+    "resource_events",
+    "resource_subscribe",
+    "resource_unsubscribe",
+    "run_edit_command",
+    "rust_browser_request",
+    "select_files",
+    "select_folder",
+    "set_browser_connection",
+    "spawn_viewer",
+    "trash_item",
+    "unwatch_file",
+    "watch_file",
+    "window_close",
+    "window_is_maximized",
+    "window_maximize",
+    "window_minimize",
+    "window_theme_changed",
+    "write_file",
+    "write_file_binary",
+    "write_file_if_unchanged"
+   ]
+  },
+  "onboarding": {
+   "capabilities": [],
+   "commands": []
+  },
+  "quick-chat": {
+   "capabilities": [],
+   "commands": []
+  },
+  "settings": {
+   "capabilities": [],
+   "commands": []
+  },
+  "skill-viewer-": {
+   "capabilities": [
+    "skill-viewer"
+   ],
+   "commands": [
+    "list_skill_files",
+    "read_skill_file",
+    "skill_viewer_close",
+    "skill_viewer_load"
+   ]
+  },
+  "skill-viewer-probe": {
+   "capabilities": [
+    "skill-viewer"
+   ],
+   "commands": [
+    "list_skill_files",
+    "read_skill_file",
+    "skill_viewer_close",
+    "skill_viewer_load"
+   ]
+  },
+  "splash": {
+   "capabilities": [],
+   "commands": []
+  },
+  "viewer-": {
+   "capabilities": [
+    "resource-viewer"
+   ],
+   "commands": [
+    "file_info",
+    "read_file",
+    "read_file_base64",
+    "read_file_snapshot",
+    "resource_events",
+    "resource_subscribe",
+    "resource_unsubscribe",
+    "viewer_close",
+    "viewer_request_load"
+   ]
+  },
+  "viewer-probe": {
+   "capabilities": [
+    "resource-viewer"
+   ],
+   "commands": [
+    "file_info",
+    "read_file",
+    "read_file_base64",
+    "read_file_snapshot",
+    "resource_events",
+    "resource_subscribe",
+    "resource_unsubscribe",
+    "viewer_close",
+    "viewer_request_load"
+   ]
+  }
+ },
+ "cases": [
+  {
+   "case": "caps::registered-commands-nonzero",
+   "ok": true,
+   "actual": 1,
+   "detail": [
+    "R09",
+    "T01",
+    "T02",
+    "T05",
+    "boot",
+    "browser_viewer::close_browser_viewer",
+    "browser_viewer::get_browser_viewer_context",
+    "browser_viewer::open_browser_viewer",
+    "browser_viewer::rust_browser_request",
+    "browser_viewer::set_browser_connection",
+    "commands::app_ready",
+    "commands::get_app_version",
+    "commands::get_platform",
+    "commands::get_server_connection_info",
+    "commands::get_server_port",
+    "commands::get_server_token",
+    "commands::get_service_status",
+    "commands::open_external",
+    "commands::window_close",
+    "commands::window_is_maximized",
+    "commands::window_maximize",
+    "commands::window_minimize",
+    "commands::window_theme_changed",
+    "copy_file",
+    "file_info",
+    "list_skill_files",
+    "main",
+    "open_file",
+    "open_skill_viewer",
+    "read_file",
+    "read_file_base64",
+    "read_file_snapshot",
+    "read_skill_file",
+    "renderer",
+    "resource_events",
+    "resource_subscribe",
+    "resource_unsubscribe",
+    "run_edit_command",
+    "select_files",
+    "select_folder",
+    "skill_viewer_close",
+    "skill_viewer_load",
+    "spawn_viewer",
+    "trash_item",
+    "unwatch_file",
+    "viewer",
+    "viewer_close",
+    "viewer_request_load",
+    "watch_file",
+    "write_file",
+    "write_file_binary",
+    "write_file_if_unchanged"
+   ]
+  },
+  {
+   "case": "caps::invoke-handler-equals-build-manifest",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "onlyInvokeHandler": [
+     "R09",
+     "T01",
+     "T02",
+     "T05",
+     "boot",
+     "browser_viewer::close_browser_viewer",
+     "browser_viewer::get_browser_viewer_context",
+     "browser_viewer::open_browser_viewer",
+     "browser_viewer::rust_browser_request",
+     "browser_viewer::set_browser_connection",
+     "commands::app_ready",
+     "commands::get_app_version",
+     "commands::get_platform",
+     "commands::get_server_connection_info",
+     "commands::get_server_port",
+     "commands::get_server_token",
+     "commands::get_service_status",
+     "commands::open_external",
+     "commands::window_close",
+     "commands::window_is_maximized",
+     "commands::window_maximize",
+     "commands::window_minimize",
+     "commands::window_theme_changed",
+     "main",
+     "renderer",
+     "viewer"
+    ],
+    "onlyBuildManifest": [
+     "app_ready",
+     "close_browser_viewer",
+     "get_app_version",
+     "get_browser_viewer_context",
+     "get_platform",
+     "get_server_connection_info",
+     "get_server_port",
+     "get_server_token",
+     "get_service_status",
+     "open_browser_viewer",
+     "open_external",
+     "rust_browser_request",
+     "set_browser_connection",
+     "window_close",
+     "window_is_maximized",
+     "window_maximize",
+     "window_minimize",
+     "window_theme_changed"
+    ]
+   }
+  },
+  {
+   "case": "caps::each-command-has-permission",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "missingPermission": [
+     "R09",
+     "T01",
+     "T02",
+     "T05",
+     "boot",
+     "browser_viewer::close_browser_viewer",
+     "browser_viewer::get_browser_viewer_context",
+     "browser_viewer::open_browser_viewer",
+     "browser_viewer::rust_browser_request",
+     "browser_viewer::set_browser_connection",
+     "commands::app_ready",
+     "commands::get_app_version",
+     "commands::get_platform",
+     "commands::get_server_connection_info",
+     "commands::get_server_port",
+     "commands::get_server_token",
+     "commands::get_service_status",
+     "commands::open_external",
+     "commands::window_close",
+     "commands::window_is_maximized",
+     "commands::window_maximize",
+     "commands::window_minimize",
+     "commands::window_theme_changed",
+     "main",
+     "renderer",
+     "viewer"
+    ]
+   }
+  },
+  {
+   "case": "caps::each-permission-command-registered",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "orphanPermissionCommands": [
+     "app_ready",
+     "close_browser_viewer",
+     "get_app_version",
+     "get_browser_viewer_context",
+     "get_platform",
+     "get_server_connection_info",
+     "get_server_port",
+     "get_server_token",
+     "get_service_status",
+     "open_browser_viewer",
+     "open_external",
+     "rust_browser_request",
+     "set_browser_connection",
+     "window_close",
+     "window_is_maximized",
+     "window_maximize",
+     "window_minimize",
+     "window_theme_changed"
+    ]
+   }
+  },
+  {
+   "case": "caps::acl-manifest-covers-registered",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "missingFromAcl": [
+     "R09",
+     "T01",
+     "T02",
+     "T05",
+     "boot",
+     "browser_viewer::close_browser_viewer",
+     "browser_viewer::get_browser_viewer_context",
+     "browser_viewer::open_browser_viewer",
+     "browser_viewer::rust_browser_request",
+     "browser_viewer::set_browser_connection",
+     "commands::app_ready",
+     "commands::get_app_version",
+     "commands::get_platform",
+     "commands::get_server_connection_info",
+     "commands::get_server_port",
+     "commands::get_server_token",
+     "commands::get_service_status",
+     "commands::open_external",
+     "commands::window_close",
+     "commands::window_is_maximized",
+     "commands::window_maximize",
+     "commands::window_minimize",
+     "commands::window_theme_changed",
+     "main",
+     "renderer",
+     "viewer"
+    ]
+   }
+  },
+  {
+   "case": "caps::capabilities-reference-known-permissions",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "caps::no-dangerous-permissions",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "caps::capability-windows-nonempty",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "r09-browser-viewer": [
+     "browser-viewer"
+    ],
+    "resource-main": [
+     "main"
+    ],
+    "r09-host": [
+     "main"
+    ],
+    "skill-viewer": [
+     "skill-viewer-*"
+    ],
+    "resource-viewer": [
+     "viewer-*"
+    ]
+   }
+  },
+  {
+   "case": "caps::expanded::browser-viewer",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "capabilities": [
+     "r09-browser-viewer"
+    ],
+    "commands": [
+     "close_browser_viewer",
+     "get_browser_viewer_context",
+     "rust_browser_request"
+    ]
+   }
+  },
+  {
+   "case": "caps::expanded::main",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "capabilities": [
+     "resource-main",
+     "r09-host"
+    ],
+    "commands": [
+     "app_ready",
+     "close_browser_viewer",
+     "copy_file",
+     "file_info",
+     "get_app_version",
+     "get_platform",
+     "get_server_connection_info",
+     "get_server_port",
+     "get_server_token",
+     "get_service_status",
+     "list_skill_files",
+     "open_browser_viewer",
+     "open_external",
+     "open_file",
+     "open_skill_viewer",
+     "read_file",
+     "read_file_base64",
+     "read_file_snapshot",
+     "read_skill_file",
+     "resource_events",
+     "resource_subscribe",
+     "resource_unsubscribe",
+     "run_edit_command",
+     "rust_browser_request",
+     "select_files",
+     "select_folder",
+     "set_browser_connection",
+     "spawn_viewer",
+     "trash_item",
+     "unwatch_file",
+     "watch_file",
+     "window_close",
+     "window_is_maximized",
+     "window_maximize",
+     "window_minimize",
+     "window_theme_changed",
+     "write_file",
+     "write_file_binary",
+     "write_file_if_unchanged"
+    ]
+   }
+  },
+  {
+   "case": "caps::expanded::onboarding",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "capabilities": [],
+    "commands": []
+   }
+  },
+  {
+   "case": "caps::expanded::quick-chat",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "capabilities": [],
+    "commands": []
+   }
+  },
+  {
+   "case": "caps::expanded::settings",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "capabilities": [],
+    "commands": []
+   }
+  },
+  {
+   "case": "caps::expanded::skill-viewer-",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "capabilities": [
+     "skill-viewer"
+    ],
+    "commands": [
+     "list_skill_files",
+     "read_skill_file",
+     "skill_viewer_close",
+     "skill_viewer_load"
+    ]
+   }
+  },
+  {
+   "case": "caps::expanded::skill-viewer-probe",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "capabilities": [
+     "skill-viewer"
+    ],
+    "commands": [
+     "list_skill_files",
+     "read_skill_file",
+     "skill_viewer_close",
+     "skill_viewer_load"
+    ]
+   }
+  },
+  {
+   "case": "caps::expanded::splash",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "capabilities": [],
+    "commands": []
+   }
+  },
+  {
+   "case": "caps::expanded::viewer-",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "capabilities": [
+     "resource-viewer"
+    ],
+    "commands": [
+     "file_info",
+     "read_file",
+     "read_file_base64",
+     "read_file_snapshot",
+     "resource_events",
+     "resource_subscribe",
+     "resource_unsubscribe",
+     "viewer_close",
+     "viewer_request_load"
+    ]
+   }
+  },
+  {
+   "case": "caps::expanded::viewer-probe",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "capabilities": [
+     "resource-viewer"
+    ],
+    "commands": [
+     "file_info",
+     "read_file",
+     "read_file_base64",
+     "read_file_snapshot",
+     "resource_events",
+     "resource_subscribe",
+     "resource_unsubscribe",
+     "viewer_close",
+     "viewer_request_load"
+    ]
+   }
+  },
+  {
+   "case": "caps::policy-present",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "expected": "docs/rust-tauri/R09/R09_COMMAND_POLICY.json",
+    "note": "T06 授权策略文件尚未建立；静态检查通过不代表 A11 通过"
+   }
+  },
+  {
+   "case": "caps::wdio-feature-gated",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "optional": true,
+    "featureGate": true
+   }
+  },
+  {
+   "case": "caps::release-config-has-no-dev-url",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "releaseConfigPresent": true
+   }
+  },
+  {
+   "case": "caps::no-dev-port-in-production-config",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  }
+ ],
+ "failedCases": [
+  "caps::invoke-handler-equals-build-manifest",
+  "caps::each-command-has-permission",
+  "caps::each-permission-command-registered",
+  "caps::acl-manifest-covers-registered",
+  "caps::policy-present"
+ ],
+ "policy": null,
+ "durationSecs": 0.305
+}

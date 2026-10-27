@@ -1,0 +1,14 @@
+$ /bin/sh -c strings -a /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E "wdio|webdriver" || true
+--- exit=0 duration=0.20s ---
+0
+
+$ /bin/sh -c strings -a /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E "devUrl" || true
+--- exit=0 duration=0.20s ---
+0
+
+$ /bin/sh -c strings -a /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E "localhost:5173" || true
+--- exit=0 duration=0.19s ---
+0
+
+$ codesign --verify --deep --strict /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app
+--- exit=0 duration=0.08s ---

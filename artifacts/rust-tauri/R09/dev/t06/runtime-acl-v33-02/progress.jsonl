@@ -1,0 +1,6 @@
+{"n": 20, "case": "blocked::allow-side-effect::main::copy_file", "ok": false, "at": 1793034302.768519}
+{"n": 40, "case": "acl::main::open_settings::allow", "ok": true, "at": 1793034302.852909}
+{"n": 60, "case": "blocked::allow-side-effect::main::select_folder", "ok": false, "at": 1793034302.89411}
+{"n": 80, "case": "blocked::allow-side-effect::main::window_minimize", "ok": false, "at": 1793034302.914231}
+{"n": 100, "case": "blocked::window-open::onboarding", "ok": false, "at": 1793034302.924632}
+{"n": 105, "final": true, "status": "PASS_WITH_BLOCKED_WINDOWS", "at": 1793034302.959025}
