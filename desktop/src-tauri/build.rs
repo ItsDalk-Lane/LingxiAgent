@@ -79,6 +79,16 @@ fn main() {
         "onboarding_complete",
         "speech_permission_status",
         "speech_permission_request",
+        // R10 功能补齐：About 更新链（固定 GitHub 端点，见 update_about.rs）。
+        "release_check_latest",
+        "get_update_digest_history",
+        "get_pending_announcement",
+        "ack_announcement",
+        // R10 功能补齐：可观测导出（capability token 会话，见 observability_export.rs）。
+        "observability_export_begin",
+        "observability_export_write",
+        "observability_export_end",
+        "observability_export_abort",
     ];
     // R09-T06 D11：测试注入命令只在 r09-test-hooks 构建注册；交付 release 不含。
     if std::env::var_os("CARGO_FEATURE_R09_TEST_HOOKS").is_some() {

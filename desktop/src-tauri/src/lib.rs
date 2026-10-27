@@ -5,9 +5,11 @@ pub mod files;
 pub mod host;
 pub mod native;
 pub mod native_commands;
+pub mod observability_export;
 pub mod resource_bridge;
 pub mod service;
 pub mod skills;
+pub mod update_about;
 
 use browser_viewer::{
     close_browser_viewer, get_browser_viewer_context, open_browser_viewer, rust_browser_request,
@@ -20,6 +22,12 @@ use commands::{
 };
 use files::{FileInfo, FileVersion, SaveResult, TextSnapshot};
 use native_commands::*;
+// R10：`#[tauri::command]` 的 `__cmd__*` 宏在 crate root 导出；generate_handler!
+// 只接受裸函数名（模块路径会去找 `update_about::__cmd__*` 而编译失败）。
+use observability_export::{
+    observability_export_abort, observability_export_begin, observability_export_end,
+    observability_export_write,
+};
 use resource_bridge::ResourceConnection;
 use serde::Serialize;
 use serde_json::{json, Value};
@@ -34,6 +42,9 @@ use std::{
 };
 use tauri::{Emitter, Manager, State, WebviewWindow};
 use tauri_plugin_dialog::DialogExt;
+use update_about::{
+    ack_announcement, get_pending_announcement, get_update_digest_history, release_check_latest,
+};
 
 #[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -774,7 +785,19 @@ fn schedule_window_state_save(window: &WebviewWindow) {
     });
 }
 
+/// R10/R11：reqwest 使用 `rustls-no-provider`，但服务健康检查在宿主启动早期就会
+/// 构建 Client；provider 必须在任何 reqwest Client 之前安装，否则 release 包会在
+/// tokio worker 里 panic（HTTP 请求并不需要 TLS，但 Client 构建仍会检查 provider）。
+fn install_rustls_crypto_provider() {
+    use std::sync::Once;
+    static ONCE: Once = Once::new();
+    ONCE.call_once(|| {
+        let _ = rustls::crypto::ring::default_provider().install_default();
+    });
+}
+
 pub fn run() {
+    install_rustls_crypto_provider();
     // R09-T03/T04 native 插件组（single-instance/global-shortcut/notification/autostart）
     // 必须最先注册：single-instance 要求自己第一个 plugin。
     let builder = native::install::with_plugins(tauri::Builder::default())
@@ -787,6 +810,10 @@ pub fn run() {
         .manage(browser_viewer::BrowserViewerState::default())
         // R09-T03/T04 命令面的宿主侧句柄（keep-awake 后端等）。
         .manage(native_commands::CommandState::default())
+        // R10：About 更新链缓存（release 60s / digest 10min）。
+        .manage(update_about::UpdateAboutState::default())
+        // R10：可观测导出的 capability-token 会话。
+        .manage(observability_export::ObservabilityExportState::default())
         .setup(|app| {
             #[cfg(feature = "r09-host")]
             {
@@ -881,6 +908,14 @@ pub fn run() {
         onboarding_complete,
         speech_permission_status,
         speech_permission_request,
+        release_check_latest,
+        get_update_digest_history,
+        get_pending_announcement,
+        ack_announcement,
+        observability_export_begin,
+        observability_export_write,
+        observability_export_end,
+        observability_export_abort,
     ]);
     #[cfg(feature = "r09-test-hooks")]
     let builder = builder.invoke_handler(tauri::generate_handler![
@@ -959,6 +994,14 @@ pub fn run() {
         onboarding_complete,
         speech_permission_status,
         speech_permission_request,
+        release_check_latest,
+        get_update_digest_history,
+        get_pending_announcement,
+        ack_announcement,
+        observability_export_begin,
+        observability_export_write,
+        observability_export_end,
+        observability_export_abort,
         debug_open_onboarding,
         debug_open_onboarding_preview,
         debug_asset_probe
@@ -986,6 +1029,8 @@ pub fn run() {
                 }
             }
             tauri::WindowEvent::Destroyed => {
+                // R10：窗口销毁时关闭其未完成的导出会话并删除半成品。
+                observability_export::cleanup_window(window.app_handle(), window.label());
                 let state = window.state::<Arc<DesktopState>>();
                 // v3：派生 viewer 关闭 → 向主窗发 Electron 同形 `viewer-closed`（数字 windowId）。
                 if window.label().starts_with("viewer-") {

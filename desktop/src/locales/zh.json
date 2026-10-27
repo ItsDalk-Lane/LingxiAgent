@@ -823,6 +823,9 @@
     "memoryOn": "记忆",
     "memoryOff": "此次聊天不参考记忆",
     "memoryDisabled": "记忆已关闭",
+    "fileTask": "文件任务",
+    "fileTaskBusy": "正在选择文件…",
+    "fileTaskHint": "选择文件，直接开始文件任务",
     "agentSelector": "选择助手",
     "placeholderTips": [
       "试试输入 / 唤起命令菜单",
@@ -5939,7 +5942,7 @@
   },
   "systemPermissions": {
     "title": "系统权限",
-    "description": "测试版需要在 macOS 系统设置中授权麦克风、语音识别与通知；点下面按钮会弹出系统请求。",
+    "description": "Lingxi 需要在 macOS 系统设置中授权麦克风、语音识别与通知；点下面按钮会弹出系统请求。",
     "microphone": "麦克风",
     "speech": "语音识别",
     "notification": "通知",

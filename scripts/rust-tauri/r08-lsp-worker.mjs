@@ -9,9 +9,10 @@ const chunks=[]; for await (const chunk of process.stdin) chunks.push(chunk);
 const input=JSON.parse(Buffer.concat(chunks).toString('utf8'));
 let root, client;
 const servers={typescript:['typescript-language-server',['--stdio']],python:['pyright-langserver',['--stdio']],go:['gopls',[]],rust:['rust-analyzer',[]],cpp:['clangd',['--background-index=false','--clang-tidy=false']]};
+const versionCommands={typescript:['typescript-language-server','--version'],python:['pyright','--version'],go:['gopls','version'],rust:['rust-analyzer','--version'],cpp:['clangd','--version']};
 try {
   if(input.op==='status') {
-    const availability=await Promise.all(Object.entries(servers).map(async([language,[server]])=>({language,server,available:await new Promise(resolve=>{let done=false;const child=spawn(server,['--version'],{stdio:'ignore'});const finish=value=>{if(done)return;done=true;clearTimeout(timer);resolve(value);};const timer=setTimeout(()=>{child.kill();finish(false);},3000);child.once('error',()=>finish(false));child.once('exit',code=>finish(code===0));})})));
+    const availability=await Promise.all(Object.entries(servers).map(async([language,[server]])=>({language,server,available:await new Promise(resolve=>{let done=false;const [versionCmd,...versionArgs]=versionCommands[language];const child=spawn(versionCmd,versionArgs,{stdio:'ignore'});const finish=value=>{if(done)return;done=true;clearTimeout(timer);resolve(value);};const timer=setTimeout(()=>{child.kill();finish(false);},3000);child.once('error',()=>finish(false));child.once('exit',code=>finish(code===0));})})));
     process.stdout.write(JSON.stringify({availability}));
   } else if(input.op==='ast') {
     root=await realpath(input._scratch || await mkdtemp(path.join(tmpdir(),'lingxi-r08-ast-')));

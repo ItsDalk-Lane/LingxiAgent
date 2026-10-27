@@ -823,6 +823,9 @@
     "memoryOn": "記憶",
     "memoryOff": "このチャットでは記憶を使用しません",
     "memoryDisabled": "記憶はオフです",
+    "fileTask": "ファイルタスク",
+    "fileTaskBusy": "ファイルを選択中…",
+    "fileTaskHint": "ファイルを選択してファイルタスクを開始",
     "agentSelector": "エージェントを選択",
     "placeholderTips": [
       "/ を入力するとコマンドメニューが開きます",
@@ -5834,7 +5837,7 @@
   },
   "systemPermissions": {
     "title": "システム権限",
-    "description": "このテスト版ではマイク・音声認識・通知の権限が必要です。下のボタンでシステムの確認ダイアログを出します。",
+    "description": "Lingxi ではマイク・音声認識・通知の権限が必要です。下のボタンでシステムの確認ダイアログを出します。",
     "microphone": "マイク",
     "speech": "音声認識",
     "notification": "通知",

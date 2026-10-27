@@ -695,6 +695,34 @@ pub async fn sidebar_ui_put_route(
 // 端口决策：旧 PUT 的 catch→400 全包（含存储损坏）按本模块族既有约定改为
 // 损坏/IO 响亮 500，仅体校验失败 400——不复制 catch-all 静默口径。
 
+/// 外观 patch 的写入门（R10 缺口）：theme 必须是可保存的字符串。
+///
+/// 历史实现只做 trim + 非空过滤，控制字符/非字符串会原样 merge 进
+/// preferences.json（GET 时再被 normalize 丢掉），文件里留下不可见坏值。
+/// 在 merge_write 之前拒绝，保证“非法输入不落盘”；未知主题 id 仍允许
+/// （客户端主题表可扩展，宿主不硬编码枚举）。
+fn validate_appearance_patch(patch: &Value) -> Result<(), String> {
+    let Some(object) = patch.as_object() else {
+        return Err("appearance must be an object".into());
+    };
+    if let Some(raw) = object.get("theme") {
+        let Some(theme) = raw.as_str() else {
+            return Err("appearance theme must be string".into());
+        };
+        let trimmed = theme.trim();
+        if trimmed.is_empty() {
+            return Err("appearance theme must not be empty".into());
+        }
+        if trimmed.chars().count() > 64 {
+            return Err("appearance theme is too long".into());
+        }
+        if trimmed.chars().any(char::is_control) {
+            return Err("appearance theme contains control characters".into());
+        }
+    }
+    Ok(())
+}
+
 fn normalize_appearance(source: &Value) -> Value {
     let mut out = serde_json::Map::new();
     if let Some(theme) = source
@@ -730,6 +758,10 @@ pub async fn appearance_put_route(
         Ok(value) => value,
         Err(response) => return response,
     };
+    // 非法 theme 在读取/合并/落盘之前拒绝（400），不留下不可见坏值。
+    if let Err(message) = validate_appearance_patch(&patch) {
+        return EndpointError::invalid_message(message).into_response();
+    }
     let before = match state.memory().read_root() {
         Ok(root) => normalize_appearance(&root["appearance"]),
         Err(response) => return response,
@@ -1038,5 +1070,35 @@ pub async fn plan_mode_post_route(
             Json(body).into_response()
         }
         Err(response) => response,
+    }
+}
+
+#[cfg(test)]
+mod appearance_validation_tests {
+    use super::validate_appearance_patch;
+    use serde_json::json;
+
+    #[test]
+    fn appearance_patch_requires_safe_theme_string() {
+        assert!(validate_appearance_patch(&json!({})).is_ok());
+        assert!(validate_appearance_patch(&json!({"theme":" hana-ink "})).is_ok());
+        assert!(validate_appearance_patch(&json!({"theme":"warm-paper","serif":true})).is_ok());
+        // NUL 是 R09 T03 的真实反例：旧实现会把它写进 preferences.json。
+        assert_eq!(
+            validate_appearance_patch(&json!({"theme":"\u{0}"})).unwrap_err(),
+            "appearance theme contains control characters"
+        );
+        assert_eq!(
+            validate_appearance_patch(&json!({"theme":"   "})).unwrap_err(),
+            "appearance theme must not be empty"
+        );
+        assert_eq!(
+            validate_appearance_patch(&json!({"theme":42})).unwrap_err(),
+            "appearance theme must be string"
+        );
+        assert_eq!(
+            validate_appearance_patch(&json!({"theme":"x".repeat(65)})).unwrap_err(),
+            "appearance theme is too long"
+        );
     }
 }

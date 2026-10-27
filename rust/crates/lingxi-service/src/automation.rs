@@ -1417,6 +1417,37 @@ fn notification_mode(value: Option<&Value>) -> Result<&str, String> {
             .ok_or_else(|| "notification preference mode must be string".into()),
     }
 }
+/// PUT patch 白名单：只允许这三类完成通知偏好的已知键（turnCompletion 为旧客户端
+/// 别名）；未知键不落盘（400），避免把任意 renderer 字段写进 preferences.json。
+const NOTIFICATION_PATCH_KEYS: [&str; 4] = [
+    "chatCompletion",
+    "turnCompletion",
+    "scheduledTaskCompletion",
+    "patrolCompletion",
+];
+const CHAT_COMPLETION_MODES: [&str; 3] = ["never", "when_unfocused", "when_session_unfocused"];
+const BACKGROUND_COMPLETION_MODES: [&str; 3] = ["never", "when_unfocused", "always"];
+
+/// 校验 patch 自身：键必须在白名单内、值必须是字符串且属于对应枚举。
+/// 在加锁/读盘/写入之前调用，保证非法 patch 不产生任何持久化副作用。
+fn validate_notification_patch(patch: &serde_json::Map<String, Value>) -> Result<(), String> {
+    for (key, value) in patch {
+        if !NOTIFICATION_PATCH_KEYS.contains(&key.as_str()) {
+            return Err(format!("unknown notification preference key: {key}"));
+        }
+        let allowed: &[&str] = match key.as_str() {
+            "chatCompletion" | "turnCompletion" => &CHAT_COMPLETION_MODES,
+            _ => &BACKGROUND_COMPLETION_MODES,
+        };
+        let mode = value
+            .as_str()
+            .ok_or_else(|| format!("notification preference {key} must be string"))?;
+        if !allowed.contains(&mode) {
+            return Err(format!("notification preference {key} is invalid"));
+        }
+    }
+    Ok(())
+}
 fn notification_preferences(prefs: &Value) -> Result<Value, String> {
     let source = prefs.get("notifications").unwrap_or(&Value::Null);
     if !source.is_null() && !source.is_object() {
@@ -1465,6 +1496,8 @@ pub async fn notification_preferences_put_route(
             .unwrap_or(&body)
             .as_object()
             .ok_or("notification preference patch must be object")?;
+        // 先只读校验 patch：未知键/非字符串/越界枚举一律 400，且不触碰任何存储。
+        validate_notification_patch(patch)?;
         let _lock = crate::agents_admin::preferences_locked();
         let mut prefs = state.memory().read_preferences_root()?;
         notification_preferences(&prefs)?;
@@ -1480,6 +1513,7 @@ pub async fn notification_preferences_put_route(
             if key == "turnCompletion" {
                 continue;
             }
+            // 只合并已知键；preferences.notifications 里既有的未知/历史字段保持不动。
             prefs["notifications"][key] = value.clone();
         }
         let normalized = notification_preferences(&prefs)?;
@@ -1551,5 +1585,46 @@ mod shutdown_tests {
         }
         assert!(completed.load(std::sync::atomic::Ordering::Acquire));
         assert!(host.tasks.lock().unwrap().is_empty());
+    }
+}
+
+#[cfg(test)]
+mod notification_patch_tests {
+    use super::*;
+    use serde_json::Map;
+
+    fn patch(value: Value) -> Map<String, Value> {
+        value.as_object().cloned().unwrap_or_default()
+    }
+
+    #[test]
+    fn notification_patch_whitelist_rejects_unknown_keys_and_invalid_values() {
+        assert!(validate_notification_patch(&patch(json!({
+            "chatCompletion": "when_unfocused",
+            "turnCompletion": "when_session_unfocused",
+            "scheduledTaskCompletion": "always",
+            "patrolCompletion": "never",
+        })))
+        .is_ok());
+        // 未知键（宿主侧通知载荷字段不是 server 偏好键）。
+        assert_eq!(
+            validate_notification_patch(&patch(json!({"desktopFocusPolicy": "when_unfocused"})))
+                .unwrap_err(),
+            "unknown notification preference key: desktopFocusPolicy"
+        );
+        // 类型错误。
+        assert_eq!(
+            validate_notification_patch(&patch(json!({"scheduledTaskCompletion": true})))
+                .unwrap_err(),
+            "notification preference scheduledTaskCompletion must be string"
+        );
+        // 枚举越界。
+        assert_eq!(
+            validate_notification_patch(&patch(json!({"patrolCompletion": "invented"})))
+                .unwrap_err(),
+            "notification preference patrolCompletion is invalid"
+        );
+        // 空 patch 合法（不写任何键）。
+        assert!(validate_notification_patch(&Map::new()).is_ok());
     }
 }

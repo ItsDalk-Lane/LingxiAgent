@@ -822,6 +822,9 @@
     "memoryOn": "Memory",
     "memoryOff": "Memory not used for this chat",
     "memoryDisabled": "Memory is off",
+    "fileTask": "File task",
+    "fileTaskBusy": "Choosing files…",
+    "fileTaskHint": "Choose files to start a file task",
     "agentSelector": "Choose agent",
     "placeholderTips": [
       "Type / to bring up the command menu",
@@ -5838,7 +5841,7 @@
   },
   "systemPermissions": {
     "title": "System permissions",
-    "description": "This test build needs macOS permission for microphone, speech recognition and notifications. The buttons below trigger the real system prompts.",
+    "description": "Lingxi needs macOS permission for microphone, speech recognition and notifications. The buttons below trigger the real system prompts.",
     "microphone": "Microphone",
     "speech": "Speech recognition",
     "notification": "Notifications",

@@ -25,7 +25,13 @@ serde_json = "=1.0.151"
 base64 = "=0.23.1"
 sha2 = "=0.11.0"
 tokio = { version = "=1.53.1", features = ["sync", "time", "rt", "macros"] }
-reqwest = { version = "=0.13.5", default-features = false, features = ["json"] }
+# R10：About 更新链访问固定 GitHub HTTPS 端点。统一用 rustls + ring provider
+# （ring provider 在 update_about.rs 显式安装），避免 aws-lc-sys 的 cmake 构建依赖。
+reqwest = { version = "=0.13.5", default-features = false, features = ["json", "rustls-no-provider"] }
+ring = "=0.17.14"
+rustls = { version = "=0.23.45", default-features = false, features = ["std", "tls12", "ring"] }
+# R10：可观测导出的不透明 capability token（跨窗口不可猜测）。
+uuid = { version = "=1.29.0", features = ["v4"] }
 open = "=5.4.4"
 lingxi-protocol = { path = "../../rust/crates/lingxi-protocol" }
 trash = "=5.2.9"

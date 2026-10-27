@@ -27,7 +27,7 @@ use crate::service::shutdown::ShutdownReport;
 use crate::service::{resolve, Diagnostics, ServiceRuntime, StartError, SupervisorConfig, Timings};
 
 const MAIN_WINDOW_LABEL: &str = "main";
-const MAIN_WINDOW_TITLE: &str = "Lingxi · Rust 预览";
+const MAIN_WINDOW_TITLE: &str = "Lingxi";
 const APP_READY_FALLBACK: Duration = Duration::from_secs(30);
 
 fn home_for_diagnostics(env: &crate::service::env::EnvSnapshot) -> Result<PathBuf, StartError> {
@@ -145,6 +145,125 @@ fn validate_asset_workspace_root(home: &Path, raw: &str) -> Option<PathBuf> {
     Some(canonical)
 }
 
+/// 随包 Chromium 的可执行文件候选（R11：网页/PDF 预览不再依赖用户 Chrome）。
+///
+/// 生产包 resource_dir 下是 `chromium/Chromium.app/...`；开发/证据构建回退到
+/// `desktop/src-tauri/resources/chromium/`（`npm run fetch:chromium` 写入，
+/// 已在 .gitignore 内）。显式 `LINGXI_CHROMIUM_PATH` 永远优先，便于测试注入。
+fn bundled_chromium_executable(app: &tauri::App) -> Option<PathBuf> {
+    if let Some(raw) = std::env::var_os("LINGXI_CHROMIUM_PATH") {
+        return Some(PathBuf::from(raw));
+    }
+    let mut roots: Vec<PathBuf> = Vec::new();
+    if let Ok(resource_dir) = app.path().resource_dir() {
+        roots.push(resource_dir.join("chromium"));
+    }
+    roots.push(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("resources/chromium"));
+    roots
+        .into_iter()
+        .map(|root| root.join("Chromium.app/Contents/MacOS/Chromium"))
+        .find(|candidate| candidate.is_file())
+}
+
+/// 把随包 Chromium 路径交给服务子进程；找不到时保持未设置，由服务显式
+/// 报不可用（不静默降级到“假装有浏览器”）。
+fn install_bundled_chromium(app: &tauri::App, diagnostics: &Diagnostics) {
+    if std::env::var_os("LINGXI_CHROMIUM_PATH").is_some() {
+        return;
+    }
+    let Some(executable) = bundled_chromium_executable(app) else {
+        diagnostics.log("chromium-unavailable", json!({}));
+        return;
+    };
+    std::env::set_var("LINGXI_CHROMIUM_PATH", &executable);
+    diagnostics.log(
+        "chromium-ready",
+        json!({ "path": executable.display().to_string() }),
+    );
+}
+
+/// 随包 Node 运行时/外围 worker 根目录（R11 业主裁决：Node 随包）。
+///
+/// 生产包结构：`node/bin/node`、`workers/*.mjs`、`office/themes|covers`、
+/// `bin/ast-grep`；开发/证据构建回退到 `desktop/src-tauri/resources/`。
+fn bundled_runtime_root(app: &tauri::App) -> Option<PathBuf> {
+    let mut roots: Vec<PathBuf> = Vec::new();
+    if let Ok(resource_dir) = app.path().resource_dir() {
+        roots.push(resource_dir);
+    }
+    roots.push(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("resources"));
+    roots
+        .into_iter()
+        .find(|root| root.join("node/bin/node").is_file())
+}
+
+fn set_env_if_absent(key: &str, value: &Path) {
+    if std::env::var_os(key).is_none() {
+        std::env::set_var(key, value);
+    }
+}
+
+/// 把 Node 运行时和 worker 路径交给服务子进程；Node/worker 缺失时保持未设置，
+/// 由服务/工具显式报“找不到 Node/worker”，不假装可用。
+fn install_bundled_node_runtime(app: &tauri::App, diagnostics: &Diagnostics) {
+    let Some(root) = bundled_runtime_root(app) else {
+        diagnostics.log("node-runtime-unavailable", json!({}));
+        return;
+    };
+    let node = root.join("node/bin/node");
+    let node_bin = root.join("node/bin");
+    let workers = root.join("workers");
+    let office = root.join("office");
+    let bin = root.join("bin");
+    let lsp_bin = root.join("lsp/bin");
+
+    // PATH 优先：AST/LSP/PTC 通过 `node`/`ast-grep`/语言服务器名称解析，
+    // 必须让随包版本排在系统版本之前；用户显式指定的其它工具仍保留在后面。
+    let mut path_entries: Vec<PathBuf> = vec![node_bin.clone(), bin.clone(), lsp_bin.clone()];
+    path_entries.extend(std::env::split_paths(
+        &std::env::var_os("PATH").unwrap_or_default(),
+    ));
+    if let Ok(joined) = std::env::join_paths(path_entries) {
+        std::env::set_var("PATH", joined);
+    }
+
+    set_env_if_absent("LINGXI_BRIDGE_NODE", &node);
+    let bridge_worker = workers.join("bridge-sdk-worker.mjs");
+    if bridge_worker.is_file() {
+        set_env_if_absent("LINGXI_BRIDGE_WORKER", &bridge_worker);
+    }
+    let office_worker = workers.join("office-document-worker.mjs");
+    let office_themes = office.join("themes");
+    let office_covers = office.join("covers");
+    if office_worker.is_file() && office_themes.is_dir() && office_covers.is_dir() {
+        set_env_if_absent("LINGXI_OFFICE_NODE", &node);
+        set_env_if_absent("LINGXI_OFFICE_WORKER", &office_worker);
+        set_env_if_absent("LINGXI_OFFICE_THEMES", &office_themes);
+        set_env_if_absent("LINGXI_OFFICE_COVERS", &office_covers);
+    }
+    for (key, file) in [
+        ("LINGXI_PTC_WORKER", "ptc-worker.mjs"),
+        ("LINGXI_LSP_WORKER", "lsp-worker.mjs"),
+        ("LINGXI_MEDIA_HELPER", "media-jimeng-worker.mjs"),
+    ] {
+        let candidate = workers.join(file);
+        if candidate.is_file() {
+            set_env_if_absent(key, &candidate);
+        }
+    }
+    set_env_if_absent("LINGXI_MEDIA_NODE", &node);
+
+    diagnostics.log(
+        "node-runtime-ready",
+        json!({
+            "node": node.display().to_string(),
+            "workers": workers.display().to_string(),
+            "astGrep": bin.join("ast-grep").display().to_string(),
+            "lspBin": lsp_bin.display().to_string(),
+        }),
+    );
+}
+
 /// setup 阶段：只做状态初始化；服务启动放异步任务（不阻塞事件循环）。
 pub fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     let env = crate::service::env::EnvSnapshot::from_process();
@@ -163,6 +282,9 @@ pub fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
             "lingxi-service"
         });
     let diagnostics = Diagnostics::for_home(&home);
+    // R11：随包 Chromium/Node/worker 在服务 spawn 前注入；缺失时由服务显式报不可用。
+    install_bundled_chromium(app, &diagnostics);
+    install_bundled_node_runtime(app, &diagnostics);
     diagnostics.log(
         "host-start",
         json!({

@@ -205,6 +205,31 @@
     color: var(--accent);
 }
 
+/* 欢迎页底部动作：固定文件任务入口 + 记忆开关 */
+.welcomeActions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    margin-top: var(--space-4);
+}
+
+.welcomeActions .memoryToggleBtn {
+    margin-top: 0;
+}
+
+.fileTaskBtn {
+    color: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    opacity: 0.95;
+}
+
+.fileTaskBtn:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    opacity: 1;
+}
+
 /* 记忆开关按钮 */
 .memoryToggleBtn {
     display: inline-flex;

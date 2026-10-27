@@ -823,6 +823,9 @@
     "memoryOn": "記憶",
     "memoryOff": "此次聊天不參考記憶",
     "memoryDisabled": "記憶已關閉",
+    "fileTask": "檔案任務",
+    "fileTaskBusy": "正在選擇檔案…",
+    "fileTaskHint": "選擇檔案，直接開始檔案任務",
     "agentSelector": "選擇助手",
     "placeholderTips": [
       "試試輸入 / 喚起命令選單",
@@ -5834,7 +5837,7 @@
   },
   "systemPermissions": {
     "title": "系統權限",
-    "description": "測試版需要在 macOS 系統設定中授權麥克風、語音辨識與通知；點下方按鈕會跳出系統請求。",
+    "description": "Lingxi 需要在 macOS 系統設定中授權麥克風、語音辨識與通知；點下方按鈕會跳出系統請求。",
     "microphone": "麥克風",
     "speech": "語音辨識",
     "notification": "通知",

@@ -14,6 +14,7 @@ use std::time::Instant;
 use serde_json::{json, Value};
 use tauri::{AppHandle, Manager, State, WebviewWindow};
 
+use crate::native::window_controls;
 use crate::service::{ConnectionInfoView, Diagnostics, ServiceRuntime};
 
 pub struct HostState {
@@ -337,8 +338,15 @@ pub fn app_ready(window: WebviewWindow, state: State<'_, HostState>) -> Result<(
     Ok(())
 }
 
+/// 渲染层不允许指定窗口 id：出现即按越权尝试显式拒绝（Electron 语义是忽略
+/// 参数、只作用于调用者窗口；Tauri 自定义命令以显式错误表达同一安全边界）。
+fn reject_injected_window_id(window_id: Option<&str>) -> Result<(), String> {
+    window_controls::reject_window_id_argument(window_id).map_err(|error| error.to_string())
+}
+
 #[tauri::command]
-pub fn window_minimize(window: WebviewWindow) -> Result<(), String> {
+pub fn window_minimize(window: WebviewWindow, window_id: Option<String>) -> Result<(), String> {
+    reject_injected_window_id(window_id.as_deref())?;
     if suppress_window_control_in_automation(&window, "window_minimize") {
         return Ok(());
     }
@@ -346,7 +354,8 @@ pub fn window_minimize(window: WebviewWindow) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub fn window_maximize(window: WebviewWindow) -> Result<(), String> {
+pub fn window_maximize(window: WebviewWindow, window_id: Option<String>) -> Result<(), String> {
+    reject_injected_window_id(window_id.as_deref())?;
     if suppress_window_control_in_automation(&window, "window_maximize") {
         return Ok(());
     }
@@ -358,13 +367,32 @@ pub fn window_maximize(window: WebviewWindow) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub fn window_close(window: WebviewWindow) -> Result<(), String> {
+pub fn window_close(window: WebviewWindow, window_id: Option<String>) -> Result<(), String> {
+    reject_injected_window_id(window_id.as_deref())?;
     window.close().map_err(|error| error.to_string())
 }
 
 #[tauri::command]
-pub fn window_is_maximized(window: WebviewWindow) -> Result<bool, String> {
+pub fn window_is_maximized(
+    window: WebviewWindow,
+    window_id: Option<String>,
+) -> Result<bool, String> {
+    reject_injected_window_id(window_id.as_deref())?;
     window.is_maximized().map_err(|error| error.to_string())
+}
+
+/// Electron `window-theme-changed` 的主题白名单：dark/light 映射原生外观，
+/// auto/system 显式跟随系统；空/控制字符/未知主题一律显式错误且不触碰窗口外观。
+fn native_theme_for(theme: &str) -> Result<Option<tauri::Theme>, String> {
+    if theme.is_empty() || theme.len() > 64 || theme.chars().any(char::is_control) {
+        return Err("主题形态非法（空/控制字符/超长）".to_string());
+    }
+    match theme {
+        "dark" => Ok(Some(tauri::Theme::Dark)),
+        "light" => Ok(Some(tauri::Theme::Light)),
+        "auto" | "system" => Ok(None),
+        other => Err(format!("未知主题: {other}")),
+    }
 }
 
 /// Electron `window-theme-changed` 的等价：主题名反射到原生窗口 appearance。
@@ -374,16 +402,11 @@ pub fn window_theme_changed(
     theme: String,
     state: State<'_, HostState>,
 ) -> Result<(), String> {
-    let native_theme = match theme.as_str() {
-        "dark" => Some(tauri::Theme::Dark),
-        "light" => Some(tauri::Theme::Light),
-        _ => None,
-    };
-    if let Some(native_theme) = native_theme {
-        window
-            .set_theme(Some(native_theme))
-            .map_err(|error| error.to_string())?;
-    }
+    let native_theme = native_theme_for(&theme)?;
+    // 非法主题在上一步已返回错误，不会执行 set_theme（窗口外观保持原状）。
+    window
+        .set_theme(native_theme)
+        .map_err(|error| error.to_string())?;
     log_event(
         &state,
         "window-theme",
@@ -463,5 +486,44 @@ mod tests {
             automation_window_control_action(false),
             AutomationWindowControl::Proceed
         );
+    }
+
+    #[test]
+    fn window_theme_whitelist_accepts_four_values_only() {
+        assert!(matches!(
+            native_theme_for("dark"),
+            Ok(Some(tauri::Theme::Dark))
+        ));
+        assert!(matches!(
+            native_theme_for("light"),
+            Ok(Some(tauri::Theme::Light))
+        ));
+        // auto/system → 显式跟随系统（set_theme(None)），不是静默 no-op。
+        assert!(matches!(native_theme_for("auto"), Ok(None)));
+        assert!(matches!(native_theme_for("system"), Ok(None)));
+        // 空/控制字符/未知主题（含旧主题注册表名）必须显式错误，调用方不得 set_theme。
+        for bad in [
+            "",
+            "\u{0}",
+            "dark\u{0}",
+            "midnight",
+            "coral",
+            "system ",
+            "DARK",
+        ] {
+            assert!(native_theme_for(bad).is_err(), "{bad:?} 应被拒绝");
+        }
+    }
+
+    #[test]
+    fn renderer_window_id_is_rejected_for_window_controls() {
+        assert!(reject_injected_window_id(None).is_ok());
+        for injected in ["main", "viewer-999", ""] {
+            let error = reject_injected_window_id(Some(injected)).unwrap_err();
+            assert!(
+                error.contains("窗口控制命令不接受"),
+                "{injected:?} 应拒绝，实际 {error}"
+            );
+        }
     }
 }

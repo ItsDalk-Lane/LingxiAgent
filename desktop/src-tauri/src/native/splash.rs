@@ -18,7 +18,7 @@
 use std::path::{Path, PathBuf};
 
 use super::errors::{deny, HostResult, E_INVALID_ARGUMENT, E_WINDOW_NOT_ALLOWED};
-use super::window_labels::{require_exact_label, ONBOARDING, SPLASH};
+use super::window_labels::{require_exact_label, MAIN, ONBOARDING, SPLASH};
 
 pub const AVATAR_EXTS: &[&str] = &["png", "jpg", "jpeg", "webp"];
 pub const MAX_AVATAR_BYTES: u64 = 15 * 1024 * 1024;
@@ -28,9 +28,14 @@ pub const DEFAULT_SPLASH_LOCALE: &str = "zh-CN";
 pub const DEFAULT_SPLASH_YUAN: &str = "lingxi";
 pub const AVATAR_ROLES: &[&str] = &["agent", "user"];
 
-/// splash 数据命令只允许 splash/onboarding 窗口调用（现役 sender 白名单）。
+/// splash 数据命令允许的调用窗口：splash/onboarding（现役 sender 白名单）与
+/// main（OWNER-04 裁决：Electron ipc 无窗口限制，主窗也允许读启动资料/头像）。
+///
+/// 注意：放开的只是窗口 label；页面 URL 仍按调用窗口分流校验
+/// （splash/onboarding → `validate_splash_page_url`，main → `validate_main_page_url`），
+/// 不会因为允许 main 而放宽来源/页面门。
 pub fn authorize_splash_caller(caller: &str) -> HostResult<()> {
-    require_exact_label(caller, &[SPLASH, ONBOARDING])
+    require_exact_label(caller, &[SPLASH, ONBOARDING, MAIN])
 }
 
 /// 页面 URL 白名单：只允许 `splash.html` / `onboarding.html`（可带 `preview=1`
@@ -75,6 +80,67 @@ pub fn validate_splash_page_url(url: &str) -> HostResult<()> {
         }
     }
     Ok(())
+}
+
+/// 主窗口调用 splash 数据命令时的页面门（OWNER-04）。
+///
+/// 只允许主窗自己的精确 `index.html` 页面，且来源仍必须是本壳
+/// （`validate_splash_origin` 的 file/tauri/localhost 白名单）；除 fragment 外
+/// 不允许任何查询参数（主窗 `index.html` 不携带 query，非法 query 一律拒绝）。
+/// 这条门不替代 `validate_splash_page_url`：splash/onboarding 仍走原有的
+/// `splash.html`/`onboarding.html` 精确页门。
+pub fn validate_main_page_url(url: &str) -> HostResult<()> {
+    if url.is_empty() || url.len() > 4096 || url.chars().any(|c| c.is_control()) {
+        return Err(deny(E_INVALID_ARGUMENT, "页面 URL 形态非法"));
+    }
+    validate_splash_origin(url)?;
+    let Some((path, query)) = page_path_and_query(url) else {
+        return Err(deny(E_INVALID_ARGUMENT, "主窗口页面 URL 缺少路径"));
+    };
+    // file: 形态带绝对路径，只要求最后一段是 index.html；其余本壳来源形态
+    // （tauri://localhost、dev http://localhost:port）要求路径精确为 /index.html。
+    let exact_index = if url.starts_with("file:") {
+        path.ends_with("/index.html")
+    } else {
+        path == "/index.html"
+    };
+    if !exact_index {
+        return Err(deny(
+            E_WINDOW_NOT_ALLOWED,
+            "主窗口只允许精确 index.html 页面调用",
+        ));
+    }
+    if let Some(query) = query {
+        if !query.is_empty() {
+            return Err(deny(E_INVALID_ARGUMENT, "主窗口页面 URL 不允许查询参数"));
+        }
+    }
+    Ok(())
+}
+
+/// 从本壳页面 URL 中取出 path（含前导 `/`）与 query（已去掉 fragment）。
+/// 不解析 authority 细节（来源门由 `validate_splash_origin` 负责）。
+fn page_path_and_query(url: &str) -> Option<(&str, Option<&str>)> {
+    let path = match url.split_once("://") {
+        Some((_scheme, rest)) => {
+            let start = rest.find('/')?;
+            &rest[start..]
+        }
+        None => {
+            let rest = url.strip_prefix("file:")?;
+            if !rest.starts_with('/') {
+                return None;
+            }
+            rest
+        }
+    };
+    let (path, query) = match path.split_once('?') {
+        Some((path, query)) => (path, Some(query)),
+        None => (path, None),
+    };
+    let path = path.split('#').next().unwrap_or(path);
+    let query = query.map(|query| query.split('#').next().unwrap_or(query));
+    Some((path, query))
 }
 
 /// 页面来源门（现役 `isTrustedSplashAvatarSender`：file:// 本地页面或 devUrl 的
@@ -223,10 +289,12 @@ mod tests {
     use crate::native::errors::{E_INVALID_ARGUMENT, E_WINDOW_NOT_ALLOWED};
 
     #[test]
-    fn only_splash_and_onboarding_windows_may_read() {
+    fn main_splash_and_onboarding_windows_may_read() {
         assert!(authorize_splash_caller("splash").is_ok());
         assert!(authorize_splash_caller("onboarding").is_ok());
-        for caller in ["main", "settings", "quick-chat", "viewer-1"] {
+        // OWNER-04：主窗也允许读启动资料/头像（页面门仍在 native_commands 分流）。
+        assert!(authorize_splash_caller("main").is_ok());
+        for caller in ["settings", "quick-chat", "viewer-1", "browser-viewer"] {
             assert_eq!(
                 authorize_splash_caller(caller).unwrap_err().code(),
                 E_WINDOW_NOT_ALLOWED
@@ -271,6 +339,42 @@ mod tests {
                 .code(),
             E_INVALID_ARGUMENT
         );
+    }
+
+    #[test]
+    fn main_page_url_is_exactly_index_html_on_trusted_origin() {
+        for good in [
+            "tauri://localhost/index.html",
+            "tauri://localhost/index.html#/chat",
+            "http://localhost:5173/index.html",
+            "http://127.0.0.1:5173/index.html",
+            "file:///Applications/Lingxi.app/Contents/Resources/index.html",
+            "file:/Applications/Lingxi.app/Contents/Resources/index.html",
+        ] {
+            assert!(validate_main_page_url(good).is_ok(), "应接受 {good}");
+        }
+        for (bad, code) in [
+            // 非精确 index.html：splash/onboarding 页面不能被主窗门接受
+            ("tauri://localhost/splash.html", E_WINDOW_NOT_ALLOWED),
+            ("tauri://localhost/onboarding.html", E_WINDOW_NOT_ALLOWED),
+            ("tauri://localhost/", E_WINDOW_NOT_ALLOWED),
+            ("tauri://localhost/evil/index.html", E_WINDOW_NOT_ALLOWED),
+            // 任何查询参数都拒绝（主窗页面不带 query）
+            ("tauri://localhost/index.html?preview=1", E_INVALID_ARGUMENT),
+            ("tauri://localhost/index.html?x", E_INVALID_ARGUMENT),
+            // 伪造来源仍拒绝
+            ("https://evil.example/index.html", E_WINDOW_NOT_ALLOWED),
+            ("tauri://evil.example/index.html", E_WINDOW_NOT_ALLOWED),
+            // 形态非法
+            ("", E_INVALID_ARGUMENT),
+            ("tauri://localhost/index.html\u{0}", E_INVALID_ARGUMENT),
+        ] {
+            assert_eq!(
+                validate_main_page_url(bad).unwrap_err().code(),
+                code,
+                "应拒绝 {bad:?}"
+            );
+        }
     }
 
     #[test]

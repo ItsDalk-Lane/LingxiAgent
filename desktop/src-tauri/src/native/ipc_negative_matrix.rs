@@ -229,7 +229,7 @@ pub fn cases() -> Vec<NegativeCase> {
             crate::native::errors::E_ENUM_INVALID,
             || {
                 expect_error(
-                    global_shortcut::plan_test_register("Alt+; rm -rf /").map(|_| ()),
+                    global_shortcut::plan_test_register("Alt+; rm -rf /", &[]).map(|_| ()),
                     crate::native::errors::E_ENUM_INVALID,
                 )
             }
@@ -240,7 +240,7 @@ pub fn cases() -> Vec<NegativeCase> {
             crate::native::errors::E_ENUM_INVALID,
             || {
                 expect_error(
-                    global_shortcut::plan_test_register("Alt+NotAKey").map(|_| ()),
+                    global_shortcut::plan_test_register("Alt+NotAKey", &[]).map(|_| ()),
                     crate::native::errors::E_ENUM_INVALID,
                 )
             }

@@ -242,14 +242,20 @@ pub fn show_notification(
     agent_id: Option<String>,
     options: Option<Value>,
 ) -> Result<Value, String> {
-    let focus_policy = options
-        .as_ref()
-        .and_then(|value| {
-            value
-                .get("focusPolicy")
-                .or_else(|| value.get("focus_policy"))
-        })
-        .and_then(Value::as_str);
+    // Electron renderer 侧的字段名是 `desktopFocusPolicy`（shared/desktop-notification-policy.cjs）；
+    // 兼容旧/外部调用方的 snake_case 与通用 `focusPolicy` 别名：按顺序取第一个出现的键，
+    // 再交给 notification 模块做严格枚举归一（未知值回落 always，与现役一致）。
+    let focus_policy = options.as_ref().and_then(|value| {
+        [
+            "desktopFocusPolicy",
+            "desktop_focus_policy",
+            "focusPolicy",
+            "focus_policy",
+        ]
+        .iter()
+        .find_map(|key| value.get(*key))
+        .and_then(Value::as_str)
+    });
     let request = notification::validate_notification_request(
         role_label(&window),
         &title,
@@ -498,6 +504,7 @@ pub fn quick_chat_reload_shortcut(window: WebviewWindow, app: AppHandle) -> Resu
 pub fn keybindings_test_register(
     window: WebviewWindow,
     app: AppHandle,
+    native: State<'_, install::NativeState>,
     shortcut: String,
 ) -> Result<Value, String> {
     window_labels::require_role(
@@ -508,23 +515,38 @@ pub fn keybindings_test_register(
         ],
     )
     .map_err(denied)?;
-    let plan = global_shortcut::plan_test_register(&shortcut).map_err(denied)?;
+    // 本宿主已在启动时注册的键位由注册表判定；命中时只证明“已被本应用占用”，
+    // 不重复注册（重复 register 在插件层会失败，原实现因此把自身占用误报成冲突）。
+    let current = native
+        .registered_shortcuts
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
+        .clone();
+    let plan = global_shortcut::plan_test_register(&shortcut, &current).map_err(denied)?;
     use tauri_plugin_global_shortcut::GlobalShortcutExt;
-    let registered = app
-        .global_shortcut()
-        .register(plan.shortcut.as_str())
-        .is_ok();
-    let cleaned = if registered && plan.must_unregister_after {
-        app.global_shortcut()
-            .unregister(plan.shortcut.as_str())
-            .is_ok()
+    let registered = if plan.already_registered {
+        true
     } else {
+        app.global_shortcut()
+            .register(plan.shortcut.as_str())
+            .is_ok()
+    };
+    let cleaned = if plan.must_unregister_after {
+        // 探测注册成功后立即注销；未注册成功则无需清理。
         !registered
+            || app
+                .global_shortcut()
+                .unregister(plan.shortcut.as_str())
+                .is_ok()
+    } else {
+        true
     };
     Ok(json!({
         "ok": registered && cleaned,
         "shortcut": plan.shortcut,
         "registered": registered,
+        // Electron 现役回执字段名是 `self`；R10 契约名是 `selfRegistered`，两者同时返回。
+        "self": plan.already_registered,
         "selfRegistered": plan.already_registered,
     }))
 }
@@ -728,9 +750,15 @@ pub fn quick_chat_open_session_ack(
 // ── splash / onboarding ────────────────────────────────────────────────
 
 fn splash_page_allowed(window: &WebviewWindow) -> Result<(), String> {
-    splash::authorize_splash_caller(role_label(window)).map_err(denied)?;
+    let caller = role_label(window);
+    splash::authorize_splash_caller(caller).map_err(denied)?;
     let url = window.url().map_err(|error| error.to_string())?;
-    splash::validate_splash_page_url(url.as_str()).map_err(denied)
+    // OWNER-04：main 只放行精确 index.html 页面；splash/onboarding 保持原精确页门。
+    if caller == window_labels::MAIN {
+        splash::validate_main_page_url(url.as_str()).map_err(denied)
+    } else {
+        splash::validate_splash_page_url(url.as_str()).map_err(denied)
+    }
 }
 
 fn current_agent_id(home: &Path) -> Option<String> {

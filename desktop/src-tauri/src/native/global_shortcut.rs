@@ -286,7 +286,11 @@ pub fn summarize_registration(
     }
 }
 
-/// `keybindings:test-register` 的探测计划：已注册 → self:true；否则注册后立即注销。
+/// `keybindings:test-register` 的探测计划。
+///
+/// `current` 是本宿主当前真实注册的快捷键表：命中时该键位已被本应用占用
+/// （Electron 现役 `globalShortcut.isRegistered` → `{ok:true, self:true}`），
+/// 不能重复注册，也不应注销；未命中才注册探测并立即注销。
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TestRegisterPlan {
     pub shortcut: String,
@@ -294,16 +298,17 @@ pub struct TestRegisterPlan {
     pub must_unregister_after: bool,
 }
 
-pub fn plan_test_register(raw_shortcut: &str) -> HostResult<TestRegisterPlan> {
+pub fn plan_test_register(raw_shortcut: &str, current: &[String]) -> HostResult<TestRegisterPlan> {
     let normalized = normalize_binding(raw_shortcut);
     if normalized.is_empty() {
         return Err(deny(E_INVALID_ARGUMENT, "invalid shortcut"));
     }
     validate_accelerator(&normalized)?;
+    let already_registered = current.iter().any(|shortcut| shortcut == &normalized);
     Ok(TestRegisterPlan {
         shortcut: normalized,
-        already_registered: false,
-        must_unregister_after: true,
+        already_registered,
+        must_unregister_after: !already_registered,
     })
 }
 
@@ -452,19 +457,32 @@ mod tests {
     }
 
     #[test]
-    fn test_register_plan_always_cleans_up() {
-        let plan = plan_test_register("alt+space").unwrap();
+    fn test_register_plan_cleans_up_only_for_foreign_shortcuts() {
+        let plan = plan_test_register("alt+space", &[]).unwrap();
         assert_eq!(plan.shortcut, "Alt+Space");
         assert!(!plan.already_registered);
         assert!(plan.must_unregister_after);
         assert_eq!(
-            plan_test_register("").unwrap_err().code(),
+            plan_test_register("", &[]).unwrap_err().code(),
             E_INVALID_ARGUMENT
         );
         assert_eq!(
-            plan_test_register("Alt+").unwrap_err().code(),
+            plan_test_register("Alt+", &[]).unwrap_err().code(),
             E_INVALID_ARGUMENT
         );
+        // 已被本宿主注册：证明 self，不重复注册也不注销。
+        let current = vec!["Alt+Space".to_string(), "Control+Shift+M".to_string()];
+        let owned = plan_test_register("alt+space", &current).unwrap();
+        assert_eq!(owned.shortcut, "Alt+Space");
+        assert!(owned.already_registered);
+        assert!(!owned.must_unregister_after);
+        // 大小写/别名归一后仍能命中宿主注册表。
+        let owned_alias = plan_test_register(" alt+space ", &current).unwrap();
+        assert!(owned_alias.already_registered);
+        // 未在表中的键位仍按探测后清理处理。
+        let foreign = plan_test_register("F13", &current).unwrap();
+        assert!(!foreign.already_registered);
+        assert!(foreign.must_unregister_after);
     }
 
     #[test]

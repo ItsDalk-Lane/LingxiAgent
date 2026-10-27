@@ -823,6 +823,9 @@
     "memoryOn": "기억",
     "memoryOff": "이 대화에서는 기억을 사용하지 않아요",
     "memoryDisabled": "기억이 꺼져 있어요",
+    "fileTask": "파일 작업",
+    "fileTaskBusy": "파일 선택 중…",
+    "fileTaskHint": "파일을 선택해 파일 작업 시작",
     "agentSelector": "에이전트 선택",
     "placeholderTips": [
       "/ 를 입력하면 명령 메뉴가 열려요",
@@ -5834,7 +5837,7 @@
   },
   "systemPermissions": {
     "title": "시스템 권한",
-    "description": "이 테스트 빌드는 마이크, 음성 인식, 알림 권한이 필요합니다. 아래 버튼으로 시스템 요청을 표시합니다.",
+    "description": "Lingxi는 마이크, 음성 인식, 알림 권한이 필요합니다. 아래 버튼으로 시스템 요청을 표시합니다.",
     "microphone": "마이크",
     "speech": "음성 인식",
     "notification": "알림",

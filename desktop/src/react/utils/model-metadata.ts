@@ -1,5 +1,5 @@
-import knownModelFallbacks from '../../../../lib/known-model-fallbacks.json';
-import knownModels from '../../../../lib/known-models.json';
+import knownModelFallbacks from '../../shared-data/known-model-fallbacks.json';
+import knownModels from '../../shared-data/known-models.json';
 
 export interface ModelReferenceMeta {
   name?: string;

@@ -280,8 +280,13 @@ async fn worker(
     sandbox: &Option<Arc<dyn SandboxPort>>,
     ctx: &RunContext,
 ) -> Result<Value, String> {
-    let script = Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../scripts/rust-tauri/r08-lsp-worker.mjs");
+    // 安装包由宿主注入随包 worker；开发/测试回退到仓库脚本。
+    let script = std::env::var_os("LINGXI_LSP_WORKER")
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|| {
+            Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("../../../scripts/rust-tauri/r08-lsp-worker.mjs")
+        });
     run_snapshot_worker(&script, input, cwd, sandbox, ctx).await
 }
 

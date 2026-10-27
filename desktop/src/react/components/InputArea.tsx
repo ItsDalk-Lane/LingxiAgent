@@ -112,6 +112,7 @@ import {
 } from './input/slash-commands';
 import { attachFilesFromPaths } from '../MainContent';
 import { searchDeskFiles } from '../stores/desk-actions';
+import { registerFileTaskHandler } from '../stores/file-task-actions';
 import { lingxiFetch } from '../services/service-client';
 import { VOICE_RECORD_TOGGLE_EVENT } from '../keybindings/useKeybindings';
 import type { DeskSearchResult } from '../types';
@@ -1210,6 +1211,35 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
     browserFileInputRef.current?.click();
     window.setTimeout(restoreEditorFocus, 0);
   }, [inputLocked, restoreEditorFocus, surface]);
+
+  // R10：Welcome 页的固定「文件任务」入口复用当前输入区的真实附件选择流程。
+  // 欢迎页还没有会话时先落一个草稿会话，再走同一套附件快照；否则只会提示
+  // “请先创建会话”，入口等于不可用。
+  const handleFileTask = useCallback(async () => {
+    if (inputLocked) return;
+    if (!scopedSessionPath && pendingNewSession) {
+      const sessionRef = await ensureSession(pendingDraftId);
+      if (!sessionRef) {
+        addToast(t('error.code.sessionCreateFailed'), 'error');
+        return;
+      }
+      loadSessions();
+    }
+    await handleAttach();
+  }, [
+    addToast,
+    ensureSession,
+    handleAttach,
+    inputLocked,
+    loadSessions,
+    pendingDraftId,
+    pendingNewSession,
+    scopedSessionPath,
+    t,
+  ]);
+
+  // 不依赖 Welcome → MainContent 的反向 import；InputArea 负责注册真实处理器。
+  useEffect(() => registerFileTaskHandler(handleFileTask), [handleFileTask]);
 
   const ensureVoiceSessionRef = useCallback(async (): Promise<Readonly<SessionRef>> => {
     const state = useStore.getState();

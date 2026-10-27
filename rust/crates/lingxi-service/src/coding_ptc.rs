@@ -174,14 +174,36 @@ fn contained_command(node: &Path, script: &Path) -> Result<tokio::process::Comma
     let script = script
         .canonicalize()
         .map_err(|e| format!("RUN_TOOLS_WORKER_MISSING: {e}"))?;
-    let runtime = script_root()
-        .join("lib/ptc/ptc-runtime.ts")
-        .canonicalize()
-        .map_err(|e| e.to_string())?;
-    let package = script_root()
-        .join("package.json")
-        .canonicalize()
-        .map_err(|e| e.to_string())?;
+    // 随包 worker 是自包含 ESM：不再依赖仓库 lib/ptc 与 package.json。
+    // 只有仓库开发路径才把这两个文件纳入 sandbox 白名单。
+    let bundled_worker = std::env::var_os("LINGXI_PTC_WORKER").is_some();
+    let runtime = if bundled_worker {
+        None
+    } else {
+        Some(
+            script_root()
+                .join("lib/ptc/ptc-runtime.ts")
+                .canonicalize()
+                .map_err(|e| e.to_string())?,
+        )
+    };
+    let package = if bundled_worker {
+        None
+    } else {
+        Some(
+            script_root()
+                .join("package.json")
+                .canonicalize()
+                .map_err(|e| e.to_string())?,
+        )
+    };
+    let mut contained_paths: Vec<&Path> = vec![&node, &script];
+    if let Some(runtime) = runtime.as_ref() {
+        contained_paths.push(runtime);
+    }
+    if let Some(package) = package.as_ref() {
+        contained_paths.push(package);
+    }
     #[cfg(target_os = "macos")]
     {
         let sandbox = Path::new("/usr/bin/sandbox-exec");
@@ -202,7 +224,7 @@ fn contained_command(node: &Path, script: &Path) -> Result<tokio::process::Comma
                 serde_json::to_string(path).unwrap()
             ));
         }
-        for path in [&node, &script, &runtime, &package] {
+        for path in &contained_paths {
             profile.push_str(&format!(
                 " (literal {})",
                 serde_json::to_string(&path.to_string_lossy()).unwrap()
@@ -241,7 +263,7 @@ fn contained_command(node: &Path, script: &Path) -> Result<tokio::process::Comma
             command.arg("--ro-bind").arg(path).arg(path);
         }
         let mut directories = std::collections::BTreeSet::new();
-        for file in [&node, &script, &runtime, &package] {
+        for file in &contained_paths {
             for path in file.ancestors().skip(1) {
                 if path != Path::new("/") && !system.iter().any(|base| path.starts_with(base)) {
                     directories.insert(path.to_path_buf());
@@ -251,7 +273,7 @@ fn contained_command(node: &Path, script: &Path) -> Result<tokio::process::Comma
         for path in directories {
             command.arg("--dir").arg(path);
         }
-        for file in [&node, &script, &runtime, &package] {
+        for file in &contained_paths {
             if !system.iter().any(|base| file.starts_with(base)) {
                 command.arg("--ro-bind").arg(file).arg(file);
             }
@@ -264,7 +286,7 @@ fn contained_command(node: &Path, script: &Path) -> Result<tokio::process::Comma
     }
     #[cfg(not(any(target_os = "macos", target_os = "linux")))]
     {
-        let _ = (node, script, runtime, package);
+        let _ = (node, script, runtime, package, contained_paths);
         Err("RUN_TOOLS_PLATFORM_UNSUPPORTED: 本平台尚无已验证的严格程序隔离，拒绝执行".into())
     }
 }
@@ -292,8 +314,13 @@ impl Executor {
             .map(|p| p.join("node"))
             .find(|p| p.is_file())
             .ok_or("RUN_TOOLS_NODE_MISSING: 请在环境依赖设置中安装 Node.js 24")?;
-        let script = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("../../../scripts/rust-tauri/r08-ptc-worker.mjs");
+        // 安装包由宿主注入随包 worker；开发/测试回退到仓库脚本。
+        let script = std::env::var_os("LINGXI_PTC_WORKER")
+            .map(std::path::PathBuf::from)
+            .unwrap_or_else(|| {
+                Path::new(env!("CARGO_MANIFEST_DIR"))
+                    .join("../../../scripts/rust-tauri/r08-ptc-worker.mjs")
+            });
         let mut command = contained_command(&node, &script)?;
         command
             .current_dir("/")

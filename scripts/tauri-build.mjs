@@ -176,6 +176,29 @@ function parseArgs(argv) {
   return options;
 }
 
+function stageWorkers() {
+  // release 包需要 Node 运行时、worker、主题/封面与 ast-grep；缺一项就失败，
+  // 不让“安装后才发现工具不可用”进入产物。
+  const resources = path.join(TAURI_DIR, 'resources');
+  for (const required of [
+    path.join(resources, 'node', 'bin', 'node'),
+    path.join(resources, 'chromium', 'Chromium.app', 'Contents', 'MacOS', 'Chromium'),
+    path.join(resources, 'lsp', 'bin', 'clangd'),
+    path.join(resources, 'lsp', 'bin', 'rust-analyzer'),
+    path.join(resources, 'lsp', 'bin', 'gopls'),
+    path.join(resources, 'lsp', 'bin', 'typescript-language-server'),
+    path.join(resources, 'lsp', 'bin', 'pyright-langserver'),
+  ]) {
+    if (!fs.existsSync(required)) {
+      throw new Error(`bundled runtime missing: ${required} (run npm run fetch:node / fetch:chromium)`);
+    }
+  }
+  execFileSync(process.execPath, [path.join(ROOT, 'scripts', 'stage-tauri-workers.mjs')], {
+    cwd: ROOT,
+    stdio: 'inherit',
+  });
+}
+
 function resolveServiceStage() {
   const { stageDirectory, verifyStage } = require('../scripts/build-rust-desktop-service.mjs');
   const directory = stageDirectory(ROOT);
@@ -380,6 +403,7 @@ function main() {
   }
   const theme = { path: 'lib/theme.js', sha256: sha256File(themeBundle), bytes: fs.statSync(themeBundle).size };
   const renderer = sha256Tree(rendererRoot);
+  if (options.mode === 'release') stageWorkers();
   const triple = hostTriple(env);
   const cliVersion = tauriCliVersion();
   const config = generateConfig(options.mode, version);

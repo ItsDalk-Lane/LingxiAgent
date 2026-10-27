@@ -25,7 +25,10 @@ import type {
   QuickChatOpenSessionRequest,
   QuickChatOpenSessionResult,
   QuickChatSessionTarget,
+  ReleaseCheckResult,
+  ReleaseDigest,
   SpeechPermissionState,
+  UpdateDigestHistoryResult,
   WorkspaceChangePayload,
 } from '../types';
 
@@ -60,28 +63,20 @@ export const TAURI_CAPABILITY_REASONS: Readonly<Record<string, string>> = {
   browserSwitchTab: 'R09-T05 迁移中：浏览器查看器由 T05 接线',
   browserCloseTab: 'R09-T05 迁移中：浏览器查看器由 T05 接线',
   browserEmergencyStop: 'R09-T05 迁移中：浏览器急停由 T05 接线',
-  // T03 剩余（R06 已有命令，host-core 接线时从实现表移除本理由）
-  observabilityExportBegin: 'R09-T03 待接线：observability_export_begin（capability token 状态机）',
-  observabilityExportWrite: 'R09-T03 待接线：observability_export_write',
-  observabilityExportEnd: 'R09-T03 待接线：observability_export_end',
-  observabilityExportAbort: 'R09-T03 待接线：observability_export_abort',
-  // R10 更新链（T03 只映射）
-  releaseCheckLatest: 'R09-R10 范围：更新链在 R10 验收',
-  getPendingAnnouncement: 'R09-R10 范围：更新链在 R10 验收',
-  ackAnnouncement: 'R09-R10 范围：更新链在 R10 验收',
-  getUpdateDigestHistory: 'R09-R10 范围：更新链在 R10 验收',
-  autoUpdateCheck: 'R09-R10 范围：更新链在 R10 验收',
-  autoUpdateInstall: 'R09-R10 范围：更新链在 R10 验收',
-  autoUpdateState: 'R09-R10 范围：更新链在 R10 验收',
-  autoUpdateSetChannel: 'R09-R10 范围：更新链在 R10 验收',
-  onAutoUpdateState: 'R09-R10 范围：更新链在 R10 验收',
-  trainUpdateStatus: 'R09-R10 范围：OTA 更新链在 R10 验收',
-  trainUpdateCheck: 'R09-R10 范围：OTA 更新链在 R10 验收',
-  trainUpdateApply: 'R09-R10 范围：OTA 更新链在 R10 验收',
-  onTrainUpdateAvailable: 'R09-R10 范围：OTA 更新链在 R10 验收',
-  onTrainUpdateProgress: 'R09-R10 范围：OTA 更新链在 R10 验收',
-  onTrainFallbackNotice: 'R09-R10 范围：OTA 更新链在 R10 验收',
-  ackTrainFallbackNotice: 'R09-R10 范围：OTA 更新链在 R10 验收',
+  // R10 功能补齐：About 更新链的检测/历史/升级公告已实现；安装型自动更新与
+  // OTA 列车仍受发布通道与签名裁决约束（OWNER-03：不做正式签名、不声称自动更新）。
+  autoUpdateCheck: '发布通道裁决未授权：OWNER-03 不做正式签名/自动更新；本轮不实现',
+  autoUpdateInstall: '发布通道裁决未授权：OWNER-03 不做正式签名/自动更新；本轮不实现',
+  autoUpdateState: '发布通道裁决未授权：OWNER-03 不做正式签名/自动更新；本轮不实现',
+  autoUpdateSetChannel: '发布通道裁决未授权：OWNER-03 不做正式签名/自动更新；本轮不实现',
+  onAutoUpdateState: '发布通道裁决未授权：OWNER-03 不做正式签名/自动更新；本轮不实现',
+  trainUpdateStatus: 'OTA 发布通道未建立（无 channel manifest/latest.json）；本轮不实现',
+  trainUpdateCheck: 'OTA 发布通道未建立（无 channel manifest/latest.json）；本轮不实现',
+  trainUpdateApply: 'OTA 发布通道未建立（无 channel manifest/latest.json）；本轮不实现',
+  onTrainUpdateAvailable: 'OTA 发布通道未建立（无 channel manifest/latest.json）；本轮不实现',
+  onTrainUpdateProgress: 'OTA 发布通道未建立（无 channel manifest/latest.json）；本轮不实现',
+  onTrainFallbackNotice: 'OTA 发布通道未建立（无 channel manifest/latest.json）；本轮不实现',
+  ackTrainFallbackNotice: 'OTA 发布通道未建立（无 channel manifest/latest.json）；本轮不实现',
   // 平台/契约限制
   cardFrameNavigationGuard: 'Tauri/Wry 无 will-frame-navigate 等价：保持 flag=false，HTTP 卡片降级为仅同源（OQ-07）',
   debugOpenOnboarding: 'debug 构建专属：release 命令不存在（T06 裁决）',
@@ -91,6 +86,17 @@ export const TAURI_CAPABILITY_REASONS: Readonly<Record<string, string>> = {
 function errorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
   return String(error);
+}
+
+/** Uint8Array → base64（Tauri command 的二进制参数走字符串，避免 JSON 数字数组膨胀）。 */
+function bytesToBase64(bytes: Uint8Array): string {
+  let binary = '';
+  const chunkSize = 0x8000;
+  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+    const slice = bytes.subarray(offset, offset + chunkSize);
+    binary += String.fromCharCode(...slice);
+  }
+  return globalThis.btoa(binary);
 }
 
 /** 通知 options 只接受 desktopFocusPolicy 枚举（Rust 侧同规则校验）。 */
@@ -486,6 +492,34 @@ export function createTauriHostCapabilities(
 
     // ── 文件拖入路径（Tauri 无 File.path；宿主 drop 事件队列 → getFilePath）──
     ...(deps.getFilePath ? { getFilePath: (file: File) => deps.getFilePath!(file) } : {}),
+
+    // ── About 更新链（R10）：固定 GitHub 端点；超时/尺寸/cache 在 Rust 侧 ──
+    releaseCheckLatest: () => invoke<ReleaseCheckResult>('release_check_latest'),
+    getUpdateDigestHistory: () =>
+      invoke<UpdateDigestHistoryResult>('get_update_digest_history'),
+    getPendingAnnouncement: () =>
+      invoke<{ version: string; entries: ReleaseDigest[] } | null>('get_pending_announcement'),
+    ackAnnouncement: async () => {
+      await invoke('ack_announcement');
+    },
+
+    // ── 可观测导出（R10）：exportId 是绑定发起窗口的不透明 capability token；
+    //    chunk 用 base64 过 IPC（Rust 侧解码并限制单块 ≤4MB）。
+    observabilityExportBegin: (payload: { defaultFileName: string }) =>
+      invoke<
+        { canceled: true } | { canceled: false; exportId: string; filePath: string }
+      >('observability_export_begin', { defaultFileName: payload.defaultFileName }),
+    observabilityExportWrite: (payload: { exportId: string; chunk: Uint8Array }) =>
+      invoke<{ bytesWritten: number }>('observability_export_write', {
+        exportId: payload.exportId,
+        chunk: bytesToBase64(payload.chunk),
+      }),
+    observabilityExportEnd: (payload: { exportId: string }) =>
+      invoke<{ bytesWritten: number; filePath: string }>('observability_export_end', {
+        exportId: payload.exportId,
+      }),
+    observabilityExportAbort: (payload: { exportId: string }) =>
+      invoke<{ aborted: boolean }>('observability_export_abort', { exportId: payload.exportId }),
 
     // ── 文件 URL（asset 协议；无 convertFileSrc 时显式受限）────────
     getFileUrl: (path: string) => {

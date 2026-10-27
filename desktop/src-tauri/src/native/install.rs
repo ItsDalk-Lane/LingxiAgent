@@ -741,7 +741,7 @@ impl keep_awake::KeepAwakeBackend for SystemKeepAwake {
 
 #[cfg(target_os = "macos")]
 mod mac_keep_awake {
-    use std::ffi::c_void;
+    use std::ffi::{c_void, CStr};
 
     const K_CF_STRING_ENCODING_UTF8: u32 = 0x0800_0100;
     const K_IOPM_ASSERTION_LEVEL_ON: u32 = 255;
@@ -758,7 +758,11 @@ mod mac_keep_awake {
     }
     // SDK 里 kIOPMAssertionTypePreventUserIdleSystemSleep 是 CFSTR 宏（编译期
     // 常量字符串），不是可链接的外部静态符号；必须自行建 CFString。
-    const ASSERTION_TYPE: &str = "PreventUserIdleSystemSleep";
+    //
+    // 必须是 NUL 结尾的 C 字符串：`&str::as_ptr()` 指向的字节没有终止符，
+    // CFStringCreateWithCString 会读到未定义内存/长度错误，IOPMAssertion 随即
+    // 返回 kIOReturnBadArgument（-536870206，v39-native-03 实测）。
+    pub(super) const ASSERTION_TYPE: &CStr = c"PreventUserIdleSystemSleep";
     #[link(name = "CoreFoundation", kind = "framework")]
     extern "C" {
         fn CFStringCreateWithCString(
@@ -774,7 +778,7 @@ mod mac_keep_awake {
         unsafe {
             let kind_ref = CFStringCreateWithCString(
                 std::ptr::null(),
-                ASSERTION_TYPE.as_ptr().cast(),
+                ASSERTION_TYPE.as_ptr(),
                 K_CF_STRING_ENCODING_UTF8,
             );
             let name_ref = CFStringCreateWithCString(
@@ -811,6 +815,19 @@ mod mac_keep_awake {
         unsafe {
             let _ = IOPMAssertionRelease(assertion_id);
         }
+    }
+}
+
+#[cfg(all(test, target_os = "macos"))]
+mod mac_keep_awake_tests {
+    /// IOKit 断言类型必须以 NUL 结尾：`&str` 的指针不是合法 C 字符串
+    /// （-536870206）；这里把已修常量钉成字节断言，防止回退。
+    #[test]
+    fn assertion_type_is_nul_terminated_c_string() {
+        assert_eq!(
+            super::mac_keep_awake::ASSERTION_TYPE.to_bytes(),
+            b"PreventUserIdleSystemSleep"
+        );
     }
 }
 

@@ -34,7 +34,15 @@
       "binaries/lingxi-service"
     ],
     "resources": {
-      "resources/rust-service/build.json": "rust-service/build.json"
+      "resources/rust-service/build.json": "rust-service/build.json",
+      "../../release-digest.v1.json": "release-digest.v1.json",
+      "../../release-digest.v2.json": "release-digest.v2.json",
+      "resources/chromium": "chromium",
+      "resources/node": "node",
+      "resources/workers": "workers",
+      "resources/office": "office",
+      "resources/bin/ast-grep": "bin/ast-grep",
+      "resources/lsp": "lsp"
     },
     "macOS": {
       "signingIdentity": "-",

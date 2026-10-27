@@ -1847,10 +1847,11 @@ pub async fn models_route(
     axum::Extension(p): axum::Extension<Principal>,
     State(state): State<ServiceState>,
 ) -> Response {
-    let (_, choice) = match setting_choice(&state, &p, None).await {
-        Ok(v) => v,
-        Err(e) => return e,
-    };
+    // 模型目录必须能在“尚未配置模型来源/尚无助手”的首启状态下返回空列表；
+    // 此时 setting_choice 会报 model plane unavailable，但设置页需要靠这个
+    // 响应进入模型配置，不能把空目录伪装成整页刷新失败。
+    // 当前选择只用于标记 isCurrent，缺失时按未选中处理。
+    let current_choice = setting_choice(&state, &p, None).await.ok().map(|(_, choice)| choice);
     let response = crate::settings_ui::models_route(State(state.clone())).await;
     let status = response.status();
     let bytes = match axum::body::to_bytes(response.into_body(), 1024 * 1024).await {
@@ -1864,7 +1865,7 @@ pub async fn models_route(
         Ok(v) => v,
         Err(e) => return setting_failure(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()),
     };
-    let current = choice.model.or_else(|| {
+    let current = current_choice.and_then(|choice| choice.model).or_else(|| {
         state.model_gateway().and_then(|g| {
             g.configured_routes()
                 .get("chat")

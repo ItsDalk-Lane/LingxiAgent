@@ -173,7 +173,7 @@ describe('R09-T01：Tauri DesktopHost', () => {
     const host = getDesktopHost();
     const platform = host.api as PlatformApi & Record<string, unknown>;
 
-    for (const name of ['browserGoBack', 'releaseCheckLatest', 'autoUpdateCheck', 'readDocxHtml', 'browserReload']) {
+    for (const name of ['browserGoBack', 'autoUpdateCheck', 'browserReload']) {
       expect(typeof platform[name]).toBe('function');
       let thrown: unknown = null;
       try {
@@ -181,7 +181,7 @@ describe('R09-T01：Tauri DesktopHost', () => {
       } catch (error) {
         thrown = error;
       }
-      expect(isHostCapabilityError(thrown)).toBe(true);
+      expect(isHostCapabilityError(thrown), name).toBe(true);
       expect((thrown as { code?: string }).code).toBe(HOST_CAPABILITY_UNAVAILABLE);
       expect((thrown as { reason?: string }).reason).toBeTruthy();
       expect(explainHostCapability(name)).toBeTruthy();
@@ -202,7 +202,10 @@ describe('R09-T01：Tauri DesktopHost', () => {
     expect(host.capabilityReason('readFile')).toBeNull();
     expect(host.capabilityReason('watchWorkspace')).toBeNull();
     expect(host.capabilityReason('browserGoBack')).toContain('R09-T05');
-    expect(host.capabilityReason('releaseCheckLatest')).toContain('R09-R10');
+    // R10 功能补齐：About 更新链已真实实现，不再是受限理由。
+    expect(host.capabilityReason('releaseCheckLatest')).toBeNull();
+    expect(host.capabilityReason('getUpdateDigestHistory')).toBeNull();
+    expect(host.capabilityReason('autoUpdateCheck')).toContain('OWNER-03');
     expect(host.capabilityReason('getFilePath')).toBeNull();
     expect(platform.getFilePath?.(new File(['x'], 'x.txt'))).toBeNull();
   });
