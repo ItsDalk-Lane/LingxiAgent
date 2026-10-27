@@ -1,0 +1,27 @@
+{
+  "family": "openai-completions",
+  "case": "error",
+  "route": {"provider": "openai-golden", "model": "gpt-golden-4o"},
+  "auth": {"kind": "bearer", "token": "sk-golden-openai-secret"},
+  "input": {
+    "submission": "ping",
+    "tools": [],
+    "prior": []
+  },
+  "http_error": {
+    "status": 429,
+    "body": "{\"error\":{\"message\":\"rate limit hit for key sk-golden-openai-secret; slow down\"}}"
+  },
+  "expected_transport": {
+    "path": "/v1/chat/completions",
+    "headers": [
+      ["authorization", "Bearer sk-golden-openai-secret"],
+      ["content-type", "application/json"]
+    ]
+  },
+  "expected_failure": {
+    "code": "budget_exceeded",
+    "retryable": true,
+    "message": "provider returned HTTP 429 Too Many Requests: {\"error\":{\"message\":\"rate limit hit for key [redacted]; slow down\"}}"
+  }
+}

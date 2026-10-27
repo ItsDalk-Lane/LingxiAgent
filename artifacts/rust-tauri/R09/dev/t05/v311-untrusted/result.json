@@ -1,0 +1,376 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t05_untrusted_preview",
+ "status": "PASS",
+ "exitCode": 0,
+ "durationSecs": 96.121,
+ "caseCount": 53,
+ "casesSha256": "2c759afeae650dbb51bac0ec05ee44b731f8bcb9dc07d478e5d5e436196e1a06",
+ "commands": [
+  {
+   "id": "build-lingxi-service",
+   "argv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "build",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "-p",
+    "lingxi-service"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.304,
+   "logSha256": "e837bc957a1f6863f069a79dec359404685f9849715e615ae89cd20b4786f026"
+  },
+  {
+   "id": "chrome-loopback-ancestor-allowed",
+   "argv": [
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "--headless=new",
+    "--disable-gpu",
+    "--no-first-run",
+    "--no-default-browser-check",
+    "--disable-background-networking",
+    "--disable-component-update",
+    "--disable-sync",
+    "--metrics-recording-only",
+    "--disable-extensions",
+    "--no-proxy-server",
+    "--disable-dev-shm-usage",
+    "--user-data-dir=/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-55461-1793066684319/chrome-profile-loopback-ancestor-allowed",
+    "--virtual-time-budget=10000",
+    "--dump-dom",
+    "--use-mock-keychain",
+    "http://127.0.0.1:56819/wrapper?mode=iframe&previewUrl=http%3A%2F%2F127.0.0.1%3A56821%2Flingxi%2Fv1%2Fpreview%2Fhtml%2Fpv_145786e5da7d575fd2c63727636ab5a5%3FpreviewToken%3DyD8wpwv0azK6IGLAi3qDMUxAxKUO82tYkqovWV-Omas"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.501,
+   "logSha256": "d602a3052c6d5a17b5598f53594677cd285d30b9993654db0b78fcbb95a7706e"
+  },
+  {
+   "id": "chrome-localhost-ancestor-allowed",
+   "argv": [
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "--headless=new",
+    "--disable-gpu",
+    "--no-first-run",
+    "--no-default-browser-check",
+    "--disable-background-networking",
+    "--disable-component-update",
+    "--disable-sync",
+    "--metrics-recording-only",
+    "--disable-extensions",
+    "--no-proxy-server",
+    "--disable-dev-shm-usage",
+    "--user-data-dir=/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-55461-1793066684319/chrome-profile-localhost-ancestor-allowed",
+    "--virtual-time-budget=10000",
+    "--dump-dom",
+    "--use-mock-keychain",
+    "http://localhost:56819/wrapper?mode=iframe&previewUrl=http%3A%2F%2F127.0.0.1%3A56821%2Flingxi%2Fv1%2Fpreview%2Fhtml%2Fpv_145786e5da7d575fd2c63727636ab5a5%3FpreviewToken%3DyD8wpwv0azK6IGLAi3qDMUxAxKUO82tYkqovWV-Omas"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.51,
+   "logSha256": "637941446b2676d304821b5aaa59552fec517e6bb4625065d253e71695d60b7e"
+  },
+  {
+   "id": "chrome-tauri-custom-port-ancestor",
+   "argv": [
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "--headless=new",
+    "--disable-gpu",
+    "--no-first-run",
+    "--no-default-browser-check",
+    "--disable-background-networking",
+    "--disable-component-update",
+    "--disable-sync",
+    "--metrics-recording-only",
+    "--disable-extensions",
+    "--no-proxy-server",
+    "--disable-dev-shm-usage",
+    "--user-data-dir=/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-55461-1793066684319/chrome-profile-tauri-custom-port-ancestor",
+    "--virtual-time-budget=10000",
+    "--dump-dom",
+    "--use-mock-keychain",
+    "http://tauri.localhost:56819/wrapper?mode=iframe&previewUrl=http%3A%2F%2F127.0.0.1%3A56821%2Flingxi%2Fv1%2Fpreview%2Fhtml%2Fpv_145786e5da7d575fd2c63727636ab5a5%3FpreviewToken%3DyD8wpwv0azK6IGLAi3qDMUxAxKUO82tYkqovWV-Omas"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.528,
+   "logSha256": "904b84d5211858b7e9bad3d008718f09a2ee4dddc495298906c4a15097bc3839"
+  },
+  {
+   "id": "chrome-evil-tauri-ancestor-denied",
+   "argv": [
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "--headless=new",
+    "--disable-gpu",
+    "--no-first-run",
+    "--no-default-browser-check",
+    "--disable-background-networking",
+    "--disable-component-update",
+    "--disable-sync",
+    "--metrics-recording-only",
+    "--disable-extensions",
+    "--no-proxy-server",
+    "--disable-dev-shm-usage",
+    "--user-data-dir=/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-55461-1793066684319/chrome-profile-evil-tauri-ancestor-denied",
+    "--virtual-time-budget=10000",
+    "--dump-dom",
+    "--use-mock-keychain",
+    "http://evil.tauri.localhost:56819/wrapper?mode=iframe&previewUrl=http%3A%2F%2F127.0.0.1%3A56821%2Flingxi%2Fv1%2Fpreview%2Fhtml%2Fpv_145786e5da7d575fd2c63727636ab5a5%3FpreviewToken%3DyD8wpwv0azK6IGLAi3qDMUxAxKUO82tYkqovWV-Omas"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.527,
+   "logSha256": "0bdacb12922b413e356f29288be18b052d2a911d7ba68551c49980a11a3c5c23"
+  },
+  {
+   "id": "chrome-evil-example-ancestor-denied",
+   "argv": [
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "--headless=new",
+    "--disable-gpu",
+    "--no-first-run",
+    "--no-default-browser-check",
+    "--disable-background-networking",
+    "--disable-component-update",
+    "--disable-sync",
+    "--metrics-recording-only",
+    "--disable-extensions",
+    "--no-proxy-server",
+    "--disable-dev-shm-usage",
+    "--user-data-dir=/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-55461-1793066684319/chrome-profile-evil-example-ancestor-denied",
+    "--virtual-time-budget=10000",
+    "--dump-dom",
+    "--host-resolver-rules=MAP evil.example 127.0.0.1",
+    "--use-mock-keychain",
+    "http://evil.example:56819/wrapper?mode=iframe&previewUrl=http%3A%2F%2F127.0.0.1%3A56821%2Flingxi%2Fv1%2Fpreview%2Fhtml%2Fpv_145786e5da7d575fd2c63727636ab5a5%3FpreviewToken%3DyD8wpwv0azK6IGLAi3qDMUxAxKUO82tYkqovWV-Omas"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.53,
+   "logSha256": "cb645b4bcc5acc231406b9f2367dd9d23129344b1cdde6175cab587f23b51630"
+  },
+  {
+   "id": "chrome-svg-img-malicious",
+   "argv": [
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "--headless=new",
+    "--disable-gpu",
+    "--no-first-run",
+    "--no-default-browser-check",
+    "--disable-background-networking",
+    "--disable-component-update",
+    "--disable-sync",
+    "--metrics-recording-only",
+    "--disable-extensions",
+    "--no-proxy-server",
+    "--disable-dev-shm-usage",
+    "--user-data-dir=/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-55461-1793066684319/chrome-profile-svg-img-malicious",
+    "--virtual-time-budget=10000",
+    "--dump-dom",
+    "--use-mock-keychain",
+    "http://localhost:56819/wrapper?mode=img&imgUrl=http%3A%2F%2F127.0.0.1%3A56819%2Fasset%2Fmalicious.svg"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.49,
+   "logSha256": "0f97f705c17f0d581667f436ed0be8dcbb5363daa6b01345dbd50519f1819ec1"
+  },
+  {
+   "id": "chrome-svg-img-benign",
+   "argv": [
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "--headless=new",
+    "--disable-gpu",
+    "--no-first-run",
+    "--no-default-browser-check",
+    "--disable-background-networking",
+    "--disable-component-update",
+    "--disable-sync",
+    "--metrics-recording-only",
+    "--disable-extensions",
+    "--no-proxy-server",
+    "--disable-dev-shm-usage",
+    "--user-data-dir=/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-55461-1793066684319/chrome-profile-svg-img-benign",
+    "--virtual-time-budget=10000",
+    "--dump-dom",
+    "--use-mock-keychain",
+    "http://localhost:56819/wrapper?mode=img&imgUrl=http%3A%2F%2F127.0.0.1%3A56819%2Fasset%2Fbenign.svg"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.5,
+   "logSha256": "818ef3ccc6039d398009a5b3b565efa41865ac05feef593698b72bf65ea9305f"
+  },
+  {
+   "id": "chrome-benign-ancestor-allowed",
+   "argv": [
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "--headless=new",
+    "--disable-gpu",
+    "--no-first-run",
+    "--no-default-browser-check",
+    "--disable-background-networking",
+    "--disable-component-update",
+    "--disable-sync",
+    "--metrics-recording-only",
+    "--disable-extensions",
+    "--no-proxy-server",
+    "--disable-dev-shm-usage",
+    "--user-data-dir=/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-55461-1793066684319/chrome-profile-benign-ancestor-allowed",
+    "--virtual-time-budget=10000",
+    "--dump-dom",
+    "--use-mock-keychain",
+    "http://localhost:56819/wrapper?mode=iframe&previewUrl=http%3A%2F%2F127.0.0.1%3A56821%2Flingxi%2Fv1%2Fpreview%2Fhtml%2Fpv_d82ec6dbb22ce44442d890a0c649ab8f%3FpreviewToken%3DrqKvmO0aaIp5Qj2WWtNrhhzPVEM1VJKsDcSH_TVQObU"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.502,
+   "logSha256": "087a6e594604c10fa1ccd43504f11c852f7c8f8ac9911d87f4007ee54934a1f5"
+  },
+  {
+   "id": "r06-t05-preview",
+   "argv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r06_t05_preview"
+   ],
+   "exitCode": 0,
+   "durationSecs": 79.27,
+   "logSha256": "ab140a91f08002eb4cb39c5ba09a867a7fbc7d33f0af79a6bd1981856a64d8e7"
+  },
+  {
+   "id": "r07-pdf-network-gate",
+   "argv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "-p",
+    "lingxi-adapters",
+    "--test",
+    "r07_pdf_chromium",
+    "--",
+    "--include-ignored",
+    "html_network_frames_and_workers_never_reach_loopback_canary",
+    "--test-threads=1"
+   ],
+   "exitCode": 0,
+   "durationSecs": 5.935,
+   "logSha256": "0a611309f20d9525f4941a99b837d624b93ea1a2ebcfd55b8c83e7fb646824bb"
+  }
+ ],
+ "logSha256": "a24612666f1244406564d73e659224a7c21a979a467c5441fdd81858b8ddc5d7",
+ "finishedAtUnixMs": 1793066780440,
+ "acceptance": "R09-A10",
+ "environment": {
+  "platform": "macos-arm64",
+  "chromePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "chromeVersion": "Google Chrome 155.0.8059.85",
+  "chromeSha256": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d",
+  "python": "3.14.3",
+  "isolation": {
+   "LINGXI_HOME": "/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-55461-1793066684319/home",
+   "TMPDIR": "/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-55461-1793066684319/tmp"
+  }
+ },
+ "originMatrix": {
+  "allowed": {
+   "tauri://localhost": {
+    "status": 200,
+    "body": "{\"status\":\"ok\",\"serverKind\":\"lingxi-service\",\"serverVersion\":\"0.0.0\",\"wireProtocolMin\":1,\"wireProtocolMax\":1,\"dataEpoch\""
+   },
+   "http://tauri.localhost": {
+    "status": 200,
+    "body": "{\"status\":\"ok\",\"serverKind\":\"lingxi-service\",\"serverVersion\":\"0.0.0\",\"wireProtocolMin\":1,\"wireProtocolMax\":1,\"dataEpoch\""
+   },
+   "https://tauri.localhost": {
+    "status": 200,
+    "body": "{\"status\":\"ok\",\"serverKind\":\"lingxi-service\",\"serverVersion\":\"0.0.0\",\"wireProtocolMin\":1,\"wireProtocolMax\":1,\"dataEpoch\""
+   }
+  },
+  "forged": {
+   "tauri://evil": {
+    "status": 403,
+    "body": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-bf2a3b20750012dd56c7e674a2fa9f54\"},\"message\":\"transport p"
+   },
+   "tauri://localhost.evil.example": {
+    "status": 403,
+    "body": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-1eacca86c9e9ceed17e67f099b002929\"},\"message\":\"transport p"
+   },
+   "http://evil.tauri.localhost": {
+    "status": 403,
+    "body": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-41b501e378e180dda179d337999f50e8\"},\"message\":\"transport p"
+   },
+   "http://tauri.localhost.evil.example": {
+    "status": 403,
+    "body": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-04931fa1d6b7e311da941324831e0226\"},\"message\":\"transport p"
+   },
+   "http://tauri.localhost:8080": {
+    "status": 403,
+    "body": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-05ae08cf44e6f5fa7c813dc7aa6453a8\"},\"message\":\"transport p"
+   },
+   "http://127.0.0.1.evil.example": {
+    "status": 403,
+    "body": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-67e992afd5e83458d362fd0927e09428\"},\"message\":\"transport p"
+   }
+  }
+ },
+ "previewCsp": {
+  "frameAncestors": "frame-ancestors 'self' file: http://127.0.0.1:* http://localhost:* tauri: http://tauri.localhost https://tauri.localhost"
+ },
+ "canary": {
+  "hits": 0,
+  "requests": 18
+ },
+ "chromeRuns": {
+  "loopback_ancestor_allowed": {
+   "exit": 0,
+   "domSha256": "dd742781b218da8c9c33274ea713c688b2b92eb3fdb5e559f066bfabd374886e",
+   "reportKind": "r09-a10-preview-alive"
+  },
+  "localhost_ancestor_allowed": {
+   "exit": 0,
+   "domSha256": "037258d97a99c1c278d4e838e3384eb70430e4f5f365a6bc51bd6dad1bbdf3d6",
+   "reportKind": "r09-a10-preview-alive"
+  },
+  "tauri_custom_port_ancestor_observed": {
+   "exit": 0,
+   "domSha256": "b2978f9b0fce630a69e4f3112546a1dc3edb207a322c7680027cdb1c34185225",
+   "reportKind": null
+  },
+  "evil_tauri_ancestor_denied": {
+   "exit": 0,
+   "domSha256": "87efed478b3c755388f42e23fa4114cf619a1e6bc977da3c869859764047297a",
+   "reportKind": null
+  },
+  "evil_example_ancestor_denied": {
+   "exit": 0,
+   "domSha256": "1d92190a779fc62c27f33ef63d44b1711456a0d4d8829817549150acfa5a353d",
+   "reportKind": null
+  }
+ },
+ "tauriWebviewBoundary": {
+  "note": "本轮用真实 Chrome 验证 sandbox iframe + CSP 安全语义、Origin 精确匹配、frame-ancestors 伪造祖先拒绝；Tauri 真机 webview（WKWebView/WebView2/WebKitGTK）嵌入、Tauri IPC 命令 canary 属 T06/T07 回归边界，未冒充已验证。",
+  "cspPortLimitation": "CSP host-source `http://tauri.localhost`（无端口）只匹配默认端口；真实 Tauri origin 即无端口形态，本机 harness 用非特权高位端口，故 tauri.localhost:PORT 祖先按规范被拒绝（已记录观测）；真实端口形态由 T06/T07 在 Tauri 构建上回归。",
+  "keychainAutomationBoundary": "测试/诊断 Chrome 一律 --use-mock-keychain（产品 launcher 默认不变，仅 LINGXI_BROWSER_TEST_NO_KEYCHAIN=1 测试环境变量生效）",
+  "platformBlocked": [
+   "macos-x64",
+   "windows-x64",
+   "linux-x64"
+  ]
+ },
+ "leafCoverage": {
+  "verified": [],
+  "blocked": {},
+  "note": "A10 是基础验收场景（非 19 补充叶）；相关文件预览叶 4173A0 的服务侧安全面由本套件覆盖，Tauri 预览宿主仍待 T03/T06。"
+ }
+}

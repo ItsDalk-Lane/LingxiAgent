@@ -1,0 +1,50 @@
+{
+  "recordedAt": "2026-10-18T06:31:31.468275+00:00",
+  "status": "READY_FOR_ROOT_REAL_BINARY_RUN_NOT_ACCEPTANCE",
+  "test": "desktop/src/react/__tests__/services/r07-oauth-real-service.test.tsx",
+  "testSha256": "23261911b64df1e66c35744fd9d74457562931afbecf60847eaf6c33c5bd935e",
+  "requiredEnv": [
+    "LINGXI_R07_SERVICE_BIN=<absolute current production lingxi-service binary>"
+  ],
+  "optionalEnv": [
+    "LINGXI_R07_OAUTH_EVIDENCE_DIR=<absolute owned receipt directory>"
+  ],
+  "command": "LINGXI_R07_SERVICE_BIN=/private/tmp/lingxi-r07-build/debug/lingxi-service LINGXI_R07_OAUTH_EVIDENCE_DIR=\"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R07/T08/oauth-real-ui1\" npx vitest run desktop/src/react/__tests__/services/r07-oauth-real-service.test.tsx --maxWorkers=1",
+  "checks": [
+    "actual component PKCE start button; original authorization URL state and code challenge present; manual input triggers actual Rust callback",
+    "actual credential private persistent store under canonical provider, no duplicate display-alias store",
+    "actual component refresh reads authoritative live provider summary; secret absent in summary",
+    "actual health consumes same live OAuth credential through real production gateway to loopback external model",
+    "actual logout button clears real credential and live summary",
+    "actual device start, user code, one real authorization_pending and next true installed result via actual timed POST polling",
+    "single embedded source bytes unchanged; child SIGTERM exit0; external server closed; fixtures removed only after success"
+  ],
+  "validation": [
+    {
+      "command": "npx vitest run desktop/src/react/__tests__/services/r07-oauth-real-service.test.tsx --maxWorkers=1",
+      "log": "artifacts/rust-tauri/R07/T08/oauth-real-ui-discovery1.log",
+      "logSha256": "5cdb48cabb3206c1ba5ff77b3f42287450f604bc98f30f8cc8d2b1825fbf8aa5",
+      "exitCode": 0,
+      "outcome": "1 skipped; env absent, no real pass claimed; before final static helper correction"
+    },
+    {
+      "command": "npx tsc --noEmit --pretty false --project tsconfig.test.json",
+      "log": "artifacts/rust-tauri/R07/T08/oauth-real-ui-types1.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exitCode": 0,
+      "outcome": "test-project typecheck only"
+    }
+  ],
+  "limitations": [
+    "Only loopback OAuth/token/device/model external responses replaced; Rust HTTP/storage/gateway remain real.",
+    "openExternal uses a recorded URL and actual loopback GET proxy. This is not native browser-launch evidence.",
+    "Native account, supplier browser login, real account/paid requests not executed.",
+    "All original leaf states/old failures unchanged; root must run new final binary and retain real receipt."
+  ],
+  "sourceHashes": {
+    "desktop/src/react/settings/tabs/providers/oauth-service.ts": "5329f15514d28b70510a4c43683736605200e2b92d31eaab6d35c651a650a133",
+    "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx": "d7e533d6a228c08d6e1d30e5264250613f3a665b94a35830726813cc488b4011",
+    "desktop/src/react/settings/tabs/providers/ProviderDetail.tsx": "2826039519eb6646675f640d0fea6f0f7f0f81b192a0c168615f1e85aa990cb4",
+    "rust/crates/lingxi-service/tests/r07_t08_oauth_alias.rs": "2f9306ff6101aea22a5b91f93586b9e2ad0c22c3df9f3a0a20c00ca06727f887"
+  }
+}

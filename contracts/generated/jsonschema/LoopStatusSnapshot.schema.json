@@ -1,0 +1,60 @@
+{
+  "$defs": {
+    "LoopState": {
+      "enum": [
+        "running",
+        "paused",
+        "stopped",
+        "completed"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "maxTurns": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "pausedReason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "prompt": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "runtimeError": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "$ref": "#/$defs/LoopState"
+    },
+    "turnCount": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "status",
+    "turnCount",
+    "maxTurns",
+    "pausedReason",
+    "prompt"
+  ],
+  "title": "LoopStatusSnapshot",
+  "type": "object"
+}

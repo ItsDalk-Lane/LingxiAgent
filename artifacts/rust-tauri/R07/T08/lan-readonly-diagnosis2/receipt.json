@@ -1,0 +1,154 @@
+{
+  "scope": "OWNED_EMPTY_HOME_LAN_TCP_DIAGNOSIS_NOT_GATE_PASS",
+  "requests": [
+    {
+      "label": "loopback-issue-mobile",
+      "destination": "127.0.0.1:64033",
+      "addressKind": "loopback",
+      "method": "POST",
+      "path": "/lingxi/v1/access/mobile-credentials",
+      "budgetSeconds": 20,
+      "connected": true,
+      "requestWritten": true,
+      "responseBytes": 809,
+      "localSocket": [
+        "127.0.0.1",
+        64034
+      ],
+      "peerSocket": [
+        "127.0.0.1",
+        64033
+      ],
+      "status": 200,
+      "responseSha256": "8c66feff1114a824b887de9e287a8f27a9ba6d3b556e7a692e26b77637aa5982",
+      "setCookiePresent": false,
+      "elapsedSeconds": 1.337
+    },
+    {
+      "label": "lan-first-foreign-origin-login",
+      "destination": "192.168.3.96:64033",
+      "addressKind": "actual-lan-interface",
+      "method": "POST",
+      "path": "/lingxi/v1/web-auth/login",
+      "budgetSeconds": 20,
+      "connected": true,
+      "requestWritten": true,
+      "responseBytes": 0,
+      "localSocket": [
+        "192.168.3.96",
+        64037
+      ],
+      "peerSocket": [
+        "192.168.3.96",
+        64033
+      ],
+      "errorType": "TimeoutError",
+      "timedOut": true,
+      "elapsedSeconds": 20.005
+    },
+    {
+      "label": "loopback-foreign-origin-control",
+      "destination": "127.0.0.1:64033",
+      "addressKind": "loopback",
+      "method": "POST",
+      "path": "/lingxi/v1/web-auth/login",
+      "budgetSeconds": 5,
+      "connected": true,
+      "requestWritten": true,
+      "responseBytes": 341,
+      "localSocket": [
+        "127.0.0.1",
+        64102
+      ],
+      "peerSocket": [
+        "127.0.0.1",
+        64033
+      ],
+      "status": 403,
+      "responseSha256": "7a2733402cafe07f1f29aa7dd67e5d79ac8852acc26e3507fc9cf35279f798b4",
+      "setCookiePresent": false,
+      "elapsedSeconds": 0.001
+    },
+    {
+      "label": "lan-health",
+      "destination": "192.168.3.96:64033",
+      "addressKind": "actual-lan-interface",
+      "method": "GET",
+      "path": "/lingxi/v1/health",
+      "budgetSeconds": 5,
+      "connected": true,
+      "requestWritten": true,
+      "responseBytes": 0,
+      "localSocket": [
+        "192.168.3.96",
+        64103
+      ],
+      "peerSocket": [
+        "192.168.3.96",
+        64033
+      ],
+      "errorType": "TimeoutError",
+      "timedOut": true,
+      "elapsedSeconds": 5.002
+    },
+    {
+      "label": "loopback-health-control",
+      "destination": "127.0.0.1:64033",
+      "addressKind": "loopback",
+      "method": "GET",
+      "path": "/lingxi/v1/health",
+      "budgetSeconds": 5,
+      "connected": true,
+      "requestWritten": true,
+      "responseBytes": 251,
+      "localSocket": [
+        "127.0.0.1",
+        64104
+      ],
+      "peerSocket": [
+        "127.0.0.1",
+        64033
+      ],
+      "status": 200,
+      "responseSha256": "d5532a59a9ed1c8e639adae65a4601bbcc8dcbd04f167c458310fcd00a6b3d79",
+      "setCookiePresent": false,
+      "elapsedSeconds": 0.001
+    },
+    {
+      "label": "lan-correct-origin-login",
+      "destination": "192.168.3.96:64033",
+      "addressKind": "actual-lan-interface",
+      "method": "POST",
+      "path": "/lingxi/v1/web-auth/login",
+      "budgetSeconds": 5,
+      "connected": true,
+      "requestWritten": true,
+      "responseBytes": 0,
+      "localSocket": [
+        "192.168.3.96",
+        64105
+      ],
+      "peerSocket": [
+        "192.168.3.96",
+        64033
+      ],
+      "errorType": "TimeoutError",
+      "timedOut": true,
+      "elapsedSeconds": 5.002
+    }
+  ],
+  "networkSettingsChanged": false,
+  "manualClockInjected": false,
+  "isolatedHomeRoot": "/private/tmp/lingxi-r07-lan-readonly-4czlsg55",
+  "binarySha256Before": "e3c682aa7c5cbc6259fb5dfe01087394da3283a8db7021b9e94fb87abadf2cc4",
+  "actualInterface": "en0",
+  "actualLanIp": "192.168.3.96",
+  "readyAddress": "0.0.0.0:64033",
+  "serviceExitCode": 0,
+  "stdoutSha256": "584053e105702e486f3a8f318c6981d8918407a94662f72c2d15d7b2ddb78da8",
+  "stderrSha256": "e61510259cc4a9a680dcb2a2d1da2b6210c94a3f92efd857bf652b8c4ab36666",
+  "binarySha256After": "21458f19bdc4f1becc1366c3e395ed63dd60a769357713cf77fca97196479383",
+  "binaryUnchanged": false,
+  "probeSourceSha256": "2bf980618872ff13d46aa569b86a751aba78a80b3f398eb98549a9e24fefd4e5",
+  "credentialFilesNotCopied": true
+}

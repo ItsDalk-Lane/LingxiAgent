@@ -590,7 +590,7 @@ function createJimengAdapter({
   };
 }
 
-function buildImageSubmitArgs(params: any = {}, ctx: any = {}, snapshot: any = null) {
+export function buildImageSubmitArgs(params: any = {}, ctx: any = {}, snapshot: any = null) {
   const defaults = imageProviderDefaults(ctx, params.providerId || "jimeng-cli");
   const images = imagesFromParams(params);
   const modeId = images.length > 0 ? "image2image" : "text2image";
@@ -619,7 +619,7 @@ function buildImageSubmitArgs(params: any = {}, ctx: any = {}, snapshot: any = n
   return args;
 }
 
-function buildVideoSubmitArgs(params: any = {}, ctx: any = {}, snapshot: any = null) {
+export function buildVideoSubmitArgs(params: any = {}, ctx: any = {}, snapshot: any = null) {
   const defaults = videoProviderDefaults(ctx, params.providerId || "jimeng-cli");
   const images = imagesFromParams(params);
   const modelVersion = normalizeVideoModelVersion(

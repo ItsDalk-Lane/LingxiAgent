@@ -1,0 +1,136 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t07_release_smoke",
+ "cases": [
+  {
+   "case": "t07::platform.macos-arm64-recorded",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "os": "27.0.1",
+    "osBuild": "26A434",
+    "arch": "arm64",
+    "kernel": "27.0.0",
+    "hostPlatform": "macos-arm64",
+    "webkit": "22625.1.29.11.28",
+    "display": "Chipset Model: Apple M3 Ultra\n          Resolution: 2560 x 1440 (QHD/WQHD - Wide Quad High Definition)"
+   }
+  },
+  {
+   "case": "t07::platform.macos-arm64-recorded",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "os": "27.0.1",
+    "osBuild": "26A434",
+    "arch": "arm64",
+    "kernel": "27.0.0",
+    "hostPlatform": "macos-arm64",
+    "webkit": "22625.1.29.11.28",
+    "display": "Chipset Model: Apple M3 Ultra\n          Resolution: 2560 x 1440 (QHD/WQHD - Wide Quad High Definition)"
+   }
+  },
+  {
+   "case": "t07::release.no-test-driver",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "features": [
+     "r09-host"
+    ]
+   }
+  },
+  {
+   "case": "t07::release.bundle-and-executable",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "app": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+    "exe": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+    "sha256": "8c26577e33b6ecbe28295782728d006bc4bc6767543c13a30f58ab7dfb2c4cbe",
+    "candidateNote": "当前工作树候选（T06 可能同时修改）；sha 已记录，GUI 批次用同一候选"
+   }
+  },
+  {
+   "case": "t07::release.no-e2e-driver-strings",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "wdio": 0,
+    "devUrl": 0,
+    "localhost5173": 0
+   }
+  },
+  {
+   "case": "t07::release.codesign-verified",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "boundary": "ad-hoc only; BLOCKED-SIGNING-IDENTITY 不冒充正式签名/公证"
+   }
+  },
+  {
+   "case": "t07::platform.macos-arm64",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "status": "NOT_EXECUTED",
+    "note": "静态前半（无 GUI）已完成；本机 E2E 断言待 Lead cleared 的 GUI 批次"
+   }
+  },
+  {
+   "case": "t07::platform.macos-x64.blocked",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": "BLOCKED_PLATFORM",
+    "reason": "无可用真机/受控 VM；不用交叉编译或 Linux/macOS 截图替代原生验收（BLOCKED.md）"
+   }
+  },
+  {
+   "case": "t07::platform.windows-x64.blocked",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": "BLOCKED_PLATFORM",
+    "reason": "无可用真机/受控 VM；不用交叉编译或 Linux/macOS 截图替代原生验收（BLOCKED.md）"
+   }
+  },
+  {
+   "case": "t07::platform.linux-x64.blocked",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": "BLOCKED_PLATFORM",
+    "reason": "无可用真机/受控 VM；不用交叉编译或 Linux/macOS 截图替代原生验收（BLOCKED.md）"
+   }
+  },
+  {
+   "case": "isolation::no-residual-processes",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "killed": [],
+    "residual": [],
+    "marker": "/private/tmp/lingxi-r09-runtime/r09_t07_release_smoke-11241-1793026190533"
+   }
+  },
+  {
+   "case": "isolation::real-home-untouched",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "before": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    },
+    "after": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    }
+   }
+  }
+ ]
+}

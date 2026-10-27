@@ -1,0 +1,14 @@
+[
+ {
+  "pid": 60365,
+  "ppid": 60345,
+  "pgid": 60345,
+  "command": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop"
+ },
+ {
+  "pid": 60369,
+  "ppid": 60365,
+  "pgid": 60369,
+  "command": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t01_release_offline-60345-1793030946002/home-release"
+ }
+]

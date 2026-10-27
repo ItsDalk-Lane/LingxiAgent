@@ -29,7 +29,9 @@ describe('settings primitive discipline', () => {
     const source = read('desktop/src/react/settings/SettingsContent.tsx');
 
     expect(source).toContain("import { SettingsPage } from './components/SettingsPrimitives';");
-    expect(source).toMatch(/<SettingsPage tab=\{effectiveActiveTab\}[^>]*>\s*<ActiveTab \/>\s*<\/SettingsPage>/s);
+    // R07 起默认分支在 ActiveTab 前多一条刷新失败提示条（rustDataError），
+    // 页面原语形态不变；合同允许该可选提示条夹在页体与 ActiveTab 之间。
+    expect(source).toMatch(/<SettingsPage tab=\{effectiveActiveTab\}[^>]*>\s*(\{rustConnection && rustDataError && [\s\S]*?role="alert"[\s\S]*?\})?\s*<ActiveTab \/>\s*<\/SettingsPage>/s);
   });
 
   it('has no layout-bypassing flush variant or tab-specific wide shell', () => {

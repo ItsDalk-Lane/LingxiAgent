@@ -1,0 +1,54 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 10s
+     Running tests/r07_t08_mcp_settings.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_mcp_settings-5528f6df6edb0028)
+
+running 22 tests
+test an_unconfigured_mcp_read_and_restore_do_not_create_directories_or_block_the_service ... ok
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-9536f3076432a332
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-b6900567479cd672
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-9214c84f54ceb9d0
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-e4ce3919967d8aa9
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-5c41d792d8611de2
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-ac2dc908a9941732
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-83edaa0f4a7f1dc0
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-0eeab50b3615b5a9
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-0deedbcec73dd983
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-6dfd098cd993a302
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-00e57500e35dd859
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-e877bc03ad54ded3
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-b3c2c21c4004641c
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-d83f657a01d7398f
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-28a691a09db5fbdd
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-558f6e54d75234af
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-38202afbc8f12f95
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-e129ee4c060580e9
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-a2276391f988bdeb
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-a4dbe1729da27d01
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-179991f8259ceb34
+test global_disable_rejects_new_queued_start_while_old_sdk_cleanup_is_draining ... ok
+test occupied_listen_port_cleans_restored_mcp_and_knowledge_while_external_state_is_retained ... ok
+test an_authenticated_http_request_waiting_for_the_real_media_lock_cannot_use_a_replaced_owner_credential ... ok
+test invalid_provided_connector_shapes_never_write_and_schema_corruption_blocks_restore ... ok
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-d8554d0377e9acd4
+test rejected_update_must_not_cancel_an_accepted_background_sdk_start ... ok
+test explicit_start_revalidates_original_owner_while_real_sdk_initialize_is_waiting ... ok
+test concurrent_registration_never_exposes_a_bare_executor_to_disabled_agent ... ok
+test restoring_lazy_lifecycle_keeps_saved_intent_without_starting_external_processes ... ok
+test http_saved_start_is_immediate_and_duplicate_start_uses_one_actual_sdk_connection ... ok
+test http_bulk_preflights_all_rows_and_keeps_saved_partial_runtime_failures ... ok
+test editing_a_queued_connector_cleans_old_generation_before_new_sdk_start ... ok
+test a_real_pending_settings_approval_does_not_survive_local_credential_replacement ... ok
+test http_bulk_pending_start_does_not_block_other_saves_and_stop_disable_reap_real_groups ... ok
+LINGXI_AUTH_REJECTED request_id="req-6c1329762f9314494675b28378465417" method=GET path=/lingxi/v1/mcp/state status=403 reason=local_owner_required remote=127.0.0.1:57150
+test cancelling_a_real_settings_run_interrupts_initialization_and_preserves_saved_intent ... ok
+test queued_original_authority_revocation_and_shutdown_cancel_and_reap_owned_sdk_start ... ok
+test actual_mcp_catalog_crosses_the_shared_defer_threshold_without_losing_other_sources ... ok
+test http_page_state_keeps_real_tools_agent_defaults_defer_and_private_edit_material ... ok
+test stopping_an_actual_inflight_mcp_call_records_unknown_without_replay_and_reaps_group ... ok
+test real_run_nine_mcp_settings_actions_persist_and_gate_actual_sdk_consumers ... ok
+LINGXI_AUTH_REJECTED request_id="req-b8cd9e606e50eab1ccdddc81746cf5c4" method=POST path=/lingxi/v1/mcp/settings-action status=403 reason=local_owner_required remote=127.0.0.1:57238
+test management_rejects_other_identities_corrupt_files_links_and_replaced_parent ... ok
+test a_real_web_login_cannot_gain_local_settings_authority_through_an_approved_model_tool ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.05s
+

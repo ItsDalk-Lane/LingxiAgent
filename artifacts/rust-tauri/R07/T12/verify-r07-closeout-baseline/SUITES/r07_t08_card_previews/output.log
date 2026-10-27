@@ -1,0 +1,27 @@
+
+running 3 tests
+test oversized_theme_variables_clear_by_utf8_bytes_while_valid_card_still_registers ... ok
+test plan_assets_read_real_bytes_and_refuse_missing_invalid_and_escape_without_mutation ... ok
+test export_plan_alias_matches_preview_without_package_write_then_real_export_and_asset ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.95s
+
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.48s
+     Running tests/r07_t08_card_previews.rs (rust/target/debug/deps/r07_t08_card_previews-cbfdf7c0ce4a4fd4)

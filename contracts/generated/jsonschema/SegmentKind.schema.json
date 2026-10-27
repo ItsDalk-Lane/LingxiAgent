@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "enum": [
+        "text",
+        "reasoning"
+      ],
+      "type": "string"
+    },
+    {
+      "const": "mood",
+      "description": "仅供独立情绪轨迹展示，不混入助手正文或推理正文。",
+      "type": "string"
+    }
+  ],
+  "title": "SegmentKind"
+}

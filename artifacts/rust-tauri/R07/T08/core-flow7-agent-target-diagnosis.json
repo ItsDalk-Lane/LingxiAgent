@@ -1,0 +1,52 @@
+{
+  "purpose": "core-flow7 三项失败现场与最小修复说明",
+  "status": "修复已写；未编译、未运行新检查，等待主控统一验证",
+  "originalFailureLog": {
+    "path": "artifacts/rust-tauri/R07/T08/core-flow7.log",
+    "sha256": "1676edbac174b79050fef90ba13ef9aba7ba540352c174cb7ff43bc61f3147e5"
+  },
+  "retainedPrivateReplaceScene": {
+    "path": "/private/tmp/lingxi-r07-tests/tmp/lingxi-private-replace-33b0e46643ae9a96",
+    "symlinkTarget": "/private/tmp/lingxi-r07-tests/tmp/lingxi-private-replace-33b0e46643ae9a96/outside",
+    "outsideBytes": "outside",
+    "originalBytes": "original",
+    "originalDirectoryEntries": [
+      "config.yaml"
+    ]
+  },
+  "actualNoFollowProbe": {
+    "errno": 20,
+    "message": "[Errno 20] Not a directory: '/private/tmp/lingxi-r07-tests/tmp/lingxi-private-replace-33b0e46643ae9a96/agent'"
+  },
+  "diagnosis": [
+    {
+      "failure": "private_replace_parent_swap",
+      "observed": "现场无越界写入且临时对象已回收；同一已替换父目录执行O_NOFOLLOW|O_DIRECTORY返回ENOTDIR errno20",
+      "inference": "原Rust same_directory使用?把该I/O错误转为WriteError::Failed，而旧测试仅接受Conflict；旧原始Rust返回值未打印，不能冒称已有该值的运行日志",
+      "change": "仅交换前目录复核将现有is_symlink_swap(ELOOP/ENOTDIR)归为Conflict；其它I/O仍Failed。测试先核无副作用再打印精确返回值。保留原件chmod后sync_all再记录私密状态。"
+    },
+    {
+      "failure": "agent_target missing/link close",
+      "sourceChain": [
+        "run_with_tls: bridge.start后立即on_ready",
+        "BridgeHost::run: import_existing().await?",
+        "import_existing: 各平台先await get_connector再old_config",
+        "old_config: agent_dir_checked映射原始message",
+        "BridgeHost::wait_stopped: 保留并返回任务错误",
+        "run_with_tls: Bridge wait失败映射Serve"
+      ],
+      "evidence": "错误全文与old_config直接返回的message一致；记忆ticker的普通host_error不会在wait_stopped返回。测试原本只等监听，启动导入可能在破坏b路径后才检查b。",
+      "change": "夹具明确配置两助手五平台disabled，并等待全部10条真实导入记录后注入路径故障；仍真实HTTP、真实后台和真实退出，不吞run错误，退出超时亦失败。",
+      "scope": "证明启动导入完成后HTTP目标失效/链接替换的安全拒绝及恢复自有夹具后正常退出；不证明损坏启动可自行恢复。"
+    }
+  ],
+  "validation": {
+    "cargo": "未运行（主控统一执行）",
+    "rustfmt": "仅file_safety.rs与r07_t08_agent_target.rs，退出0",
+    "diffCheck": "仅上述两文件，退出0"
+  },
+  "sourceHashes": {
+    "rust/crates/lingxi-service/src/file_safety.rs": "0b361b544067ad5d90d4abaf2beb6627322f31ed67d59c0ef238c062ca994114",
+    "rust/crates/lingxi-service/tests/r07_t08_agent_target.rs": "d8520c0cf64f309f218976853b5ac16d2adf489946c10221467adf9ebcb0fcab"
+  }
+}

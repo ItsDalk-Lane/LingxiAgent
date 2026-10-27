@@ -1,0 +1,12 @@
+{
+  "status": "PREPARED_NOT_APPLIED_NOT_COMPILED",
+  "basePath": "rust/crates/lingxi-service/src/file_safety.rs",
+  "baseSha256": "c183ba7a500f93d8e8e9e65aa2f87fd67924446f1a59a18a33efd557ba0c1e99",
+  "candidateSha256": "d24105cb3c947de9d92b60e24b91661809daddbce07689f0a48c7a38dc541a85",
+  "patchSha256": "46eb1dc4703a1b0e423a2e603078507c3688229fb68412ca266f0bde51e6495b",
+  "ordinaryWriteLimitBytes": 8388608,
+  "ordinaryReadBoundMaxBytes": 20971520,
+  "artifactLimitBytes": 52428800,
+  "syntaxFormatting": "rustfmt --edition 2021 completed; not Rust compilation",
+  "preparedUnitTests": 4
+}

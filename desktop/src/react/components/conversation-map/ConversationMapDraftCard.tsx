@@ -7,6 +7,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { useStore } from '../../stores';
+import { captureSessionConnection, ownsSessionConnection } from '../../services/session-connection-owner';
+import { resolveServerConnection } from '../../services/service-client';
 import type { MapDraft } from '../../stores/conversation-map-slice';
 import { useI18n } from '../../hooks/use-i18n';
 import { CARD_HEIGHT, CARD_WIDTH, type MapCard } from './conversation-map-layout';
@@ -87,8 +89,17 @@ export function ConversationMapDraftCard({ draft, anchor, position }: Props) {
     saveQuickPhrases(next);
   };
 
+  const ownsDraft = () => {
+    const current = useStore.getState().mapDraft;
+    if (current?.draftId !== draft.draftId || current?.anchorCardId !== draft.anchorCardId
+      || current.sessionId !== draft.sessionId || current.sessionPath !== draft.sessionPath || current.kind !== draft.kind) return false;
+    if (!draft.nativeOwner) return true;
+    const owner = captureSessionConnection();
+    return !!owner && ownsSessionConnection(owner) && owner.key === draft.nativeOwner.key && owner.revision === draft.nativeOwner.revision;
+  };
+
   const appendPhrase = (phrase: string) => {
-    if (draft.sending) return;
+    if (draft.sending || !ownsDraft()) return;
     const next = `${draft.text}${draft.text.endsWith(' ') || !draft.text ? '' : ' '}${phrase}`;
     updateMapDraftText(next.slice(0, 4000));
   };
@@ -102,15 +113,25 @@ export function ConversationMapDraftCard({ draft, anchor, position }: Props) {
 
   const send = async () => {
     if (draft.sending || !draft.text.trim()) return;
+    const owner = resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service' ? captureSessionConnection() : null;
+    const current = () => {
+      const value = useStore.getState().mapDraft;
+      return (!owner || ownsSessionConnection(owner)) && value?.draftId === draft.draftId && value?.anchorCardId === draft.anchorCardId
+        && value.sessionId === draft.sessionId && value.sessionPath === draft.sessionPath && value.kind === draft.kind
+        && (!owner || value.nativeOwner?.key === owner.key && value.nativeOwner.revision === owner.revision);
+    };
+    if (!current()) return;
     setMapDraftSending(true);
     try {
       const ok = await sendMapDraft(draft, {
         answerEntryId: anchor.answerEntryId,
         questionEntryId: anchor.questionEntryId,
       }, t);
+      if (!current()) return;
       if (ok) setMapDraft(null);
       else setMapDraftSending(false);
     } catch (err) {
+      if (!current()) return;
       console.warn('[conversation-map] send draft failed', err);
       useStore.getState().addToast(t('map.sendFailed'), 'error');
       setMapDraftSending(false);
@@ -143,7 +164,7 @@ export function ConversationMapDraftCard({ draft, anchor, position }: Props) {
           placeholder={draft.kind === 'continue'
             ? t('map.draftContinuePlaceholder')
             : t('map.draftBranchPlaceholder')}
-          onChange={(event) => updateMapDraftText(event.target.value)}
+          onChange={(event) => { if (ownsDraft()) updateMapDraftText(event.target.value); }}
           onKeyDown={(event) => {
             if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
               event.preventDefault();
@@ -201,7 +222,7 @@ export function ConversationMapDraftCard({ draft, anchor, position }: Props) {
             type="button"
             className={styles.toolbarButton}
             disabled={draft.sending}
-            onClick={() => setMapDraft(null)}
+            onClick={() => { if (ownsDraft()) setMapDraft(null); }}
           >
             {t('map.cancel')}
           </button>

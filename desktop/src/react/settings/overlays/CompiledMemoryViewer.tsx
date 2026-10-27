@@ -22,6 +22,7 @@ export function CompiledMemoryViewer() {
   const [weekDays, setWeekDays] = useState<WeekDay[]>([]);
   const [weekDrafts, setWeekDrafts] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [savingAll, setSavingAll] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   useMermaidDiagrams(contentRef, [sections, loading, editing]);
@@ -35,10 +36,13 @@ export function CompiledMemoryViewer() {
 
   const load = async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const aid = useSettingsStore.getState().getSettingsAgentId();
       const res = await lingxiFetch(`/api/memories/compiled?agentId=${aid}`);
       const data = await res.json();
+      if (data?.error) throw new Error(typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
+      if (!data.sections || !['facts', 'today', 'week', 'longterm'].every(key => typeof data.sections[key] === 'string')) throw new Error('编译记忆响应缺少完整 sections');
       const nextSections = {
         facts: data.sections?.facts || '',
         today: data.sections?.today || '',
@@ -51,6 +55,7 @@ export function CompiledMemoryViewer() {
       setLongtermDraft(nextSections.longterm);
       await loadWeekDays(aid);
     } catch (err: any) {
+      setLoadError(err.message || String(err));
       setSections({ facts: '', today: '', week: '', longterm: '' });
       setFactsDraft('');
       setTodayDraft('');
@@ -67,7 +72,9 @@ export function CompiledMemoryViewer() {
     try {
       const res = await lingxiFetch(`/api/memories/compiled/week/days?agentId=${aid}`);
       const data = await res.json();
-      const days: WeekDay[] = Array.isArray(data.days) ? data.days : [];
+      if (data?.error) throw new Error(typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
+      if (!Array.isArray(data.days)) throw new Error('周记忆响应缺少 days');
+      const days: WeekDay[] = data.days;
       setWeekDays(days);
       setWeekDrafts(Object.fromEntries(days.map((d) => [d.date, d.body])));
     } catch (err: any) {
@@ -231,6 +238,7 @@ export function CompiledMemoryViewer() {
           </div>
         </div>
         <div className={`${styles['memory-viewer-body']} ${styles['compiled-memory-body']}`}>
+          {loadError && <p role="alert">{loadError}</p>}
           {loading ? (
             <div className="memory-viewer-empty">Loading...</div>
           ) : editing ? (

@@ -10,7 +10,7 @@
 
 import { useEffect, useState } from 'react';
 import type { ModelObservabilityCallListItem } from '../../../../../shared/model-observability-api-contract.ts';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../services/service-client';
 import { aggregateTurnUsage, type TurnUsageStats, type TurnUsageWindow } from './turn-usage';
 
 /** 单轮调用上限：一轮内的模型调用（含工具轮）远达不到该值，兜底防全量拉取。 */

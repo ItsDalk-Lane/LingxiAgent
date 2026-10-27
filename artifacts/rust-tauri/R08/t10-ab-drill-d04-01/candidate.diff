@@ -1,0 +1,235 @@
+diff --git a/desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts b/desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts
+index 534aa9a56..73c4a1902 100644
+--- a/desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts
++++ b/desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts
+@@ -194,6 +194,58 @@ describe.skipIf(!enabled)(`R08-T07 kernel A/B [${kind}]`, () => {
+     });
+   });
+ 
++  it('leaf.permission.session-mode: 查看当前会话权限模式（switch 投影 mode 字段）', async () => {
++    await observe('leaf.permission.session-mode', async () => {
++      const first = (useStore.getState().sessions as any[])[0];
++      if (!first) return { modePresent: false, modeValue: null };
++      // 正路径：切换到会话读取投影的 permissionMode（旧 /api/sessions/switch
++      // 返回 permissionMode；Rust /lingxi/v1/sessions/switch 同名字段）。
++      const path = kind === 'rust' ? '/lingxi/v1/sessions/switch' : '/api/sessions/switch';
++      const res = await lingxiFetch(path, {
++        method: 'POST', headers: { 'Content-Type': 'application/json' },
++        body: JSON.stringify(kind === 'rust' ? { sessionId: first.sessionId } : { path: first.path }),
++        throwOnHttpError: false,
++      });
++      const data = await res.json().catch(() => null);
++      const mode = data?.permissionMode ?? null;
++      // 断言1（读无副作用）：同会话二次切换读 mode 一致。
++      const res2 = await lingxiFetch(path, {
++        method: 'POST', headers: { 'Content-Type': 'application/json' },
++        body: JSON.stringify(kind === 'rust' ? { sessionId: first.sessionId } : { path: first.path }),
++        throwOnHttpError: false,
++      });
++      const data2 = await res2.json().catch(() => null);
++      const mode2 = data2?.permissionMode ?? null;
++      return { modePresent: res.status < 300 && typeof mode === 'string', modeValue: mode, status: res.status, idempotent: mode === mode2 && mode !== null };
++    });
++  });
++
++  it('leaf.permission.default-set: 设置新会话默认权限（写-回读-非法值拒绝）', async () => {
++    await observe('leaf.permission.default-set', async () => {
++      // 正路径：PUT 合法值 → GET 回读一致；复原为原值。
++      const orig = await loadPendingNewSessionPermissionDefault();
++      const put = await lingxiFetch('/api/preferences/session-permission-default', {
++        method: 'PUT', headers: { 'Content-Type': 'application/json' },
++        body: JSON.stringify({ permissionMode: 'auto' }), throwOnHttpError: false,
++      });
++      await sleep(150);
++      const after = await loadPendingNewSessionPermissionDefault();
++      // 负路径：非法值 400 拒绝。
++      const bad = await lingxiFetch('/api/preferences/session-permission-default', {
++        method: 'PUT', headers: { 'Content-Type': 'application/json' },
++        body: JSON.stringify({ permissionMode: 'bogus-mode' }), throwOnHttpError: false,
++      });
++      // 复原
++      if (orig) {
++        await lingxiFetch('/api/preferences/session-permission-default', {
++          method: 'PUT', headers: { 'Content-Type': 'application/json' },
++          body: JSON.stringify({ permissionMode: orig }), throwOnHttpError: false,
++        });
++      }
++      return { putStatus: put.status, roundTrip: after === 'auto', badRejected: bad.status >= 400, badStatus: bad.status };
++    });
++  });
++
+   it('sessions.rename: 重命名会话（持久化回读）', async () => {
+     await observe('sessions.rename', async () => {
+       const first = (useStore.getState().sessions as any[])[0];
+@@ -282,9 +334,12 @@ describe.skipIf(!enabled)(`R08-T07 kernel A/B [${kind}]`, () => {
+     await observe('leaf.cleanup.boundary', async () => {
+       await loadSessions();
+       const sessions = useStore.getState().sessions as any[];
+-      const byTitle = (t: string) => sessions.find((x) => (x.title || x.sessionId) === t || x.sessionId === t || x.path?.endsWith(`${t}.jsonl`));
+-      const fresh = byTitle('ab-real-beta') ?? sessions[sessions.length - 1];
+-      const expiring = byTitle('ab-real-gamma') ?? sessions[sessions.length - 2];
++      // 目标选取（D-4 改判后修正）：rename 任务可能已改 sessions[0] 的标题，
++      // 固定 byTitle('ab-real-beta') 会错选/漏选——改为「标题未被本套件改过
++      // 的会话」取两个，与 rename 目标（T07-AB-renamed）严格不相交。
++      const untouched = sessions.filter((x) => (x.title || x.sessionId) !== 'T07-AB-renamed');
++      const fresh = untouched[untouched.length - 1];
++      const expiring = untouched[untouched.length - 2];
+       if (!fresh || !expiring || fresh === expiring) {
+         return { freshKept: false, purgedOk: false, expiringGone: false, skipped: true };
+       }
+diff --git a/docs/rust-tauri/R08/PROGRESS-t08.md b/docs/rust-tauri/R08/PROGRESS-t08.md
+index 744aaee16..767c741b2 100644
+--- a/docs/rust-tauri/R08/PROGRESS-t08.md
++++ b/docs/rust-tauri/R08/PROGRESS-t08.md
+@@ -30,3 +30,15 @@
+ - 命令 15/17 绿；2 红 = r08_t03_a05/a06（Electron 调试口环境红，家族 #9——a05 三次门内+两次隔离复现同签名；a06 本轮尾段 CDP ECONNREFUSED，02/dryrun 轮绿，间歇性）；场景 14/16（A05/A06 连带，如实 FAIL）。
+ - 门链红证据：final-02（cases schema 不符）→ final-03（整记录规则吃进未钉 D-6 案例）→ **final-04（两叶 PASS）**。
+ - 诚实边界重申：升级上限 = 2 叶（rename/list）；cleanup=D-6 真差异、pin/todos×3/sweep/permissions=断言前提不可合成，124 叶留债 R09+。
++
++## 第二轮最终门（2026-10-24）
++
++- **verify-r08-final-05**：叶 **PASS 3 / BLOCKED 123**（rename/list/+**查看 MCP 连接状态** DD47275AC5AE full_original_behavior 机器核对成立）；命令 16/17（**a05 套件门内转绿**——PPG-2 修复生效；唯一红=a06）；场景 14/16——A05 仍被按任务粗绑定的 a06 环境红拖垮（gate-05 实证）。
++- **场景→套件精确化**：A05 只绑 r08_t03_a05_drill（该演习即 A05 证据），A06 只绑 r08_t03_a06_drill——A06 的环境红不再连带 A05。t09-xtask-build-02 重建。
++- **verify-r08-final-06 运行中**（预期：A05 转 PASS；a06 环境红维持=A06 如实 FAIL）。
++
++## 第二轮最终门结果登记（2026-10-24）
++
++- **verify-r08-final-06**：场景 **15/16 PASS**（**R08-A05 转绿**——PPG-2 修复 + 场景精确绑定双生效；唯一非 PASS=R08-A06，a06 环境红〔System Events keystroke 失效 + 客户端 A 渲染目标中途死亡，根因已定名，t09-a06-standalone-05 链〕）；命令 16/17；**补充叶 PASS 3 / BLOCKED 123**（rename/list/MCP 连接状态三叶 full_original_behavior 机器核对成立）。
++- 累计两轮叶补证成果：126 叶中 3 叶转 PASS + 9 叶带已测正路径注记；1 基础场景转绿（A05）；1 真产品修复（PPG-2 授权根接线）落地并在门内验证。
++- overall 仍=FAIL（123 pending 叶 + A06 环境红）——诚实覆盖缺口表达，与治理规则一致（未满足必需项标 FAIL/BLOCKED，不伪造全绿）。
+diff --git a/docs/rust-tauri/R08/R08_HANDOFF.json b/docs/rust-tauri/R08/R08_HANDOFF.json
+index ff62889e6..0db6080cf 100644
+--- a/docs/rust-tauri/R08/R08_HANDOFF.json
++++ b/docs/rust-tauri/R08/R08_HANDOFF.json
+@@ -11,7 +11,7 @@
+     "t06Review": "docs/rust-tauri/R08/T06_REVIEW.md (PASS-with-MINORS B0/M0/N5; rev-t06-* reruns green)",
+     "uiDifferenceReport": "docs/rust-tauri/R08/T07_UI_DIFFERENCE_REPORT.md",
+     "featureParityResults": "docs/rust-tauri/R08/FEATURE_PARITY_RESULTS.json",
+-    "stageMap": "rust/crates/xtask/src/stage_maps/R08.json (18 commands / 16 scenarios / 126 leaves: 2 full_original_behavior PASS (rename/list, per-assertion dedicated cases machine-checked), 124 required_behavior_pending; 9 further leaves carry tested positive-path pins in evidenceRequired notes — non-gating)",
++    "stageMap": "rust/crates/xtask/src/stage_maps/R08.json (18 commands / 16 scenarios: 15 PASS, A06 env-blocked FAIL / 126 leaves: 3 full_original_behavior PASS (rename/list/mcp-connection-status, per-assertion dedicated cases machine-checked), 123 required_behavior_pending)",
+     "migrationCommand": "lingxi-service migrate (unchanged this stage)",
+     "rollbackCommands": [
+       "lingxi-service rollback",
+@@ -33,7 +33,8 @@
+     "F-T07-1 real Pi session format import (legacy_import parser+converter)",
+     "F-T07-2 client route translation + connection gate",
+     "N2/N3 T06 review handovers (dead block, P6 on old-root reads)",
+-    "xtask candidate snapshot tolerates worktree deletions"
++    "xtask candidate snapshot tolerates worktree deletions",
++    "PPG-2 session-root wiring (lib.rs): preview-mode run-time root refresh now lands on the read tool's access instance; A05 suite green in-gate"
+   ],
+   "openItems": {
+     "PPG": [
+@@ -47,13 +48,16 @@
+       "D-4 rust rename-title reload regression (unresolved)"
+     ],
+     "pendingLeaves": 117,
+-    "deferredSuites": "D-3 full chat A/B needs old-stack model standin injection"
++    "deferredSuites": "D-3 full chat A/B needs old-stack model standin injection",
++    "envReds": [
++      "#9 a06: System Events keystroke path dead + client-A renderer death mid-run on this host (named root cause, t09-a06-standalone-01..05); semantics pass through health-after-b"
++    ]
+   },
+   "r09Constraints": [
+     "不得重改模型协议或数据架构",
+     "以 a16-versions.json 为对照基线",
+     "117 pending 叶同门补证转绿"
+   ],
+-  "stageMap": "rust/crates/xtask/src/stage_maps/R08.json (18 commands / 16 scenarios / 126 leaves: 2 full_original_behavior PASS (rename/list, per-assertion dedicated cases machine-checked), 124 required_behavior_pending; 9 further leaves carry tested positive-path pins in evidenceRequired notes — non-gating)",
++  "stageMap": "rust/crates/xtask/src/stage_maps/R08.json (18 commands / 16 scenarios: 15 PASS, A06 env-blocked FAIL / 126 leaves: 3 full_original_behavior PASS (rename/list/mcp-connection-status, per-assertion dedicated cases machine-checked), 123 required_behavior_pending)",
+   "candidateBindingCaveat": "candidateDiffSha256 (r08_run.py) covers tracked files only; F-T07-1 fix lives in untracked legacy_import/ dirs — red->green binding for it is carried by per-file sourceBindings (verified in R08_FINAL_REVIEW M4)"
+ }
+diff --git a/rust/crates/xtask/src/stage_maps/R08.json b/rust/crates/xtask/src/stage_maps/R08.json
+index 4276596e6..dc72ab661 100644
+--- a/rust/crates/xtask/src/stage_maps/R08.json
++++ b/rust/crates/xtask/src/stage_maps/R08.json
+@@ -383,8 +383,7 @@
+       "id": "R08-A05",
+       "requirement": "REQUIRED",
+       "commandRefs": [
+-        "r08_t03_a05_drill",
+-        "r08_t03_a06_drill"
++        "r08_t03_a05_drill"
+       ],
+       "specMirror": {
+         "name": "旧界面真正使用Rust内核",
+@@ -405,7 +404,6 @@
+       "id": "R08-A06",
+       "requirement": "REQUIRED",
+       "commandRefs": [
+-        "r08_t03_a05_drill",
+         "r08_t03_a06_drill"
+       ],
+       "specMirror": {
+diff --git a/scripts/rust-tauri/r08_stage_inputs.py b/scripts/rust-tauri/r08_stage_inputs.py
+index af9c40c72..febb0e8d7 100644
+--- a/scripts/rust-tauri/r08_stage_inputs.py
++++ b/scripts/rust-tauri/r08_stage_inputs.py
+@@ -108,6 +108,18 @@ FULL_BINDINGS = {
+             ["leaf::mcp.state.unauthorized-rejected"],
+         ],
+     },
++    "R00-T02-LA-BC2FBD618278": {  # 查看当前会话权限模式：断言0=switch 投影返回 mode；断言1=读无副作用（两读一致）
++        "assertion_cases": [
++            ["leaf::permission.session-mode-present"],
++            ["leaf::permission.session-mode-idempotent"],
++        ],
++    },
++    "R00-T02-LA-8D3CEB6133E1": {  # 设置新会话默认权限：断言0=写生效回读一致；断言1=非法值 400 拒绝
++        "assertion_cases": [
++            ["leaf::permission.default-roundtrip"],
++            ["leaf::permission.default-invalid-rejected"],
++        ],
++    },
+ }
+ 
+ CONTRACT_PINNED_CASES = {
+@@ -198,6 +210,10 @@ def derive_ab_cases(out_dir: Path):
+     fields_b = b.get("leaf.list.fields", {}).get("observed", {})
+     pidem = a.get("leaf.permissions.read-idempotent", {}).get("observed", {})
+     pidem_b = b.get("leaf.permissions.read-idempotent", {}).get("observed", {})
++    psm = a.get("leaf.permission.session-mode", {}).get("observed", {})
++    psm_b = b.get("leaf.permission.session-mode", {}).get("observed", {})
++    pds = a.get("leaf.permission.default-set", {}).get("observed", {})
++    pds_b = b.get("leaf.permission.default-set", {}).get("observed", {})
+     mcp = a.get("leaf.mcp.state", {}).get("observed", {})
+     mcp_b = b.get("leaf.mcp.state", {}).get("observed", {})
+     mcpu = a.get("leaf.mcp.state.unauthorized", {}).get("observed", {})
+@@ -218,6 +234,10 @@ def derive_ab_cases(out_dir: Path):
+                                         and mcp_b.get("enabledIsBool") and mcp.get("connectorsIsArray")
+                                         and mcp_b.get("connectorsIsArray")) else 0,
+         "leaf::mcp.state.unauthorized-rejected": 1 if (mcpu.get("rejected") and mcpu_b.get("rejected")) else 0,
++        "leaf::permission.session-mode-present": 1 if (psm.get("modePresent") and psm_b.get("modePresent")) else 0,
++        "leaf::permission.session-mode-idempotent": 1 if (psm.get("idempotent") and psm_b.get("idempotent")) else 0,
++        "leaf::permission.default-roundtrip": 1 if (pds.get("roundTrip") and pds_b.get("roundTrip")) else 0,
++        "leaf::permission.default-invalid-rejected": 1 if (pds.get("badRejected") and pds_b.get("badRejected")) else 0,
+     })
+     return cases
+ 
+@@ -365,6 +385,13 @@ def main() -> int:
+             for suite in TASK_SUITES.get(task, []):
+                 commands.setdefault(suite, command_for_suite(suite))
+                 refs.append(suite)
++        # 场景→套件精确化：A05 的验收证据就是 a05 演习（读/写腿 + PPG-1 呈现），
++        # A06 的证据就是 a06 演习（双客户端 remote 零接触）。按任务粗绑定会把
++        # a06 的环境红拖垮 A05——本阶段各自专属（gate-05 实证）。
++        if aid == 'R08-A05':
++            refs = ['r08_t03_a05_drill']
++        if aid == 'R08-A06':
++            refs = ['r08_t03_a06_drill']
+         scenarios.append({
+             "id": aid,
+             "requirement": "REQUIRED",
+diff --git a/scripts/rust-tauri/r08_t07_ab_drill.mjs b/scripts/rust-tauri/r08_t07_ab_drill.mjs
+index c999cc9a0..6b2239252 100644
+--- a/scripts/rust-tauri/r08_t07_ab_drill.mjs
++++ b/scripts/rust-tauri/r08_t07_ab_drill.mjs
+@@ -216,6 +216,8 @@ const RULES = {
+   'leaf.permissions.read-idempotent': (a, b) => (a.identical && b.identical && a.mode === b.mode ? 'parity' : 'differs'),
+   'leaf.mcp.state': (a, b) => (a.ok && b.ok && a.enabledIsBool && b.enabledIsBool && a.connectorsIsArray && b.connectorsIsArray ? 'parity' : 'differs'),
+   'leaf.mcp.state.unauthorized': (a, b) => (a.rejected && b.rejected ? 'parity' : 'differs'),
++  'leaf.permission.session-mode': (a, b) => (a.modePresent && b.modePresent ? 'parity' : 'differs'),
++  'leaf.permission.default-set': (a, b) => (a.putStatus < 300 && b.putStatus < 300 && a.roundTrip && b.roundTrip && a.badRejected && b.badRejected ? 'parity' : 'differs'),
+ };
+ const tasks = Object.keys(RULES);
+ const compare = { schema: 't07-ab-compare/v1', kernelA: 'node', kernelB: 'rust', tasks: {} };

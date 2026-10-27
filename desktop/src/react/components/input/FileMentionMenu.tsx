@@ -4,6 +4,7 @@ import { kindOfFileName } from '../../utils/file-kind';
 import { FileKindIcon } from '../shared/FileKindIcon';
 import { FolderIcon } from '../shared/FolderIcon';
 import styles from './InputArea.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 export const FileMentionMenu = memo(function FileMentionMenu({
   items,
@@ -58,7 +59,7 @@ function FileMentionButton({
 }) {
   const fileKind = kindOfFileName(item.name || item.path, item.mimeType);
   const thumbnailUrl = !item.isDirectory && (fileKind === 'image' || fileKind === 'svg') && item.path && typeof window !== 'undefined'
-    ? window.platform?.getFileUrl?.(item.path)
+    ? usePlatform()?.getFileUrl?.(item.path)
     : null;
 
   return (

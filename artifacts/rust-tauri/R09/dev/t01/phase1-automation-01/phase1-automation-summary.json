@@ -1,0 +1,54 @@
+{
+ "schema": "lingxi.r09.phase1-automation.v1",
+ "launchCount": 1,
+ "automation": {
+  "LINGXI_R09_AUTOMATION": "1",
+  "dialogSink": "sink-failure-dialog.json"
+ },
+ "window": {
+  "windowCreatedVisible": false,
+  "appReadyWindowVisible": false,
+  "showSuppressedEvent": true,
+  "activationPolicy": "Accessory (macOS automation; no Dock icon)",
+  "domEvalInHiddenWindow": 121
+ },
+ "crashFlow": {
+  "crashes": [
+   1,
+   2
+  ],
+  "restarted": true,
+  "failureReason": "RUST_SERVICE_CRASH_RESTART_EXHAUSTED",
+  "sinkModalShown": false,
+  "detailPath": "/private/tmp/lingxi-r09-phase1-automation/home/diagnostics/tauri-launch/failure.json"
+ },
+ "events": [
+  "host-start",
+  "resolve",
+  "binary",
+  "spawn",
+  "ready",
+  "instance",
+  "identity",
+  "service-ready",
+  "host-service-ready",
+  "window-created",
+  "page-load",
+  "page-load",
+  "app-ready-window-suppressed",
+  "app-ready",
+  "dom-projection",
+  "service-crashed",
+  "restart",
+  "spawn",
+  "ready",
+  "instance",
+  "identity",
+  "service-ready",
+  "service-crashed",
+  "service-launch-failed",
+  "failure-dialog-suppressed"
+ ],
+ "processResidual": [],
+ "processResidualCount": 0
+}

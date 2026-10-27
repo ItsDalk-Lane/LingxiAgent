@@ -1,0 +1,71 @@
+{
+  "status": "READY_FOR_INDEPENDENT_REVIEW_LOCAL",
+  "date": "2026-10-21",
+  "testedScope": "run_code真实工具经注入外部模型的真实kernel/gateway/storage链；不代领默认组合根或UI",
+  "environment": {
+    "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+    "rustc": "1.98.1 (48a229cea 2026-09-01)",
+    "python": "3.14.3",
+    "node": "24.16.0"
+  },
+  "sourceSha256": {
+    "rust/crates/lingxi-service/src/coding_run_code.rs": "0bad24bc0225f3ee2e0f272716c14fb8ea6424cf44cb552586d3ba32ef1aaea2",
+    "rust/crates/lingxi-service/tests/r08_admission_run_code.rs": "4e69dadb687ece1b7253c5e8800afceab2f56b6a7d1e2a6548fd2bcf35969afb"
+  },
+  "commands": [
+    {
+      "command": "/Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r08_admission_run_code --no-run",
+      "exitCode": 101,
+      "log": "compile-01.log",
+      "result": "测试cancel_run_for传入Arc而非存储引用；已修复；原始失败保留"
+    },
+    {
+      "command": "/Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r08_admission_run_code -- --test-threads=1 --nocapture",
+      "exitCode": 101,
+      "log": "test-01.log",
+      "result": "7通过/1失败；Node运行异常被原生REPL domain接走，错误等待成超时；已修复"
+    },
+    {
+      "command": "/Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r08_admission_run_code -- --test-threads=1 --nocapture",
+      "exitCode": 0,
+      "log": "test-02.log",
+      "result": "8通过/0失败/0忽略/0过滤；32.91秒，真实30秒上限"
+    },
+    {
+      "command": "/Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r08_admission_run_code python_and_node_real_kernels_preserve_variables_functions_imports_and_isolate_agent_sessions -- --exact --nocapture",
+      "exitCode": 0,
+      "log": "test-03.log",
+      "result": "新增Node顶层await和动态import持久断言后，1通过/0失败/0忽略/7明确过滤；不是全套替代"
+    }
+  ],
+  "logSha256": {
+    "compile-01.log": "c4db50d9fa06874e295635afbebdd58d724f5689ef8b13aa07f5f104a99384d3",
+    "test-01.log": "926512a8bb6a885c00034190e5e39877caa7eb0bba119968ef8a9e753e18ec31",
+    "test-02.log": "7fb656660b9c963b8135486ec1baa4986c388429e2cdfe73e6643a71614d5b4d",
+    "test-03.log": "ec1aa41071bf0dab31cfaaf16e52ebfca462bbe6e98cc95f011b84c1149294e9"
+  },
+  "originalLeaf": "R00-T02-LA-C88F29B5114A",
+  "assertionBindings": {
+    "两次调用可共享变量": "python_and_node_real_kernels_preserve_variables_functions_imports_and_isolate_agent_sessions",
+    "重启后旧变量消失": "python_and_node_real_kernels_preserve_variables_functions_imports_and_isolate_agent_sessions",
+    "取消清理内核": "cancelling_real_run_stops_persistent_python_kernel_and_its_actual_grandchild",
+    "语言无效、无会话、内核死亡或超时显式失败；重启不声称保留旧状态。": [
+      "real_gateway_status_remains_read_only_and_code_never_inherits_service_secrets",
+      "output_is_real_bounded_head_tail_utf8_and_dead_kernel_requires_explicit_restart",
+      "real_thirty_second_cap_reports_timeout_keeps_busy_state_and_restart_ends_it_without_replay"
+    ]
+  },
+  "constraints": [
+    "仅合成独立临时根",
+    "只替代外部模型响应",
+    "无全局HOME修改",
+    "无提交推送",
+    "无生产默认/真实用户数据迁移"
+  ],
+  "limits": [
+    "仅本机macOS执行，非Unix监督器现有明确UnsupportedPlatform",
+    "Node官方REPL内部domain形状依赖已在启动检查，缺失则拒启",
+    "尚待独立审查与正式默认组合根验收",
+    "UI与R08迁移/回滚/前滚不在本局部结果内"
+  ]
+}

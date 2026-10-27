@@ -1,0 +1,19 @@
+ok stop-half: exit 0
+ok stop-half: journal.phase == selfcheck
+ok stop-half: ruling absent before committed (§10)
+ok resume-half: exit 0
+ok resume-half: CUTOVER_RESULT present
+ok resume-half: outcome=committed phase=committed
+ok resume-half: journal.phase == committed
+ok resume-half: nine phases ok in order + committed terminal state
+ok resume-half: no refused entry
+ok resume-half: pointer valid
+ok resume-half: target stamp epoch 2 (R08_CUTOVER)
+ok resume-half: ruling in work-dir
+ok resume-half: ruling copy in target legacy-import/
+ok resume-half: ruling copy byte-equal
+ok resume-half: ruling fields (schema/cutoverId/strategy/sharedWrites/enforcement×3)
+ok resume-half: legacy root byte-equal (zero-mutation red line)
+ok resume-half: no duplicated ok phase
+D2_RESULT {"verdict":"PASS","leg":"resume-half"}
+D2_EXIT=0

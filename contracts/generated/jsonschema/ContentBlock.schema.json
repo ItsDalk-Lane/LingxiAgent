@@ -1,0 +1,156 @@
+{
+  "$defs": {
+    "ContentDigest": {
+      "additionalProperties": false,
+      "description": "Hash of canonical content (protocol §6). `algorithm` is `sha256`;\n`canonicalization` names the canonical JSON profile.",
+      "properties": {
+        "algorithm": {
+          "type": "string"
+        },
+        "canonicalization": {
+          "type": "string"
+        },
+        "hex": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "algorithm",
+        "canonicalization",
+        "hex"
+      ],
+      "type": "object"
+    },
+    "ResourceId": {
+      "description": "Identity of one persisted resource (session file / attachment).\n\nOpaque string identifier. Equality and ordering carry no\nsemantics; the string form is preserved verbatim across\nmigrations (legacy IDs are never renumbered). On the wire this is\na plain JSON string (`#[serde(transparent)]`).",
+      "type": "string"
+    },
+    "ResourceKind": {
+      "enum": [
+        "session_file",
+        "attachment",
+        "artifact",
+        "export"
+      ],
+      "type": "string"
+    },
+    "ResourceRef": {
+      "additionalProperties": false,
+      "description": "Reference to a real, authorized resource (contract §3: ResourceService\nowns real files and grants; a model claiming a file exists never creates\na resource reference by itself).",
+      "properties": {
+        "digest": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ContentDigest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "displayName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "$ref": "#/$defs/ResourceKind"
+        },
+        "resourceId": {
+          "$ref": "#/$defs/ResourceId"
+        },
+        "sizeBytes": {
+          "description": "Byte size as a decimal string (precision rule: all u64 on the wire\nare strings).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "uri": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "resourceId",
+        "kind"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "One block of normalized message content.\n\n`opaque` preserves provider-specific state (e.g. reasoning signatures /\nopaque blocks) **verbatim** — contract §6 forbids flattening such state\ninto ordinary text or dropping it for uniformity.",
+  "oneOf": [
+    {
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "type": {
+          "const": "text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "text"
+      ],
+      "type": "object"
+    },
+    {
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "type": {
+          "const": "reasoning",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "text"
+      ],
+      "type": "object"
+    },
+    {
+      "properties": {
+        "resource": {
+          "$ref": "#/$defs/ResourceRef"
+        },
+        "type": {
+          "const": "resource_ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "resource"
+      ],
+      "type": "object"
+    },
+    {
+      "description": "Provider-opaque payload, preserved byte-identically.",
+      "properties": {
+        "data": true,
+        "provider": {
+          "type": "string"
+        },
+        "type": {
+          "const": "opaque",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "provider",
+        "data"
+      ],
+      "type": "object"
+    }
+  ],
+  "title": "ContentBlock"
+}

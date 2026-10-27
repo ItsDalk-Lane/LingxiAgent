@@ -1,0 +1,6 @@
+{"n": 20, "case": "blocked::allow-side-effect::main::copy_file", "ok": false, "at": 1793063907.679438}
+{"n": 40, "case": "blocked::allow-side-effect::main::open_file", "ok": false, "at": 1793063907.809921}
+{"n": 60, "case": "acl::main::rust_browser_request::allow", "ok": true, "at": 1793063907.901815}
+{"n": 80, "case": "acl::main::window_is_maximized::allow", "ok": true, "at": 1793063907.920307}
+{"n": 100, "case": "blocked::window-open::onboarding", "ok": false, "at": 1793063907.933079}
+{"n": 105, "final": true, "status": "PASS_WITH_BLOCKED_WINDOWS", "at": 1793063907.974129}

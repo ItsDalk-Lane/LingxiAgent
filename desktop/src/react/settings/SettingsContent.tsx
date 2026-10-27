@@ -1,20 +1,26 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { useSettingsStore } from './store';
+import { useSettingsStore, type SettingsSnapshot, type SettingsStore } from './store';
+import { createRemoteResource } from './resource-state';
 import { lingxiFetch } from './api';
 import {
   createLocalServerConnection,
+  resolveServerConnection,
   readPersistedServerConnectionState,
   refreshLocalServerConnectionState,
   upsertServerConnection,
+  validateRestartTransport,
+  LOCAL_CONNECTION_ID,
   type ServerConnection,
-} from '../services/server-connection';
+} from '../services/service-client';
 import { t } from './helpers';
 import { loadAgents, loadAvatars, loadProvidersSummary, loadSettingsModels, loadSettingsSnapshot } from './actions';
+import { captureSettingsConnection, ownsSettingsConnection, type SettingsConnectionOwner } from './connection-owner';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { SettingsNav } from './SettingsNav';
 import { Toast } from './Toast';
 import { AgentTab } from './tabs/AgentTab';
+import { RustAgentTab } from './tabs/RustAgentTab';
 import { MeTab } from './tabs/MeTab';
 import { InterfaceTab } from './tabs/InterfaceTab';
 import { GeneralTab } from './tabs/GeneralTab';
@@ -44,6 +50,7 @@ import { WechatQrcodeOverlay } from './overlays/WechatQrcodeOverlay';
 import { InputContextMenu } from '../components/InputContextMenu';
 import { SettingsPage } from './components/SettingsPrimitives';
 import styles from './Settings.module.css';
+import { usePlatform } from '../hooks/use-platform';
 
 const TAB_COMPONENTS: Record<string, React.ComponentType> = {
   agent: AgentTab,
@@ -67,6 +74,12 @@ const TAB_COMPONENTS: Record<string, React.ComponentType> = {
   about: AboutTab,
 };
 
+// 只开放本阶段已接真实服务的设置；用量和环境检查分别由T10/T12接入。
+const RUST_SETTINGS_TABS = new Set([
+  'agent', 'access', 'me', 'interface', 'keybindings', 'general', 'browser', 'work',
+  'skills', 'mcp', 'bridge', 'providers', 'models', 'sharing', 'experiments', 'security', 'about',
+]);
+
 function connectionState(connection: ServerConnection | null) {
   const persisted = readPersistedServerConnectionState();
   const serverConnections = connection
@@ -81,6 +94,26 @@ function connectionState(connection: ServerConnection | null) {
     activeServerConnectionId: activeServerConnection?.connectionId ?? null,
     activeServerConnection,
   };
+}
+
+function markRustCoreUnavailable(store: SettingsStore): void {
+  const reason = t('settings.rustCoreUnavailable');
+  store.set({
+    rustSettingsUnavailable: true,
+    settingsIdentityOwner: null,
+    activeTab: 'access',
+    agents: [],
+    currentAgentId: null,
+    settingsAgentId: null,
+    settingsConfig: null,
+    settingsConfigKey: null,
+    settingsConfigStatus: 'error',
+    settingsConfigError: reason,
+    settingsSnapshot: { ...createRemoteResource<SettingsSnapshot>(), status: 'error', error: reason },
+    globalModelsConfig: null,
+    runtimeModels: [],
+    providersSummary: {},
+  });
 }
 
 /** Tab 顶部大标题（对应左栏导航 label），所有 tab 都会显示 */
@@ -128,9 +161,17 @@ export function SettingsContent({
   onActiveTabChange,
   listenToWindowTabSwitch = false,
 }: SettingsContentProps) {
-  const { activeTab, ready } = useSettingsStore(
-    useShallow(s => ({ activeTab: s.activeTab, ready: s.ready }))
+  const { activeTab, ready, rustSettingsUnavailable, rustConnection, rustIdentityVerified } = useSettingsStore(
+    useShallow(s => ({ activeTab: s.activeTab, ready: s.ready, rustSettingsUnavailable: s.rustSettingsUnavailable,
+      rustConnection: resolveServerConnection(s)?.serverNodeKind === 'lingxi-service',
+      rustIdentityVerified: ownsSettingsConnection(s.settingsIdentityOwner) }))
   );
+  const rustConnectionKey = useSettingsStore(s => {
+    const connection = resolveServerConnection(s);
+    return connection?.serverNodeKind === 'lingxi-service' ? JSON.stringify(connection) : null;
+  });
+  const rustDataError = useSettingsStore(s => s.agentsError
+    || (s.agents.length > 0 ? s.settingsConfigError : null) || s.runtimeModelsError);
   const set = useSettingsStore(s => s.set);
   const lastReportedActiveTabRef = useRef<string | null>(null);
   const settingsMainRef = useRef<HTMLDivElement>(null);
@@ -140,8 +181,12 @@ export function SettingsContent({
   }, []);
 
   useEffect(() => {
+    if (rustConnectionKey) void initializeRustSettings();
+  }, [rustConnectionKey]);
+
+  useEffect(() => {
     if (!listenToWindowTabSwitch) return;
-    const platform = window.platform;
+    const platform = usePlatform();
     if (!platform?.onSwitchTab) return;
     const unsubscribe = platform.onSwitchTab((tab: string) => {
       const nextTab = normalizeSettingsTab(tab);
@@ -151,13 +196,17 @@ export function SettingsContent({
   }, [listenToWindowTabSwitch, set]);
 
   useEffect(() => {
-    const platform = window.platform;
+    const platform = usePlatform();
     if (!platform?.onSettingsChanged) return;
     const unsubscribe = platform.onSettingsChanged((type: string, data: unknown) => {
+      if (type === 'bridge-status-changed') {
+        window.dispatchEvent(new CustomEvent('hana-bridge-reload', { detail: data }));
+        return;
+      }
       if (type === 'skills-changed') {
         window.dispatchEvent(new CustomEvent('hana-skills-changed', { detail: data || {} }));
       } else if (type === 'models-changed') {
-        void loadSettingsModels();
+        if (!useSettingsStore.getState().rustSettingsUnavailable || resolveServerConnection(useSettingsStore.getState())?.serverNodeKind === 'lingxi-service') void loadSettingsModels();
       }
     });
     return typeof unsubscribe === 'function' ? unsubscribe : undefined;
@@ -165,7 +214,7 @@ export function SettingsContent({
 
   useEffect(() => {
     const refreshModels = () => {
-      void loadSettingsModels();
+      if (!useSettingsStore.getState().rustSettingsUnavailable || resolveServerConnection(useSettingsStore.getState())?.serverNodeKind === 'lingxi-service') void loadSettingsModels();
     };
     window.addEventListener('hana-models-changed', refreshModels);
     return () => window.removeEventListener('hana-models-changed', refreshModels);
@@ -182,33 +231,81 @@ export function SettingsContent({
 
   // Server 重启后用新端口重新加载数据
   useEffect(() => {
-    const platform = window.platform;
+    const platform = usePlatform();
     if (!platform?.onServerRestarted) return;
-    const unsubscribe = platform.onServerRestarted((data: { port: number; token?: string | null }) => {
+    let lastLocalIdentity: ServerConnection | null = null;
+    const unsubscribe = platform.onServerRestarted((data: { port: number; token?: string | null; serverNodeKind?: string | null; serverNodeTransport?: string | null; host?: string | null }) => {
       const store = useSettingsStore.getState();
-      console.log('[settings] server restarted, new port:', data.port);
-      const serverToken = data.token ?? store.serverToken;
-      const nextConnectionState = refreshLocalServerConnectionState({
+      const priorToken = store.serverToken;
+      const fromEvent = validateRestartTransport(data?.port, data?.token);
+      if (fromEvent && fromEvent.port === String(store.serverPort) && fromEvent.token === priorToken
+        && (data.serverNodeKind === 'lingxi-service') === (store.activeServerConnection?.serverNodeKind === 'lingxi-service')
+        && (data.serverNodeTransport || 'http') === (store.activeServerConnection?.serverNodeTransport || 'http')) {
+        return;
+      }
+      const previousLocal = store.serverConnections[LOCAL_CONNECTION_ID]
+        ?? (store.activeServerConnection?.connectionId === LOCAL_CONNECTION_ID ? store.activeServerConnection : null)
+        ?? lastLocalIdentity;
+      const expectedRust = previousLocal?.serverNodeKind === 'lingxi-service';
+      if (previousLocal) lastLocalIdentity = { ...previousLocal, token: null };
+      const previousActiveId = store.activeServerConnectionId;
+      const localWasSelected = previousActiveId === LOCAL_CONNECTION_ID;
+      const cleared = refreshLocalServerConnectionState({
         serverConnections: store.serverConnections,
-        activeServerConnectionId: store.activeServerConnectionId,
+        activeServerConnectionId: previousActiveId,
         activeServerConnection: store.activeServerConnection,
-        serverPort: data.port,
-        serverToken,
+        serverPort: null,
+        serverToken: null,
       });
-      store.set({
-        serverPort: data.port,
-        serverToken,
-        ...nextConnectionState,
-      });
-      const agentsReload = loadAgents().catch(() => {});
-      // snapshot 依赖 agentId（getSettingsAgentId 读 loadAgents 的落库结果）：
-      // 必须等 agents 完成后再发，否则 agentId 为空时快照以「No settings agent
-      // selected」必败且无人重试，settingsConfig 恒 null。
-      agentsReload.then(() => { loadSettingsSnapshot().catch(() => {}); });
-      loadSettingsModels().catch(() => {});
-      loadProvidersSummary().catch(() => {});
+      store.set({ serverPort: null, serverToken: null, ...cleared });
+      const applyFresh = (transport: { port: string; token: string }) => {
+        const verified = createLocalServerConnection({
+          serverPort: transport.port,
+          serverToken: transport.token,
+          serverNodeKind: data.serverNodeKind,
+          serverNodeTransport: data.serverNodeTransport,
+          serverHost: data.host ?? null,
+        });
+        if (!verified) throw new Error('invalid restarted local server connection');
+        const current = useSettingsStore.getState();
+        const serverConnections = previousLocal
+          ? { ...current.serverConnections, [LOCAL_CONNECTION_ID]: previousLocal }
+          : current.serverConnections;
+        const next = refreshLocalServerConnectionState({
+          serverConnections,
+          activeServerConnectionId: previousActiveId,
+          activeServerConnection: current.activeServerConnection,
+          serverPort: transport.port,
+          serverToken: transport.token,
+          serverNodeKind: verified.serverNodeKind,
+          serverNodeTransport: verified.serverNodeTransport,
+        });
+        current.set({ serverPort: Number(transport.port), serverToken: transport.token, ...next });
+        if (verified.serverNodeKind === 'lingxi-service') {
+          void initializeRustSettings();
+          return;
+        }
+        current.set({ rustSettingsUnavailable: false });
+        const agentsReload = loadAgents().catch(() => {});
+        // snapshot 依赖 agentId，必须等 agents 完成后再发。
+        agentsReload.then(() => { loadSettingsSnapshot().catch(() => {}); });
+        loadSettingsModels().catch(() => {});
+        loadProvidersSummary().catch(() => {});
+      };
+      if (fromEvent && fromEvent.token !== priorToken
+        && (!expectedRust || data.serverNodeKind === 'lingxi-service')) {
+        try {
+          applyFresh(fromEvent);
+          return;
+        } catch { /* 拒绝坏协议字段 */ }
+      }
+      store.showToast(t('status.serverRestartInvalid'), 'error');
+      if (expectedRust && localWasSelected) markRustCoreUnavailable(useSettingsStore.getState());
+      // 桥事件缺字段或仍给旧令牌时保持断开，等待下一次有效重启事件。
     });
-    return typeof unsubscribe === 'function' ? unsubscribe : undefined;
+    return () => {
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
   }, []);
 
   const effectiveActiveTab = normalizeSettingsTab(activeTab);
@@ -287,9 +384,25 @@ export function SettingsContent({
                 </div>
               )}
               <ErrorBoundary region={effectiveActiveTab} resetKeys={[effectiveActiveTab]}>
-                <SettingsPage tab={effectiveActiveTab} layout={effectiveActiveTab === 'providers' ? 'fill' : 'flow'}>
-                  <ActiveTab />
-                </SettingsPage>
+                {rustConnection && ready && rustIdentityVerified && !rustSettingsUnavailable && effectiveActiveTab === 'agent' ? (
+                  <SettingsPage tab={effectiveActiveTab} layout="flow">
+                    <RustAgentTab />
+                  </SettingsPage>
+                ) : effectiveActiveTab !== 'access' && (rustSettingsUnavailable
+                  || (rustConnection && (!rustIdentityVerified || !RUST_SETTINGS_TABS.has(effectiveActiveTab)))) ? (
+                  // Rust core 不可用时整页内容替换为提示条。提示条仍走同一个页面
+                  // 原语（同 padding/布局），只是页体从 <ActiveTab /> 换成 alert——
+                  // SettingsContent 的页面清单契约要求每个 tab 的页体都是
+                  // <SettingsPage><ActiveTab /></SettingsPage> 原语形态。
+                  <SettingsPage tab={effectiveActiveTab} layout={effectiveActiveTab === 'providers' ? 'fill' : 'flow'}>
+                    <div role="alert">{t('settings.rustCoreUnavailable')}</div>
+                  </SettingsPage>
+                ) : (
+                  <SettingsPage tab={effectiveActiveTab} layout={effectiveActiveTab === 'providers' ? 'fill' : 'flow'}>
+                    {rustConnection && rustDataError && <div role="alert">{t('settings.refreshFailed')}: {rustDataError}</div>}
+                    <ActiveTab />
+                  </SettingsPage>
+                )}
               </ErrorBoundary>
             </div>
           </div>
@@ -319,10 +432,83 @@ export function SettingsContent({
   );
 }
 
+let rustInitialization: { owner: SettingsConnectionOwner; promise: Promise<void> } | null = null;
+
+/** 冷启动、切换连接和重启共用真实身份核验；单项配置错误仍允许用户进入设置修复。 */
+function initializeRustSettings(): Promise<void> {
+  const connection = resolveServerConnection(useSettingsStore.getState());
+  if (connection?.serverNodeKind !== 'lingxi-service') return Promise.resolve();
+  if (rustInitialization && ownsSettingsConnection(rustInitialization.owner)) return rustInitialization.promise;
+  const owner = captureSettingsConnection();
+  const store = useSettingsStore.getState();
+  if (!ownsSettingsConnection(store.settingsIdentityOwner)) store.set({ rustSettingsUnavailable: true });
+  const timeout = setTimeout(() => {
+    if (!ownsSettingsConnection(owner)) return;
+    if (!useSettingsStore.getState().ready) {
+      console.warn('[settings] init timeout (15s), forcing ready');
+      useSettingsStore.getState().set({ ready: true, rustSettingsUnavailable: true });
+    }
+  }, 15_000);
+  const promise = (async () => {
+    try {
+      await window.i18n.load('zh-CN');
+      if (!ownsSettingsConnection(owner)) return;
+      const identity = await (await lingxiFetch('/lingxi/v1/server/identity')).json();
+      if (!ownsSettingsConnection(owner)) return;
+      if (identity?.serverNodeKind !== 'lingxi-service'
+        || identity.serverNodeTransport !== (connection.serverNodeTransport || 'http')
+        || typeof identity.serverId !== 'string' || !identity.serverId
+        || typeof identity.studioId !== 'string' || !identity.studioId
+        || !['user', 'paired'].includes(identity.authState)
+        || !Array.isArray(identity.capabilities)) {
+        throw new Error('Rust settings server identity does not match');
+      }
+      const localeConfig = await (await lingxiFetch('/api/config')).json();
+      if (!ownsSettingsConnection(owner)) return;
+      if (localeConfig.error) throw new Error(localeConfig.error);
+      await window.i18n.load(localeConfig.locale || 'zh-CN');
+      if (!ownsSettingsConnection(owner)) return;
+      useSettingsStore.getState().set({ settingsIdentityOwner: owner });
+      // 供应商未配置、尚无助手或某个资料读取失败由各页显示，不能堵住修复它们的入口。
+      const agentsReady = loadAgents();
+      await Promise.all([
+        agentsReady,
+        agentsReady.then(() => ownsSettingsConnection(owner) ? loadSettingsSnapshot({ retainSameKeyData: true }) : undefined),
+        agentsReady.then(() => ownsSettingsConnection(owner) ? loadAvatars() : undefined),
+        loadSettingsModels(),
+      ]);
+      if (!ownsSettingsConnection(owner)) return;
+      if (!ownsSettingsConnection(useSettingsStore.getState().settingsIdentityOwner)) {
+        // 本轮读取期间撤销了身份，也要结束加载，保留可见的恢复入口。
+        useSettingsStore.getState().set({ ready: true, rustSettingsUnavailable: true });
+        return;
+      }
+      // 期间的真实401会撤销身份；迟到的普通资源结果不能复活它。
+      useSettingsStore.getState().set({ ready: true, rustSettingsUnavailable: false });
+      void loadProvidersSummary().catch(error => console.error('[settings] providers summary failed:', error));
+    } catch (error) {
+      if (!ownsSettingsConnection(owner)) return;
+      const reason = error instanceof Error ? error.message : String(error);
+      console.error('[settings] init failed:', error);
+      const current = useSettingsStore.getState();
+      current.set({ ready: true, settingsIdentityOwner: null, rustSettingsUnavailable: true,
+        settingsConfigStatus: 'error', settingsConfigError: reason });
+      current.showToast(reason, 'error');
+    } finally {
+      clearTimeout(timeout);
+    }
+  })();
+  const active = { owner, promise };
+  rustInitialization = active;
+  void promise.finally(() => { if (rustInitialization === active) rustInitialization = null; });
+  return promise;
+}
+
 /** 初始化：连接三要素并行 → 连接就绪后全部数据加载并行（含供应商摘要） */
 async function initSettings() {
-  const platform = window.platform;
+  const platform = usePlatform();
   const store = useSettingsStore.getState();
+  let requestedRust = false;
   // store 是模块级 singleton：重开设置时上次的完整数据还在。有缓存就静默后台
   // 刷新、直接渲染旧数据，绝不用全屏 loading mask 挡住用户；只有冷启动（连
   // settingsConfig 都没有）才显示 mask。
@@ -331,6 +517,7 @@ async function initSettings() {
 
   // 超时保护：15 秒后强制显示，防止无限白屏
   const timeout = setTimeout(() => {
+    if (requestedRust) return;
     if (!useSettingsStore.getState().ready) {
       console.warn('[settings] init timeout (15s), forcing ready');
       useSettingsStore.getState().set({ ready: true });
@@ -338,10 +525,13 @@ async function initSettings() {
   }, 15_000);
 
   try {
-    // port/token/platform 是三个互不依赖的 IPC：串行会白送两轮往返的 mask 时间
-    const [rawServerPort, serverToken, platformName] = await Promise.all([
-      typeof platform?.getServerPort === 'function' ? platform.getServerPort() : null,
-      typeof platform?.getServerToken === 'function' ? platform.getServerToken() : null,
+    const [connectionInfo, platformName] = await Promise.all([
+      typeof platform?.getServerConnectionInfo === 'function'
+        ? platform.getServerConnectionInfo()
+        : Promise.all([
+          typeof platform?.getServerPort === 'function' ? platform.getServerPort() : null,
+          typeof platform?.getServerToken === 'function' ? platform.getServerToken() : null,
+        ]).then(([port, token]) => ({ port, token, serverNodeKind: null, serverNodeTransport: 'http', host: null })),
       (async () => {
         try {
           return typeof platform?.getPlatform === 'function' ? await platform.getPlatform() : null;
@@ -350,15 +540,31 @@ async function initSettings() {
         }
       })(),
     ]);
+    const rawServerPort = connectionInfo.port;
+    requestedRust = connectionInfo.serverNodeKind === 'lingxi-service';
+    const serverToken = connectionInfo.token;
     const serverPort = rawServerPort === null || rawServerPort === undefined
       ? null
       : Number(rawServerPort);
+    const localConnection = createLocalServerConnection({
+      serverPort, serverToken,
+      serverNodeKind: connectionInfo.serverNodeKind,
+      serverNodeTransport: connectionInfo.serverNodeTransport,
+      serverHost: connectionInfo.host ?? null,
+    });
     store.set({
       serverPort,
       serverToken,
       platformName,
-      ...connectionState(createLocalServerConnection({ serverPort, serverToken })),
+      ...connectionState(localConnection),
     });
+    requestedRust = useSettingsStore.getState().activeServerConnection?.serverNodeKind === 'lingxi-service';
+
+    if (requestedRust) {
+      await initializeRustSettings();
+      return;
+    }
+    store.set({ rustSettingsUnavailable: false });
 
     // i18n（依赖 /api/config 的 locale，内部全容错，绝不阻塞 ready）
     const i18nReady = (async () => {
@@ -396,6 +602,12 @@ async function initSettings() {
     void loadProvidersSummary().catch(() => {});
   } catch (err) {
     console.error('[settings] init failed:', err);
+    if (requestedRust) {
+      const reason = err instanceof Error ? err.message : String(err);
+      // 读取失败保留已有资料并显示错误，不能把失败伪装成成功的空列表。
+      store.set({ rustSettingsUnavailable: true, settingsConfigStatus: 'error', settingsConfigError: reason });
+      store.showToast(reason, 'error');
+    }
     store.set({ ready: true }); // 即使失败也移除 mask，让用户能操作
   } finally {
     clearTimeout(timeout);

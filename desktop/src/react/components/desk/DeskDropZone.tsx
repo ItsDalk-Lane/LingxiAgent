@@ -17,11 +17,12 @@ import {
   readAppFileDragPayload,
 } from '../../utils/app-file-drag';
 import { canUseNativeResourcePath } from '../../services/resource-access';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 import { isWebRuntime } from '../../utils/platform-runtime';
 import type { CtxMenuState } from './desk-types';
 import type { InlineCreateKind } from './DeskTree';
 import s from './Desk.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 function currentResourceAccessContext() {
   return { connection: resolveServerConnection(useStore.getState()) };
@@ -94,7 +95,7 @@ export function DeskDropZone({
         { label: tFn('desk.ctx.newMdFile'), action: () => { void onStartCreate('', 'markdown'); } },
         { label: tFn('desk.ctx.newFolder'), action: () => { void onStartCreate('', 'folder'); } },
         ...(!isWebRuntime() && canUseNativePath ? [
-          { label: tFn('desk.ctx.openInFinder'), action: () => { const p = deskCurrentDir(); if (p) window.platform?.showInFinder?.(p); } },
+          { label: tFn('desk.ctx.openInFinder'), action: () => { const p = deskCurrentDir(); if (p) usePlatform()?.showInFinder?.(p); } },
         ] : []),
       ],
     });
@@ -140,7 +141,7 @@ export function DeskDropZone({
       }
       const paths: string[] = [];
       for (const f of Array.from(files)) {
-        const p = window.platform?.getFilePath?.(f);
+        const p = usePlatform()?.getFilePath?.(f);
         if (p) paths.push(p);
       }
       if (paths.length > 0) {

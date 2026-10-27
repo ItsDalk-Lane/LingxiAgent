@@ -1,0 +1,30 @@
+
+running 6 tests
+test logical_day_changes_at_local_four_am ... ok
+test started_unknown_and_closed_intake_never_replay_or_claim_next_day ... ok
+test busy_bridge_is_remaining_work_without_claiming_or_interrupting_it ... ok
+test known_failure_waits_an_hour_and_retries_with_new_attempt ... ok
+test permission_change_during_real_summary_cancels_and_keeps_unknown_receipt ... ok
+test actual_bridge_only_compacts_once_then_replays_day_receipt_after_restart ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.65s
+
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.70s
+     Running tests/r07_daily_fresh_compact.rs (rust/target/debug/deps/r07_daily_fresh_compact-9819ce7979787294)

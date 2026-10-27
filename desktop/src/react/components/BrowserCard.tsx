@@ -9,14 +9,18 @@
  * 点击卡片即打开那个会话的浏览器窗口。
  */
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { currentRustBrowserConnection, openRustBrowserViewer, startRustBrowserConnectionObserver } from '../services/service-client';
 import { useStore } from '../stores';
+import { captureConversationRequestScope } from '../services/conversation-request-scope';
 import {
   setBrowserCardCollapsed,
+  browserConnectionScope,
   useBrowserState,
   type BrowserSessionState,
 } from '../stores/browser-slice';
 import { normalizeSessionPath } from '../stores/session-slice';
+import { usePlatform } from '../hooks/use-platform';
 
 interface DisplayBrowser {
   /** 浏览器归属的会话路径（可能不是当前会话） */
@@ -25,7 +29,11 @@ interface DisplayBrowser {
 }
 
 export function BrowserCard() {
+  const [error, setError] = useState('');
+  useEffect(() => { startRustBrowserConnectionObserver(); }, []);
   const currentPath = useStore(s => s.currentSessionPath);
+  const connection = useStore(s => s.activeServerConnection);
+  useEffect(() => { setError(''); }, [currentPath, connection]);
   const currentState = useBrowserState();
   const browserBySession = useStore(s => s.browserBySession);
 
@@ -35,21 +43,31 @@ export function BrowserCard() {
       return { sessionPath: currentPath, state: currentState };
     }
     const currentNorm = normalizeSessionPath(currentPath);
+    const connection = currentRustBrowserConnection();
+    const currentScope = browserConnectionScope(useStore.getState());
     let best: (DisplayBrowser & { activity: number }) | null = null;
     for (const value of Object.values(browserBySession || {})) {
       if (!value?.running) continue;
+      if (connection && (value.executionNode !== connection.serverId || (value.connectionScope !== undefined && value.connectionScope !== currentScope))) continue;
       const sp = value.sessionPath || null;
       if (sp && currentNorm && normalizeSessionPath(sp) === currentNorm) continue;
       const activity = value.lastActiveAt ?? value.thumbnailCapturedAt ?? 0;
       if (!best || activity > best.activity) best = { sessionPath: sp, state: value, activity };
     }
     return best;
-  }, [currentPath, currentState, browserBySession]);
+  }, [currentPath, currentState, browserBySession, connection]);
 
   const handleClick = useCallback(() => {
-    // 接力显示的卡片打开归属会话的浏览器；归属不明时退回当前会话（旧行为）
-    const sessionPath = display?.sessionPath ?? useStore.getState().currentSessionPath;
-    window.platform?.openBrowserViewer?.(sessionPath ? { sessionPath } : undefined);
+    // 原生入口必须有实际归属；旧 Node 卡片保留现有兼容行为。
+    const rust = currentRustBrowserConnection();
+    const sessionPath = display?.sessionPath ?? (rust ? null : useStore.getState().currentSessionPath);
+    if (rust) {
+      if (!sessionPath) { setError('browser_native_session_required'); return; }
+      const scope = captureConversationRequestScope();
+      void openRustBrowserViewer(sessionPath).catch(cause => { if (scope.isCurrent()) setError(cause instanceof Error ? cause.message : String(cause)); }).finally(scope.dispose);
+      return;
+    }
+    usePlatform()?.openBrowserViewer?.(sessionPath ? { sessionPath } : undefined);
   }, [display]);
 
   // 叉只收起卡片，不碰浏览器本身：agent 的操作不能被一次视觉整理打断。
@@ -83,6 +101,8 @@ export function BrowserCard() {
           </svg>
         </div>
         <div className="browser-floating-text">
+          {error && <span role="alert">{error}</span>}
+          {display.state.executionNode && <div className="browser-floating-url">{display.state.executionNode}</div>}
           <div className="browser-floating-label">{(window.t ?? ((p: string) => p))('browser.using')}</div>
           {displayUrl && (
             <div className="browser-floating-url">{displayUrl}</div>

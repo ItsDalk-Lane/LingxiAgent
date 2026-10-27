@@ -1,0 +1,62 @@
+[
+  {
+    "name": "flow-delta",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r07_automation_flow",
+      "--locked"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 19.704,
+    "log": "/private/tmp/lingxi-r07-t01-flow-delta.log",
+    "sourceFingerprint": "6fd3fc2f563575f7daee7dc7b0ea2939ffca5fcae693e5da3680a3824bf1ef79"
+  },
+  {
+    "name": "lib-automation-complete",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "automation",
+      "--locked"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 10.577,
+    "log": "/private/tmp/lingxi-r07-t01-lib-automation-complete.log",
+    "sourceFingerprint": "6fd3fc2f563575f7daee7dc7b0ea2939ffca5fcae693e5da3680a3824bf1ef79"
+  },
+  {
+    "name": "clippy-complete",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "clippy",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "-p",
+      "lingxi-service",
+      "-p",
+      "lingxi-adapters",
+      "-p",
+      "lingxi-protocol",
+      "--lib",
+      "--locked",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 5.491,
+    "log": "/private/tmp/lingxi-r07-t01-clippy-complete.log",
+    "sourceFingerprint": "6fd3fc2f563575f7daee7dc7b0ea2939ffca5fcae693e5da3680a3824bf1ef79"
+  }
+]

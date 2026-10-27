@@ -1,0 +1,31 @@
+
+running 7 tests
+test actual_http_apps_visibility_launch_input_resources_and_generation_cancellation ... ok
+test cancelled_browser_flows_release_pending_capacity_without_erasing_saved_facts ... ok
+test actual_session_run_http_404_never_replays_the_posted_mcp_tool_call ... ok
+test old_official_sdk_refresh_cannot_overwrite_a_new_browser_login_committed_to_source ... ok
+test oauth_cancel_changed_configuration_revoked_owner_and_shutdown_never_resurrect_credentials ... ok
+test actual_oauth_pkce_dcr_private_source_refresh_restart_resources_and_logout ... ok
+test settings_content_mcp_oauth_page_consumes_the_same_owned_sdk_and_private_source ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.00s
+
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.60s
+     Running tests/r07_t08_mcp_remote.rs (rust/target-r07/debug/deps/r07_t08_mcp_remote-c925b1af13c9611e)

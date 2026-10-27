@@ -1,0 +1,13 @@
+{
+ "schema": "lingxi.r09.t07.evidence-wrapper.v1",
+ "kind": "delivery bundle skeleton + evidence exe（非交付产物）",
+ "wrapperApp": "/private/tmp/lingxi-r09-t07/evidence-app-20261026-230352/Lingxi.app",
+ "sourceApp": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app (只读复制)",
+ "candidateEvidenceExeSha256BeforeReplace": "c3622805999f1a8871dc8faa1ffebd42ab7a0bd3a61501c8721f1fb0160ba071",
+ "wrapperMainExeSha256AfterAdhocSign": "8fe7733e23cdadd62b31f2ed99197efd23f47fe0979f35f4145a31f168685573",
+ "signExit": 0,
+ "verifyExit": 0,
+ "signing": "ad-hoc (-) 仅 /tmp 副本；不冒充正式签名/公证",
+ "note": "codesign ad-hoc 会重写主执行文件签名块（bytes 变化），candidate 内容身份以上游 evidence exe sha 记录；sidecar/build.json 保持 delivery 内容",
+ "sidecarBuildJsonSha256": "40085e84a6bed3f2f4ad9f64d725ba91b19e6518886007f4d01dd9e21f23d353"
+}

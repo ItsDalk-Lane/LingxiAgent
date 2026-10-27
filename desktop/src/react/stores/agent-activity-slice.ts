@@ -6,30 +6,8 @@
  */
 
 import { sessionScopedKey, sessionScopedValue, type SessionLocatorState } from './session-slice';
-
-export interface AgentActivityEntry {
-  id: string;
-  kind: 'subagent' | 'workflow' | 'workflow_agent' | 'workflow_step' | 'heartbeat' | 'cron';
-  status: 'running' | 'done' | 'failed' | 'aborted';
-  sessionId?: string | null;
-  sessionPath: string | null;
-  agentId: string | null;
-  agentName: string | null;
-  summary: string | null;
-  childSessionId?: string | null;
-  childSessionPath: string | null;
-  threadId?: string | null;
-  threadKind?: string | null;
-  access?: string | null;
-  startedAt: number | null;
-  finishedAt: number | null;
-  // workflow_agent 子节点和 subagent 都会用 label：节点名或子 Agent 展示标签。
-  parentTaskId?: string | null;
-  label?: string | null;
-  phaseLabel?: string | null;
-  tokens?: number | null;
-  stepKind?: 'parallel' | 'pipeline' | 'log' | null;
-}
+import type { AgentActivityEntry } from '../../../../contracts/generated/ts/lingxi-protocol';
+export type { AgentActivityEntry } from '../../../../contracts/generated/ts/lingxi-protocol';
 
 export interface AgentActivitySlice {
   /** 按 session identity key 存储的活动列表（读旧 path key 兼容） */

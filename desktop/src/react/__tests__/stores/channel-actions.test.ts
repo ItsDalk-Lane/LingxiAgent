@@ -57,6 +57,17 @@ const mockFetch = vi.mocked(lingxiFetch);
 describe('channel-actions', () => {
   beforeEach(() => {
     setStateCalls.length = 0;
+    mockState.serverPort = '3210';
+    mockState.currentAgentId = 'hana';
+    mockState.activeServerConnection = null;
+    mockState.activeServerConnectionId = null;
+    mockState.channelIsDM = false;
+    mockState.channelListError = null;
+    mockState.channelListLoading = false;
+    mockState.channelHistoryError = null;
+    mockState.channelHistoryLoading = false;
+    mockState.channelSettingsError = null;
+    mockState.channelSettingsLoading = false;
     mockState.channels = [];
     mockState.currentChannel = null;
     mockState.channelMessages = [];
@@ -92,7 +103,7 @@ describe('channel-actions', () => {
 
       expect(mockFetch).toHaveBeenCalledTimes(2);
       // 检查 setState 被调用，包含合并的 channels
-      const lastPatch = setStateCalls[setStateCalls.length - 1];
+      const lastPatch = setStateCalls.findLast(patch => patch.channels)!;
       expect(lastPatch.channels).toBeDefined();
       const channels = lastPatch.channels as Array<{ id: string; isDM: boolean; dmOwnerId?: string }>;
       expect(channels.length).toBe(2);
@@ -184,6 +195,7 @@ describe('channel-actions', () => {
 
   describe('DM phone settings owner', () => {
     it('loads DM phone settings with the stored owner agent id', async () => {
+      mockState.currentChannel = 'dm:agent1';
       mockState.channels = [{
         id: 'dm:agent1',
         name: 'Agent 1',
@@ -756,4 +768,199 @@ describe('channel-actions', () => {
       ]);
     });
   });
+  describe('请求失败与切换保护', () => {
+    const response = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
+    const deferred = () => {
+      let resolve!: (response: Response) => void;
+      const promise = new Promise<Response>(done => { resolve = done; });
+      return { promise, resolve };
+    };
+
+    it('列表失败保留旧目录与未读数，并明确记录错误', async () => {
+      const old = [{ id: 'old', name: 'existing', newMessageCount: 7 }];
+      mockState.channels = old;
+      mockState.channelTotalUnread = 7;
+      mockFetch.mockResolvedValueOnce(response({ error: 'unavailable' }, 503))
+        .mockResolvedValueOnce(response({ dms: [] }));
+      const { loadChannels } = await import('../../stores/channel-actions');
+      await loadChannels();
+      expect(mockState.channels).toBe(old);
+      expect(mockState.channelTotalUnread).toBe(7);
+      expect(mockState.channelListError).toContain('503');
+      expect(mockState.channelListLoading).toBe(false);
+    });
+
+    it('缺少目录字段的响应不能伪装成空列表', async () => {
+      mockState.channels = [{ id: 'old' }];
+      mockFetch.mockResolvedValueOnce(response({ channels: [] })).mockResolvedValueOnce(response({}));
+      const { loadChannels } = await import('../../stores/channel-actions');
+      await loadChannels();
+      expect(mockState.channels).toEqual([{ id: 'old' }]);
+      expect(mockState.channelListError).toContain('dms');
+    });
+
+    it.each(['currentAgentId', 'serverPort'])('切换%s后迟到的目录不覆盖新目录', async field => {
+      const pending = deferred();
+      mockFetch.mockReturnValueOnce(pending.promise).mockResolvedValueOnce(response({ dms: [] }));
+      const { loadChannels } = await import('../../stores/channel-actions');
+      const loading = loadChannels();
+      mockState[field] = field === 'serverPort' ? '3211' : 'new-selection';
+      mockState.channels = [{ id: 'new' }];
+      pending.resolve(response({ channels: [{ id: 'old' }] }));
+      await loading;
+      expect(mockState.channels).toEqual([{ id: 'new' }]);
+      expect(mockState.channelListError).toBeNull();
+    });
+
+    it('两次目录读取乱序返回时保留最新请求', async () => {
+      const pending = deferred();
+      mockFetch.mockReturnValueOnce(pending.promise)
+        .mockResolvedValueOnce(response({ dms: [] }))
+        .mockResolvedValueOnce(response({ channels: [{ id: 'new' }] }))
+        .mockResolvedValueOnce(response({ dms: [] }));
+      const { loadChannels } = await import('../../stores/channel-actions');
+      const old = loadChannels();
+      await loadChannels();
+      pending.resolve(response({ channels: [{ id: 'old' }] }));
+      await old;
+      expect(mockState.channels).toEqual([expect.objectContaining({ id: 'new' })]);
+    });
+
+    it('历史读取失败保留同会话缓存，初次失败也留下错误而不是空历史', async () => {
+      vi.stubGlobal('window', { t: (key: string) => key });
+      const cached = [{ sender: 'hana', timestamp: '2026-10-16T00:00:00Z', body: 'cached' }];
+      mockState.channelMessageCache = { ch1: cached };
+      mockFetch.mockRejectedValueOnce(new Error('offline'));
+      const { openChannel } = await import('../../stores/channel-actions');
+      await openChannel('ch1');
+      expect(mockState.channelMessages).toBe(cached);
+      expect(mockState.channelHistoryError).toBe('offline');
+      expect(mockState.channelHistoryLoading).toBe(false);
+      expect(mockState.channelSettingsError).toBe('offline');
+      mockFetch.mockRejectedValueOnce(new Error('not loaded'));
+      await openChannel('ch2');
+      expect(mockState.channelHistoryError).toBe('not loaded');
+      expect((mockState.channelMessageCache as any).ch2).toBeUndefined();
+    });
+
+    it('旧频道历史返回后不覆盖新选择，也不继续读取旧频道设置', async () => {
+      vi.stubGlobal('window', { t: (key: string) => key });
+      const pending = deferred();
+      mockFetch.mockReturnValueOnce(pending.promise);
+      const { openChannel } = await import('../../stores/channel-actions');
+      const loading = openChannel('ch1');
+      mockState.currentChannel = 'ch2';
+      mockState.channelMessages = [{ sender: 'new', timestamp: 'now', body: 'new selection' }];
+      pending.resolve(response({ name: 'old', members: [], messages: [] }));
+      await loading;
+      expect(mockState.currentChannel).toBe('ch2');
+      expect(mockState.channelMessages).toEqual([{ sender: 'new', timestamp: 'now', body: 'new selection' }]);
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('设置读取失败不会覆盖真实旧值为默认设置', async () => {
+      mockState.currentChannel = 'ch1';
+      mockState.channelAgentPhoneToolMode = 'write';
+      mockState.channelAgentGuardLimit = 8;
+      mockFetch.mockRejectedValueOnce(new Error('settings offline'));
+      const { loadConversationAgentPhoneSettings } = await import('../../stores/channel-actions');
+      await loadConversationAgentPhoneSettings('ch1');
+      expect(mockState.channelAgentPhoneToolMode).toBe('write');
+      expect(mockState.channelAgentGuardLimit).toBe(8);
+      expect(mockState.channelSettingsError).toBe('settings offline');
+    });
+
+    it('设置保存迟到时不覆盖另一个频道的值', async () => {
+      mockState.currentChannel = 'ch1';
+      const pending = deferred();
+      mockFetch.mockReturnValueOnce(pending.promise);
+      const { saveConversationAgentPhoneSettings } = await import('../../stores/channel-actions');
+      const saving = saveConversationAgentPhoneSettings({ mode: 'write' });
+      mockState.currentChannel = 'ch2';
+      pending.resolve(response({ mode: 'write' }));
+      await saving;
+      expect(mockState.channelAgentPhoneToolMode).toBe('read_only');
+    });
+
+    it('缺少真实活动身份的响应不能清掉已有动态', async () => {
+      const previous = { ch1: { hana: [{ agentId: 'hana', summary: 'existing' }] } };
+      mockState.channelAgentActivities = previous;
+      mockFetch.mockResolvedValueOnce(response({ activities: [{ timestamp: 'now', state: 'idle', summary: 'missing actor' }] }));
+      const { loadConversationAgentActivities } = await import('../../stores/channel-actions');
+      await loadConversationAgentActivities('ch1');
+      expect(mockState.channelAgentActivities).toBe(previous);
+    });
+
+    it('私聊即使绕过输入框调用也不会发送用户消息', async () => {
+      mockState.currentChannel = 'dm:peer';
+      const { sendChannelMessage } = await import('../../stores/channel-actions');
+      await expect(sendChannelMessage('do not send')).rejects.toThrow(/read only/);
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it('频道发送失败交回调用方，不能添加假消息', async () => {
+      mockState.currentChannel = 'ch1';
+      mockFetch.mockRejectedValueOnce(new Error('send offline'));
+      const { sendChannelMessage } = await import('../../stores/channel-actions');
+      await expect(sendChannelMessage('keep text')).rejects.toThrow('send offline');
+      expect(mockState.channelMessages).toEqual([]);
+    });
+
+    it('删除旧频道的响应不能清空后来选择的频道', async () => {
+      mockState.currentChannel = 'ch1';
+      const pending = deferred();
+      mockFetch.mockReturnValueOnce(pending.promise)
+        .mockResolvedValueOnce(response({ channels: [{ id: 'ch2' }] }))
+        .mockResolvedValueOnce(response({ dms: [] }));
+      const { deleteChannel } = await import('../../stores/channel-actions');
+      const deleting = deleteChannel('ch1');
+      mockState.currentChannel = 'ch2';
+      pending.resolve(response({ ok: true }));
+      await deleting;
+      expect(mockState.currentChannel).toBe('ch2');
+    });
+  });
+
+  describe('用户动作重试身份', () => {
+    it('未确认的同一消息复用requestId，成功后相同正文是新动作', async () => {
+      mockState.currentChannel = 'retry-channel';
+      mockFetch.mockRejectedValueOnce(new Error('timeout'))
+        .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true, timestamp: '2026-10-16T01:00:00Z' })))
+        .mockResolvedValue(new Response(JSON.stringify({ ok: true, timestamp: '2026-10-16T01:01:00Z' })));
+      const { sendChannelMessage } = await import('../../stores/channel-actions');
+      await expect(sendChannelMessage('retry-message')).rejects.toThrow('timeout');
+      await sendChannelMessage('retry-message');
+      await sendChannelMessage('retry-message');
+      const sends = mockFetch.mock.calls.filter(([path]) => path.endsWith('/messages'));
+      const ids = sends.map(([, options]) => JSON.parse(String(options?.body)).requestId);
+      expect(ids[0]).toMatch(/^channel-message:/);
+      expect(ids[1]).toBe(ids[0]);
+      expect(ids[2]).not.toBe(ids[0]);
+    });
+
+    it('不同正文和不同目标必须分配新requestId', async () => {
+      mockState.currentChannel = 'retry-a';
+      mockFetch.mockRejectedValue(new Error('timeout'));
+      const { sendChannelMessage } = await import('../../stores/channel-actions');
+      await expect(sendChannelMessage('one')).rejects.toThrow();
+      await expect(sendChannelMessage('two')).rejects.toThrow();
+      mockState.currentChannel = 'retry-b';
+      await expect(sendChannelMessage('two')).rejects.toThrow();
+      const ids = mockFetch.mock.calls.map(([, options]) => JSON.parse(String(options?.body)).requestId);
+      expect(new Set(ids).size).toBe(3);
+    });
+
+    it('创建超时后同一输入重试复用requestId，成员变化则是新动作', async () => {
+      mockFetch.mockRejectedValue(new Error('create timeout'));
+      const { createChannel } = await import('../../stores/channel-actions');
+      await expect(createChannel('retry-create', ['a', 'b'])).rejects.toThrow();
+      await expect(createChannel('retry-create', ['a', 'b'])).rejects.toThrow();
+      await expect(createChannel('retry-create', ['a', 'c'])).rejects.toThrow();
+      const ids = mockFetch.mock.calls.map(([, options]) => JSON.parse(String(options?.body)).requestId);
+      expect(ids[0]).toMatch(/^channel-create:/);
+      expect(ids[1]).toBe(ids[0]);
+      expect(ids[2]).not.toBe(ids[0]);
+    });
+  });
+
 });

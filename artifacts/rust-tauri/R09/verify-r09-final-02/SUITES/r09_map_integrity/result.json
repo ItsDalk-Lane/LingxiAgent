@@ -1,0 +1,11 @@
+{
+ "schema": "lingxi.r09.map-integrity.v1",
+ "suite": "r09_map_integrity",
+ "status": "PASS",
+ "detail": "",
+ "caseCount": 19,
+ "failedCases": [],
+ "mapSha256": "13c10094dcefcc8f0b0844ec27aefc42a47d3a69f963539992276d34bfaefc87",
+ "evidence": "map-integrity-cases.json",
+ "durationSecs": 2.275
+}

@@ -1,0 +1,36 @@
+{
+  "stage": "R07-T05",
+  "candidate": "t05a",
+  "name": "pdf-chromium",
+  "purpose": "final_acceptance",
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-adapters",
+    "--test",
+    "r07_pdf_chromium",
+    "--",
+    "--include-ignored",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-16T04:40:43.247188+00:00",
+  "sourceFingerprint": "19c0caf26577bb1c14e16376c216d423e7b5459d4cced6a65096e31c56707689",
+  "log": "t05a-pdf-chromium.log",
+  "endedAt": "2026-10-16T04:41:06.774320+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "19c0caf26577bb1c14e16376c216d423e7b5459d4cced6a65096e31c56707689",
+  "logSha256": "37a9a1982aac7c8f0931f52856b9de666fb0721d03220d7a328795855fa1f81a",
+  "sourceUnchanged": true
+}

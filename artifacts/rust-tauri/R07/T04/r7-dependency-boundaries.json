@@ -1,0 +1,23 @@
+{
+  "candidate": "r7",
+  "name": "dependency-boundaries",
+  "command": [
+    "node",
+    "scripts/check-dependency-boundaries.mjs"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-15T23:22:06.213533+00:00",
+  "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+  "log": "r7-dependency-boundaries.log",
+  "endedAt": "2026-10-15T23:22:08.547644+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+  "logSha256": "db38fc81337716b2f26bd5433a62222bdb39b8d26466d48f1897e9788f7149eb",
+  "sourceUnchanged": true
+}

@@ -1,0 +1,36 @@
+
+running 8 tests
+test real_child_approval_is_separate_from_outer_approval_and_denial_writes_nothing ... ok
+test real_parallel_children_only_return_selected_summary_and_keep_bounded_ui_receipts ... ok
+test later_program_failure_keeps_real_completed_effect_and_exposes_it_in_receipts ... ok
+test cancelling_actual_program_reaps_its_real_node_process ... FAILED
+test real_file_child_receipts_bound_arguments_and_outputs_without_losing_head_tail ... ok
+test unknown_recursive_and_sandbox_failures_are_explicit_and_catchable ... ok
+test actual_vm_escape_cannot_read_write_connect_or_delegate_a_host_write ... ok
+test real_default_ten_minute_timeout_keeps_completed_action_and_reaps_worker has been running for over 60 seconds
+test real_default_ten_minute_timeout_keeps_completed_action_and_reaps_worker ... ok
+
+failures:
+
+---- cancelling_actual_program_reaps_its_real_node_process stdout ----
+
+thread 'cancelling_actual_program_reaps_its_real_node_process' (12048510) panicked at crates/lingxi-service/tests/r08_admission_ptc.rs:473:5:
+assertion `left == right` failed: 必须捕获实际外围进程
+  left: 3
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    cancelling_actual_program_reaps_its_real_node_process
+
+test result: FAILED. 7 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 600.87s
+
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r08_admission_ptc.rs (rust/target/debug/deps/r08_admission_ptc-5d41adb521f581e6)
+error: test failed, to rerun pass `-p lingxi-service --test r08_admission_ptc`

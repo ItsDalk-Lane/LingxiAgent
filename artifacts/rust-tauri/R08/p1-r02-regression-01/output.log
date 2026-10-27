@@ -1,0 +1,78 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stderr | desktop/src/react/__tests__/services/R02RustWebSocket.test.ts > Rust desktop WebSocket connection > stays offline until the Rust wire handshake succeeds and never opens the Node chat composer
+[ws] message parse error: TypeError: __vite_ssr_import_0__.useStore.subscribe is not a function
+    at observe (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/session-connection-owner.ts:25:12)
+    at captureSessionConnection (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/session-connection-owner.ts:60:3)
+    at startRustMediaPolling (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/rust-media.ts:148:17)
+    at markConnectionReady (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/websocket.ts:319:31)
+    at FakeSocket._ws.onmessage (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/websocket.ts:417:9)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/services/R02RustWebSocket.test.ts:81:12
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/services/R02RustWebSocket.test.ts > Rust desktop WebSocket connection > does not open a WebSocket when ticket issuance fails
+[ws] connection setup failed: Error: websocket ticket response missing ticket
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/services/R02RustWebSocket.test.ts:102:49
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64
+[ErrorBus][WS_DISCONNECTED][c68074ac] WS_DISCONNECTED {}
+
+stderr | desktop/src/react/__tests__/services/R02RustWebSocket.test.ts > Rust desktop WebSocket connection > never reuses stored local transport when an explicit port or token is invalid
+[ws] connection setup failed: Error: local server token missing
+    at openConnectionWebSocket (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/websocket.ts:272:11)
+    at Module.connectWebSocket (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/websocket.ts:239:8)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/services/R02RustWebSocket.test.ts:141:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20
+    at new Promise (<anonymous>)
+
+ ❯ desktop/src/react/__tests__/services/R02RustWebSocket.test.ts (6 tests | 1 failed) 516ms
+     × stays offline until the Rust wire handshake succeeds and never opens the Node chat composer 289ms
+     ✓ rejects an incompatible handshake without showing a connected state 56ms
+     ✓ does not open a WebSocket when ticket issuance fails 53ms
+     ✓ rejects a partial success hello instead of showing a false connected state 54ms
+     ✓ times out a socket that never returns ServerHello 58ms
+     ✓ never reuses stored local transport when an explicit port or token is invalid 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/R02RustWebSocket.test.ts > Rust desktop WebSocket connection > stays offline until the Rust wire handshake succeeds and never opens the Node chat composer
+AssertionError: expected "vi.fn()" to not be called at all, but actually been called 1 times
+
+Received:
+
+  1st vi.fn() call:
+
+    Array []
+
+
+Number of calls: 1
+
+ ❯ desktop/src/react/__tests__/services/R02RustWebSocket.test.ts:85:40
+     83|       serverKind: 'lingxi-service', serverVersion: '0.1.0' }) });
+     84|     expect(fixture.state.wsState).toBe('connected');
+     85|     expect(fixture.composerOpened).not.toHaveBeenCalled();
+       |                                        ^
+     86|   });
+     87|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  07:45:08
+   Duration  13.01s (transform 8.33s, setup 590ms, import 9.01s, tests 516ms, environment 0ms)
+

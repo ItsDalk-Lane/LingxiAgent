@@ -1,0 +1,12 @@
+{
+  "purpose": "evidence_helper_selfcheck",
+  "recordedAt": "2026-10-18T02:50:51.501958+00:00",
+  "helper": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R07/T07/evidence-tools/run_candidate.py",
+  "helperSha256": "fec1ca190293b123fcb9223ce8453c3706a5805e203d095286ba6c8dc5496edf",
+  "fingerprintBefore": "e48326035ef70c86b43e67924e334ec76a3f5a6ab1a8ddb8d7a8cd2dcaa2a261",
+  "fingerprintWithUnlistedSource": "10522dbcc542b7605445b9ba9ce15bdeeadd6d2ba80f1fbb0e1096cb9d1e1f19",
+  "fingerprintAfterOwnProbeRemoved": "e48326035ef70c86b43e67924e334ec76a3f5a6ab1a8ddb8d7a8cd2dcaa2a261",
+  "newUnlistedSourceDetected": true,
+  "ownRemovalRestoresFingerprint": true,
+  "probeRemoved": true
+}

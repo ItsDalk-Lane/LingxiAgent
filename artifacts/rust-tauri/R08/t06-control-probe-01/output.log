@@ -1,0 +1,2 @@
+CONTROL_PROBE_FAIL stage=readiness detail=launcher exited early: {"code":1,"signal":null}
+PROBE_EXIT=2

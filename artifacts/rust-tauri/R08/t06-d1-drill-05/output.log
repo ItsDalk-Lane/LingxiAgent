@@ -1,0 +1,49 @@
+PASS fixture gen exit 0
+PASS migrate exit 0 :: CUTOVER_RESULT cutoverId=cut-1792758447897-48701 phase=committed outcome=committed detail=cutover committed; ruling at /private/tmp/t06-d1-drill-05/rollback-work/single-writer-ruling.json
+
+PASS migrate committed :: CUTOVER_RESULT cutoverId=cut-1792758447897-48701 phase=committed outcome=committed detail=cutover committed; ruling at /private/tmp/t06-d1-drill-05/rollback-work/single-writer-ruling.json
+
+PASS standin worker emitted
+PASS agents create 2xx :: 200 {"id":"t06d1","name":"T06-D1","ok":true}
+FAIL sessions/new 2xx :: 500 {"code":"internal","details":{"causeId":"internal","requestId":"req-fa47632a1fc6c8c5e4c54e50b633b453"},"message":"selected chat model has not declared tool support","retryable":false}
+FAIL sessionId present :: {"code":"internal","details":{"causeId":"internal","requestId":"req-fa47632a1fc6c8c5e4c54e50b633b453"},"message":"selected chat model has not declared tool support","retryable":false}
+FAIL attachments/local 2xx :: 404 {"code":"not_found","details":{"causeId":"resource.not_found","requestId":"req-ef2ff0f995e23afac5b67c9002647ad5"},"message":"resource not found","retryable":false}
+PASS preferences/appearance PUT 2xx :: 200 {"appearance":{"theme":"t06-d1-edit"},"ok":true}
+PASS bridge config 2xx :: 200 {"ok":true,"status":{"agentId":"t06d1","bridgeError":null,"bridgeInitializing":false,"bridgeReady":true,"dingtalk":{"agentId":"t06d1","configured":false,"enabled":false,"error":null,"status":"disconne
+PASS bridge owner 2xx :: 200 {"ok":true,"status":{"agentId":"t06d1","bridgeError":null,"bridgeInitializing":false,"bridgeReady":true,"dingtalk":{"agentId":"t06d1","configured":false,"enabled":false,"error":null,"status":"disconne
+PASS bridge config 2xx :: 200 {"ok":true,"status":{"agentId":"t06d1","bridgeError":null,"bridgeInitializing":false,"bridgeReady":true,"dingtalk":{"agentId":"t06d1","configured":false,"enabled":false,"error":null,"status":"disconne
+PASS sentinel rows exactly 3 (no queued) :: [["conv-t06-s2","unknown"],["conv-t06-s3","started"],["conv-t06-s1","confirmed"]]
+PASS S1 confirmed with platform receipt :: {"delivery_id":"reply:bridge-f024836284f96339c0162747aa3bccaaab11f9278810f5c937af8749e6927c71","conversation_id":"conv-t06-s1","status":"confirmed","platform_receipt_json":"{\"platform\":\"telegram\",\"messageIds\":[\"t06-standin-1\"],\"rawJson\":null}","error":null}
+PASS S2 unknown :: {"delivery_id":"reply:bridge-0b4a17bacaa73ba36c9cec535978aaef7d73473e5530ec0d9a5efa105b2e6148","conversation_id":"conv-t06-s2","status":"unknown","platform_receipt_json":null,"error":"platform_returned_no_message_id"}
+PASS S3 started :: {"delivery_id":"reply:bridge-6da8763d703782db97ca781223642cc0945b7beadc3d513b7a338e8807c880c0","conversation_id":"conv-t06-s3","status":"started","platform_receipt_json":null,"error":null}
+PASS external sends exactly once per leg (gen phase) :: {"s1":1,"s2":1,"s3":1,"other":0}
+PASS settings edit landed :: {
+  "appearance": {
+    "theme": "t06-d1-edit"
+  }
+}
+PASS service clean exit 0 :: exitCode=0
+PASS S3 at shutdown: started-or-controlled-unknown :: {"delivery_id":"reply:bridge-6da8763d703782db97ca781223642cc0945b7beadc3d513b7a338e8807c880c0","conversation_id":"conv-t06-s3","status":"unknown","platform_receipt_json":null,"error":"worker stopped before a confirmed receipt"}
+S3_SETTLE_PATH_AT_SHUTDOWN graceful-shutdown-settle
+FAIL rollback exit 0 :: error: rollback: phase export_verify refused: payload knowledge/ingestion-worker.lock: read /private/tmp/t06-d1-drill-05/delta-out/rb-1792758449988-48706/payload/files/knowledge__ingestion-worker.lock: No such file or directory (os error 2)
+
+FAIL rollback committed
+FAIL pointer → old root after rollback :: {"schemaVersion":1,"activeDataRoot":"/private/tmp/t06-d1-drill-05/new-root","cutoverId":"cut-1792758447897-48701","committedAt":"2026-10-23T12:27:28.769Z"}
+FAIL old root stamp v2{1,1,1} :: {"epoch":7,"stampedAt":1760000000000}
+FAIL old root leases empty registry :: {"version":1,"leases":[{"id":"lease-001685-498ded6a","holder":"run-parent-1"}]}
+FAIL old root a1 config.yaml created
+FAIL knowledge synthetic tables renamed :: synth= prod=documents,processing_artifacts
+FAIL reforward-A exit 0 :: error: reforward: phase preflight refused: pointer activeDataRoot /private/tmp/t06-d1-drill-05/new-root != old root /private/tmp/t06-d1-drill-05/old-root (reforward requires the pointer to be on the old root)
+
+FAIL reforward-A committed
+PASS pointer → new root after reforward :: {"schemaVersion":1,"activeDataRoot":"/private/tmp/t06-d1-drill-05/new-root","cutoverId":"cut-1792758447897-48701","committedAt":"2026-10-23T12:27:28.769Z"}
+PASS S1 confirmed + receipt byte-identical after round trip :: ["{\"platform\":\"telegram\",\"messageIds\":[\"t06-standin-1\"],\"rawJson\":null}","{\"platform\":\"telegram\",\"messageIds\":[\"t06-standin-1\"],\"rawJson\":null}"]
+PASS S2 unchanged after round trip :: [{"delivery_id":"reply:bridge-0b4a17bacaa73ba36c9cec535978aaef7d73473e5530ec0d9a5efa105b2e6148","conversation_id":"conv-t06-s2","status":"unknown","platform_receipt_json":null,"error":"platform_returned_no_message_id"},{"delivery_id":"reply:bridge-0b4a17bacaa73ba36c9cec535978aaef7d73473e5530ec0d9a5efa105b2e6148","conversation_id":"conv-t06-s2","status":"unknown","platform_receipt_json":null,"error":"platform_returned_no_message_id"}]
+PASS S3 settled unknown via controlled path (no resend) :: {"delivery_id":"reply:bridge-6da8763d703782db97ca781223642cc0945b7beadc3d513b7a338e8807c880c0","conversation_id":"conv-t06-s3","status":"unknown","platform_receipt_json":null,"error":"worker stopped before a confirmed receipt"}
+S3_SETTLE_PATH_FINAL graceful-shutdown-settle
+PASS external sends frozen across rollback+reforward (counter 恒=1/腿) :: {"s1":1,"s2":1,"s3":1,"other":0} → {"s1":1,"s2":1,"s3":1,"other":0}
+PASS new attachment bytes unchanged (A11 往返附件摘要) :: 0 files
+PASS session/message/run counts unchanged (A11 新增数据可恢复且不重复) :: {"sessions":11,"messages":835,"runs":10} → {"sessions":11,"messages":835,"runs":10}
+PASS settings edit preserved
+D1_RESULT failures=12 legs={"s1":1,"s2":1,"s3":1,"other":0} counts={"sessions":11,"messages":835,"runs":10}
+D1 DRILL FAILURES: 12

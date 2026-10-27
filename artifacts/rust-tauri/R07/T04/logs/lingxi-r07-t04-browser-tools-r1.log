@@ -1,0 +1,12 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.30s
+     Running tests/r07_browser_tools.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_browser_tools-dfd1908d7da3d362)
+
+running 4 tests
+test actual_navigation_waits_for_approval_and_dispatches_exact_reviewed_url ... ok
+test external_unknown_effect_is_persisted_and_never_reported_as_success ... ok
+test page_change_and_foreign_tab_invalidate_approval_before_external_dispatch ... ok
+test actual_readonly_snapshot_persists_receipt_but_write_never_dispatches ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+

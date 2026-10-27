@@ -1,0 +1,12 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/services/r07-interface-preferences-real-service.test.tsx (1 test) 1082ms
+   ✓ actual navigation saves keybindings and sidebar, keeps saved reload failures, and reads global archive metadata across restart  1081ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  18:32:23
+   Duration  2.81s (transform 1.04s, setup 38ms, import 1.38s, tests 1.08s, environment 242ms)
+
+JSON report written to /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R07/T08/interface-consumer-real2/vitest-results.json

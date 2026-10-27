@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "candidate": "t07b",
+  "status": "REAL_FAILURE_PRESERVED_FIXTURE_HOOK_COLLISION_DIAGNOSED",
+  "checkedAt": "2026-10-18T03:06:27.883789+00:00",
+  "failedTest": "native_pending_reference_deletion_current_electron_shows_and_retries_truthfully",
+  "sourceUntouched": true,
+  "cargoExecutedByReviewer": false,
+  "evidence": {
+    "uiReport": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-references-pending-71416-1792292362805725000/home/ui-result.json",
+    "uiReportSha256": "b912f76c37247af49b7564dc0af31b213a491fec51a67954dae5d7702677fc09",
+    "receiptPath": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-references-pending-71416-1792292362805725000/home/lingxi-service/agent-deletions/delete-71416-1792292393351354000-2/receipt.json",
+    "receiptSha256": "1f93049fe41b311b8f8d80501872e38fdeb49f529c334ed53b32926a5cd2c078",
+    "receiptFacts": {
+      "status": "completed",
+      "logicalDeleted": true,
+      "cleanupPending": false,
+      "referencesPending": false,
+      "referenceError": null,
+      "wasReferenced": false,
+      "createdAt": "2026-10-18T02:59:53.374Z",
+      "updatedAt": "2026-10-18T02:59:53.579Z"
+    },
+    "preferencesImmutableFlag": false,
+    "ownerParallelEvidencePath": "/private/tmp/lingxi-r07-tests/tmp/r06-settings-evidence-71416/receipt-owner-electron.json",
+    "ownerParallelEvidenceSha256": "67741e071bc80fe598fc006a2f6e70b13792d2879ddb6c85d2d822ca5009d919",
+    "ownerEvidenceMtimeUTC": "2026-10-18T02:59:56.448104+00:00"
+  },
+  "cause": {
+    "confirmedMechanism": "全进程HOOK为Option<(home,Hook)>；不同home注册互相覆盖，probe按home过滤后另一home无回调；guard回填previous可覆盖其他活跃注册。",
+    "competingRegistrations": [
+      "r06_agent_settings_live.rs:1040 references-pending",
+      "r06_agent_settings_live.rs:1349 receipt-owner"
+    ],
+    "uiObservation": "失败发生在解除immutable和retry之前，真实磁盘却是completed且无referenceError、preferences无immutable；页面不显示pending符合真实输入，未发现页面漏显示证据。",
+    "timingLimit": "原工具未记录hook注册/覆盖时刻，不能声称重建纳秒级覆盖先后；owner guard至少持有到其证据写入之后，与失败真实删除在同一并行窗口。"
+  },
+  "proposedFix": "按home存活跃token栈；guard按token删除自身，probe锁内克隆/锁外回调；保持原真实Electron断言与并行执行，不用串行或重试掩盖。"
+}

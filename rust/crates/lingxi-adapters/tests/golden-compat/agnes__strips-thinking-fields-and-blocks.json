@@ -1,0 +1,59 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "agnes",
+  "case": "strips-thinking-fields-and-blocks",
+  "model": {
+    "provider": "agnes",
+    "id": "agnes-2-flash",
+    "baseUrl": "https://agnes-ai.com/v1",
+    "api": "openai-completions"
+  },
+  "payload": {
+    "model": "agnes-2-flash",
+    "messages": [
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "hidden"
+          },
+          {
+            "type": "text",
+            "text": "hello"
+          }
+        ],
+        "reasoning_content": "trace"
+      }
+    ],
+    "thinking": {
+      "type": "enabled"
+    },
+    "reasoning_effort": "low",
+    "chat_template_kwargs": {
+      "enable_thinking": true
+    }
+  },
+  "options": {
+    "mode": "chat"
+  },
+  "expected": {
+    "thinkingFormat": null,
+    "reasoningProfile": null,
+    "matched": "agnes",
+    "result": {
+      "model": "agnes-2-flash",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "hello"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,271 @@
+{
+  "$defs": {
+    "ClientAgentSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "effectiveHomeFolder": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "hasAvatar": {
+          "type": "boolean"
+        },
+        "homeFolder": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "isCurrent": {
+          "type": "boolean"
+        },
+        "isPrimary": {
+          "type": "boolean"
+        },
+        "memoryMasterEnabled": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "yuan": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "yuan",
+        "isPrimary",
+        "isCurrent",
+        "hasAvatar",
+        "memoryMasterEnabled"
+      ],
+      "type": "object"
+    },
+    "ClientAvatarAvailability": {
+      "additionalProperties": false,
+      "properties": {
+        "agent": {
+          "type": "boolean"
+        },
+        "user": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "agent",
+        "user"
+      ],
+      "type": "object"
+    },
+    "ClientModelSelection": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "provider"
+      ],
+      "type": "object"
+    },
+    "ClientModelState": {
+      "enum": [
+        "ready",
+        "unconfigured",
+        "unavailable"
+      ],
+      "type": "string"
+    },
+    "ClientModelSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "audio": {
+          "type": "boolean"
+        },
+        "audioTransport": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "audioTransportSupported": {
+          "type": "boolean"
+        },
+        "defaultThinkingLevel": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "input": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "isCurrent": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "reasoning": {
+          "type": "boolean"
+        },
+        "thinkingLevels": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "xhigh": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "provider",
+        "isCurrent",
+        "reasoning",
+        "xhigh",
+        "thinkingLevels",
+        "audio",
+        "audioTransportSupported",
+        "input"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "activeModel": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ClientModelSelection"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "agentName": {
+      "type": "string"
+    },
+    "agentYuan": {
+      "type": "string"
+    },
+    "agents": {
+      "items": {
+        "$ref": "#/$defs/ClientAgentSummary"
+      },
+      "type": "array"
+    },
+    "appearance": {
+      "description": "这里只能放入已归一化的已知外观、排版和聊天布局字段。"
+    },
+    "avatars": {
+      "$ref": "#/$defs/ClientAvatarAvailability"
+    },
+    "chat": true,
+    "currentAgentId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "currentModel": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ClientModelSelection"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "cwdHistory": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "editor": true,
+    "homeFolder": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "locale": {
+      "type": "string"
+    },
+    "memoryEnabled": {
+      "type": "boolean"
+    },
+    "memoryMasterEnabled": {
+      "type": "boolean"
+    },
+    "modelGeneration": {
+      "type": "string"
+    },
+    "modelState": {
+      "$ref": "#/$defs/ClientModelState"
+    },
+    "models": {
+      "items": {
+        "$ref": "#/$defs/ClientModelSummary"
+      },
+      "type": "array"
+    },
+    "permissionMode": {
+      "type": "string"
+    },
+    "thinkingLevel": {
+      "type": "string"
+    },
+    "userName": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "locale",
+    "agentName",
+    "userName",
+    "agentYuan",
+    "cwdHistory",
+    "memoryMasterEnabled",
+    "memoryEnabled",
+    "thinkingLevel",
+    "permissionMode",
+    "appearance",
+    "editor",
+    "chat",
+    "avatars",
+    "agents",
+    "models",
+    "modelState",
+    "modelGeneration"
+  ],
+  "title": "MobileBootstrapResponse",
+  "type": "object"
+}

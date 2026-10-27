@@ -1,0 +1,22 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 39s
+ok   fixture-gen exit 0
+FAIL migrate exit 0 — status=2 stderr=error: migrate: refused [data-consistency]: preflight refused (check=data-consistency); report at /private/tmp/t05work.uwSYg2/t05-e2e-2rtOzZ/work/preflight-report.json
+FAIL CUTOVER_RESULT line present
+FAIL outcome=stopped phase=pointer_switch
+ok   journal.json exists
+FAIL journal.phase == selfcheck — phase=refused
+FAIL eight phases ok in order — []
+FAIL import bookmark completed
+FAIL adopt bookmark committed
+FAIL pointer file exists
+ok   legacy root byte-equal (zero-mutation red line)
+FAIL target runs.db exists
+FAIL backup-manifest.json exists
+ok   no .tmp-* residue in work-dir
+ok   no .tmp-* residue in backup-dir
+ok   single-writer-ruling.json absent before committed
+FAIL double-run guard exit 2 — status=2 stderr=error: migrate: journal /private/tmp/t05work.uwSYg2/t05-e2e-2rtOzZ/work/journal.json already exists (cutoverId "cut-1792728153233-82746", phase "refused"); pass --resume <cutoverId> to continue (double-run guard)
+ok   resume wrong id exit 2
+FAIL journal phase unchanged after guards — refused
+E2E_RESULT {"verdict":"FAIL","failures":["migrate exit 0 — status=2 stderr=error: migrate: refused [data-consistency]: preflight refused (check=data-consistency); report at /private/tmp/t05work.uwSYg2/t05-e2e-2rtOzZ/work/preflight-report.json","CUTOVER_RESULT line present","outcome=stopped phase=pointer_switch","journal.phase == selfcheck — phase=refused","eight phases ok in order — []","import bookmark completed","adopt bookmark committed","pointer file exists","target runs.db exists","backup-manifest.json exists","double-run guard exit 2 — status=2 stderr=error: migrate: journal /private/tmp/t05work.uwSYg2/t05-e2e-2rtOzZ/work/journal.json already exists (cutoverId \"cut-1792728153233-82746\", phase \"refused\"); pass --resume <cutoverId> to continue (double-run guard)","journal phase unchanged after guards — refused"]}

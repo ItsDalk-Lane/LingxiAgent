@@ -1,0 +1,75 @@
+$ /Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo build --manifest-path rust/Cargo.toml -p lingxi-service
+--- exit=0 duration=0.30s ---
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.27s
+
+$ /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --headless=new --disable-gpu --no-first-run --no-default-browser-check --disable-background-networking --disable-component-update --disable-sync --metrics-recording-only --disable-extensions --no-proxy-server --disable-dev-shm-usage --user-data-dir=/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-55461-1793066684319/chrome-profile-loopback-ancestor-allowed --virtual-time-budget=10000 --dump-dom --use-mock-keychain http://127.0.0.1:56819/wrapper?mode=iframe&previewUrl=http%3A%2F%2F127.0.0.1%3A56821%2Flingxi%2Fv1%2Fpreview%2Fhtml%2Fpv_145786e5da7d575fd2c63727636ab5a5%3FpreviewToken%3DyD8wpwv0azK6IGLAi3qDMUxAxKUO82tYkqovWV-Omas
+--- exit=0 duration=0.50s ---
+<dom 5681 bytes> exit=0
+
+$ /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --headless=new --disable-gpu --no-first-run --no-default-browser-check --disable-background-networking --disable-component-update --disable-sync --metrics-recording-only --disable-extensions --no-proxy-server --disable-dev-shm-usage --user-data-dir=/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-55461-1793066684319/chrome-profile-localhost-ancestor-allowed --virtual-time-budget=10000 --dump-dom --use-mock-keychain http://localhost:56819/wrapper?mode=iframe&previewUrl=http%3A%2F%2F127.0.0.1%3A56821%2Flingxi%2Fv1%2Fpreview%2Fhtml%2Fpv_145786e5da7d575fd2c63727636ab5a5%3FpreviewToken%3DyD8wpwv0azK6IGLAi3qDMUxAxKUO82tYkqovWV-Omas
+--- exit=0 duration=0.51s ---
+<dom 5681 bytes> exit=0
+
+$ /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --headless=new --disable-gpu --no-first-run --no-default-browser-check --disable-background-networking --disable-component-update --disable-sync --metrics-recording-only --disable-extensions --no-proxy-server --disable-dev-shm-usage --user-data-dir=/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-55461-1793066684319/chrome-profile-tauri-custom-port-ancestor --virtual-time-budget=10000 --dump-dom --use-mock-keychain http://tauri.localhost:56819/wrapper?mode=iframe&previewUrl=http%3A%2F%2F127.0.0.1%3A56821%2Flingxi%2Fv1%2Fpreview%2Fhtml%2Fpv_145786e5da7d575fd2c63727636ab5a5%3FpreviewToken%3DyD8wpwv0azK6IGLAi3qDMUxAxKUO82tYkqovWV-Omas
+--- exit=0 duration=0.53s ---
+<dom 3940 bytes> exit=0
+
+$ /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --headless=new --disable-gpu --no-first-run --no-default-browser-check --disable-background-networking --disable-component-update --disable-sync --metrics-recording-only --disable-extensions --no-proxy-server --disable-dev-shm-usage --user-data-dir=/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-55461-1793066684319/chrome-profile-evil-tauri-ancestor-denied --virtual-time-budget=10000 --dump-dom --use-mock-keychain http://evil.tauri.localhost:56819/wrapper?mode=iframe&previewUrl=http%3A%2F%2F127.0.0.1%3A56821%2Flingxi%2Fv1%2Fpreview%2Fhtml%2Fpv_145786e5da7d575fd2c63727636ab5a5%3FpreviewToken%3DyD8wpwv0azK6IGLAi3qDMUxAxKUO82tYkqovWV-Omas
+--- exit=0 duration=0.53s ---
+<dom 3945 bytes> exit=0
+
+$ /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --headless=new --disable-gpu --no-first-run --no-default-browser-check --disable-background-networking --disable-component-update --disable-sync --metrics-recording-only --disable-extensions --no-proxy-server --disable-dev-shm-usage --user-data-dir=/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-55461-1793066684319/chrome-profile-evil-example-ancestor-denied --virtual-time-budget=10000 --dump-dom --host-resolver-rules=MAP evil.example 127.0.0.1 --use-mock-keychain http://evil.example:56819/wrapper?mode=iframe&previewUrl=http%3A%2F%2F127.0.0.1%3A56821%2Flingxi%2Fv1%2Fpreview%2Fhtml%2Fpv_145786e5da7d575fd2c63727636ab5a5%3FpreviewToken%3DyD8wpwv0azK6IGLAi3qDMUxAxKUO82tYkqovWV-Omas
+--- exit=0 duration=0.53s ---
+<dom 3937 bytes> exit=0
+
+$ /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --headless=new --disable-gpu --no-first-run --no-default-browser-check --disable-background-networking --disable-component-update --disable-sync --metrics-recording-only --disable-extensions --no-proxy-server --disable-dev-shm-usage --user-data-dir=/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-55461-1793066684319/chrome-profile-svg-img-malicious --virtual-time-budget=10000 --dump-dom --use-mock-keychain http://localhost:56819/wrapper?mode=img&imgUrl=http%3A%2F%2F127.0.0.1%3A56819%2Fasset%2Fmalicious.svg
+--- exit=0 duration=0.49s ---
+<dom 3748 bytes> exit=0
+
+$ /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --headless=new --disable-gpu --no-first-run --no-default-browser-check --disable-background-networking --disable-component-update --disable-sync --metrics-recording-only --disable-extensions --no-proxy-server --disable-dev-shm-usage --user-data-dir=/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-55461-1793066684319/chrome-profile-svg-img-benign --virtual-time-budget=10000 --dump-dom --use-mock-keychain http://localhost:56819/wrapper?mode=img&imgUrl=http%3A%2F%2F127.0.0.1%3A56819%2Fasset%2Fbenign.svg
+--- exit=0 duration=0.50s ---
+<dom 3736 bytes> exit=0
+
+$ /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --headless=new --disable-gpu --no-first-run --no-default-browser-check --disable-background-networking --disable-component-update --disable-sync --metrics-recording-only --disable-extensions --no-proxy-server --disable-dev-shm-usage --user-data-dir=/private/tmp/lingxi-r09-runtime/r09_t05_untrusted_preview-55461-1793066684319/chrome-profile-benign-ancestor-allowed --virtual-time-budget=10000 --dump-dom --use-mock-keychain http://localhost:56819/wrapper?mode=iframe&previewUrl=http%3A%2F%2F127.0.0.1%3A56821%2Flingxi%2Fv1%2Fpreview%2Fhtml%2Fpv_d82ec6dbb22ce44442d890a0c649ab8f%3FpreviewToken%3DrqKvmO0aaIp5Qj2WWtNrhhzPVEM1VJKsDcSH_TVQObU
+--- exit=0 duration=0.50s ---
+<dom 4169 bytes> exit=0
+
+$ /Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r06_t05_preview
+--- exit=0 duration=79.27s ---
+
+running 5 tests
+test create_preview_identity_ttl_and_errors ... ok
+test serve_preview_token_gate_expiry_and_csp ... ok
+test asset_over_50mb_refused ... ok
+test asset_scope_rewrite_base_inject_and_serve_gates ... ok
+test preview_route_faces_and_public_token_gate ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+   Compiling ring v0.17.14
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+   Compiling rcgen v0.14.10
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (test "r06_t05_preview") generated 1 warning
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 16s
+     Running tests/r06_t05_preview.rs (rust/target/debug/deps/r06_t05_preview-0729975817d963c6)
+
+$ /Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml -p lingxi-adapters --test r07_pdf_chromium -- --include-ignored html_network_frames_and_workers_never_reach_loopback_canary --test-threads=1
+--- exit=0 duration=5.93s ---
+
+running 1 test
+test html_network_frames_and_workers_never_reach_loopback_canary ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 5.78s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s
+     Running tests/r07_pdf_chromium.rs (rust/target/debug/deps/r07_pdf_chromium-499d11c618388529)

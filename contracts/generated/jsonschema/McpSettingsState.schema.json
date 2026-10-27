@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "页面读取同一管理者的公开配置；回执保留各动作原有未知扩展。",
+  "properties": {
+    "agentConfig": true,
+    "agentId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "config": true,
+    "settingsResults": {
+      "items": true,
+      "type": "array"
+    }
+  },
+  "required": [
+    "config",
+    "agentConfig",
+    "settingsResults"
+  ],
+  "title": "McpSettingsState",
+  "type": "object"
+}

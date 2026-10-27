@@ -1,0 +1,3490 @@
+{
+  "schema_version": 1,
+  "task_id": "R00-T02",
+  "group": "CORE",
+  "source_sha": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084",
+  "review_count": 47,
+  "reviews": [
+    {
+      "original_feature_id": "F-D04-BODY_EFFECT-CONFIRM-CONFIRMED-A083F1",
+      "entry_id": "body-effect:confirm:confirmed",
+      "kind": "body_effect",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "批准待处理请求",
+      "call_chain": [
+        "server/routes/confirm.ts:14",
+        "server/routes/confirm.ts:37",
+        "desktop/src/react/components/chat/SettingsConfirmCard.tsx:98",
+        "desktop/src/react/services/ws-message-handler.ts:1441",
+        "server/routes/confirm.ts:14",
+        "server/routes/confirm.ts:55",
+        "desktop/src/react/components/chat/SettingsConfirmCard.tsx:98"
+      ],
+      "source_refs": [
+        "server/routes/confirm.ts:14",
+        "server/routes/confirm.ts:55",
+        "desktop/src/react/components/chat/SettingsConfirmCard.tsx:98"
+      ],
+      "user_action": "在确认卡批准指定待处理请求",
+      "success_result": "授权范围通过后 ConfirmStore 标记 confirmed，广播 confirmation_resolved，待批动作才继续",
+      "refusal_or_boundary": "无效 action 400、已处理 404、越权 403；批准目标变化须重审且不能扩大授权",
+      "branch_variants": [
+        "confirmed 与 rejected 是相反分支"
+      ],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R04-T03"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R04-A05",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R04-A06",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "在确认卡批准指定待处理请求",
+        "then": "授权范围通过后 ConfirmStore 标记 confirmed，广播 confirmation_resolved，待批动作才继续",
+        "assertions": [
+          "授权范围通过后 ConfirmStore 标记 confirmed，广播 confirmation_resolved，待批动作才继续",
+          "无效 action 400、已处理 404、越权 403；批准目标变化须重审且不能扩大授权"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "server/routes/confirm.ts": "dc8a5392d2c6c5f91c1bfb0d9b13c504b1ab6eb798ce28575445a2404fc3a9da",
+        "desktop/src/react/components/chat/SettingsConfirmCard.tsx": "ceb71f84f7dca1aa109b4e05f5cf8c84bc0514d86dcc508a8fd3abeb37d01eef",
+        "desktop/src/react/services/ws-message-handler.ts": "76d30e60d7bf00706a3815fafb79b104938c56cf3b29a1938ce0f0580dbd0e3d"
+      }
+    },
+    {
+      "original_feature_id": "F-D04-BODY_EFFECT-CONFIRM-REJECTED-F97BFB",
+      "entry_id": "body-effect:confirm:rejected",
+      "kind": "body_effect",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "拒绝待处理请求",
+      "call_chain": [
+        "server/routes/confirm.ts:14",
+        "server/routes/confirm.ts:37",
+        "desktop/src/react/components/chat/SettingsConfirmCard.tsx:109",
+        "desktop/src/react/services/ws-message-handler.ts:1441",
+        "server/routes/confirm.ts:14",
+        "server/routes/confirm.ts:55",
+        "desktop/src/react/components/chat/SettingsConfirmCard.tsx:109"
+      ],
+      "source_refs": [
+        "server/routes/confirm.ts:14",
+        "server/routes/confirm.ts:55",
+        "desktop/src/react/components/chat/SettingsConfirmCard.tsx:109"
+      ],
+      "user_action": "在确认卡拒绝指定待处理请求",
+      "success_result": "授权范围通过后 ConfirmStore 标记 rejected，广播 confirmation_resolved，待批动作不执行",
+      "refusal_or_boundary": "无效 action 400、已处理 404、越权 403；拒绝后再次提交不得继续原动作",
+      "branch_variants": [
+        "confirmed 与 rejected 是相反分支"
+      ],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R04-T03"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R04-A05",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R04-A06",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "在确认卡拒绝指定待处理请求",
+        "then": "授权范围通过后 ConfirmStore 标记 rejected，广播 confirmation_resolved，待批动作不执行",
+        "assertions": [
+          "授权范围通过后 ConfirmStore 标记 rejected，广播 confirmation_resolved，待批动作不执行",
+          "无效 action 400、已处理 404、越权 403；拒绝后再次提交不得继续原动作"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "server/routes/confirm.ts": "dc8a5392d2c6c5f91c1bfb0d9b13c504b1ab6eb798ce28575445a2404fc3a9da",
+        "desktop/src/react/components/chat/SettingsConfirmCard.tsx": "ceb71f84f7dca1aa109b4e05f5cf8c84bc0514d86dcc508a8fd3abeb37d01eef",
+        "desktop/src/react/services/ws-message-handler.ts": "76d30e60d7bf00706a3815fafb79b104938c56cf3b29a1938ce0f0580dbd0e3d"
+      }
+    },
+    {
+      "original_feature_id": "F-D17-BRIDGE_ADAPTER-BRIDGE-DINGTALK-244169",
+      "entry_id": "bridge:dingtalk",
+      "kind": "bridge_adapter",
+      "decision": "VARIANT",
+      "semantic_identity": "dingtalk 平台收发",
+      "call_chain": [
+        "lib/bridge/bridge-manager.ts:129",
+        "lib/bridge/bridge-manager.ts:117",
+        "lib/bridge/dingtalk-adapter.ts:1",
+        "lib/bridge/bridge-manager.ts:851"
+      ],
+      "source_refs": [
+        "lib/bridge/bridge-manager.ts:117",
+        "lib/bridge/dingtalk-adapter.ts:1",
+        "lib/bridge/bridge-manager.ts:851"
+      ],
+      "user_action": "在 dingtalk 平台私聊或群聊发消息",
+      "success_result": "启用且配置企业 clientId/clientSecret 或 legacy app后建立平台连接；入站消息绑定该平台/Agent 会话并回发清洗后的回复",
+      "refusal_or_boundary": "未启用、凭证缺失、发送者越权或重复消息时不触发第二 Run；新旧凭证形态与机器人 code",
+      "branch_variants": [
+        "新旧凭证形态与机器人 code"
+      ],
+      "variant_group": "bridge_platform_message",
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R07-T02"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R07-A03",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A04",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "在 dingtalk 平台私聊或群聊发消息",
+        "then": "启用且配置企业 clientId/clientSecret 或 legacy app后建立平台连接；入站消息绑定该平台/Agent 会话并回发清洗后的回复",
+        "assertions": [
+          "启用且配置企业 clientId/clientSecret 或 legacy app后建立平台连接；入站消息绑定该平台/Agent 会话并回发清洗后的回复",
+          "未启用、凭证缺失、发送者越权或重复消息时不触发第二 Run；新旧凭证形态与机器人 code"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "lib/bridge/bridge-manager.ts": "be2d84920168b9244e83bc3c2485e6f27ab1d92d3ddd1fc86ee8f1b715d99c59",
+        "lib/bridge/dingtalk-adapter.ts": "ce7fd52f2d7a03cbb3458f2d13ba30a7987d97bf0290fd703f8867aa41dfc3a6"
+      }
+    },
+    {
+      "original_feature_id": "F-D17-BRIDGE_ADAPTER-BRIDGE-FEISHU-C32ABF",
+      "entry_id": "bridge:feishu",
+      "kind": "bridge_adapter",
+      "decision": "VARIANT",
+      "semantic_identity": "feishu 平台收发",
+      "call_chain": [
+        "lib/bridge/bridge-manager.ts:123",
+        "lib/bridge/bridge-manager.ts:117",
+        "lib/bridge/feishu-adapter.ts:1",
+        "lib/bridge/bridge-manager.ts:851"
+      ],
+      "source_refs": [
+        "lib/bridge/bridge-manager.ts:117",
+        "lib/bridge/feishu-adapter.ts:1",
+        "lib/bridge/bridge-manager.ts:851"
+      ],
+      "user_action": "在 feishu 平台私聊或群聊发消息",
+      "success_result": "启用且配置appId/appSecret/region后建立平台连接；入站消息绑定该平台/Agent 会话并回发清洗后的回复",
+      "refusal_or_boundary": "未启用、凭证缺失、发送者越权或重复消息时不触发第二 Run；异步连接与飞书区域选择",
+      "branch_variants": [
+        "异步连接与飞书区域选择"
+      ],
+      "variant_group": "bridge_platform_message",
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R07-T02"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R07-A03",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A04",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "在 feishu 平台私聊或群聊发消息",
+        "then": "启用且配置appId/appSecret/region后建立平台连接；入站消息绑定该平台/Agent 会话并回发清洗后的回复",
+        "assertions": [
+          "启用且配置appId/appSecret/region后建立平台连接；入站消息绑定该平台/Agent 会话并回发清洗后的回复",
+          "未启用、凭证缺失、发送者越权或重复消息时不触发第二 Run；异步连接与飞书区域选择"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "lib/bridge/bridge-manager.ts": "be2d84920168b9244e83bc3c2485e6f27ab1d92d3ddd1fc86ee8f1b715d99c59",
+        "lib/bridge/feishu-adapter.ts": "a1e4330d026e47d2b85a90e837326599f2113ab4f400bfed2b6afd9b2f842a5b"
+      }
+    },
+    {
+      "original_feature_id": "F-D17-BRIDGE_ADAPTER-BRIDGE-QQ-45432D",
+      "entry_id": "bridge:qq",
+      "kind": "bridge_adapter",
+      "decision": "VARIANT",
+      "semantic_identity": "qq 平台收发",
+      "call_chain": [
+        "lib/bridge/bridge-manager.ts:146",
+        "lib/bridge/bridge-manager.ts:117",
+        "lib/bridge/qq-adapter.ts:1",
+        "lib/bridge/bridge-manager.ts:851"
+      ],
+      "source_refs": [
+        "lib/bridge/bridge-manager.ts:117",
+        "lib/bridge/qq-adapter.ts:1",
+        "lib/bridge/bridge-manager.ts:851"
+      ],
+      "user_action": "在 qq 平台私聊或群聊发消息",
+      "success_result": "启用且配置appID/appSecret后建立平台连接；入站消息绑定该平台/Agent 会话并回发清洗后的回复",
+      "refusal_or_boundary": "未启用、凭证缺失、发送者越权或重复消息时不触发第二 Run；DM guild 映射回写",
+      "branch_variants": [
+        "DM guild 映射回写"
+      ],
+      "variant_group": "bridge_platform_message",
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R07-T02"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R07-A03",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A04",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "在 qq 平台私聊或群聊发消息",
+        "then": "启用且配置appID/appSecret后建立平台连接；入站消息绑定该平台/Agent 会话并回发清洗后的回复",
+        "assertions": [
+          "启用且配置appID/appSecret后建立平台连接；入站消息绑定该平台/Agent 会话并回发清洗后的回复",
+          "未启用、凭证缺失、发送者越权或重复消息时不触发第二 Run；DM guild 映射回写"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "lib/bridge/bridge-manager.ts": "be2d84920168b9244e83bc3c2485e6f27ab1d92d3ddd1fc86ee8f1b715d99c59",
+        "lib/bridge/qq-adapter.ts": "284ebb9c774c421a04e40d12d92148b72b0bdba7ec526d23e142be891138683f"
+      }
+    },
+    {
+      "original_feature_id": "F-D17-BRIDGE_ADAPTER-BRIDGE-TELEGRAM-0909C1",
+      "entry_id": "bridge:telegram",
+      "kind": "bridge_adapter",
+      "decision": "VARIANT",
+      "semantic_identity": "telegram 平台收发",
+      "call_chain": [
+        "lib/bridge/bridge-manager.ts:118",
+        "lib/bridge/bridge-manager.ts:117",
+        "lib/bridge/telegram-adapter.ts:1",
+        "lib/bridge/bridge-manager.ts:851"
+      ],
+      "source_refs": [
+        "lib/bridge/bridge-manager.ts:117",
+        "lib/bridge/telegram-adapter.ts:1",
+        "lib/bridge/bridge-manager.ts:851"
+      ],
+      "user_action": "在 telegram 平台私聊或群聊发消息",
+      "success_result": "启用且配置bot token后建立平台连接；入站消息绑定该平台/Agent 会话并回发清洗后的回复",
+      "refusal_or_boundary": "未启用、凭证缺失、发送者越权或重复消息时不触发第二 Run；私聊 sessionKey tg_dm 与群组边界",
+      "branch_variants": [
+        "私聊 sessionKey tg_dm 与群组边界"
+      ],
+      "variant_group": "bridge_platform_message",
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R07-T02"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R07-A03",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A04",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "在 telegram 平台私聊或群聊发消息",
+        "then": "启用且配置bot token后建立平台连接；入站消息绑定该平台/Agent 会话并回发清洗后的回复",
+        "assertions": [
+          "启用且配置bot token后建立平台连接；入站消息绑定该平台/Agent 会话并回发清洗后的回复",
+          "未启用、凭证缺失、发送者越权或重复消息时不触发第二 Run；私聊 sessionKey tg_dm 与群组边界"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "lib/bridge/bridge-manager.ts": "be2d84920168b9244e83bc3c2485e6f27ab1d92d3ddd1fc86ee8f1b715d99c59",
+        "lib/bridge/telegram-adapter.ts": "9ec1aeb796c5119797d800f70eb35f8df6a75b485b10f5222d964e289a09b259"
+      }
+    },
+    {
+      "original_feature_id": "F-D17-BRIDGE_ADAPTER-BRIDGE-WECHAT-2D2B3D",
+      "entry_id": "bridge:wechat",
+      "kind": "bridge_adapter",
+      "decision": "VARIANT",
+      "semantic_identity": "wechat 平台收发",
+      "call_chain": [
+        "lib/bridge/bridge-manager.ts:161",
+        "lib/bridge/bridge-manager.ts:117",
+        "lib/bridge/wechat-adapter.ts:1",
+        "lib/bridge/bridge-manager.ts:851"
+      ],
+      "source_refs": [
+        "lib/bridge/bridge-manager.ts:117",
+        "lib/bridge/wechat-adapter.ts:1",
+        "lib/bridge/bridge-manager.ts:851"
+      ],
+      "user_action": "在 wechat 平台私聊或群聊发消息",
+      "success_result": "启用且配置botToken后建立平台连接；入站消息绑定该平台/Agent 会话并回发清洗后的回复",
+      "refusal_or_boundary": "未启用、凭证缺失、发送者越权或重复消息时不触发第二 Run；微信 token 与本机数据根",
+      "branch_variants": [
+        "微信 token 与本机数据根"
+      ],
+      "variant_group": "bridge_platform_message",
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R07-T02"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R07-A03",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A04",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "在 wechat 平台私聊或群聊发消息",
+        "then": "启用且配置botToken后建立平台连接；入站消息绑定该平台/Agent 会话并回发清洗后的回复",
+        "assertions": [
+          "启用且配置botToken后建立平台连接；入站消息绑定该平台/Agent 会话并回发清洗后的回复",
+          "未启用、凭证缺失、发送者越权或重复消息时不触发第二 Run；微信 token 与本机数据根"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "lib/bridge/bridge-manager.ts": "be2d84920168b9244e83bc3c2485e6f27ab1d92d3ddd1fc86ee8f1b715d99c59",
+        "lib/bridge/wechat-adapter.ts": "80a01a3156c0203865c2077e0fa9821ca9a1cef9e6eb095200b3913dfae744ec"
+      }
+    },
+    {
+      "original_feature_id": "F-D16-BUILTIN_PLUGIN_ADAPTER-BUILTIN-PLUGIN-ADAPTER-JIMENG-CLI-IMAGE-125C9E",
+      "entry_id": "builtin-plugin-adapter:jimeng-cli:image",
+      "kind": "builtin_plugin_adapter",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "即梦 CLI image 生成",
+      "call_chain": [
+        "plugins/jimeng-cli/index.ts:51",
+        "plugins/jimeng-cli/manifest.json:1",
+        "plugins/jimeng-cli/adapters/dreamina.ts:658",
+        "plugins/jimeng-cli/lib/dreamina-capabilities.ts:521",
+        "plugins/jimeng-cli/index.ts:51"
+      ],
+      "source_refs": [
+        "plugins/jimeng-cli/adapters/dreamina.ts:658",
+        "plugins/jimeng-cli/lib/dreamina-capabilities.ts:521",
+        "plugins/jimeng-cli/index.ts:51"
+      ],
+      "user_action": "选即梦 CLI 生成图片",
+      "success_result": "授权后调用本机 dreamina image，任务完成才登记并显示真实图片文件",
+      "refusal_or_boundary": "未装命令、能力不支持或外部凭证未获授权时失败，不登记假文件",
+      "branch_variants": [
+        "比例/分辨率/参考图分别按能力快照校验"
+      ],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R04-T07",
+        "R07-T05"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R04-A13",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R04-A14",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A09",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A10",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "选即梦 CLI 生成图片",
+        "then": "授权后调用本机 dreamina image，任务完成才登记并显示真实图片文件",
+        "assertions": [
+          "授权后调用本机 dreamina image，任务完成才登记并显示真实图片文件",
+          "未装命令、能力不支持或外部凭证未获授权时失败，不登记假文件"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "plugins/jimeng-cli/index.ts": "16ee387ac24dc8d194d3143f460a9f82c0f4984e7e1d8cbc8e100c2121cad2cd",
+        "plugins/jimeng-cli/manifest.json": "ca62fa66818c6e418185c931610ca89cfb689a304354f5223d2929b18216ac52",
+        "plugins/jimeng-cli/adapters/dreamina.ts": "9155a53b81bfbb5600705a624f48c2e0eb34d34ae4ad04ec4fd9bf707f774611",
+        "plugins/jimeng-cli/lib/dreamina-capabilities.ts": "0d972b83e80b289636ec90e674d90ae7e6755999e5b3bcc8428a1ed89e0a4099"
+      }
+    },
+    {
+      "original_feature_id": "F-D16-BUILTIN_PLUGIN_ADAPTER-BUILTIN-PLUGIN-ADAPTER-JIMENG-CLI-VIDEO-7747A6",
+      "entry_id": "builtin-plugin-adapter:jimeng-cli:video",
+      "kind": "builtin_plugin_adapter",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "即梦 CLI video 生成",
+      "call_chain": [
+        "plugins/jimeng-cli/index.ts:52",
+        "plugins/jimeng-cli/adapters/dreamina.ts:674",
+        "plugins/jimeng-cli/lib/dreamina-capabilities.ts:521",
+        "plugins/jimeng-cli/index.ts:52"
+      ],
+      "source_refs": [
+        "plugins/jimeng-cli/adapters/dreamina.ts:674",
+        "plugins/jimeng-cli/lib/dreamina-capabilities.ts:521",
+        "plugins/jimeng-cli/index.ts:52"
+      ],
+      "user_action": "选即梦 CLI 生成视频",
+      "success_result": "授权后调用本机 dreamina video，轮询完成并登记真实视频文件",
+      "refusal_or_boundary": "未装命令、凭证拒绝、时长/分辨率不支持或远端未完成时不显示已交付",
+      "branch_variants": [
+        "时长/比例/分辨率/单张参考图按能力快照校验"
+      ],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R04-T07",
+        "R07-T05"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R04-A13",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R04-A14",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A09",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A10",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "选即梦 CLI 生成视频",
+        "then": "授权后调用本机 dreamina video，轮询完成并登记真实视频文件",
+        "assertions": [
+          "授权后调用本机 dreamina video，轮询完成并登记真实视频文件",
+          "未装命令、凭证拒绝、时长/分辨率不支持或远端未完成时不显示已交付"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "plugins/jimeng-cli/index.ts": "16ee387ac24dc8d194d3143f460a9f82c0f4984e7e1d8cbc8e100c2121cad2cd",
+        "plugins/jimeng-cli/adapters/dreamina.ts": "9155a53b81bfbb5600705a624f48c2e0eb34d34ae4ad04ec4fd9bf707f774611",
+        "plugins/jimeng-cli/lib/dreamina-capabilities.ts": "0d972b83e80b289636ec90e674d90ae7e6755999e5b3bcc8428a1ed89e0a4099"
+      }
+    },
+    {
+      "original_feature_id": "F-D20-CLI-CLI-CHAT-D3710D",
+      "entry_id": "cli:chat",
+      "kind": "cli",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "CLI chat",
+      "call_chain": [
+        "cli/entry.ts:88",
+        "cli/chat.ts:98",
+        "cli/client.ts:1"
+      ],
+      "source_refs": [
+        "cli/chat.ts:98",
+        "cli/client.ts:1"
+      ],
+      "user_action": "启动终端聊天",
+      "success_result": "选择或创建会话后通过 WS 提交消息，终端流式显示回复和工具进度",
+      "refusal_or_boundary": "连接/身份失败返回非零；错会话帧不显示，Ctrl+C 只取消当前 stream",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R02-T03",
+        "R07-T09"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R02-A05",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R02-A06",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A17",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A18",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "启动终端聊天",
+        "then": "选择或创建会话后通过 WS 提交消息，终端流式显示回复和工具进度",
+        "assertions": [
+          "选择或创建会话后通过 WS 提交消息，终端流式显示回复和工具进度",
+          "连接/身份失败返回非零；错会话帧不显示，Ctrl+C 只取消当前 stream"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "cli/entry.ts": "8fc1c049c11513f0fd98e9ead07110779c42838e3e35e901fbb4ffae484b1a2e",
+        "cli/chat.ts": "82910bfb2e03a9b240031e7e37cd974ca2e653b07244d17851d5c79206ed39a2",
+        "cli/client.ts": "0da5d80036ff0dd2fbf32a630e6161eb9882650316002bdf7cdd5a70458dd661"
+      }
+    },
+    {
+      "original_feature_id": "F-D20-CLI-CLI-CONTINUE-3B8633",
+      "entry_id": "cli:continue",
+      "kind": "cli",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "CLI continue",
+      "call_chain": [
+        "cli/entry.ts:84",
+        "cli/chat.ts:98",
+        "cli/client.ts:1"
+      ],
+      "source_refs": [
+        "cli/chat.ts:98",
+        "cli/client.ts:1"
+      ],
+      "user_action": "从终端续接指定会话",
+      "success_result": "解析目标会话后恢复其历史并可继续提交，终端显示该会话回复",
+      "refusal_or_boundary": "会话不存在或跨权限时拒绝，不悄悄新建或串到其他会话",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R02-T03",
+        "R07-T09"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R02-A05",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R02-A06",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A17",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A18",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "从终端续接指定会话",
+        "then": "解析目标会话后恢复其历史并可继续提交，终端显示该会话回复",
+        "assertions": [
+          "解析目标会话后恢复其历史并可继续提交，终端显示该会话回复",
+          "会话不存在或跨权限时拒绝，不悄悄新建或串到其他会话"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "cli/entry.ts": "8fc1c049c11513f0fd98e9ead07110779c42838e3e35e901fbb4ffae484b1a2e",
+        "cli/chat.ts": "82910bfb2e03a9b240031e7e37cd974ca2e653b07244d17851d5c79206ed39a2",
+        "cli/client.ts": "0da5d80036ff0dd2fbf32a630e6161eb9882650316002bdf7cdd5a70458dd661"
+      }
+    },
+    {
+      "original_feature_id": "F-D20-CLI-CLI-HELP-B8A1AD",
+      "entry_id": "cli:help",
+      "kind": "cli",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "显示 CLI 帮助",
+      "call_chain": [
+        "cli/entry.ts:27",
+        "cli/args.ts:6",
+        "cli/entry.ts:27"
+      ],
+      "source_refs": [
+        "cli/args.ts:6",
+        "cli/entry.ts:27"
+      ],
+      "user_action": "请求 CLI 帮助",
+      "success_result": "打印命令与参数说明并以 0 退出",
+      "refusal_or_boundary": "未知参数打印错误和帮助并以 1 退出；不启动服务",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R02-T03",
+        "R07-T09"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R02-A05",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R02-A06",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A17",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A18",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "请求 CLI 帮助",
+        "then": "打印命令与参数说明并以 0 退出",
+        "assertions": [
+          "打印命令与参数说明并以 0 退出",
+          "未知参数打印错误和帮助并以 1 退出；不启动服务"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "cli/entry.ts": "8fc1c049c11513f0fd98e9ead07110779c42838e3e35e901fbb4ffae484b1a2e",
+        "cli/args.ts": "5c8b9b4b1a0a753532f5ff65a8b9ff4fb8622f71ae4d65688d5efa66879896c0"
+      }
+    },
+    {
+      "original_feature_id": "F-D20-CLI-CLI-SERVE-1B0976",
+      "entry_id": "cli:serve",
+      "kind": "cli",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "CLI serve",
+      "call_chain": [
+        "cli/entry.ts:33",
+        "cli/server-runner.ts:1",
+        "cli/entry.ts:33"
+      ],
+      "source_refs": [
+        "cli/server-runner.ts:1",
+        "cli/entry.ts:33"
+      ],
+      "user_action": "从终端启动服务",
+      "success_result": "以前台服务进程运行，保留指定 channel 与数据降级约束",
+      "refusal_or_boundary": "启动/数据版本失败给错误，不偷偷切换数据目录",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R02-T03",
+        "R07-T09"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R02-A05",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R02-A06",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A17",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A18",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "从终端启动服务",
+        "then": "以前台服务进程运行，保留指定 channel 与数据降级约束",
+        "assertions": [
+          "以前台服务进程运行，保留指定 channel 与数据降级约束",
+          "启动/数据版本失败给错误，不偷偷切换数据目录"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "cli/entry.ts": "8fc1c049c11513f0fd98e9ead07110779c42838e3e35e901fbb4ffae484b1a2e",
+        "cli/server-runner.ts": "7488ce265c6abaec54a9f59e099af06b1af3335240a134184b39c96805662dd4"
+      }
+    },
+    {
+      "original_feature_id": "F-D20-CLI-CLI-SESSIONS-200D4E",
+      "entry_id": "cli:sessions",
+      "kind": "cli",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "CLI sessions",
+      "call_chain": [
+        "cli/entry.ts:80",
+        "cli/chat.ts:86",
+        "cli/entry.ts:80"
+      ],
+      "source_refs": [
+        "cli/chat.ts:86",
+        "cli/entry.ts:80"
+      ],
+      "user_action": "在终端列出会话",
+      "success_result": "从已认证服务读取并列出最多 20 个会话；空列表显示 No sessions yet",
+      "refusal_or_boundary": "服务未连接或未授权时返回错误，不读取其他主体会话",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R02-T03",
+        "R07-T09"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R02-A05",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R02-A06",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A17",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A18",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "在终端列出会话",
+        "then": "从已认证服务读取并列出最多 20 个会话；空列表显示 No sessions yet",
+        "assertions": [
+          "从已认证服务读取并列出最多 20 个会话；空列表显示 No sessions yet",
+          "服务未连接或未授权时返回错误，不读取其他主体会话"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "cli/entry.ts": "8fc1c049c11513f0fd98e9ead07110779c42838e3e35e901fbb4ffae484b1a2e",
+        "cli/chat.ts": "82910bfb2e03a9b240031e7e37cd974ca2e653b07244d17851d5c79206ed39a2"
+      }
+    },
+    {
+      "original_feature_id": "F-D20-CLI-CLI-STATUS-EEC1A2",
+      "entry_id": "cli:status",
+      "kind": "cli",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "CLI status",
+      "call_chain": [
+        "cli/entry.ts:76",
+        "cli/chat.ts:71",
+        "cli/entry.ts:76"
+      ],
+      "source_refs": [
+        "cli/chat.ts:71",
+        "cli/entry.ts:76"
+      ],
+      "user_action": "在终端查看服务状态",
+      "success_result": "显示 URL、版本、Studio、Agent、模型和认证来源",
+      "refusal_or_boundary": "服务不可达时返回诊断错误；身份读取失败可用健康信息但不伪造认证来源",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R02-T03",
+        "R07-T09"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R02-A05",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R02-A06",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A17",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A18",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "在终端查看服务状态",
+        "then": "显示 URL、版本、Studio、Agent、模型和认证来源",
+        "assertions": [
+          "显示 URL、版本、Studio、Agent、模型和认证来源",
+          "服务不可达时返回诊断错误；身份读取失败可用健康信息但不伪造认证来源"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "cli/entry.ts": "8fc1c049c11513f0fd98e9ead07110779c42838e3e35e901fbb4ffae484b1a2e",
+        "cli/chat.ts": "82910bfb2e03a9b240031e7e37cd974ca2e653b07244d17851d5c79206ed39a2"
+      }
+    },
+    {
+      "original_feature_id": "F-D20-CLI-CLI-SUBCOMMAND-BUNDLE-STATUS-AA65EF",
+      "entry_id": "cli:subcommand:bundle-status",
+      "kind": "cli",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "查看 bundle 状态",
+      "call_chain": [
+        "cli/entry.ts:49",
+        "cli/entry.ts:43",
+        "cli/bundle.ts:119",
+        "shared/artifact-core/pointer-store.cjs:1"
+      ],
+      "source_refs": [
+        "cli/bundle.ts:119",
+        "shared/artifact-core/pointer-store.cjs:1"
+      ],
+      "user_action": "查看 Web 前端包状态",
+      "success_result": "只读本地 current/next 指针及上次检查、可用版本和错误",
+      "refusal_or_boundary": "无包时提示 pull；不得联网或改指针",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R07-T09",
+        "R10-T07",
+        "R11-T04"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R07-A17",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A18",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R10-A13",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R10-A14",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R11-A07",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R11-A08",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "查看 Web 前端包状态",
+        "then": "只读本地 current/next 指针及上次检查、可用版本和错误",
+        "assertions": [
+          "只读本地 current/next 指针及上次检查、可用版本和错误",
+          "无包时提示 pull；不得联网或改指针"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "cli/entry.ts": "8fc1c049c11513f0fd98e9ead07110779c42838e3e35e901fbb4ffae484b1a2e",
+        "cli/bundle.ts": "fa6297e67edb2b5bf2739e3b0cf62d46955d915ea06985010fbcd601fc94b704",
+        "shared/artifact-core/pointer-store.cjs": "a176fa4ab93885b190784ce0a51dc54c192bba531ac414f5b0656014c5c8cd7b"
+      }
+    },
+    {
+      "original_feature_id": "F-D20-CLI-CLI-SUBCOMMAND-CHECKPOINTS-00E57B",
+      "entry_id": "cli:subcommand:checkpoints",
+      "kind": "cli",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "CLI 子命令 checkpoints",
+      "call_chain": [
+        "cli/entry.ts:58",
+        "cli/data.ts:177",
+        "shared/data-epoch.cjs:1"
+      ],
+      "source_refs": [
+        "cli/data.ts:177",
+        "shared/data-epoch.cjs:1"
+      ],
+      "user_action": "列出数据检查点",
+      "success_result": "读取有效 checkpoint 并打印 epoch、日期、store 数量和体积",
+      "refusal_or_boundary": "损坏/不完整检查点跳过且给数量；不尝试恢复",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R07-T09",
+        "R08-T06",
+        "R10-T04"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R07-A17",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A18",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A11",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A12",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R10-A07",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R10-A08",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "列出数据检查点",
+        "then": "读取有效 checkpoint 并打印 epoch、日期、store 数量和体积",
+        "assertions": [
+          "读取有效 checkpoint 并打印 epoch、日期、store 数量和体积",
+          "损坏/不完整检查点跳过且给数量；不尝试恢复"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "cli/entry.ts": "8fc1c049c11513f0fd98e9ead07110779c42838e3e35e901fbb4ffae484b1a2e",
+        "cli/data.ts": "1d44d1de7451d052df2ef126c7e962fc4fc6b6aa51dc35850c848e9a5cc8fa2b",
+        "shared/data-epoch.cjs": "b0f81591d0e630b11d9786cfd11eccb9ea546e25646a2dc54375b50fc7ff464d"
+      }
+    },
+    {
+      "original_feature_id": "F-D20-CLI-CLI-SUBCOMMAND-DATA-RESTORE-1388F8",
+      "entry_id": "cli:subcommand:data-restore",
+      "kind": "cli",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "恢复数据检查点",
+      "call_chain": [
+        "cli/entry.ts:61",
+        "cli/entry.ts:52",
+        "cli/data.ts:221"
+      ],
+      "source_refs": [
+        "cli/data.ts:221"
+      ],
+      "user_action": "恢复指定数据检查点",
+      "success_result": "精确确认后执行恢复，打印收据和隔离目录；旧数据可从隔离目录找回",
+      "refusal_or_boundary": "非 TTY 无确认 token、token 不符或检查点不存在时退出 1，目标数据不改",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R07-T09",
+        "R08-T06",
+        "R10-T04"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R07-A17",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A18",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A11",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A12",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R10-A07",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R10-A08",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "恢复指定数据检查点",
+        "then": "精确确认后执行恢复，打印收据和隔离目录；旧数据可从隔离目录找回",
+        "assertions": [
+          "精确确认后执行恢复，打印收据和隔离目录；旧数据可从隔离目录找回",
+          "非 TTY 无确认 token、token 不符或检查点不存在时退出 1，目标数据不改"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "cli/entry.ts": "8fc1c049c11513f0fd98e9ead07110779c42838e3e35e901fbb4ffae484b1a2e",
+        "cli/data.ts": "1d44d1de7451d052df2ef126c7e962fc4fc6b6aa51dc35850c848e9a5cc8fa2b"
+      }
+    },
+    {
+      "original_feature_id": "F-D20-CLI-CLI-SUBCOMMAND-DIAGNOSE-0BE8B2",
+      "entry_id": "cli:subcommand:diagnose",
+      "kind": "cli",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "CLI 子命令 diagnose",
+      "call_chain": [
+        "cli/entry.ts:55",
+        "cli/data.ts:119"
+      ],
+      "source_refs": [
+        "cli/data.ts:119"
+      ],
+      "user_action": "诊断本机数据版本",
+      "success_result": "读取 epoch、升级日志、维护状态和可恢复检查点并打印",
+      "refusal_or_boundary": "损坏状态明确报 corrupt；不自动修复或新建空库",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R07-T09",
+        "R08-T06",
+        "R10-T04"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R07-A17",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A18",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A11",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A12",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R10-A07",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R10-A08",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "诊断本机数据版本",
+        "then": "读取 epoch、升级日志、维护状态和可恢复检查点并打印",
+        "assertions": [
+          "读取 epoch、升级日志、维护状态和可恢复检查点并打印",
+          "损坏状态明确报 corrupt；不自动修复或新建空库"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "cli/entry.ts": "8fc1c049c11513f0fd98e9ead07110779c42838e3e35e901fbb4ffae484b1a2e",
+        "cli/data.ts": "1d44d1de7451d052df2ef126c7e962fc4fc6b6aa51dc35850c848e9a5cc8fa2b"
+      }
+    },
+    {
+      "original_feature_id": "F-D20-CLI-CLI-SUBCOMMAND-PULL-289A40",
+      "entry_id": "cli:subcommand:pull",
+      "kind": "cli",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "CLI 子命令 pull",
+      "call_chain": [
+        "cli/entry.ts:46",
+        "cli/bundle.ts:81",
+        "shared/artifact-core/ota-core.cjs:1"
+      ],
+      "source_refs": [
+        "cli/bundle.ts:81",
+        "shared/artifact-core/ota-core.cjs:1"
+      ],
+      "user_action": "手动拉取 Web 前端包",
+      "success_result": "签名和协议检查通过后激活 renderer 指针并显示版本；已有最新版明确提示",
+      "refusal_or_boundary": "签名、通道、版本或协议拒绝时退出 1，旧可用包保留；不更换服务二进制",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R07-T09",
+        "R10-T07",
+        "R11-T04"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R07-A17",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A18",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R10-A13",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R10-A14",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R11-A07",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R11-A08",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "手动拉取 Web 前端包",
+        "then": "签名和协议检查通过后激活 renderer 指针并显示版本；已有最新版明确提示",
+        "assertions": [
+          "签名和协议检查通过后激活 renderer 指针并显示版本；已有最新版明确提示",
+          "签名、通道、版本或协议拒绝时退出 1，旧可用包保留；不更换服务二进制"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "cli/entry.ts": "8fc1c049c11513f0fd98e9ead07110779c42838e3e35e901fbb4ffae484b1a2e",
+        "cli/bundle.ts": "fa6297e67edb2b5bf2739e3b0cf62d46955d915ea06985010fbcd601fc94b704",
+        "shared/artifact-core/ota-core.cjs": "5f20fe645eac56cda2edeb0f5b25ed2f823937cdfcffa318c0759954628df30a"
+      }
+    },
+    {
+      "original_feature_id": "F-D05-EXPERIMENT-EXPERIMENT-SUBAGENT-PROACTIVE-DELEGATION-980C09",
+      "entry_id": "experiment:subagent.proactive_delegation",
+      "kind": "experiment",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "现役子代理主动委派实验开关",
+      "call_chain": [
+        "lib/experiments/registry.ts:15",
+        "lib/experiments/registry.ts:122",
+        "core/agent.ts:933",
+        "core/agent.ts:1756",
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:444"
+      ],
+      "source_refs": [
+        "lib/experiments/registry.ts:122",
+        "core/agent.ts:933",
+        "core/agent.ts:1756",
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:444"
+      ],
+      "user_action": "在实验设置切换主动委派并新建会话",
+      "success_result": "默认关闭；开启后新会话主 Agent 提示增加独立研究可用只读子代理的条件，工具依旧按权限执行",
+      "refusal_or_boundary": "关闭无额外委派提示；已有会话和子代理不追溯更改；不能自动扩大工具权限",
+      "branch_variants": [
+        "默认关闭；restartPolicy=new_session"
+      ],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R03-T03",
+        "R03-T06",
+        "R06-T03"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R03-A05",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R03-A06",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R03-A11",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R03-A12",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A05",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A06",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "在实验设置切换主动委派并新建会话",
+        "then": "默认关闭；开启后新会话主 Agent 提示增加独立研究可用只读子代理的条件，工具依旧按权限执行",
+        "assertions": [
+          "默认关闭；开启后新会话主 Agent 提示增加独立研究可用只读子代理的条件，工具依旧按权限执行",
+          "关闭无额外委派提示；已有会话和子代理不追溯更改；不能自动扩大工具权限"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "lib/experiments/registry.ts": "1d3a7380f266ff90c60d5b376d510f6c3dd38f3a4ce38d3323c2031825f947ae",
+        "core/agent.ts": "f8b35094657f9fe415fa0d087906cbce8036be85c0c94944e50d404f7459708b",
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx": "9469403cf1b6a40f6ed6c81b48e22ac2618b3622c9ff217cfd383dea73b64927"
+      }
+    },
+    {
+      "original_feature_id": "F-D18-SCHEDULER-SCHEDULER-CRON-866157",
+      "entry_id": "scheduler:cron",
+      "kind": "scheduler",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "定时任务",
+      "call_chain": [
+        "hub/scheduler.ts:82",
+        "hub/scheduler.ts:200",
+        "lib/desk/cron-scheduler.ts:42",
+        "hub/scheduler.ts:275"
+      ],
+      "source_refs": [
+        "hub/scheduler.ts:200",
+        "lib/desk/cron-scheduler.ts:42",
+        "hub/scheduler.ts:275"
+      ],
+      "user_action": "设置 Studio 定时任务并等待触发",
+      "success_result": "触发后以指定 actor Agent 独立 Run 执行，写活动记录并广播 cron_job_done",
+      "refusal_or_boundary": "actor 不存在/执行上下文不匹配会报错；同一 job 并发跳过，超时取消，不扩大源会话文件授权",
+      "branch_variants": [
+        "时区/DST、重启去重、超时及 source session 所有权"
+      ],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R03-T06",
+        "R07-T01"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R03-A11",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R03-A12",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A01",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A02",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "设置 Studio 定时任务并等待触发",
+        "then": "触发后以指定 actor Agent 独立 Run 执行，写活动记录并广播 cron_job_done",
+        "assertions": [
+          "触发后以指定 actor Agent 独立 Run 执行，写活动记录并广播 cron_job_done",
+          "actor 不存在/执行上下文不匹配会报错；同一 job 并发跳过，超时取消，不扩大源会话文件授权"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "hub/scheduler.ts": "8bcb199fcb2e116e01b0d9719077779caa64bad7d37f87af9dc93fda109bdcb8",
+        "lib/desk/cron-scheduler.ts": "e1b91b955a91caa8bc60c0c170d884450e90b2359c2702afa7b9feead3ed01a0"
+      }
+    },
+    {
+      "original_feature_id": "F-D18-SCHEDULER-SCHEDULER-FRESH-COMPACT-3CF3C1",
+      "entry_id": "scheduler:fresh-compact",
+      "kind": "scheduler",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "每日新鲜压缩维护",
+      "call_chain": [
+        "hub/scheduler.ts:83",
+        "hub/scheduler.ts:58",
+        "lib/fresh-compact/daily-scheduler.ts:36",
+        "hub/fresh-compact-maintainer.ts:1"
+      ],
+      "source_refs": [
+        "hub/scheduler.ts:58",
+        "lib/fresh-compact/daily-scheduler.ts:36",
+        "hub/fresh-compact-maintainer.ts:1"
+      ],
+      "user_action": "启用每日历史维护并等待日界",
+      "success_result": "边界后运行 stale 会话 fresh compact，并按结果安排下一次或重试",
+      "refusal_or_boundary": "任务仍在跑不并发；失败或剩余 stale 会话延迟重试；关闭时清理定时器",
+      "branch_variants": [
+        "日界偏移、重启、失败重试"
+      ],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R03-T06",
+        "R07-T01"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R03-A11",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R03-A12",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A01",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A02",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "启用每日历史维护并等待日界",
+        "then": "边界后运行 stale 会话 fresh compact，并按结果安排下一次或重试",
+        "assertions": [
+          "边界后运行 stale 会话 fresh compact，并按结果安排下一次或重试",
+          "任务仍在跑不并发；失败或剩余 stale 会话延迟重试；关闭时清理定时器"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "hub/scheduler.ts": "8bcb199fcb2e116e01b0d9719077779caa64bad7d37f87af9dc93fda109bdcb8",
+        "lib/fresh-compact/daily-scheduler.ts": "d1ee90fde3191d43226f5ceb41f701f5077066107e4a8d9df087a42efa3e083b",
+        "hub/fresh-compact-maintainer.ts": "5d4595078fb4e51854f4523bf35370d4943ccf724d2979fa80690a9030bd2f1e"
+      }
+    },
+    {
+      "original_feature_id": "F-D18-SCHEDULER-SCHEDULER-HEARTBEAT-CFA5BB",
+      "entry_id": "scheduler:heartbeat",
+      "kind": "scheduler",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "定期心跳",
+      "call_chain": [
+        "hub/scheduler.ts:81",
+        "hub/scheduler.ts:122",
+        "lib/desk/heartbeat.ts:602",
+        "hub/scheduler.ts:451"
+      ],
+      "source_refs": [
+        "hub/scheduler.ts:122",
+        "lib/desk/heartbeat.ts:602",
+        "hub/scheduler.ts:451"
+      ],
+      "user_action": "启用指定 Agent 巡检并等待周期触发",
+      "success_result": "扫描该 Agent 工作区并以其身份执行隔离巡检，活动页/通知显示结果",
+      "refusal_or_boundary": "总开关或 Agent 开关关闭不启动；重复启动幂等；关闭释放任务，不能串 Agent 工作区",
+      "branch_variants": [
+        "Agent 级开关、总开关、重载和停止"
+      ],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R03-T06",
+        "R07-T01"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R03-A11",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R03-A12",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A01",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A02",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "启用指定 Agent 巡检并等待周期触发",
+        "then": "扫描该 Agent 工作区并以其身份执行隔离巡检，活动页/通知显示结果",
+        "assertions": [
+          "扫描该 Agent 工作区并以其身份执行隔离巡检，活动页/通知显示结果",
+          "总开关或 Agent 开关关闭不启动；重复启动幂等；关闭释放任务，不能串 Agent 工作区"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "hub/scheduler.ts": "8bcb199fcb2e116e01b0d9719077779caa64bad7d37f87af9dc93fda109bdcb8",
+        "lib/desk/heartbeat.ts": "d1fa6c3187e620bc38fd284377323f7264d1aaa9a99db304106b9c64b45b3153"
+      }
+    },
+    {
+      "original_feature_id": "F-D18-SLASH_COMMAND-SLASH-COMMAND-APPLY-5F394A",
+      "entry_id": "slash-command:apply",
+      "kind": "slash_command",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "/apply 应用自动任务建议",
+      "call_chain": [
+        "core/slash-commands/bridge-commands.ts:139",
+        "core/slash-commands/index.ts:25",
+        "core/engine.ts:863",
+        "lib/bridge/bridge-manager.ts:1139",
+        "server/routes/chat.ts:2538",
+        "core/slash-commands/bridge-commands.ts:139",
+        "core/slash-commands/bridge-commands.ts:327"
+      ],
+      "source_refs": [
+        "core/slash-commands/bridge-commands.ts:139",
+        "core/slash-commands/bridge-commands.ts:327"
+      ],
+      "user_action": "发送 /apply 建立自动任务建议",
+      "success_result": "把当前会话内建议写为自动任务，返回任务标题",
+      "refusal_or_boundary": "找不到建议、Studio 身份缺失或已应用时不创建重复任务",
+      "branch_variants": [
+        "Bridge 与桌面共享 dispatcher；反馈通道分别断言"
+      ],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R03-T06",
+        "R07-T01"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R03-A11",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R03-A12",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A01",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A02",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "发送 /apply 建立自动任务建议",
+        "then": "把当前会话内建议写为自动任务，返回任务标题",
+        "assertions": [
+          "把当前会话内建议写为自动任务，返回任务标题",
+          "找不到建议、Studio 身份缺失或已应用时不创建重复任务"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "core/slash-commands/bridge-commands.ts": "b485c9c6f8407f74d33b54b949229bdb7a167dedf9a22e6f5294194ffe1a8764",
+        "core/slash-commands/index.ts": "3abe601fb5c277ebfdf27b3ac898d04b50eed14336f6f45d2209e6e4c30f433c",
+        "core/engine.ts": "fcd97183d19fd4edbf4f16a0ff3d09e2d60d2aabe524089e89f38b09d1135c97",
+        "lib/bridge/bridge-manager.ts": "be2d84920168b9244e83bc3c2485e6f27ab1d92d3ddd1fc86ee8f1b715d99c59",
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D01-SLASH_COMMAND-SLASH-COMMAND-COMPACT-0FE8BE",
+      "entry_id": "slash-command:compact",
+      "kind": "slash_command",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "/compact 压缩会话上下文",
+      "call_chain": [
+        "core/slash-commands/bridge-commands.ts:168",
+        "core/slash-commands/index.ts:25",
+        "core/engine.ts:863",
+        "lib/bridge/bridge-manager.ts:1139",
+        "server/routes/chat.ts:2538",
+        "core/slash-commands/bridge-commands.ts:168"
+      ],
+      "source_refs": [
+        "core/slash-commands/bridge-commands.ts:168"
+      ],
+      "user_action": "发送 /compact",
+      "success_result": "先回复正在压缩，再返回 token 前后数或完成说明",
+      "refusal_or_boundary": "失败回传压缩失败；接管态目标为被接管桌面会话",
+      "branch_variants": [
+        "Bridge 与桌面共享 dispatcher；反馈通道分别断言"
+      ],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R03-A01",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R03-A02",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A07",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A08",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A13",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A14",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "发送 /compact",
+        "then": "先回复正在压缩，再返回 token 前后数或完成说明",
+        "assertions": [
+          "先回复正在压缩，再返回 token 前后数或完成说明",
+          "失败回传压缩失败；接管态目标为被接管桌面会话"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "core/slash-commands/bridge-commands.ts": "b485c9c6f8407f74d33b54b949229bdb7a167dedf9a22e6f5294194ffe1a8764",
+        "core/slash-commands/index.ts": "3abe601fb5c277ebfdf27b3ac898d04b50eed14336f6f45d2209e6e4c30f433c",
+        "core/engine.ts": "fcd97183d19fd4edbf4f16a0ff3d09e2d60d2aabe524089e89f38b09d1135c97",
+        "lib/bridge/bridge-manager.ts": "be2d84920168b9244e83bc3c2485e6f27ab1d92d3ddd1fc86ee8f1b715d99c59",
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D04-SLASH_COMMAND-SLASH-COMMAND-CONFIRM-75C0AE",
+      "entry_id": "slash-command:confirm",
+      "kind": "slash_command",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "/confirm 确认待处理请求",
+      "call_chain": [
+        "core/slash-commands/bridge-commands.ts:148",
+        "core/slash-commands/index.ts:25",
+        "core/engine.ts:863",
+        "lib/bridge/bridge-manager.ts:1139",
+        "server/routes/chat.ts:2538",
+        "core/slash-commands/bridge-commands.ts:149",
+        "core/slash-commands/bridge-commands.ts:148",
+        "core/slash-commands/bridge-commands.ts:304"
+      ],
+      "source_refs": [
+        "core/slash-commands/bridge-commands.ts:148",
+        "core/slash-commands/bridge-commands.ts:304"
+      ],
+      "user_action": "发送 /confirm 加确认 ID",
+      "success_result": "ConfirmStore 将待处理请求标为 confirmed，继续原待批动作并广播状态",
+      "refusal_or_boundary": "ID 缺失/已处理不重复执行；命令来源权限须由 dispatcher 检查",
+      "branch_variants": [
+        "Bridge 与桌面共享 dispatcher；反馈通道分别断言"
+      ],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R04-A05",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R04-A06",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R04-A11",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R04-A12",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "发送 /confirm 加确认 ID",
+        "then": "ConfirmStore 将待处理请求标为 confirmed，继续原待批动作并广播状态",
+        "assertions": [
+          "ConfirmStore 将待处理请求标为 confirmed，继续原待批动作并广播状态",
+          "ID 缺失/已处理不重复执行；命令来源权限须由 dispatcher 检查"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "core/slash-commands/bridge-commands.ts": "b485c9c6f8407f74d33b54b949229bdb7a167dedf9a22e6f5294194ffe1a8764",
+        "core/slash-commands/index.ts": "3abe601fb5c277ebfdf27b3ac898d04b50eed14336f6f45d2209e6e4c30f433c",
+        "core/engine.ts": "fcd97183d19fd4edbf4f16a0ff3d09e2d60d2aabe524089e89f38b09d1135c97",
+        "lib/bridge/bridge-manager.ts": "be2d84920168b9244e83bc3c2485e6f27ab1d92d3ddd1fc86ee8f1b715d99c59",
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D17-SLASH_COMMAND-SLASH-COMMAND-EXITRC-A99369",
+      "entry_id": "slash-command:exitrc",
+      "kind": "slash_command",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "/exitrc 退出桌面会话接管",
+      "call_chain": [
+        "core/slash-commands/bridge-commands.ts:107",
+        "core/slash-commands/index.ts:25",
+        "core/engine.ts:863",
+        "lib/bridge/bridge-manager.ts:1139",
+        "server/routes/chat.ts:2538",
+        "core/slash-commands/bridge-commands.ts:107"
+      ],
+      "source_refs": [
+        "core/slash-commands/bridge-commands.ts:107"
+      ],
+      "user_action": "在 Bridge 发 /exitrc",
+      "success_result": "清空待选或已接管状态并撤桌面横幅",
+      "refusal_or_boundary": "非 Bridge 或未接管时只返回明确提示，不动桌面会话",
+      "branch_variants": [
+        "Bridge 与桌面共享 dispatcher；反馈通道分别断言"
+      ],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R07-T02"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R07-A03",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A04",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "在 Bridge 发 /exitrc",
+        "then": "清空待选或已接管状态并撤桌面横幅",
+        "assertions": [
+          "清空待选或已接管状态并撤桌面横幅",
+          "非 Bridge 或未接管时只返回明确提示，不动桌面会话"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "core/slash-commands/bridge-commands.ts": "b485c9c6f8407f74d33b54b949229bdb7a167dedf9a22e6f5294194ffe1a8764",
+        "core/slash-commands/index.ts": "3abe601fb5c277ebfdf27b3ac898d04b50eed14336f6f45d2209e6e4c30f433c",
+        "core/engine.ts": "fcd97183d19fd4edbf4f16a0ff3d09e2d60d2aabe524089e89f38b09d1135c97",
+        "lib/bridge/bridge-manager.ts": "be2d84920168b9244e83bc3c2485e6f27ab1d92d3ddd1fc86ee8f1b715d99c59",
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D01-SLASH_COMMAND-SLASH-COMMAND-FRESH-COMPACT-5A6E0D",
+      "entry_id": "slash-command:fresh-compact",
+      "kind": "slash_command",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "/fresh-compact 刷新提示词和记忆后压缩",
+      "call_chain": [
+        "core/slash-commands/bridge-commands.ts:196",
+        "core/slash-commands/index.ts:25",
+        "core/engine.ts:863",
+        "lib/bridge/bridge-manager.ts:1139",
+        "server/routes/chat.ts:2538",
+        "core/slash-commands/bridge-commands.ts:197",
+        "core/slash-commands/bridge-commands.ts:196"
+      ],
+      "source_refs": [
+        "core/slash-commands/bridge-commands.ts:196"
+      ],
+      "user_action": "发送 /fresh-compact",
+      "success_result": "刷新提示词和记忆后压缩，回传 token 变化或原因",
+      "refusal_or_boundary": "接管态拒绝；失败明确回报且原始历史保留",
+      "branch_variants": [
+        "Bridge 与桌面共享 dispatcher；反馈通道分别断言"
+      ],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R03-A01",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R03-A02",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A07",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A08",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A13",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A14",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "发送 /fresh-compact",
+        "then": "刷新提示词和记忆后压缩，回传 token 变化或原因",
+        "assertions": [
+          "刷新提示词和记忆后压缩，回传 token 变化或原因",
+          "接管态拒绝；失败明确回报且原始历史保留"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "core/slash-commands/bridge-commands.ts": "b485c9c6f8407f74d33b54b949229bdb7a167dedf9a22e6f5294194ffe1a8764",
+        "core/slash-commands/index.ts": "3abe601fb5c277ebfdf27b3ac898d04b50eed14336f6f45d2209e6e4c30f433c",
+        "core/engine.ts": "fcd97183d19fd4edbf4f16a0ff3d09e2d60d2aabe524089e89f38b09d1135c97",
+        "lib/bridge/bridge-manager.ts": "be2d84920168b9244e83bc3c2485e6f27ab1d92d3ddd1fc86ee8f1b715d99c59",
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D19-SLASH_COMMAND-SLASH-COMMAND-LOOP-125BFE",
+      "entry_id": "slash-command:loop",
+      "kind": "slash_command",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "/loop 启动或管理会话循环任务",
+      "call_chain": [
+        "core/slash-commands/bridge-commands.ts:223",
+        "core/slash-commands/index.ts:25",
+        "core/engine.ts:863",
+        "lib/bridge/bridge-manager.ts:1139",
+        "server/routes/chat.ts:2538",
+        "core/slash-commands/bridge-commands.ts:223",
+        "core/slash-commands/bridge-commands.ts:247"
+      ],
+      "source_refs": [
+        "core/slash-commands/bridge-commands.ts:223",
+        "core/slash-commands/bridge-commands.ts:247"
+      ],
+      "user_action": "发送 /loop 启动或管理循环",
+      "success_result": "start/status/pause/resume/stop 各返回状态并作用于当前会话循环",
+      "refusal_or_boundary": "会话无效、服务未就绪或命令参数错误时不创建循环",
+      "branch_variants": [
+        "Bridge 与桌面共享 dispatcher；反馈通道分别断言"
+      ],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R07-T03",
+        "R07-T07"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R07-A05",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A06",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A13",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A14",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "发送 /loop 启动或管理循环",
+        "then": "start/status/pause/resume/stop 各返回状态并作用于当前会话循环",
+        "assertions": [
+          "start/status/pause/resume/stop 各返回状态并作用于当前会话循环",
+          "会话无效、服务未就绪或命令参数错误时不创建循环"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "core/slash-commands/bridge-commands.ts": "b485c9c6f8407f74d33b54b949229bdb7a167dedf9a22e6f5294194ffe1a8764",
+        "core/slash-commands/index.ts": "3abe601fb5c277ebfdf27b3ac898d04b50eed14336f6f45d2209e6e4c30f433c",
+        "core/engine.ts": "fcd97183d19fd4edbf4f16a0ff3d09e2d60d2aabe524089e89f38b09d1135c97",
+        "lib/bridge/bridge-manager.ts": "be2d84920168b9244e83bc3c2485e6f27ab1d92d3ddd1fc86ee8f1b715d99c59",
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D02-SLASH_COMMAND-SLASH-COMMAND-NEW-485B2D",
+      "entry_id": "slash-command:new",
+      "kind": "slash_command",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "/new 开启新会话",
+      "call_chain": [
+        "core/slash-commands/bridge-commands.ts:25",
+        "core/slash-commands/index.ts:25",
+        "core/engine.ts:863",
+        "lib/bridge/bridge-manager.ts:1139",
+        "server/routes/chat.ts:2538",
+        "core/slash-commands/bridge-commands.ts:25"
+      ],
+      "source_refs": [
+        "core/slash-commands/bridge-commands.ts:25"
+      ],
+      "user_action": "发送 /new",
+      "success_result": "轮换为新会话，旧会话归档；无历史时仍创建新会话",
+      "refusal_or_boundary": "接管态拒绝，未找到当前会话明确提示",
+      "branch_variants": [
+        "Bridge 与桌面共享 dispatcher；反馈通道分别断言"
+      ],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R06-A05",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A06",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A07",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A08",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A13",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A14",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "发送 /new",
+        "then": "轮换为新会话，旧会话归档；无历史时仍创建新会话",
+        "assertions": [
+          "轮换为新会话，旧会话归档；无历史时仍创建新会话",
+          "接管态拒绝，未找到当前会话明确提示"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "core/slash-commands/bridge-commands.ts": "b485c9c6f8407f74d33b54b949229bdb7a167dedf9a22e6f5294194ffe1a8764",
+        "core/slash-commands/index.ts": "3abe601fb5c277ebfdf27b3ac898d04b50eed14336f6f45d2209e6e4c30f433c",
+        "core/engine.ts": "fcd97183d19fd4edbf4f16a0ff3d09e2d60d2aabe524089e89f38b09d1135c97",
+        "lib/bridge/bridge-manager.ts": "be2d84920168b9244e83bc3c2485e6f27ab1d92d3ddd1fc86ee8f1b715d99c59",
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D17-SLASH_COMMAND-SLASH-COMMAND-RC-A220BF",
+      "entry_id": "slash-command:rc",
+      "kind": "slash_command",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "/rc 从 Bridge 私聊接管桌面会话",
+      "call_chain": [
+        "core/slash-commands/bridge-commands.ts:61",
+        "core/slash-commands/index.ts:25",
+        "core/engine.ts:863",
+        "lib/bridge/bridge-manager.ts:1139",
+        "server/routes/chat.ts:2538",
+        "core/slash-commands/bridge-commands.ts:61",
+        "lib/bridge/bridge-manager.ts:1139"
+      ],
+      "source_refs": [
+        "core/slash-commands/bridge-commands.ts:61",
+        "lib/bridge/bridge-manager.ts:1139"
+      ],
+      "user_action": "在 Bridge 私聊发送 /rc 并选编号",
+      "success_result": "列出同 Agent 可接管的最近桌面会话；选择后接管并通知桌面",
+      "refusal_or_boundary": "群聊、桌面来源、已接管、无可用会话及五分钟超时均不建立接管",
+      "branch_variants": [
+        "Bridge 与桌面共享 dispatcher；反馈通道分别断言"
+      ],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R07-T02"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R07-A03",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A04",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "在 Bridge 私聊发送 /rc 并选编号",
+        "then": "列出同 Agent 可接管的最近桌面会话；选择后接管并通知桌面",
+        "assertions": [
+          "列出同 Agent 可接管的最近桌面会话；选择后接管并通知桌面",
+          "群聊、桌面来源、已接管、无可用会话及五分钟超时均不建立接管"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "core/slash-commands/bridge-commands.ts": "b485c9c6f8407f74d33b54b949229bdb7a167dedf9a22e6f5294194ffe1a8764",
+        "core/slash-commands/index.ts": "3abe601fb5c277ebfdf27b3ac898d04b50eed14336f6f45d2209e6e4c30f433c",
+        "core/engine.ts": "fcd97183d19fd4edbf4f16a0ff3d09e2d60d2aabe524089e89f38b09d1135c97",
+        "lib/bridge/bridge-manager.ts": "be2d84920168b9244e83bc3c2485e6f27ab1d92d3ddd1fc86ee8f1b715d99c59",
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D04-SLASH_COMMAND-SLASH-COMMAND-REJECT-CD1524",
+      "entry_id": "slash-command:reject",
+      "kind": "slash_command",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "/reject 拒绝待处理请求",
+      "call_chain": [
+        "core/slash-commands/bridge-commands.ts:158",
+        "core/slash-commands/index.ts:25",
+        "core/engine.ts:863",
+        "lib/bridge/bridge-manager.ts:1139",
+        "server/routes/chat.ts:2538",
+        "core/slash-commands/bridge-commands.ts:159",
+        "core/slash-commands/bridge-commands.ts:158",
+        "core/slash-commands/bridge-commands.ts:304"
+      ],
+      "source_refs": [
+        "core/slash-commands/bridge-commands.ts:158",
+        "core/slash-commands/bridge-commands.ts:304"
+      ],
+      "user_action": "发送 /reject 加确认 ID",
+      "success_result": "ConfirmStore 标为 rejected，回复已取消并广播；原待批动作不执行",
+      "refusal_or_boundary": "ID 缺失/已处理不再次决策；Bridge 权限与反馈单独核查",
+      "branch_variants": [
+        "Bridge 与桌面共享 dispatcher；反馈通道分别断言"
+      ],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R04-A05",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R04-A06",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R04-A11",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R04-A12",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "发送 /reject 加确认 ID",
+        "then": "ConfirmStore 标为 rejected，回复已取消并广播；原待批动作不执行",
+        "assertions": [
+          "ConfirmStore 标为 rejected，回复已取消并广播；原待批动作不执行",
+          "ID 缺失/已处理不再次决策；Bridge 权限与反馈单独核查"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "core/slash-commands/bridge-commands.ts": "b485c9c6f8407f74d33b54b949229bdb7a167dedf9a22e6f5294194ffe1a8764",
+        "core/slash-commands/index.ts": "3abe601fb5c277ebfdf27b3ac898d04b50eed14336f6f45d2209e6e4c30f433c",
+        "core/engine.ts": "fcd97183d19fd4edbf4f16a0ff3d09e2d60d2aabe524089e89f38b09d1135c97",
+        "lib/bridge/bridge-manager.ts": "be2d84920168b9244e83bc3c2485e6f27ab1d92d3ddd1fc86ee8f1b715d99c59",
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D02-SLASH_COMMAND-SLASH-COMMAND-RESET-3FCB25",
+      "entry_id": "slash-command:reset",
+      "kind": "slash_command",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "/reset 重置会话",
+      "call_chain": [
+        "core/slash-commands/bridge-commands.ts:43",
+        "core/slash-commands/index.ts:25",
+        "core/engine.ts:863",
+        "lib/bridge/bridge-manager.ts:1139",
+        "server/routes/chat.ts:2538",
+        "core/slash-commands/bridge-commands.ts:44",
+        "core/slash-commands/bridge-commands.ts:43"
+      ],
+      "source_refs": [
+        "core/slash-commands/bridge-commands.ts:43"
+      ],
+      "user_action": "发送 /reset",
+      "success_result": "删除当前会话历史并提示已清除",
+      "refusal_or_boundary": "接管态拒绝；未找到时不删除其他会话",
+      "branch_variants": [
+        "Bridge 与桌面共享 dispatcher；反馈通道分别断言"
+      ],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R06-A05",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A06",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A07",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A08",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A13",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A14",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "发送 /reset",
+        "then": "删除当前会话历史并提示已清除",
+        "assertions": [
+          "删除当前会话历史并提示已清除",
+          "接管态拒绝；未找到时不删除其他会话"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "core/slash-commands/bridge-commands.ts": "b485c9c6f8407f74d33b54b949229bdb7a167dedf9a22e6f5294194ffe1a8764",
+        "core/slash-commands/index.ts": "3abe601fb5c277ebfdf27b3ac898d04b50eed14336f6f45d2209e6e4c30f433c",
+        "core/engine.ts": "fcd97183d19fd4edbf4f16a0ff3d09e2d60d2aabe524089e89f38b09d1135c97",
+        "lib/bridge/bridge-manager.ts": "be2d84920168b9244e83bc3c2485e6f27ab1d92d3ddd1fc86ee8f1b715d99c59",
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D01-SLASH_COMMAND-SLASH-COMMAND-STOP-4EA88B",
+      "entry_id": "slash-command:stop",
+      "kind": "slash_command",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "/stop 中止当前回复",
+      "call_chain": [
+        "core/slash-commands/bridge-commands.ts:8",
+        "core/slash-commands/index.ts:25",
+        "core/engine.ts:863",
+        "lib/bridge/bridge-manager.ts:1139",
+        "server/routes/chat.ts:2538",
+        "core/slash-commands/bridge-commands.ts:9",
+        "core/slash-commands/bridge-commands.ts:9",
+        "core/slash-commands/bridge-commands.ts:8"
+      ],
+      "source_refs": [
+        "core/slash-commands/bridge-commands.ts:8"
+      ],
+      "user_action": "发送 /stop",
+      "success_result": "当前流中止；无活动流时返回已停止提示",
+      "refusal_or_boundary": "接管态仅中止被接管桌面会话，不误停 Bridge 自身其他会话",
+      "branch_variants": [
+        "Bridge 与桌面共享 dispatcher；反馈通道分别断言"
+      ],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R03-A01",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R03-A02",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A07",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A08",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A13",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A14",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "发送 /stop",
+        "then": "当前流中止；无活动流时返回已停止提示",
+        "assertions": [
+          "当前流中止；无活动流时返回已停止提示",
+          "接管态仅中止被接管桌面会话，不误停 Bridge 自身其他会话"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "core/slash-commands/bridge-commands.ts": "b485c9c6f8407f74d33b54b949229bdb7a167dedf9a22e6f5294194ffe1a8764",
+        "core/slash-commands/index.ts": "3abe601fb5c277ebfdf27b3ac898d04b50eed14336f6f45d2209e6e4c30f433c",
+        "core/engine.ts": "fcd97183d19fd4edbf4f16a0ff3d09e2d60d2aabe524089e89f38b09d1135c97",
+        "lib/bridge/bridge-manager.ts": "be2d84920168b9244e83bc3c2485e6f27ab1d92d3ddd1fc86ee8f1b715d99c59",
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D01-WS_IN-WS-IN-ABORT-7CBF6F",
+      "entry_id": "ws-in:abort",
+      "kind": "ws_in",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "WS abort",
+      "call_chain": [
+        "server/routes/chat.ts:2367",
+        "server/routes/chat.ts:2367",
+        "server/routes/chat.ts:2390"
+      ],
+      "source_refs": [
+        "server/routes/chat.ts:2367",
+        "server/routes/chat.ts:2390"
+      ],
+      "user_action": "点击停止当前回复",
+      "success_result": "已接收中止返回 abort_result accepted；排队提交停止后 UI 立即恢复空闲",
+      "refusal_or_boundary": "旧 streamId 返回 stale_stream 且不取消新流；无活动任务为 already_stopped",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R03-A01",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R03-A02",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A07",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A08",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A13",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A14",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "点击停止当前回复",
+        "then": "已接收中止返回 abort_result accepted；排队提交停止后 UI 立即恢复空闲",
+        "assertions": [
+          "已接收中止返回 abort_result accepted；排队提交停止后 UI 立即恢复空闲",
+          "旧 streamId 返回 stale_stream 且不取消新流；无活动任务为 already_stopped"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D01-WS_IN-WS-IN-COMPACT-421EEA",
+      "entry_id": "ws-in:compact",
+      "kind": "ws_in",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "WS compact",
+      "call_chain": [
+        "server/routes/chat.ts:2572",
+        "server/routes/chat.ts:2572",
+        "shared/compaction-mode.ts:1"
+      ],
+      "source_refs": [
+        "server/routes/chat.ts:2572",
+        "shared/compaction-mode.ts:1"
+      ],
+      "user_action": "在界面请求压缩上下文",
+      "success_result": "先回 compaction_accepted，再按实际结果回 succeeded/noop/failed",
+      "refusal_or_boundary": "未知 method、实验关闭、会话不存在/正在流式时明确失败，不能改历史",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R03-A01",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R03-A02",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A07",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A08",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A13",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A14",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "在界面请求压缩上下文",
+        "then": "先回 compaction_accepted，再按实际结果回 succeeded/noop/failed",
+        "assertions": [
+          "先回 compaction_accepted，再按实际结果回 succeeded/noop/failed",
+          "未知 method、实验关闭、会话不存在/正在流式时明确失败，不能改历史"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87",
+        "shared/compaction-mode.ts": "2acbf3ceb9304ff3419fb9e30e6b70dd495d56683548d4c9585d1e37b1e5de24"
+      }
+    },
+    {
+      "original_feature_id": "F-D22-WS_IN-WS-IN-CONTEXT-USAGE-4D1720",
+      "entry_id": "ws-in:context_usage",
+      "kind": "ws_in",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "WS context_usage",
+      "call_chain": [
+        "server/routes/chat.ts:2512",
+        "server/routes/chat.ts:2512"
+      ],
+      "source_refs": [
+        "server/routes/chat.ts:2512"
+      ],
+      "user_action": "查看当前会话上下文用量",
+      "success_result": "返回 tokens、contextWindow、percent 及可选 breakdown 供界面展示",
+      "refusal_or_boundary": "无数据返回 null 而非实际 0；越权会话不泄露用量",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R05-T07",
+        "R07-T10"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R05-A13",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R05-A14",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A19",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R07-A20",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "查看当前会话上下文用量",
+        "then": "返回 tokens、contextWindow、percent 及可选 breakdown 供界面展示",
+        "assertions": [
+          "返回 tokens、contextWindow、percent 及可选 breakdown 供界面展示",
+          "无数据返回 null 而非实际 0；越权会话不泄露用量"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D01-WS_IN-WS-IN-INTERJECT-92620B",
+      "entry_id": "ws-in:interject",
+      "kind": "ws_in",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "WS interject",
+      "call_chain": [
+        "server/routes/chat.ts:2678",
+        "server/routes/chat.ts:2678"
+      ],
+      "source_refs": [
+        "server/routes/chat.ts:2678"
+      ],
+      "user_action": "回复流中追加输入",
+      "success_result": "经会话授权和媒体校验后走插入队列/打断策略，收到输入回执和新回复",
+      "refusal_or_boundary": "媒体超限/不支持、会话身份无效时拒绝且不写空消息",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R03-A01",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R03-A02",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A07",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A08",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A13",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A14",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "回复流中追加输入",
+        "then": "经会话授权和媒体校验后走插入队列/打断策略，收到输入回执和新回复",
+        "assertions": [
+          "经会话授权和媒体校验后走插入队列/打断策略，收到输入回执和新回复",
+          "媒体超限/不支持、会话身份无效时拒绝且不写空消息"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D01-WS_IN-WS-IN-PROMPT-D483E4",
+      "entry_id": "ws-in:prompt",
+      "kind": "ws_in",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "WS prompt",
+      "call_chain": [
+        "server/routes/chat.ts:2678",
+        "server/routes/chat.ts:2678"
+      ],
+      "source_refs": [
+        "server/routes/chat.ts:2678"
+      ],
+      "user_action": "提交聊天内容或技能/媒体",
+      "success_result": "经授权进入会话 Run，流式返回阶段、工具和最终回复",
+      "refusal_or_boundary": "空内容不提交；图片数量/大小/格式不合法时发送类型化拒绝回执",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R03-A01",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R03-A02",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A07",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A08",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A13",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A14",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "提交聊天内容或技能/媒体",
+        "then": "经授权进入会话 Run，流式返回阶段、工具和最终回复",
+        "assertions": [
+          "经授权进入会话 Run，流式返回阶段、工具和最终回复",
+          "空内容不提交；图片数量/大小/格式不合法时发送类型化拒绝回执"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D01-WS_IN-WS-IN-RESUME-STREAM-816642",
+      "entry_id": "ws-in:resume_stream",
+      "kind": "ws_in",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "WS resume_stream",
+      "call_chain": [
+        "server/routes/chat.ts:2464",
+        "server/routes/chat.ts:2464"
+      ],
+      "source_refs": [
+        "server/routes/chat.ts:2464"
+      ],
+      "user_action": "切回正在回复的会话",
+      "success_result": "按 streamId/sinceSeq 补发遗漏事件和重置/截断标记",
+      "refusal_or_boundary": "无活动流返回空事件与运行态；越权会话不泄露旧帧",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R03-A01",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R03-A02",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A07",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A08",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A13",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A14",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "切回正在回复的会话",
+        "then": "按 streamId/sinceSeq 补发遗漏事件和重置/截断标记",
+        "assertions": [
+          "按 streamId/sinceSeq 补发遗漏事件和重置/截断标记",
+          "无活动流返回空事件与运行态；越权会话不泄露旧帧"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D01-WS_IN-WS-IN-SLASH-2FAA74",
+      "entry_id": "ws-in:slash",
+      "kind": "ws_in",
+      "decision": "SUPPORT",
+      "semantic_identity": "WS slash",
+      "call_chain": [
+        "server/routes/chat.ts:2531",
+        "server/routes/chat.ts:2531"
+      ],
+      "source_refs": [
+        "server/routes/chat.ts:2531"
+      ],
+      "user_action": "在桌面输入斜杠命令",
+      "success_result": "把命令交给同一 slash dispatcher 并以 slash_result 显示",
+      "refusal_or_boundary": "未知命令回错误；Agent 身份无法解析或系统未就绪时拒绝",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [
+        "F-D01-SLASH_COMMAND-SLASH-COMMAND-STOP-4EA88B",
+        "F-D02-SLASH_COMMAND-SLASH-COMMAND-NEW-485B2D",
+        "F-D02-SLASH_COMMAND-SLASH-COMMAND-RESET-3FCB25",
+        "F-D17-SLASH_COMMAND-SLASH-COMMAND-RC-A220BF",
+        "F-D17-SLASH_COMMAND-SLASH-COMMAND-EXITRC-A99369",
+        "F-D18-SLASH_COMMAND-SLASH-COMMAND-APPLY-5F394A",
+        "F-D04-SLASH_COMMAND-SLASH-COMMAND-CONFIRM-75C0AE",
+        "F-D04-SLASH_COMMAND-SLASH-COMMAND-REJECT-CD1524",
+        "F-D01-SLASH_COMMAND-SLASH-COMMAND-COMPACT-0FE8BE",
+        "F-D01-SLASH_COMMAND-SLASH-COMMAND-FRESH-COMPACT-5A6E0D",
+        "F-D19-SLASH_COMMAND-SLASH-COMMAND-LOOP-125BFE"
+      ],
+      "task_ids": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R03-A01",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R03-A02",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A07",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A08",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A13",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A14",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "在桌面输入斜杠命令",
+        "then": "把命令交给同一 slash dispatcher 并以 slash_result 显示",
+        "assertions": [
+          "把命令交给同一 slash dispatcher 并以 slash_result 显示",
+          "未知命令回错误；Agent 身份无法解析或系统未就绪时拒绝"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D01-WS_IN-WS-IN-STEER-C1FB9C",
+      "entry_id": "ws-in:steer",
+      "kind": "ws_in",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "WS steer",
+      "call_chain": [
+        "server/routes/chat.ts:2445",
+        "server/routes/chat.ts:2445"
+      ],
+      "source_refs": [
+        "server/routes/chat.ts:2445"
+      ],
+      "user_action": "在回复中追加指令",
+      "success_result": "活动流被 steer 后收到 steered；流已停则作为普通 prompt 提交",
+      "refusal_or_boundary": "已删除 Agent 或未获会话权限时拒绝，不能混入别人的流",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R03-A01",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R03-A02",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A07",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A08",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A13",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R08-A14",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "在回复中追加指令",
+        "then": "活动流被 steer 后收到 steered；流已停则作为普通 prompt 提交",
+        "assertions": [
+          "活动流被 steer 后收到 steered；流已停则作为普通 prompt 提交",
+          "已删除 Agent 或未获会话权限时拒绝，不能混入别人的流"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D05-WS_IN-WS-IN-SUBAGENT-STOP-REQUEST-857747",
+      "entry_id": "ws-in:subagent_stop_request",
+      "kind": "ws_in",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "WS subagent_stop_request",
+      "call_chain": [
+        "server/routes/chat.ts:2353",
+        "server/routes/chat.ts:2353"
+      ],
+      "source_refs": [
+        "server/routes/chat.ts:2353"
+      ],
+      "user_action": "停止本会话子代理任务",
+      "success_result": "按 taskId 与所属会话停止任务，返回 subagent_stop_result",
+      "refusal_or_boundary": "他人任务或失效会话被拒绝，不终止无关任务",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [
+        "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHAT-TASK-TASKID-ABORT-POST-B47CAC"
+      ],
+      "task_ids": [
+        "R03-T03",
+        "R03-T06",
+        "R06-T03"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R03-A05",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R03-A06",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R03-A11",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R03-A12",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A05",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A06",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "停止本会话子代理任务",
+        "then": "按 taskId 与所属会话停止任务，返回 subagent_stop_result",
+        "assertions": [
+          "按 taskId 与所属会话停止任务，返回 subagent_stop_result",
+          "他人任务或失效会话被拒绝，不终止无关任务"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D13-WS_IN-WS-IN-TERMINAL-CLOSE-REQUEST-CFD9F0",
+      "entry_id": "ws-in:terminal_close_request",
+      "kind": "ws_in",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "WS terminal_close_request",
+      "call_chain": [
+        "server/routes/chat.ts:2310",
+        "server/routes/chat.ts:2310"
+      ],
+      "source_refs": [
+        "server/routes/chat.ts:2310"
+      ],
+      "user_action": "关闭会话终端",
+      "success_result": "终止指定 terminalId 并返回 killed 或 already_stopped",
+      "refusal_or_boundary": "终端管理器不可用/ID不匹配返回 rejected，不谎报已停止",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R04-T05"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R04-A09",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R04-A10",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "关闭会话终端",
+        "then": "终止指定 terminalId 并返回 killed 或 already_stopped",
+        "assertions": [
+          "终止指定 terminalId 并返回 killed 或 already_stopped",
+          "终端管理器不可用/ID不匹配返回 rejected，不谎报已停止"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D13-WS_IN-WS-IN-TERMINAL-SNAPSHOT-REQUEST-CE6906",
+      "entry_id": "ws-in:terminal_snapshot_request",
+      "kind": "ws_in",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "WS terminal_snapshot_request",
+      "call_chain": [
+        "server/routes/chat.ts:2294",
+        "server/routes/chat.ts:2294"
+      ],
+      "source_refs": [
+        "server/routes/chat.ts:2294"
+      ],
+      "user_action": "打开终端查看当前输出",
+      "success_result": "通过 terminalWsBridge 送当前终端快照",
+      "refusal_or_boundary": "会话身份不符时拒绝，不送他人终端内容",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R04-T05"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R04-A09",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R04-A10",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "打开终端查看当前输出",
+        "then": "通过 terminalWsBridge 送当前终端快照",
+        "assertions": [
+          "通过 terminalWsBridge 送当前终端快照",
+          "会话身份不符时拒绝，不送他人终端内容"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    },
+    {
+      "original_feature_id": "F-D13-WS_IN-WS-IN-TERMINAL-TAIL-REQUEST-4C35E6",
+      "entry_id": "ws-in:terminal_tail_request",
+      "kind": "ws_in",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "WS terminal_tail_request",
+      "call_chain": [
+        "server/routes/chat.ts:2300",
+        "server/routes/chat.ts:2300"
+      ],
+      "source_refs": [
+        "server/routes/chat.ts:2300"
+      ],
+      "user_action": "继续读取终端输出",
+      "success_result": "按 terminalId/sinceSeq 返回后续输出",
+      "refusal_or_boundary": "无权会话或不匹配终端拒绝，不接续错误进程",
+      "branch_variants": [],
+      "variant_group": null,
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R04-T05"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R04-A09",
+          "fit": "GAP",
+          "reason": "该旧场景没有直接操作并检查此入口的具体结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R04-A10",
+          "fit": "INDIRECT",
+          "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "继续读取终端输出",
+        "then": "按 terminalId/sinceSeq 返回后续输出",
+        "assertions": [
+          "按 terminalId/sinceSeq 返回后续输出",
+          "无权会话或不匹配终端拒绝，不接续错误进程"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "当前 TypeScript 产品源码静态取证；Rust/Tauri 结果仍待实施阶段执行"
+      ],
+      "reviewed_source_sha256": {
+        "server/routes/chat.ts": "43316a7cd28a16f0d948cc5c85ae059c809676dfef635c7667c39c229bed1b87"
+      }
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { lingxiFetch, lingxiUrl } from '../../hooks/use-hana-fetch';
+import { lingxiFetch, lingxiUrl } from '../../services/service-client';
 
 export interface KnowledgeModelRefDto {
   id: string;

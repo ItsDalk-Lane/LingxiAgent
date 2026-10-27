@@ -1,0 +1,22 @@
+{
+ "stage": "R07-T06",
+ "purpose": "development_not_final_acceptance",
+ "command": "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-adapters",
+ "environment": {
+  "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+  "CARGO_BUILD_JOBS": "4",
+  "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+  "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+ },
+ "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+ "sourceFingerprintBefore": "a105285987831147fa2bf34f2d4c60848ce945fce015a72a583ac3d7c8eb1ffa",
+ "sourceFingerprintAfter": "a105285987831147fa2bf34f2d4c60848ce945fce015a72a583ac3d7c8eb1ffa",
+ "exitCode": 101,
+ "logSha256": "5984f92e766da8b6215b8d9c1c39c16cf795f2aab7b81f8061137a2b99b35c44",
+ "sourceUnchanged": true,
+ "versionBinding": {
+  "workspace": "rust/Cargo.toml",
+  "locked": true
+ },
+ "finishedAtUnixMs": 1792131347496
+}

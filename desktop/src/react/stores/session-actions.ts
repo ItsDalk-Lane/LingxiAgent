@@ -8,9 +8,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- store partial patch + API 响应 JSON */
 
 import { useStore } from './index';
-import { appendConnectionAuth, buildConnectionUrl, type ServerConnection } from '../services/server-connection';
+import { captureSessionConnection, ownsSessionConnection, sessionOwnerFetch } from '../services/session-connection-owner';
+import { readRustChatHistory, projectRustHistoryItems } from '../services/rust-chat-history';
+import { refreshRustMediaJobs } from '../services/rust-media';
+import { refreshRustAgentActivities } from '../services/rust-agent-activities';
+import { readLoopRuntimeError, warnLoopRuntimeError } from '../services/loop-runtime-error';
+import { appendConnectionAuth, buildConnectionUrl, resolveServerConnection, type ServerConnection } from '../services/server-connection';
 import { sessionScopedKey, sessionScopedListIncludes, sessionScopedValue } from './session-slice';
 import { lingxiFetch, lingxiUrl } from '../hooks/use-hana-fetch';
+import { getDesktopHost } from '../host/desktop-host';
 import {
   conditionalMessagesFetch,
   hasMessagesValidationRecord,
@@ -42,6 +48,27 @@ import { findPrimaryAgent, resolveAgentWorkspace } from '../utils/agent-workspac
 let _switchVersion = 0;
 let _switchAbortController: AbortController | null = null;
 let _pendingDraftSequence = 0;
+let nativeListVersion = 0;
+function captureNativeSessionConnection() {
+  return resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service'
+    ? captureSessionConnection() : null;
+}
+
+/**
+ * 置顶时间戳的线上形状归一（R08-C①）：旧 Node 栈投影给 ISO 字符串
+ * pinnedAt；Rust 列表投影给数字 pinnedAt（Unix 毫秒）、pin 响应给
+ * pinnedAtUnixMs。store/组件层（session-sections/SessionList/ws 合并）统一
+ * 消费 string|null，所以在唯一边界（列表映射与 pin 响应）把数字归一为
+ * ISO 字符串——两种内核写入 store 的形状自此一致。
+ */
+function pinnedAtFromWire(value: unknown): string | null {
+  if (typeof value === 'string' && value.length > 0) return value;
+  if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
+    return new Date(value).toISOString();
+  }
+  return null;
+}
+
 
 export interface SessionRef {
   sessionId: string;
@@ -153,7 +180,7 @@ export interface SessionHistoryEvidencePage {
   hasMore: boolean;
   oldestId?: string;
   reconciliation?: {sessionId: string; sessionPath: string; complete: boolean; snapshotId: string;
-    runRevision: number; runStatus: 'running' | 'reconciled_idle' | 'unknown'};
+    runRevision: number | string; runStatus: 'running' | 'reconciled_idle' | 'unknown'};
 }
 /** 只读对账：认证/URL取自捕获连接，不水合编辑器、文件列表或当前会话。 */
 export async function fetchSessionHistoryPage(
@@ -161,6 +188,18 @@ export async function fetchSessionHistoryPage(
   sessionRef: {sessionId: string; sessionPath: string},
   options: {before?: string; signal: AbortSignal},
 ): Promise<SessionHistoryEvidencePage> {
+  if (connection.serverNodeKind === 'lingxi-service') {
+    const { readRustChatHistory } = await import('../services/rust-chat-history');
+    // 协调证明要求覆盖完整分支；不把半页 unknown 冒称空闲。
+    const page = await readRustChatHistory(connection, sessionRef.sessionId, {all:true,reconciliation:true,signal:options.signal});
+    if (page.notModified === true) throw new Error('reconciliation cannot use a cached 304');
+    if (sessionRef.sessionPath !== `native:${sessionRef.sessionId}`) throw new Error('reconciliation requires the canonical session locator');
+    return {messages:page.rawItems.flatMap(value=>{
+      if (!value || typeof value !== 'object' || (value as {kind?:unknown}).kind !== 'user_message') return [];
+      const row=value as {messageId:string;legacyFields?:{clientMessageId?:string;snapshotVersion?:number}};
+      return [{id:row.messageId,sourceEntryId:row.messageId,role:'user',clientMessageId:row.legacyFields?.clientMessageId,snapshotVersion:row.legacyFields?.snapshotVersion}];
+    }),hasMore:false,reconciliation:page.reconciliation};
+  }
   const params = new URLSearchParams({sessionId:sessionRef.sessionId,path:sessionRef.sessionPath,reconciliation:'1'});
   if (options.before) params.set('before', options.before);
   const response = await fetch(buildConnectionUrl(connection, `/api/sessions/messages?${params}`), {
@@ -235,7 +274,11 @@ function isAbortError(err: unknown): boolean {
 }
 
 function isDesktopShell(): boolean {
-  return typeof window !== 'undefined' && !!(window as unknown as { hana?: unknown }).hana;
+  // R08-T02：经宿主边界判断原生桌面壳（宿主 kind），不再直读 window.hana。
+  // R09-T01：Tauri 宿主与 Electron 同属原生桌面壳（输入焦点恢复等行为一致）。
+  if (typeof window === 'undefined') return false;
+  const kind = getDesktopHost().kind;
+  return kind === 'electron' || kind === 'tauri';
 }
 
 function shouldRestoreInputFocus(path: string | null): boolean {
@@ -414,6 +457,28 @@ export async function loadMessages(
 ): Promise<void> {
   const targetPath = forPath || useStore.getState().currentSessionPath;
   if (!targetPath) return;
+  const nativeOwner = captureNativeSessionConnection();
+  if (nativeOwner?.connection.serverNodeKind === 'lingxi-service') {
+    const sessionId = targetPath.startsWith('native:') ? targetPath.slice(7)
+      : sessionIdForPathFromState(useStore.getState() as Record<string, any>, targetPath);
+    if (!sessionId) throw new Error('会话身份缺失，无法加载历史');
+    const version = useStore.getState().bumpLoadMessagesVersion(targetPath);
+    const liveVersion = readMessageLiveVersion(targetPath);
+    try {
+      const data = await readRustChatHistory(nativeOwner.connection, sessionId, { all: opts?.all === true });
+      if (!ownsSessionConnection(nativeOwner)
+        || sessionScopedValue(useStore.getState() as Record<string, any>, useStore.getState()._loadMessagesVersion, targetPath) !== version
+        || readMessageLiveVersion(targetPath) !== liveVersion || data.notModified === true) return;
+      useStore.getState().initSession(targetPath, data.items, data.page.hasMore, data.revision, data.page.nextCursor);
+      useStore.setState(state => {
+        const key = sessionScopedKey(state as Record<string, any>, targetPath) || targetPath;
+        return { chatSessions: { ...state.chatSessions, [key]: { ...state.chatSessions[key], nativeRawItems: data.rawItems } } };
+      });
+      if (data.items.length && useStore.getState().currentSessionPath === targetPath) useStore.setState({ welcomeVisible: false });
+      await refreshRustMediaJobs(nativeOwner, sessionId);
+    } catch (error) { if (ownsSessionConnection(nativeOwner)) { console.warn('[session] 历史读取失败，保留当前内容', error); throw error; } }
+    return;
+  }
   console.error('[lm-entry] targetPath=', targetPath.slice(-24), 'preloaded=', !!opts?.preloaded);
   const messageLiveVersionBefore = readMessageLiveVersion(targetPath);
   // 捕获 hydrate 前的 live 版本：若 fetch 期间有 tool_end 更新 todos，
@@ -763,6 +828,37 @@ export async function loadMoreMessages(forPath?: string): Promise<void> {
   const session = sessionScopedValue(useStore.getState() as Record<string, any>, useStore.getState().chatSessions, targetPath);
   if (!session || !session.hasMore || session.loadingMore) return;
 
+  const owner = captureNativeSessionConnection();
+  if (owner?.connection.serverNodeKind === 'lingxi-service') {
+    const sessionId = targetPath.startsWith('native:') ? targetPath.slice(7) : sessionIdForPathFromState(useStore.getState() as Record<string, any>, targetPath);
+    if (!sessionId || !session.nextBefore || !Array.isArray(session.nativeRawItems)) throw new Error('历史分页资料缺失，请重新加载此会话');
+    const version = sessionScopedValue(useStore.getState() as Record<string, any>, useStore.getState()._loadMessagesVersion, targetPath);
+    const liveVersion = readMessageLiveVersion(targetPath);
+    useStore.getState().setLoadingMore(targetPath, true);
+    try {
+      const data = await readRustChatHistory(owner.connection, sessionId, { cursor: session.nextBefore });
+      if (!ownsSessionConnection(owner) || data.notModified === true
+        || readMessageLiveVersion(targetPath) !== liveVersion
+        || sessionScopedValue(useStore.getState() as Record<string, any>, useStore.getState()._loadMessagesVersion, targetPath) !== version) return;
+      if (data.revision !== session.revision) { await loadMessages(targetPath); return; }
+      const rawItems = [...data.rawItems, ...session.nativeRawItems];
+      const items = projectRustHistoryItems(rawItems, sessionId);
+      useStore.getState().initSession(targetPath, items, data.page.hasMore, data.revision, data.page.nextCursor);
+      useStore.setState(state => {
+        const key = sessionScopedKey(state as Record<string, any>, targetPath) || targetPath;
+        return { chatSessions: { ...state.chatSessions, [key]: { ...state.chatSessions[key], nativeRawItems: rawItems } } };
+      });
+      await refreshRustMediaJobs(owner, sessionId);
+    } catch (error) {
+      if (ownsSessionConnection(owner)) {
+        console.warn('[session] 历史翻页失败，保留已加载内容', error);
+        useStore.getState().addToast(presentError(error).text, 'error');
+      }
+    } finally {
+      if (ownsSessionConnection(owner) && sessionScopedValue(useStore.getState() as Record<string, any>, useStore.getState()._loadMessagesVersion, targetPath) === version) useStore.getState().setLoadingMore(targetPath, false);
+    }
+    return;
+  }
   useStore.getState().setLoadingMore(targetPath, true);
   try {
     // 游标（F1）：优先服务端 nextBefore；旧服务端回退 oldestId（hydrate 时已按
@@ -911,12 +1007,18 @@ export async function loadSessions(): Promise<void> {
   // 第一个 lingxiFetch 调用——调用方/测试对"/api/sessions 是这次加载的第一个
   // 请求"这个顺序有既有假设），紧接着不等待地发起 /api/health 探测：两个请求
   // 仍然背靠背同时打到网络上，只是调用顺序固定，不会因为并行而变得不确定。
-  const sessionsFetchPromise = lingxiFetch('/api/sessions');
-  const metaRecoveryPromise = fetchSessionMetaRecoveryStatus();
+  const owner = captureNativeSessionConnection();
+  const native = owner?.connection.serverNodeKind === 'lingxi-service';
+  const version = native ? ++nativeListVersion : 0;
+  const sessionsFetchPromise = native ? sessionOwnerFetch(owner, '/lingxi/v1/sessions/studio-list') : lingxiFetch('/api/sessions');
+  const metaRecoveryPromise = native ? Promise.resolve(null) : fetchSessionMetaRecoveryStatus();
   try {
     const res = await sessionsFetchPromise;
     const data = await res.json();
-    const serverSessions = Array.isArray(data) ? data.map(normalizeServerSessionProjection) : [];
+    if (native && (!ownsSessionConnection(owner) || version !== nativeListVersion)) return;
+    if (native && (!data || !Array.isArray(data.sessions) || data.sessions.some((item: any) => !item || typeof item.sessionId !== 'string' || item.path !== `native:${item.sessionId}` || typeof item.revision !== 'string'))) throw new Error('会话列表格式无效，已保留原列表');
+    const rows = native ? data.sessions.map((item: any) => ({ ...item, revision: JSON.stringify(item.revision), modified: typeof item.modified === 'number' ? new Date(item.modified).toISOString() : null, pinnedAt: pinnedAtFromWire(item.pinnedAt) })) : data;
+    const serverSessions = Array.isArray(rows) ? rows.map(normalizeServerSessionProjection) : [];
     const localSessions = useStore.getState().sessions || [];
     const sessions = mergeSessionsWithOptimisticFirstMessages(serverSessions, localSessions);
 
@@ -951,9 +1053,13 @@ export async function loadSessions(): Promise<void> {
         maxTurns: s.loopStatus.maxTurns ?? null,
         pausedReason: s.loopStatus.pausedReason ?? null,
         prompt: s.loopStatus.prompt ?? null,
+        ...(readLoopRuntimeError(s.loopStatus.runtimeError) ? { runtimeError: readLoopRuntimeError(s.loopStatus.runtimeError) } : {}),
       };
     }
     useStore.setState({ loopStatusBySession: nextLoopStatusBySession });
+    for (const [sessionId, loopStatus] of Object.entries(nextLoopStatusBySession)) {
+      warnLoopRuntimeError(sessionId, loopStatus.runtimeError);
+    }
 
     const latest = useStore.getState();
     if (
@@ -970,8 +1076,14 @@ export async function loadSessions(): Promise<void> {
     // reconcile，发送后的 loadSessions 刷新拿到了新 revision 却没有消费者——
     // 「列表说磁盘前进了、缓存永远不追」的缺口在此闭合（issue #1610 桌面端补齐）。
     void reconcileCurrentSessionMessages('sessions_refresh');
-  } catch { /* ignore */ }
-  useStore.getState().setSessionMetaRecovery(await metaRecoveryPromise);
+  } catch (error) {
+    if (native && ownsSessionConnection(owner) && version === nativeListVersion) {
+      console.warn('[session] 会话列表读取失败，保留原列表', error);
+      useStore.getState().addToast(presentError(error).text, 'error');
+    }
+  }
+  const recovery = await metaRecoveryPromise;
+  if (!native || (ownsSessionConnection(owner) && version === nativeListVersion)) useStore.getState().setSessionMetaRecovery(recovery);
 }
 
 /**
@@ -1138,13 +1250,16 @@ export async function switchSession(path: string): Promise<void> {
 
   const abortController = new AbortController();
   _switchAbortController = abortController;
-  const targetSessionId = sessionIdForPathFromState(s as Record<string, any>, path);
+  const targetSessionId = path.startsWith('native:') ? path.slice(7) : sessionIdForPathFromState(s as Record<string, any>, path);
+  const owner = captureNativeSessionConnection();
+  const native = owner?.connection.serverNodeKind === 'lingxi-service';
 
   try {
-    const res = await lingxiFetch('/api/sessions/switch', {
+    const fetcher = native ? (target: string, options: RequestInit) => sessionOwnerFetch(owner!, target, options) : lingxiFetch;
+    const res = await fetcher(native ? '/lingxi/v1/sessions/switch' : '/api/sessions/switch', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+      body: JSON.stringify(native ? { sessionId: targetSessionId } : {
         path,
         ...(targetSessionId ? { sessionId: targetSessionId } : {}),
         currentSessionPath: s.currentSessionPath,
@@ -1152,8 +1267,8 @@ export async function switchSession(path: string): Promise<void> {
       signal: abortController.signal,
     });
     const data = await res.json();
-    if (!isCurrentSwitch(myVersion, path)) return;
-    if (data.error) {
+    if ((native && !ownsSessionConnection(owner)) || !isCurrentSwitch(myVersion, path)) return;
+    if (!res.ok || data.error || (native && (data.sessionId !== targetSessionId || data.path !== path))) {
       // 带上错误码，呈现层才能把它翻成人话；没有码的原生崩溃走兜底文案 + 详情。
       const routeError = normalizeSessionRouteError(data);
       console.error('[session] switch failed:', routeError.message, routeError.code || '');
@@ -1209,13 +1324,18 @@ export async function switchSession(path: string): Promise<void> {
     }
 
     // 在设置 currentSessionPath 之前预加载消息历史。
+    if (native && owner && typeof data.sessionId === 'string') void refreshRustAgentActivities(owner, data.sessionId);
     // 一旦 currentSessionPath 指向新 session，主窗口 WebSocket 会将该 session 的流式事件
     // 路由到 streamBufferManager，触发 bumpMessageLiveVersion，导致 loadMessages 的
     // 竞态守卫跳过 hydrate，store 丢失完整历史。提前加载可避免此竞态。
-    const hasData = !!sessionScopedValue(useStore.getState() as Record<string, any>, useStore.getState().chatSessions, path);
-    if (!hasData) {
+    const cachedMessages = sessionScopedValue(useStore.getState() as Record<string, any>, useStore.getState().chatSessions, path);
+    const hasData = !!cachedMessages;
+    // 原生切换以服务器当前历史修订判断缓存；稳定修订不读，新增回合必须真实恢复。
+    const nativeNeedsReload = native && hasData
+      && (typeof data.historyRevision !== 'string' || cachedMessages.revision !== data.historyRevision || isStreaming);
+    if (!hasData || nativeNeedsReload) {
       await loadMessages(path);
-      if (myVersion !== _switchVersion) return;
+      if (myVersion !== _switchVersion || (native && !ownsSessionConnection(owner))) return;
     }
 
     // 批量更新 store（切 currentSessionPath 切换对话内容；可见 desk/preview 状态由 workspace 激活流程恢复）
@@ -1267,7 +1387,7 @@ export async function switchSession(path: string): Promise<void> {
       workspaceMountId: data.workspaceMountId || null,
       workspaceLabel: data.workspaceLabel || null,
     });
-    if (myVersion !== _switchVersion) return;
+    if (myVersion !== _switchVersion || (native && !ownsSessionConnection(owner))) return;
 
     // 同步浏览器状态到 keyed store（服务端返回当前 session 的 browser 状态）
     if (path) {
@@ -1318,11 +1438,19 @@ export async function switchSession(path: string): Promise<void> {
     }
 
     await requestActiveSessionStreamResume(path, isStreaming);
-    if (myVersion !== _switchVersion) return;
+    if (myVersion !== _switchVersion || (native && !ownsSessionConnection(owner))) return;
 
     // 切换会话后刷新 context ring
     useStore.setState({ contextTokens: null, contextWindow: null, contextPercent: null });
     import('../services/websocket').then(({ getWebSocket, requestTerminalSnapshotForCurrentSession }) => {
+      if (myVersion !== _switchVersion || (native && !ownsSessionConnection(owner))) return;
+      // R08 收尾（D01）：context_usage 与 terminal_snapshot_request 都是旧内核
+      // wire 帧，Rust 不认（close 1008 invalid_message）——Rust 预览下每次会话
+      // 切换都会打断聊天连接（t07 ab run-19 实证 terminal 帧同样非法）。终端
+      // 快照在 Rust 腿由终端域自己的通道承担（D13）；ContextRing 由 rust 分支
+      // 资源事件维护。
+      const rustWire = resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service';
+      if (rustWire) return;
       // 终端快照走会话切换的通用路径：compact 布局不挂 TerminalCard，没人替它发请求。
       // 服务端快照是幂等单播，与 ws 重连 / TerminalCard 挂载时的重复请求不冲突。
       requestTerminalSnapshotForCurrentSession(useStore.getState());
@@ -1342,7 +1470,7 @@ export async function switchSession(path: string): Promise<void> {
     // Restore input focus only if the user is still in the chat surface that initiated the switch.
     requestChatInputFocus(path);
   } catch (err) {
-    if (myVersion !== _switchVersion || isAbortError(err)) return;
+    if (myVersion !== _switchVersion || isAbortError(err) || (native && !ownsSessionConnection(owner))) return;
     useStore.setState((state: Record<string, any>) => (
       state.pendingSessionSwitchPath === path ? { pendingSessionSwitchPath: null } : {}
     ));
@@ -1468,13 +1596,22 @@ function currentPendingSessionDraft(): { body: PendingSessionCreateBody; key: st
 }
 
 async function postPendingSessionCreate(body: PendingSessionCreateBody): Promise<any> {
-  const res = await lingxiFetch('/api/sessions/new-detached', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-    throwOnHttpError: false,
+  const owner = captureNativeSessionConnection();
+  const native = owner?.connection.serverNodeKind === 'lingxi-service';
+  const payload = { ...body };
+  if (native) {
+    // 当前 Rust 焦点入口自行记录创建事实，Node 独立创建专用标记不跨协议传入。
+    delete payload.recordWorkspaceHistory;
+    payload.agentId ||= useStore.getState().currentAgentId;
+  }
+  const res = native ? await sessionOwnerFetch(owner, '/lingxi/v1/sessions/new', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
+  }) : await lingxiFetch('/api/sessions/new-detached', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), throwOnHttpError: false,
   });
-  return res.json();
+  const data = await res.json();
+  if (native && !ownsSessionConnection(owner)) throw new Error('连接已切换，已忽略旧会话创建结果');
+  return data;
 }
 
 function stageDetachedSessionForActivation(data: any, ref: Readonly<SessionRef>, state: Record<string, any>): void {
@@ -1660,6 +1797,8 @@ export async function createNewSession(options: CreateNewSessionOptions = {}): P
 // ══════════════════════════════════════════════════════
 
 export async function ensureSession(expectedPendingDraftId?: string | null): Promise<Readonly<SessionRef> | null> {
+  const owner = captureNativeSessionConnection();
+  const native = owner?.connection.serverNodeKind === 'lingxi-service';
   try {
     const initialState = useStore.getState() as Record<string, any>;
     if (initialState.pendingNewSession !== true) return frozenSessionRefFromState(initialState);
@@ -1669,6 +1808,7 @@ export async function ensureSession(expectedPendingDraftId?: string | null): Pro
     if (expectedPendingDraftId && draftId !== expectedPendingDraftId) return null;
 
     const data = await postPendingSessionCreate(draft.body);
+    if (native && !ownsSessionConnection(owner)) return null;
     // 带上错误码，呈现层才能把它翻成人话；没有码的原生崩溃走兜底文案 + 详情。
     if (data?.error) {
       const routeError = normalizeSessionRouteError(data);
@@ -1686,6 +1826,7 @@ export async function ensureSession(expectedPendingDraftId?: string | null): Pro
     stageDetachedSessionForActivation(data, ref, latestState);
     await switchSession(ref.sessionPath);
     const activated = useStore.getState() as Record<string, any>;
+    if (native && !ownsSessionConnection(owner)) return null;
     if (activated.currentSessionId === ref.sessionId && activated.currentSessionPath === ref.sessionPath) {
       activated.clearDraft?.(HOME_DRAFT_KEY);
       activated.clearDraft?.(ref.sessionId);
@@ -1694,6 +1835,7 @@ export async function ensureSession(expectedPendingDraftId?: string | null): Pro
     }
     return ref;
   } catch (err) {
+    if (native && !ownsSessionConnection(owner)) return null;
     console.error('[session] create failed:', err);
     showSessionCreationError(err);
     return null;
@@ -1708,7 +1850,12 @@ export async function continueDeletedAgentSession(path: string): Promise<boolean
       body: JSON.stringify({ path }),
     });
     const data = await res.json();
-    if (!res.ok || data.error || !data.path) {
+    // R08-C②：响应形状适配——旧栈回 path；Rust 回 sessionId（无 path）。
+    // UI 需要可切换的会话定位符，Rust 会话定位符 = native:<sessionId>。
+    const targetPath = typeof data.path === 'string' && data.path
+      ? data.path
+      : (typeof data.sessionId === 'string' && data.sessionId ? `native:${data.sessionId}` : null);
+    if (!res.ok || data.error || !targetPath) {
       const routeError = normalizeSessionRouteError(data);
       const message = routeError.message || res.statusText || 'continue failed';
       console.error('[session] continue deleted-agent session failed:', message, routeError.code || '');
@@ -1722,7 +1869,7 @@ export async function continueDeletedAgentSession(path: string): Promise<boolean
     }
 
     await loadSessions();
-    await switchSession(data.path);
+    await switchSession(targetPath);
     if (data.compactionError) {
       useStore.getState().addToast(
         `${tr('session.deletedAgent.continueCompactionFailed')}: ${data.compactionError}`,
@@ -1836,7 +1983,13 @@ export async function listArchivedSessions(): Promise<ArchivedSession[]> {
   try {
     const res = await lingxiFetch('/api/sessions/archived');
     if (!res.ok) return [];
-    return await res.json();
+    const data = await res.json();
+    // F-T07-3（2026-10-24 定位）：Rust /lingxi/v1/sessions/archived 返回
+    // {sessions:[…]} 包裹形（旧栈裸数组）——未解包时 UI 归档列表拿到对象，
+    // .some/渲染全断（t10-ab-drill-d04-01 B 腿伪差异 D-6 的真因）。
+    if (Array.isArray(data)) return data;
+    if (data && Array.isArray(data.sessions)) return data.sessions;
+    return [];
   } catch (err) {
     console.error('[archived] list failed:', err);
     return [];
@@ -2053,7 +2206,11 @@ export async function pinSession(path: string, pinned: boolean): Promise<boolean
       return false;
     }
 
-    const pinnedAt = typeof data.pinnedAt === 'string' ? data.pinnedAt : null;
+    // R08-C①：pin 响应形状归一——Rust 回 pinnedAtUnixMs（数字）/旧栈回
+    // pinnedAt（ISO 字符串）；统一经 pinnedAtFromWire 落 store 为 string|null。
+    const pinnedAt = pinned
+      ? pinnedAtFromWire(data.pinnedAtUnixMs ?? data.pinnedAt ?? null)
+      : null;
     const responseSessionId = normalizeSessionId(data.sessionId) || localSessionId;
     const sessions = useStore.getState().sessions.map(s =>
       (responseSessionId && normalizeSessionId(s.sessionId) === responseSessionId) || s.path === path

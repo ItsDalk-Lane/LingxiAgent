@@ -1,0 +1,253 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/mobile/MobileApp.test.tsx (28 tests | 1 failed) 1789ms
+     × uses the Rust auth routes and never enters the old mobile workspace 1016ms
+ ❯ desktop/src/react/__tests__/mobile/R07RustMobileRuntime.test.ts (10 tests | 1 failed) 41ms
+     × 初始化读取正式bootstrap与四scope会话入口，不读取settings权限面 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > uses the Rust auth routes and never enters the old mobile workspace
+TestingLibraryElementError: Unable to find an element with the text: Rust 聊天尚不可用. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main[39m
+      [33mclass[39m=[32m"onboarding"[39m
+    [36m>[39m
+      [36m<form[39m
+        [33mclass[39m=[32m"onboarding-step active"[39m
+      [36m>[39m
+        [36m<img[39m
+          [33malt[39m=[32m""[39m
+          [33mclass[39m=[32m"onboarding-avatar"[39m
+          [33msrc[39m=[32m"./icon.png"[39m
+        [36m/>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"onboarding-title"[39m
+        [36m>[39m
+          [0m手机访问 Hana[0m
+        [36m</h1>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"onboarding-subtitle"[39m
+        [36m>[39m
+          [0m使用桌面端设置的本地账号登录。[0m
+        [36m</p>[39m
+        [36m<div[39m
+          [33maria-label[39m=[32m"登录方式"[39m
+          [33mclass[39m=[32m"provider-grid"[39m
+          [33mrole[39m=[32m"tablist"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-selected[39m=[32m"false"[39m
+            [33mclass[39m=[32m"provider-card"[39m
+            [33mrole[39m=[32m"tab"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0m访问密钥[0m
+          [36m</button>[39m
+          [36m<button[39m
+            [33maria-selected[39m=[32m"true"[39m
+            [33mclass[39m=[32m"provider-card selected"[39m
+            [33mrole[39m=[32m"tab"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0m用户名密码[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<label[39m
+          [33mclass[39m=[32m"custom-field"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"ob-field-label"[39m
+          [36m>[39m
+            [0m用户名[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mautocomplete[39m=[32m"username"[39m
+            [33mclass[39m=[32m"ob-input"[39m
+            [33mspellcheck[39m=[32m"false"[39m
+            [33mvalue[39m=[32m"owner"[39m
+          [36m/>[39m
+        [36m</label>[39m
+        [36m<label[39m
+          [33mclass[39m=[32m"custom-field"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"ob-field-label"[39m
+          [36m>[39m
+            [0m密码[0m
+          [36m</span>[39m
+          [36m<input[39m
+            [33mautocomplete[39m=[32m"current-password"[39m
+            [33mclass[39m=[32m"ob-input"[39m
+            [33mtype[39m=[32m"password"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+        [36m</label>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"onboarding-subtitle"[39m
+        [36m>[39m
+          [0m远程明文链路不接收账号密码。[0m
+        [36m</p>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"ob-status error"[39m
+        [36m>[39m
+          [0munexpected mobile request: http://localhost:3000/lingxi/v1/mobile/bootstrap[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"onboarding-actions"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"ob-btn ob-btn-primary"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mtype[39m=[32m"submit"[39m
+          [36m>[39m
+            [0m登录[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</form>[39m
+    [36m</main>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<html[39m
+  [33mstyle[39m=[32m"--editor-markdown-font-family: var(--font-serif-text, var(--font-serif)); --editor-markdown-font-size: 16px; --editor-markdown-h1-font-size: 28px; --editor-markdown-h2-font-size: 21px; --editor-markdown-h3-font-size: 18px; --editor-markdown-h4-font-size: 16px; --editor-markdown-h5-font-size: 15px; --editor-markdown-h6-font-size: 14px; --editor-markdown-line-height: 1.5; --editor-markdown-content-padding-x: 24px; --editor-markdown-content-width: 720px; --chat-column-width: 720px; --chat-input-column-width: calc(var(--chat-column-width) + var(--chat-input-column-extra)); --chat-message-font-size: 15px;"[39m
+[36m>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"onboarding"[39m
+      [36m>[39m
+        [36m<form[39m
+          [33mclass[39m=[32m"onboarding-step active"[39m
+        [36m>[39m
+          [36m<img[39m
+            [33malt[39m=[32m""[39m
+            [33mclass[39m=[32m"onboarding-avatar"[39m
+            [33msrc[39m=[32m"./icon.png"[39m
+          [36m/>[39m
+          [36m<h1[39m
+            [33mclass[39m=[32m"onboarding-title"[39m
+          [36m>[39m
+            [0m手机访问 Hana[0m
+          [36m</h1>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"onboarding-subtitle"[39m
+          [36m>[39m
+            [0m使用桌面端设置的本地账号登录。[0m
+          [36m</p>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"登录方式"[39m
+            [33mclass[39m=[32m"provider-grid"[39m
+            [33mrole[39m=[32m"tablist"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-selected[39m=[32m"false"[39m
+              [33mclass[39m=[32m"provider-card"[39m
+              [33mrole[39m=[32m"tab"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0m访问密钥[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-selected[39m=[32m"true"[39m
+              [33mclass[39m=[32m"provider-card selected"[39m
+              [33mrole[39m=[32m"tab"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0m用户名密码[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<label[39m
+            [33mclass[39m=[32m"custom-field"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"ob-field-label"[39m
+            [36m>[39m
+              [0m用户名[0m
+            [36m</span>[39m
+            [36m<input[39m
+              [33mautocomplete[39m=[32m"username"[39m
+              [33mclass[39m=[32m"ob-input"[39m
+              [33mspellcheck[39m=[32m"false"[39m
+              [33mvalue[39m=[32m"owner"[39m
+            [36m/>[39m
+          [36m</label>[39m
+          [36m<label[39m
+            [33mclass[39m=[32m"custom-field"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"ob-field-label"[39m
+            [36m>[39m
+              [0m密码[0m
+            [36m</span>[39m
+            [36m<input[39m
+              [33mautocomplete[39m=[32m"current-password"[39m
+              [33mclass[39m=[32m"ob-input"[39m
+              [33mtype[39m=[32m"password"[39m
+              [33mvalue[39m=[32m""[39m
+            [36m/>[39m
+          [36m</label>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"onboarding-subtitle"[39m
+          [36m>[39m
+            [0m远程明文链路不接收账号密码。[0m
+          [36m</p>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"ob-status error"[39m
+          [36m>[39m
+            [0munexpected mobile request: http://localhost:3000/lingxi/v1/mobile/bootstrap[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"onboarding-actions"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"ob-btn ob-btn-primary"[39m
+              [33mdisabled[39m=[32m""[39m
+              [33mtype[39m=[32m"submit"[39m
+            [36m>[39m
+              [0m登录[0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</form>[39m
+      [36m</main>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+ ❯ Proxy.waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ desktop/src/react/__tests__/mobile/MobileApp.test.tsx:268:11
+    266|     fireEvent.click(screen.getByRole('button', { name: '登录' }));
+    267|
+    268|     await waitFor(() => expect(screen.getByText('Rust 聊天尚不可用')).toBeIn…
+       |           ^
+    269|     const loginCall = fetchMock.mock.calls.find(([input]) => String(in…
+    270|     expect(JSON.parse(String(loginCall?.[1]?.body))).toEqual({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  desktop/src/react/__tests__/mobile/R07RustMobileRuntime.test.ts > Rust 手机使用正式聊天上下文 > 初始化读取正式bootstrap与四scope会话入口，不读取settings权限面
+Error: 聊天目标已切换，旧回复已丢弃
+ ❯ Object.response.json desktop/src/react/services/chat-client.ts:78:66
+     76|   response.json = async () => {
+     77|     const value: unknown = await readJson();
+     78|     if (!ownsSelection() || !ownsSessionConnection(owner)) throw new E…
+       |                                                                  ^
+     79|     return projectJson ? projectJson(value) : value;
+     80|   };
+ ❯ loadModels desktop/src/react/utils/ui-helpers.ts:32:18
+ ❯ Module.initializeMobileRuntime desktop/src/react/mobile/mobile-init.ts:257:3
+ ❯ desktop/src/react/__tests__/mobile/R07RustMobileRuntime.test.ts:88:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  2 failed | 36 passed (38)
+   Start at  21:15:49
+   Duration  4.28s (transform 1.20s, setup 26ms, import 1.67s, tests 1.83s, environment 608ms)
+

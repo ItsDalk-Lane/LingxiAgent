@@ -13,6 +13,12 @@ vi.mock('../../hooks/use-hana-fetch', () => ({
 vi.mock('../../services/server-connection', () => ({
   hasServerConnection: () => true,
 }));
+// 本套仍只检查合并草稿和防抖参数；真实连接隔离由原生双服务父测试证明。
+vi.mock('../../services/session-connection-owner', () => ({
+  captureSessionConnection: () => ({ connection: { serverNodeKind: 'legacy' } }),
+  ownsSessionConnection: () => true,
+  sessionOwnerFetch: (_owner: unknown, path: string, options?: RequestInit) => lingxiFetch(path, options),
+}));
 
 const mockFetch = vi.mocked(lingxiFetch);
 

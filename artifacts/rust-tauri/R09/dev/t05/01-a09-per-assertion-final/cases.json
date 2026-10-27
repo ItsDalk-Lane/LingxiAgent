@@ -1,0 +1,879 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t05_browser_pdf",
+ "cases": [
+  {
+   "case": "env::chromium-installed",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "candidates": [
+     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+     "/Applications/Chromium.app/Contents/MacOS/Chromium",
+     "/usr/bin/chromium",
+     "/usr/bin/chromium-browser",
+     "/usr/bin/google-chrome"
+    ],
+    "LINGXI_TEST_CHROMIUM": null
+   }
+  },
+  {
+   "case": "a09::environment-recorded",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "platform": "macos-arm64",
+    "chromePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "chromeVersion": "Google Chrome 155.0.8059.85",
+    "chromeSha256": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d",
+    "rustToolchain": "rustup run 1.98.1",
+    "python": "3.14.3",
+    "node": "v24.16.0",
+    "electronReferenceVersion": "v42.8.1",
+    "isolation": {
+     "LINGXI_HOME": "/private/tmp/lingxi-r09-t05/runtime-a09g/r09_t05_browser_pdf-51388-1793023607552/home",
+     "TMPDIR": "/private/tmp/lingxi-r09-t05/runtime-a09g/r09_t05_browser_pdf-51388-1793023607552/tmp"
+    },
+    "oldChainEnvironment": "独立对照目录/隔离 HOME；旧链不进测试安装",
+    "platformBlocked": [
+     "macos-x64",
+     "windows-x64",
+     "linux-x64"
+    ]
+   }
+  },
+  {
+   "case": "a09::r01-frozen-baseline-verified",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "files": 4,
+    "commit": "15fa0cee3^"
+   }
+  },
+  {
+   "case": "a09::old-chain-baseline-reused-frozen",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "sourceDir": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/old-chain-baseline",
+    "pdfSha256": "10828bf50c38601dcf6de46f45c5ed07a1823c450e25b90ac92f4307578728de",
+    "pageCount": 74,
+    "note": "hash 可复算的冻结基线复用；未启动 Electron"
+   }
+  },
+  {
+   "case": "a09::old-chain-74-pages",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "pageCount": 74
+   }
+  },
+  {
+   "case": "a09::old-chain-reproduction-matches-r01-frozen",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "pageCountFrozen": 74,
+    "pageCountRegenerated": 74,
+    "perPageLumaGridMaxDiff": 0.0,
+    "textLengthFrozen": 91198,
+    "textLengthRegenerated": 91198,
+    "note": "R01 冻结 old probe 来自 git 15fa0cee3^；重生成基线必须逐页一致"
+   }
+  },
+  {
+   "case": "a09::pdf-chromium-7-green",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": {
+     "passed": 7,
+     "failed": 0,
+     "ignored": 0
+    },
+    "serial": true,
+    "note": "MAX_LEASES=2 的进程级 PDF 上限要求 --test-threads=1；默认并行会 PDF_CAPACITY（运行参数问题，非产品缺陷）"
+   }
+  },
+  {
+   "case": "a09::pdf-static-utf8-cleanup-confirmed",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "static_utf8_pdf_is_returned_only_after_confirmed_private_cleanup",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-s1-quality-rendered-real-chromium",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "actual_r01_documents_preserve_fonts_images_pagination_and_js_contract",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-network-canary-zero-hit",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "html_network_frames_and_workers_never_reach_loopback_canary",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-timeout-cancel-cleanup",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "total_deadline_and_explicit_cancel_reap_before_returning_failure",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-broken-assets-explicit-failure",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "broken_background_font_and_unfrozen_stylesheet_are_explicit_failures",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-print-isolates-logged-in-workspace",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "printing_never_switches_or_clears_the_regular_logged_in_workspace",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-lease-scope-and-quota",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "two_auxiliary_leases_are_scoped_and_dropped_future_is_cancelled",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-compare-old-vs-rust-all-pass",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "failed": [],
+    "old": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-per-assertion-final/old-chain/s1-long-zh.pdf",
+    "new": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-per-assertion-final/rust-pdf/r01-quality-51ab708c0e935614cb80bcddc9b115bd/s1-long-zh.pdf"
+   }
+  },
+  {
+   "case": "a09::pdf-compare-page-count-equal-74",
+   "ok": true,
+   "actual": 1,
+   "detail": "old=74 new=74"
+  },
+  {
+   "case": "a09::pdf-compare-no-blank-pages-old",
+   "ok": true,
+   "actual": 1,
+   "detail": "blank pages: []"
+  },
+  {
+   "case": "a09::pdf-compare-no-blank-pages-rust",
+   "ok": true,
+   "actual": 1,
+   "detail": "blank pages: []"
+  },
+  {
+   "case": "a09::pdf-compare-table-rows-old",
+   "ok": true,
+   "actual": 1,
+   "detail": "140/140"
+  },
+  {
+   "case": "a09::pdf-compare-table-rows-rust",
+   "ok": true,
+   "actual": 1,
+   "detail": "140/140"
+  },
+  {
+   "case": "a09::pdf-compare-text-similarity-ge-0.99",
+   "ok": true,
+   "actual": 1,
+   "detail": "normalized ratio=0.99910 len old=87161 new=87148"
+  },
+  {
+   "case": "a09::pdf-compare-visual-grid-le-20",
+   "ok": true,
+   "actual": 1,
+   "detail": "per-page 16x16 luma grid mean|Δ|: max=7.15 mean=6.45 warn>20 (0-255 scale)"
+  },
+  {
+   "case": "a09::pdf-rust-embeds-font-EBGaramond",
+   "ok": true,
+   "actual": 1,
+   "detail": "new fonts=['AAAAAA+NotoSerifSC-Bold', 'ABAAAA+NotoSerifSC-Bold', 'ACAAAA+NotoSerifSC-Regular', 'BAAAAA+NotoSerifSC-Bold', 'BBAAAA+STSongti-SC-Bold', 'BCAAAA+NotoSerifSC-Regular', 'CAAAAA+NotoSerifSC-Bold', 'CBAAAA+NotoSerifSC-Bold']…"
+  },
+  {
+   "case": "a09::pdf-rust-embeds-font-NotoSerifSC",
+   "ok": true,
+   "actual": 1,
+   "detail": "new fonts=['AAAAAA+NotoSerifSC-Bold', 'ABAAAA+NotoSerifSC-Bold', 'ACAAAA+NotoSerifSC-Regular', 'BAAAAA+NotoSerifSC-Bold', 'BBAAAA+STSongti-SC-Bold', 'BCAAAA+NotoSerifSC-Regular', 'CAAAAA+NotoSerifSC-Bold', 'CBAAAA+NotoSerifSC-Bold']…"
+  },
+  {
+   "case": "a09::pdf-rust-embeds-font-JetBrainsMono",
+   "ok": true,
+   "actual": 1,
+   "detail": "new fonts=['AAAAAA+NotoSerifSC-Bold', 'ABAAAA+NotoSerifSC-Bold', 'ACAAAA+NotoSerifSC-Regular', 'BAAAAA+NotoSerifSC-Bold', 'BBAAAA+STSongti-SC-Bold', 'BCAAAA+NotoSerifSC-Regular', 'CAAAAA+NotoSerifSC-Bold', 'CBAAAA+NotoSerifSC-Bold']…"
+  },
+  {
+   "case": "a09::browser-chromium-10-green",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": {
+     "passed": 10,
+     "failed": 0,
+     "ignored": 0
+    },
+    "serial": true,
+    "attempts": [
+     {
+      "attempt": 1,
+      "exitCode": 0,
+      "passed": 10,
+      "failed": 0,
+      "failedTests": [],
+      "log": "r07-browser-chromium-attempt1.log"
+     }
+    ],
+    "note": "默认并行曾出现 cookie-resume/页面分离类真实 Chrome 抖动；串行 + 至多一次重试后全绿，R07 红历史保留"
+   }
+  },
+  {
+   "case": "a09::assertion-tests-8-green",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": {
+     "passed": 8,
+     "failed": 0,
+     "ignored": 0
+    },
+    "serial": true,
+    "target": "rust/crates/lingxi-adapters/tests/r09_t05_assertions.rs"
+   }
+  },
+  {
+   "case": "a09::service-browser-routes-green",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": {
+     "passed": 11,
+     "failed": 0,
+     "ignored": 0
+    }
+   }
+  },
+  {
+   "case": "a09::service-browser-tools-green",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": {
+     "passed": 13,
+     "failed": 0,
+     "ignored": 0
+    }
+   }
+  },
+  {
+   "case": "a09::service-web-tools-green",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": {
+     "passed": 9,
+     "failed": 0,
+     "ignored": 0
+    }
+   }
+  },
+  {
+   "case": "a09::service-office-tools-green",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": {
+     "passed": 15,
+     "failed": 0,
+     "ignored": 0
+    }
+   }
+  },
+  {
+   "case": "a09::service-preview-regression-green",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": {
+     "passed": 5,
+     "failed": 0,
+     "ignored": 0
+    }
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A67D342381C0::a1-tabs-and-active-sync-server-snapshot",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-A67D342381C0",
+    "assertion": 1,
+    "evidenceTests": [
+     "browser_tabs_a1_tab_set_and_active_follow_real_target_changes"
+    ],
+    "assertionSummary": "真实 Chromium target 集合/活动标签逐步同步；服务端快照跟随变化（viewer DOM 投影属 T06）",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A67D342381C0::a2-invalid-tab-and-close-failure-explicit",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-A67D342381C0",
+    "assertion": 2,
+    "evidenceTests": [
+     "browser_tabs_a2_invalid_tab_id_and_close_failure_are_explicit_and_state_unchanged"
+    ],
+    "assertionSummary": "协议非法 tabId→invalid_browser_command 不执行；未知 tab→browser_stale_tab；关闭失败如实报错且状态不变（不得显示已关闭）",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A09B78985A14::a1-emergency-stop-revoke-until-new-user-run",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-A09B78985A14",
+    "assertion": 1,
+    "evidenceTests": [
+     "actual_http_command_replay_changed_input_and_emergency_receipt_never_repeat_external_actions",
+     "new_actual_user_submission_releases_emergency_stop_with_a_new_epoch"
+    ],
+    "assertionSummary": "close-session revoke=true 关闭并撤销授权；旧请求 403；新用户提交产生新 epoch 才释放",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A09B78985A14::a2-no-legacy-local-instance-and-close-failure-visible",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-A09B78985A14",
+    "assertion": 2,
+    "evidenceTests": [
+     "unknown_external_revoke_receipt_never_repeats_the_stop_or_reopens_content"
+    ],
+    "assertionSummary": "Tauri 无 Electron 旧实例（close_browser_viewer 本地销毁结构断言，T06 运行时待回归）；关闭失败可见：409 effectUnknown + BROWSER_CLEANUP_UNCONFIRMED 状态投影，不隐藏窗口冒充成功",
+    "missingTests": [],
+    "structuralCheck": {
+     "file": "desktop/src-tauri/src/browser_viewer.rs",
+     "function": "close_browser_viewer",
+     "forbiddenTokens": [],
+     "bodyBytes": 622,
+     "note": "Tauri 无 Electron 旧实例路径；close 只清 target/销毁窗口，运行时 Tauri 窗口 E2E 归 T06，不用结构断言替代"
+    }
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-8A45B19A18B4::a1-real-back-forward-reload-url-title-flags",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-8A45B19A18B4",
+    "assertion": 1,
+    "evidenceTests": [
+     "browser_navigation_a1_back_forward_reload_update_url_title_and_flags"
+    ],
+    "assertionSummary": "真实后退/前进/刷新更新 URL/标题/canGoBack/canGoForward 与服务端快照",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-8A45B19A18B4::a2-no-active-view-and-illegal-urls-explicit",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-8A45B19A18B4",
+    "assertion": 2,
+    "evidenceTests": [
+     "browser_navigation_a2_no_active_view_and_illegal_urls_fail_explicitly"
+    ],
+    "assertionSummary": "无活动 view 的 Back/Forward/Reload/Snapshot/Screenshot/Scroll 显式 browser_empty_workspace；javascript:/file:/data:/ftp:/无 scheme/userinfo 地址 browser_url_forbidden 且不改地址",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-7D212CBD9EEF::a1-verify-success-persists-only-after-real-success",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-7D212CBD9EEF",
+    "assertion": 1,
+    "evidenceTests": [
+     "verification_real_http_masks_same_provider_and_only_persists_after_success"
+    ],
+    "assertionSummary": "真实外部验证成功后保存 provider/key；失败时不保存（before 快照逐字段相等）",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-7D212CBD9EEF::a2-verify-reject-no-widened-persistence-visible-error",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-7D212CBD9EEF",
+    "assertion": 2,
+    "evidenceTests": [
+     "verification_real_http_masks_same_provider_and_only_persists_after_success",
+     "provider_auth_redirect_and_rate_limit_keep_real_error_diagnostics"
+    ],
+    "assertionSummary": "拒绝/无效输入无越权持久化（跨供应商掩码不发请求、密钥不回显）；错误对用户可见（ok=false + 真实 errorCode/诊断）",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-1809C8E13EA3::a1-read-prefs-and-running-state-no-write",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-1809C8E13EA3",
+    "assertion": 1,
+    "evidenceTests": [
+     "preferences_and_session_projection_are_read_only_and_close_without_revoke_is_real"
+    ],
+    "assertionSummary": "GET /preferences/browser 返回设置；GET /session-states 返回运行中状态；磁盘与 BrowserManager 设置前后不变（不写）",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-1809C8E13EA3::a2-put-apply-no-widened-write-or-disclosure",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-1809C8E13EA3",
+    "assertion": 2,
+    "evidenceTests": [
+     "partial_preferences_preserve_unknown_fields_and_external_cookie_failure_is_not_success",
+     "chat_device_reads_state_but_only_explicit_remote_admin_controls_the_actual_service_node"
+    ],
+    "assertionSummary": "PUT 后 apply 失败不扩大写入（未知字段 400、设置/磁盘不变）；非本机 owner 读全局偏好 403（不扩大披露范围）",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-03A9E92909C6::a1-clear-site-data-success-and-failure-receipt",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-03A9E92909C6",
+    "assertion": 1,
+    "evidenceTests": [
+     "independent_persistent_profiles_auxiliary_locale_and_site_data_cleanup",
+     "partial_preferences_preserve_unknown_fields_and_external_cookie_failure_is_not_success"
+    ],
+    "assertionSummary": "真实 Chromium 站点数据清理后 cookie 消失（clear_site_data 后 Resume/Eval 为空）；服务 clear-cookies 成功 ok=true、失败 BROWSER_CLEAR_FAILED 非 2xx",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-03A9E92909C6::a2-clear-state-matches-actual-side-effect",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-03A9E92909C6",
+    "assertion": 2,
+    "evidenceTests": [
+     "partial_preferences_preserve_unknown_fields_and_external_cookie_failure_is_not_success"
+    ],
+    "assertionSummary": "失败/拒绝时返回状态与实际外部副作用一致（clear_calls 真实计数、命令零派发）",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-ED5FD5B469B8::a1-update-prefs-save-and-return-new-state",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-ED5FD5B469B8",
+    "assertion": 1,
+    "evidenceTests": [
+     "partial_preferences_preserve_unknown_fields_and_external_cookie_failure_is_not_success"
+    ],
+    "assertionSummary": "PUT 保存未知字段保留并将新状态落盘/返回 BrowserManager 实际设置",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-ED5FD5B469B8::a2-apply-failure-400-readback-no-auto-rollback",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-ED5FD5B469B8",
+    "assertion": 2,
+    "evidenceTests": [
+     "partial_external_configuration_is_rolled_back_and_unconfirmed_rollback_is_explicit_unknown"
+    ],
+    "assertionSummary": "应用失败非 2xx 返回 ok=false；外部部分失败时回滚到实际旧策略；回滚未确认返回 409 effectUnknown（不假设自动回滚）",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-367052089D11::a1-states-running-resumable-unavailable-projection",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-367052089D11",
+    "assertion": 1,
+    "evidenceTests": [
+     "restart_restores_cold_metadata_and_confirmed_receipt_without_automatically_opening_a_page",
+     "preferences_and_session_projection_are_read_only_and_close_without_revoke_is_real"
+    ],
+    "assertionSummary": "session-states 返回 running/executionNode/url；冷重启后 running=false、resumable=true",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-367052089D11::a2-states-invalid-unauthorized-downstream-explicit",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-367052089D11",
+    "assertion": 2,
+    "evidenceTests": [
+     "chat_device_reads_state_but_only_explicit_remote_admin_controls_the_actual_service_node",
+     "preferences_and_session_projection_are_read_only_and_close_without_revoke_is_real"
+    ],
+    "assertionSummary": "权限不足（chat-only 设备控制被 403、全局偏好 403）与无效输入显式错误，不呈现成功",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-593534A4F2AB::a1-sessions-list-cold-url-retained",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-593534A4F2AB",
+    "assertion": 1,
+    "evidenceTests": [
+     "restart_restores_cold_metadata_and_confirmed_receipt_without_automatically_opening_a_page",
+     "preferences_and_session_projection_are_read_only_and_close_without_revoke_is_real"
+    ],
+    "assertionSummary": "GET /browser/sessions 返回冷恢复会话目录与旧网址（读取目录不启动页面）",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-593534A4F2AB::a2-sessions-invalid-unauthorized-explicit",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-593534A4F2AB",
+    "assertion": 2,
+    "evidenceTests": [
+     "chat_device_reads_state_but_only_explicit_remote_admin_controls_the_actual_service_node",
+     "preferences_and_session_projection_are_read_only_and_close_without_revoke_is_real"
+    ],
+    "assertionSummary": "目录读取的权限/错误边界显式（非 owner 权限被拒、无效会话定位 4xx，不呈现成功）",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-178C8CBA29C2::a1-close-session-real-stop-and-state-broadcast",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-178C8CBA29C2",
+    "assertion": 1,
+    "evidenceTests": [
+     "preferences_and_session_projection_are_read_only_and_close_without_revoke_is_real"
+    ],
+    "assertionSummary": "普通关闭走真实 Stop、响应 sessions 投影 running=false、重放不重复外部动作",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-178C8CBA29C2::a2-close-invalid-unauthorized-downstream-explicit",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-178C8CBA29C2",
+    "assertion": 2,
+    "evidenceTests": [
+     "chat_device_reads_state_but_only_explicit_remote_admin_controls_the_actual_service_node",
+     "unknown_external_revoke_receipt_never_repeats_the_stop_or_reopens_content"
+    ],
+    "assertionSummary": "权限不足 403、无效输入 4xx、下游效果未知 409 effectUnknown，均显式不呈现成功",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-F1A5597E3E78::a1-close-and-revoke-authority-real",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-F1A5597E3E78",
+    "assertion": 1,
+    "evidenceTests": [
+     "actual_http_command_replay_changed_input_and_emergency_receipt_never_repeat_external_actions",
+     "new_actual_user_submission_releases_emergency_stop_with_a_new_epoch"
+    ],
+    "assertionSummary": "close+revoke 真实关闭并撤销授权（authority.revoked/epoch 递增），后续命令 403",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-F1A5597E3E78::a2-revoke-invalid-unknown-explicit",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-F1A5597E3E78",
+    "assertion": 2,
+    "evidenceTests": [
+     "unknown_external_revoke_receipt_never_repeats_the_stop_or_reopens_content"
+    ],
+    "assertionSummary": "撤权下游返回未知时 409 effectUnknown 且只撤一次；重放不重复外部动作",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-DCD85A04A7E9::a1-open-session-explicit-resume-cold-metadata",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-DCD85A04A7E9",
+    "assertion": 1,
+    "evidenceTests": [
+     "restart_restores_cold_metadata_and_confirmed_receipt_without_automatically_opening_a_page"
+    ],
+    "assertionSummary": "open-session 尝试恢复冷元数据并返回 resume 状态；恢复失败可空态；viewer 显示该会话属 T06，非本 case 通过前提",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-DCD85A04A7E9::a2-open-invalid-unauthorized-downstream-explicit",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-DCD85A04A7E9",
+    "assertion": 2,
+    "evidenceTests": [
+     "archive_and_permanent_delete_reclaim_only_the_actual_session_browser_before_success",
+     "chat_device_reads_state_but_only_explicit_remote_admin_controls_the_actual_service_node"
+    ],
+    "assertionSummary": "无效/已删除会话打开失败非 2xx；chat-only 设备打开 403；不呈现成功",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A30E4BDF2FA2::a1-navigation-title-and-snapshot-match",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-A30E4BDF2FA2",
+    "assertion": 1,
+    "evidenceTests": [
+     "browser_tool_a1_title_and_snapshot_match_real_navigation",
+     "same_real_target_input_snapshot_generations_and_empty_workspace"
+    ],
+    "assertionSummary": "导航后标题/快照正文与真实页面匹配（含表单元素进入快照）",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A30E4BDF2FA2::a2-stale-ref-explicit-failure",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-A30E4BDF2FA2",
+    "assertion": 2,
+    "evidenceTests": [
+     "browser_tool_a2_stale_snapshot_reference_fails_explicitly",
+     "page_cannot_move_or_forge_a_snapshot_reference_to_another_element"
+    ],
+    "assertionSummary": "页面更换后旧 ref click/type 显式 browser_stale_snapshot，伪造 ref 同样拒绝",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A30E4BDF2FA2::a3-session-a-state-not-leaked-to-b",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-A30E4BDF2FA2",
+    "assertion": 3,
+    "evidenceTests": [
+     "browser_tool_a3_session_state_and_cookies_never_leak_between_sessions",
+     "password_values_never_enter_normal_or_compact_snapshots_and_stay_in_the_page",
+     "screenshot_owned_file_materializes_into_exact_read_pixels_without_granting_other_sessions"
+    ],
+    "assertionSummary": "独立 Chromium 进程/profile：A/B 标签与 URL 不同、快照互不含对方内容、Cookie 不继承；截图文件只授予本会话",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A30E4BDF2FA2::a4-no-session-blocked-or-browser-error-explicit-no-cross-session",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-A30E4BDF2FA2",
+    "assertion": 4,
+    "evidenceTests": [
+     "browser_tool_a4_browser_errors_are_explicit_and_never_touch_another_session",
+     "unconfirmed_http_emergency_keeps_last_page_and_live_process_explicitly_unknown"
+    ],
+    "assertionSummary": "不可达页面 browser_navigation 显式失败（effect_unknown=false）；无会话 browser_not_running；另一会话状态逐字段不变，不误操作",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-FD7A5A76B8EA::a1-fetch-body-and-final-url-session-file",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-FD7A5A76B8EA",
+    "assertion": 1,
+    "evidenceTests": [
+     "public_fetch_keeps_five_hop_guard_and_registers_readable_full_session_file"
+    ],
+    "assertionSummary": "正文/最终 URL 对应；截断标记与完整会话文件可读回；未授权文件不越权",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-FD7A5A76B8EA::a2-blocked-page-not-normal-content",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-FD7A5A76B8EA",
+    "assertion": 2,
+    "evidenceTests": [
+     "web_fetch_blocked_page_invalid_urls_and_redirect_failures_are_explicit_without_writes"
+    ],
+    "assertionSummary": "403 captcha 阻断页返回 WEB_FETCH_HTTP_403 显式失败，不当正文/摘要成功返回",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-FD7A5A76B8EA::a3-invalid-url-redirect-network-error-no-workspace-write",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-FD7A5A76B8EA",
+    "assertion": 3,
+    "evidenceTests": [
+     "web_fetch_blocked_page_invalid_urls_and_redirect_failures_are_explicit_without_writes",
+     "public_fetch_proxy_pin_limitation_is_explicit_without_sending_any_request"
+    ],
+    "assertionSummary": "javascript:/file:/非法 URL 与重定向上限显式错误；失败不登记会话文件、不写工作区",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-D1B56A275C3A::a1-search-real-links-and-provider",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-D1B56A275C3A",
+    "assertion": 1,
+    "evidenceTests": [
+     "all_five_http_providers_use_real_gateway_and_distinct_authentication",
+     "auto_records_each_real_http_attempt_then_all_three_browser_page_diagnostics"
+    ],
+    "assertionSummary": "结果含真实链接与 provider/source_type；五种 HTTP 供应商真实网关与独立鉴权",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-D1B56A275C3A::a2-no-config-not-fake-success",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-D1B56A275C3A",
+    "assertion": 2,
+    "evidenceTests": [
+     "auto_all_failed_is_explicit_and_fixed_provider_never_silently_falls_back"
+    ],
+    "assertionSummary": "无可用配置时 diagnostics=all_failed 且内容显式失败，不伪造搜索命中",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-D1B56A275C3A::a3-missing-key-rate-limit-failure-explicit",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-D1B56A275C3A",
+    "assertion": 3,
+    "evidenceTests": [
+     "provider_auth_redirect_and_rate_limit_keep_real_error_diagnostics",
+     "auto_all_failed_is_explicit_and_fixed_provider_never_silently_falls_back"
+    ],
+    "assertionSummary": "缺 key/限流/鉴权重定向显式错误码（WEB_SEARCH_RATE_LIMITED 等）与真实诊断，不假成功",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-4173A08A51CC::a1-service-side-docx-xlsx-pdf-read",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-4173A08A51CC",
+    "assertion": 1,
+    "evidenceTests": [
+     "office::real_document_worker_reads_docx_xlsx_and_paged_pdf_without_changing_inputs"
+    ],
+    "assertionSummary": "服务侧真实读取 docx/xlsx/分页 PDF 且输入零改动；Tauri 文件预览/资源变更重读/只读窗口整叶 pending T03/T06（不登记整叶）",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-4173A08A51CC::a2-service-side-read-failure-explicit",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "leaf": "R00-T02-LA-4173A08A51CC",
+    "assertion": 2,
+    "evidenceTests": [
+     "office::real_document_worker_reads_docx_xlsx_and_paged_pdf_without_changing_inputs"
+    ],
+    "assertionSummary": "扫描件 OCR 不支持时显式失败，不冒称读取成功；二进制/过大信息卡与独立 viewer 不回写属 T03/T06 pending（不登记整叶）",
+    "missingTests": []
+   }
+  },
+  {
+   "case": "isolation::real-home-untouched",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "before": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    },
+    "after": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    }
+   }
+  }
+ ]
+}

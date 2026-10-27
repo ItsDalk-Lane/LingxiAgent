@@ -1,0 +1,10 @@
+{
+ "schema": "lingxi.r09.gate-negative.v1",
+ "suite": "r09_gate_negative",
+ "status": "PASS",
+ "exitCode": 0,
+ "caseCount": 7,
+ "failedCases": [],
+ "durationSecs": 4.97,
+ "note": "真实调用 r09_producer 工具；损坏样本在隔离临时目录构造并还原。"
+}

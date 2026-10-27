@@ -1,0 +1,36 @@
+{
+  "label": "t10-persona-suite2",
+  "stage": "R07-T09",
+  "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+  "command": [
+    "env",
+    "LINGXI_PRODUCT_DIR=/private/tmp/lingxi-r07-tests/persona-product",
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r06_original_persona_proofs"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "PATH": "/Users/study_superior/.cargo/bin:/Users/study_superior/Desktop/Code/LingxiAgent/.venv/bin:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/share/dotnet:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/Users/study_superior/.lmstudio/bin:/Users/study_superior/.lmstudio/bin",
+    "CARGO_TARGET_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target-r07",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp",
+    "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib"
+  },
+  "startedAt": "2026-10-19T03:22:56.358282+00:00",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "bf01b4b42c348444654732d3fd3d0b836ee370c09b9bd70681faa958b488965e",
+  "finalAcceptance": false,
+  "exitCode": 0,
+  "endedAt": "2026-10-19T03:23:08.749513+00:00",
+  "sourceFingerprintAfter": "bf01b4b42c348444654732d3fd3d0b836ee370c09b9bd70681faa958b488965e",
+  "log": "artifacts/rust-tauri/R07/T09/t10-persona-suite2.log",
+  "logSha256": "626dea50cd74049a6da0ad680fcdce85a73e7cbd34627a9b4bff12c57b880977",
+  "sourceUnchanged": true
+}

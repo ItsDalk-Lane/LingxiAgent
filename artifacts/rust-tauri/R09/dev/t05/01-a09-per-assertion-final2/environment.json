@@ -1,0 +1,20 @@
+{
+ "platform": "macos-arm64",
+ "chromePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+ "chromeVersion": "Google Chrome 155.0.8059.85",
+ "chromeSha256": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d",
+ "rustToolchain": "rustup run 1.98.1",
+ "python": "3.14.3",
+ "node": "v24.16.0",
+ "electronReferenceVersion": "v42.8.1",
+ "isolation": {
+  "LINGXI_HOME": "/private/tmp/lingxi-r09-t05/runtime-a09h/r09_t05_browser_pdf-53559-1793023702562/home",
+  "TMPDIR": "/private/tmp/lingxi-r09-t05/runtime-a09h/r09_t05_browser_pdf-53559-1793023702562/tmp"
+ },
+ "oldChainEnvironment": "独立对照目录/隔离 HOME；旧链不进测试安装",
+ "platformBlocked": [
+  "macos-x64",
+  "windows-x64",
+  "linux-x64"
+ ]
+}

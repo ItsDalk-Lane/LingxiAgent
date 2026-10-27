@@ -1,0 +1,50 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/desktop-rust-local-service.test.mjs (13 tests | 1 failed) 82ms
+   ✓ Windows 产物守卫只调用受信安装资源程序且拒绝失败 52ms
+   ✓ 桌面 Rust 模式必须显式选择，未知值拒绝 0ms
+   ✓ 打包 Rust 模式从本机资源定位程序，环境覆盖无效 2ms
+   ✓ 打包 Rust 程序缺失、错平台、损坏或被换成链接时拒绝 3ms
+   ✓ 打包配置四个发行入口均准备同平台 Rust 程序，并纳入装箱与签名 1ms
+   ✓ Windows 签名只允许改 PE 校验和与证书表，程序正文改变则拒绝 1ms
+   ✓ macOS 签名只允许改 Mach-O 签名块和对应长度，正文改变则拒绝 0ms
+   ✓ 预构建 Rust 程序跟随固定工具链、全部源码输入和应用版本变化失效 15ms
+   ✓ 只接受本轮进程、数据根、READY 地址和短令牌一致的 Rust 记录 2ms
+   ✓ 远端连接未配置时返回 null，配置但与运行时矛盾时拒绝 0ms
+   ✓ 远端令牌文件必须绝对路径、owner-only 且形状固定 1ms
+   × 远端 URL 形状守卫：绝对 http(s)、显式端口、无用户/路径注入 3ms
+   ✓ 非回环明文 http 必须显式 drill 门，回环与 https 不需要 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/desktop-rust-local-service.test.mjs > 远端 URL 形状守卫：绝对 http(s)、显式端口、无用户/路径注入
+AssertionError: The input did not match the regular expression /host\/port shape/. Input:
+
+'Error: invalid LINGXI_DESKTOP_RUST_REMOTE_URL: not an absolute URL'
+
+
+- Expected:
+/host\/port shape/
+
++ Received:
+Error {
+  "message": "invalid LINGXI_DESKTOP_RUST_REMOTE_URL: not an absolute URL",
+}
+
+ ❯ tests/desktop-rust-local-service.test.mjs:323:10
+    321|   assert.throws(() => readRemoteRustConnection({ env: env('https://192…
+    322|   assert.throws(() => readRemoteRustConnection({ env: env('https://192…
+    323|   assert.throws(() => readRemoteRustConnection({ env: env('https://192…
+       |          ^
+    324|   assert.throws(() => readRemoteRustConnection({ env: env('https://:34…
+    325| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 12 passed (13)
+   Start at  20:46:33
+   Duration  209ms (transform 42ms, setup 24ms, import 20ms, tests 82ms, environment 0ms)
+

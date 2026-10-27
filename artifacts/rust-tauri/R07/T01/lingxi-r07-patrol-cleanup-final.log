@@ -1,0 +1,8 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s
+     Running unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_service-0591b361ca6dec9e)
+
+running 1 test
+test automation_patrol::tests::wait_stopped_waits_for_every_beat_after_coordinator_and_earlier_beat_panic ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 440 filtered out; finished in 0.02s
+

@@ -1,0 +1,32 @@
+{
+ "fields": {
+  "title": {
+   "electron": "Lingxi · Rust 预览",
+   "tauri": "Lingxi · Rust 预览"
+  },
+  "platform": {
+   "electron": "darwin",
+   "tauri": "darwin"
+  },
+  "reactRootMounted": {
+   "electron": true,
+   "tauri": true
+  },
+  "rootChildCount": {
+   "electron": 4,
+   "tauri": 4
+  },
+  "bodyTextHash": {
+   "electron": 1065066033,
+   "tauri": 3627538922
+  },
+  "bodyTextLength": {
+   "electron": 121,
+   "tauri": 229
+  }
+ },
+ "mismatched": [
+  "bodyTextHash",
+  "bodyTextLength"
+ ]
+}

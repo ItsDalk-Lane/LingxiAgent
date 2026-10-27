@@ -1,0 +1,68 @@
+{
+  "schema": "lingxi.r09.tauri-build.v1",
+  "mode": "debug",
+  "features": [
+    "e2e-test",
+    "r09-host",
+    "r09-test-hooks"
+  ],
+  "evidenceBuild": true,
+  "builtAtUnixMs": 1793029402892,
+  "cacheHit": false,
+  "command": [
+    "tauri",
+    "build",
+    "--config",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/tauri.debug.generated.conf.json",
+    "--features",
+    "r09-host,r09-test-hooks,e2e-test",
+    "--debug",
+    "--no-bundle"
+  ],
+  "rendererBuild": [],
+  "inputs": {
+    "mode": "debug",
+    "crateSourceDigest": "da18b6695e2600049e44ac0ef76b46df560c9baa59effec6a67cb40587d1e8c9",
+    "crateSourceFileCount": 165,
+    "rendererDigest": "60a6591c37e81ff2333608c2ada8a582ff947a9401f91c7adb9174dcc1655751",
+    "rendererFileCount": 644,
+    "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+    "themeBundleBytes": 5187,
+    "configTemplateSha256": "febd9ef1d3e3b316699e77e3133831d991df14faaeb8c177af3602ad4b446ae2",
+    "packageVersion": "0.1.43",
+    "tauriCli": "tauri-cli 2.12.4",
+    "toolchain": "1.98.1",
+    "target": "aarch64-apple-darwin",
+    "serviceManifestSha256": null,
+    "serviceBuildJsonSha256": null,
+    "features": [
+      "e2e-test",
+      "r09-host",
+      "r09-test-hooks"
+    ],
+    "evidenceBuild": true,
+    "hostFeature": "r09-host",
+    "hostFeatureEffects": [
+      "service-supervisor",
+      "product-react-window",
+      "host-boot-commands"
+    ]
+  },
+  "config": {
+    "file": "desktop/src-tauri/tauri.debug.generated.conf.json",
+    "generatedSha256": "ff9230c4b76b091e712b8697ec7243f38b9050288e9dd37480ec9879ed571b7f"
+  },
+  "themeBundle": {
+    "path": "lib/theme.js",
+    "sha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+    "bytes": 5187
+  },
+  "artifacts": {
+    "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/debug/lingxi-resource-desktop",
+    "executableSha256": "2de636baf8912c60cc43a5e355307ba423afc05f6892ec7948c50a96ab337ae4",
+    "appBundle": null,
+    "appBundleExists": false
+  },
+  "service": null,
+  "codesign": null
+}

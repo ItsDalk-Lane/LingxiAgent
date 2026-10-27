@@ -1,0 +1,23 @@
+{
+ "stage": "R07-T06",
+ "purpose": "development_not_final_acceptance",
+ "command": "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-adapters",
+ "environment": {
+  "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+  "CARGO_BUILD_JOBS": "4",
+  "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+  "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+ },
+ "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+ "sourceFingerprintBefore": "a105285987831147fa2bf34f2d4c60848ce945fce015a72a583ac3d7c8eb1ffa",
+ "sourceFingerprintAfter": "a105285987831147fa2bf34f2d4c60848ce945fce015a72a583ac3d7c8eb1ffa",
+ "exitCode": 101,
+ "logSha256": "418e722d23800abfe761f5513d2060eb283da009d63ad9b2aaf9f8a2cd12a4fc",
+ "sourceUnchanged": true,
+ "versionBinding": {
+  "workspace": "rust/Cargo.toml",
+  "locked": true
+ },
+ "note": "dev-t06gallery2 的失败为既有环境依赖（r06_ex05 测试写死 /private/tmp/r06-ex05-delivery 路径），补建目录后本运行复验；与 v23/gallery 改动无因果关系。",
+ "finishedAtUnixMs": 1792131454054
+}

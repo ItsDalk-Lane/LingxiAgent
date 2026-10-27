@@ -1,0 +1,581 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t03_ipc_negative",
+ "cases": [
+  {
+   "case": "isolation::real-home-provided",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": null
+  },
+  {
+   "case": "ipc::open_external.file-scheme",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "open_external",
+    "expect": "URL_SCHEME_DENIED",
+    "actual": "URL_SCHEME_DENIED"
+   }
+  },
+  {
+   "case": "ipc::open_external.control-char",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "open_external",
+    "expect": "URL_INVALID",
+    "actual": "URL_INVALID"
+   }
+  },
+  {
+   "case": "ipc::open_file.relative-path",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "open_file",
+    "expect": "PATH_NOT_ABSOLUTE",
+    "actual": "PATH_NOT_ABSOLUTE"
+   }
+  },
+  {
+   "case": "ipc::open_folder.relative-path",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "open_folder",
+    "expect": "PATH_NOT_ABSOLUTE",
+    "actual": "PATH_NOT_ABSOLUTE"
+   }
+  },
+  {
+   "case": "ipc::show_in_finder.nul-path",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "show_in_finder",
+    "expect": "PATH_NOT_ABSOLUTE",
+    "actual": "PATH_NOT_ABSOLUTE"
+   }
+  },
+  {
+   "case": "ipc::argument_guard.overlong-path",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "read_file",
+    "expect": "PATH_NOT_ABSOLUTE",
+    "actual": "PATH_NOT_ABSOLUTE"
+   }
+  },
+  {
+   "case": "ipc::trash.relative-path",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "trash_item",
+    "expect": "PATH_NOT_ABSOLUTE",
+    "actual": "PATH_NOT_ABSOLUTE"
+   }
+  },
+  {
+   "case": "ipc::dialog.relative-result-path",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "select_files",
+    "expect": "PATH_NOT_ABSOLUTE",
+    "actual": "PATH_NOT_ABSOLUTE"
+   }
+  },
+  {
+   "case": "ipc::drag.relative-path",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "start_drag",
+    "expect": "PATH_NOT_ABSOLUTE",
+    "actual": "PATH_NOT_ABSOLUTE"
+   }
+  },
+  {
+   "case": "ipc::drag.nul-path",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "start_drag",
+    "expect": "INVALID_ARGUMENT",
+    "actual": "INVALID_ARGUMENT"
+   }
+  },
+  {
+   "case": "ipc::drop.file-uri",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "file_drop",
+    "expect": "INVALID_ARGUMENT",
+    "actual": "INVALID_ARGUMENT"
+   }
+  },
+  {
+   "case": "ipc::drop.relative-path",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "file_drop",
+    "expect": "PATH_NOT_ABSOLUTE",
+    "actual": "PATH_NOT_ABSOLUTE"
+   }
+  },
+  {
+   "case": "ipc::run_edit_command.shell-style",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "run_edit_command",
+    "expect": "INVALID_ARGUMENT",
+    "actual": "INVALID_ARGUMENT"
+   }
+  },
+  {
+   "case": "ipc::run_edit_command.devtools",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "run_edit_command",
+    "expect": "INVALID_ARGUMENT",
+    "actual": "INVALID_ARGUMENT"
+   }
+  },
+  {
+   "case": "ipc::global_shortcut.injection",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "keybindings_test_register",
+    "expect": "ENUM_INVALID",
+    "actual": "ENUM_INVALID"
+   }
+  },
+  {
+   "case": "ipc::global_shortcut.unknown-key",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "keybindings_test_register",
+    "expect": "ENUM_INVALID",
+    "actual": "ENUM_INVALID"
+   }
+  },
+  {
+   "case": "ipc::quick_chat.resize.unknown-mode",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "quick_chat_resize",
+    "expect": "WINDOW_LABEL_INVALID",
+    "actual": "WINDOW_LABEL_INVALID"
+   }
+  },
+  {
+   "case": "ipc::settings_changed.unknown-event",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "settings_changed",
+    "expect": "ENUM_INVALID",
+    "actual": "ENUM_INVALID"
+   }
+  },
+  {
+   "case": "ipc::settings_changed.missing-theme",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "settings_changed",
+    "expect": "INVALID_ARGUMENT",
+    "actual": "INVALID_ARGUMENT"
+   }
+  },
+  {
+   "case": "ipc::open_settings.tab-injection",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "open_settings",
+    "expect": "ENUM_INVALID",
+    "actual": "ENUM_INVALID"
+   }
+  },
+  {
+   "case": "ipc::theme.control-char",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "sync_window_theme",
+    "expect": "ENUM_INVALID",
+    "actual": "ENUM_INVALID"
+   }
+  },
+  {
+   "case": "ipc::screenshot.unknown-theme",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "screenshot_render",
+    "expect": "INVALID_ARGUMENT",
+    "actual": "INVALID_ARGUMENT"
+   }
+  },
+  {
+   "case": "ipc::screenshot.segment-oob",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "screenshot_render",
+    "expect": "INVALID_ARGUMENT",
+    "actual": "INVALID_ARGUMENT"
+   }
+  },
+  {
+   "case": "ipc::screenshot.outside-home-dir",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "screenshot_render",
+    "expect": "URL_SCHEME_DENIED",
+    "actual": "URL_SCHEME_DENIED"
+   }
+  },
+  {
+   "case": "ipc::splash.evil-origin",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "get_splash_info",
+    "expect": "WINDOW_NOT_ALLOWED",
+    "actual": "WINDOW_NOT_ALLOWED"
+   }
+  },
+  {
+   "case": "ipc::splash.query-injection",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "get_avatar_path",
+    "expect": "INVALID_ARGUMENT",
+    "actual": "INVALID_ARGUMENT"
+   }
+  },
+  {
+   "case": "ipc::window_control.renderer-window-id",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "window_minimize",
+    "expect": "WINDOW_NOT_ALLOWED",
+    "actual": "WINDOW_NOT_ALLOWED"
+   }
+  },
+  {
+   "case": "ipc::window_control.viewer-caller",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "window_close",
+    "expect": "WINDOW_NOT_ALLOWED",
+    "actual": "WINDOW_NOT_ALLOWED"
+   }
+  },
+  {
+   "case": "ipc::show_notification.settings-caller",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "show_notification",
+    "expect": "WINDOW_NOT_ALLOWED",
+    "actual": "WINDOW_NOT_ALLOWED"
+   }
+  },
+  {
+   "case": "ipc::app_ready.splash-caller",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "app_ready",
+    "expect": "WINDOW_NOT_ALLOWED",
+    "actual": "WINDOW_NOT_ALLOWED"
+   }
+  },
+  {
+   "case": "ipc::window_labels.viewer-label-glob",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "spawn_viewer",
+    "expect": "WINDOW_LABEL_INVALID",
+    "actual": "WINDOW_LABEL_INVALID"
+   }
+  },
+  {
+   "case": "ipc::window_labels.unknown-role",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "get_platform",
+    "expect": "WINDOW_NOT_ALLOWED",
+    "actual": "WINDOW_NOT_ALLOWED"
+   }
+  },
+  {
+   "case": "ipc::single_instance.home-override",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "app_start",
+    "expect": "INVALID_ARGUMENT",
+    "actual": "INVALID_ARGUMENT"
+   }
+  },
+  {
+   "case": "ipc::restart.argv-injection",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "restart_app",
+    "expect": "WINDOW_NOT_ALLOWED",
+    "actual": "WINDOW_NOT_ALLOWED"
+   }
+  },
+  {
+   "case": "ipc::onboarding.main-caller",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "onboarding_complete",
+    "expect": "WINDOW_NOT_ALLOWED",
+    "actual": "WINDOW_NOT_ALLOWED"
+   }
+  },
+  {
+   "case": "ipc::onboarding.rust-runtime",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "onboarding_complete",
+    "expect": "NOT_IMPLEMENTED",
+    "actual": "NOT_IMPLEMENTED"
+   }
+  },
+  {
+   "case": "ipc::debug-onboarding.release",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "debug_open_onboarding",
+    "expect": "RELEASE_DISABLED",
+    "actual": "RELEASE_DISABLED"
+   }
+  },
+  {
+   "case": "ipc::speech.settings-caller",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "speech_permission_status",
+    "expect": "WINDOW_NOT_ALLOWED",
+    "actual": "WINDOW_NOT_ALLOWED"
+   }
+  },
+  {
+   "case": "ipc::speech.linux-platform",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "speech_permission_request",
+    "expect": "PLATFORM_UNSUPPORTED",
+    "actual": "PLATFORM_UNSUPPORTED"
+   }
+  },
+  {
+   "case": "ipc::computer_use.remote-lease",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "computer_use_start",
+    "expect": "REMOTE_DEVICE_DENIED",
+    "actual": "REMOTE_DEVICE_DENIED"
+   }
+  },
+  {
+   "case": "ipc::computer_use.expired-lease",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "computer_use_action",
+    "expect": "COMPUTER_USE_LEASE_EXPIRED",
+    "actual": "COMPUTER_USE_LEASE_EXPIRED"
+   }
+  },
+  {
+   "case": "ipc::computer_use.stale-controls",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "computer_use_action",
+    "expect": "COMPUTER_USE_STALE_CONTROLS",
+    "actual": "COMPUTER_USE_STALE_CONTROLS"
+   }
+  },
+  {
+   "case": "ipc::remote_boundary.self-grant",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "device_grant",
+    "expect": "REMOTE_DEVICE_DENIED",
+    "actual": "REMOTE_DEVICE_DENIED"
+   }
+  },
+  {
+   "case": "ipc::remote_boundary.ungranted-device",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "device_read",
+    "expect": "REMOTE_DEVICE_DENIED",
+    "actual": "REMOTE_DEVICE_DENIED"
+   }
+  },
+  {
+   "case": "ipc::computer_use.wrong-lease-id",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "command": "computer_use_stop",
+    "expect": "TOKEN_INVALID",
+    "actual": "TOKEN_INVALID"
+   }
+  },
+  {
+   "case": "negative::matrix-emitted",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "cases": 45
+   }
+  },
+  {
+   "case": "negative::window-label-gates-present",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "missing": []
+   }
+  },
+  {
+   "case": "negative::no-process-spawn",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": null
+  },
+  {
+   "case": "blocked::ipc::registered-host-negative-invoke",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "命令面已注册；逐窗口 invoke 负向矩阵（ACL 拒绝 + 无副作用）需真实 GUI/wdio（Lead GUI 禁令；T06 运行期矩阵）"
+   }
+  },
+  {
+   "case": "blocked::ipc::acl-denied-window",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "未授权窗口调用必须被 Tauri ACL 拒绝；capability 配置已就绪（T06），真实宿主拒绝矩阵需 GUI/wdio"
+   }
+  },
+  {
+   "case": "blocked::ipc::no-child-process-observed",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "真实 IPC 注入后进程表探针（无子进程/无 shell）需真实宿主会话（Lead GUI 禁令）"
+   }
+  },
+  {
+   "case": "isolation::real-home-untouched",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "before": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    },
+    "after": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,14 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_adapters-6c8c124e84396616)
+
+running 7 tests
+test browser::host::startup_tests::auxiliary_initialization_unknown_preserves_profile_and_owner_until_retry ... ok
+test browser::host::startup_tests::cdp_preparation_failure_happens_before_any_real_spawn ... ok
+test browser::host::startup_tests::first_target_failure_keeps_actual_process_and_target_until_cleanup_retry ... ok
+test browser::host::startup_tests::forget_rechecks_late_startup_unknown_before_purging_profile ... ok
+test browser::host::startup_tests::live_initialization_failure_keeps_real_owner_until_cleanup_retry_confirms ... ok
+test browser::host::startup_tests::revoke_startup_timeout_preserves_late_unknown_live_until_same_epoch_retry ... ok
+test browser::host::startup_tests::revoke_waits_for_real_spawn_owner_registration_and_confirmed_reap ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 135 filtered out; finished in 7.08s
+

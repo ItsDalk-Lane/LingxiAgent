@@ -1,0 +1,43 @@
+{
+  "label": "t10-service-regression29",
+  "stage": "R07-T09",
+  "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+  "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "-p",
+    "lingxi-service",
+    "--",
+    "--skip",
+    "r00_management_positive_and_negative_branches_on_real_service",
+    "--skip",
+    "native_remaining_tenet_health_and_order_real_failures_and_pointer_cancel",
+    "--skip",
+    "native_settings_nineteen_actions_actual_electron_and_service",
+    "--skip",
+    "original_system_directory_dialog_real_path_cancel_and_no_install",
+    "--skip",
+    "current_native_resource_three_leaves_real_windows_and_os_trash"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "PATH": "/Users/study_superior/.cargo/bin:/Users/study_superior/Desktop/Code/LingxiAgent/.venv/bin:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/share/dotnet:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/Users/study_superior/.lmstudio/bin:/Users/study_superior/.lmstudio/bin",
+    "CARGO_TARGET_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target-r07",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp",
+    "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib"
+  },
+  "startedAt": "2026-10-19T01:57:35.772075+00:00",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "3db25de098b8c23c2c4642f1855a5261a193f868c857325616e656d7d7db56fe",
+  "finalAcceptance": false,
+  "exitCode": 101,
+  "endedAt": "2026-10-19T02:22:45.464755+00:00",
+  "sourceFingerprintAfter": "3db25de098b8c23c2c4642f1855a5261a193f868c857325616e656d7d7db56fe",
+  "log": "artifacts/rust-tauri/R07/T09/t10-service-regression29.log",
+  "logSha256": "d7c6ce0812400f4e8b390cb42363603ea7f5209dc0d1d9f1c1c7d922436b95a4",
+  "sourceUnchanged": true
+}

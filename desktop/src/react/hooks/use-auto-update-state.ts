@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { AutoUpdateState } from '../types';
+import { usePlatform } from './use-platform';
 
 function devWebPreviewState(): AutoUpdateState | null {
   if (!window.__LINGXI_DEV_WEB__) return null;
@@ -59,7 +60,7 @@ export function useAutoUpdateState(): AutoUpdateState | null {
 
     let alive = true;
 
-    window.hana?.autoUpdateState?.()
+    usePlatform()?.autoUpdateState?.()
       .then((nextState) => {
         if (alive && nextState) {
           setState(nextState);
@@ -67,7 +68,7 @@ export function useAutoUpdateState(): AutoUpdateState | null {
       })
       .catch(() => {});
 
-    const unsubscribe = window.hana?.onAutoUpdateState?.((nextState) => {
+    const unsubscribe = usePlatform()?.onAutoUpdateState?.((nextState) => {
       setState(nextState);
     });
 

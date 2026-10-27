@@ -1,0 +1,33 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ × desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面 167ms
+   → expected 200 to be 201 // Object.is equality
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面
+AssertionError: expected 200 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 200
+
+ ❯ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx:53:28
+     51|       body: JSON.stringify({ id: 'entry-agent', name: '入口助手' }),
+     52|     });
+     53|     expect(created.status).toBe(201);
+       |                            ^
+     54|     // 只观察真实请求的地址与状态；不代填初始化资料、不替换服务响应。
+     55|     globalThis.fetch = async (input, init) => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  17:41:29
+   Duration  1.95s (transform 1.05s, setup 19ms, import 1.44s, tests 167ms, environment 254ms)
+

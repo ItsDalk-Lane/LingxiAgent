@@ -1,0 +1,4 @@
+ok   baseline: exit 0 stopped@pointer_switch
+ok   baseline: import 时长校准 > 0
+BASELINE importDurationMs=364 batches=35/35 issues=5
+A09_RESULT {"verdict":"PASS","scenario":"baseline"}

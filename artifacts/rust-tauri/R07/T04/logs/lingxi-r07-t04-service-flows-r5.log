@@ -1,0 +1,32 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 24.12s
+     Running tests/r07_browser_routes.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_browser_routes-c933ce6238713ee4)
+
+running 8 tests
+test partial_external_configuration_is_rolled_back_and_unconfirmed_rollback_is_explicit_unknown ... ok
+test screenshot_registers_a_real_png_session_file_and_http_content_preserves_its_type_and_bytes ... FAILED
+test partial_preferences_preserve_unknown_fields_and_external_cookie_failure_is_not_success ... ok
+test unknown_external_revoke_receipt_never_repeats_the_stop_or_reopens_content ... ok
+test actual_http_command_replay_changed_input_and_emergency_receipt_never_repeat_external_actions ... ok
+test archive_and_permanent_delete_reclaim_only_the_actual_session_browser_before_success ... ok
+test restart_restores_cold_metadata_and_confirmed_receipt_without_automatically_opening_a_page ... ok
+test chat_device_reads_state_but_only_explicit_remote_admin_controls_the_actual_service_node ... ok
+
+failures:
+
+---- screenshot_registers_a_real_png_session_file_and_http_content_preserves_its_type_and_bytes stdout ----
+
+thread 'screenshot_registers_a_real_png_session_file_and_http_content_preserves_its_type_and_bytes' (804596) panicked at crates/lingxi-service/tests/r07_browser_routes.rs:603:5:
+assertion `left == right` failed
+  left: String("browser-screenshot_mywpiww0_f8b05b18.png")
+ right: "browser-screenshot.png"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    screenshot_registers_a_real_png_session_file_and_http_content_preserves_its_type_and_bytes
+
+test result: FAILED. 7 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.48s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_browser_routes`

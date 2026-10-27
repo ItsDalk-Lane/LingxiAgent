@@ -1,0 +1,56 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 46.34s
+     Running tests/r07_conversation_tools.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_conversation_tools-040609c1e6dc3fce)
+
+running 7 tests
+test dynamic_channel_contract_preserves_read_review_and_inherited_read_only ... ok
+test executor_rechecks_real_run_generation_attempt_and_owner ... ok
+test membership_revoked_during_real_approval_cannot_publish ... ok
+test real_create_adds_actual_actor_and_keeps_a_durable_source_receipt ... ok
+test real_dm_confirmation_writes_both_histories_once_as_session_actor ... ok
+test real_channel_post_waits_for_approval_and_records_actual_actor_and_source ... ok
+test real_read_run_is_member_scoped_and_ambiguous_names_list_ids ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.86s
+
+     Running tests/r07_phone_runtime.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_phone_runtime-6b33c93be36bde1a)
+
+running 13 tests
+test actual_http_phone_only_explicit_reply_is_public_request_retry_and_restart_do_not_repeat ... FAILED
+test actual_member_removal_cancels_waiting_models_before_any_publication ... ok
+test actual_read_only_phone_rejects_native_write_and_hides_recursive_tools ... ok
+test actual_channel_pass_records_decision_without_publishing_ordinary_final ... ok
+test actual_dm_stop_marker_stops_chain_and_new_user_action_waits_for_direction_cooldown ... ok
+test actual_same_second_dm_reset_hides_old_history_without_replaying_or_losing_new_action ... ok
+test actual_dm_chain_shares_three_run_budget_across_both_directions_and_cooldown ... ok
+test actual_legacy_markdown_first_discovery_external_append_and_restart_keep_one_cause ... ok
+test actual_completed_run_before_activity_restart_waits_full_interval_from_terminal_time ... ok
+test actual_dm_stop_marker_variants_strip_public_text_and_never_start_reverse_run ... ok
+test actual_archived_phone_session_rotates_and_does_not_block_independent_channel ... ok
+test actual_phone_sessions_reuse_within_30_minutes_and_rotate_at_idle_expiry ... ok
+test actual_proactive_31_minutes_obeys_disable_enable_and_restart_slot_receipt ... FAILED
+
+failures:
+
+---- actual_http_phone_only_explicit_reply_is_public_request_retry_and_restart_do_not_repeat stdout ----
+
+thread 'actual_http_phone_only_explicit_reply_is_public_request_retry_and_restart_do_not_repeat' (663184) panicked at crates/lingxi-service/tests/r07_phone_runtime.rs:547:5:
+assertion `left == right` failed
+  left: String("User")
+ right: "user"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- actual_proactive_31_minutes_obeys_disable_enable_and_restart_slot_receipt stdout ----
+
+thread 'actual_proactive_31_minutes_obeys_disable_enable_and_restart_slot_receipt' (663188) panicked at crates/lingxi-service/tests/r07_phone_runtime.rs:395:13:
+手机真实投递未完成；观察=[Observation { ctx: RunContext { principal: LocalUser, session_id: SessionId("phone-session-9ca0a8dae37440486e06c50e246d5ea6466b12cfa8d0bd2c52baeb3ca8e748fb"), run_id: RunId("run_000001a3185c5000_000001"), attempt: AttemptId("run_000001a3185c5000_000001#a1"), generation: 1 }, actor: "b", origin: Channel, delivery: "phone-0bb27d84ac913d07a44ce3782e3b3a65f1bf3b25905c1ee3f88e5c20c0d4f14d", declarations: ["tool:first-party:ask_user", "tool:first-party:automation", "tool:first-party:channel_pass", "tool:first-party:channel_read_context", "tool:first-party:channel_reply", "tool:first-party:check_pending_tasks", "tool:first-party:checkpoint", "tool:first-party:edit", "tool:first-party:file", "tool:first-party:jian_update_status", "tool:first-party:materialize", "tool:first-party:notify", "tool:first-party:patrol_update_log", "tool:first-party:read", "tool:first-party:rewind", "tool:first-party:session", "tool:first-party:show_card", "tool:first-party:stop_task", "tool:first-party:todo_write", "tool:first-party:write"] }, Observation { ctx: RunContext { principal: LocalUser, session_id: SessionId("phone-session-ba2862777cf895370b34f76baae020d0109f8b2b4639ed4f0c98e4f47c132d38"), run_id: RunId("run_000001a3185c5000_000002"), attempt: AttemptId("run_000001a3185c5000_000002#a1"), generation: 1 }, actor: "a", origin: Channel, delivery: "phone-984487239e07e491e6297452bd129094b57f8f11a671aab50ddc17b5c4172711", declarations: ["tool:first-party:ask_user", "tool:first-party:automation", "tool:first-party:channel_pass", "tool:first-party:channel_read_context", "tool:first-party:channel_reply", "tool:first-party:check_pending_tasks", "tool:first-party:checkpoint", "tool:first-party:edit", "tool:first-party:file", "tool:first-party:jian_update_status", "tool:first-party:materialize", "tool:first-party:notify", "tool:first-party:patrol_update_log", "tool:first-party:read", "tool:first-party:rewind", "tool:first-party:session", "tool:first-party:show_card", "tool:first-party:stop_task", "tool:first-party:todo_write", "tool:first-party:write"] }]，宿主={"lastError":null,"running":true}
+
+
+failures:
+    actual_http_phone_only_explicit_reply_is_public_request_retry_and_restart_do_not_repeat
+    actual_proactive_31_minutes_obeys_disable_enable_and_restart_slot_receipt
+
+test result: FAILED. 11 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 14.89s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_phone_runtime`

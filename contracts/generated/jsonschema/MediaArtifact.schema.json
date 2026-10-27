@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "fileId": {
+      "type": "string"
+    },
+    "filename": {
+      "type": "string"
+    },
+    "mime": {
+      "type": "string"
+    },
+    "sizeBytes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "fileId",
+    "filename",
+    "mime",
+    "sizeBytes"
+  ],
+  "title": "MediaArtifact",
+  "type": "object"
+}

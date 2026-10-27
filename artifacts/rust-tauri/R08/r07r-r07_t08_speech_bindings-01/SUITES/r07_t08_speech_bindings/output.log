@@ -1,0 +1,16 @@
+
+running 2 tests
+test http_publish_volcengine_speech_reaches_same_operation_actual_bigasr_credentials_and_usage ... ok
+test http_publish_system_speech_reaches_same_operation_real_say_product_zero_transport_and_recognition_refusal ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.14s
+
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r07_t08_speech_bindings") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.92s
+     Running tests/r07_t08_speech_bindings.rs (rust/target/debug/deps/r07_t08_speech_bindings-bc858722d3d590c8)

@@ -1,0 +1,6 @@
+{"n": 20, "case": "blocked::allow-side-effect::main::copy_file", "ok": false, "at": 1793066799.035302}
+{"n": 40, "case": "acl::main::open_external::allow", "ok": true, "at": 1793066799.127242}
+{"n": 60, "case": "acl::main::resource_unsubscribe::allow", "ok": true, "at": 1793066799.163305}
+{"n": 80, "case": "acl::main::watch_file::allow", "ok": true, "at": 1793066799.191503}
+{"n": 100, "case": "blocked::window-open::quick-chat", "ok": false, "at": 1793066799.20417}
+{"n": 107, "final": true, "status": "PASS_WITH_BLOCKED_WINDOWS", "at": 1793066799.2450418}

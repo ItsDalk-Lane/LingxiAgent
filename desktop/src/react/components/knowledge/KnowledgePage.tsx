@@ -26,6 +26,7 @@ import {
 import { NotebookSettingsDialog } from './NotebookSettingsDialog';
 import { Button, Overlay } from '../../ui';
 import styles from './KnowledgePage.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 const tr = (key: string, vars?: Record<string, string | number>) => window.t?.(key, vars) ?? key;
 
@@ -537,12 +538,12 @@ export function KnowledgePage({ onClose }: { onClose?: () => void }) {
   }, [selectedNotebookId, ingestionRefreshKey, refreshSources, refreshNotebooks]);
 
   const handleImportFiles = async () => {
-    if (!selectedNotebookId || !window.platform?.selectFiles) {
+    if (!selectedNotebookId || !usePlatform()?.selectFiles) {
       addToast(tr('knowledge.importUnavailable'), 'error');
       return;
     }
     setShowImportMenu(false);
-    const filePaths = await window.platform.selectFiles({ multiple: true });
+    const filePaths = await usePlatform().selectFiles({ multiple: true });
     if (filePaths.length === 0) return;
     setImporting(true);
     let successCount = 0;
@@ -569,12 +570,12 @@ export function KnowledgePage({ onClose }: { onClose?: () => void }) {
   };
 
   const handleImportDirectory = async () => {
-    if (!selectedNotebookId || !window.platform?.selectFolder) {
+    if (!selectedNotebookId || !usePlatform()?.selectFolder) {
       addToast(tr('knowledge.importUnavailable'), 'error');
       return;
     }
     setShowImportMenu(false);
-    const dirPath = await window.platform.selectFolder();
+    const dirPath = await usePlatform().selectFolder();
     if (!dirPath) return;
     setImporting(true);
     try {

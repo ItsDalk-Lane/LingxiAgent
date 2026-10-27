@@ -1,0 +1,2693 @@
+{
+  "scope": "源码证明边界，不是业务执行证据",
+  "excerpts": [
+    {
+      "path": "scripts/rust-tauri/r07_apply_leaf_bindings.py",
+      "start": 65,
+      "end": 118,
+      "sourceSha256": "7400a8dc10e4d1e351c641f80f438bc41cb17f700003d4ff9c9b23d2d9e286e9",
+      "lines": [
+        {
+          "line": 65,
+          "text": "    applied = 0"
+        },
+        {
+          "line": 66,
+          "text": "    for leaf_id, binding in bindings[\"leaves\"].items():"
+        },
+        {
+          "line": 67,
+          "text": "        leaf = leaves.get(leaf_id)"
+        },
+        {
+          "line": 68,
+          "text": "        if leaf is None:"
+        },
+        {
+          "line": 69,
+          "text": "            errors.append(f\"{leaf_id}: not in stage map\")"
+        },
+        {
+          "line": 70,
+          "text": "            continue"
+        },
+        {
+          "line": 71,
+          "text": "        groups = binding[\"assertionCases\"]"
+        },
+        {
+          "line": 72,
+          "text": "        if binding[\"basis\"] == \"full_original_behavior\" and len(groups) != len(leaf[\"r00Assertions\"]):"
+        },
+        {
+          "line": 73,
+          "text": "            errors.append("
+        },
+        {
+          "line": 74,
+          "text": "                f\"{leaf_id}: {len(groups)} case groups for {len(leaf['r00Assertions'])} assertions\""
+        },
+        {
+          "line": 75,
+          "text": "            )"
+        },
+        {
+          "line": 76,
+          "text": "            continue"
+        },
+        {
+          "line": 77,
+          "text": "        flat = [case for group in groups for case in group]"
+        },
+        {
+          "line": 78,
+          "text": "        if len(set(flat)) != len(flat):"
+        },
+        {
+          "line": 79,
+          "text": "            errors.append(f\"{leaf_id}: duplicate case within leaf\")"
+        },
+        {
+          "line": 80,
+          "text": "            continue"
+        },
+        {
+          "line": 81,
+          "text": "        if any(not group for group in groups):"
+        },
+        {
+          "line": 82,
+          "text": "            errors.append(f\"{leaf_id}: an assertion has no case\")"
+        },
+        {
+          "line": 83,
+          "text": "            continue"
+        },
+        {
+          "line": 84,
+          "text": "        for suite in binding[\"suiteRefs\"]:"
+        },
+        {
+          "line": 85,
+          "text": "            if suite not in commands:"
+        },
+        {
+          "line": 86,
+          "text": "                errors.append(f\"{leaf_id}: suiteRef {suite!r} is not a registered command\")"
+        },
+        {
+          "line": 87,
+          "text": "        for case in flat:"
+        },
+        {
+          "line": 88,
+          "text": "            suite = case.split(\"::\", 1)[0]"
+        },
+        {
+          "line": 89,
+          "text": "            if suite not in binding[\"suiteRefs\"]:"
+        },
+        {
+          "line": 90,
+          "text": "                errors.append(f\"{leaf_id}: case {case!r} comes from a suite outside suiteRefs\")"
+        },
+        {
+          "line": 91,
+          "text": "        if errors:"
+        },
+        {
+          "line": 92,
+          "text": "            continue"
+        },
+        {
+          "line": 93,
+          "text": "        leaf[\"basisKind\"] = binding[\"basis\"]"
+        },
+        {
+          "line": 94,
+          "text": "        leaf[\"evidenceCommandRefs\"] = list(binding[\"suiteRefs\"]) + [producer]"
+        },
+        {
+          "line": 95,
+          "text": "        leaf[\"evidencePaths\"] = [evidence_path]"
+        },
+        {
+          "line": 96,
+          "text": "        leaf[\"assertionContract\"] = {"
+        },
+        {
+          "line": 97,
+          "text": "            \"producerCommand\": producer,"
+        },
+        {
+          "line": 98,
+          "text": "            \"evidencePath\": evidence_path,"
+        },
+        {
+          "line": 99,
+          "text": "            \"cases\": [{\"case\": case, \"expect\": 1} for case in flat],"
+        },
+        {
+          "line": 100,
+          "text": "        }"
+        },
+        {
+          "line": 101,
+          "text": "        if binding[\"basis\"] == \"full_original_behavior\":"
+        },
+        {
+          "line": 102,
+          "text": "            leaf[\"originalAssertionCases\"] = groups"
+        },
+        {
+          "line": 103,
+          "text": "            leaf.pop(\"stageShare\", None)"
+        },
+        {
+          "line": 104,
+          "text": "            leaf.pop(\"laterShare\", None)"
+        },
+        {
+          "line": 105,
+          "text": "        elif binding[\"basis\"] == \"stage_share_satisfied\":"
+        },
+        {
+          "line": 106,
+          "text": "            # 阶段中立份额：仅含后续阶段的叶允许；份额边界与余款文本必填。"
+        },
+        {
+          "line": 107,
+          "text": "            if not binding.get(\"stageShare\") or not binding.get(\"laterShare\"):"
+        },
+        {
+          "line": 108,
+          "text": "                errors.append(f\"{leaf_id}: stage_share_satisfied needs stageShare and laterShare\")"
+        },
+        {
+          "line": 109,
+          "text": "                continue"
+        },
+        {
+          "line": 110,
+          "text": "            later = [s for s in leaf.get(\"r00ExecutionStageIds\", []) if s > \"R07\"]"
+        },
+        {
+          "line": 111,
+          "text": "            if not later:"
+        },
+        {
+          "line": 112,
+          "text": "                errors.append(f\"{leaf_id}: stage_share_satisfied but no later stage in R00 ledger\")"
+        },
+        {
+          "line": 113,
+          "text": "                continue"
+        },
+        {
+          "line": 114,
+          "text": "            leaf[\"stageShare\"] = binding[\"stageShare\"]"
+        },
+        {
+          "line": 115,
+          "text": "            leaf[\"laterShare\"] = binding[\"laterShare\"]"
+        },
+        {
+          "line": 116,
+          "text": "            leaf.pop(\"originalAssertionCases\", None)"
+        },
+        {
+          "line": 117,
+          "text": "        else:"
+        },
+        {
+          "line": 118,
+          "text": "            errors.append(f\"{leaf_id}: unsupported basis {binding['basis']!r}\")"
+        }
+      ]
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_t12_closure.rs",
+      "start": 193,
+      "end": 271,
+      "sourceSha256": "eeb924ca0711c502f5e6fe45b6291ce483c71810bb6d4fa1f985af7685dfd359",
+      "lines": [
+        {
+          "line": 193,
+          "text": ""
+        },
+        {
+          "line": 194,
+          "text": "/// A23 运行时半边：每条静态注册的路由在真实服务上——持本地令牌探测不得 404"
+        },
+        {
+          "line": 195,
+          "text": "/// （未接线的声明是空洞）；无凭证不得越过鉴权（公共面除外）。"
+        },
+        {
+          "line": 196,
+          "text": "#[tokio::test(flavor = \"multi_thread\", worker_threads = 2)]"
+        },
+        {
+          "line": 197,
+          "text": "async fn r07_t12_a23_runtime_route_matrix() {"
+        },
+        {
+          "line": 198,
+          "text": "    // 探针要对每条路由各打两发（全表 320+ 次），默认 240/窗 的对等限流会"
+        },
+        {
+          "line": 199,
+          "text": "    // 在中途 429——本用例测的是接线与鉴权，不是限流（限流另有 R02 专属"
+        },
+        {
+          "line": 200,
+          "text": "    // 测试），故把窗口预算抬到探针总量够不着的高度。"
+        },
+        {
+          "line": 201,
+          "text": "    let deps = ServiceDeps {"
+        },
+        {
+          "line": 202,
+          "text": "        rate_max: 100_000,"
+        },
+        {
+          "line": 203,
+          "text": "        ..ServiceDeps::default()"
+        },
+        {
+          "line": 204,
+          "text": "    };"
+        },
+        {
+          "line": 205,
+          "text": "    let server = boot(unique_dir(\"route-matrix\"), deps).await;"
+        },
+        {
+          "line": 206,
+          "text": "    let routes = registered_routes();"
+        },
+        {
+          "line": 207,
+          "text": "    assert!("
+        },
+        {
+          "line": 208,
+          "text": "        routes.len() > 100,"
+        },
+        {
+          "line": 209,
+          "text": "        \"route inventory suspiciously small: {}\","
+        },
+        {
+          "line": 210,
+          "text": "        routes.len()"
+        },
+        {
+          "line": 211,
+          "text": "    );"
+        },
+        {
+          "line": 212,
+          "text": ""
+        },
+        {
+          "line": 213,
+          "text": "    // 公共面精确镜像 classify_route 的 GET-Public 分支（auth.rs）："
+        },
+        {
+          "line": 214,
+          "text": "    // 健康、OAuth 回调、web-auth 会话查询、mobile/desktop 静态壳。"
+        },
+        {
+          "line": 215,
+          "text": "    // 新增公共路由若未同步本清单会被 unguarded 响亮揪出——这是有意的。"
+        },
+        {
+          "line": 216,
+          "text": "    // 注意 web-auth/login|logout 仅 POST 公共，GET 探测必须仍 401。"
+        },
+        {
+          "line": 217,
+          "text": "    let public_get = ["
+        },
+        {
+          "line": 218,
+          "text": "        \"/lingxi/v1/health\","
+        },
+        {
+          "line": 219,
+          "text": "        \"/lingxi/v1/mcp/oauth/callback\","
+        },
+        {
+          "line": 220,
+          "text": "        \"/lingxi/v1/web-auth/session\","
+        },
+        {
+          "line": 221,
+          "text": "        \"/mobile\","
+        },
+        {
+          "line": 222,
+          "text": "        \"/mobile/\","
+        },
+        {
+          "line": 223,
+          "text": "        \"/mobile/{*path}\","
+        },
+        {
+          "line": 224,
+          "text": "        \"/desktop\","
+        },
+        {
+          "line": 225,
+          "text": "        \"/desktop/\","
+        },
+        {
+          "line": 226,
+          "text": "        \"/desktop/{*path}\","
+        },
+        {
+          "line": 227,
+          "text": "    ];"
+        },
+        {
+          "line": 228,
+          "text": "    // token 即凭证的读面（classify_route Public 分支逐字镜像）：HTML 预览"
+        },
+        {
+          "line": 229,
+          "text": "    // 与桥媒体拉取——无效/过期一律 404 空体，不回 401/403 泄露存在性。"
+        },
+        {
+          "line": 230,
+          "text": "    let public_token_get = |route: &str| -> bool {"
+        },
+        {
+          "line": 231,
+          "text": "        if let Some(rest) = route.strip_prefix(\"/lingxi/v1/preview/html/\") {"
+        },
+        {
+          "line": 232,
+          "text": "            return !rest.is_empty();"
+        },
+        {
+          "line": 233,
+          "text": "        }"
+        },
+        {
+          "line": 234,
+          "text": "        if let Some(token) = route.strip_prefix(\"/lingxi/v1/bridge/media/\") {"
+        },
+        {
+          "line": 235,
+          "text": "            return !token.is_empty() && !token.contains('/');"
+        },
+        {
+          "line": 236,
+          "text": "        }"
+        },
+        {
+          "line": 237,
+          "text": "        false"
+        },
+        {
+          "line": 238,
+          "text": "    };"
+        },
+        {
+          "line": 239,
+          "text": "    let mut holes = Vec::new();"
+        },
+        {
+          "line": 240,
+          "text": "    let mut unguarded = Vec::new();"
+        },
+        {
+          "line": 241,
+          "text": "    for (route, source) in &routes {"
+        },
+        {
+          "line": 242,
+          "text": "        let probe = probe_path(route);"
+        },
+        {
+          "line": 243,
+          "text": "        // 空洞判定用无人注册的 TRACE 方法：已注册路径 → 路由层 405（处理器"
+        },
+        {
+          "line": 244,
+          "text": "        // 不参与，静态资产缺文件、资源不存在的处理器级 404 都不干扰）；"
+        },
+        {
+          "line": 245,
+          "text": "        // 未注册路径 → 404。鉴权先于路由，持本地令牌直达路由层。"
+        },
+        {
+          "line": 246,
+          "text": "        let (with, _) = server"
+        },
+        {
+          "line": 247,
+          "text": "            .call(Some(&server.token.clone()), \"TRACE\", &probe, None)"
+        },
+        {
+          "line": 248,
+          "text": "            .await;"
+        },
+        {
+          "line": 249,
+          "text": "        if with == 404 {"
+        },
+        {
+          "line": 250,
+          "text": "            holes.push(format!(\"{route} ({source})\"));"
+        },
+        {
+          "line": 251,
+          "text": "        }"
+        },
+        {
+          "line": 252,
+          "text": "        if public_get.contains(&route.as_str()) || public_token_get(route) {"
+        },
+        {
+          "line": 253,
+          "text": "            continue;"
+        },
+        {
+          "line": 254,
+          "text": "        }"
+        },
+        {
+          "line": 255,
+          "text": "        let (without, _) = server.call(None, \"GET\", &probe, None).await;"
+        },
+        {
+          "line": 256,
+          "text": "        if without != 401 {"
+        },
+        {
+          "line": 257,
+          "text": "            unguarded.push(format!(\"{route} ({source}) -> {without}\"));"
+        },
+        {
+          "line": 258,
+          "text": "        }"
+        },
+        {
+          "line": 259,
+          "text": "    }"
+        },
+        {
+          "line": 260,
+          "text": "    assert!(holes.is_empty(), \"注册声明但未接线的路由空洞: {holes:?}\");"
+        },
+        {
+          "line": 261,
+          "text": "    assert!("
+        },
+        {
+          "line": 262,
+          "text": "        unguarded.is_empty(),"
+        },
+        {
+          "line": 263,
+          "text": "        \"无凭证未 401 的受守路由: {unguarded:?}\""
+        },
+        {
+          "line": 264,
+          "text": "    );"
+        },
+        {
+          "line": 265,
+          "text": "    server.stop().await;"
+        },
+        {
+          "line": 266,
+          "text": "}"
+        },
+        {
+          "line": 267,
+          "text": ""
+        },
+        {
+          "line": 268,
+          "text": "/// 最小 OpenAI 兼容 SSE 替身：一次应答即完结（无工具），记录全部请求路径。"
+        },
+        {
+          "line": 269,
+          "text": "struct Stub {"
+        },
+        {
+          "line": 270,
+          "text": "    addr: SocketAddr,"
+        },
+        {
+          "line": 271,
+          "text": "    paths: Arc<Mutex<Vec<String>>>,"
+        }
+      ]
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_probe_access.rs",
+      "start": 267,
+      "end": 323,
+      "sourceSha256": "a59033ecf2f9922805bcc83a54c0750dddca737b2dd121db5dbfab125fea7b24",
+      "lines": [
+        {
+          "line": 267,
+          "text": "async fn device_credentials_issue_honest_transport_handling() {"
+        },
+        {
+          "line": 268,
+          "text": "    let server = boot(\"devicecred\").await;"
+        },
+        {
+          "line": 269,
+          "text": "    let (status, body) = server"
+        },
+        {
+          "line": 270,
+          "text": "        .call("
+        },
+        {
+          "line": 271,
+          "text": "            \"POST\","
+        },
+        {
+          "line": 272,
+          "text": "            \"/lingxi/v1/devices/credentials\","
+        },
+        {
+          "line": 273,
+          "text": "            Some(json!({\"requestedDevice\":{\"deviceKind\":\"desktop\"}})),"
+        },
+        {
+          "line": 274,
+          "text": "        )"
+        },
+        {
+          "line": 275,
+          "text": "        .await;"
+        },
+        {
+          "line": 276,
+          "text": "    if status == 200 {"
+        },
+        {
+          "line": 277,
+          "text": "        assert!("
+        },
+        {
+          "line": 278,
+          "text": "            body[\"secret\"].is_string() || body[\"credential\"][\"secret\"].is_string(),"
+        },
+        {
+          "line": 279,
+          "text": "            \"{body}\""
+        },
+        {
+          "line": 280,
+          "text": "        );"
+        },
+        {
+          "line": 281,
+          "text": "    } else {"
+        },
+        {
+          "line": 282,
+          "text": "        // 非安全传输上的签发拒绝是显式错误，不是空数据或成功提示。"
+        },
+        {
+          "line": 283,
+          "text": "        assert!("
+        },
+        {
+          "line": 284,
+          "text": "            status == 400 || status == 403,"
+        },
+        {
+          "line": 285,
+          "text": "            \"一次性 secret 签发在明文通道应显式拒绝: {status} {body}\""
+        },
+        {
+          "line": 286,
+          "text": "        );"
+        },
+        {
+          "line": 287,
+          "text": "    }"
+        },
+        {
+          "line": 288,
+          "text": "    server.stop().await;"
+        },
+        {
+          "line": 289,
+          "text": "}"
+        },
+        {
+          "line": 290,
+          "text": ""
+        },
+        {
+          "line": 291,
+          "text": "#[tokio::test]"
+        },
+        {
+          "line": 292,
+          "text": "async fn mobile_credentials_and_qr_honest_states() {"
+        },
+        {
+          "line": 293,
+          "text": "    let server = boot(\"mobilecred\").await;"
+        },
+        {
+          "line": 294,
+          "text": "    let (status, body) = server"
+        },
+        {
+          "line": 295,
+          "text": "        .call("
+        },
+        {
+          "line": 296,
+          "text": "            \"POST\","
+        },
+        {
+          "line": 297,
+          "text": "            \"/lingxi/v1/access/mobile-credentials\","
+        },
+        {
+          "line": 298,
+          "text": "            Some(json!({\"requestedDevice\":{\"deviceKind\":\"mobile\"}})),"
+        },
+        {
+          "line": 299,
+          "text": "        )"
+        },
+        {
+          "line": 300,
+          "text": "        .await;"
+        },
+        {
+          "line": 301,
+          "text": "    if status == 200 {"
+        },
+        {
+          "line": 302,
+          "text": "        assert!("
+        },
+        {
+          "line": 303,
+          "text": "            body[\"secret\"].is_string() || body[\"credential\"][\"secret\"].is_string(),"
+        },
+        {
+          "line": 304,
+          "text": "            \"{body}\""
+        },
+        {
+          "line": 305,
+          "text": "        );"
+        },
+        {
+          "line": 306,
+          "text": "        // 同屏地址可用时二维码 SVG 可读；LAN 不可用为 400（诚实错误）。"
+        },
+        {
+          "line": 307,
+          "text": "        let (qr_status, qr) = server"
+        },
+        {
+          "line": 308,
+          "text": "            .call(\"GET\", \"/lingxi/v1/access/mobile-qr.svg\", None)"
+        },
+        {
+          "line": 309,
+          "text": "            .await;"
+        },
+        {
+          "line": 310,
+          "text": "        assert!(qr_status == 200 || qr_status == 400, \"{qr_status} {qr}\");"
+        },
+        {
+          "line": 311,
+          "text": "    } else {"
+        },
+        {
+          "line": 312,
+          "text": "        assert!(status == 400 || status == 403, \"{status} {body}\");"
+        },
+        {
+          "line": 313,
+          "text": "    }"
+        },
+        {
+          "line": 314,
+          "text": "    server.stop().await;"
+        },
+        {
+          "line": 315,
+          "text": "}"
+        },
+        {
+          "line": 316,
+          "text": ""
+        },
+        {
+          "line": 317,
+          "text": "#[tokio::test]"
+        },
+        {
+          "line": 318,
+          "text": "async fn pairing_session_create_approve_and_device_revoke() {"
+        },
+        {
+          "line": 319,
+          "text": "    let server = boot(\"pairing\").await;"
+        },
+        {
+          "line": 320,
+          "text": "    // 创建配对会话：本地主人获得配对码与到期时间。"
+        },
+        {
+          "line": 321,
+          "text": "    let (status, body) = server"
+        },
+        {
+          "line": 322,
+          "text": "        .call("
+        },
+        {
+          "line": 323,
+          "text": "            \"POST\","
+        }
+      ]
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_probe_access.rs",
+      "start": 505,
+      "end": 523,
+      "sourceSha256": "a59033ecf2f9922805bcc83a54c0750dddca737b2dd121db5dbfab125fea7b24",
+      "lines": [
+        {
+          "line": 505,
+          "text": "async fn static_shells_serve_or_guide_without_fabricating() {"
+        },
+        {
+          "line": 506,
+          "text": "    let server = boot(\"static\").await;"
+        },
+        {
+          "line": 507,
+          "text": "    for path in [\"/mobile\", \"/desktop\"] {"
+        },
+        {
+          "line": 508,
+          "text": "        let (status, body) = server.call(\"GET\", path, None).await;"
+        },
+        {
+          "line": 509,
+          "text": "        let final_status = if status == 308 || status == 301 {"
+        },
+        {
+          "line": 510,
+          "text": "            server.call(\"GET\", &format!(\"{path}/\"), None).await.0"
+        },
+        {
+          "line": 511,
+          "text": "        } else {"
+        },
+        {
+          "line": 512,
+          "text": "            status"
+        },
+        {
+          "line": 513,
+          "text": "        };"
+        },
+        {
+          "line": 514,
+          "text": "        // 有构建产物 → 200 页面；无产物 → 指引/错误（非空成功体伪装）。"
+        },
+        {
+          "line": 515,
+          "text": "        assert!("
+        },
+        {
+          "line": 516,
+          "text": "            final_status == 200 || final_status == 404 || final_status == 400,"
+        },
+        {
+          "line": 517,
+          "text": "            \"{path} -> {final_status} {body}\""
+        },
+        {
+          "line": 518,
+          "text": "        );"
+        },
+        {
+          "line": 519,
+          "text": "    }"
+        },
+        {
+          "line": 520,
+          "text": "    server.stop().await;"
+        },
+        {
+          "line": 521,
+          "text": "}"
+        },
+        {
+          "line": 522,
+          "text": ""
+        },
+        {
+          "line": 523,
+          "text": "#[tokio::test]"
+        }
+      ]
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_probe_access.rs",
+      "start": 658,
+      "end": 760,
+      "sourceSha256": "a59033ecf2f9922805bcc83a54c0750dddca737b2dd121db5dbfab125fea7b24",
+      "lines": [
+        {
+          "line": 658,
+          "text": "async fn channels_create_and_delete_roundtrip() {"
+        },
+        {
+          "line": 659,
+          "text": "    let server = boot(\"channels\").await;"
+        },
+        {
+          "line": 660,
+          "text": "    // 创建频道：名称 + 至少两名不同 Agent 成员。"
+        },
+        {
+          "line": 661,
+          "text": "    let (status, body) = server"
+        },
+        {
+          "line": 662,
+          "text": "        .call("
+        },
+        {
+          "line": 663,
+          "text": "            \"POST\","
+        },
+        {
+          "line": 664,
+          "text": "            \"/lingxi/v1/channels\","
+        },
+        {
+          "line": 665,
+          "text": "            Some(json!({\"name\":\"probe-channel\",\"memberAgentIds\":[\"lingxi\",\"second\"]})),"
+        },
+        {
+          "line": 666,
+          "text": "        )"
+        },
+        {
+          "line": 667,
+          "text": "        .await;"
+        },
+        {
+          "line": 668,
+          "text": "    if status == 200 || status == 201 {"
+        },
+        {
+          "line": 669,
+          "text": "        // 删除频道返回 ok；再次删除 404。"
+        },
+        {
+          "line": 670,
+          "text": "        let (status, body) = server"
+        },
+        {
+          "line": 671,
+          "text": "            .call(\"DELETE\", \"/lingxi/v1/channels/probe-channel\", None)"
+        },
+        {
+          "line": 672,
+          "text": "            .await;"
+        },
+        {
+          "line": 673,
+          "text": "        assert_eq!(status, 200, \"{body}\");"
+        },
+        {
+          "line": 674,
+          "text": "        let (status, _) = server"
+        },
+        {
+          "line": 675,
+          "text": "            .call(\"DELETE\", \"/lingxi/v1/channels/probe-channel\", None)"
+        },
+        {
+          "line": 676,
+          "text": "            .await;"
+        },
+        {
+          "line": 677,
+          "text": "        assert_eq!(status, 404);"
+        },
+        {
+          "line": 678,
+          "text": "    } else {"
+        },
+        {
+          "line": 679,
+          "text": "        // 成员不足/名称非法的拒绝是显式错误。"
+        },
+        {
+          "line": 680,
+          "text": "        assert_eq!(status, 400, \"{body}\");"
+        },
+        {
+          "line": 681,
+          "text": "    }"
+        },
+        {
+          "line": 682,
+          "text": "    // 成员不足拒绝。"
+        },
+        {
+          "line": 683,
+          "text": "    let (status, _) = server"
+        },
+        {
+          "line": 684,
+          "text": "        .call("
+        },
+        {
+          "line": 685,
+          "text": "            \"POST\","
+        },
+        {
+          "line": 686,
+          "text": "            \"/lingxi/v1/channels\","
+        },
+        {
+          "line": 687,
+          "text": "            Some(json!({\"name\":\"bad\",\"memberAgentIds\":[\"lingxi\"]})),"
+        },
+        {
+          "line": 688,
+          "text": "        )"
+        },
+        {
+          "line": 689,
+          "text": "        .await;"
+        },
+        {
+          "line": 690,
+          "text": "    assert_eq!(status, 400);"
+        },
+        {
+          "line": 691,
+          "text": "    server.stop().await;"
+        },
+        {
+          "line": 692,
+          "text": "}"
+        },
+        {
+          "line": 693,
+          "text": ""
+        },
+        {
+          "line": 694,
+          "text": "#[tokio::test]"
+        },
+        {
+          "line": 695,
+          "text": "async fn session_permission_default_read_and_write() {"
+        },
+        {
+          "line": 696,
+          "text": "    let server = boot(\"permdefault\").await;"
+        },
+        {
+          "line": 697,
+          "text": "    let (status, body) = server"
+        },
+        {
+          "line": 698,
+          "text": "        .call("
+        },
+        {
+          "line": 699,
+          "text": "            \"GET\","
+        },
+        {
+          "line": 700,
+          "text": "            \"/lingxi/v1/preferences/session-permission-default\","
+        },
+        {
+          "line": 701,
+          "text": "            None,"
+        },
+        {
+          "line": 702,
+          "text": "        )"
+        },
+        {
+          "line": 703,
+          "text": "        .await;"
+        },
+        {
+          "line": 704,
+          "text": "    assert_eq!(status, 200, \"{body}\");"
+        },
+        {
+          "line": 705,
+          "text": "    let current = body[\"permissionMode\"]"
+        },
+        {
+          "line": 706,
+          "text": "        .as_str()"
+        },
+        {
+          "line": 707,
+          "text": "        .or(body[\"default\"].as_str())"
+        },
+        {
+          "line": 708,
+          "text": "        .unwrap_or(\"ask\")"
+        },
+        {
+          "line": 709,
+          "text": "        .to_string();"
+        },
+        {
+          "line": 710,
+          "text": "    // 写入经专用偏好面（PUT /preferences/session-permission-default）并读回。"
+        },
+        {
+          "line": 711,
+          "text": "    let next = if current == \"operate\" {"
+        },
+        {
+          "line": 712,
+          "text": "        \"ask\""
+        },
+        {
+          "line": 713,
+          "text": "    } else {"
+        },
+        {
+          "line": 714,
+          "text": "        \"operate\""
+        },
+        {
+          "line": 715,
+          "text": "    };"
+        },
+        {
+          "line": 716,
+          "text": "    let (status, body) = server"
+        },
+        {
+          "line": 717,
+          "text": "        .call("
+        },
+        {
+          "line": 718,
+          "text": "            \"PUT\","
+        },
+        {
+          "line": 719,
+          "text": "            \"/lingxi/v1/preferences/session-permission-default\","
+        },
+        {
+          "line": 720,
+          "text": "            Some(json!({\"permissionMode\": next})),"
+        },
+        {
+          "line": 721,
+          "text": "        )"
+        },
+        {
+          "line": 722,
+          "text": "        .await;"
+        },
+        {
+          "line": 723,
+          "text": "    assert_eq!(status, 200, \"{body}\");"
+        },
+        {
+          "line": 724,
+          "text": "    let (_, after) = server"
+        },
+        {
+          "line": 725,
+          "text": "        .call("
+        },
+        {
+          "line": 726,
+          "text": "            \"GET\","
+        },
+        {
+          "line": 727,
+          "text": "            \"/lingxi/v1/preferences/session-permission-default\","
+        },
+        {
+          "line": 728,
+          "text": "            None,"
+        },
+        {
+          "line": 729,
+          "text": "        )"
+        },
+        {
+          "line": 730,
+          "text": "        .await;"
+        },
+        {
+          "line": 731,
+          "text": "    assert!("
+        },
+        {
+          "line": 732,
+          "text": "        after[\"permissionMode\"] == json!(next) || after[\"default\"] == json!(next),"
+        },
+        {
+          "line": 733,
+          "text": "        \"{after}\""
+        },
+        {
+          "line": 734,
+          "text": "    );"
+        },
+        {
+          "line": 735,
+          "text": "    // 非法模式拒绝且不改变已存值。"
+        },
+        {
+          "line": 736,
+          "text": "    let (status, _) = server"
+        },
+        {
+          "line": 737,
+          "text": "        .call("
+        },
+        {
+          "line": 738,
+          "text": "            \"PUT\","
+        },
+        {
+          "line": 739,
+          "text": "            \"/lingxi/v1/preferences/session-permission-default\","
+        },
+        {
+          "line": 740,
+          "text": "            Some(json!({\"permissionMode\": \"yolo\"})),"
+        },
+        {
+          "line": 741,
+          "text": "        )"
+        },
+        {
+          "line": 742,
+          "text": "        .await;"
+        },
+        {
+          "line": 743,
+          "text": "    assert_eq!(status, 400);"
+        },
+        {
+          "line": 744,
+          "text": "    let (_, unchanged) = server"
+        },
+        {
+          "line": 745,
+          "text": "        .call("
+        },
+        {
+          "line": 746,
+          "text": "            \"GET\","
+        },
+        {
+          "line": 747,
+          "text": "            \"/lingxi/v1/preferences/session-permission-default\","
+        },
+        {
+          "line": 748,
+          "text": "            None,"
+        },
+        {
+          "line": 749,
+          "text": "        )"
+        },
+        {
+          "line": 750,
+          "text": "        .await;"
+        },
+        {
+          "line": 751,
+          "text": "    assert!("
+        },
+        {
+          "line": 752,
+          "text": "        unchanged[\"permissionMode\"] == json!(next) || unchanged[\"default\"] == json!(next),"
+        },
+        {
+          "line": 753,
+          "text": "        \"{unchanged}\""
+        },
+        {
+          "line": 754,
+          "text": "    );"
+        },
+        {
+          "line": 755,
+          "text": "    server.stop().await;"
+        },
+        {
+          "line": 756,
+          "text": "}"
+        }
+      ]
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+      "start": 315,
+      "end": 405,
+      "sourceSha256": "1c7cda6338c8d0399b871c59c42dd8b4d3162e7568e6f00f102cffa279d594ef",
+      "lines": [
+        {
+          "line": 315,
+          "text": "async fn original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval() {"
+        },
+        {
+          "line": 316,
+          "text": "    let h = Harness::boot().await;"
+        },
+        {
+          "line": 317,
+          "text": "    h.state.skills().set_guard(Arc::new(Guard));"
+        },
+        {
+          "line": 318,
+          "text": "    let service = h.state.skills();"
+        },
+        {
+          "line": 319,
+          "text": "    let args = json!({\"name\":\"learned-pitfall\",\"description\":\"重试前检查原始输入\",\"lesson\":\"# 教训\\n先确认文件身份再执行。\"});"
+        },
+        {
+          "line": 320,
+          "text": "    let before = std::fs::read(h.home.join(\"agents/agentA/config.yaml\")).unwrap();"
+        },
+        {
+          "line": 321,
+          "text": "    let warning = service.learn_lesson(\"agentA\", &args).await.unwrap();"
+        },
+        {
+          "line": 322,
+          "text": "    assert_eq!(warning[\"requiresRiskConfirmation\"], true);"
+        },
+        {
+          "line": 323,
+          "text": "    assert!(!h.home.join(\"skills/learned-pitfall\").exists());"
+        },
+        {
+          "line": 324,
+          "text": "    assert_eq!("
+        },
+        {
+          "line": 325,
+          "text": "        std::fs::read(h.home.join(\"agents/agentA/config.yaml\")).unwrap(),"
+        },
+        {
+          "line": 326,
+          "text": "        before"
+        },
+        {
+          "line": 327,
+          "text": "    );"
+        },
+        {
+          "line": 328,
+          "text": "    let mut accepted = args.clone();"
+        },
+        {
+          "line": 329,
+          "text": "    accepted[\"risk_accepted\"] = json!(true);"
+        },
+        {
+          "line": 330,
+          "text": "    accepted[\"risk_confirmation_token\"] = warning[\"riskConfirmationToken\"].clone();"
+        },
+        {
+          "line": 331,
+          "text": "    let mut wrong = accepted.clone();"
+        },
+        {
+          "line": 332,
+          "text": "    wrong[\"lesson\"] = json!(\"已改变的正文\");"
+        },
+        {
+          "line": 333,
+          "text": "    let refusal = service.learn_lesson(\"agentA\", &wrong).await.unwrap();"
+        },
+        {
+          "line": 334,
+          "text": "    assert_eq!(refusal[\"ok\"], false);"
+        },
+        {
+          "line": 335,
+          "text": "    assert!(!h.home.join(\"skills/learned-pitfall\").exists());"
+        },
+        {
+          "line": 336,
+          "text": "    // 内容改变会作废旧 token；重新展示当前内容的风险后，必须重新明确接受。"
+        },
+        {
+          "line": 337,
+          "text": "    let renewed = service.learn_lesson(\"agentA\", &args).await.unwrap();"
+        },
+        {
+          "line": 338,
+          "text": "    accepted[\"risk_confirmation_token\"] = renewed[\"riskConfirmationToken\"].clone();"
+        },
+        {
+          "line": 339,
+          "text": "    let success = service.learn_lesson(\"agentA\", &accepted).await.unwrap();"
+        },
+        {
+          "line": 340,
+          "text": "    assert_eq!(success[\"ok\"], true, \"{success}\");"
+        },
+        {
+          "line": 341,
+          "text": "    assert_eq!(success[\"riskOverride\"], true);"
+        },
+        {
+          "line": 342,
+          "text": "    assert_eq!(success[\"experienceIndexed\"], true);"
+        },
+        {
+          "line": 343,
+          "text": "    let file = h.home.join(\"skills/learned-pitfall/SKILL.md\");"
+        },
+        {
+          "line": 344,
+          "text": "    assert!(std::fs::read_to_string(&file)"
+        },
+        {
+          "line": 345,
+          "text": "        .unwrap()"
+        },
+        {
+          "line": 346,
+          "text": "        .contains(\"先确认文件身份再执行。\"));"
+        },
+        {
+          "line": 347,
+          "text": "    let text = std::fs::read_to_string(h.home.join(\"agents/agentA/config.yaml\")).unwrap();"
+        },
+        {
+          "line": 348,
+          "text": "    assert!(text.contains(\"learned-pitfall\"));"
+        },
+        {
+          "line": 349,
+          "text": "    assert!("
+        },
+        {
+          "line": 350,
+          "text": "        !std::fs::read_to_string(h.home.join(\"agents/agentB/config.yaml\"))"
+        },
+        {
+          "line": 351,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 352,
+          "text": "            .contains(\"learned-pitfall\")"
+        },
+        {
+          "line": 353,
+          "text": "    );"
+        },
+        {
+          "line": 354,
+          "text": "    let experience ="
+        },
+        {
+          "line": 355,
+          "text": "        lingxi_adapters::storage::agent_memory::ExperienceStore::new(&h.home.join(\"agents/agentA\"));"
+        },
+        {
+          "line": 356,
+          "text": "    assert!(experience"
+        },
+        {
+          "line": 357,
+          "text": "        .index_text_checked()"
+        },
+        {
+          "line": 358,
+          "text": "        .unwrap()"
+        },
+        {
+          "line": 359,
+          "text": "        .contains(\"learned lessons\"));"
+        },
+        {
+          "line": 360,
+          "text": "    assert!(experience"
+        },
+        {
+          "line": 361,
+          "text": "        .list_documents_checked()"
+        },
+        {
+          "line": 362,
+          "text": "        .unwrap()"
+        },
+        {
+          "line": 363,
+          "text": "        .iter()"
+        },
+        {
+          "line": 364,
+          "text": "        .any(|doc| doc.body.contains(\"learned-pitfall\")));"
+        },
+        {
+          "line": 365,
+          "text": "    let (_, catalog) = h"
+        },
+        {
+          "line": 366,
+          "text": "        .request("
+        },
+        {
+          "line": 367,
+          "text": "            \"GET\","
+        },
+        {
+          "line": 368,
+          "text": "            \"/lingxi/v1/skills?agentId=agentA&runtime=1\","
+        },
+        {
+          "line": 369,
+          "text": "            Value::Null,"
+        },
+        {
+          "line": 370,
+          "text": "            false,"
+        },
+        {
+          "line": 371,
+          "text": "        )"
+        },
+        {
+          "line": 372,
+          "text": "        .await;"
+        },
+        {
+          "line": 373,
+          "text": "    assert!(catalog[\"skills\"]"
+        },
+        {
+          "line": 374,
+          "text": "        .as_array()"
+        },
+        {
+          "line": 375,
+          "text": "        .unwrap()"
+        },
+        {
+          "line": 376,
+          "text": "        .iter()"
+        },
+        {
+          "line": 377,
+          "text": "        .any(|skill| skill[\"name\"] == \"learned-pitfall\" && skill[\"enabled\"] == true));"
+        },
+        {
+          "line": 378,
+          "text": "    let written = std::fs::read(&file).unwrap();"
+        },
+        {
+          "line": 379,
+          "text": "    assert!(service.learn_lesson(\"agentA\", &accepted).await.is_err());"
+        },
+        {
+          "line": 380,
+          "text": "    assert_eq!(std::fs::read(&file).unwrap(), written);"
+        },
+        {
+          "line": 381,
+          "text": "    assert!(service.learn_lesson(\"missing\", &args).await.is_err());"
+        },
+        {
+          "line": 382,
+          "text": "    assert!(service"
+        },
+        {
+          "line": 383,
+          "text": "        .learn_lesson("
+        },
+        {
+          "line": 384,
+          "text": "            \"agentA\","
+        },
+        {
+          "line": 385,
+          "text": "            &json!({\"name\":\"../escape\",\"description\":\"x\",\"lesson\":\"y\"})"
+        },
+        {
+          "line": 386,
+          "text": "        )"
+        },
+        {
+          "line": 387,
+          "text": "        .await"
+        },
+        {
+          "line": 388,
+          "text": "        .is_err());"
+        },
+        {
+          "line": 389,
+          "text": "    let bad_pool = h.home.join(\"skills\");"
+        },
+        {
+          "line": 390,
+          "text": "    let held = h.home.join(\"held-skills\");"
+        },
+        {
+          "line": 391,
+          "text": "    std::fs::rename(&bad_pool, &held).unwrap();"
+        },
+        {
+          "line": 392,
+          "text": "    std::fs::write(&bad_pool, \"blocked\").unwrap();"
+        },
+        {
+          "line": 393,
+          "text": "    let failed = service"
+        },
+        {
+          "line": 394,
+          "text": "        .learn_lesson("
+        },
+        {
+          "line": 395,
+          "text": "            \"agentA\","
+        },
+        {
+          "line": 396,
+          "text": "            &json!({\"name\":\"cannot-write\",\"description\":\"x\",\"lesson\":\"y\",\"risk_accepted\":true}),"
+        },
+        {
+          "line": 397,
+          "text": "        )"
+        },
+        {
+          "line": 398,
+          "text": "        .await;"
+        },
+        {
+          "line": 399,
+          "text": "    assert!(failed.is_err());"
+        },
+        {
+          "line": 400,
+          "text": "    assert!(!held.join(\"cannot-write\").exists());"
+        },
+        {
+          "line": 401,
+          "text": "    std::fs::remove_file(&bad_pool).unwrap();"
+        },
+        {
+          "line": 402,
+          "text": "    std::fs::rename(held, bad_pool).unwrap();"
+        },
+        {
+          "line": 403,
+          "text": "    h.close().await;"
+        },
+        {
+          "line": 404,
+          "text": "}"
+        },
+        {
+          "line": 405,
+          "text": ""
+        }
+      ]
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_automation_flow.rs",
+      "start": 303,
+      "end": 376,
+      "sourceSha256": "8e54ef78d2376fced600773bc10823616c8344a3adb2b73bff6ee88b2d878173",
+      "lines": [
+        {
+          "line": 303,
+          "text": "async fn real_tool_suggestion_requires_apply_and_replays_after_expiry() {"
+        },
+        {
+          "line": 304,
+          "text": "    let h = Harness::boot(None).await;"
+        },
+        {
+          "line": 305,
+          "text": "    chat(&h,json!({\"tool\":\"automation\",\"args\":{\"action\":\"create\",\"scheduleType\":\"every\",\"schedule\":\"1\",\"prompt\":\"核对资料\",\"label\":\"草案\"}})).await;"
+        },
+        {
+          "line": 306,
+          "text": "    assert!("
+        },
+        {
+          "line": 307,
+          "text": "        store::list_jobs(h.state.storage(), None)"
+        },
+        {
+          "line": 308,
+          "text": "            .await"
+        },
+        {
+          "line": 309,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 310,
+          "text": "            .is_empty(),"
+        },
+        {
+          "line": 311,
+          "text": "        \"模型建议不能自行启用\""
+        },
+        {
+          "line": 312,
+          "text": "    );"
+        },
+        {
+          "line": 313,
+          "text": "    let result = h.provider.results.lock().unwrap().last().unwrap().clone();"
+        },
+        {
+          "line": 314,
+          "text": "    assert_eq!(result[\"ok\"], true, \"{result}\");"
+        },
+        {
+          "line": 315,
+          "text": "    let suggestion = result[\"details\"][\"suggestionId\"].as_str().unwrap();"
+        },
+        {
+          "line": 316,
+          "text": "    assert_eq!("
+        },
+        {
+          "line": 317,
+          "text": "        result[\"details\"][\"automationSuggestion\"][\"suggestionId\"],"
+        },
+        {
+          "line": 318,
+          "text": "        suggestion"
+        },
+        {
+          "line": 319,
+          "text": "    );"
+        },
+        {
+          "line": 320,
+          "text": "    let body = json!({\"action\":\"apply_suggestion\",\"sessionId\":\"scheduler-source\",\"suggestionId\":suggestion,\"jobData\":{\"label\":\"用户改名\",\"targetAgentId\":\"lingxi\"}});"
+        },
+        {
+          "line": 321,
+          "text": "    let (status, applied) = h"
+        },
+        {
+          "line": 322,
+          "text": "        .request(\"POST\", \"/lingxi/v1/desk/cron\", body.clone())"
+        },
+        {
+          "line": 323,
+          "text": "        .await;"
+        },
+        {
+          "line": 324,
+          "text": "    assert_eq!(status, 200, \"{applied}\");"
+        },
+        {
+          "line": 325,
+          "text": "    assert_eq!(applied[\"job\"][\"label\"], \"用户改名\");"
+        },
+        {
+          "line": 326,
+          "text": "    assert_eq!(applied[\"job\"][\"schedule\"], 60_000);"
+        },
+        {
+          "line": 327,
+          "text": "    h.clock.advance(31 * 60_000);"
+        },
+        {
+          "line": 328,
+          "text": "    let (status, replayed) = h.request(\"POST\", \"/lingxi/v1/desk/cron\", body).await;"
+        },
+        {
+          "line": 329,
+          "text": "    assert_eq!(status, 200, \"{replayed}\");"
+        },
+        {
+          "line": 330,
+          "text": "    assert_eq!(replayed[\"job\"][\"id\"], applied[\"job\"][\"id\"]);"
+        },
+        {
+          "line": 331,
+          "text": "    assert_eq!("
+        },
+        {
+          "line": 332,
+          "text": "        store::list_jobs(h.state.storage(), None)"
+        },
+        {
+          "line": 333,
+          "text": "            .await"
+        },
+        {
+          "line": 334,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 335,
+          "text": "            .len(),"
+        },
+        {
+          "line": 336,
+          "text": "        1"
+        },
+        {
+          "line": 337,
+          "text": "    );"
+        },
+        {
+          "line": 338,
+          "text": "    let root = h.close().await;"
+        },
+        {
+          "line": 339,
+          "text": "    std::fs::remove_dir_all(root).unwrap();"
+        },
+        {
+          "line": 340,
+          "text": "}"
+        },
+        {
+          "line": 341,
+          "text": ""
+        },
+        {
+          "line": 342,
+          "text": "#[tokio::test]"
+        },
+        {
+          "line": 343,
+          "text": "async fn slash_apply_uses_frozen_owned_suggestion() {"
+        },
+        {
+          "line": 344,
+          "text": "    let h = Harness::boot(None).await;"
+        },
+        {
+          "line": 345,
+          "text": "    chat(&h,json!({\"tool\":\"automation\",\"args\":{\"action\":\"create\",\"scheduleType\":\"every\",\"schedule\":\"2\",\"prompt\":\"整理资料\",\"label\":\"每日资料核对\"}})).await;"
+        },
+        {
+          "line": 346,
+          "text": "    let result = h.provider.results.lock().unwrap().last().unwrap().clone();"
+        },
+        {
+          "line": 347,
+          "text": "    assert_eq!(result[\"ok\"], true, \"{result}\");"
+        },
+        {
+          "line": 348,
+          "text": "    let suggestion = result[\"details\"][\"suggestionId\"].as_str().unwrap();"
+        },
+        {
+          "line": 349,
+          "text": "    let (status, response) = h"
+        },
+        {
+          "line": 350,
+          "text": "        .request("
+        },
+        {
+          "line": 351,
+          "text": "            \"POST\","
+        },
+        {
+          "line": 352,
+          "text": "            \"/lingxi/v1/sessions/scheduler-source/slash\","
+        },
+        {
+          "line": 353,
+          "text": "            json!({\"text\":format!(\"/apply {suggestion}\")}),"
+        },
+        {
+          "line": 354,
+          "text": "        )"
+        },
+        {
+          "line": 355,
+          "text": "        .await;"
+        },
+        {
+          "line": 356,
+          "text": "    assert_eq!(status, 200, \"{response}\");"
+        },
+        {
+          "line": 357,
+          "text": "    assert_eq!(response[\"results\"][0][\"level\"], \"success\", \"{response}\");"
+        },
+        {
+          "line": 358,
+          "text": "    assert!("
+        },
+        {
+          "line": 359,
+          "text": "        response[\"results\"][0][\"text\"]"
+        },
+        {
+          "line": 360,
+          "text": "            .as_str()"
+        },
+        {
+          "line": 361,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 362,
+          "text": "            .contains(\"每日资料核对\"),"
+        },
+        {
+          "line": 363,
+          "text": "        \"{response}\""
+        },
+        {
+          "line": 364,
+          "text": "    );"
+        },
+        {
+          "line": 365,
+          "text": "    assert_eq!("
+        },
+        {
+          "line": 366,
+          "text": "        store::list_jobs(h.state.storage(), None)"
+        },
+        {
+          "line": 367,
+          "text": "            .await"
+        },
+        {
+          "line": 368,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 369,
+          "text": "            .len(),"
+        },
+        {
+          "line": 370,
+          "text": "        1"
+        },
+        {
+          "line": 371,
+          "text": "    );"
+        },
+        {
+          "line": 372,
+          "text": "    let root = h.close().await;"
+        },
+        {
+          "line": 373,
+          "text": "    std::fs::remove_dir_all(root).unwrap();"
+        },
+        {
+          "line": 374,
+          "text": "}"
+        },
+        {
+          "line": 375,
+          "text": ""
+        },
+        {
+          "line": 376,
+          "text": "#[tokio::test]"
+        }
+      ]
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_automation_activity.rs",
+      "start": 238,
+      "end": 336,
+      "sourceSha256": "c37d5e631a0a2fee87064607f059c07720c2e38a8113f4f24d203be49570b0a0",
+      "lines": [
+        {
+          "line": 238,
+          "text": "async fn completed_activity_promotes_the_same_real_session_without_new_messages_or_runs() {"
+        },
+        {
+          "line": 239,
+          "text": "    let h = Harness::start(None).await;"
+        },
+        {
+          "line": 240,
+          "text": "    let id = h.execute().await;"
+        },
+        {
+          "line": 241,
+          "text": "    let list = h.list().await;"
+        },
+        {
+          "line": 242,
+          "text": "    assert_eq!(list.len(), 1);"
+        },
+        {
+          "line": 243,
+          "text": "    assert_eq!(list[0][\"id\"], id);"
+        },
+        {
+          "line": 244,
+          "text": "    assert_eq!(list[0][\"type\"], \"cron\");"
+        },
+        {
+          "line": 245,
+          "text": "    assert_eq!(list[0][\"status\"], \"done\");"
+        },
+        {
+          "line": 246,
+          "text": "    assert_eq!(list[0][\"summary\"], \"真实活动的最终回复\");"
+        },
+        {
+          "line": 247,
+          "text": "    let session = list[0][\"sessionId\"].as_str().unwrap().to_owned();"
+        },
+        {
+          "line": 248,
+          "text": "    let (status, detail) = h"
+        },
+        {
+          "line": 249,
+          "text": "        .request("
+        },
+        {
+          "line": 250,
+          "text": "            \"GET\","
+        },
+        {
+          "line": 251,
+          "text": "            &format!(\"/lingxi/v1/desk/activities/{id}/session\"),"
+        },
+        {
+          "line": 252,
+          "text": "            None,"
+        },
+        {
+          "line": 253,
+          "text": "        )"
+        },
+        {
+          "line": 254,
+          "text": "        .await;"
+        },
+        {
+          "line": 255,
+          "text": "    assert_eq!(status, 200, \"{detail}\");"
+        },
+        {
+          "line": 256,
+          "text": "    assert_eq!("
+        },
+        {
+          "line": 257,
+          "text": "        detail[\"messages\"],"
+        },
+        {
+          "line": 258,
+          "text": "        json!([{\"role\":\"assistant\",\"content\":\"真实活动的最终回复\"}])"
+        },
+        {
+          "line": 259,
+          "text": "    );"
+        },
+        {
+          "line": 260,
+          "text": "    assert_eq!(detail[\"activity\"][\"agentName\"], \"活动助手\");"
+        },
+        {
+          "line": 261,
+          "text": "    let (status, sessions) = h.request(\"GET\", \"/lingxi/v1/sessions\", None).await;"
+        },
+        {
+          "line": 262,
+          "text": "    assert_eq!(status, 200, \"{sessions}\");"
+        },
+        {
+          "line": 263,
+          "text": "    assert!("
+        },
+        {
+          "line": 264,
+          "text": "        !sessions[\"sessions\"]"
+        },
+        {
+          "line": 265,
+          "text": "            .as_array()"
+        },
+        {
+          "line": 266,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 267,
+          "text": "            .iter()"
+        },
+        {
+          "line": 268,
+          "text": "            .any(|row| row[\"sessionId\"] == session),"
+        },
+        {
+          "line": 269,
+          "text": "        \"未升格的后台会话不能混入普通列表\""
+        },
+        {
+          "line": 270,
+          "text": "    );"
+        },
+        {
+          "line": 271,
+          "text": "    let before = h.counts().await;"
+        },
+        {
+          "line": 272,
+          "text": "    assert_eq!(before[\"user\"], 0, \"后台提示不能伪造用户消息\");"
+        },
+        {
+          "line": 273,
+          "text": "    let (status, promoted) = h"
+        },
+        {
+          "line": 274,
+          "text": "        .request("
+        },
+        {
+          "line": 275,
+          "text": "            \"POST\","
+        },
+        {
+          "line": 276,
+          "text": "            &format!(\"/lingxi/v1/desk/activities/{id}/promote\"),"
+        },
+        {
+          "line": 277,
+          "text": "            None,"
+        },
+        {
+          "line": 278,
+          "text": "        )"
+        },
+        {
+          "line": 279,
+          "text": "        .await;"
+        },
+        {
+          "line": 280,
+          "text": "    assert_eq!(status, 200, \"{promoted}\");"
+        },
+        {
+          "line": 281,
+          "text": "    assert_eq!(promoted[\"sessionId\"], session);"
+        },
+        {
+          "line": 282,
+          "text": "    assert_eq!(promoted[\"sessionPath\"], format!(\"native:{session}\"));"
+        },
+        {
+          "line": 283,
+          "text": "    assert_eq!(h.counts().await, before);"
+        },
+        {
+          "line": 284,
+          "text": "    assert!(h.list().await.is_empty());"
+        },
+        {
+          "line": 285,
+          "text": "    let (status, repeated) = h"
+        },
+        {
+          "line": 286,
+          "text": "        .request("
+        },
+        {
+          "line": 287,
+          "text": "            \"POST\","
+        },
+        {
+          "line": 288,
+          "text": "            &format!(\"/lingxi/v1/desk/activities/{id}/promote\"),"
+        },
+        {
+          "line": 289,
+          "text": "            None,"
+        },
+        {
+          "line": 290,
+          "text": "        )"
+        },
+        {
+          "line": 291,
+          "text": "        .await;"
+        },
+        {
+          "line": 292,
+          "text": "    assert_eq!(status, 200, \"{repeated}\");"
+        },
+        {
+          "line": 293,
+          "text": "    assert_eq!(repeated[\"sessionPath\"], promoted[\"sessionPath\"]);"
+        },
+        {
+          "line": 294,
+          "text": "    let (status, sessions) = h.request(\"GET\", \"/lingxi/v1/sessions\", None).await;"
+        },
+        {
+          "line": 295,
+          "text": "    assert_eq!(status, 200, \"{sessions}\");"
+        },
+        {
+          "line": 296,
+          "text": "    assert!(sessions[\"sessions\"]"
+        },
+        {
+          "line": 297,
+          "text": "        .as_array()"
+        },
+        {
+          "line": 298,
+          "text": "        .unwrap()"
+        },
+        {
+          "line": 299,
+          "text": "        .iter()"
+        },
+        {
+          "line": 300,
+          "text": "        .any(|row| row[\"sessionId\"] == session));"
+        },
+        {
+          "line": 301,
+          "text": "    let home = h.close().await;"
+        },
+        {
+          "line": 302,
+          "text": "    let h = Harness::start(Some(home)).await;"
+        },
+        {
+          "line": 303,
+          "text": "    assert!(h.list().await.is_empty());"
+        },
+        {
+          "line": 304,
+          "text": "    assert_eq!(h.counts().await, before);"
+        },
+        {
+          "line": 305,
+          "text": "    h.close().await;"
+        },
+        {
+          "line": 306,
+          "text": "}"
+        },
+        {
+          "line": 307,
+          "text": ""
+        },
+        {
+          "line": 308,
+          "text": "#[tokio::test(flavor = \"multi_thread\", worker_threads = 4)]"
+        },
+        {
+          "line": 309,
+          "text": "async fn running_activity_uses_actual_state_and_cannot_be_promoted_while_busy() {"
+        },
+        {
+          "line": 310,
+          "text": "    let h = Harness::start(None).await;"
+        },
+        {
+          "line": 311,
+          "text": "    h.provider.parked.store(true, Ordering::Release);"
+        },
+        {
+          "line": 312,
+          "text": "    h.add_due().await;"
+        },
+        {
+          "line": 313,
+          "text": "    let state = h.state.clone();"
+        },
+        {
+          "line": 314,
+          "text": "    let check = tokio::spawn(async move { state.automation().check_due(&state).await });"
+        },
+        {
+          "line": 315,
+          "text": "    tokio::time::timeout(Duration::from_secs(10), h.provider.entered.notified())"
+        },
+        {
+          "line": 316,
+          "text": "        .await"
+        },
+        {
+          "line": 317,
+          "text": "        .unwrap();"
+        },
+        {
+          "line": 318,
+          "text": "    let list = h.list().await;"
+        },
+        {
+          "line": 319,
+          "text": "    assert_eq!(list.len(), 1);"
+        },
+        {
+          "line": 320,
+          "text": "    assert_eq!(list[0][\"status\"], \"running\");"
+        },
+        {
+          "line": 321,
+          "text": "    assert!(list[0][\"finishedAt\"].is_null());"
+        },
+        {
+          "line": 322,
+          "text": "    let id = list[0][\"id\"].as_str().unwrap();"
+        },
+        {
+          "line": 323,
+          "text": "    let (status, body) = h"
+        },
+        {
+          "line": 324,
+          "text": "        .request("
+        },
+        {
+          "line": 325,
+          "text": "            \"POST\","
+        },
+        {
+          "line": 326,
+          "text": "            &format!(\"/lingxi/v1/desk/activities/{id}/promote\"),"
+        },
+        {
+          "line": 327,
+          "text": "            None,"
+        },
+        {
+          "line": 328,
+          "text": "        )"
+        },
+        {
+          "line": 329,
+          "text": "        .await;"
+        },
+        {
+          "line": 330,
+          "text": "    assert_eq!(status, 409, \"{body}\");"
+        },
+        {
+          "line": 331,
+          "text": "    assert_eq!(body[\"error\"], \"session_busy\");"
+        },
+        {
+          "line": 332,
+          "text": "    h.provider.parked.store(false, Ordering::Release);"
+        },
+        {
+          "line": 333,
+          "text": "    h.provider.release.notify_one();"
+        },
+        {
+          "line": 334,
+          "text": "    tokio::time::timeout(Duration::from_secs(10), check)"
+        },
+        {
+          "line": 335,
+          "text": "        .await"
+        },
+        {
+          "line": 336,
+          "text": "        .unwrap()"
+        }
+      ]
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_t08_settings.rs",
+      "start": 403,
+      "end": 424,
+      "sourceSha256": "249140e1690506fd0c7058d1891d7690573a10ff1f893ce79ae7a5b05be212db",
+      "lines": [
+        {
+          "line": 403,
+          "text": "async fn rejected_agent_provider_and_yuan_patches_do_not_save_global_values_first() {"
+        },
+        {
+          "line": 404,
+          "text": "    let h = Harness::boot().await;"
+        },
+        {
+          "line": 405,
+          "text": "    let path = h.home.join(\"user/preferences.json\");"
+        },
+        {
+          "line": 406,
+          "text": "    let before = std::fs::read(&path).unwrap();"
+        },
+        {
+          "line": 407,
+          "text": "    for patch in ["
+        },
+        {
+          "line": 408,
+          "text": "        json!({\"locale\":\"ja\",\"providers\":[]}),"
+        },
+        {
+          "line": 409,
+          "text": "        json!({\"locale\":\"ja\",\"agent\":{\"yuan\":\"unregistered-unknown-yuan\"}}),"
+        },
+        {
+          "line": 410,
+          "text": "    ] {"
+        },
+        {
+          "line": 411,
+          "text": "        let (status, value) = h"
+        },
+        {
+          "line": 412,
+          "text": "            .request("
+        },
+        {
+          "line": 413,
+          "text": "                reqwest::Method::PUT,"
+        },
+        {
+          "line": 414,
+          "text": "                \"/lingxi/v1/agents/a/config\","
+        },
+        {
+          "line": 415,
+          "text": "                Some(patch),"
+        },
+        {
+          "line": 416,
+          "text": "            )"
+        },
+        {
+          "line": 417,
+          "text": "            .await;"
+        },
+        {
+          "line": 418,
+          "text": "        assert_eq!(status, 400, \"{value}\");"
+        },
+        {
+          "line": 419,
+          "text": "        assert_eq!(std::fs::read(&path).unwrap(), before);"
+        },
+        {
+          "line": 420,
+          "text": "    }"
+        },
+        {
+          "line": 421,
+          "text": "    h.close().await;"
+        },
+        {
+          "line": 422,
+          "text": "}"
+        },
+        {
+          "line": 423,
+          "text": ""
+        },
+        {
+          "line": 424,
+          "text": "#[tokio::test]"
+        }
+      ]
+    },
+    {
+      "path": "desktop/src/react/__tests__/settings/AccessTab.test.tsx",
+      "start": 490,
+      "end": 509,
+      "sourceSha256": "3d5bdc66da666b952c2a260f498e1ae7faedf76b8301cb31cebb70a501bdeede",
+      "lines": [
+        {
+          "line": 490,
+          "text": "  it('revokes individual credentials without requiring whole-device revocation', async () => {"
+        },
+        {
+          "line": 491,
+          "text": "    mockLingxiFetch.mockImplementation((url: string, options?: RequestInit) => {"
+        },
+        {
+          "line": 492,
+          "text": "      if (url === '/api/access/summary') return Promise.resolve(jsonResponse(pairedSummary));"
+        },
+        {
+          "line": 493,
+          "text": "      if (url === '/api/devices/credentials/cred_1/revoke' && options?.method === 'POST') {"
+        },
+        {
+          "line": 494,
+          "text": "        return Promise.resolve(jsonResponse({ ok: true }));"
+        },
+        {
+          "line": 495,
+          "text": "      }"
+        },
+        {
+          "line": 496,
+          "text": "      throw new Error(`unexpected request: ${url}`);"
+        },
+        {
+          "line": 497,
+          "text": "    });"
+        },
+        {
+          "line": 498,
+          "text": "    const { AccessTab } = await import('../../settings/tabs/AccessTab');"
+        },
+        {
+          "line": 499,
+          "text": ""
+        },
+        {
+          "line": 500,
+          "text": "    render(<AccessTab />);"
+        },
+        {
+          "line": 501,
+          "text": ""
+        },
+        {
+          "line": 502,
+          "text": "    expect(await screen.findByText('User Phone')).toBeInTheDocument();"
+        },
+        {
+          "line": 503,
+          "text": "    fireEvent.click(screen.getByRole('button', { name: 'settings.access.revokeCredential' }));"
+        },
+        {
+          "line": 504,
+          "text": ""
+        },
+        {
+          "line": 505,
+          "text": "    await waitFor(() => {"
+        },
+        {
+          "line": 506,
+          "text": "      expect(mockLingxiFetch).toHaveBeenCalledWith('/api/devices/credentials/cred_1/revoke', { method: 'POST' });"
+        },
+        {
+          "line": 507,
+          "text": "    });"
+        },
+        {
+          "line": 508,
+          "text": "  });"
+        },
+        {
+          "line": 509,
+          "text": ""
+        }
+      ]
+    },
+    {
+      "path": "tests/cli-data.test.ts",
+      "start": 209,
+      "end": 244,
+      "sourceSha256": "9d2d0683afe25a803ae15a09dd8912fdf43d884d865ec10b7a33246248b9dfc6",
+      "lines": [
+        {
+          "line": 209,
+          "text": "  it(\"lists complete checkpoints with transitionId, epoch range, createdAt, store count, and size\", async () => {"
+        },
+        {
+          "line": 210,
+          "text": "    const home = makeHomeDir();"
+        },
+        {
+          "line": 211,
+          "text": "    const store = testStore({ id: \"json-store\", format: \"json\", pathKind: \"file\", pathPatterns: [\"user/preferences.json\"] });"
+        },
+        {
+          "line": 212,
+          "text": "    seedJsonStore(home, \"user/preferences.json\", { locale: \"zh\" });"
+        },
+        {
+          "line": 213,
+          "text": "    await buildCheckpoint({ homeDir: home, store, transitionId: \"t-list\", fromEpoch: 1, toEpoch: 2 });"
+        },
+        {
+          "line": 214,
+          "text": "    const logSpy = vi.spyOn(console, \"log\").mockImplementation(() => {});"
+        },
+        {
+          "line": 215,
+          "text": ""
+        },
+        {
+          "line": 216,
+          "text": "    const code = await runDataCheckpoints({ lingxiHome: home });"
+        },
+        {
+          "line": 217,
+          "text": ""
+        },
+        {
+          "line": 218,
+          "text": "    expect(code).toBe(0);"
+        },
+        {
+          "line": 219,
+          "text": "    const output = stripAnsi(collectOutput(logSpy));"
+        },
+        {
+          "line": 220,
+          "text": "    expect(output).toContain(\"t-list\");"
+        },
+        {
+          "line": 221,
+          "text": "    expect(output).toContain(\"1 → 2\");"
+        },
+        {
+          "line": 222,
+          "text": "    expect(output).toMatch(/Stores\\s+1/);"
+        },
+        {
+          "line": 223,
+          "text": "    expect(output).toMatch(/Size\\s+\\d/);"
+        },
+        {
+          "line": 224,
+          "text": "  });"
+        },
+        {
+          "line": 225,
+          "text": ""
+        },
+        {
+          "line": 226,
+          "text": "  it(\"skips .tmp-* and .invalid-* directories and reports them as a count instead of listing them\", async () => {"
+        },
+        {
+          "line": 227,
+          "text": "    const home = makeHomeDir();"
+        },
+        {
+          "line": 228,
+          "text": "    const store = testStore({ id: \"json-store\", format: \"json\", pathKind: \"file\", pathPatterns: [\"user/preferences.json\"] });"
+        },
+        {
+          "line": 229,
+          "text": "    seedJsonStore(home, \"user/preferences.json\", { locale: \"zh\" });"
+        },
+        {
+          "line": 230,
+          "text": "    await buildCheckpoint({ homeDir: home, store, transitionId: \"t-real\" });"
+        },
+        {
+          "line": 231,
+          "text": "    fs.mkdirSync(path.join(home, \"data-epoch-checkpoints\", \"t-real.invalid-123\"), { recursive: true });"
+        },
+        {
+          "line": 232,
+          "text": "    const logSpy = vi.spyOn(console, \"log\").mockImplementation(() => {});"
+        },
+        {
+          "line": 233,
+          "text": ""
+        },
+        {
+          "line": 234,
+          "text": "    const code = await runDataCheckpoints({ lingxiHome: home });"
+        },
+        {
+          "line": 235,
+          "text": ""
+        },
+        {
+          "line": 236,
+          "text": "    expect(code).toBe(0);"
+        },
+        {
+          "line": 237,
+          "text": "    const output = collectOutput(logSpy);"
+        },
+        {
+          "line": 238,
+          "text": "    expect(output).toContain(\"t-real\");"
+        },
+        {
+          "line": 239,
+          "text": "    expect(output).not.toContain(\"t-real.invalid-123\");"
+        },
+        {
+          "line": 240,
+          "text": "    expect(output).toMatch(/1 incomplete\\/invalid checkpoint directory found and skipped/);"
+        },
+        {
+          "line": 241,
+          "text": "  });"
+        },
+        {
+          "line": 242,
+          "text": "});"
+        },
+        {
+          "line": 243,
+          "text": ""
+        },
+        {
+          "line": 244,
+          "text": "describe(\"hana data restore — confirmation is never skippable\", () => {"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "status": "DEVELOPMENT_NOT_FINAL_CANDIDATE",
+  "recordedAt": "2026-10-18T06:24:44.362635+00:00",
+  "sourceHashes": {
+    "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx": "d7e533d6a228c08d6e1d30e5264250613f3a665b94a35830726813cc488b4011",
+    "desktop/src/react/settings/tabs/providers/oauth-service.ts": "5329f15514d28b70510a4c43683736605200e2b92d31eaab6d35c651a650a133",
+    "desktop/src/react/settings/tabs/providers/ProviderDetail.tsx": "2826039519eb6646675f640d0fea6f0f7f0f81b192a0c168615f1e85aa990cb4",
+    "desktop/src/react/settings/tabs/providers/__tests__/OAuthCredentials.test.tsx": "77e01a5b23a888647d331579a0ac4e4cdedff11524cf7926e656505a94de6157",
+    "desktop/src/locales/zh.json": "72b36f3a6772f67f95f1e402371d399c6da26006f15be588e5b152f65565ecf1",
+    "desktop/src/locales/en.json": "ad1bce0decf00c62190b50f77d985164e798aff682fd1415a2e677908b2b8e5f",
+    "desktop/src/locales/ja.json": "c63d458cbe95c00650505b5c6eb2df67486a3ccae01b7f872a0013a0a819b794",
+    "desktop/src/locales/ko.json": "93e7b9c089a97902cca27398243dce6028f8e25f2063ef0afb850c45b55f65d8",
+    "desktop/src/locales/zh-TW.json": "9ec1bf6efdcda23e7688489350bac706267d1c2ec0f9f4778127ecdb2c044140"
+  },
+  "runs": [
+    {
+      "log": "artifacts/rust-tauri/R07/T08/oauth-ui1.log",
+      "logSha256": "5cc095ccd7931a4b4414950cfbfab584e90369fe38299ca0a51c77e17735d124",
+      "wrapperExitCode": 0,
+      "vitestExitCode": "NOT_SEPARATELY_CAPTURED",
+      "result": "10 tests passed in original log; wrapper printed log after vitest, so do not infer independent raw exit"
+    },
+    {
+      "command": "npx vitest run desktop/src/react/settings/tabs/providers/__tests__/OAuthCredentials.test.tsx --maxWorkers=1",
+      "log": "artifacts/rust-tauri/R07/T08/oauth-ui2.log",
+      "logSha256": "a8f67573834d29721f1d254e0c2bc2556d80075bb0a93946d5f0cdd2249e77be",
+      "exitCode": 0,
+      "result": "10 passed; subsequently added coverage, not final source"
+    },
+    {
+      "command": "npx vitest run desktop/src/react/settings/tabs/providers/__tests__/OAuthCredentials.test.tsx --maxWorkers=1",
+      "log": "artifacts/rust-tauri/R07/T08/oauth-ui3.log",
+      "logSha256": "5d640ffbad16ff52d4e8c6c843233c0e3f0995afa243d6ecba1a6f7891de1a3c",
+      "exitCode": 0,
+      "result": "13 passed; fetch mocked here, real backend checks owned by root/core agent"
+    },
+    {
+      "command": "npx tsc --noEmit --pretty false --project tsconfig.json",
+      "log": "artifacts/rust-tauri/R07/T08/oauth-types1.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exitCode": 0,
+      "result": "one tsconfig only; not npm three-project final typecheck"
+    }
+  ],
+  "contractDifferences": [
+    "Rust start is real provider path POST with start.flow and expiresAtUnixMs; PKCE callback sends original state/code, device polling POST respects returned interval including slowDown.",
+    "Legacy Node URLs/body/GET poll remain; missing Node status continues old bounded wait instead of false success.",
+    "Cancellation aborts local fetch/wait only; notice says external authorization may still complete. Late results discarded on cancel, connection revision change including away/back, provider change and unmount.",
+    "Completion with persisted=false explicitly warns; successful credential action followed by refresh error preserves applied fact.",
+    "Credential refresh second media stage rechecks original connection owner.",
+    "Backend exact Codex alias mapping delegated to core agent; no frontend guessed runtime alias."
+  ],
+  "limitations": [
+    "No Cargo or native window tests run here.",
+    "No real supplier authorization/account/paid/network request; unit tests replace fetch, so not full acceptance.",
+    "No T08 leaf status or old failure edited."
+  ]
+}

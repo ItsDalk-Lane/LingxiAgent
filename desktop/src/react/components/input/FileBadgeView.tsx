@@ -2,6 +2,7 @@ import { NodeViewWrapper } from '@tiptap/react';
 import type { NodeViewProps } from '@tiptap/react';
 import { kindOfFileName } from '../../utils/file-kind';
 import styles from './FileBadgeView.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 export function FileBadgeView({ node }: NodeViewProps) {
   const name = (node.attrs.name || node.attrs.path || '') as string;
@@ -9,7 +10,7 @@ export function FileBadgeView({ node }: NodeViewProps) {
   const mimeType = typeof node.attrs.mimeType === 'string' ? node.attrs.mimeType : undefined;
   const kind = node.attrs.isDirectory === true ? 'directory' : kindOfFileName(name || path, mimeType);
   const thumbnailUrl = (kind === 'image' || kind === 'svg') && path && typeof window !== 'undefined'
-    ? window.platform?.getFileUrl?.(path)
+    ? usePlatform()?.getFileUrl?.(path)
     : null;
   const isAudio = kind === 'audio';
 

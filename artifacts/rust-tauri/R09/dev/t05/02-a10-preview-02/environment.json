@@ -1,0 +1,11 @@
+{
+ "platform": "macos-arm64",
+ "chromePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+ "chromeVersion": "Google Chrome 155.0.8059.85",
+ "chromeSha256": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d",
+ "python": "3.14.3",
+ "isolation": {
+  "LINGXI_HOME": "/private/tmp/lingxi-r09-t05/runtime-a10b/r09_t05_untrusted_preview-19537-1793022263466/home",
+  "TMPDIR": "/private/tmp/lingxi-r09-t05/runtime-a10b/r09_t05_untrusted_preview-19537-1793022263466/tmp"
+ }
+}

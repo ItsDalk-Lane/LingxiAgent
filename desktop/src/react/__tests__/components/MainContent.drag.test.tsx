@@ -8,6 +8,7 @@ import { useStore } from '../../stores';
 import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { MainContent } from '../../MainContent';
 import { SkillsPanel } from '../../components/SkillsPanel';
+import { resetDesktopHostForTests } from '../../host/desktop-host';
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
   lingxiFetch: vi.fn(),
@@ -51,7 +52,7 @@ describe('MainContent app file drag attachments', () => {
 
   afterEach(() => {
     cleanup();
-    delete (window as unknown as { platform?: unknown }).platform;
+    resetDesktopHostForTests();
   });
 
   it('ends the global drag lifecycle when SkillsPanel exclusively consumes the nested drop', async () => {

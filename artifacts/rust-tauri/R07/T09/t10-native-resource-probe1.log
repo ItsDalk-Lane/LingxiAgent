@@ -1,0 +1,73 @@
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.36s
+     Running tests/r06_native_resource_completion.rs (rust/target-r07/debug/deps/r06_native_resource_completion-e05079856df02f31)
+
+running 1 test
+test current_native_resource_three_leaves_real_windows_and_os_trash ... FAILED
+
+failures:
+
+---- current_native_resource_three_leaves_real_windows_and_os_trash stdout ----
+
+thread 'current_native_resource_three_leaves_real_windows_and_os_trash' (5974261) panicked at crates/lingxi-service/tests/r06_native_resource_completion.rs:83:5:
+当前原生检查失败，证据/private/tmp/lingxi-r07-tests/tmp/r06-resource-parent-88179-1792374747543718000
+
+running 1 test
+test current_tauri_resources_real_preview_watch_and_system_trash ... FAILED
+
+successes:
+
+successes:
+
+failures:
+
+---- current_tauri_resources_real_preview_watch_and_system_trash stdout ----
+NATIVE_RESOURCE_CASE legacy_absolute_registration_and_current_resource_changed PASS
+NATIVE_RESOURCE_CASE actual_text_markdown_office_binary_large_error_readonly_isolation PASS
+SYSTEM_TRASH_OBSERVATION_REQUIRED /private/tmp/lingxi-r07-tests/tmp/r06-native-resource-88277-1792374756969676000
+
+thread 'current_tauri_resources_real_preview_watch_and_system_trash' (5975117) panicked at tests/resource_current_host.rs:423:9:
+须通过本轮真实Finder确认唯一合成文件，不能以源消失代替系统废纸篓证明
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    current_tauri_resources_real_preview_watch_and_system_trash
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 246.13s
+
+
+   Compiling lingxi-resource-desktop v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.53s
+     Running tests/resource_current_host.rs (/Users/study_superior/.cache/lingxi-r06-builds/tauri-resources/debug/deps/resource_current_host-4f25f8b9f593db82)
+error: test failed, to rerun pass `--test resource_current_host`
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    current_native_resource_three_leaves_real_windows_and_os_trash
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 255.56s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_native_resource_completion`

@@ -1,0 +1,29 @@
+{
+  "files": [
+    {
+      "path": "artifacts/rust-tauri/R07/T08/mcp-session-reproduce3-diagnosis-scenes/lingxi-r07-mcp-session-permission-44874c7929adfad4/runs.snapshot.db",
+      "sha256": "ed6ba79a011694bcfb50dc3aaee9599a57fa6bdc6231491b9a786994e226ba4b",
+      "bytes": 839680,
+      "copyMethod": "SQLite read-only backup API"
+    },
+    {
+      "path": "artifacts/rust-tauri/R07/T08/mcp-session-reproduce3-diagnosis-scenes/lingxi-r07-mcp-session-permission-44874c7929adfad4/mcp-calls.jsonl",
+      "sha256": "6ee309e7fba5c65d9eb8de4321d96c3ddf02b27ae3358d5ad8a798c773c25e33",
+      "bytes": 130,
+      "copyMethod": "only synthetic external MCP calls fixture bytes"
+    },
+    {
+      "path": "artifacts/rust-tauri/R07/T08/mcp-session-reproduce3-diagnosis-scenes/lingxi-r07-mcp-session-permission-3f556f7b44747a63/runs.snapshot.db",
+      "sha256": "ec52a0c93d12663e6ea663bfc37dc606592eb85bbf921ca54614e03b8628585a",
+      "bytes": 802816,
+      "copyMethod": "SQLite read-only backup API"
+    },
+    {
+      "path": "artifacts/rust-tauri/R07/T08/mcp-session-reproduce3-diagnosis-scenes/lingxi-r07-mcp-session-permission-ce446e489efe8f06/runs.snapshot.db",
+      "sha256": "e31e7f31904ce90b46dcb3a49af04bd124e43b30cdf7675f6ccd0a7d7376e77d",
+      "bytes": 811008,
+      "copyMethod": "SQLite read-only backup API"
+    }
+  ],
+  "excluded": "不复制 token、设备凭证和用户管理文件；仅自有合成 fixture 数据库一致快照与外端调用记录"
+}

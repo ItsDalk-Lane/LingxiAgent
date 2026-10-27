@@ -1,0 +1,6 @@
+{
+  "sourceHome": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-http-8f321256e1a70280",
+  "sqliteBackup": "artifacts/rust-tauri/R07/T08/core-flow10-provider-http-failure/runtime-snapshot.sqlite",
+  "sha256": "cb5664bc7f9b141763bb1c2ea43b2691a8b4da71e5261a4ccafc905995ebe6a7",
+  "finding": "文本模型视觉绑定被真实publisher以400 vision_capability_required、saved=false拒绝；测试先前要求200错误。只修测试保持严格能力规则。"
+}

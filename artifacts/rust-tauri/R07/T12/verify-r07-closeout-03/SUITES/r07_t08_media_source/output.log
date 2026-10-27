@@ -1,0 +1,10 @@
+
+running 2 tests
+test media_http_source_crud_same_operations_actual_generation_restart_and_projection_corruption ... ok
+test media_source_queued_revocation_and_stale_edit_cannot_resurrect_deleted_model ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.87s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.47s
+     Running tests/r07_t08_media_source.rs (rust/target/debug/deps/r07_t08_media_source-da5e21e57e62f8e5)

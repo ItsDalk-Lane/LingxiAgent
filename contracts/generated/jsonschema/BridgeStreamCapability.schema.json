@@ -1,0 +1,61 @@
+{
+  "$defs": {
+    "BridgeConversationKind": {
+      "enum": [
+        "dm",
+        "group"
+      ],
+      "type": "string"
+    },
+    "BridgeStreamMode": {
+      "enum": [
+        "batch",
+        "draft",
+        "rich_draft",
+        "edit_message",
+        "cardkit_stream",
+        "block"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "maxChars": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "minIntervalMs": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "mode": {
+      "$ref": "#/$defs/BridgeStreamMode"
+    },
+    "receiptFolded": {
+      "type": "boolean"
+    },
+    "rich": {
+      "type": "boolean"
+    },
+    "scopes": {
+      "items": {
+        "$ref": "#/$defs/BridgeConversationKind"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "mode",
+    "scopes",
+    "minIntervalMs",
+    "maxChars",
+    "rich",
+    "receiptFolded"
+  ],
+  "title": "BridgeStreamCapability",
+  "type": "object"
+}

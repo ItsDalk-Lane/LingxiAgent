@@ -1,0 +1,32 @@
+
+running 25 tests
+test r07_git_panel::ai_commit_message_chat_fallback ... ok
+test r07_git_panel::activity_summary_revocation_cancels_call_records_unknown_usage_and_releases_permit ... ok
+test r07_git_panel::status_detached_head_reports_short_hash ... ok
+test r07_git_panel::activity_summary_actual_http_uses_summarize_slot_and_records_success_and_failure ... ok
+test r07_git_panel::ai_commit_message_happy_path_sanitizes_and_records_usage ... ok
+test r07_git_panel::status_reports_totals_states_and_placeholders ... ok
+test r07_git_panel::log_clamps_limit_and_parses_refs ... ok
+test r07_git_panel::worktree_info_and_list_main_and_linked ... ok
+test r07_git_panel::file_diff_tracked_untracked_binary_and_invalid ... ok
+test r07_git_panel::checkout_matrix ... ok
+test r07_git_panel::branches_current_detached_and_checked_out_elsewhere ... ok
+test r07_git_panel::commit_flow ... ok
+test r07_git_panel::create_branch_matrix ... ok
+test r07_git_panel::discard_flows ... ok
+test r07_git_panel::gate_query_403_body_400_studio_mount_and_agent ... ok
+test r07_git_panel::amend_flow ... ok
+test r07_git_panel::log_stats_batch_whitelist_and_merge_first_parent ... ok
+test r07_git_panel::worktree_create_matrix ... ok
+test r07_git_panel::stage_unstage_flows ... ok
+test r07_git_panel::ai_commit_message_failure_envelopes ... ok
+test r07_git_panel::stash_full_flow ... ok
+test r07_git_panel::status_ahead_behind_pushable_with_bare_remote ... ok
+test r07_git_panel::push_pull_fetch_buckets ... ok
+test r07_git_panel::activity_summary_empty_missing_and_device_permission_are_honest ... ok
+test r07_git_panel::auth_scope_gates ... ok
+
+test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 14.60s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.15s
+     Running tests/r07_git_panel.rs (rust/target/debug/deps/r07_git_panel-177bf5ccab011ce7)

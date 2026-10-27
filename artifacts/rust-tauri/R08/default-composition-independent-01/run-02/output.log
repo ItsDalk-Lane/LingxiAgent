@@ -1,0 +1,25 @@
+   Compiling r08-admission-review v0.0.0 (/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r08-independent-default-d8_jwy97/harness)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `r08-admission-review` (test "default_plane") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.33s
+     Running tests/default_plane.rs (rust/target/debug/deps/default_plane-77cad4f82e8fe30f)
+
+running 1 test
+test default_composition_registry_preparation_and_real_model_tools ... INDEPENDENT_DEFAULT_TARGET_PREPARED run_tools tool:first-party:run_tools
+INDEPENDENT_DEFAULT_TARGET_PREPARED run_code tool:first-party:run_code
+INDEPENDENT_DEFAULT_TARGET_PREPARED ast_grep tool:first-party:ast_grep
+INDEPENDENT_DEFAULT_TARGET_PREPARED lsp tool:first-party:lsp
+INDEPENDENT_DEFAULT_TARGET_PREPARED security_scan tool:first-party:security_scan
+INDEPENDENT_REAL_RUN INDEPENDENT_SCENE_SEED run_000001a15ff69ecb_000001 completed
+INDEPENDENT_REAL_RUN INDEPENDENT_SCENE_QUERY run_000001a15ff69f50_000002 completed
+INDEPENDENT_REAL_RUN INDEPENDENT_SCENE_SECURITY run_000001a15ff69fa5_000003 completed
+INDEPENDENT_REAL_RUN INDEPENDENT_SCENE_PTC run_000001a15ff6a04a_000004 completed
+INDEPENDENT_DEFAULT_MODEL_EXECUTED run_code security_scan run_tools; real storage/child receipts/model projection verified
+INDEPENDENT_REAL_STORAGE_REOPEN_NO_REEXECUTION /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r08-independent-default-d8_jwy97/home/lingxi-r07-t12-default-composition-33769-1792611360299101000
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.87s
+

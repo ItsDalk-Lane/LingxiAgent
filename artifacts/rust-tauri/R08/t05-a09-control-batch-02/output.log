@@ -1,0 +1,11 @@
+ok   control: 首跑 exit 0 且 interrupted
+ok   control: runId 可解析
+ok   control: 续跑 exit 0 且 complete
+ok   control: identity hash 对拍
+ok   control: staging sidecar 归一化对拍
+ok   control: runs.db 统计对拍
+ok   control: issues 多重集对拍
+FAIL control: migration receipt 归一化对拍
+ok   control: 旧根逐字节零写
+SCRATCH_KEPT /private/tmp/t05a09-matrix/a09-control_stop-after-batch-AbCzkY
+A09_RESULT {"verdict":"FAIL","scenario":"control:stop-after-batch","failures":["control: migration receipt 归一化对拍"]}

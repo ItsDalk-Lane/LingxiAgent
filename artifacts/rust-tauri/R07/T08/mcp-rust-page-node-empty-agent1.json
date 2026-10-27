@@ -1,0 +1,48 @@
+{
+  "label": "mcp-rust-page-node-empty-agent1",
+  "command": [
+    "node_modules/.bin/vitest",
+    "run",
+    "desktop/src/react/settings/tabs/mcp/mcp-api.test.ts",
+    "desktop/src/react/settings/tabs/__tests__/McpTab.test.tsx",
+    "desktop/src/react/settings/tabs/mcp/__tests__/ConnectorImport.test.tsx",
+    "desktop/src/react/__tests__/settings/R07McpRustAPI.test.ts",
+    "--maxWorkers=1"
+  ],
+  "exitCode": 0,
+  "elapsedSeconds": 4.765356063842773,
+  "sourceBefore": {
+    "desktop/src/react/settings/tabs/mcp/mcp-api.test.ts": "08fecf8e522eaea4c35cf4f4250ed8a0ed34b8efd7e1a2b21e100203d4687299",
+    "desktop/src/react/settings/tabs/__tests__/McpTab.test.tsx": "11f9a08c91ee61a1dd4e6ad8b79625faba161e5c0ee6f23ba5372ddae7896a61",
+    "desktop/src/react/settings/tabs/mcp/__tests__/ConnectorImport.test.tsx": "5d841de863bb2121e3be7d4e00fb88b1b02d417403e18abbbcda65eddf6ff0a6",
+    "desktop/src/react/__tests__/settings/R07McpRustAPI.test.ts": "9c50df84d2183490885f73a400257c6df386f4703e5395722b40b39d61a2bd29",
+    "desktop/src/react/settings/tabs/McpTab.tsx": "7dd258b9130afdbab4576ef4ebbeddfa5d7126c6ee1e8ce7fc97dd58a20f5eec",
+    "desktop/src/react/settings/tabs/mcp/ConnectorImport.tsx": "1f31743dbd2b302ba91fdd5739ed922b81353503b4bd1cd64e337d696c2c3f65",
+    "desktop/src/react/settings/tabs/mcp/mcp-api.ts": "2ef756206da8deadcaed7e9904dee0fc0389710aa4fb1441b4cfba81463a9f8a",
+    "desktop/src/react/settings/api.ts": "9526f3f06e23958979ff60087a629b8464a23e0afef27bf656a2c995f5a10dcb",
+    "desktop/src/react/services/rust-settings.ts": "ab2a6179b3bd7e1998d72e17e0538f43245133fff52afe550ea73d81331ef679",
+    "desktop/src/locales/zh.json": "dfc3f3c6f504f7470c38b205f64edf602d35de2674e404c94f0d41f6c51b058b",
+    "desktop/src/locales/en.json": "4ac6499cb80f50f557e5f1fc286aefba9b50b13c107460e6d0a77d074cb7c55e",
+    "desktop/src/locales/ja.json": "62d1a1fb96006a6e07bda453181fe62d8f7599290d9cc1fe3872f75d715022b5",
+    "desktop/src/locales/ko.json": "407943ed2ad68bdf882a7f388b5a94e3637572fcc7ab344b441f33ac9ca66b5c",
+    "desktop/src/locales/zh-TW.json": "cce8cfcaced46e79fcc6239c8d1a507c314ada83577960888de30bd72223fae1"
+  },
+  "sourceAfter": {
+    "desktop/src/react/settings/tabs/mcp/mcp-api.test.ts": "08fecf8e522eaea4c35cf4f4250ed8a0ed34b8efd7e1a2b21e100203d4687299",
+    "desktop/src/react/settings/tabs/__tests__/McpTab.test.tsx": "11f9a08c91ee61a1dd4e6ad8b79625faba161e5c0ee6f23ba5372ddae7896a61",
+    "desktop/src/react/settings/tabs/mcp/__tests__/ConnectorImport.test.tsx": "5d841de863bb2121e3be7d4e00fb88b1b02d417403e18abbbcda65eddf6ff0a6",
+    "desktop/src/react/__tests__/settings/R07McpRustAPI.test.ts": "9c50df84d2183490885f73a400257c6df386f4703e5395722b40b39d61a2bd29",
+    "desktop/src/react/settings/tabs/McpTab.tsx": "7dd258b9130afdbab4576ef4ebbeddfa5d7126c6ee1e8ce7fc97dd58a20f5eec",
+    "desktop/src/react/settings/tabs/mcp/ConnectorImport.tsx": "1f31743dbd2b302ba91fdd5739ed922b81353503b4bd1cd64e337d696c2c3f65",
+    "desktop/src/react/settings/tabs/mcp/mcp-api.ts": "2ef756206da8deadcaed7e9904dee0fc0389710aa4fb1441b4cfba81463a9f8a",
+    "desktop/src/react/settings/api.ts": "9526f3f06e23958979ff60087a629b8464a23e0afef27bf656a2c995f5a10dcb",
+    "desktop/src/react/services/rust-settings.ts": "ab2a6179b3bd7e1998d72e17e0538f43245133fff52afe550ea73d81331ef679",
+    "desktop/src/locales/zh.json": "dfc3f3c6f504f7470c38b205f64edf602d35de2674e404c94f0d41f6c51b058b",
+    "desktop/src/locales/en.json": "4ac6499cb80f50f557e5f1fc286aefba9b50b13c107460e6d0a77d074cb7c55e",
+    "desktop/src/locales/ja.json": "62d1a1fb96006a6e07bda453181fe62d8f7599290d9cc1fe3872f75d715022b5",
+    "desktop/src/locales/ko.json": "407943ed2ad68bdf882a7f388b5a94e3637572fcc7ab344b441f33ac9ca66b5c",
+    "desktop/src/locales/zh-TW.json": "cce8cfcaced46e79fcc6239c8d1a507c314ada83577960888de30bd72223fae1"
+  },
+  "logSha256": "00ebf82b14f452cc319dcc65b3b44dafc6149e5e7c67161c9210bfba8305a15b",
+  "scope": "Node消费者与组件机制验证，不代Rust服务或实际SDK验证"
+}

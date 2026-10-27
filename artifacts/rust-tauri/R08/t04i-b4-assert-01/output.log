@@ -1,0 +1,17 @@
+PASS exactly one import run
+PASS run.state=interrupted
+PASS stopped: some done, some planned
+PASS receipt.runId matches run row
+PASS stopped: receipt.status=partial
+PASS stopped: no resumedFromRunId (first run)
+PASS stopped: resumed=false
+PASS receipt.sourceUnchanged=true
+FAIL sourceRootSha256 = fixture v2 root hash e22999bea96992c267c6118c022836099a6671c0fc868490b922a3c36abae392
+PASS source manifest pair exists
+PASS source manifest before/after byte-equal
+PASS manifest covers fixture source files
+PASS no kill-recovery issue in clean stop/resume round
+PASS no conflict errors (no duplicate/merge attempts)
+PASS messages PK unique (no duplicates)
+
+B4-ASSERT[stopped] FAILURES: 14 pass, 1 fail

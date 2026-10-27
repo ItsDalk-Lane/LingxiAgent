@@ -1,0 +1,12 @@
+
+running 4 tests
+test bridge_document_bytes_are_owned_and_invalid_names_mimes_or_sessions_create_no_file_fact ... ok
+test history_uses_canonical_final_and_reset_obeys_live_lease_then_starts_new_context ... ok
+test manual_send_queues_real_file_without_fake_run_and_http_retries_return_same_fact ... ok
+test manual_media_accepts_safe_bytes_above_old_snapshot_cap_and_refuses_qq_group_documents ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.09s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.72s
+     Running tests/r07_bridge_session_routes.rs (rust/target/debug/deps/r07_bridge_session_routes-508f875efb78f11d)

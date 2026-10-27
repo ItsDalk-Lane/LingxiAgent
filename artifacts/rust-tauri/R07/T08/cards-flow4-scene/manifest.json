@@ -1,0 +1,148 @@
+{
+  "status": "FAILED_DEVELOPMENT_FIXTURE",
+  "sourceLog": "artifacts/rust-tauri/R07/T08/core-flow4.log",
+  "sourceLogSha256": "5d598b64e0a8339c78b27afebf66081dd3d313b31766314cd35cd765a6040915",
+  "failureDetails": [
+    "三个测试在请求之前写合成preferences时缺user目录而ENOENT",
+    "真实card HTTP在LRU217触发每IP限流429，保留产品速率限制"
+  ],
+  "sceneNote": "仅枚举本测试专属合成fixture前缀；记录存活现场，不假定并行测试名与随机home的一一映射。",
+  "fixtures": [
+    {
+      "fixture": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-skills-cards-185c17b3ff249687",
+      "facts": [
+        {
+          "relative": "user",
+          "exists": false,
+          "isDirectory": false
+        },
+        {
+          "relative": "user/preferences.json",
+          "exists": false,
+          "isDirectory": false
+        },
+        {
+          "relative": "agents/a/config.yaml",
+          "exists": true,
+          "isDirectory": false,
+          "bytes": 48,
+          "sha256": "21d4757cd4807950ed4fbcacfd3c396e3fb15242070b3e1946b794c27195de39"
+        },
+        {
+          "relative": "agents/b/config.yaml",
+          "exists": true,
+          "isDirectory": false,
+          "bytes": 48,
+          "sha256": "c0642927b6702956d2e984f2ba6f8dfaa981d5501d45f19c50d42f0f22463bf4"
+        },
+        {
+          "relative": "workspace",
+          "exists": true,
+          "isDirectory": true
+        }
+      ]
+    },
+    {
+      "fixture": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-skills-cards-7319cd71176a4fec",
+      "facts": [
+        {
+          "relative": "user",
+          "exists": false,
+          "isDirectory": false
+        },
+        {
+          "relative": "user/preferences.json",
+          "exists": false,
+          "isDirectory": false
+        },
+        {
+          "relative": "agents/a/config.yaml",
+          "exists": true,
+          "isDirectory": false,
+          "bytes": 48,
+          "sha256": "21d4757cd4807950ed4fbcacfd3c396e3fb15242070b3e1946b794c27195de39"
+        },
+        {
+          "relative": "agents/b/config.yaml",
+          "exists": true,
+          "isDirectory": false,
+          "bytes": 48,
+          "sha256": "c0642927b6702956d2e984f2ba6f8dfaa981d5501d45f19c50d42f0f22463bf4"
+        },
+        {
+          "relative": "workspace",
+          "exists": true,
+          "isDirectory": true
+        }
+      ]
+    },
+    {
+      "fixture": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-skills-cards-7a24f4cac1b0322d",
+      "facts": [
+        {
+          "relative": "user",
+          "exists": false,
+          "isDirectory": false
+        },
+        {
+          "relative": "user/preferences.json",
+          "exists": false,
+          "isDirectory": false
+        },
+        {
+          "relative": "agents/a/config.yaml",
+          "exists": true,
+          "isDirectory": false,
+          "bytes": 48,
+          "sha256": "21d4757cd4807950ed4fbcacfd3c396e3fb15242070b3e1946b794c27195de39"
+        },
+        {
+          "relative": "agents/b/config.yaml",
+          "exists": true,
+          "isDirectory": false,
+          "bytes": 48,
+          "sha256": "c0642927b6702956d2e984f2ba6f8dfaa981d5501d45f19c50d42f0f22463bf4"
+        },
+        {
+          "relative": "workspace",
+          "exists": true,
+          "isDirectory": true
+        }
+      ]
+    },
+    {
+      "fixture": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-skills-cards-f0d3d6565ac8c8ab",
+      "facts": [
+        {
+          "relative": "user",
+          "exists": false,
+          "isDirectory": false
+        },
+        {
+          "relative": "user/preferences.json",
+          "exists": false,
+          "isDirectory": false
+        },
+        {
+          "relative": "agents/a/config.yaml",
+          "exists": true,
+          "isDirectory": false,
+          "bytes": 48,
+          "sha256": "21d4757cd4807950ed4fbcacfd3c396e3fb15242070b3e1946b794c27195de39"
+        },
+        {
+          "relative": "agents/b/config.yaml",
+          "exists": true,
+          "isDirectory": false,
+          "bytes": 48,
+          "sha256": "c0642927b6702956d2e984f2ba6f8dfaa981d5501d45f19c50d42f0f22463bf4"
+        },
+        {
+          "relative": "workspace",
+          "exists": true,
+          "isDirectory": true
+        }
+      ]
+    }
+  ]
+}

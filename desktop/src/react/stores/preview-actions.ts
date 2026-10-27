@@ -17,6 +17,7 @@ import {
   type PreviewReadingPosition,
   type PreviewScrollSnapshot,
 } from '../../../../shared/preview-reading-position.ts';
+import { usePlatform } from '../hooks/use-platform';
 
 // ── Viewer spawn（派生只读窗口） ──
 
@@ -37,7 +38,7 @@ export async function spawnViewer(previewItem: PreviewItem): Promise<void> {
   if (!canSpawnViewer(previewItem)) return;
   if (!previewItem.filePath) return; // TS 窄化，canSpawnViewer 已保证
 
-  const windowId = await window.platform?.spawnViewer?.({
+  const windowId = await usePlatform()?.spawnViewer?.({
     filePath: previewItem.filePath,
     title: previewItem.title,
     type: previewItem.type,
@@ -59,7 +60,7 @@ export async function spawnViewer(previewItem: PreviewItem): Promise<void> {
  * App mount 时调用一次。
  */
 export function initViewerEvents(): void {
-  window.platform?.onViewerClosed?.((windowId: number) => {
+  usePlatform()?.onViewerClosed?.((windowId: number) => {
     useStore.getState().removePinnedViewer(windowId);
   });
 }

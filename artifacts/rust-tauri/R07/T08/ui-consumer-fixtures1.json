@@ -1,0 +1,32 @@
+{
+  "label": "ui-consumer-fixtures1",
+  "scope": "DEVELOPMENT_THREE_TEST_TARGETS_NOT_CANDIDATE_D",
+  "command": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "desktop/src/react/__tests__/settings/OAuthCredentials.test.tsx",
+    "desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx",
+    "tests/stream-route-consumer-isolation.test.ts",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startedAt": "2026-10-18T09:04:13.734019+00:00",
+  "ownedTestSha256Before": {
+    "desktop/src/react/__tests__/settings/OAuthCredentials.test.tsx": "1859414210f1d76e164cbad026ebaca9229546d60a562ceb76a9b6d7bb27da7a",
+    "desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx": "55f5ddc7cee36531db7a064b8a4402104a530cb1aa48fc904afee9749c1d59d2",
+    "tests/stream-route-consumer-isolation.test.ts": "f307f77025b6191e5a390eb07c8208acc993b78aee8c0769940bceb56b158074"
+  },
+  "cargoRun": false,
+  "exitCode": 1,
+  "endedAt": "2026-10-18T09:04:26.457345+00:00",
+  "ownedTestSha256After": {
+    "desktop/src/react/__tests__/settings/OAuthCredentials.test.tsx": "1859414210f1d76e164cbad026ebaca9229546d60a562ceb76a9b6d7bb27da7a",
+    "desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx": "55f5ddc7cee36531db7a064b8a4402104a530cb1aa48fc904afee9749c1d59d2",
+    "tests/stream-route-consumer-isolation.test.ts": "f307f77025b6191e5a390eb07c8208acc993b78aee8c0769940bceb56b158074"
+  },
+  "log": "artifacts/rust-tauri/R07/T08/ui-consumer-fixtures1.log",
+  "logSha256": "51d3c0cc5e6a19155d9407c9d734a14ea4e7dca6d483b656718abd69b9fc1279",
+  "finalAcceptance": false,
+  "ownedTestsUnchangedDuringRun": true
+}

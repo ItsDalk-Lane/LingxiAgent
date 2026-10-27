@@ -1,0 +1,27 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: methods `add` and `check_due` are never used
+   --> crates/lingxi-service/tests/r07_automation_flow.rs:226:14
+    |
+115 | impl Harness {
+    | ------------ methods in this implementation
+...
+226 |     async fn add(&self, kind: &str, schedule: Value) -> Value {
+    |              ^^^
+...
+231 |     async fn check_due(&self) -> Result<usize, String> {
+    |              ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (test "r07_automation_flow") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.76s
+     Running tests/r07_automation_flow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_flow-2ab8cb00acd1866c)
+
+running 4 tests
+test slash_apply_uses_frozen_owned_suggestion ... ok
+test real_tool_suggestion_requires_apply_and_replays_after_expiry ... ok
+test started_display_with_no_receipt_becomes_unknown_without_resend ... ok
+test real_notify_tool_claim_and_receipt_survive_restart_without_resend ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s
+

@@ -8,6 +8,8 @@
  * app-ws-shim 直接调用 streamBufferManager.handle(msg)。
  */
 
+import { conversationSuggestionFromDetails } from '../services/conversation-suggestion';
+import { rustMediaBlocksFromDetails } from '../services/rust-media';
 import { StreamAdmission } from '../services/stream-admission';
 import type { ChatMessage, ContentBlock } from '../stores/chat-types';
 import { useStore } from '../stores';
@@ -879,6 +881,13 @@ class StreamBufferManager {
               };
               const allDone = tools.every(t => t.done);
               blocks[i] = { ...tg, tools, collapsed: allDone && tools.length > 1 };
+              if (msg.success && buf.sessionPath.startsWith('native:')) {
+                blocks.push(...rustMediaBlocksFromDetails(msg.details, buf.sessionPath.slice(7)));
+              }
+              const suggestion = msg.success ? conversationSuggestionFromDetails(msg.details) : null;
+              if (suggestion && !blocks.some(block => block.type === 'suggestion_card' && block.suggestionId === suggestion.suggestionId)) {
+                blocks.push({ ...suggestion, processOrder: buf.nextProcessOrder++ });
+              }
               return { ...m, blocks };
             }
           }

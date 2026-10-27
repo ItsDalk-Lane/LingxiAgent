@@ -1,0 +1,19 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/r08/r08-t07-terminal-ab.test.ts > R08-T07 terminal A/B [rust] > leaf.terminal.positive: snapshot/tail/close 三帧真实正路径（双内核 PTY） 12422ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  19:15:26
+   Duration  13.27s (transform 630ms, setup 24ms, import 421ms, tests 12.44s, environment 301ms)
+
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-terminal-ab.test.ts > R08-T07 terminal A/B [rust] > leaf.terminal.positive: snapshot/tail/close 三帧真实正路径（双内核 PTY）
+[has-dbg] called sessionPath= native:sess-33299-1a177ec2578-1 sessionId= sess-33299-1a177ec2578-1
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-terminal-ab.test.ts > R08-T07 terminal A/B [rust] > leaf.terminal.positive: snapshot/tail/close 三帧真实正路径（双内核 PTY）
+[has-dbg] called sessionPath= native:sess-33299-1a177ec2578-1 sessionId= sess-33299-1a177ec2578-1
+[has-dbg] recordsSize= 0 limit= 50
+

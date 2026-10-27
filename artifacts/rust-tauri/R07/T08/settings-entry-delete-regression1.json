@@ -1,0 +1,39 @@
+{
+  "label": "settings-entry-delete-regression1",
+  "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--no-fail-fast",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r06_agent_delete_skills_live",
+    "--test",
+    "r06_agent_settings_live",
+    "--",
+    "--nocapture"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "PATH": "/Users/study_superior/.cargo/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/share/dotnet:/Users/study_superior/.codex/tmp/arg0-macos/codex-arg0vSRIw5:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/Users/study_superior/.lmstudio/bin:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/study_superior/.lmstudio/bin",
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp",
+    "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib"
+  },
+  "startedAt": "2026-10-18T10:23:27.388789+00:00",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "76f2c87f4f3a57b0917f122829b35462e0073f8c89e25bee660341b50427abde",
+  "finalAcceptance": false,
+  "exitCode": 101,
+  "endedAt": "2026-10-18T10:25:23.149774+00:00",
+  "sourceFingerprintAfter": "6bd4e2e38bae069353e3c85de4fc7d63a12442f5e1d4afc92d0f17ba5f105ad2",
+  "log": "artifacts/rust-tauri/R07/T08/settings-entry-delete-regression1.log",
+  "logSha256": "2c365e98ff3259a870fb8bc2033c47b484952702d98cefe23055811dc4bfeaa0",
+  "sourceUnchanged": false
+}

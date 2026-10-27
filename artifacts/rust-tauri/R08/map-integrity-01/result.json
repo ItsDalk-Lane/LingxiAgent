@@ -1,0 +1,188 @@
+{
+  "schema": "lingxi.r08.map-integrity-preparation.v1",
+  "startedAt": "2026-10-21T14:02:10.600688+00:00",
+  "sourceSha": "86840d1700397d3dd620a41f2b884df4cddd5cc2",
+  "sourceBindings": {
+    "docs/rust-tauri/R08/R08_LEAF_MAP.json": "ff6639b0ad1d15a0a57ff22769d26903cff6758c81bd72725c176935ce434b98",
+    "scripts/rust-tauri/r08_leaf_map.py": "47e68517495944f548fe3ec49390a4a14828b9d96428797c273692d4d09d9ef2",
+    "scripts/rust-tauri/r08_map_integrity_probe.py": "7449d0d957bcb9b7993c89f864d6c3f201c7ead7ee6fc11e18a77a2fe3ab630b",
+    "docs/rust-tauri/R00/ACCEPTANCE_MAP.json": "db54d0a172b9728e8c7f235ea8ad7d3b92485a9072baf3c02a97fb0787f6372e",
+    "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json": "dde223382183c08fa4e2ef202ef20239dad98f7bfcac5d42288683965ce6e86d"
+  },
+  "cases": [
+    {
+      "id": "R08-PREP-MAP-01",
+      "name": "原准备地图保持未验收状态",
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "-B",
+        "-c",
+        "import importlib.util, pathlib, sys\nspec = importlib.util.spec_from_file_location(\"r08_map_checker\", sys.argv[1])\nmodule = importlib.util.module_from_spec(spec)\nspec.loader.exec_module(module)\nmodule.DEST = pathlib.Path(sys.argv[2])\nsys.argv = [str(module.__file__), \"--check\"]\nmodule.main()\n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_leaf_map.py",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-map-integrity-ku3gvol9/01.json"
+      ],
+      "fixtureSha256": "ff6639b0ad1d15a0a57ff22769d26903cff6758c81bd72725c176935ce434b98",
+      "expectedExitCode": 0,
+      "actualExitCode": 0,
+      "expectationMatched": true,
+      "logSha256": "34ebffc6cedfb7e977290f2b0ec4a47f7dbe76e7091978a0cc36593638e0a205"
+    },
+    {
+      "id": "R08-PREP-MAP-02",
+      "name": "漏基础场景必须拒绝",
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "-B",
+        "-c",
+        "import importlib.util, pathlib, sys\nspec = importlib.util.spec_from_file_location(\"r08_map_checker\", sys.argv[1])\nmodule = importlib.util.module_from_spec(spec)\nspec.loader.exec_module(module)\nmodule.DEST = pathlib.Path(sys.argv[2])\nsys.argv = [str(module.__file__), \"--check\"]\nmodule.main()\n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_leaf_map.py",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-map-integrity-ku3gvol9/02.json"
+      ],
+      "fixtureSha256": "ce97d465135ffb9ba0a357f08bbd77053a12f9ef23363a5f6562779f1b050468",
+      "expectedExitCode": 1,
+      "actualExitCode": 1,
+      "expectationMatched": true,
+      "logSha256": "6aa27dfcbccbcfaaf51cba89a5e62ef87a6e8f33d18f0cee04acb20723349d87"
+    },
+    {
+      "id": "R08-PREP-MAP-03",
+      "name": "漏补充叶并伪改数量必须拒绝",
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "-B",
+        "-c",
+        "import importlib.util, pathlib, sys\nspec = importlib.util.spec_from_file_location(\"r08_map_checker\", sys.argv[1])\nmodule = importlib.util.module_from_spec(spec)\nspec.loader.exec_module(module)\nmodule.DEST = pathlib.Path(sys.argv[2])\nsys.argv = [str(module.__file__), \"--check\"]\nmodule.main()\n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_leaf_map.py",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-map-integrity-ku3gvol9/03.json"
+      ],
+      "fixtureSha256": "12fa8125e7968142129edffb7dd8276c556319b9e384cb959a8403acf83250f9",
+      "expectedExitCode": 1,
+      "actualExitCode": 1,
+      "expectationMatched": true,
+      "logSha256": "6aa27dfcbccbcfaaf51cba89a5e62ef87a6e8f33d18f0cee04acb20723349d87"
+    },
+    {
+      "id": "R08-PREP-MAP-04",
+      "name": "漏原断言必须拒绝",
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "-B",
+        "-c",
+        "import importlib.util, pathlib, sys\nspec = importlib.util.spec_from_file_location(\"r08_map_checker\", sys.argv[1])\nmodule = importlib.util.module_from_spec(spec)\nspec.loader.exec_module(module)\nmodule.DEST = pathlib.Path(sys.argv[2])\nsys.argv = [str(module.__file__), \"--check\"]\nmodule.main()\n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_leaf_map.py",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-map-integrity-ku3gvol9/04.json"
+      ],
+      "fixtureSha256": "38e4de1cfb95a23cbb636e1f862f8cc090a33a2f89b76410a858d13d3e315258",
+      "expectedExitCode": 1,
+      "actualExitCode": 1,
+      "expectationMatched": true,
+      "logSha256": "6aa27dfcbccbcfaaf51cba89a5e62ef87a6e8f33d18f0cee04acb20723349d87"
+    },
+    {
+      "id": "R08-PREP-MAP-05",
+      "name": "弱化原断言必须拒绝",
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "-B",
+        "-c",
+        "import importlib.util, pathlib, sys\nspec = importlib.util.spec_from_file_location(\"r08_map_checker\", sys.argv[1])\nmodule = importlib.util.module_from_spec(spec)\nspec.loader.exec_module(module)\nmodule.DEST = pathlib.Path(sys.argv[2])\nsys.argv = [str(module.__file__), \"--check\"]\nmodule.main()\n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_leaf_map.py",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-map-integrity-ku3gvol9/05.json"
+      ],
+      "fixtureSha256": "5c7df34c91d39118ecafedcb87c63ac34eaf483372482ccd0a4a75410ddf179e",
+      "expectedExitCode": 1,
+      "actualExitCode": 1,
+      "expectationMatched": true,
+      "logSha256": "6aa27dfcbccbcfaaf51cba89a5e62ef87a6e8f33d18f0cee04acb20723349d87"
+    },
+    {
+      "id": "R08-PREP-MAP-06",
+      "name": "冒用前阶段通过必须拒绝",
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "-B",
+        "-c",
+        "import importlib.util, pathlib, sys\nspec = importlib.util.spec_from_file_location(\"r08_map_checker\", sys.argv[1])\nmodule = importlib.util.module_from_spec(spec)\nspec.loader.exec_module(module)\nmodule.DEST = pathlib.Path(sys.argv[2])\nsys.argv = [str(module.__file__), \"--check\"]\nmodule.main()\n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_leaf_map.py",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-map-integrity-ku3gvol9/06.json"
+      ],
+      "fixtureSha256": "64cf0451e2ccc9f0f4353a6de50afe5ec5f17b805dad4d259cffbb8d8ddf06c5",
+      "expectedExitCode": 1,
+      "actualExitCode": 1,
+      "expectationMatched": true,
+      "logSha256": "6aa27dfcbccbcfaaf51cba89a5e62ef87a6e8f33d18f0cee04acb20723349d87"
+    },
+    {
+      "id": "R08-PREP-MAP-07",
+      "name": "空证据伪造通过必须拒绝",
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "-B",
+        "-c",
+        "import importlib.util, pathlib, sys\nspec = importlib.util.spec_from_file_location(\"r08_map_checker\", sys.argv[1])\nmodule = importlib.util.module_from_spec(spec)\nspec.loader.exec_module(module)\nmodule.DEST = pathlib.Path(sys.argv[2])\nsys.argv = [str(module.__file__), \"--check\"]\nmodule.main()\n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_leaf_map.py",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-map-integrity-ku3gvol9/07.json"
+      ],
+      "fixtureSha256": "f832bbf6af7e6ddf779b500db6c4743a3ec5810fcc3d5f0200edbfed5b29106c",
+      "expectedExitCode": 1,
+      "actualExitCode": 1,
+      "expectationMatched": true,
+      "logSha256": "6aa27dfcbccbcfaaf51cba89a5e62ef87a6e8f33d18f0cee04acb20723349d87"
+    },
+    {
+      "id": "R08-PREP-MAP-08",
+      "name": "漏替代浏览器宿主义务必须拒绝",
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "-B",
+        "-c",
+        "import importlib.util, pathlib, sys\nspec = importlib.util.spec_from_file_location(\"r08_map_checker\", sys.argv[1])\nmodule = importlib.util.module_from_spec(spec)\nspec.loader.exec_module(module)\nmodule.DEST = pathlib.Path(sys.argv[2])\nsys.argv = [str(module.__file__), \"--check\"]\nmodule.main()\n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_leaf_map.py",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-map-integrity-ku3gvol9/08.json"
+      ],
+      "fixtureSha256": "97549b5ac9cc00d7466ffe37f48cc767682411c76afc91b2813c4ca08bd8fa27",
+      "expectedExitCode": 1,
+      "actualExitCode": 1,
+      "expectationMatched": true,
+      "logSha256": "6aa27dfcbccbcfaaf51cba89a5e62ef87a6e8f33d18f0cee04acb20723349d87"
+    },
+    {
+      "id": "R08-PREP-MAP-09",
+      "name": "漏新增Rust存储必须拒绝",
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "-B",
+        "-c",
+        "import importlib.util, pathlib, sys\nspec = importlib.util.spec_from_file_location(\"r08_map_checker\", sys.argv[1])\nmodule = importlib.util.module_from_spec(spec)\nspec.loader.exec_module(module)\nmodule.DEST = pathlib.Path(sys.argv[2])\nsys.argv = [str(module.__file__), \"--check\"]\nmodule.main()\n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_leaf_map.py",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-map-integrity-ku3gvol9/09.json"
+      ],
+      "fixtureSha256": "7ef0deb11e54285fac53d50d67a717c4c46cebaa15430bdc1d3cebbcd60f7ce5",
+      "expectedExitCode": 1,
+      "actualExitCode": 1,
+      "expectationMatched": true,
+      "logSha256": "6aa27dfcbccbcfaaf51cba89a5e62ef87a6e8f33d18f0cee04acb20723349d87"
+    },
+    {
+      "id": "R08-PREP-MAP-10",
+      "name": "移除损坏输入后原地图仍有效且未验收",
+      "argv": [
+        "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+        "-B",
+        "-c",
+        "import importlib.util, pathlib, sys\nspec = importlib.util.spec_from_file_location(\"r08_map_checker\", sys.argv[1])\nmodule = importlib.util.module_from_spec(spec)\nspec.loader.exec_module(module)\nmodule.DEST = pathlib.Path(sys.argv[2])\nsys.argv = [str(module.__file__), \"--check\"]\nmodule.main()\n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_leaf_map.py",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-map-integrity-ku3gvol9/10.json"
+      ],
+      "fixtureSha256": "ff6639b0ad1d15a0a57ff22769d26903cff6758c81bd72725c176935ce434b98",
+      "expectedExitCode": 0,
+      "actualExitCode": 0,
+      "expectationMatched": true,
+      "logSha256": "34ebffc6cedfb7e977290f2b0ec4a47f7dbe76e7091978a0cc36593638e0a205"
+    }
+  ],
+  "boundary": "实际调用准备地图检查器；不证明业务执行、正式R08门禁或双写/重复外发检查",
+  "sourceBindingsStable": true,
+  "status": "PASS_PREPARATION_CHECKER",
+  "finishedAt": "2026-10-21T14:02:12.136398+00:00"
+}

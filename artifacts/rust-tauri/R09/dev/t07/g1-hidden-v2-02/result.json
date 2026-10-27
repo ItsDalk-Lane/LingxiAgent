@@ -1,0 +1,29 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t07_native_e2e",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 4.447,
+ "caseCount": 18,
+ "casesSha256": "51304b5b11b128db524b790607c8b321676c4dfd45f29aae2d0e137242ae4e37",
+ "commands": [
+  {
+   "id": "t07-fixtures",
+   "argv": [
+    "python3",
+    "-B",
+    "scripts/rust-tauri/r09_t07_fixture.py",
+    "--home",
+    "/private/tmp/lingxi-r09-runtime/r09_t07_native_e2e-29018-1793028299893/home-t07-fixtures",
+    "--evidence",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t07/g1-hidden-v2-02/fixtures"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.174,
+   "logSha256": "1bfd264229476ddadc3c9112cb118ff15a616aea1b2c93c1200d804d0ea8aa5b"
+  }
+ ],
+ "logSha256": "02735d3ce134081142e0cebc01981a738a5ab500fca6e3c5d4b5e8bd1ecac6a1",
+ "finishedAtUnixMs": 1793028304340,
+ "failureDetail": "wdio script error: {'available': True, 'error': 'TypeError: Load failed', 'ok': False, 'url': 'asset://localhost/%2Fprivate%2Ftmp%2Flingxi-r09-runtime%2Fr09_t07_native_e2e-29018-1793028299893%2Ftmp%2Ft07-asset-fixture.txt'}"
+}

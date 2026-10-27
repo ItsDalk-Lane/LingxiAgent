@@ -1,149 +1,18 @@
 /**
- * platform.js — 平台适配层
+ * platform.js — React 之前的宿主可视引导（R08-T02 收口 / R09-T01 Tauri）
  *
- * Electron 环境：直接转发给 preload 注入的 window.hana（IPC）
- * Web 环境：降级到 HTTP API + 浏览器原生 API
+ * window.platform / web fallback 的安装已迁移到
+ * desktop/src/react/host/（DesktopHost：getDesktopHost 惰性安装，
+ * Electron 桥 / Tauri 宿主 / Web 受限宿主三选一）。
  *
- * 使用方式：所有前端代码调 platform.xxx()，不再直接碰 window.hana。
+ * 本文件是非模块 <script>，只保留必须先于 React 执行的可视引导：
+ * data-platform 属性 + win32 滚动条 idle 行为。
+ * 属于 host 内部白名单文件：只探测 window.hana 与 window.__TAURI__。
  */
 (function () {
-  if (window.hana) {
-    // Electron — 直接用 preload 注入的 IPC bridge
-    window.platform = window.hana;
-    return;
-  }
-
-  // Web / 非 Electron 环境 — HTTP fallback
-  const params = new URLSearchParams(location.search);
-  const devWeb = normalizeDevWebConfig(window.__LINGXI_DEV_WEB__);
-  const token = params.get("token") || localStorage.getItem("hana-token") || "";
-  const baseUrl = devWeb.apiBaseUrl || `${location.protocol}//${location.host}`;
-  const serverPort = devWeb.serverPort || safePortFromBaseUrl(baseUrl) || location.port || "3000";
-
-  function normalizeDevWebConfig(value) {
-    if (!value || typeof value !== "object") {
-      return { serverPort: "", apiBaseUrl: "" };
-    }
-    const serverPort = typeof value.serverPort === "number" || typeof value.serverPort === "string"
-      ? String(value.serverPort).trim()
-      : "";
-    const apiBaseUrl = typeof value.apiBaseUrl === "string"
-      ? value.apiBaseUrl.replace(/\/+$/, "")
-      : "";
-    return { serverPort, apiBaseUrl };
-  }
-
-  function safePortFromBaseUrl(value) {
-    try {
-      return new URL(value).port;
-    } catch {
-      return "";
-    }
-  }
-
-  function apiFetch(path, opts = {}) {
-    const headers = { ...opts.headers };
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-    return fetch(`${baseUrl}${path}`, { ...opts, headers });
-  }
-
-  window.platform = {
-    // 服务器连接
-    getServerPort: async () => serverPort,
-    getServerToken: async () => token,
-    appReady: async () => {},
-    syncWindowTheme: () => {},
-    runEditCommand: async () => false,
-
-    // 文件 I/O → server HTTP
-    readFile: (p) => apiFetch(`/api/fs/read?path=${encodeURIComponent(p)}`).then(r => r.ok ? r.text() : null),
-    readFileSnapshot: async () => null,
-    readFileBase64: (p) => apiFetch(`/api/fs/read-base64?path=${encodeURIComponent(p)}`).then(r => r.ok ? r.text() : null),
-    readDocxHtml: (p) => apiFetch(`/api/fs/docx-html?path=${encodeURIComponent(p)}`).then(r => r.ok ? r.text() : null),
-    readXlsxHtml: (p) => apiFetch(`/api/fs/xlsx-html?path=${encodeURIComponent(p)}`).then(r => r.ok ? r.text() : null),
-
-    // 文件写入 / 监听 / 派生 viewer 窗口 → Web 不支持
-    writeFile: async () => false,
-    writeFileBinary: async () => false,
-    copyFile: async () => false,
-    writeFileIfUnchanged: async () => ({ ok: false }),
-    watchFile: async () => false,
-    unwatchFile: async () => false,
-    onFileChanged: () => {},
-    watchWorkspace: async () => false,
-    unwatchWorkspace: async () => false,
-    onWorkspaceChanged: () => {},
-    spawnViewer: async () => null,
-    viewerRequestLoad: async () => null,
-    viewerClose: () => {},
-    onViewerClosed: () => {},
-
-    // 文件路径（Web 不支持系统路径）
-    getFilePath: () => null,
-    getAvatarPath: () => null,
-    getSplashInfo: async () => ({}),
-
-    // 系统对话框 → Web 降级
-    selectFolder: async () => null,
-    selectFiles: async () => [],
-    selectSkill: async () => null,
-    selectPlugin: async () => null,
-
-    // OS 集成 → 静默降级
-    openFolder: () => {},
-    openFile: () => {},
-    openExternal: (url) => { try { window.open(url, "_blank"); } catch {} },
-    showInFinder: () => {},
-    startDrag: () => {},
-
-    // 窗口管理 → 单页降级
-    openSettings: () => {},
-    reloadMainWindow: () => location.reload(),
-
-    // 设置通信 → Web 环境暂不支持跨窗口
-    settingsChanged: () => {},
-    onSettingsChanged: () => {},
-    onOpenSettingsModal: () => {},
-
-    // 浏览器查看器 → Web 环境暂不支持
-    openBrowserViewer: () => {},
-    closeBrowserViewer: () => {},
-    onBrowserUpdate: () => {},
-    browserGoBack: () => {},
-    browserGoForward: () => {},
-    browserReload: () => {},
-    browserNewTab: () => {},
-    browserSwitchTab: () => {},
-    browserCloseTab: () => {},
-    browserEmergencyStop: () => {},
-
-    // Skill 查看器 → Web 环境暂不支持
-    openSkillViewer: () => {},
-    listSkillFiles: async () => [],
-    readSkillFile: async () => null,
-
-    // Onboarding
-    onboardingComplete: async () => {},
-    debugOpenOnboarding: async () => {},
-    debugOpenOnboardingPreview: async () => {},
-
-    // 窗口控制（Web 不需要）
-    getPlatform: async () => "web",
-    windowMinimize: () => {},
-    windowMaximize: () => {},
-    windowClose: () => {},
-    windowIsMaximized: async () => false,
-    onMaximizeChange: () => {},
-  };
-})();
-
-// ── 平台检测 ──
-(async function initPlatform() {
-  const p = window.platform;
-  if (!p?.getPlatform) return;
-  const plat = await p.getPlatform();
-  document.documentElement.setAttribute("data-platform", plat);
-  if (plat === "win32") {
+  function applyPlatform(plat) {
+    document.documentElement.setAttribute("data-platform", plat);
+    if (plat !== "win32") return;
     const scrollIdleTimers = new WeakMap();
     document.addEventListener("scroll", (event) => {
       if (document.documentElement.getAttribute("data-platform") !== "win32") return;
@@ -160,5 +29,29 @@
       scrollIdleTimers.set(target, nextTimer);
     }, { capture: true, passive: true });
   }
-  // Windows/Linux 窗口控制按钮已迁移到 React (App.tsx WindowControls)
+
+  const bridge = window.hana;
+  if (!bridge || typeof bridge.getPlatform !== "function") {
+    const tauri = window.__TAURI__;
+    if (tauri && tauri.core && typeof tauri.core.invoke === "function") {
+      // R09-T01：Tauri 宿主。React 启动前先用 UA 给出近似平台，随后经宿主
+      // `get_platform` 异步纠正（词表与 Electron process.platform 一致：
+      // darwin / win32 / linux），React 与 CSS 不需要第二套分支。
+      const ua = String((typeof navigator !== "undefined" && navigator.userAgent) || "");
+      applyPlatform(/Mac/i.test(ua) ? "darwin" : /Windows/i.test(ua) ? "win32" : /Linux/i.test(ua) ? "linux" : "web");
+      Promise.resolve(tauri.core.invoke("get_platform")).then((plat) => {
+        if (typeof plat === "string" && plat) applyPlatform(plat);
+      }).catch(() => {});
+      return;
+    }
+    document.documentElement.setAttribute("data-platform", "web");
+    return;
+  }
+  // Electron：沿用既有行为，抢先安装 window.platform 别名（= preload 桥本体），
+  // 保证未迁移的 window.platform 读取在 React 启动前即可用；DesktopHost 惰性收编同一对象。
+  window.platform = bridge;
+  Promise.resolve(bridge.getPlatform()).then((plat) => {
+    applyPlatform(plat);
+    // Windows/Linux 窗口控制按钮在 React (App.tsx WindowControls)
+  }).catch(() => {});
 })();

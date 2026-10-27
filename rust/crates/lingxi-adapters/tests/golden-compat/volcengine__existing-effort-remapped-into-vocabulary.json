@@ -1,0 +1,33 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "volcengine",
+  "case": "existing-effort-remapped-into-vocabulary",
+  "model": {
+    "provider": "volcengine",
+    "id": "doubao-seed-1-8",
+    "baseUrl": "https://ark.cn-beijing.volces.com/api/v3",
+    "api": "openai-completions",
+    "reasoning": true
+  },
+  "payload": {
+    "model": "doubao-seed-1-8",
+    "messages": [],
+    "reasoning_effort": "max"
+  },
+  "options": {
+    "mode": "chat"
+  },
+  "expected": {
+    "thinkingFormat": "volcengine",
+    "reasoningProfile": null,
+    "matched": "volcengine",
+    "result": {
+      "model": "doubao-seed-1-8",
+      "messages": [],
+      "reasoning_effort": "high",
+      "thinking": {
+        "type": "enabled"
+      }
+    }
+  }
+}

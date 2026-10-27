@@ -1,0 +1,1 @@
+{"dialect":"json-schema/draft-07","schema":{"$schema":"http://json-schema.org/draft-07/schema#","properties":{"limit":{"default":10,"type":"integer"},"query":{"description":"搜索关键词","type":"string"}},"required":["query"],"title":"第三方工具参数（原样保留，含非标准扩展）","type":"object","x-vendor-extension":{"honorific":"供應商自訂欄位","tags":["甲","乙"]}}}

@@ -1,0 +1,281 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > treats wechat as a connected bridge when bootstrapping the sidebar dot
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > treats wechat as a connected bridge when bootstrapping the sidebar dot
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:246:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:248:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > treats wechat as a connected bridge when bootstrapping the sidebar dot
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:334:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:248:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > treats wechat as a connected bridge when bootstrapping the sidebar dot
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes the HttpOnly device web session before opening WebSocket for a persisted LAN frontend
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:334:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:338:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes the HttpOnly device web session before opening WebSocket for a persisted LAN frontend
+[hana-launch] app-ready
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > stops startup explicitly when server identity cannot be loaded
+[hana-launch] app-ready {"reason":"server-identity-failed"}
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > stops startup explicitly when server identity cannot be loaded
+[init] server identity failed: identity unavailable
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > reconnects a saved Rust server through its own login and identity routes
+[hana-launch] app-ready {"reason":"server-identity-failed"}
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > reconnects a saved Rust server through its own login and identity routes
+[init] server identity failed: identity offline
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > uses the cold local Rust identity and does not call legacy bootstrap endpoints
+[hana-launch] app-ready {"reason":"rust-core-unavailable"}
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > keeps a failed remote connection selected and shows its failure without exposing its key
+[hana-launch] app-ready {"reason":"server-identity-failed"}
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > keeps a failed remote connection selected and shows its failure without exposing its key
+[init] server identity failed: credential denied [redacted]
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > initializes the pending workspace from agent home even when cwd history points elsewhere
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:246:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:542:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > initializes the pending workspace from agent home even when cwd history points elsewhere
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:334:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:542:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > initializes the pending workspace from agent home even when cwd history points elsewhere
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > loads the studio workspace list during bootstrap so the default-workspace merge key is ready for the first session list
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:246:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:595:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > loads the studio workspace list during bootstrap so the default-workspace merge key is ready for the first session list
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:334:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:595:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > loads the studio workspace list during bootstrap so the default-workspace merge key is ready for the first session list
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > hydrates the persisted permission default before showing the pending new-session draft
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:246:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:641:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > hydrates the persisted permission default before showing the pending new-session draft
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:334:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:641:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > hydrates the persisted permission default before showing the pending new-session draft
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local token and rebuilds websocket after server restart
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:246:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:690:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local token and rebuilds websocket after server restart
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:334:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:690:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local token and rebuilds websocket after server restart
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local restart credentials without stealing an active remote connection
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:246:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:782:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local restart credentials without stealing an active remote connection
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:334:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:782:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local restart credentials without stealing an active remote connection
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes the desk default workspace when settings change the current agent workspace
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:246:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:862:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes the desk default workspace when settings change the current agent workspace
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:334:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:862:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes the desk default workspace when settings change the current agent workspace
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > ignores workspace changes for non-current agents
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:246:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:924:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > ignores workspace changes for non-current agents
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:334:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:924:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > ignores workspace changes for non-current agents
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > clears the previous default desk root when settings clear the current agent workspace
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:246:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:986:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > clears the previous default desk root when settings clear the current agent workspace
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:334:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:986:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > clears the previous default desk root when settings clear the current agent workspace
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > configures context usage requests before settings and websocket handlers dispatch app events
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:246:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:1052:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > configures context usage requests before settings and websocket handlers dispatch app events
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:334:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:1052:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > configures context usage requests before settings and websocket handlers dispatch app events
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > opens the in-window settings modal when main process requests settings
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:246:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:1123:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > opens the in-window settings modal when main process requests settings
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:334:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:1123:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > opens the in-window settings modal when main process requests settings
+[hana-launch] app-ready
+
+ ✓ desktop/src/react/__tests__/app-init.test.ts (16 tests) 645ms
+     ✓ treats wechat as a connected bridge when bootstrapping the sidebar dot  551ms
+ ✓ desktop/src/react/__tests__/settings/R07McpRustAPI.test.ts (8 tests) 34ms
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx (9 tests) 1149ms
+     ✓ pins the active tab title beside the settings title in the modal header  816ms
+
+ Test Files  3 passed (3)
+      Tests  33 passed (33)
+   Start at  20:49:51
+   Duration  2.01s (transform 1.24s, setup 36ms, import 536ms, tests 1.83s, environment 1.30s)
+

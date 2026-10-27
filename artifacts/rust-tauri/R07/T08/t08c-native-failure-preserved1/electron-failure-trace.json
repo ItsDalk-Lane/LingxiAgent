@@ -1,0 +1,328 @@
+{
+  "scenario": "boundaries",
+  "error": "AssertionError [ERR_ASSERTION]: 14-success-post-failed-get-old-list-and-error\n    at check (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/__tests__/r06-settings-electron-main.cjs:20:38)\n    at remainingBoundaries (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/__tests__/r06-settings-electron-main.cjs:670:5)\n    at async /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/__tests__/r06-settings-electron-main.cjs:179:39",
+  "checks": [
+    "production-settings-entry",
+    "actual-agents-list",
+    "actual-settings-snapshot",
+    "actual-model-catalog",
+    "actual-current-model-binding",
+    "explicit-maintenance-state",
+    "14-write-persisted-before-refresh-error"
+  ],
+  "requests": [
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/server/identity",
+      "status": 204,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/server/identity",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/settings/config",
+      "status": 204,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/settings/config",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents",
+      "status": 204,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/models",
+      "status": 204,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/settings/snapshot",
+      "status": 204,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/settings/avatar-health",
+      "status": 204,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/models",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/settings/avatar-health",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/settings/snapshot",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/providers/summary",
+      "status": 204,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agent-deletions",
+      "status": 204,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 204,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 204,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 204,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/health",
+      "status": 204,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 204,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agent-deletions",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/providers/summary",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/server/identity",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/user-profile",
+      "status": 204,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/identity",
+      "status": 204,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/agents-md",
+      "status": 204,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/public-agents-md",
+      "status": 204,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/user-profile",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/agents-md",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/public-agents-md",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/models",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/identity",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/providers/summary",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/health",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 200,
+      "origin": "http://127.0.0.1:59923"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 409,
+      "origin": "http://127.0.0.1:59923"
+    }
+  ],
+  "reveals": [],
+  "forms": {
+    "selected": "agentA",
+    "dataAgentId": "agentA",
+    "configStatus": "ready",
+    "hasConfigKey": true,
+    "expected": {
+      "name": "助手agentA",
+      "identity": "agentA已保存身份",
+      "behavior": "agentA已保存行为"
+    },
+    "forms": [
+      {
+        "names": [],
+        "textareas": []
+      },
+      {
+        "names": [
+          {
+            "value": "助手agentA",
+            "className": "_agent-name-input_1e1e0",
+            "disabled": false
+          }
+        ],
+        "textareas": [
+          {
+            "rows": 3,
+            "value": "agentA已保存身份",
+            "disabled": false
+          },
+          {
+            "rows": 10,
+            "value": "agentA已保存行为",
+            "disabled": false
+          }
+        ]
+      },
+      {
+        "names": [
+          {
+            "value": "助手agentA",
+            "className": "_agent-name-input_1e1e0",
+            "disabled": false
+          }
+        ],
+        "textareas": [
+          {
+            "rows": 3,
+            "value": "agentA已保存身份",
+            "disabled": false
+          },
+          {
+            "rows": 10,
+            "value": "agentA已保存行为",
+            "disabled": false
+          }
+        ]
+      }
+    ]
+  },
+  "windowDestroyed": false
+}

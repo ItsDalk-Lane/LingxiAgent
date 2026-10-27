@@ -1,0 +1,17 @@
+
+running 3 tests
+test oversized_theme_variables_clear_by_utf8_bytes_while_valid_card_still_registers ... ok
+test plan_assets_read_real_bytes_and_refuse_missing_invalid_and_escape_without_mutation ... ok
+test export_plan_alias_matches_preview_without_package_write_then_real_export_and_asset ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.85s
+
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r07_t08_card_previews") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.56s
+     Running tests/r07_t08_card_previews.rs (rust/target/debug/deps/r07_t08_card_previews-f524ec5d679d5924)

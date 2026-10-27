@@ -670,7 +670,7 @@
     ],
     "version": 3
   },
-  "payloadFingerprint": "sha256:a4e41368790fb176e6a4b8a4756a1e59ba7e2bab324508f4d22e372e20e46589",
+  "payloadFingerprint": "sha256:2ed75f9bc701185aa8cb5463746c468b797aeed970550c6d05e3d79896f87f8b",
   "registry": [
     {
       "affectedByEpochMigration": true,
@@ -3412,8 +3412,8 @@
   ],
   "review": {
     "classification": "compatible",
-    "compatibilityReason": "本轮终态批次保护、输入契约与流投影修复不改变持久数据格式；tasks/schedules与旧attempt缺省兼容保持，媒体批次索引仅进程内释放，审批卡终态同步仅运行投影。",
-    "payloadFingerprint": "sha256:a4e41368790fb176e6a4b8a4756a1e59ba7e2bab324508f4d22e372e20e46589"
+    "compatibilityReason": "R17-R21 Rust service full-chain wiring (commit cdd213078) touched guarded sources desktop/main.cjs, shared/artifact-core/activation.cjs, shared/artifact-core/ota-core.cjs: it adds the private-artifact-guard hooks around activation/OTA (prepare/verify/seal call-outs and Windows-only guards), the Rust local-service startup/shutdown branches, and the get-server-connection-info IPC. No persisted store shape, DATA_EPOCH, or write-site set changes; scan-persistent-stores inventory and startup receipt are unchanged.",
+    "payloadFingerprint": "sha256:2ed75f9bc701185aa8cb5463746c468b797aeed970550c6d05e3d79896f87f8b"
   },
   "schemas": [
     {
@@ -3629,7 +3629,7 @@
       "contract": "desktop window bounds, release announcement bookmark, and update cache version marker readers",
       "kind": "directory-contract",
       "module": "desktop/main.cjs",
-      "sourceHash": "sha256:77b4ec1ce7ecad57da98b2b4833ed732f7175558eb447fa05281e99573fd5afd",
+      "sourceHash": "sha256:586d62414bc903756da73189e55a25c55541752181986f4c4d23277c08b21e4a",
       "storeId": "desktop-window-version-state"
     },
     {

@@ -1,0 +1,22 @@
+hdiutil: WARNING: 'hdiutil attach -nobrowse ...' is deprecated. Please use 'diskutil image attach --mountOptions nobrowse ...' instead.
+NEGATIVE exit=2 stderr=error: migrate: refused [disk-space]: preflight refused (check=disk-space); report at /private/tmp/t05a10-matrix/a10-rpzl8j/neg/work/preflight-report.json
+ok   负例: exit 2
+ok   负例: journal 存在且 phase=refused
+ok   负例: refusal.check=disk-space
+ok   负例: preflight-report.json 存在
+ok   负例: disk-space 检查 status=refused
+ok   负例: 证据含 requiredBytes 实数
+ok   负例: 证据含 backupDirVolume avail 实数且短缺
+DISK_SPACE_FACT requiredBytes=268635965 backupAvail=66248704
+ok   负例: 目标根不存在（结构性零部分产物）
+ok   负例: 旧根逐字节零改动
+ok   负例: work-dir 仅含 journal+preflight-report
+ok   负例: 无 .tmp-* 残留
+POSITIVE exit=0
+ok   正控制: exit 0
+FAIL 正控制: stopped@pointer_switch（干净停机非拒绝） — {"phase":"selfcheck","stopEntry":{"phase":"pointer_switch","enteredAt":"2026-10-23T05:20:23.731Z","leftAt":"2026-10-23T05:20:23.750Z","outcome":"ok","detail":{"activeDataRoot":"/private/tmp/t05a10-matrix/a10-rpzl8j/pos/new-home","committedAt":"2026-10-23T05:20:23.741Z","pointer":"/private/tmp/t05a10-matrix/a10-rpzl8j/pos/active-data-root.json"}}}
+hdiutil: WARNING: 'hdiutil attach -nobrowse ...' is deprecated. Please use 'diskutil image attach --mountOptions nobrowse ...' instead.
+NEARFIT_FACT sizeMiB=353 avail=368476160 required=268635965
+ok   近拟合: avail≥required 时 migrate 通过（阈值为实测比较）
+SCRATCH_KEPT /private/tmp/t05a10-matrix/a10-rpzl8j
+A10_RESULT {"verdict":"FAIL","failures":["正控制: stopped@pointer_switch（干净停机非拒绝）"],"notes":[]}

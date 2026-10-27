@@ -1,0 +1,121 @@
+{
+  "kind": "R07_HANDOFF_35_PROVENANCE_READONLY_RESEARCH",
+  "date": "2026-10-18",
+  "sourceHead": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "conclusion": "NOT_FOUND_IN_INSPECTED_MATERIALS",
+  "approvedStatement": {
+    "source": "当前聊天的已批准方案；由主控提供原句，未提供逐项列表",
+    "text": "验收覆盖 24 个基础场景、408 个细分场景的 R07 责任，以及 2 项扩展边界，包含前阶段移交的 35 项检查。"
+  },
+  "missing": [
+    "对应35项的权威逐项清单或冻结引用",
+    "每项稳定ID及原文到来源的对应关系",
+    "该35集合的去重口径及当时接受/延期决定"
+  ],
+  "establishedFacts": [
+    "R07原任务书是12任务、24基础场景，开始条件要求消费前阶段交接，但没有35项枚举。",
+    "R07_PROGRESS.scope只有24基础、408补充、2扩展；其中service 35组是测试分组，不是移交项。",
+    "T12_GATE_READINESS第52至60行明确35逐项清单未核实；它是本次缺口记录，不能倒作原始清单。",
+    "R00 T03-R3-F01/F02在R01以RR-T03-R3-F01/F02继承，两条真实责任是重复传递，不能重复凑数。",
+    "R02-DEFERRED-TO-R07-LEAVES与R03-DEFERRED-TO-R07-NINE-LEAVES继承同一九叶；另有31/69分组及跨阶段叶，不构成35权威集合。",
+    "R06_HANDOFF.unresolved_items为10个旧分组；没有35项枚举，且其旧R07_READY状态不能推翻最新用户接受回执。",
+    "定向Git历史搜索命中的是R02文件计数/AR历史角色数；未发现合格的35项移交枚举。"
+  ],
+  "excludedNonSources": [
+    "229个跨阶段叶集合",
+    "AR_HANDOFF历史35唯一角色",
+    "R01 preserve-format 35格式项及文档比较35 checks",
+    "其他测试/文件数量35"
+  ],
+  "r06Authority": {
+    "userInstruction": "不需要整轮重新跑，现在可以标R06已经完成了",
+    "acceptedImplementationCommit": "1be9107555629c8ea62abd1701c1e4b565c62419",
+    "fullStageRerunRequired": false,
+    "lastActualFullFormalResult": "FAIL_PRESERVED",
+    "newFullStageRunExecuted": false,
+    "fullFormalExitZeroClaimed": false
+  },
+  "minimumRecoveryCondition": "提供最初35项列表所在原消息/文件/冻结引用（含稳定ID及原文）；若原方案当时只有总数，则需明确承认35的逐项来源缺失，不能从其他数量重新拼装。",
+  "scopeLimits": [
+    "仅本次检查材料内未找到，不声称所有外部聊天或已失档材料均不存在",
+    "不新增35条义务、不改原账、不重开R06、不运行Cargo/测试、不提交或推送"
+  ],
+  "inspectedMaterials": [
+    {
+      "path": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R07_外围能力、后台自动化与多入口接入.md",
+      "sha256": "6c3375f324fea033c2cfdd679667132a0d0af7dd11c267292416d63550a2779d"
+    },
+    {
+      "path": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/04_阶段依赖与接口交接.md",
+      "sha256": "940c896508e929ec5f25c2b9020c06c2035c3f9800f43b78b1fd5e303e92bde3"
+    },
+    {
+      "path": "docs/rust-tauri/R07/R07_PROGRESS.json",
+      "sha256": "5b824d906d44dc4ef92336ae080bec61d85f37d606ad37c2aff74e6e1c526805"
+    },
+    {
+      "path": "docs/rust-tauri/R07/T12_GATE_READINESS.md",
+      "sha256": "ad67fd99317215e16e5be04691e08c95c15d760a1594044c52d0969eba624376"
+    },
+    {
+      "path": "docs/rust-tauri/R00/R00_HANDOFF.json",
+      "sha256": "c925e839c088502ae4e4d2798b9a284b26e30f26fb41ec1f39ced9a440669938"
+    },
+    {
+      "path": "docs/rust-tauri/R01/R01_HANDOFF.json",
+      "sha256": "9780cd5ef1058208b012d3c76e1da4a802e5cb36462a09892e3cd6d1f1000000"
+    },
+    {
+      "path": "docs/rust-tauri/R02/R02_HANDOFF.json",
+      "sha256": "09136a0797d105d6bdd2594bc99dd10f54ab728896fd561b31dd6e9dafb9a8b7"
+    },
+    {
+      "path": "docs/rust-tauri/R03/R03_HANDOFF.json",
+      "sha256": "50f99f052cd5a73beed76b21c4ce74e972b7a04d7f3dbfcc8191586e988aa4aa"
+    },
+    {
+      "path": "docs/rust-tauri/R04/R04_HANDOFF.json",
+      "sha256": "dc23fa11522e41f836dc13d21efffb34f0cbf54565a58d0e5bae953302648465"
+    },
+    {
+      "path": "docs/rust-tauri/R05/R05_HANDOFF.json",
+      "sha256": "a776f19d47a614bce73702a56a583df06a15670a96ad724356156bc7406a8021"
+    },
+    {
+      "path": "docs/rust-tauri/R06/R06_HANDOFF.json",
+      "sha256": "bf2f7425901b13f208412a36b3c8e22e315136d408c9584a06f16e37eec0540f"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/AR_PROGRESS.json",
+      "sha256": "8279b22d2bce311760d5bf152e2f5a16b22dd02dfbdf1045e027c96149752f92"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/AR_HANDOFF.md",
+      "sha256": "b18f2230ddef872e623e0cac27a8f7ea6ceefa03adcd004902c00a7d003bc960"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/HANDOFF_NEXT_AGENT.md",
+      "sha256": "e7bcfb1afff1f7ab36f71f0e96961e6d27347ea82f3deeb4a66b00f464a759b6"
+    },
+    {
+      "path": "docs/rust-tauri/R06/repair-current/route-a-20261014/PLAN.md",
+      "sha256": "daf9e7407b9b6522486e70586955b456f65bb88e1a16d78dfa26d35d3c31d680"
+    },
+    {
+      "path": "docs/rust-tauri/R05/repair-current/RR3_HANDOFF.md",
+      "sha256": "28d3dfd68d71619b2b40b288bd93512d4a220304c43908f93d91a1ef79d6bc79"
+    },
+    {
+      "path": "docs/rust-tauri/R03/repair-current/R03_FIX_HANDOFF.md",
+      "sha256": "43561ae7718eeb7571b1d78cead3d14eb5e0df246fcad529f48ee59b5ea5175e"
+    },
+    {
+      "path": "docs/rust-tauri/R02/R02_FULL_SCOPE_HANDOFF_R18.md",
+      "sha256": "ac8141ccfa40cc54a8407de68ac68fd463ea177e0218d7bb17cd7b0a551e1023"
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json",
+      "sha256": "f9c53b1e485317b648a5effce87b11eaa39637058eed38d74aadad046986be13"
+    }
+  ]
+}

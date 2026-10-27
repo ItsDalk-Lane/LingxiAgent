@@ -1,0 +1,88 @@
+[
+  {
+    "name": "lib-automation",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "automation_",
+      "--locked"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 26.571,
+    "log": "/private/tmp/lingxi-r07-t01-lib-automation-frozen.log"
+  },
+  {
+    "name": "protocol-tests",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "-p",
+      "lingxi-protocol",
+      "--locked"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 0.605,
+    "log": "/private/tmp/lingxi-r07-t01-protocol-tests-frozen.log"
+  },
+  {
+    "name": "protocol-generated-check",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "run",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "-p",
+      "lingxi-protocol",
+      "--bin",
+      "lingxi-protocol-gen",
+      "--locked",
+      "--",
+      "--check"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 0.411,
+    "log": "/private/tmp/lingxi-r07-t01-protocol-generated-check-frozen.log"
+  },
+  {
+    "name": "protocol-rust-roundtrip",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "run",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "-p",
+      "lingxi-protocol",
+      "--bin",
+      "lingxi-protocol-verify",
+      "--locked",
+      "--",
+      "--ts",
+      "artifacts/rust-tauri/R07/T01/ts-roundtrip"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 0.414,
+    "log": "/private/tmp/lingxi-r07-t01-protocol-rust-roundtrip-frozen.log"
+  },
+  {
+    "name": "format",
+    "argv": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "fmt",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 2.328,
+    "log": "/private/tmp/lingxi-r07-t01-format-frozen.log"
+  }
+]

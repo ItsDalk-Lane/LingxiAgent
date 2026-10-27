@@ -1,0 +1,52 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0277]: a value of type `Vec<&std::string::String>` cannot be built from an iterator over elements of type `&&std::string::String`
+   --> crates/lingxi-service/src/cutover_rollback.rs:641:62
+    |
+641 |         let added: Vec<&String> = a_keys.difference(&b_keys).collect();
+    |                                                              ^^^^^^^ value of type `Vec<&std::string::String>` cannot be built from `std::iter::Iterator<Item=&&std::string::String>`
+    |
+help: the trait `FromIterator<&&std::string::String>` is not implemented for `Vec<&std::string::String>`
+      but trait `FromIterator<&std::string::String>` is implemented for it
+   --> /private/tmp/rust-20260123-8344-1t53h/rustc-1.93.0-src/library/alloc/src/vec/mod.rs:3721:1
+    = help: for that trait implementation, expected `std::string::String`, found `&std::string::String`
+note: the method call chain might not have had the expected associated types
+   --> crates/lingxi-service/src/cutover_rollback.rs:639:58
+    |
+622 |     let am = parse(a)?;
+    |              --------- this expression has type `Map<String, Value>`
+...
+639 |     let a_keys: std::collections::BTreeSet<&String> = am.keys().collect();
+    |                                                          ^^^^^^ `Iterator::Item` is `&String` here
+640 |     if b_keys != a_keys {
+641 |         let added: Vec<&String> = a_keys.difference(&b_keys).collect();
+    |                                          ------------------- `Iterator::Item` is `&&String` here
+note: required by a bound in `std::iter::Iterator::collect`
+   --> /private/tmp/rust-20260123-8344-1t53h/rustc-1.93.0-src/library/core/src/iter/traits/iterator.rs:2015:5
+
+error[E0277]: a value of type `Vec<&std::string::String>` cannot be built from an iterator over elements of type `&&std::string::String`
+   --> crates/lingxi-service/src/cutover_rollback.rs:642:64
+    |
+642 |         let removed: Vec<&String> = b_keys.difference(&a_keys).collect();
+    |                                                                ^^^^^^^ value of type `Vec<&std::string::String>` cannot be built from `std::iter::Iterator<Item=&&std::string::String>`
+    |
+help: the trait `FromIterator<&&std::string::String>` is not implemented for `Vec<&std::string::String>`
+      but trait `FromIterator<&std::string::String>` is implemented for it
+   --> /private/tmp/rust-20260123-8344-1t53h/rustc-1.93.0-src/library/alloc/src/vec/mod.rs:3721:1
+    = help: for that trait implementation, expected `std::string::String`, found `&std::string::String`
+note: the method call chain might not have had the expected associated types
+   --> crates/lingxi-service/src/cutover_rollback.rs:638:58
+    |
+621 |     let bm = parse(b)?;
+    |              --------- this expression has type `Map<String, Value>`
+...
+638 |     let b_keys: std::collections::BTreeSet<&String> = bm.keys().collect();
+    |                                                          ^^^^^^ `Iterator::Item` is `&String` here
+...
+642 |         let removed: Vec<&String> = b_keys.difference(&a_keys).collect();
+    |                                            ------------------- `Iterator::Item` is `&&String` here
+note: required by a bound in `std::iter::Iterator::collect`
+   --> /private/tmp/rust-20260123-8344-1t53h/rustc-1.93.0-src/library/core/src/iter/traits/iterator.rs:2015:5
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `lingxi-service` (bin "lingxi-service" test) due to 2 previous errors

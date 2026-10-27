@@ -1,18 +1,31 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { useSettingsStore } from '../store';
+import { useSettingsStore, type Agent } from '../store';
 import { lingxiFetch } from '../api';
 import { t } from '../helpers';
 import { loadSettingsConfig, loadAgents } from '../actions';
+import { loadRustAgents } from '../rust-agents';
+import { resolveServerConnection } from '../../services/service-client';
 import { Overlay } from '../../ui';
 import styles from '../Settings.module.css';
+
+// 确认绑定完整连接快照；字段排序不把等价重建当作切换，任何实际身份/路由变化都须重开。
+function connectionIdentity(connection: unknown): string {
+  return JSON.stringify(connection ?? null, (_key, value: unknown) => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return value;
+    const object = value as Record<string, unknown>;
+    return Object.fromEntries(Object.keys(object).sort().map(key => [key, object[key]]));
+  });
+}
 
 type CleanupSkill = { name: string; description?: string };
 
 export function AgentDeleteOverlay() {
-  const { agents, currentAgentId, settingsAgentId } = useSettingsStore(
-    useShallow(s => ({ agents: s.agents, currentAgentId: s.currentAgentId, settingsAgentId: s.settingsAgentId }))
+  const { agents, currentAgentId, settingsAgentId, source } = useSettingsStore(
+    useShallow(s => ({ agents: s.agents, currentAgentId: s.currentAgentId, settingsAgentId: s.settingsAgentId, source: s }))
   );
+  // 解析后备连接可能产生新对象；在订阅快照外解析，避免React快照被新引用反复触发。
+  const connection = resolveServerConnection(source);
   const showToast = useSettingsStore(s => s.showToast);
   const [visible, setVisible] = useState(false);
   // step 2（技能勾选）只在预览发现可随删技能时出现，否则 1 → 3 直通
@@ -26,15 +39,25 @@ export function AgentDeleteOverlay() {
   const [waitingPreview, setWaitingPreview] = useState(false);
   // await 预览后闭包里的 state 已过期，走 ref 读最新结果
   const cleanupSkillsRef = useRef<CleanupSkill[]>([]);
+  const previewFailedRef = useRef(false);
+  const deleteConnectionRef = useRef<string | null>(null);
+  const confirmationOpenRef = useRef(false);
+  const connectionChangedRef = useRef(false);
+  const rustMode = connection?.serverNodeKind === 'lingxi-service';
+  const connectionKey = connectionIdentity(connection);
   const previewPromiseRef = useRef<Promise<void> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const targetId = deleteTargetId || settingsAgentId || currentAgentId;
-  const target = agents.find(a => a.id === targetId);
+  const targetSnapshotRef = useRef<Agent | null>(null);
+  // 旧确认只保留原目标供显示拒绝；不能因新连接列表清空而失去原来的拒绝按钮。
+  const target = connectionChangedRef.current || deleteConnectionRef.current !== connectionKey
+    ? targetSnapshotRef.current : agents.find(a => a.id === targetId);
 
   const fetchCleanupPreview = useCallback(async (agentId: string) => {
     try {
       const res = await lingxiFetch(`/api/agents/${agentId}/skills/cleanup-preview`);
       const data = await res.json().catch(() => null);
+      if (rustMode && !Array.isArray(data?.skills)) throw new Error('技能预览返回格式不正确');
       const skills = Array.isArray(data?.skills)
         ? data.skills
             .filter((s: any) => typeof s?.name === 'string')
@@ -44,20 +67,39 @@ export function AgentDeleteOverlay() {
       setCleanupSkills(skills);
       // 默认全选：符合「删除助手时技能一并清掉」的主诉求，想保留的手动取消
       setSelectedSkills(new Set(skills.map((s: CleanupSkill) => s.name)));
-    } catch {
-      // 预览失败静默降级为「无随删技能」，流程退回原来的两步
+    } catch (failure) {
+      if (rustMode) {
+        // Rust入口不能把预览失败当成没有技能；阻止继续并显示真正原因。
+        previewFailedRef.current = true;
+        setError(`${t('settings.agent.deleteFailed')}: ${failure instanceof Error ? failure.message : String(failure)}`);
+      }
+      // 旧Node入口保留既有两步回退行为。
       cleanupSkillsRef.current = [];
       setCleanupSkills([]);
       setSelectedSkills(new Set());
     }
-  }, []);
+  }, [rustMode]);
+
+  useEffect(() => useSettingsStore.subscribe(state => {
+    // 与lingxiFetch使用同一解析入口，登记表变更、后备来源切换和来回切换均锁存失效。
+    if (confirmationOpenRef.current && deleteConnectionRef.current !== connectionIdentity(resolveServerConnection(state))) {
+      connectionChangedRef.current = true;
+    }
+  }), []);
 
   useEffect(() => {
     const handler = (event: Event) => {
       const agentId = event instanceof CustomEvent && typeof event.detail?.agentId === 'string'
         ? event.detail.agentId
         : null;
+      const current = useSettingsStore.getState();
+      const originalId = agentId || current.settingsAgentId || current.currentAgentId;
+      targetSnapshotRef.current = current.agents.find(agent => agent.id === originalId) || null;
       setDeleteTargetId(agentId);
+      deleteConnectionRef.current = connectionIdentity(resolveServerConnection(useSettingsStore.getState()));
+      confirmationOpenRef.current = true;
+      connectionChangedRef.current = false;
+      previewFailedRef.current = false;
       setStep(1);
       setNameInput('');
       setError('');
@@ -70,7 +112,7 @@ export function AgentDeleteOverlay() {
     };
     window.addEventListener('hana-show-agent-delete', handler);
     return () => window.removeEventListener('hana-show-agent-delete', handler);
-  }, [fetchCleanupPreview]);
+  }, [fetchCleanupPreview, connectionKey]);
 
   useEffect(() => {
     if (step === 3) requestAnimationFrame(() => inputRef.current?.focus());
@@ -78,7 +120,9 @@ export function AgentDeleteOverlay() {
 
   const close = useCallback(() => {
     setVisible(false);
+    confirmationOpenRef.current = false;
     setDeleteTargetId(null);
+    targetSnapshotRef.current = null;
     setDeleting(false);
     setError('');
   }, []);
@@ -93,6 +137,7 @@ export function AgentDeleteOverlay() {
         setWaitingPreview(false);
       }
     }
+    if (previewFailedRef.current) return;
     if (cleanupSkillsRef.current.length > 0) {
       setStep(2);
     } else {
@@ -114,6 +159,9 @@ export function AgentDeleteOverlay() {
     setDeleting(true);
     setError('');
     try {
+      if (connectionChangedRef.current || deleteConnectionRef.current !== connectionIdentity(resolveServerConnection(useSettingsStore.getState()))) {
+        throw new Error('连接已改变，请重新打开删除确认');
+      }
       const selected = [...selectedSkills];
       const res = await lingxiFetch(
         `/api/agents/${targetId}`,
@@ -135,9 +183,27 @@ export function AgentDeleteOverlay() {
           : t('settings.agent.deleted', { name: target.name }),
         'success',
       );
+      if (rustMode && data.logicalDeleted === true) {
+        window.dispatchEvent(new CustomEvent('hana-agent-deletion-changed'));
+        const pending = [data.cleanupPending && '剩余文件清理待完成', data.referencesPending && '助手引用更新待完成，尚未确认切换', (data.journalCheckpointPending || data.journalError) && '删除记录保存待完成'].filter(Boolean);
+        if (pending.length) {
+          const completed = deletedCount > 0 ? t('settings.agent.deletedWithSkills', { name: target.name, count: String(deletedCount) }) : t('settings.agent.deleted', { name: target.name });
+          showToast(`${completed}；${pending.join('；')}`, 'success');
+        }
+      }
       useSettingsStore.setState({ settingsAgentId: null });
-      await loadAgents();
-      await loadSettingsConfig();
+      if (rustMode) {
+        // 删除已成功；列表刷新失败单独显示，不能重新宣称删除失败。
+        try {
+          await loadRustAgents();
+          if (data.referencesPending) useSettingsStore.setState({ currentAgentId: null });
+          await loadSettingsConfig();
+        }
+        catch (failure) { showToast(failure instanceof Error ? failure.message : String(failure), 'error'); }
+      } else {
+        await loadAgents();
+        await loadSettingsConfig();
+      }
     } catch (err: any) {
       const message = t('settings.agent.deleteFailed') + ': ' + err.message;
       setError(message);
@@ -165,11 +231,12 @@ export function AgentDeleteOverlay() {
           <div className={styles['agent-delete-step']}>
             <h3 className={styles['agent-delete-title']}>{t('settings.agent.deleteTitle1', { name: target.name })}</h3>
             <p className={styles['agent-delete-desc']}>{t('settings.agent.deleteDesc1')}</p>
+            {error && <div className={styles['settings-inline-error']} role="alert">{error}</div>}
             <div className={styles['agent-delete-actions']}>
               <button className={styles['agent-delete-cancel']} onClick={close}>{t('settings.agent.deleteCancel')}</button>
               <button
                 className={styles['agent-delete-danger']}
-                disabled={waitingPreview}
+                disabled={waitingPreview || (rustMode && !!error)}
                 onClick={goNextFromWarning}
               >
                 {t('settings.agent.deleteNext')}

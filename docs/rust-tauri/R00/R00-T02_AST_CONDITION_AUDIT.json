@@ -1,0 +1,289 @@
+{
+  "schema_version": 1,
+  "task_id": "R00-T02",
+  "scope": "只读审查 ask_user 的 action 来源、条件路径和人工裁决边界；样例为发现器验收设计，未对产品执行变异或判 PASS",
+  "source_identity": {
+    "head_at_review": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084",
+    "files_sha256_at_initial_read": {
+      "lib/tools/ask-user-tool.ts": "a5ab37846f976cddee845b81b77ae3cafc322ecd281fd917990ab0cbfacb6a17",
+      "lib/confirm-store.ts": "431fbf5bd9477acb8781567830d9b97a4de01e5fd03c33c2b5e26c0991073e13",
+      "server/routes/confirm.ts": "59e951452a09c2c4b0bcb9f5f20af442f5b7e21226cf4e7d57b1bfadbc62b0fb",
+      "core/slash-commands/bridge-commands.ts": "d37ff28026596474ff59c97469952dab19a7f4787b74fd458198c6838b561a18",
+      "docs/rust-tauri/R00/r00_t02_source_gates.py": "68ec6622bcf8522498ac1a0f19edd8feee2950f7676e5f209206c3ec9e98c3c3",
+      "docs/rust-tauri/R00/R00-T02_BRANCH_SEMANTIC_CONTRACT.json": "6e9932cd86088e7f0111fd83eacad60a0df5899eb445b244ad18bf436222d512"
+    },
+    "concurrent_edit_note": "修复代理在本审查期间修改了未跟踪候选 r00_t02_source_gates.py；本报告的门禁缺陷事实绑定初读 SHA 68ec6622...，不声称已审完新候选或运行其负例。"
+  },
+  "real_source_trace": {
+    "origin": {
+      "location": "lib/tools/ask-user-tool.ts:275-277",
+      "expression": "const decision = await promise; const action = decision?.action",
+      "semantic_marker": "只标记此 promise 结果的 action 属性及其别名；不能按变量名 action 全文件匹配"
+    },
+    "producers": [
+      {
+        "value": "timeout",
+        "evidence": ["lib/confirm-store.ts:70-75"],
+        "current_reachability": "REACHABLE"
+      },
+      {
+        "value": "aborted",
+        "evidence": ["lib/confirm-store.ts:126-134"],
+        "current_reachability": "REACHABLE"
+      },
+      {
+        "value": "confirmed",
+        "evidence": ["server/routes/confirm.ts:17-20", "server/routes/confirm.ts:37", "core/slash-commands/bridge-commands.ts:155", "core/slash-commands/bridge-commands.ts:316-329"],
+        "current_reachability": "REACHABLE"
+      },
+      {
+        "value": "rejected",
+        "evidence": ["server/routes/confirm.ts:17-20", "server/routes/confirm.ts:37", "core/slash-commands/bridge-commands.ts:165", "core/slash-commands/bridge-commands.ts:316-329"],
+        "current_reachability": "REACHABLE"
+      },
+      {
+        "value": "OTHER",
+        "evidence": ["lib/confirm-store.ts:97-103"],
+        "current_reachability": "NOT_PROVEN_FROM_CURRENT_CALLERS",
+        "meaning": "resolve 本身不校验 action；这要求对新增上游生产者复审，不证明 skipped 当前已可提交"
+      },
+      {
+        "value": "null/undefined",
+        "evidence": ["lib/tools/ask-user-tool.ts:276", "lib/confirm-store.ts:68-86"],
+        "current_reachability": "NOT_PROVEN_FROM_CURRENT_CALLERS",
+        "meaning": "有限符号域的保守哨兵；optional chaining 可产生 undefined，当前 ConfirmStore 创建的 promise 正常返回 action 对象"
+      }
+    ],
+    "terminal_paths": [
+      {
+        "condition": "action === confirmed",
+        "condition_location": "lib/tools/ask-user-tool.ts:279",
+        "return_location": "lib/tools/ask-user-tool.ts:292",
+        "result": "toolOk:answered=true,timedOut=false; answers 来自 mapAnswer(q, value?.[q.key])；消息为 answered",
+        "contract_value": "confirmed"
+      },
+      {
+        "condition": "action !== confirmed && action === timeout",
+        "condition_location": "lib/tools/ask-user-tool.ts:295",
+        "return_location": "lib/tools/ask-user-tool.ts:308",
+        "result": "toolOk:answered=true,timedOut=true; answers 来自 recommendedAnswer，推荐项有无改变 answers/autoSelected；消息为 timedOut",
+        "contract_value": "timeout"
+      },
+      {
+        "condition": "action !== confirmed && action !== timeout && action === aborted",
+        "condition_location": "lib/tools/ask-user-tool.ts:311",
+        "return_location": "lib/tools/ask-user-tool.ts:312",
+        "result": "toolOk:answered=false,aborted=true,answers=[]；消息为 aborted",
+        "contract_value": "aborted"
+      },
+      {
+        "condition": "action 不属于 confirmed/timeout/aborted",
+        "condition_location": "lib/tools/ask-user-tool.ts:279-314",
+        "return_location": "lib/tools/ask-user-tool.ts:314",
+        "result": "toolOk:answered=false,dismissed=true,answers=[]；消息为 dismissed",
+        "contract_value": "<default>",
+        "residual_symbolic_domain": ["rejected", "OTHER", "null", "undefined"],
+        "reachability_note": "rejected 有现役来源；其余域仅作为保守路径检查，不自动宣布上游可达"
+      }
+    ]
+  },
+  "current_gate_finding": {
+    "status": "INCOMPLETE_STATIC_DISCOVERY_AT_INITIAL_READ",
+    "evidence": ["docs/rust-tauri/R00/r00_t02_source_gates.py:104-149", "docs/rust-tauri/R00/r00_t02_source_gates.py:152-173", "docs/rust-tauri/R00/R00-T02_REVIEW_R6.md:17-23"],
+    "explanation": "现门禁用正则寻找 action === 字面值和 switch case，并检查固定默认返回；includes、反向比较、helper 和条件中未知表达式可能漏报。完整 build 的 includes(skipped) 内存反例在 R6 独立审阅中意外成功。",
+    "contract_gap": "当前人工契约逐值列四条，但只比较值及简化的 toolOk/toolError 标志；结果消息、answers 形成方式、同一值的新增提前返回和路径身份也要进入比较。",
+    "producer_gap": "人工契约 producer_evidence 未列 slash /confirm、/reject 的生产入口，见 core/slash-commands/bridge-commands.ts:155,165,316-329。"
+  },
+  "in_progress_ast_candidate_probe": {
+    "parser_sha256_at_probe": "4570f0a1ca9cba354c2c4f0949b9c0eb8f2a206a3a3c3023008e1bc41c179092",
+    "parser_path": "docs/rust-tauri/R00/ask_user_ast_gate.cjs",
+    "method": "Python 在内存替换 ask-user-tool.ts 中 confirmed 条件前的源码片段，把 source 和原契约四值作为 JSON 标准输入交 node parser；未写生产或候选文件。只测解析器，不等同完整 build。",
+    "observations": [
+      {
+        "insertion": "const skipped = action === 'skipped'; if (skipped) return toolError('skipped');",
+        "actual": "退出码 0；branches 无 skipped，manual=[]，results 无 skipped",
+        "expected": "新 skipped 错误路径必须被发现，旧人工契约不变时阻止自动通过",
+        "cause": "候选字面值仅从顶层 if/switch 条件收集，未沿 action 相关 initializer 扫描别名条件"
+      },
+      {
+        "insertion": "if (action === 'skipped') return toolOk('new', { answered:false, dismissed:true, answers:[] });",
+        "actual": "退出码 0；branches 无 skipped，manual=[]，results 无 skipped",
+        "expected": "虽 flags 与旧兜底相同，但消息改变且新增选择条件，仍须人工同效/拆分裁决",
+        "cause": "结果签名忽略消息，且新增值只有签名不同于 default 才进入 branches"
+      },
+      {
+        "insertion": "switch (action) { default: return 旧兜底; case 'skipped': return toolError('skipped'); }",
+        "actual": "退出码 0；skipped_result 被计算为旧兜底，manual=[]",
+        "expected": "JavaScript switch 应先寻找匹配的 skipped case，再决定是否进入 default",
+        "cause": "解释器按源码顺序立即进入 default，未先搜索所有 case"
+      }
+    ],
+    "recheck_required_if_parser_changes": true
+  },
+  "second_in_progress_parser_probe": {
+    "parser_sha256_at_probe": "b18fe4d70d1e3a9a7d20ebd2fa353ec17c19df86c5a97fc93315c2bb3468c473",
+    "method": "同样仅以内存替换源码并直接调用 parser；未运行完整 build；修复代理并发修改后必须重测",
+    "observations": [
+      {
+        "insertion": "const allowed = new Set(['skipped']); if (allowed.has(action)) return toolError('x');",
+        "actual": "退出码 0；branches 无 skipped，manual=[]，results 无 skipped",
+        "expected": "未改动的字面 Set 必须发现 skipped；无法证明集合稳定则 MANUAL"
+      },
+      {
+        "insertion": "function isSkipped(x: unknown) { return x === 'skipped'; } if (isSkipped(action)) return toolError('x');",
+        "actual": "退出码 0；产生 9 个 MANUAL，未得到可自动判定的 skipped 分支",
+        "expected": "纯本地 helper 可内联，须识别 skipped；只有动态/有副作用 helper 才 MANUAL"
+      },
+      {
+        "insertion": "const unrelated = { action: 'skipped' }; if (unrelated.action === 'skipped') console.log('x');",
+        "actual": "退出码 0；产生 9 个 MANUAL",
+        "expected": "无 decision?.action 控制或结果依赖时不生成来源分支；若无法判定一般副作用，报告应与来源 MANUAL 区分"
+      },
+      {
+        "insertion": "if (allowedActions.includes(action)) return toolError('x');",
+        "actual": "退出码 0；产生 8 个 MANUAL",
+        "expected": "运行时集合读取来源 action，MANUAL 且完整构建非零"
+      }
+    ]
+  },
+  "conservative_discovery_design": {
+    "parser": "使用仓库 TypeScript 5.9 的 AST；建立符号绑定、调用图和有限控制流，不在正则中逐个追加语法",
+    "source_tracking": [
+      "从 execute 注册体中的 await promise 与 decision?.action 赋予来源标记，按词法 Symbol 跟踪别名、解构、赋值、参数和返回值",
+      "本地静态 helper 以调用点实参绑定并递归分析；同一 helper 在不同调用上下文保留路径上下文",
+      "遇动态调用目标、递归环、可写别名、逃逸到回调或未知副作用时输出带源码位置的 MANUAL，不能按无分支处理"
+    ],
+    "control_flow": [
+      "if/else、?:、switch 的 case/default/fallthrough、!、&&、||、return/throw、break/continue、try/catch/finally 都形成路径边",
+      "return/throw 终结原路径；finally 若可改写返回或抛错，按最终结果处理",
+      "可证明为词法常量且未被修改的字面数组 includes、Set.has、===/!==（两侧顺序）、纯布尔 helper 可求值；const 数组/Set 的绑定不变不意味着内容不可变，push/add 后须重新判断或 MANUAL",
+      "任何读取来源 action 的不支持谓词或结果表达式都产出 MANUAL，列可能值与消费者；未知不能并入 <default> 或标 UNREACHABLE"
+    ],
+    "symbolic_domain": ["源码中比较的字面 action 值", "现役生产者 confirmed/rejected/timeout/aborted", "null", "undefined", "OTHER"],
+    "result_identity": "记录入口、源码条件范围/规范化谓词、输入值集合、此前路径条件和最终 toolOk/toolError、消息、flags、answers/副作用。再与独立人工契约双向比对；源码 SHA 同步只能证明文件版本，不代表语义被覆盖。",
+    "manual_rule": "MANUAL 必须保留触发条件、可能结果、消费者、调用点、人工结论和复审触发条件；未裁决时完整构建不能自动通过。"
+  },
+  "designed_cases_not_executed": [
+    {
+      "id": "AST-01",
+      "code": "if (action === 'skipped') return toolError('skipped');",
+      "expected": "新 skipped 提前终结为 toolError；旧契约不变时差集失败",
+      "manual_decision_needed": "核上游 skipped 是否可达、失败效果是否应拆叶/场景"
+    },
+    {
+      "id": "AST-02",
+      "code": "if (['skipped'].includes(action)) return toolError('skipped');",
+      "expected": "与 AST-01 同一输入/结果路径；旧契约不变时失败，正是 R6 漏检反例",
+      "manual_decision_needed": "同 AST-01；不能由文本形态不同绕过"
+    },
+    {
+      "id": "AST-03",
+      "code": "const skipped = new Set(['skipped']); if (skipped.has(action)) return toolError('skipped');",
+      "expected": "若 Set 内容可证明未被修改，发现 skipped 的 toolError 路径；否则 MANUAL",
+      "manual_decision_needed": "新结果身份与生产者可达性"
+    },
+    {
+      "id": "AST-04",
+      "code": "switch (action) { case 'skipped': return toolError('skipped'); default: break; }",
+      "expected": "case skipped 独立终点；default 继续原有条件，不误把 case 归于旧兜底",
+      "manual_decision_needed": "新路径与上游约束"
+    },
+    {
+      "id": "AST-05",
+      "code": "if (action !== 'confirmed') return toolError('not confirmed');",
+      "expected": "rejected/timeout/aborted/OTHER/null/undefined 都提前错误返回；confirmed 继续，旧 timeout/aborted/default 断言失效",
+      "manual_decision_needed": "拆分或改变旧结果的逐值契约"
+    },
+    {
+      "id": "AST-06",
+      "code": "if (!['confirmed'].includes(action)) return toolError('not confirmed');",
+      "expected": "与 AST-05 同一取反结果路径；不能只登记 confirmed",
+      "manual_decision_needed": "核实际已知值及剩余域结果"
+    },
+    {
+      "id": "AST-07",
+      "code": "if (action === 'skipped' || action === 'rejected') return toolError('no');",
+      "expected": "短路两支覆盖 skipped 和 rejected；旧 rejected 兜底结果被改写，不能只报新增 skipped",
+      "manual_decision_needed": "分别核 skipped 来源及 rejected 行为变化"
+    },
+    {
+      "id": "AST-08",
+      "code": "const a = action; if (a === 'skipped' && flag) return toolError('no');",
+      "expected": "跟踪别名 a；flag 若动态但不读取 action，保留 true/false 两条条件路径及可能结果，不能假设 flag 永真",
+      "manual_decision_needed": "flag 的来源、skipped 的两种结果和场景"
+    },
+    {
+      "id": "AST-09",
+      "code": "function isSkipped(x: unknown) { return x === 'skipped'; } if (isSkipped(action)) return toolError('skipped');",
+      "expected": "按实参绑定内联纯 helper，发现 skipped 提前返回；旧契约不变时失败",
+      "manual_decision_needed": "上游可达性、错误结果"
+    },
+    {
+      "id": "AST-10",
+      "code": "const allowed = runtimeConfig.actions; if (allowed.includes(action)) return toolError('no');",
+      "expected": "MANUAL；运行时集合无法枚举，不能坠入旧 <default>",
+      "manual_decision_needed": "定位 allowed 的生产者、可能值和两端结果"
+    },
+    {
+      "id": "AST-11",
+      "code": "if (registry[mode](action)) return toolError('no');",
+      "expected": "MANUAL；动态调用目标读取来源 action，完整构建不能自动通过",
+      "manual_decision_needed": "解析 mode/registry 全部生产实现或登记动态边界"
+    },
+    {
+      "id": "AST-12",
+      "code": "const allowed = ['confirmed']; allowed.push('skipped'); if (allowed.includes(action)) return toolError('no');",
+      "expected": "不可因 const 推断数组内容固定；能解析 push 则发现 confirmed/skipped，不能解析则 MANUAL",
+      "manual_decision_needed": "内容修改顺序、两值结果"
+    },
+    {
+      "id": "AST-13",
+      "code": "const other = { action: 'skipped' }; if (other.action === 'skipped') console.log('x');",
+      "expected": "无来源依赖；不增加 ask_user 的分支候选",
+      "manual_decision_needed": "无，除非该条件另影响来源 action 的可见结果"
+    },
+    {
+      "id": "AST-14",
+      "code": "{ const action = unrelated.action; if (action === 'skipped') return toolError('x'); }",
+      "expected": "词法 shadow action 不属于 decision?.action，不生成该来源的新值候选；返回本身若改变 ask_user 结果，仍需一般控制流结果核对",
+      "manual_decision_needed": "核该独立条件是否改变总体工具行为，但不误称来源分支"
+    },
+    {
+      "id": "AST-15",
+      "code": "console.log(action);",
+      "expected": "只有日志依赖、无控制或结果依赖时不增加行为叶；如日志本身构成用户可见/持久副作用则另核",
+      "manual_decision_needed": "日志消费者性质"
+    },
+    {
+      "id": "AST-16",
+      "code": "if (action === 'confirmed' && action !== 'confirmed') return toolError('impossible');",
+      "expected": "矛盾路径可给静态不可达证明；不得用当前上游枚举代替路径逻辑证明",
+      "manual_decision_needed": "保存路径条件反证；证明不成立则保守保留"
+    },
+    {
+      "id": "AST-17",
+      "code": "return toolOk(String(action), { answered: false });",
+      "expected": "没有条件也有来源 action→消息结果的数据依赖；各值结果签名及消息需与人工契约比较",
+      "manual_decision_needed": "可见消息是否需拆分场景"
+    },
+    {
+      "id": "AST-18",
+      "code": "if (['confirmed'].includes(action)) { /* 原 confirmed 结果不变 */ }",
+      "expected": "仅作旧 === confirmed 条件的等价改写时不强制新增行为叶；仍须同步源码身份并由人确认结果/路径等价",
+      "manual_decision_needed": "等价性证据及更新后的 source_condition"
+    },
+    {
+      "id": "AST-19",
+      "code": "function isSkipped(x: unknown) { return plugin.check(x); } if (isSkipped(action)) return toolError('x');",
+      "expected": "MANUAL；helper 外逸到动态插件，不能按纯 helper 自动求值",
+      "manual_decision_needed": "插件目标、可能返回值及最终结果"
+    }
+  ],
+  "verification_state": {
+    "source_read": "DONE",
+    "producer_callers_searched": "DONE_FOR_STATIC_DIRECT_CONFIRMSTORE_RESOLVE_CALLS",
+    "designed_cases_executed": false,
+    "future_migration_scenarios_executed": false,
+    "pass_verdict": "NOT_GIVEN"
+  }
+}

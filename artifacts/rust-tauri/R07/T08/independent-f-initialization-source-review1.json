@@ -1,0 +1,32 @@
+{
+  "reviewer": "r07_t08_final_review",
+  "reviewedAt": "2026-10-18T09:29:18.135729+00:00",
+  "scope": "后继f冻结前6个检查文件的独立静态审阅；只读，不跑Cargo/GUI。",
+  "sourceHashes": {
+    "settings/__tests__/agent-delete-initialization.ts": "4c38bcd79272e48a775aa8160bb1dbeca0a8281f964805ab766eaa1cc4c4e8f2",
+    "settings/__tests__/AgentDeleteInitialization.test.ts": "c0f1978a83ab5e9975820fd1e60aec5e741637816db06a2f35562d82fc3d8148",
+    "settings/__tests__/R06AgentDeleteRustLive.test.tsx": "091325efb32aa8eb5c9eef43061fe3844887e9645eb7ab2139c1e5ae51e801e3",
+    "settings/__tests__/R06AgentDeleteConnectionReview.test.tsx": "e5a9af673d581bd01fa83a4354dd66abdbeb6bb71b26b081d25681255c3537ba",
+    "settings/__tests__/R06AgentDeleteRegistryReview.test.tsx": "7ff2553a4596d285b14c78a98f0e54ea14ad9578ecd71133d8c6d5b8533b8102",
+    "__tests__/chat-live/main.cjs": "6d8043d7332bb11727a8e5085231065d2aed18fb12906057ea8b41ae075ee63a"
+  },
+  "finalAcceptance": "pending",
+  "sourceReview": "未发现借ready、错误兼容分支或放宽业务断言变绿的实现。",
+  "facts": [
+    "三个真实服务删除检查原全部业务断言保留；只改初始化就绪屏障、真实fetch观察和finally恢复。",
+    "屏障不替换HTTP响应，不手动填ready、配置、身份或权限；实际fetch响应仍原样返回。",
+    "ready单独不足：服务identity精确匹配隔离home的serverId/studioId及本机拥有者权限，同连接URL/凭证/kind，6类初始化真实HTTP200，agents/model/config/snapshot错误拒绝，有效owner/key/fixture数据同时满足。",
+    "原15秒初始化边界及it开始起60秒总预算共同限制；捕获watchdog直接拒绝。正常Rust路径rustSettingsUnavailable=true不会被误作失败，亦不会被用来忽略真实资源错误。",
+    "chat-live在原20秒最终正文until同时等实际胶囊DOM，保留其后原即时检查及全部网络/交互动作，不新起超时。",
+    "新增三个合成负例只验证屏障拒绝资源错误、watchdog假ready和异服务身份；不充真实服务、权限或删除成功证据。"
+  ],
+  "runtimeClaims": {
+    "independentlyRunByReviewer": false,
+    "agentReportedNegativeCasesOnly": "3/3，未独立执行；真实删除两Rust目标及后继整轮尚须root同源码运行。"
+  },
+  "remainingLimits": [
+    "原e失败未证明唯一原因是一秒等待；新屏障可能揭露真实请求或资源错误，不能先结算为已修。",
+    "后继f必须重新完整20门禁，不能拼e局部通过。",
+    "f输出逐名JSON仅改报告方式，不得改选择、断言或超时；e原聚合日志不反向补造具名结果。"
+  ]
+}

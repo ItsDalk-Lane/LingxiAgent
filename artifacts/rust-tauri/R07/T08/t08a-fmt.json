@@ -1,0 +1,32 @@
+{
+  "candidate": "t08a",
+  "name": "fmt",
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "fmt",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--all",
+    "--",
+    "--check"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp",
+    "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib",
+    "PATH": "/Users/study_superior/.cargo/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/share/dotnet:/Users/study_superior/.codex/tmp/arg0-macos/codex-arg0vSRIw5:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/Users/study_superior/.lmstudio/bin:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/study_superior/.lmstudio/bin"
+  },
+  "startedAt": "2026-10-18T07:38:38.239269+00:00",
+  "sourceFingerprint": "cde9214ec9ea667afccdb5f5fd3819ff0eb114690f365b82520d2f1ff63f2134",
+  "log": "t08a-fmt.log",
+  "endedAt": "2026-10-18T07:38:42.151654+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "cde9214ec9ea667afccdb5f5fd3819ff0eb114690f365b82520d2f1ff63f2134",
+  "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "baseCommitAfter": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceUnchanged": true,
+  "gatePlanSha256": "a0f10cc54f49b23a5aba0cc070c85be9cce981219388fdd509f2ca0608c99d70"
+}

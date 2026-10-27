@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "candidate": "t07b",
+  "status": "RAW_SYNTHETIC_WORKFLOW_FAILURE_SCENE_PRESERVED",
+  "preservedAt": "2026-10-18T03:10:47.122878+00:00",
+  "sourceFixtureHome": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-workflow-0c70000a5facc241",
+  "sourceFingerprint": "7192fa54c9f314384b04f7b76453d3ae7917983801471fcb47db1dabe2d52a2b",
+  "serviceReceipt": "artifacts/rust-tauri/R07/T07/t07b-service.json",
+  "serviceLogSha256": "1c8eb272b82015b66c96b7e13ac55465a7562e2595887253e6af00b9bc5d6a7d",
+  "files": [
+    {
+      "source": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-workflow-0c70000a5facc241/agents/lingxi/workflow-journals/task_workflow_mywpiww0_1_d9zuiy.jsonl",
+      "copy": "artifacts/rust-tauri/R07/T07/t07b-workflow-fanout-scene/agents/lingxi/workflow-journals/task_workflow_mywpiww0_1_d9zuiy.jsonl",
+      "method": "BYTE_EXACT_COPY2",
+      "bytes": 217,
+      "mode": "0o644",
+      "sha256": "6e9482700924f3ba56b3d946329463fecaf9fa90b446c6dd6caf64030f0e440d",
+      "copySha256": "6e9482700924f3ba56b3d946329463fecaf9fa90b446c6dd6caf64030f0e440d"
+    },
+    {
+      "source": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-workflow-0c70000a5facc241/workflow-activity.json",
+      "copy": "artifacts/rust-tauri/R07/T07/t07b-workflow-fanout-scene/workflow-activity.json",
+      "method": "BYTE_EXACT_COPY2",
+      "bytes": 3145,
+      "mode": "0o644",
+      "sha256": "486642cb77ca359c268628aca2c4a5fb4773a6bbfeaa39d69f8baff59f2ee87b",
+      "copySha256": "486642cb77ca359c268628aca2c4a5fb4773a6bbfeaa39d69f8baff59f2ee87b"
+    },
+    {
+      "source": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-workflow-0c70000a5facc241/lingxi-service/data/runs.db",
+      "copy": "artifacts/rust-tauri/R07/T07/t07b-workflow-fanout-scene/runs.snapshot.db",
+      "method": "SQLITE_ONLINE_BACKUP_FROM_MODE_RO_WITH_WAL_VISIBLE",
+      "bytes": 823296,
+      "mode": "0o600",
+      "copySha256": "d1e7dd7ae129c30119f869c63bd79412d3fb7a0772cb2feed8f20f7f148e4eeb",
+      "rawDatabaseWalCopied": false,
+      "note": "SQLite backup事务产生一致逻辑快照；不宣称与源主db文件字节相同，不直接复制WAL/shm。"
+    }
+  ],
+  "facts": {
+    "path": "artifacts/rust-tauri/R07/T07/t07b-workflow-fanout-scene/FACTS.json",
+    "sha256": "03e4cc3fe7d0ae71275e9323fed065c4719382019d8fcb7d245b4363e2d9f6a7"
+  },
+  "scope": "只读指定合成fixture；仅相关journal/活动和一致DB快照，未复制local-token、设备凭证或其他home；原测试失败和原服务回执不改。"
+}

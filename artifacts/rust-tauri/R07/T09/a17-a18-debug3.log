@@ -1,0 +1,64 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/r07-a17-a18-cross-entry.test.mjs (2 tests | 2 skipped) 481ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/r07-a17-a18-cross-entry.test.mjs > R07-T09 A17/A18 跨入口真实验收
+AssertionError: CLI exit=1
+stdout:
+LingxiAgent · A17 验收助手
+Session session-8d15088351cd1c6192b565eb38e4ab64 · native:session-8d15088351cd1c6192b565eb38e4ab64
+
+failed.provider_error
+
+you: A17-XENTRY 15165-mvdykyvn 请写入并交付文件
+
+
+stderr:
+
+stubSeen:
+[]
+serviceStderr(尾部):
+eded [token][user]/local-token.json [token][user]/data/runs.db
+2026-10-18T15:06:48.201417Z  INFO lingxi_service: instance record published (atomic write) [token][user]/instance.json bind_addr=127.0.0.1:57143
+2026-10-18T15:06:48.253800Z  INFO lingxi_service: request handled request_id="req-705322dbb962089e47206d60df65073a" method=POST path=/lingxi/v1/agents status=200
+2026-10-18T15:06:48.284807Z  INFO lingxi_service: request handled request_id="req-34086c234cc3567e53b8e224bb8b1cea" method=PUT path=/lingxi/v1/agents/a17agent/config status=200
+2026-10-18T15:06:48.286549Z  INFO lingxi_service: request handled request_id="req-d182a05da37241104b897abdc593c4d4" method=PUT path=/lingxi/v1/agents/primary status=200
+2026-10-18T15:06:48.301762Z  INFO lingxi_service: request handled request_id="req-137d177c31265027cc090ce51fda161a" method=POST path=/lingxi/v1/agents/switch status=200
+2026-10-18T15:06:48.395718Z  INFO lingxi_service: request handled request_id="req-9d49c2a3df2eda1b20e575094ac916d3" method=GET path=/lingxi/v1/me status=200
+2026-10-18T15:06:48.396523Z  INFO lingxi_service: request handled request_id="req-0801b38171c453ec45ca22e83a6f0fe0" method=GET path=/lingxi/v1/me status=200
+2026-10-18T15:06:48.397862Z  INFO lingxi_service: request handled request_id="req-06f47757c8b245fde432abc32872763c" method=GET path=/lingxi/v1/sessions status=200
+2026-10-18T15:06:48.398726Z  INFO lingxi_service: request handled request_id="req-98b033f273b822091ba8eb1c7fbe56fa" method=GET path=/lingxi/v1/me status=200
+2026-10-18T15:06:48.399766Z  INFO lingxi_service: request handled request_id="req-4d0d4def7fc059d5119dbba8a83f92ea" method=GET [token] status=200
+2026-10-18T15:06:48.402081Z  INFO lingxi_service: request handled request_id="req-7da8b99aa15467b2783b1a808deac5ad" method=GET path=/lingxi/v1/mobile/bootstrap status=200
+2026-10-18T15:06:48.404255Z  INFO lingxi_service: request handled request_id="req-ac10829aff607d9fd2c1b37e3ff320c2" method=GET [token] status=200
+2026-10-18T15:06:48.405750Z  INFO lingxi_service: request handled request_id="req-3e91450fe82af70942e64c2d2dc14530" method=POST path=/lingxi/v1/ws-ticket status=200
+2026-10-18T15:06:48.407887Z DEBUG lingxi_service: ws upgrade authenticated source=ws_ticket request_id="req-823c7fb6c229f8b7e348872106044a95"
+2026-10-18T15:06:48.408054Z  INFO lingxi_service: request handled request_id="req-823c7fb6c229f8b7e348872106044a95" method=GET path=/lingxi/v1/ws status=101
+2026-10-18T15:06:48.413408Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a14f8d14db_000001 session_id="[token]"
+2026-10-18T15:06:48.417241Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a14f8d14db_000001 outcome=failed.provider_error
+2026-10-18T15:06:48.423358Z  INFO lingxi_service: request handled request_id="req-2127e81f23fa965628921932c9bf26c8" method=GET [token] status=200
+
+
+1 !== 0
+
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/r07-a17-a18-cross-entry.test.mjs:183:12
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 skipped (2)
+   Start at  23:06:47
+   Duration  578ms (transform 19ms, setup 17ms, import 17ms, tests 481ms, environment 0ms)
+

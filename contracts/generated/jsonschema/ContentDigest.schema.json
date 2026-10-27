@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Hash of canonical content (protocol §6). `algorithm` is `sha256`;\n`canonicalization` names the canonical JSON profile.",
+  "properties": {
+    "algorithm": {
+      "type": "string"
+    },
+    "canonicalization": {
+      "type": "string"
+    },
+    "hex": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "algorithm",
+    "canonicalization",
+    "hex"
+  ],
+  "title": "ContentDigest",
+  "type": "object"
+}

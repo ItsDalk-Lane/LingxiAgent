@@ -1,0 +1,10 @@
+
+running 3 tests
+test auth_header_mask_refills_only_same_header_and_plain_metadata_value_stays_literal ... ok
+test metadata_reads_mask_known_nested_secrets_and_masked_model_lists_refill_only_same_id ... ok
+test providers_manage_without_secrets_write_cannot_replace_or_clear_model_extension_credentials ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 14.91s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/r07_t08_metadata_redaction.rs (rust/target/debug/deps/r07_t08_metadata_redaction-6b3f041a218433cf)

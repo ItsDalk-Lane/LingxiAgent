@@ -1,0 +1,24 @@
+CARD_CLICK_STATE:{"hasHandler":true,"text":"实际点击","tokenReadable":true}
+T08_CARD_NATIVE_RESULT:{"checks":["actual-component-put-and-get","actual-self-navigation-loopback-observed"],"requests":[{"method":"OPTIONS","path":"/lingxi/v1/cards/navigation-probe","status":204},{"method":"PUT","path":"/lingxi/v1/cards/navigation-probe","status":200},{"method":"GET","path":"/lingxi/v1/cards/navigation-probe","status":200}],"outcome":{"count":1,"observed":[{"tokenReadableAndSent":true,"hrefSha256":"8fa063195602795904455470dc3548f7005b94b4f1bb78ced64f9e0f6925f535","path":"/lingxi/v1/cards/navigation-probe"}]}}
+
+▲ [WARNING] The "assert" keyword is not supported in the configured target environment ("node24.16.0") [assert-to-with]
+
+    vite.config.ts:7:33:
+      7 │ import pkg from './package.json' assert { type: 'json' };
+        │                                  ~~~~~~
+        ╵                                  with
+
+  Did you mean to use "with" instead of "assert"?
+
+[5992:1018/121444.586637:INFO:CONSOLE:733] "[vite] connecting...", source: http://127.0.0.1:5173/@vite/client (733)
+[5992:1018/121444.590810:INFO:CONSOLE:827] "[vite] connected.", source: http://127.0.0.1:5173/@vite/client (827)
+[5992:1018/121445.030662:INFO:CONSOLE:20103] "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold", source: http://127.0.0.1:5173/@fs/private/tmp/lingxi-card-nav-ryWnkM/home/.card-vite-cache/deps/react-dom_client.js?v=c84bc53c (20103)
+[5992:1018/121445.049025:INFO:CONSOLE:2] "%cElectron Security Warning (Insecure Content-Security-Policy) font-weight: bold; This renderer process has either no Content Security
+  Policy set or a policy with "unsafe-eval" enabled. This exposes users of
+  this app to unnecessary security risks.
+
+For more information and help, consult
+https://electronjs.org/docs/tutorial/security.
+This warning will not show up
+once the app is packaged.", source: node:electron/js2c/sandbox_bundle (2)
+[5992:1018/121445.105404:INFO:CONSOLE:0] "Unrecognized Content-Security-Policy directive 'navigate-to'.", source: http://127.0.0.1:63019/lingxi/v1/cards/navigation-probe?token=[REDACTED_SYNTHETIC_OWNER_TOKEN]&v=1 (0)

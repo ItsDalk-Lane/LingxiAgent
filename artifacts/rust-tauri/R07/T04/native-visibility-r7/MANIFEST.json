@@ -1,0 +1,19 @@
+{
+  "candidate": "r7",
+  "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+  "receipt": "../r7-native-visibility.json",
+  "sourceDirectory": "/private/tmp/lingxi-r07-tests/tmp/lingxi-browser-visible-evidence-2fc25bac534d09e3c765a60fd05b7e15",
+  "scope": "真实可见Chromium窗口；CDP窗口管理命令模拟外部恢复，不宣称鼠标或Dock人工操作",
+  "files": [
+    {
+      "file": "result.json",
+      "bytes": 135,
+      "sha256": "3f07df2ac4d8f9783fa7e0dcb569d4ff690af2f1d6c251af2e1af292ea58cce1"
+    },
+    {
+      "file": "cleanup.json",
+      "bytes": 31,
+      "sha256": "46c9a3d4d4fe4ec3c4385d0539920589cad2647456b6a2b3ccaa91ee9c5def51"
+    }
+  ]
+}

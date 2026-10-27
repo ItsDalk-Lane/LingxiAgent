@@ -1,0 +1,108 @@
+{
+  "reviewer": "r07_t08_final_review",
+  "reviewedAt": "2026-10-18T09:35:32.881972+00:00",
+  "candidateContext": "t08f运行中，只读查漏；未修改冻结源码或运行Cargo/GUI。",
+  "finalAcceptance": "pending",
+  "primaryProductGap": {
+    "status": "CONFIRMED_STATIC_PRODUCT_GAP",
+    "path": "desktop/src/react/settings/SettingsContent.tsx",
+    "cause": [
+      "initSettings正常Rust分支469与服务重启applyFresh Rust分支262均无条件rustSettingsUnavailable=true。",
+      "render367只特判Rust agent，370除access外一律不可用提示；T08 providers/models/skills/general归档已实现但实际容器不可达。"
+    ],
+    "actualEntry": [
+      "settings-main.tsx → SettingsApp → SettingsContent",
+      "SettingsModalShell → SettingsContent"
+    ],
+    "tauriScope": "当前desktop/src-tauri配置启动ResourceDesktop独立资源入口，并未挂SettingsApp；不得称已验证真实Tauri设置窗口或为此扩展为Tauri全壳重建。",
+    "oldAssertionCorrection": "R06AgentDelete末尾旧skills不可用断言在R06范围有历史意义，T08接通后应改为真实可达结果。前一独立fixture审阅只证明f未削弱原断言，不证明原断言能验T08功能完成。",
+    "minimalRepair": "后继候选按已接通页签开放正常Rust内容，错误/撤权保持真实拒绝，初始及服务重启路径一致；T11未接MCP设置等仍显式限制。真实容器导航后验general导入导出、providers/models实写读回、skills实际读写，不以直挂组件代替。"
+  },
+  "configurationArchiveDraft": {
+    "decision": "草稿所称还缺组件链已陈旧；当前已有且f明确选择，待本轮具名实际结果。",
+    "case": "desktop/src/react/__tests__/services/r07-settings-real-service.test.tsx::实际导出隐藏密钥，修改导出文件后从按钮导入并保留其他设置（无服务二进制时明确跳过）",
+    "asserted": [
+      "spawn指定生产二进制空home、真实token、实际HTTP创建agent",
+      "实际SettingsTransferSection导出按钮→Blob无合成秘密→导出结构",
+      "合成File通过input change导入、真实prefs及HTTP读回locale、未知字段及旧secret保留",
+      "真实混合设置PUT部分保存错误信息与已保存locale读回",
+      "URL回收及服务shutdown0"
+    ],
+    "limits": [
+      "直接挂组件，因此尚未证明SettingsContent实际入口可达。",
+      "File为jsdom选择事件、anchor点击spy；不是OS文件对话框或磁盘下载实测。",
+      "必须本轮JSON具名pass/非skip与fresh-build binding后才领本候选证据。"
+    ]
+  },
+  "skillsLeaves": {
+    "leaves": [
+      "R00-T02-LA-0DDB5AA05072",
+      "R00-T02-LA-99F8CD228733"
+    ],
+    "existingSelectedActualCase": "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection → R06SkillsRustLive.test.tsx",
+    "alreadyAsserts": [
+      "设置和Panel多项成功动作、空/取消/无助手、真实文件导出、事件重载",
+      "设置真实只读凭证403 toggle回滚"
+    ],
+    "stillUnproven": [
+      "技能/组合GET失败的初次加载与已有列表刷新结果：Panel错误toast/保留旧列表，SkillsTab console-only与初次失败可能noUser的真实合同",
+      "两个bundle并行写入一成功一失败的实际持久状态、错误提示与未重读/未整体回滚事实",
+      "goal/autolearn GET失败保持undefined及PUT失败回滚；learn_skills保存后GET失败的已写事实，当前成功用例不能自动覆盖"
+    ],
+    "sourceFacts": [
+      "SkillsTab.loadSkills 61-97仅console.error，owner变更时先清数组；Panel.loadSkillsForAgent 170-198报toast，列表赋值只在双GET均成功后。",
+      "SkillsTab.move/remove 350-407及Panel.move/remove 608-651各自Promise.all；catch仅error toast，不补重读/回滚。"
+    ],
+    "minimumChecks": [
+      "复用真实Rust+实际两组件的现有夹具，已载旧技能后用真实失效凭证触发GET刷新；分别核状态/旧列表/提示，冷启动错误另核不被当成功空列表。",
+      "各组件一次真实跨bundle拖动：让UI持有两bundle后通过真实服务删除目标，再拖动触发源PUT成功+目标404；独立HTTP读回部分变更，并核错误提示且不冒称整体成功。",
+      "能力偏好失败沿真实服务拒绝/坏输入验证；不要由通用保存API单测或Panel行为代替另一控件。"
+    ]
+  },
+  "providersLeaf": {
+    "leaf": "R00-T02-LA-D50161CE274A",
+    "draftOverbroad": "不能把全部失败分支一概说未验，已有具名组件检查覆盖若干具体分支；亦不能由这些检查把整叶关账。",
+    "existingSelectedCoverage": [
+      {
+        "case": "ApiKeyCredentials::shows an actionable refresh failure after the server accepts an API type change",
+        "scope": "确证组件接受写响应后onRefresh抛错显示refreshFailed；callback是mock，不证明真实设置GET失败及Source已写读回。"
+      },
+      {
+        "case": "ProvidersTab::keeps a configured provider and skips authoritative reload when deletion returns an error",
+        "scope": "明确DELETE配置写失败保留列表且不刷新。"
+      },
+      {
+        "case": "ProviderModelList::keeps the model editor open and skips refresh when metadata mutation returns a JSON error",
+        "scope": "明确元数据写失败不假更新。"
+      },
+      {
+        "case": "OAuthCredentials::登录已生效但刷新失败如实说明；未保存凭证不可显示普通成功 / 正式登出契约完成后刷新；刷新失败保留已经登出的事实",
+        "scope": "已覆盖OAuth组件实际事实与刷新失败的区分，不能重复列为完全未验。"
+      },
+      {
+        "case": "native_initialization_cache_summary_and_real_fifteen_second_timeout",
+        "scope": "真实初始化缓存、慢摘要、15秒及models实际500不清旧目录；原损坏旧provider-catalog已转为Source仍成功，不证明摘要HTTP失败。"
+      }
+    ],
+    "existingButNotSelectedByF": [
+      {
+        "file": "desktop/src/react/settings/hooks/__tests__/useMediaSettingsData.test.tsx",
+        "cases": [
+          "does not fail the whole resource layer when one endpoint rejects",
+          "keeps last-known-good providers when a refresh fails"
+        ],
+        "scope": "已有独立失败/旧值保留hook mock检查，f冻结UI选择没有此hooks目录，不能算当前候选通过。"
+      }
+    ],
+    "stillUnproven": [
+      "真实ProviderTab组合刷新中PUT已接受而loadSettingsConfig GET失败：Source实际已改、store error、后续summary/media是否停止；现有onRefresh mock不足。",
+      "四媒体资源单类GET失败不覆盖其他类别、旧值保留的现役hook/组件链正式结果；尤其新的speechGen不能仅以旧三类文字推定。",
+      "自定义新增/持久删除写已成功但随后设置重读失败，及新增后summary单独失败仍关闭overlay的具体组合分支。"
+    ],
+    "minimumChecks": [
+      "在真实容器入口修复后的同服务用例，至少一次供应商写入200后用真实文件权限或服务实际拒绝导致后继GET失败，再独立读回Source及UI事实，核后续请求边界；不要伪造fetch成功/失败。",
+      "已有useMediaSettingsData失败检查可先纳入后继适用检查，保留仅mock机制证据限制；需要整体真实服务条款时再补四资源中的独立实际失败。"
+    ]
+  },
+  "countPolicy": "仅凭选中143case或UI聚合数字不能判343原细项通过；每条原断言按实际具名结果及具体断言匹配，未证仍保留。"
+}

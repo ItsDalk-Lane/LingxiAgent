@@ -2,7 +2,7 @@
  * Settings 共享工具函数
  */
 import { useSettingsStore } from './store';
-import { lingxiFetch } from './api';
+import { settingsConnectionKey, lingxiFetch } from './api';
 import registry from '../../shared/theme-registry';
 import { lookupReferenceModelMeta } from '../utils/model-metadata';
 import { API_PROVIDER_PRESETS, getProviderPresetLabel } from '../utils/provider-presets';
@@ -76,11 +76,13 @@ export function lookupModelMeta(modelId: string, provider?: string): any {
  */
 export async function refreshSettingsConfigSnapshot(): Promise<void> {
   const ownerId = useSettingsStore.getState().getSettingsAgentId();
+  const connection = settingsConnectionKey();
   if (!ownerId) return;
   const cfgRes = await lingxiFetch(`/api/agents/${ownerId}/config`);
   const newConfig = await cfgRes.json();
+  if (newConfig.error) throw new Error(newConfig.error);
   // 刷新期间 settings owner 可能已切换，晚到的响应不覆盖新 owner 的快照
-  if (useSettingsStore.getState().getSettingsAgentId() !== ownerId) return;
+  if (useSettingsStore.getState().getSettingsAgentId() !== ownerId || settingsConnectionKey() !== connection) return;
   const prev = useSettingsStore.getState().settingsConfig || {};
   for (const k of ['_identity', '_agents', '_publicAgents', '_userProfile', '_experience']) {
     if (k in prev && !(k in newConfig)) newConfig[k] = (prev as any)[k];

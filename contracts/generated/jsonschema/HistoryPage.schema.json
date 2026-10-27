@@ -1,0 +1,74 @@
+{
+  "$defs": {
+    "Cursor": {
+      "description": "Opaque pagination cursor. The server owns its meaning; clients must\ntreat it as an untranslatable token. An expired/unknown cursor fails with\n`cursor_expired`; the client must re-fetch a snapshot (contract §7).",
+      "type": "string"
+    },
+    "EventId": {
+      "description": "Identity of one protocol event (dedup key; unique per stream).\n\nOpaque string identifier. Equality and ordering carry no\nsemantics; the string form is preserved verbatim across\nmigrations (legacy IDs are never renumbered). On the wire this is\na plain JSON string (`#[serde(transparent)]`).",
+      "type": "string"
+    },
+    "HistoryEntry": {
+      "additionalProperties": false,
+      "description": "One entry of a paginated history listing.",
+      "properties": {
+        "eventId": {
+          "$ref": "#/$defs/EventId"
+        },
+        "eventType": {
+          "type": "string"
+        },
+        "seq": {
+          "$ref": "#/$defs/Seq"
+        },
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "seq",
+        "eventId",
+        "eventType"
+      ],
+      "type": "object"
+    },
+    "Seq": {
+      "description": "Monotonic sequence as a decimal string. Values may exceed 2^53-1; consumers must not parse this into a JS number when precision matters.",
+      "pattern": "^(0|[1-9][0-9]*)$",
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Response half of cursor pagination. `snapshotSeq` pins the stream\nposition the page was cut at, so a following subscription can join with\na consistent cursor boundary (contract §7).",
+  "properties": {
+    "items": {
+      "items": {
+        "$ref": "#/$defs/HistoryEntry"
+      },
+      "type": "array"
+    },
+    "nextCursor": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Cursor"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "snapshotSeq": {
+      "$ref": "#/$defs/Seq"
+    }
+  },
+  "required": [
+    "items",
+    "snapshotSeq"
+  ],
+  "title": "Page",
+  "type": "object"
+}

@@ -61,6 +61,7 @@ import {
 import { isRemoteWorkbenchContentRef } from '../utils/remote-file-preview';
 import type { FileVersion, RemoteWorkbenchContentRef, VersionedWriteResult } from '../types';
 import type { PreviewScrollSnapshot } from '../../../../shared/preview-reading-position.ts';
+import { usePlatform } from '../hooks/use-platform';
 
 /* ── Types ── */
 
@@ -307,7 +308,7 @@ function attachmentSourcesFromFiles(files: File[]): MarkdownAttachmentSource[] {
     .filter(file => !file.name.endsWith('/'))
     .map(file => ({
       file,
-      path: window.platform?.getFilePath?.(file) || undefined,
+      path: usePlatform()?.getFilePath?.(file) || undefined,
       name: file.name,
       mimeType: file.type || null,
     }));
@@ -327,19 +328,20 @@ function attachmentSourcesFromAppDrag(dataTransfer: DataTransfer | null): Markdo
 
 async function writeMarkdownAttachment(source: MarkdownAttachmentSource, plan: MarkdownAttachmentPlan): Promise<void> {
   let copied = false;
-  if (source.path && typeof window.platform?.copyFile === 'function') {
-    copied = await window.platform.copyFile(source.path, plan.attachmentPath);
+  const attachPlatform = usePlatform();
+  if (source.path && typeof attachPlatform?.copyFile === 'function') {
+    copied = await attachPlatform.copyFile(source.path, plan.attachmentPath);
   }
   if (copied) return;
 
   if (!source.file) {
     throw new Error(`cannot copy attachment: ${source.name}`);
   }
-  if (typeof window.platform?.writeFileBinary !== 'function') {
+  if (typeof attachPlatform?.writeFileBinary !== 'function') {
     throw new Error('writeFileBinary unavailable');
   }
   const base64 = arrayBufferToBase64(await source.file.arrayBuffer());
-  const ok = await window.platform.writeFileBinary(plan.attachmentPath, base64);
+  const ok = await attachPlatform.writeFileBinary(plan.attachmentPath, base64);
   if (ok === false) {
     throw new Error(`failed to write attachment: ${source.name}`);
   }
@@ -632,8 +634,9 @@ export const PreviewEditor = forwardRef<PreviewEditorHandle, PreviewEditorProps>
           if (result.version) diskVersionRef.current = result.version;
         } else {
           if (!fp) return;
-          if (window.platform?.writeFileIfUnchanged) {
-            const result = await window.platform.writeFileIfUnchanged(fp, text, expectedVersion);
+          const savePlatform = usePlatform();
+          if (savePlatform?.writeFileIfUnchanged) {
+            const result = await savePlatform.writeFileIfUnchanged(fp, text, expectedVersion);
             if (!result?.ok) {
               if (result?.conflict) {
                 const tFn = window.t ?? ((p: string) => p);
@@ -644,7 +647,7 @@ export const PreviewEditor = forwardRef<PreviewEditorHandle, PreviewEditorProps>
             nextVersion = result.version ?? null;
             if (result.version) diskVersionRef.current = result.version;
           } else {
-            const ok = await window.platform?.writeFile(fp, text);
+            const ok = await usePlatform()?.writeFile(fp, text);
             if (ok === false) throw new Error('write-file returned false');
             nextVersion = undefined;
           }
@@ -840,7 +843,7 @@ export const PreviewEditor = forwardRef<PreviewEditorHandle, PreviewEditorProps>
         c.conceal.of(isMd ? [
           markdownImageContextFacet.of({
             filePath,
-            getFileUrl: window.platform?.getFileUrl,
+            getFileUrl: usePlatform()?.getFileUrl,
           }),
           markdownDecoPlugin,
           markdownCoverField,

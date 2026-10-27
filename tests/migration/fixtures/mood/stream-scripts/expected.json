@@ -1,0 +1,206 @@
+[
+  {
+    "historySegments": [
+      {
+        "content": "专注",
+        "tag": "mood",
+        "type": "block"
+      },
+      {
+        "text": "\n好的，我来处理。",
+        "type": "text"
+      }
+    ],
+    "id": "leading-mood",
+    "liveEvents": [
+      {
+        "type": "mood_start"
+      },
+      {
+        "data": "专注",
+        "type": "mood_text"
+      },
+      {
+        "type": "mood_end"
+      },
+      {
+        "data": "好的，我来处理。",
+        "type": "text"
+      }
+    ],
+    "parity": {
+      "visibleEqual": false
+    },
+    "visibleText": "好的，我来处理。"
+  },
+  {
+    "historySegments": [
+      {
+        "text": "先做了一点事 ",
+        "type": "text"
+      },
+      {
+        "content": "思考中",
+        "tag": "mood",
+        "type": "block"
+      },
+      {
+        "text": " 继续",
+        "type": "text"
+      },
+      {
+        "content": "稳定",
+        "tag": "pulse",
+        "type": "block"
+      },
+      {
+        "text": "最终回答",
+        "type": "text"
+      }
+    ],
+    "id": "mid-body-multi-blocks",
+    "liveEvents": [
+      {
+        "data": "先做了一点事 ",
+        "type": "text"
+      },
+      {
+        "type": "mood_start"
+      },
+      {
+        "data": "思考中",
+        "type": "mood_text"
+      },
+      {
+        "type": "mood_end"
+      },
+      {
+        "data": " 继续",
+        "type": "text"
+      },
+      {
+        "type": "mood_start"
+      },
+      {
+        "data": "稳定",
+        "type": "mood_text"
+      },
+      {
+        "type": "mood_end"
+      },
+      {
+        "data": "最终回答",
+        "type": "text"
+      }
+    ],
+    "parity": {
+      "visibleEqual": true
+    },
+    "visibleText": "先做了一点事  继续最终回答"
+  },
+  {
+    "historySegments": [
+      {
+        "content": "整理",
+        "tag": "reflect",
+        "type": "block"
+      },
+      {
+        "text": "答案",
+        "type": "text"
+      }
+    ],
+    "id": "tag-split-across-chunks",
+    "liveEvents": [
+      {
+        "type": "mood_start"
+      },
+      {
+        "data": "整理",
+        "type": "mood_text"
+      },
+      {
+        "type": "mood_end"
+      },
+      {
+        "data": "答案",
+        "type": "text"
+      }
+    ],
+    "parity": {
+      "visibleEqual": true
+    },
+    "visibleText": "答案"
+  },
+  {
+    "historySegments": [
+      {
+        "text": "`<mood>` 是标签语法 ```\n<pulse>code block</pulse>\n``` 尾部文本",
+        "type": "text"
+      }
+    ],
+    "id": "literal-tag-in-code",
+    "liveEvents": [
+      {
+        "data": "`<mood>` 是标签语法 ",
+        "type": "text"
+      },
+      {
+        "data": "```\n<pulse>code block</pulse>\n",
+        "type": "text"
+      },
+      {
+        "data": "``` 尾部文本",
+        "type": "text"
+      }
+    ],
+    "parity": {
+      "visibleEqual": true
+    },
+    "visibleText": "`<mood>` 是标签语法 ```\n<pulse>code block</pulse>\n``` 尾部文本"
+  },
+  {
+    "historySegments": [
+      {
+        "text": "<mood>未闭合",
+        "type": "text"
+      }
+    ],
+    "id": "unclosed-block-flush",
+    "liveEvents": [
+      {
+        "type": "mood_start"
+      },
+      {
+        "data": "未闭合",
+        "type": "mood_text"
+      },
+      {
+        "type": "mood_end"
+      }
+    ],
+    "parity": {
+      "visibleEqual": false
+    },
+    "visibleText": ""
+  },
+  {
+    "historySegments": [
+      {
+        "text": "\\<mood>A</mood>",
+        "type": "text"
+      }
+    ],
+    "id": "escaped-tag",
+    "liveEvents": [
+      {
+        "data": "\\<mood>A</mood>",
+        "type": "text"
+      }
+    ],
+    "parity": {
+      "visibleEqual": true
+    },
+    "visibleText": "\\<mood>A</mood>"
+  }
+]

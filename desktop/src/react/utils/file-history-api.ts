@@ -9,7 +9,7 @@
  * 不做静默降级。
  */
 
-import { lingxiFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../services/service-client';
 
 export interface FileHistoryFileEntry {
   relPath: string;

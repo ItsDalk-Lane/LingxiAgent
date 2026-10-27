@@ -1,0 +1,207 @@
+{
+  "candidate": "t08h",
+  "closedAt": "2026-10-18T13:01:37.498261+00:00",
+  "status": "CHECKS_PASSED_PENDING_INDEPENDENT_REVIEW",
+  "scope": "T08同一冻结候选完整20门适用检查通过；原断言范围按逐项结果表，非最终R07接受",
+  "sourceFingerprint": "f0dd4aa5092b31eb121c3977da8e65cbe2035ab3f4581b6c5898cf73f8da354e",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceAndVerificationToolsMatchedAtCloseBeforeAnySuccessorEdit": true,
+  "sourceFiles": 755,
+  "manifestSha256": "dfed102c2fd8eff025c8c64df378fbf18ebb8b113ab10b338b171719f789c8aa",
+  "gatePlanSha256": "8d8cc95b5a16fd9c26c60e76ccf5391ac32e0c4ec3de10590cc249d9ad6ac7b8",
+  "gateCount": 20,
+  "passedGates": 20,
+  "failedGates": 0,
+  "notRun": [],
+  "gates": {
+    "fmt": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08h-fmt.json",
+      "receiptSha256": "84ddc7d041ba30e1e9ee8578c8bdd694d6667686735a7d86e0c0fb22ad21e23a",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "diff": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08h-diff.json",
+      "receiptSha256": "3f01f0cdf248b82e257b1251f86da56b54bdd4369c06809f5880cebf3d14eb46",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "clippy": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08h-clippy.json",
+      "receiptSha256": "3f9824f085b9fade7e393f7763c66583316156a5a77584c50f4ec984519d8a9f",
+      "logSha256": "0b53209db424367e80c52cd8cde8b75e37af110438a0efde777104a1463956de"
+    },
+    "protocol": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08h-protocol.json",
+      "receiptSha256": "51e12929818c512ce981bb334ff0e6d69eba6a03620cd68150a81296bec9b94c",
+      "logSha256": "d4a1872efcdb40c349cfc97ae461e8b863d3b11bebd30fe9a18d2d8dad8ddad7"
+    },
+    "protocol-roundtrip": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08h-protocol-roundtrip.json",
+      "receiptSha256": "5738674e17121f10ff3f9b371f1bf0e71e552d1068eb0b5e69c77fe2a3212ff6",
+      "logSha256": "9c93319d25deb40dad43d081f033427d01a05098a49e5f5d205a2b0136872df7"
+    },
+    "protocol-tests": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08h-protocol-tests.json",
+      "receiptSha256": "79014a33662dc4243e48b5ce97788e9505915df4f77b18fa9b15d0872d38716c",
+      "logSha256": "85dfb3e94712dafb143b9ae025eb2f567c3c8dd7476e7f43a26d8de60c385097"
+    },
+    "kernel": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08h-kernel.json",
+      "receiptSha256": "0b80520574fbb23d3516232f402256b73b5614bb1742ed67d07f996e6782b5b3",
+      "logSha256": "d6fcb7a2340095d05920d9c2e0f89d0f83653e038a59566866c86465002fe5ac"
+    },
+    "boundaries": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08h-boundaries.json",
+      "receiptSha256": "85e769232d68de6278ec9fedbc1270f5ffd31134942a5a6075fcf996a0471e5e",
+      "logSha256": "1d972dd5cb804944f1b94e5be6773948dae69aa2a623d591ab7743b888cf8396"
+    },
+    "adapter": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08h-adapter.json",
+      "receiptSha256": "fc62d678a91e99028c36f827bdab32115521e668153bfd4abc7a44ea03394a60",
+      "logSha256": "7734969515236f18b06deb21eee797eecebe03adfa84494f1519c49e1a53eca3"
+    },
+    "service": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08h-service.json",
+      "receiptSha256": "8a93c8d0ac24c61a986c9827cee34f772362eaed04306119147c96898202a2dd",
+      "logSha256": "b58d4838796f89b57a18b4722c1c27ea3afe0e12f3c9da95b23dc7f9885387d8"
+    },
+    "model-regression": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08h-model-regression.json",
+      "receiptSha256": "2200f133df2dd8b5557d3b54d704157aba475c540ce7b1402b1dbd09a4a385c3",
+      "logSha256": "7dd6b4aed605f8aa85c530443fdddfb06b1f0a1d54b2feb3ec1ac663a9935033"
+    },
+    "native-skills": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08h-native-skills.json",
+      "receiptSha256": "df5c8afaccea983a103695c469c589030a7d8b602baf8e72235287bfd9d8a4e4",
+      "logSha256": "8be8dafb318849347c4431c56ca5bca4cd02bf53ce43034d4d9cd8a200bde8cc"
+    },
+    "native-picker-binding": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08h-native-picker-binding.json",
+      "receiptSha256": "56de0c3f12c71c2905572c75f0c5437a76412961d5ea7924006ea9c1a78344ae",
+      "logSha256": "475907d8a3308bddcb3977ff3e2cf2abd09976330a655f74c7413d57e7b401b0"
+    },
+    "skills-current": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08h-skills-current.json",
+      "receiptSha256": "edca5c46e71efc47c31edd24ef8d46dcac6fe5b29cd179d0f9e776c7f7433857",
+      "logSha256": "758cda85bc8c4544d089d7b1ef491069858c48d9a40f2563124c67c3dada5bdb"
+    },
+    "build": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08h-build.json",
+      "receiptSha256": "94fe5dc5b50f9c4a08e619633c7a5924bfff16fbf2352b1acb1a3fb8bda5c651",
+      "logSha256": "b07c706d46d6f8ca69ef21e986a014bd1684eec7b325c2d8fd51c94dbf9e616c"
+    },
+    "ui": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08h-ui.json",
+      "receiptSha256": "632c8bba48b8be9168ed274b4cd5101ef353fbc3da3f6efebb29cb6d256edc16",
+      "logSha256": "a7a69923a27e99d5c7df80c7c145a0a73d98914cb9fabd52881e01ca9e2a3a24"
+    },
+    "types": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08h-types.json",
+      "receiptSha256": "5c685156b0aae573867f1962285f831a0750281fdd433fe337472623872ccce3",
+      "logSha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8"
+    },
+    "card-navigation-desktop": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08h-card-navigation-desktop.json",
+      "receiptSha256": "e1f89f954a259a1d75a9d6beaa4acbc7d55d09d9c345fb4c32865671dec1c05b",
+      "logSha256": "269bf246ccba030e78e46b72a6efbcb03237148b67c91462e974ffaf4cbc7b02"
+    },
+    "card-navigation-mobile": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08h-card-navigation-mobile.json",
+      "receiptSha256": "a1545694ee9b004af67fee53ffc1215ed8945bd0c00eac794553e8a0c9cfd0ab",
+      "logSha256": "0a00b0cf5809db3bc96a9adb8ee6cf6c8c321e03014267c1ccccd522ffdb46be"
+    },
+    "metadata-redaction-binary": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08h-metadata-redaction-binary.json",
+      "receiptSha256": "93c94504539427e2b05dcc242503b847f8a4044e2f26e4ac3a131da5fae0a080",
+      "logSha256": "6446b2fd0ede781fbc9216abc0d140096c0e85916e6e6a43853d70bba8f9544a"
+    }
+  },
+  "binaryBindings": {
+    "ui": {
+      "path": "t08h-ui-binary-binding.json",
+      "sha256": "05081e0012ad8d0328b67db164d3ea18d13231627165a8da90363a0fe772a1c5",
+      "wrapperExitCode": 0
+    },
+    "card-navigation-desktop": {
+      "path": "t08h-card-navigation-desktop-binary-binding.json",
+      "sha256": "910a753a7fa0e0e468a3dca3d8bbe760dc14c9843b4e1b08a1a10e7752271791",
+      "wrapperExitCode": 0
+    },
+    "card-navigation-mobile": {
+      "path": "t08h-card-navigation-mobile-binary-binding.json",
+      "sha256": "fcab65875c86a1fd09eb94b9f6ae59f3a50fe5cffedce16de3d2a582d3c19f15",
+      "wrapperExitCode": 0
+    },
+    "metadata-redaction-binary": {
+      "path": "t08h-metadata-redaction-binary-binary-binding.json",
+      "sha256": "de7301a09e8ff3904ab7c5755fed98cca84d1cd0438008ae0ddb93220105f50c",
+      "wrapperExitCode": 0
+    }
+  },
+  "preservedBuildReceipt": "t08h-preserved-build1.json",
+  "preservedBuildReceiptSha256": "b4e968854f21549eb33bae69b1912573df9565447050d107568633aff3dfc77e",
+  "service": {
+    "targets": 40,
+    "passedCases": 948,
+    "failedCases": 0,
+    "ignoredCases": 0
+  },
+  "ui": {
+    "files": 89,
+    "passedCases": 718,
+    "failedCases": 0,
+    "pendingCases": 0,
+    "namedResult": "t08h-ui-test-results.json",
+    "namedResultSha256": "6b1a1d584bc5def39361818b24e25931bfc82108baa256f4aa3667de69aeb074"
+  },
+  "perClauseReconciliation": "t08h-per-leaf-results-waiting1.json pending actual binding",
+  "remainingBoundaries": [
+    "原17具体UI消费分支及窄负例需最终R07逐项清账，不由套件通过自动领原343全通过",
+    "minimax-token-plan原chat-only断言与既有image lane声明矛盾保留",
+    "LAN原20秒零字节失败与后续当前完整通过并列，原因未证明，不宣称根治",
+    "真实账号/付费供应商/实物手机/其他OS/正式安装包未验；旧SSE明确未实现",
+    "独立审阅及逐项绑定尚待完成"
+  ],
+  "oldFailuresRetained": true,
+  "t08AcceptanceClaimed": false,
+  "fullR07PassClaimed": false
+}

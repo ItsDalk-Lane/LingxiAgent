@@ -1,0 +1,1723 @@
+stderr | desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx > InterfaceTab appearance state > shows the first sidebar read failure and retries before enabling the control
+[settings] sidebar UI preferences load failed: Error: sidebar denied
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx:67:27
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx:15:40)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/InterfaceTab.tsx:174:5
+    at Object.react_stack_bottom_frame (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+    at runWithFiberInDEV (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+    at commitHookEffectListMount (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+    at commitHookPassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13336:11)
+    at commitPassiveMountOnFiber (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:15484:13)
+    at recursivelyTraversePassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:15439:11)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx > InterfaceTab appearance state > shows the first sidebar read failure and retries before enabling the control
+TestingLibraryElementError: Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body[39m
+  [33mclass[39m=[32m""[39m
+[36m>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_settings-tab-content_4045f0 _active_4045f0"[39m
+      [33mdata-tab[39m=[32m"interface"[39m
+    [36m>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_0_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25 _sectionPlain_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_0_-title"[39m
+          [36m>[39m
+            [0msettings.appearance.theme[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfacePlain_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"plain"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_grid_c3cd25 _grid-3_c3cd25 _gap-sm_c3cd25 _theme-options_4045f0"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_theme-card_4045f0 _active_4045f0"[39m
+              [33mdata-theme[39m=[32m"warm-paper"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-name_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.warmPaper[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-mode_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.warmPaperMode[0m
+              [36m</div>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_theme-card_4045f0"[39m
+              [33mdata-theme[39m=[32m"midnight"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-name_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.midnight[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-mode_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.midnightMode[0m
+              [36m</div>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_theme-card_4045f0"[39m
+              [33mdata-theme[39m=[32m"auto"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-name_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.auto[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-mode_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.autoMode[0m
+              [36m</div>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_theme-card_4045f0"[39m
+              [33mdata-theme[39m=[32m"high-contrast"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-name_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.highContrast[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-mode_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.highContrastMode[0m
+              [36m</div>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_theme-card_4045f0"[39m
+              [33mdata-theme[39m=[32m"grass-aroma"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-name_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.grassAroma[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-mode_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.grassAromaMode[0m
+              [36m</div>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_theme-card_4045f0"[39m
+              [33mdata-theme[39m=[32m"contemplation"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-name_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.contemplation[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-mode_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.contemplationMode[0m
+              [36m</div>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_theme-card_4045f0"[39m
+              [33mdata-theme[39m=[32m"absolutely"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-name_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.absolutely[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-mode_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.absolutelyMode[0m
+              [36m</div>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_theme-card_4045f0"[39m
+              [33mdata-theme[39m=[32m"delve"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-name_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.delve[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-mode_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.delveMode[0m
+              [36m</div>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_theme-card_4045f0"[39m
+              [33mdata-theme[39m=[32m"deep-think"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-name_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.deepThink[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-mode_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.deepThinkMode[0m
+              [36m</div>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_theme-card_4045f0"[39m
+              [33mdata-theme[39m=[32m"new-warm-paper"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-...
+
+Ignored nodes: comments, script, style
+[36m<body[39m
+  [33mclass[39m=[32m""[39m
+[36m>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_settings-tab-content_4045f0 _active_4045f0"[39m
+      [33mdata-tab[39m=[32m"interface"[39m
+    [36m>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_0_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25 _sectionPlain_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_0_-title"[39m
+          [36m>[39m
+            [0msettings.appearance.theme[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfacePlain_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"plain"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_grid_c3cd25 _grid-3_c3cd25 _gap-sm_c3cd25 _theme-options_4045f0"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_theme-card_4045f0 _active_4045f0"[39m
+              [33mdata-theme[39m=[32m"warm-paper"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-name_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.warmPaper[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-mode_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.warmPaperMode[0m
+              [36m</div>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_theme-card_4045f0"[39m
+              [33mdata-theme[39m=[32m"midnight"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-name_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.midnight[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-mode_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.midnightMode[0m
+              [36m</div>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_theme-card_4045f0"[39m
+              [33mdata-theme[39m=[32m"auto"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-name_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.auto[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-mode_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.autoMode[0m
+              [36m</div>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_theme-card_4045f0"[39m
+              [33mdata-theme[39m=[32m"high-contrast"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-name_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.highContrast[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-mode_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.highContrastMode[0m
+              [36m</div>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_theme-card_4045f0"[39m
+              [33mdata-theme[39m=[32m"grass-aroma"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-name_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.grassAroma[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-mode_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.grassAromaMode[0m
+              [36m</div>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_theme-card_4045f0"[39m
+              [33mdata-theme[39m=[32m"contemplation"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-name_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.contemplation[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-mode_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.contemplationMode[0m
+              [36m</div>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_theme-card_4045f0"[39m
+              [33mdata-theme[39m=[32m"absolutely"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-name_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.absolutely[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-mode_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.absolutelyMode[0m
+              [36m</div>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_theme-card_4045f0"[39m
+              [33mdata-theme[39m=[32m"delve"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-name_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.delve[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-mode_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.delveMode[0m
+              [36m</div>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_theme-card_4045f0"[39m
+              [33mdata-theme[39m=[32m"deep-think"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-name_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.deepThink[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-card-mode_4045f0"[39m
+              [36m>[39m
+                [0msettings.appearance.deepThinkMode[0m
+              [36m</div>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_theme-card_4045f0"[39m
+              [33mdata-theme[39m=[32m"new-warm-paper"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_theme-...
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx:73:18
+     71|     });
+     72|     render(<InterfaceTab />);
+     73|     await screen.findByRole('alert');
+       |                  ^
+     74|     const row = screen.getByText('settings.interface.sessionListSingle…
+     75|     expect(within(row as HTMLElement).getByRole('switch').hasAttribute…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  desktop/src/react/settings/tabs/__tests__/KeybindingsTab.test.tsx > KeybindingsTab saved facts when desktop reload fails > keeps saved shortcut after rejected-result from the system reload
+ FAIL  desktop/src/react/settings/tabs/__tests__/KeybindingsTab.test.tsx > KeybindingsTab saved facts when desktop reload fails > keeps saved shortcut after thrown-error from the system reload
+AssertionError: expected 'settings.keybindings.commands.quickCh…' to contain 'F9'
+
+Expected: "F9"
+Received: "settings.keybindings.commands.quickChatTogglesettings.keybindings.commands.quickChatToggleHintF8settings.keybindings.availability.unavailable+ settings.keybindings.addBindingsettings.keybindings.scope.global"
+
+ ❯ desktop/src/react/settings/tabs/__tests__/KeybindingsTab.test.tsx:322:52
+    320|     fireEvent.keyDown(window, { key: 'F9' });
+    321|     await waitFor(() => expect(useSettingsStore.getState().toastType).…
+    322|     expect(rowEl('quick-chat.toggle').textContent).toContain('F9');
+       |                                                    ^
+    323|     expect(rowEl('quick-chat.toggle').textContent).not.toContain('F8');
+    324|     expect(useSettingsStore.getState().toastMessage).toContain('settin…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  desktop/src/react/settings/tabs/__tests__/KeybindingsTab.test.tsx > KeybindingsTab saved facts when desktop reload fails > keeps persisted defaults and reports reset reload ok:false as an error
+AssertionError: expected 'success' to be 'error' // Object.is equality
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_settings-tab-content_4045f0 _active_4045f0"[39m
+        [33mdata-tab[39m=[32m"keybindings"[39m
+      [36m>[39m
+        [36m<section[39m
+          [33maria-labelledby[39m=[32m"_r_d_-title"[39m
+          [33mclass[39m=[32m"_section_c3cd25"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+              [33mid[39m=[32m"_r_d_-title"[39m
+            [36m>[39m
+              [0msettings.keybindings.title[0m
+            [36m</h2>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+            [33mdata-settings-surface[39m=[32m"card"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_kb-toolbar_4045f0"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_kb-search_4045f0"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"14"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"14"[39m
+                [36m>[39m
+                  [36m<circle[39m
+                    [33mcx[39m=[32m"11"[39m
+                    [33mcy[39m=[32m"11"[39m
+                    [33mr[39m=[32m"8"[39m
+                  [36m/>[39m
+                  [36m<line[39m
+                    [33mx1[39m=[32m"21"[39m
+                    [33mx2[39m=[32m"16.65"[39m
+                    [33my1[39m=[32m"21"[39m
+                    [33my2[39m=[32m"16.65"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<input[39m
+                  [33maria-label[39m=[32m"settings.keybindings.searchPlaceholder"[39m
+                  [33mplaceholder[39m=[32m"settings.keybindings.searchPlaceholder"[39m
+                  [33mtype[39m=[32m"text"[39m
+                  [33mvalue[39m=[32m""[39m
+                [36m/>[39m
+              [36m</div>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_kb-reset-all_4045f0"[39m
+                [33mdisabled[39m=[32m""[39m
+                [33mtitle[39m=[32m"settings.keybindings.alreadyDefault"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msettings.keybindings.resetAll[0m
+              [36m</button>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"settings.keybindings.title"[39m
+              [33mclass[39m=[32m"_kb-table_4045f0"[39m
+              [33mrole[39m=[32m"table"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_kb-head_4045f0"[39m
+                [33mrole[39m=[32m"row"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mrole[39m=[32m"columnheader"[39m
+                [36m>[39m
+                  [0msettings.keybindings.column.command[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mrole[39m=[32m"columnheader"[39m
+                [36m>[39m
+                  [0msettings.keybindings.column.binding[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mrole[39m=[32m"columnheader"[39m
+                [36m>[39m
+                  [0msettings.keybindings.column.scope[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mrole[39m=[32m"columnheader"[39m
+                [36m>[39m
+                  [0msettings.keybindings.column.actions[0m
+                [36m</span>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_kb-row_4045f0"[39m
+                [33mdata-command[39m=[32m"quick-chat.toggle"[39m
+                [33mrole[39m=[32m"row"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_kb-cell-command_4045f0"[39m
+                  [33mrole[39m=[32m"cell"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"_kb-command-name_4045f0"[39m
+                  [36m>[39m
+                    [0msettings.keybindings.commands.quickChatToggle[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"_kb-command-hint_4045f0"[39m
+                  [36m>[39m
+                    [0msettings.keybindings.commands.quickChatToggleHint[0m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_kb-cell-bindings_4045f0"[39m
+                  [33mrole[39m=[32m"cell"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"_kb-binding-line_4045f0"[39m
+                  [36m>[39m
+                    [36m<span[39m
+                      [33mclass[39m=[32m"_shortcut-keycaps_4045f0"[39m
+                    [36m>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"_shortcut-keycap_4045f0"[39m
+                      [36m>[39m
+                        [0mAlt[0m
+                      [36m</span>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"_shortcut-keycap_4045f0"[39m
+                      [36m>[39m
+                        [0mSpace[0m
+                      [36m</span>[39m
+                    [36m</span>[39m
+                    [36m<span[39m
+                      [33mclass[39m=[32m"_kb-availability_4045f0 _kb-avail-unavailable_4045f0"[39m
+                      [33mtitle[39m=[32m"settings.keybindings.availability.unavailable"[39m
+                    [36m>[39m
+                      [0msettings.keybindings.availability.unavailable[0m
+                    [36m</span>[39m
+                    [36m<span[39m
+                      [33mclass[39m=[32m"_kb-binding-actions_4045f0"[39m
+                    [36m>[39m
+                      [36m<button[39m
+                        [33maria-label[39m=[32m"settings.keybindings.editBinding"[39m
+                        [33mclass[39m=[32m"_kb-icon-btn_4045f0"[39m
+                        [33mtitle[3...
+
+Expected: "error"
+Received: "success"
+
+ ❯ desktop/src/react/settings/tabs/__tests__/KeybindingsTab.test.tsx:333:71
+    331|     keybindingsReloadGlobal.mockResolvedValueOnce({ ok: false });
+    332|     await renderTab(); fireEvent.click(screen.getByText('settings.keyb…
+    333|     await waitFor(() => expect(useSettingsStore.getState().toastType).…
+       |                                                                       ^
+    334|     expect(rowEl('quick-chat.toggle').textContent).not.toContain('F8');
+    335|     expect((screen.getByText('settings.keybindings.resetAll') as HTMLB…
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  desktop/src/react/settings/tabs/__tests__/SecurityTab.test.tsx > SecurityTab archive read failures > shows the first archive read failure with retry instead of no backups
+TestingLibraryElementError: Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_settings-tab-content_4045f0 _active_4045f0"[39m
+      [33mdata-tab[39m=[32m"security"[39m
+    [36m>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_9_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_9_-title"[39m
+          [36m>[39m
+            [0mSandbox[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0mSandbox[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0mRun commands inside a sandbox.[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_root_664e7a"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33maria-busy[39m=[32m"true"[39m
+                  [33maria-checked[39m=[32m"mixed"[39m
+                  [33mclass[39m=[32m"hana-toggle loading"[39m
+                  [33mdisabled[39m=[32m""[39m
+                  [33mrole[39m=[32m"switch"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m/>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0mSandbox network[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0mEnable the command sandbox first.[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_root_664e7a"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33maria-busy[39m=[32m"true"[39m
+                  [33maria-checked[39m=[32m"mixed"[39m
+                  [33mclass[39m=[32m"hana-toggle loading"[39m
+                  [33mdisabled[39m=[32m""[39m
+                  [33mrole[39m=[32m"switch"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m/>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_a_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_a_-title"[39m
+          [36m>[39m
+            [0mFile backup[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.security.retention[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0mKeep edit checkpoints.[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_root_717229"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33maria-expanded[39m=[32m"false"[39m
+                  [33maria-haspopup[39m=[32m"listbox"[39m
+                  [33mclass[39m=[32m"_trigger_717229"[39m
+                  [33mdata-open[39m=[32m"false"[39m
+                  [33mtitle[39m=[32m"settings.security.retention1d"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"_value_717229"[39m
+                  [36m>[39m
+                    [0msettings.security.retention1d[0m
+                  [36m</span>[39m
+                  [36m<svg[39m
+                    [33mclass[39m=[32m"_arrow_717229"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"1.5"[39m
+                    [33mviewBox[39m=[32m"0 0 16 16"[39m
+                  [36m>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M4 6l4 4 4-4"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                [36m</button>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_expandable_c3cd25"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-expanded[39m=[32m"true"[39m
+              [33mclass[39m=[32m"_expandableHeader_c3cd25"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_expandableChevron_c3cd25"[39m
+                [33mdata-expanded[39m=[32m"true"[39m
+              [36m>[39m
+                [0m›[0m
+              [36m</span>[39m
+              [36m<span>[39m
+                [0msettings.security.viewBackups[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_expandableBody_c3cd25"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_capability-row-desc_4045f0"[39m
+              [36m>[39m
+                [0msettings.security.noBackups[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_b_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_b_-title"[39m
+          [36m>[39m
+            [0msettings.security.networkProxy[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.security.networkProxyMode[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0msettings.security.networkProxyModeDesc[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_root_717229"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33maria-expanded[39m=[32m"false"[39m
+                  [33maria-haspopup[39m=[32m"listbox"[39m
+                  [33mclass[39m=[32m"_trigger_717229"[39m
+                  [33mdata-open[39m=[32m"false"[39m
+                  [33mtitle[39m=[32m"settings.security.networkProxySystem"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"_value_717229"[39m
+                  [36m>[39m
+                    [0msettings.security.networkProxySystem[0m
+                  [36m</span>[39m
+                  [36m<svg[39m
+                    [33mclass[39m=[32m"_arrow_717229"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"1.5"[39m
+                    [33mviewBox[39m=[32m"0 0 16 16"[39m
+                  [36m>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M4 6l4 4 4-4"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                [36m</button>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_sectionFooter_c3cd25"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_settings-btn-primary_4045f0"[39m
+            [36m>[39m
+              [0msettings.security.networkProxySave[0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_settings-tab-content_4045f0 _active_4045f0"[39m
+      [33mdata-tab[39m=[32m"security"[39m
+    [36m>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_9_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_9_-title"[39m
+          [36m>[39m
+            [0mSandbox[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0mSandbox[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0mRun commands inside a sandbox.[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_root_664e7a"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33maria-busy[39m=[32m"true"[39m
+                  [33maria-checked[39m=[32m"mixed"[39m
+                  [33mclass[39m=[32m"hana-toggle loading"[39m
+                  [33mdisabled[39m=[32m""[39m
+                  [33mrole[39m=[32m"switch"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m/>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0mSandbox network[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0mEnable the command sandbox first.[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_root_664e7a"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33maria-busy[39m=[32m"true"[39m
+                  [33maria-checked[39m=[32m"mixed"[39m
+                  [33mclass[39m=[32m"hana-toggle loading"[39m
+                  [33mdisabled[39m=[32m""[39m
+                  [33mrole[39m=[32m"switch"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m/>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_a_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_a_-title"[39m
+          [36m>[39m
+            [0mFile backup[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.security.retention[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0mKeep edit checkpoints.[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_root_717229"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33maria-expanded[39m=[32m"false"[39m
+                  [33maria-haspopup[39m=[32m"listbox"[39m
+                  [33mclass[39m=[32m"_trigger_717229"[39m
+                  [33mdata-open[39m=[32m"false"[39m
+                  [33mtitle[39m=[32m"settings.security.retention1d"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"_value_717229"[39m
+                  [36m>[39m
+                    [0msettings.security.retention1d[0m
+                  [36m</span>[39m
+                  [36m<svg[39m
+                    [33mclass[39m=[32m"_arrow_717229"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"1.5"[39m
+                    [33mviewBox[39m=[32m"0 0 16 16"[39m
+                  [36m>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M4 6l4 4 4-4"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                [36m</button>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_expandable_c3cd25"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-expanded[39m=[32m"true"[39m
+              [33mclass[39m=[32m"_expandableHeader_c3cd25"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_expandableChevron_c3cd25"[39m
+                [33mdata-expanded[39m=[32m"true"[39m
+              [36m>[39m
+                [0m›[0m
+              [36m</span>[39m
+              [36m<span>[39m
+                [0msettings.security.viewBackups[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_expandableBody_c3cd25"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_capability-row-desc_4045f0"[39m
+              [36m>[39m
+                [0msettings.security.noBackups[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_b_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_b_-title"[39m
+          [36m>[39m
+            [0msettings.security.networkProxy[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.security.networkProxyMode[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0msettings.security.networkProxyModeDesc[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_root_717229"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33maria-expanded[39m=[32m"false"[39m
+                  [33maria-haspopup[39m=[32m"listbox"[39m
+                  [33mclass[39m=[32m"_trigger_717229"[39m
+                  [33mdata-open[39m=[32m"false"[39m
+                  [33mtitle[39m=[32m"settings.security.networkProxySystem"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"_value_717229"[39m
+                  [36m>[39m
+                    [0msettings.security.networkProxySystem[0m
+                  [36m</span>[39m
+                  [36m<svg[39m
+                    [33mclass[39m=[32m"_arrow_717229"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"1.5"[39m
+                    [33mviewBox[39m=[32m"0 0 16 16"[39m
+                  [36m>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M4 6l4 4 4-4"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                [36m</button>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_sectionFooter_c3cd25"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_settings-btn-primary_4045f0"[39m
+            [36m>[39m
+              [0msettings.security.networkProxySave[0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ desktop/src/react/settings/tabs/__tests__/SecurityTab.test.tsx:144:18
+    142|     render(<SecurityTab />);
+    143|     fireEvent.click(screen.getByRole('button', { name: /settings.secur…
+    144|     await screen.findByRole('alert');
+       |                  ^
+    145|     expect(screen.queryByText('settings.security.noBackups')).toBeNull…
+    146|     fireEvent.click(screen.getByRole('button', { name: 'common.retry' …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  desktop/src/react/settings/tabs/__tests__/SecurityTab.test.tsx > SecurityTab archive read failures > keeps the last actual archive list when a later read fails
+TestingLibraryElementError: Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_settings-tab-content_4045f0 _active_4045f0"[39m
+      [33mdata-tab[39m=[32m"security"[39m
+    [36m>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_c_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_c_-title"[39m
+          [36m>[39m
+            [0mSandbox[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0mSandbox[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0mRun commands inside a sandbox.[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_root_664e7a"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33maria-busy[39m=[32m"true"[39m
+                  [33maria-checked[39m=[32m"mixed"[39m
+                  [33mclass[39m=[32m"hana-toggle loading"[39m
+                  [33mdisabled[39m=[32m""[39m
+                  [33mrole[39m=[32m"switch"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m/>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0mSandbox network[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0mEnable the command sandbox first.[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_root_664e7a"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33maria-busy[39m=[32m"true"[39m
+                  [33maria-checked[39m=[32m"mixed"[39m
+                  [33mclass[39m=[32m"hana-toggle loading"[39m
+                  [33mdisabled[39m=[32m""[39m
+                  [33mrole[39m=[32m"switch"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m/>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_d_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_d_-title"[39m
+          [36m>[39m
+            [0mFile backup[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.security.retention[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0mKeep edit checkpoints.[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_root_717229"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33maria-expanded[39m=[32m"false"[39m
+                  [33maria-haspopup[39m=[32m"listbox"[39m
+                  [33mclass[39m=[32m"_trigger_717229"[39m
+                  [33mdata-open[39m=[32m"false"[39m
+                  [33mtitle[39m=[32m"settings.security.retention1d"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"_value_717229"[39m
+                  [36m>[39m
+                    [0msettings.security.retention1d[0m
+                  [36m</span>[39m
+                  [36m<svg[39m
+                    [33mclass[39m=[32m"_arrow_717229"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"1.5"[39m
+                    [33mviewBox[39m=[32m"0 0 16 16"[39m
+                  [36m>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M4 6l4 4 4-4"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                [36m</button>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_expandable_c3cd25"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-expanded[39m=[32m"true"[39m
+              [33mclass[39m=[32m"_expandableHeader_c3cd25"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_expandableChevron_c3cd25"[39m
+                [33mdata-expanded[39m=[32m"true"[39m
+              [36m>[39m
+                [0m›[0m
+              [36m</span>[39m
+              [36m<span>[39m
+                [0msettings.security.viewBackups[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_expandableBody_c3cd25"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_capability-row-desc_4045f0"[39m
+              [36m>[39m
+                [0msettings.security.noBackups[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_e_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_e_-title"[39m
+          [36m>[39m
+            [0msettings.security.networkProxy[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.security.networkProxyMode[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0msettings.security.networkProxyModeDesc[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_root_717229"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33maria-expanded[39m=[32m"false"[39m
+                  [33maria-haspopup[39m=[32m"listbox"[39m
+                  [33mclass[39m=[32m"_trigger_717229"[39m
+                  [33mdata-open[39m=[32m"false"[39m
+                  [33mtitle[39m=[32m"settings.security.networkProxySystem"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"_value_717229"[39m
+                  [36m>[39m
+                    [0msettings.security.networkProxySystem[0m
+                  [36m</span>[39m
+                  [36m<svg[39m
+                    [33mclass[39m=[32m"_arrow_717229"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"1.5"[39m
+                    [33mviewBox[39m=[32m"0 0 16 16"[39m
+                  [36m>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M4 6l4 4 4-4"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                [36m</button>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_sectionFooter_c3cd25"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_settings-btn-primary_4045f0"[39m
+            [36m>[39m
+              [0msettings.security.networkProxySave[0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_settings-tab-content_4045f0 _active_4045f0"[39m
+      [33mdata-tab[39m=[32m"security"[39m
+    [36m>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_c_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_c_-title"[39m
+          [36m>[39m
+            [0mSandbox[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0mSandbox[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0mRun commands inside a sandbox.[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_root_664e7a"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33maria-busy[39m=[32m"true"[39m
+                  [33maria-checked[39m=[32m"mixed"[39m
+                  [33mclass[39m=[32m"hana-toggle loading"[39m
+                  [33mdisabled[39m=[32m""[39m
+                  [33mrole[39m=[32m"switch"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m/>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0mSandbox network[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0mEnable the command sandbox first.[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_root_664e7a"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33maria-busy[39m=[32m"true"[39m
+                  [33maria-checked[39m=[32m"mixed"[39m
+                  [33mclass[39m=[32m"hana-toggle loading"[39m
+                  [33mdisabled[39m=[32m""[39m
+                  [33mrole[39m=[32m"switch"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m/>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_d_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_d_-title"[39m
+          [36m>[39m
+            [0mFile backup[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.security.retention[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0mKeep edit checkpoints.[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_root_717229"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33maria-expanded[39m=[32m"false"[39m
+                  [33maria-haspopup[39m=[32m"listbox"[39m
+                  [33mclass[39m=[32m"_trigger_717229"[39m
+                  [33mdata-open[39m=[32m"false"[39m
+                  [33mtitle[39m=[32m"settings.security.retention1d"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"_value_717229"[39m
+                  [36m>[39m
+                    [0msettings.security.retention1d[0m
+                  [36m</span>[39m
+                  [36m<svg[39m
+                    [33mclass[39m=[32m"_arrow_717229"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"1.5"[39m
+                    [33mviewBox[39m=[32m"0 0 16 16"[39m
+                  [36m>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M4 6l4 4 4-4"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                [36m</button>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_expandable_c3cd25"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-expanded[39m=[32m"true"[39m
+              [33mclass[39m=[32m"_expandableHeader_c3cd25"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_expandableChevron_c3cd25"[39m
+                [33mdata-expanded[39m=[32m"true"[39m
+              [36m>[39m
+                [0m›[0m
+              [36m</span>[39m
+              [36m<span>[39m
+                [0msettings.security.viewBackups[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_expandableBody_c3cd25"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_capability-row-desc_4045f0"[39m
+              [36m>[39m
+                [0msettings.security.noBackups[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_e_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_e_-title"[39m
+          [36m>[39m
+            [0msettings.security.networkProxy[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.security.networkProxyMode[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0msettings.security.networkProxyModeDesc[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_root_717229"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33maria-expanded[39m=[32m"false"[39m
+                  [33maria-haspopup[39m=[32m"listbox"[39m
+                  [33mclass[39m=[32m"_trigger_717229"[39m
+                  [33mdata-open[39m=[32m"false"[39m
+                  [33mtitle[39m=[32m"settings.security.networkProxySystem"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"_value_717229"[39m
+                  [36m>[39m
+                    [0msettings.security.networkProxySystem[0m
+                  [36m</span>[39m
+                  [36m<svg[39m
+                    [33mclass[39m=[32m"_arrow_717229"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"1.5"[39m
+                    [33mviewBox[39m=[32m"0 0 16 16"[39m
+                  [36m>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M4 6l4 4 4-4"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                [36m</button>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_sectionFooter_c3cd25"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_settings-btn-primary_4045f0"[39m
+            [36m>[39m
+              [0msettings.security.networkProxySave[0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ desktop/src/react/settings/tabs/__tests__/SecurityTab.test.tsx:156:18
+    154|     fireEvent.click(toggle()); await screen.findByText('/owned/old.txt…
+    155|     fireEvent.click(toggle()); fireEvent.click(toggle());
+    156|     await screen.findByRole('alert');
+       |                  ^
+    157|     expect(screen.getByText('/owned/old.txt')).toBeTruthy();
+    158|     expect(screen.queryByText('settings.security.noBackups')).toBeNull…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+

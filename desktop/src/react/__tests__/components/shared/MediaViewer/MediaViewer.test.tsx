@@ -6,6 +6,7 @@ import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react
 import { useStore } from '../../../../stores';
 import { MediaViewer } from '../../../../components/shared/MediaViewer/MediaViewer';
 import type { FileRef } from '../../../../types/file-ref';
+import { resetDesktopHostForTests } from '../../../../host/desktop-host';
 
 const f = (id: string, kind: FileRef['kind'] = 'image'): FileRef => ({
   id, kind, source: 'desk', name: `${id}.png`, path: `/${id}.png`, ext: 'png',
@@ -20,7 +21,7 @@ describe('MediaViewer interaction', () => {
       getFileUrl: vi.fn((p: string) => `file://${p}`),
     };
   });
-  afterEach(() => { cleanup(); useStore.getState().closeMediaViewer(); delete (window as any).platform; });
+  afterEach(() => { cleanup(); useStore.getState().closeMediaViewer(); resetDesktopHostForTests(); });
 
   it('ESC 关闭', () => {
     useStore.getState().setMediaViewer({ files: [f('a'), f('b')], currentId: 'a', origin: 'desk' });

@@ -1,0 +1,455 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r07_t08_mcp_session_permissions") generated 1 warning (1 duplicate)
+warning: `lingxi-service` (test "r07_t08_mcp_remote") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 21s
+     Running tests/r07_t08_mcp_remote.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_mcp_remote-238415c6ba6a30d9)
+
+running 7 tests
+MCP远端隔离现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-5b2754493491800f
+MCP远端隔离现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-461b51fd4d748d58
+MCP远端隔离现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-d0d90a9ba3c6ad16
+MCP远端隔离现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-3e2d0e0678bcba7f
+MCP远端隔离现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-d79c17ba4a084246
+MCP远端隔离现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-04717451ddcca5d3
+MCP远端隔离现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-c90b804f960ed1ed
+MCP远端隔离现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-61cef46420f2e502
+test cancelled_browser_flows_release_pending_capacity_without_erasing_saved_facts ... ok
+MCP远端隔离现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-3e2d0e0678bcba7f
+test old_official_sdk_refresh_cannot_overwrite_a_new_browser_login_committed_to_source ... ok
+test actual_session_run_http_404_never_replays_the_posted_mcp_tool_call ... ok
+test oauth_cancel_changed_configuration_revoked_owner_and_shutdown_never_resurrect_credentials ... ok
+test actual_oauth_pkce_dcr_private_source_refresh_restart_resources_and_logout ... ok
+
+thread 'actual_http_apps_visibility_launch_input_resources_and_generation_cancellation' (3429122) panicked at crates/lingxi-service/tests/r07_t08_mcp_remote.rs:692:6:
+真实SDK资源请求取消: Elapsed(())
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test actual_http_apps_visibility_launch_input_resources_and_generation_cancellation ... FAILED
+真实MCP设置消费退出：code=Some(1), success=false
+真实MCP设置消费stdout：
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/services/r07-mcp-oauth-real-service.test.tsx (1 test | 1 failed) 14796ms
+   × 真实设置导航经MCP登录按钮到官方SDK，启动、退出及取消都有实际回执 14796ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  19:35:31
+   Duration  15.20s (transform 986ms, setup 20ms, import 56ms, tests 14.80s, environment 256ms)
+
+
+真实MCP设置消费stderr：
+stderr | desktop/src/react/__tests__/services/r07-mcp-oauth-real-service.test.tsx > 真实设置导航经MCP登录按钮到官方SDK，启动、退出及取消都有实际回执
+[settings] models load failed: Error: model plane unavailable
+    at errorWithCode (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/errors/error-presenter.ts:38:17)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/api.ts:78:27)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at lingxiFetchJson (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/api.ts:95:15)
+    at loadSettingsModels (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/actions.ts:113:18)
+    at async Promise.all (index 3)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/SettingsContent.tsx:472:7
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/r07-mcp-oauth-real-service.test.tsx > 真实设置导航经MCP登录按钮到官方SDK，启动、退出及取消都有实际回执
+TestingLibraryElementError: Unable to find an element with the text: settings.mcp.statusRunning. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_settings-content-root_4045f0"[39m
+      [33mdata-input-ctx-zone[39m=[32m"settings"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"settings-panel _settings-panel-modal_4045f0"[39m
+        [33mid[39m=[32m"settingsPanel"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"settings-header _settings-header-modal_4045f0"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_settings-title-group_4045f0"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m"settings.back"[39m
+              [33mclass[39m=[32m"_settings-return-btn_4045f0"[39m
+              [33mdata-settings-return[39m=[32m"true"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"22"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.7"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"22"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M15 18l-6-6 6-6"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<h1[39m
+              [33mclass[39m=[32m"_settings-title_4045f0"[39m
+            [36m>[39m
+              [0msettings.title[0m
+            [36m</h1>[39m
+          [36m</div>[39m
+          [36m<h1[39m
+            [33mclass[39m=[32m"_settings-header-tab-title_4045f0"[39m
+          [36m>[39m
+            [0msettings.tabs.mcp[0m
+          [36m</h1>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_settings-body_4045f0"[39m
+        [36m>[39m
+          [36m<nav[39m
+            [33mclass[39m=[32m"_settings-nav_4045f0"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_settings-search-shell_4045f0"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"_settings-search-icon_4045f0"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"15"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.8"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"15"[39m
+              [36m>[39m
+                [36m<circle[39m
+                  [33mcx[39m=[32m"11"[39m
+                  [33mcy[39m=[32m"11"[39m
+                  [33mr[39m=[32m"7"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m20 20-3.5-3.5"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<input[39m
+                [33mclass[39m=[32m"_settings-search-input_4045f0"[39m
+                [33mplaceholder[39m=[32m"settings.settingsSearch.placeholder"[39m
+                [33mtype[39m=[32m"search"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+              [33mdata-tab[39m=[32m"agent"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.5"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 2a5 5 0 0 1 5 5c0 2.76-2.24 5-5 5s-5-2.24-5-5a5 5 0 0 1 5-5z"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<span>[39m
+                [0msettings.tabs.agent[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+              [33mdata-tab[39m=[32m"me"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.5"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"[39m
+                [36m/>[39m
+                [36m<circle[39m
+                  [33mcx[39m=[32m"12"[39m
+                  [33mcy[39m=[32m"7"[39m
+                  [33mr[39m=[32m"4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<span>[39m
+                [0msettings.tabs.me[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+              [33mdata-tab[39m=[32m"interface"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.5"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+              [36m>[39m
+                [36m<circle[39m
+                  [33mcx[39m=[32m"12"[39m
+                  [33mcy[39m=[32m"12"[39m
+                  [33mr[39m=[32m"3"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M3 12h3"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M18 12h3"[39m
+                [3...
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_settings-content-root_4045f0"[39m
+      [33mdata-input-ctx-zone[39m=[32m"settings"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"settings-panel _settings-panel-modal_4045f0"[39m
+        [33mid[39m=[32m"settingsPanel"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"settings-header _settings-header-modal_4045f0"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_settings-title-group_4045f0"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m"settings.back"[39m
+              [33mclass[39m=[32m"_settings-return-btn_4045f0"[39m
+              [33mdata-settings-return[39m=[32m"true"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"22"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.7"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"22"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M15 18l-6-6 6-6"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<h1[39m
+              [33mclass[39m=[32m"_settings-title_4045f0"[39m
+            [36m>[39m
+              [0msettings.title[0m
+            [36m</h1>[39m
+          [36m</div>[39m
+          [36m<h1[39m
+            [33mclass[39m=[32m"_settings-header-tab-title_4045f0"[39m
+          [36m>[39m
+            [0msettings.tabs.mcp[0m
+          [36m</h1>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_settings-body_4045f0"[39m
+        [36m>[39m
+          [36m<nav[39m
+            [33mclass[39m=[32m"_settings-nav_4045f0"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_settings-search-shell_4045f0"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"_settings-search-icon_4045f0"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"15"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.8"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"15"[39m
+              [36m>[39m
+                [36m<circle[39m
+                  [33mcx[39m=[32m"11"[39m
+                  [33mcy[39m=[32m"11"[39m
+                  [33mr[39m=[32m"7"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m20 20-3.5-3.5"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<input[39m
+                [33mclass[39m=[32m"_settings-search-input_4045f0"[39m
+                [33mplaceholder[39m=[32m"settings.settingsSearch.placeholder"[39m
+                [33mtype[39m=[32m"search"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+              [33mdata-tab[39m=[32m"agent"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.5"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 2a5 5 0 0 1 5 5c0 2.76-2.24 5-5 5s-5-2.24-5-5a5 5 0 0 1 5-5z"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<span>[39m
+                [0msettings.tabs.agent[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+              [33mdata-tab[39m=[32m"me"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.5"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"[39m
+                [36m/>[39m
+                [36m<circle[39m
+                  [33mcx[39m=[32m"12"[39m
+                  [33mcy[39m=[32m"7"[39m
+                  [33mr[39m=[32m"4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<span>[39m
+                [0msettings.tabs.me[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+              [33mdata-tab[39m=[32m"interface"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.5"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+              [36m>[39m
+                [36m<circle[39m
+                  [33mcx[39m=[32m"12"[39m
+                  [33mcy[39m=[32m"12"[39m
+                  [33mr[39m=[32m"3"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M3 12h3"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M18 12h3"[39m
+                [3...
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ desktop/src/react/__tests__/services/r07-mcp-oauth-real-service.test.tsx:58:18
+     56|     expect(requests.some(row => row.path.startsWith('/lingxi/v1/mcp/oa…
+     57|     fireEvent.click(screen.getByRole('button', { name: 'settings.mcp.s…
+     58|     await screen.findByText('settings.mcp.statusRunning', {}, { timeou…
+       |                  ^
+     59|     expect(requests.some(row => row.path === '/lingxi/v1/mcp/settings-…
+     60|     fireEvent.click(screen.getByRole('button', { name: 'settings.oauth…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+
+thread 'settings_content_mcp_oauth_page_consumes_the_same_owned_sdk_and_private_source' (3429128) panicked at crates/lingxi-service/tests/r07_t08_mcp_remote.rs:1151:5:
+真实设置页面失败，已清理服务/外端；现场=/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-04717451ddcca5d3
+test settings_content_mcp_oauth_page_consumes_the_same_owned_sdk_and_private_source ... FAILED
+
+failures:
+
+failures:
+    actual_http_apps_visibility_launch_input_resources_and_generation_cancellation
+    settings_content_mcp_oauth_page_consumes_the_same_owned_sdk_and_private_source
+
+test result: FAILED. 5 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 18.43s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t08_mcp_remote`
+     Running tests/r07_t08_mcp_session_permissions.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_mcp_session_permissions-02f840a290300758)
+
+running 5 tests
+实际grant读后归档恢复交错：HTTP=409 response={"error":"会话已改变，请重新确认"} home=/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-session-permission-ae7ed79b692ee0c7
+test in_flight_grant_cannot_land_after_real_archive_restore_completed ... ok
+LINGXI_AUTH_REJECTED request_id="req-48754f683e335b09a37d126879eefb8a" method=POST path=/lingxi/v1/mcp/session-permissions status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:53891
+MCP批准观测：stage=first-alpha session=mcp-session-a readyMs=1285 status=200 requestMs=1272 approvalId=approval:ddb0e65b46bc25bfc740c5b886b283c4
+MCP批准观测：stage=ws-first-alpha session=mcp-ws-session readyMs=22 status=200 requestMs=1269 approvalId=approval:014663d603980dbeaadcc37518afca0b
+LINGXI_AUTH_REJECTED request_id="req-2fe8231ee5ca32484044df5406b8846a" method=POST path=/lingxi/v1/mcp/session-permissions status=403 reason=insufficient_scope remote=127.0.0.1:53900
+WS第二轮真实帧：type="session_user_message" runId=null
+WS第二轮真实帧：type="status" runId=null
+WS第二轮真实帧：type="assistant_run_start" runId="run_000001a14ecc245d_000002"
+WS第二轮真实帧：type="stage" runId=null
+WS第二轮真实帧：type="tool_start" runId=null
+WS第二轮真实帧：type="tool_end" runId=null
+WS第二轮真实帧：type="stage" runId=null
+WS第二轮真实帧：type="assistant_segment_start" runId=null
+WS第二轮真实帧：type="assistant_segment_delta" runId=null
+WS第二轮真实帧：type="assistant_segment_end" runId=null
+WS第二轮真实帧：type="assistant_run_end" runId="run_000001a14ecc245d_000002"
+test actual_ws_prompt_reuses_session_capability_for_second_different_arguments_without_approval ... ok
+MCP批准观测：stage=fresh-credential-before-restart session=mcp-restart-check readyMs=1318 status=200 requestMs=1250 approvalId=approval:e219f029b4e6349dfc6efad33568fae1
+MCP批准观测：stage=other-session-alpha session=mcp-session-b readyMs=1277 status=200 requestMs=1242 approvalId=approval:215a168e09ab09afaa34678ba40e71c5
+MCP批准观测：stage=same-home-after-restart session=mcp-restart-check readyMs=1275 status=200 requestMs=1249 approvalId=approval:d6e760fe6781ee9def2b9fcbc05a11a7
+test credential_revocation_and_same_home_real_restart_do_not_restore_temporary_grants ... ok
+MCP批准观测：stage=other-capability-beta session=mcp-session-a readyMs=1269 status=200 requestMs=1221 approvalId=approval:fd57281af8bf0d7c638a40d040b0add4
+MCP显式后台未继承授权的实际处理：run=run_000001a14ecc53db_000005 status=waiting_approval
+MCP批准观测：stage=restored-session-alpha session=mcp-scope-check readyMs=1228 status=200 requestMs=1204 approvalId=approval:0ef28c8a1027c50269f6efc52805899b
+MCP批准观测：stage=explicit-background-alpha session=mcp-session-a readyMs=0 status=200 requestMs=1208 approvalId=approval:f28042c0bbac527d1820dac4102e7807
+test paired_scope_grants_same_session_exact_capability_across_arguments_without_persisting ... ok
+MCP批准观测：stage=restarted-connector-alpha session=mcp-scope-check readyMs=1191 status=200 requestMs=1174 approvalId=approval:a5f27207a4682416dbf5e3d26d542714
+test missing_scope_foreign_session_and_damaged_payload_never_grant_and_connector_restart_invalidates ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 34.21s
+
+error: 1 target failed:
+    `-p lingxi-service --test r07_t08_mcp_remote`

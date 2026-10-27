@@ -7,6 +7,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-libra
 import '@testing-library/jest-dom/vitest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { OnboardingApp } from '../OnboardingApp';
+import { getDesktopHost } from '../../host/desktop-host';
 
 type Deferred<T> = {
   promise: Promise<T>;
@@ -132,6 +133,16 @@ describe('OnboardingApp locale switching', () => {
     });
   });
 
+  it('shows Rust onboarding is unavailable instead of calling legacy setup routes', async () => {
+    (getDesktopHost().api as unknown as Record<string, unknown>).getServerConnectionInfo = vi.fn(async () => ({
+      port: 34001, token: 'rust-token', serverNodeKind: 'lingxi-service', serverNodeTransport: 'https',
+    }));
+    const fetchMock = vi.mocked(globalThis.fetch);
+    render(<OnboardingApp preview={false} skipToTutorial={false} />);
+    expect(await screen.findByText(/Rust onboarding is not migrated/)).toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it('lets first-run users connect to an existing LAN server from the welcome page', async () => {
     const fetchMock = vi.fn(async (url: string) => {
       if (url === 'http://127.0.0.1:62950/api/agents?fresh=1') {
@@ -177,7 +188,7 @@ describe('OnboardingApp locale switching', () => {
     fireEvent.click(screen.getByRole('button', { name: '连接' }));
 
     await waitFor(() => {
-      expect(window.hana.onboardingComplete).toHaveBeenCalledTimes(1);
+      expect(getDesktopHost().api.onboardingComplete).toHaveBeenCalledTimes(1);
     });
     expect(fetchMock).toHaveBeenCalledWith('http://192.168.31.75:14500/api/web-auth/login', expect.objectContaining({
       credentials: 'include',

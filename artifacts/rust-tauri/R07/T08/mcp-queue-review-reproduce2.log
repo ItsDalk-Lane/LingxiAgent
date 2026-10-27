@@ -1,0 +1,74 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.77s
+     Running tests/r07_t08_mcp_settings.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_mcp_settings-5528f6df6edb0028)
+
+running 22 tests
+test an_unconfigured_mcp_read_and_restore_do_not_create_directories_or_block_the_service ... ok
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-4bf432e053a4bc08
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-23582bb1cf04557c
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-1fd02de46ecdad72
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-7cba0cc0edeb6fe2
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-6809e0c5f99ba17d
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-85ebfc5551267172
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-e91e27c4c2b60fe0
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-1366d469ae0ec1c4
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-95adff3065dc084c
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-f69de02488ae8241
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-635e8cf0dae3836e
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-fd47d3e7d55fd1c5
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-4c91c0721612f980
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-6c9f2d78ee7aca91
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-a1e24c921923876f
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-64cf5ab65a979e31
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-13b499ee63b8a627
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-e142a2da8ee4d12e
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-d2674748c679aae8
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-a127ec0f0d5ec30e
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-52eeb13061454839
+test occupied_listen_port_cleans_restored_mcp_and_knowledge_while_external_state_is_retained ... ok
+test an_authenticated_http_request_waiting_for_the_real_media_lock_cannot_use_a_replaced_owner_credential ... ok
+test invalid_provided_connector_shapes_never_write_and_schema_corruption_blocks_restore ... ok
+
+thread 'rejected_update_must_not_cancel_an_accepted_background_sdk_start' (3255575) panicked at crates/lingxi-service/tests/r07_t08_mcp_settings.rs:2482:5:
+拒绝的坏补丁不得取消原合法启动；home=/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-52eeb13061454839,state={"agentConfig":{"connectors":{"fixture":{"enabled":true,"tools":{}}}},"agentId":"a","config":{"builtinDeferEnabled":false,"connectors":[{"args":["/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-52eeb13061454839/external-fixture/platform.mjs","/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-52eeb13061454839/external-fixture","hold-init"],"autoStart":true,"command":"node","enabled":true,"error":"Run 已取消，MCP 启动未完成","id":"fixture","name":"fixture","running":false,"status":"failed","tools":[],"transport":"stdio"}],"deferEnabled":false,"deferThreshold":17,"enabled":true,"servers":[{"args":["/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-52eeb13061454839/external-fixture/platform.mjs","/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-52eeb13061454839/external-fixture","hold-init"],"autoStart":true,"command":"node","enabled":true,"id":"fixture","name":"fixture","transport":"stdio"}],"unknownMcp":79},"settingsResults":[{"settingsUpdate":{"action":"mcp.connector.add","agentId":null,"changes":[{"after":"已保存，尚未启动","before":"未添加","key":"mcp.connector.add","label":"fixture"}],"connectorId":"fixture","error":null,"key":"mcp.connector.add","runtimeApplied":false,"saved":true,"status":"applied","summary":"fixture 已添加，后台启动已排队；请查看后续连接状态。","title":"连接器已保存"}},{"settingsUpdate":{"action":"mcp.connector.start","agentId":null,"changes":[],"connectorId":"fixture","error":{"code":"mcp_cancelled","message":"Run 已取消，MCP 启动未完成"},"key":"mcp.connector.start","runtimeApplied":false,"saved":true,"status":"cancelled","summary":"Run 已取消，MCP 启动未完成","title":"MCP 设置未全部完成"}},{"settingsUpdate":{"action":"mcp.connector.update","agentId":null,"changes":[],"connectorId":null,"error":{"code":"invalid_mcp_settings","message":"command 必须为非空文本"},"key":"mcp.connector.update","runtimeApplied":false,"saved":false,"status":"failed","summary":"command 必须为非空文本","title":"MCP 设置未全部完成"}}]},final={"agentConfig":{"connectors":{"fixture":{"enabled":true,"tools":{}}}},"agentId":"a","config":{"builtinDeferEnabled":false,"connectors":[{"args":["/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-52eeb13061454839/external-fixture/platform.mjs","/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-52eeb13061454839/external-fixture","hold-init"],"autoStart":true,"command":"node","enabled":true,"error":"Run 已取消，MCP 启动未完成","id":"fixture","name":"fixture","running":false,"status":"failed","tools":[],"transport":"stdio"}],"deferEnabled":false,"deferThreshold":17,"enabled":true,"servers":[{"args":["/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-52eeb13061454839/external-fixture/platform.mjs","/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-52eeb13061454839/external-fixture","hold-init"],"autoStart":true,"command":"node","enabled":true,"id":"fixture","name":"fixture","transport":"stdio"}],"unknownMcp":79},"settingsResults":[{"settingsUpdate":{"action":"mcp.connector.add","agentId":null,"changes":[{"after":"已保存，尚未启动","before":"未添加","key":"mcp.connector.add","label":"fixture"}],"connectorId":"fixture","error":null,"key":"mcp.connector.add","runtimeApplied":false,"saved":true,"status":"applied","summary":"fixture 已添加，后台启动已排队；请查看后续连接状态。","title":"连接器已保存"}},{"settingsUpdate":{"action":"mcp.connector.start","agentId":null,"changes":[],"connectorId":"fixture","error":{"code":"mcp_cancelled","message":"Run 已取消，MCP 启动未完成"},"key":"mcp.connector.start","runtimeApplied":false,"saved":true,"status":"cancelled","summary":"Run 已取消，MCP 启动未完成","title":"MCP 设置未全部完成"}},{"settingsUpdate":{"action":"mcp.connector.update","agentId":null,"changes":[],"connectorId":null,"error":{"code":"invalid_mcp_settings","message":"command 必须为非空文本"},"key":"mcp.connector.update","runtimeApplied":false,"saved":false,"status":"failed","summary":"command 必须为非空文本","title":"MCP 设置未全部完成"}}]}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test rejected_update_must_not_cancel_an_accepted_background_sdk_start ... FAILED
+
+thread 'explicit_start_revalidates_original_owner_while_real_sdk_initialize_is_waiting' (3255564) panicked at crates/lingxi-service/tests/r07_t08_mcp_settings.rs:2525:5:
+assertion `left == right` failed: 原owner已撤销不能启动成功；home=/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-1fd02de46ecdad72,response={"settingsUpdate":{"action":"mcp.connector.start","agentId":null,"changes":[{"after":"运行中","before":"未运行","key":"mcp.connector.start","label":"fixture"}],"connectorId":"fixture","error":null,"key":"mcp.connector.start","runtimeApplied":true,"saved":true,"status":"applied","summary":"fixture 已完成连接并读取工具目录。","title":"连接器已启动"}},state={"agentConfig":{"connectors":{"fixture":{"enabled":true,"tools":{"env_report":true}}}},"agentId":"a","config":{"builtinDeferEnabled":false,"connectors":[{"args":["/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-1fd02de46ecdad72/external-fixture/platform.mjs","/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-1fd02de46ecdad72/external-fixture","hold-init"],"autoStart":true,"command":"node","directoryWarnings":[],"enabled":true,"error":null,"id":"fixture","name":"fixture","running":true,"status":"running","tools":[{"annotations":{"readOnlyHint":false},"description":"owned MCP tool","name":"env_report","qualifiedName":"tool:mcp:fixture:env_report","title":"env_report"}],"transport":"stdio"}],"deferEnabled":false,"deferThreshold":17,"enabled":true,"servers":[{"args":["/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-1fd02de46ecdad72/external-fixture/platform.mjs","/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-1fd02de46ecdad72/external-fixture","hold-init"],"autoStart":true,"command":"node","enabled":true,"id":"fixture","name":"fixture","transport":"stdio"}],"unknownMcp":79},"settingsResults":[{"settingsUpdate":{"action":"mcp.connector.add","agentId":null,"changes":[{"after":"已保存，尚未启动","before":"未添加","key":"mcp.connector.add","label":"fixture"}],"connectorId":"fixture","error":null,"key":"mcp.connector.add","runtimeApplied":false,"saved":true,"status":"applied","summary":"fixture 已添加，尚未启动。","title":"连接器已保存"}},{"settingsUpdate":{"action":"mcp.connector.start","agentId":null,"changes":[{"after":"运行中","before":"未运行","key":"mcp.connector.start","label":"fixture"}],"connectorId":"fixture","error":null,"key":"mcp.connector.start","runtimeApplied":true,"saved":true,"status":"applied","summary":"fixture 已完成连接并读取工具目录。","title":"连接器已启动"}}]}
+  left: 200
+ right: 403
+test explicit_start_revalidates_original_owner_while_real_sdk_initialize_is_waiting ... FAILED
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-5576da27b4144da5
+test http_saved_start_is_immediate_and_duplicate_start_uses_one_actual_sdk_connection ... ok
+test concurrent_registration_never_exposes_a_bare_executor_to_disabled_agent ... ok
+test http_bulk_preflights_all_rows_and_keeps_saved_partial_runtime_failures ... ok
+test restoring_lazy_lifecycle_keeps_saved_intent_without_starting_external_processes ... ok
+test editing_a_queued_connector_cleans_old_generation_before_new_sdk_start ... ok
+test http_bulk_pending_start_does_not_block_other_saves_and_stop_disable_reap_real_groups ... ok
+test a_real_pending_settings_approval_does_not_survive_local_credential_replacement ... ok
+test cancelling_a_real_settings_run_interrupts_initialization_and_preserves_saved_intent ... ok
+test http_page_state_keeps_real_tools_agent_defaults_defer_and_private_edit_material ... ok
+test actual_mcp_catalog_crosses_the_shared_defer_threshold_without_losing_other_sources ... ok
+test stopping_an_actual_inflight_mcp_call_records_unknown_without_replay_and_reaps_group ... ok
+
+thread 'global_disable_rejects_new_queued_start_while_old_sdk_cleanup_is_draining' (3255565) panicked at crates/lingxi-service/tests/r07_t08_mcp_settings.rs:2653:5:
+停用意图已确认后不能再接受新的后台启动；home=/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-4bf432e053a4bc08,add=Ok(Object {"settingsUpdate": Object {"action": String("mcp.connector.add"), "agentId": Null, "changes": Array [Object {"after": String("已保存，尚未启动"), "before": String("未添加"), "key": String("mcp.connector.add"), "label": String("two")}], "connectorId": String("two"), "error": Null, "key": String("mcp.connector.add"), "runtimeApplied": Bool(false), "saved": Bool(true), "status": String("applied"), "summary": String("two 已添加，后台启动已排队；请查看后续连接状态。"), "title": String("连接器已保存")}}),disable=Some(Err(McpSettingsError { status: 409, code: "mcp_stopping", message: "服务正在退出", saved: false, runtime_applied: false, results: [] }))
+test global_disable_rejects_new_queued_start_while_old_sdk_cleanup_is_draining ... FAILED
+test queued_original_authority_revocation_and_shutdown_cancel_and_reap_owned_sdk_start ... ok
+LINGXI_AUTH_REJECTED request_id="req-9ccf4262700f19ee03768101a782fa2f" method=GET path=/lingxi/v1/mcp/state status=403 reason=local_owner_required remote=127.0.0.1:56444
+test real_run_nine_mcp_settings_actions_persist_and_gate_actual_sdk_consumers ... ok
+LINGXI_AUTH_REJECTED request_id="req-fd4952fefc25455e8d6ae98bb452f412" method=POST path=/lingxi/v1/mcp/settings-action status=403 reason=local_owner_required remote=127.0.0.1:56708
+test management_rejects_other_identities_corrupt_files_links_and_replaced_parent ... ok
+test a_real_web_login_cannot_gain_local_settings_authority_through_an_approved_model_tool ... ok
+
+failures:
+
+failures:
+    explicit_start_revalidates_original_owner_while_real_sdk_initialize_is_waiting
+    global_disable_rejects_new_queued_start_while_old_sdk_cleanup_is_draining
+    rejected_update_must_not_cancel_an_accepted_background_sdk_start
+
+test result: FAILED. 19 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.60s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t08_mcp_settings`

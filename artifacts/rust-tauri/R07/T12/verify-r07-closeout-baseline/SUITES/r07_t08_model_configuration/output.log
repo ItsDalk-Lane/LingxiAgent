@@ -1,0 +1,34 @@
+
+running 10 tests
+test first_save_activates_shared_catalog_credentials_and_independent_knowledge_without_restart ... ok
+test malformed_provider_endpoint_is_rejected_without_falling_back_to_saved_address ... ok
+test legacy_custom_provider_omitted_protocol_first_save_dispatches_openai_and_explicit_invalid_never_falls_back ... ok
+test embedded_source_preserves_envelope_rejects_secret_metadata_before_write_and_reload_recovers ... ok
+test compatibility_projection_failure_reports_applied_snapshot_and_reload_can_confirm_it ... ok
+test operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes ... ok
+test explicit_codex_display_alias_edits_one_source_and_login_state_comes_from_credentials ... ok
+test headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials ... ok
+test existing_embedded_and_models_file_sources_and_retained_originals_become_private_when_saving_first_key ... ok
+test malformed_headers_never_clear_saved_settings_or_publish_a_generation ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.93s
+
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.31s
+     Running tests/r07_t08_model_configuration.rs (rust/target/debug/deps/r07_t08_model_configuration-5e17d96730c6177d)

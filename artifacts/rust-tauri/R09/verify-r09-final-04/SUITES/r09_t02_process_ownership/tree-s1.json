@@ -1,0 +1,46 @@
+{
+ "label": "s1",
+ "unixMs": 1793033201142,
+ "app": [
+  {
+   "pid": 92220,
+   "ppid": 92217,
+   "pgid": 92217,
+   "command": "/private/tmp/lingxi-r09-t07/evidence-app-gate-v33-20261027-002322/Lingxi.app/Contents/MacOS/lingxi-resource-desktop"
+  }
+ ],
+ "services": [
+  {
+   "pid": 92221,
+   "ppid": 92220,
+   "pgid": 92221,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-92217-1793033198801/home-own-local"
+  }
+ ],
+ "allServices": [
+  {
+   "pid": 84421,
+   "ppid": 1,
+   "pgid": 84421,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/../../rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t03_native_matrix-84340-1793032601031/home"
+  },
+  {
+   "pid": 89658,
+   "ppid": 41966,
+   "pgid": 89658,
+   "command": "bash -c cd /Users/study_superior/Desktop/Code/LingxiAgent && ps aux | grep -E \"lingxi-resource-desktop|Lingxi.app/Contents/MacOS|lingxi-service --home /private/tmp/lingxi-r09\" | grep -v grep | wc -l && source /private/tmp/r09-gate-final02-env.sh && rm -rf artifacts/rust-tauri/R09/verify-r09-final-04 && ~/.cargo/bin/rustup run 1.98.1 cargo run --manifest-path rust/Cargo.toml -p xtask -- verify-stage R09 --evidence artifacts/rust-tauri/R09/verify-r09-final-04 > /private/tmp/r09-gate-final-04.log 2>&1; echo \"GATE_EXIT=$?\" >> /private/tmp/r09-gate-final-04.log; tail -3 /private/tmp/r09-gate-final-04.log"
+  },
+  {
+   "pid": 92219,
+   "ppid": 92217,
+   "pgid": 92217,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-92217-1793033198801/home-remote"
+  },
+  {
+   "pid": 92221,
+   "ppid": 92220,
+   "pgid": 92221,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-92217-1793033198801/home-own-local"
+  }
+ ]
+}

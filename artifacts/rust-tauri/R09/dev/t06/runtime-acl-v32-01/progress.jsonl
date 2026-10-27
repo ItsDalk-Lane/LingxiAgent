@@ -1,0 +1,5 @@
+{"n": 20, "case": "blocked::allow-side-effect::main::copy_file", "ok": false, "at": 1793030177.531116}
+{"n": 40, "case": "acl::main::open_settings::allow", "ok": true, "at": 1793030298.116972}
+{"n": 60, "case": "blocked::allow-side-effect::main::select_files", "ok": false, "at": 1793030418.694489}
+{"n": 76, "final": true, "status": "FAIL", "at": 1793030458.9226391}
+{"n": 80, "case": "acl::runtime::wdio-port-released", "ok": true, "at": 1793030460.517636}

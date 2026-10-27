@@ -1,0 +1,14 @@
+{
+  "status": "PRECHECK_REJECTED_BINARY_CHANGED",
+  "exitCode": 1,
+  "nodeCommandExecuted": false,
+  "serviceStarted": false,
+  "functionalityResult": "NOT_RUN",
+  "expectedBinarySha256": "d7b56a69dfb584747618d8f0eb36d6ca92484b496158328c2fbc426ba4db2ece",
+  "expectedBinaryBytes": 255584512,
+  "actualBinarySha256": "d14d3b17db2c14b76b44c197a20fb3fb0cff45e34aac17d45cc710d2d67bd4dc",
+  "actualBinaryBytes": 255707856,
+  "referenceBuildReceipt": "artifacts/rust-tauri/R07/T08/settings-entry-backend-build1.json",
+  "referenceBinding": "artifacts/rust-tauri/R07/T08/settings-entry-backend-build1-binary.json",
+  "reason": "启动前实际文件与根端提供的正式开发build绑定不同；没有用旧SHA为新文件背书。"
+}

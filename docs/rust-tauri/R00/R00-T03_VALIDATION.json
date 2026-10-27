@@ -1,0 +1,296 @@
+{
+  "task": "R00-T03",
+  "status": "READY_FOR_REVIEW",
+  "base_sha": "4b4a1d98f6d2d0e03f9573aa75b7992efed03db6",
+  "observed_head": "60dbe0384e553f0a0aab7d173b2dc1ba43987b82",
+  "evidence_level": "静态源码/锁文件/只读脚本/独立 Python 扫描 oracle/TS emit 探针；未运行真实产品或供应商",
+  "checks": [
+    {
+      "name": "oracle controlled file set matches generator scope",
+      "pass_": true,
+      "detail": "independent=1664, graph=1664"
+    },
+    {
+      "name": "oracle independent scan found sites",
+      "pass_": true,
+      "detail": "specifiers=2567"
+    },
+    {
+      "name": "oracle graph matches independent source scan",
+      "pass_": true,
+      "detail": "mismatches={}"
+    },
+    {
+      "name": "oracle TypeScript emit type-erasure probe",
+      "pass_": true,
+      "detail": "ts emit probe ok"
+    },
+    {
+      "name": "oracle type-only anchors match source and graph",
+      "pass_": true,
+      "detail": ""
+    },
+    {
+      "name": "oracle synthetic type-bit flip on pi-sdk:61 rejected",
+      "pass_": true,
+      "detail": "export type 反转为运行时必须被锚点检查拒绝"
+    },
+    {
+      "name": "oracle CJS/createRequire/resolve anchors",
+      "pass_": true,
+      "detail": ""
+    },
+    {
+      "name": "A05 adapter symbol difference",
+      "pass_": true,
+      "detail": "observed=47, uncovered=[]"
+    },
+    {
+      "name": "A05 synthetic unregistered ability is rejected",
+      "pass_": true,
+      "detail": "injected difference=['__unregistered_pi_ability__']"
+    },
+    {
+      "name": "A05 Pi vendor import difference",
+      "pass_": true,
+      "detail": "vendor imports=20, uncovered=[]"
+    },
+    {
+      "name": "A05 adapter import difference",
+      "pass_": true,
+      "detail": "adapter imports=86, uncovered=[]"
+    },
+    {
+      "name": "A05 every adapter import has migration owner",
+      "pass_": true,
+      "detail": "no empty or unknown capability owner"
+    },
+    {
+      "name": "A05 extension hook difference",
+      "pass_": true,
+      "detail": "hooks=15, uncovered=[]"
+    },
+    {
+      "name": "A05 opaque dynamic import disposition",
+      "pass_": true,
+      "detail": "opaque expressions=17, unclassified=[]"
+    },
+    {
+      "name": "A05 multi-surface roots present",
+      "pass_": true,
+      "detail": "missing roots=[]"
+    },
+    {
+      "name": "A05 service composition reaches core/session-coordinator.ts",
+      "pass_": true,
+      "detail": "static graph from main-full to Pi consumer"
+    },
+    {
+      "name": "A05 service composition reaches core/bridge-session-manager.ts",
+      "pass_": true,
+      "detail": "static graph from main-full to Pi consumer"
+    },
+    {
+      "name": "A05 service composition reaches hub/agent-executor.ts",
+      "pass_": true,
+      "detail": "static graph from main-full to Pi consumer"
+    },
+    {
+      "name": "A05 service composition reaches lib/llm/cache-preserving-compaction-agent-run.ts",
+      "pass_": true,
+      "detail": "static graph from main-full to Pi consumer"
+    },
+    {
+      "name": "A05 static runtime reachability layer present and equal for Pi consumers",
+      "pass_": true,
+      "detail": "static_runtime consumers=81"
+    },
+    {
+      "name": "A05 background injected edge reaches Pi",
+      "pass_": true,
+      "detail": "scheduler -> injected engine -> coordinator isolated session -> Pi; not a static import edge"
+    },
+    {
+      "name": "A05 E01 mapped",
+      "pass_": true,
+      "detail": "完整 Node 服务"
+    },
+    {
+      "name": "A05 E02 mapped",
+      "pass_": true,
+      "detail": "开放组合服务"
+    },
+    {
+      "name": "A05 E03 mapped",
+      "pass_": true,
+      "detail": "Electron 主进程及渲染端"
+    },
+    {
+      "name": "A05 E04 mapped",
+      "pass_": true,
+      "detail": "CLI"
+    },
+    {
+      "name": "A05 E05 mapped",
+      "pass_": true,
+      "detail": "Hub 临时/电话代理"
+    },
+    {
+      "name": "A05 E06 mapped",
+      "pass_": true,
+      "detail": "Bridge 五平台"
+    },
+    {
+      "name": "A05 E07 mapped",
+      "pass_": true,
+      "detail": "Cron / 心跳 / 后台"
+    },
+    {
+      "name": "A05 E08 mapped",
+      "pass_": true,
+      "detail": "压缩 AgentRun 旁路"
+    },
+    {
+      "name": "source references exist",
+      "pass_": true,
+      "detail": "refs=941, invalid=[]"
+    },
+    {
+      "name": "locked package versions recorded",
+      "pass_": true,
+      "detail": "missing=[]"
+    },
+    {
+      "name": "runtime direct dependency set and unique IDs",
+      "pass_": true,
+      "detail": "manifest=50, rows=51"
+    },
+    {
+      "name": "runtime lock versions equal package-lock",
+      "pass_": true,
+      "detail": "every row must match installed lock entry"
+    },
+    {
+      "name": "runtime all 51 rows import/load/owner evidence (independent oracle)",
+      "pass_": true,
+      "detail": "violations={}"
+    },
+    {
+      "name": "runtime cross-surface call-chain anchors",
+      "pass_": true,
+      "detail": "service, desktop, React and plugin consumers stay visible"
+    },
+    {
+      "name": "runtime cross-surface owners explicit",
+      "pass_": true,
+      "detail": "high-impact service/desktop/renderer owner terms must be present"
+    },
+    {
+      "name": "runtime synthetic static-as-dynamic claim rejected",
+      "pass_": true,
+      "detail": "static knowledge import cannot be hidden"
+    },
+    {
+      "name": "runtime synthetic truncated source refs rejected",
+      "pass_": true,
+      "detail": "server diff consumer cannot disappear"
+    },
+    {
+      "name": "runtime synthetic generic updater owner rejected",
+      "pass_": true,
+      "detail": "artifact ordering must name Tauri/Rust/CLI ownership"
+    },
+    {
+      "name": "runtime synthetic type-only import mislabel rejected",
+      "pass_": true,
+      "detail": "type-only MermaidConfig import is not runtime load evidence"
+    },
+    {
+      "name": "runtime synthetic unevidenced package activation rejected",
+      "pass_": true,
+      "detail": "codemirror has no direct production import"
+    },
+    {
+      "name": "runtime synthetic safe-fs createRequire omission rejected",
+      "pass_": true,
+      "detail": "shared/safe-fs.ts:37 是 js-yaml 真实消费者，删除必须被独立扫描差集拒绝"
+    },
+    {
+      "name": "runtime synthetic pi-agent-core type-edge mislabel rejected",
+      "pass_": true,
+      "detail": "index.ts:61 export type 不得在依赖账本记为运行时加载"
+    },
+    {
+      "name": "A06 worker discovery closure (independent scan)",
+      "pass_": true,
+      "detail": ""
+    },
+    {
+      "name": "A06 discovery patterns match matrix declaration",
+      "pass_": true,
+      "detail": "pattern sets drift between builder and validator"
+    },
+    {
+      "name": "A06 synthetic unlisted executor is rejected",
+      "pass_": true,
+      "detail": "新增隔离调用或终态 sink 必须进入差集"
+    },
+    {
+      "name": "A06 removed classification shows up as stale",
+      "pass_": true,
+      "detail": "删除分类条目必须被 stale 差集暴露"
+    },
+    {
+      "name": "A06 peripheral candidates hold no loop or terminal sink",
+      "pass_": true,
+      "detail": ""
+    },
+    {
+      "name": "A06 synthetic kernel-to-peripheral flips rejected",
+      "pass_": true,
+      "detail": "子代理/封面/DM/延迟结果/媒体改判外围必须被语义检查拒绝"
+    },
+    {
+      "name": "A06 worker inventory covers W1-W15 root-cause rows",
+      "pass_": true,
+      "detail": "workers=['W1-1', 'W1-2', 'W1-3', 'W1-4', 'W1-5', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12', 'W13', 'W14', 'W15']"
+    },
+    {
+      "name": "A06 kernel workers name a Rust owner and retirement evidence",
+      "pass_": true,
+      "detail": "每条内核迁移条目须有 Rust 唯一负责人与退场证据"
+    },
+    {
+      "name": "A06 actual model loop worker is kernel",
+      "pass_": true,
+      "detail": "hub/agent-executor creates Pi sessions and prompts"
+    },
+    {
+      "name": "A06 direct Pi loop in compaction is kernel",
+      "pass_": true,
+      "detail": "compaction invokes runAgentLoop"
+    },
+    {
+      "name": "A06 task status writer is kernel",
+      "pass_": true,
+      "detail": "scheduler writes activity status"
+    },
+    {
+      "name": "A06 synthetic permissive classification rejected",
+      "pass_": true,
+      "detail": "a loop-owning worker cannot pass peripheral classification"
+    }
+  ],
+  "synthetic_negative_probes": 13,
+  "independent_oracle": {
+    "controlled_files": 1664,
+    "scanned_specifiers": 2567,
+    "emit_probe": "typescript transpileModule 类型擦除 9 例",
+    "worker_discovery_files": 95
+  },
+  "input_sha256": {
+    "R00-T03_IMPORT_GRAPH.json": "638d0663acb77b43dcda5844e11175af1914a8aba6464515d93f821ec9a61312",
+    "PI_REPLACEMENT_MATRIX.json": "c16b01b7bc038522696a3d74a9b8bf46f5e00581455d97ddeb77ddd217ab6d56",
+    "RUNTIME_DEPENDENCIES.json": "68d98d48740356b3f683242b7c1985ad019564ac612e14d2fa1ad202e86d3c71"
+  }
+}

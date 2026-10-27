@@ -1,0 +1,162 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.54s
+     Running tests/r06_ar_f03_operations.rs (target/debug/deps/r06_ar_f03_operations-ff5696a185d09fa0)
+
+running 21 tests
+test unknown_file_effect_survives_storage_failure_restart_and_replay ... FAILED
+test direct_driver_independent_database_reentry_and_release ... FAILED
+test subagent_exact_parent_scope_and_settled_parent_are_enforced ... FAILED
+test actual_native_write_cancel_retains_admission_until_blocking_exit ... FAILED
+test retired_seed_identity_stays_deleted_and_no_journal_reuse_is_preserved ... FAILED
+test public_direct_drive_obeys_actual_same_database_admission ... FAILED
+test real_gateway_cooperative_cancel_releases_after_actual_task_exit ... FAILED
+test positive_and_fork_event_atomicity ... FAILED
+test actual_child_keeps_parent_admission_until_exit ... FAILED
+test real_http_disconnect_cancels_only_its_drive_and_reclaims_provider_socket ... FAILED
+test local_owner_cross_session_owner_child_and_foreign_before_busy_are_preserved ... FAILED
+test actual_native_edit_cancel_retains_admission_until_blocking_exit ... FAILED
+test public_borrowed_submission_rejects_mixed_real_database_before_effects ... FAILED
+test slow_model_does_not_block_independent_session_or_metadata ... FAILED
+test authenticated_barrier_rewind_execute_and_cancelled_waiter ... FAILED
+test direct_driver_fake_agent_and_child_have_zero_effects ... FAILED
+test actual_resourceio_owned_write_cancel_retains_until_fifo_exit ... FAILED
+test actual_different_agent_child_keeps_exact_parent_permit ... FAILED
+test same_database_constructor_and_instance_contract ... FAILED
+test latest_permission_and_lifecycle_are_rechecked_before_commit ... FAILED
+test completed_fork_replay_conflict_and_recovered_event_are_consistent ... FAILED
+
+failures:
+
+---- unknown_file_effect_survives_storage_failure_restart_and_replay stdout ----
+
+thread 'unknown_file_effect_survives_storage_failure_restart_and_replay' (15627199) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- direct_driver_independent_database_reentry_and_release stdout ----
+
+thread 'direct_driver_independent_database_reentry_and_release' (15627187) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+
+---- subagent_exact_parent_scope_and_settled_parent_are_enforced stdout ----
+
+thread 'subagent_exact_parent_scope_and_settled_parent_are_enforced' (15627198) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+
+---- actual_native_write_cancel_retains_admission_until_blocking_exit stdout ----
+
+thread 'actual_native_write_cancel_retains_admission_until_blocking_exit' (15627182) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+
+---- retired_seed_identity_stays_deleted_and_no_journal_reuse_is_preserved stdout ----
+
+thread 'retired_seed_identity_stays_deleted_and_no_journal_reuse_is_preserved' (15627195) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+
+---- public_direct_drive_obeys_actual_same_database_admission stdout ----
+
+thread 'public_direct_drive_obeys_actual_same_database_admission' (15627192) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+
+---- real_gateway_cooperative_cancel_releases_after_actual_task_exit stdout ----
+
+thread 'real_gateway_cooperative_cancel_releases_after_actual_task_exit' (15627193) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+
+---- positive_and_fork_event_atomicity stdout ----
+
+thread 'positive_and_fork_event_atomicity' (15627190) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+
+---- actual_child_keeps_parent_admission_until_exit stdout ----
+
+thread 'actual_child_keeps_parent_admission_until_exit' (15627179) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+
+---- real_http_disconnect_cancels_only_its_drive_and_reclaims_provider_socket stdout ----
+
+thread 'real_http_disconnect_cancels_only_its_drive_and_reclaims_provider_socket' (15627194) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+
+---- local_owner_cross_session_owner_child_and_foreign_before_busy_are_preserved stdout ----
+
+thread 'local_owner_cross_session_owner_child_and_foreign_before_busy_are_preserved' (15627189) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+
+---- actual_native_edit_cancel_retains_admission_until_blocking_exit stdout ----
+
+thread 'actual_native_edit_cancel_retains_admission_until_blocking_exit' (15627181) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+
+---- public_borrowed_submission_rejects_mixed_real_database_before_effects stdout ----
+
+thread 'public_borrowed_submission_rejects_mixed_real_database_before_effects' (15627191) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+
+---- slow_model_does_not_block_independent_session_or_metadata stdout ----
+
+thread 'slow_model_does_not_block_independent_session_or_metadata' (15627197) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+
+---- authenticated_barrier_rewind_execute_and_cancelled_waiter stdout ----
+
+thread 'authenticated_barrier_rewind_execute_and_cancelled_waiter' (15627184) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+
+---- direct_driver_fake_agent_and_child_have_zero_effects stdout ----
+
+thread 'direct_driver_fake_agent_and_child_have_zero_effects' (15627186) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+
+---- actual_resourceio_owned_write_cancel_retains_until_fifo_exit stdout ----
+
+thread 'actual_resourceio_owned_write_cancel_retains_until_fifo_exit' (15627183) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+
+---- actual_different_agent_child_keeps_exact_parent_permit stdout ----
+
+thread 'actual_different_agent_child_keeps_exact_parent_permit' (15627180) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+
+---- same_database_constructor_and_instance_contract stdout ----
+
+thread 'same_database_constructor_and_instance_contract' (15627196) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+
+---- latest_permission_and_lifecycle_are_rechecked_before_commit stdout ----
+
+thread 'latest_permission_and_lifecycle_are_rechecked_before_commit' (15627188) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+
+---- completed_fork_replay_conflict_and_recovered_event_are_consistent stdout ----
+
+thread 'completed_fork_replay_conflict_and_recovered_event_are_consistent' (15627185) panicked at crates/lingxi-service/tests/r06_ar_f03_operations.rs:569:67:
+called `Result::unwrap()` on an `Err` value: NotPresent
+
+
+failures:
+    actual_child_keeps_parent_admission_until_exit
+    actual_different_agent_child_keeps_exact_parent_permit
+    actual_native_edit_cancel_retains_admission_until_blocking_exit
+    actual_native_write_cancel_retains_admission_until_blocking_exit
+    actual_resourceio_owned_write_cancel_retains_until_fifo_exit
+    authenticated_barrier_rewind_execute_and_cancelled_waiter
+    completed_fork_replay_conflict_and_recovered_event_are_consistent
+    direct_driver_fake_agent_and_child_have_zero_effects
+    direct_driver_independent_database_reentry_and_release
+    latest_permission_and_lifecycle_are_rechecked_before_commit
+    local_owner_cross_session_owner_child_and_foreign_before_busy_are_preserved
+    positive_and_fork_event_atomicity
+    public_borrowed_submission_rejects_mixed_real_database_before_effects
+    public_direct_drive_obeys_actual_same_database_admission
+    real_gateway_cooperative_cancel_releases_after_actual_task_exit
+    real_http_disconnect_cancels_only_its_drive_and_reclaims_provider_socket
+    retired_seed_identity_stays_deleted_and_no_journal_reuse_is_preserved
+    same_database_constructor_and_instance_contract
+    slow_model_does_not_block_independent_session_or_metadata
+    subagent_exact_parent_scope_and_settled_parent_are_enforced
+    unknown_file_effect_survives_storage_failure_restart_and_replay
+
+test result: FAILED. 0 passed; 21 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.50s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_ar_f03_operations`
+CARGO_EXIT=101

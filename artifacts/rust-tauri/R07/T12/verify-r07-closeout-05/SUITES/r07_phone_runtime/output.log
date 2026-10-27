@@ -1,0 +1,23 @@
+
+running 15 tests
+test actual_member_removal_cancels_waiting_models_before_any_publication ... ok
+test actual_read_only_phone_rejects_native_write_and_hides_recursive_tools ... ok
+test actual_http_channel_management_and_dm_read_surfaces_preserve_real_state ... ok
+test actual_channel_pass_records_decision_without_publishing_ordinary_final ... ok
+test actual_http_phone_only_explicit_reply_is_public_request_retry_and_restart_do_not_repeat ... ok
+test actual_dm_stop_marker_stops_chain_and_new_user_action_waits_for_direction_cooldown ... ok
+test actual_same_second_dm_reset_hides_old_history_without_replaying_or_losing_new_action ... ok
+test actual_dm_chain_shares_three_run_budget_across_both_directions_and_cooldown ... ok
+test actual_completed_run_before_activity_restart_waits_full_interval_from_terminal_time ... ok
+test actual_legacy_markdown_first_discovery_external_append_and_restart_keep_one_cause ... ok
+test actual_proactive_31_minutes_obeys_disable_enable_and_restart_slot_receipt ... ok
+test actual_archived_phone_session_rotates_and_does_not_block_independent_channel ... ok
+test actual_dm_stop_marker_variants_strip_public_text_and_never_start_reverse_run ... ok
+test actual_phone_sessions_reuse_within_30_minutes_and_rotate_at_idle_expiry ... ok
+test actual_channel_recursive_replies_share_one_guard_budget_and_restart_does_not_reopen_it ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.77s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.84s
+     Running tests/r07_phone_runtime.rs (rust/target/debug/deps/r07_phone_runtime-e178303b46e6cff8)

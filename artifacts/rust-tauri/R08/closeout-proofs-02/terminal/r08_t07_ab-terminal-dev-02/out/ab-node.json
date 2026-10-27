@@ -1,0 +1,140 @@
+{
+  "kind": "node",
+  "observations": {
+    "leaf.terminal.positive": {
+      "ok": true,
+      "observed": {
+        "cases": {
+          "snapshot.current-terminal-listed": true,
+          "snapshot.lists-both-session-terminals": true,
+          "snapshot.identity-mismatch-rejected": true,
+          "snapshot.other-session-no-leak": true,
+          "tail.initial-window": true,
+          "tail.new-output-after-since": true,
+          "tail.identity-mismatch-rejected": true,
+          "tail.foreign-terminal-rejected": true,
+          "close.reports-killed-or-already-stopped": true,
+          "close.process-really-stopped": true,
+          "close.unknown-id-rejected": true,
+          "close.foreign-terminal-rejected": true,
+          "close.identity-mismatch-rejected": true,
+          "transport.survives-frame-family": true
+        },
+        "infra": {
+          "final": true,
+          "echo": {
+            "steps": 2,
+            "last": "{\n  \"terminalId\": \"term_mvp5tzct_4e1fd282\",\n  \"toolCallId\": \"r08-plan-term1-1\",\n  \"sessionId\": \"sess_0mvp5tybb_333ac1073af00abaada0\",\n  \"sessionPath\": \"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02/root-a-node/agents/a1/sessions/2026-10-26T11-15-12-488Z_01a177eb-ebe8-7693-a516-eb859becb9ed.jsonl\",\n  \"agentId\": \"a1\",\n  \"cwd\": \"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02/workspace\",\n  \"command\": \"cd '/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02/workspace' && while true; do printf 'beat\\\\n' >> \\\"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02/workspace/r08-terminal-heartbeat-node-1793013312535-33370.txt\\\"; sleep 0.2; done\",\n  \"label\": \"while true; do printf 'beat\\\\n' >> \\\"/private/tmp/lingxi-r08-verif\",\n  \"status\": \"running\",\n  \"seq\": 0,\n  \"createdAt\": 1793013313853,\n  \"lastActivityAt\": 1793013313853,\n  \"exitedAt\": null,\n  \"exitCode\": null,\n  \"signal\": null,\n  \"transcriptPath\": \"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02/root-a-node/.ephemeral/terminal-sessions/term_mvp5tzct_4e1fd282.jsonl\",\n  \"output\": \"\",\n  \"processId\": \"term_mvp5tzct_4e1fd282\",\n  \"process_id\": \"term_mvp5tzct_4e1fd282\",\n  \"execCommand\": {\n    \"cmd\": \"wh"
+          },
+          "terminalIds": [
+            "term_mvp5tz2l_5ac06327",
+            "term_mvp5tzct_4e1fd282"
+          ],
+          "workspace": "/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02/workspace"
+        },
+        "probes": {
+          "managerUnavailableReachable": false,
+          "snapshot": {
+            "type": "terminal_snapshot",
+            "currentStatus": "running",
+            "terminalCount": 2,
+            "currentKeys": [
+              "agentId",
+              "command",
+              "createdAt",
+              "cwd",
+              "exitCode",
+              "exitedAt",
+              "label",
+              "lastActivityAt",
+              "seq",
+              "sessionId",
+              "sessionPath",
+              "signal",
+              "status",
+              "terminalId",
+              "toolCallId",
+              "transcriptPath"
+            ],
+            "mismatch": {
+              "type": "error",
+              "code": "session_identity_mismatch",
+              "leakedTerminalFrames": 0
+            },
+            "foreign": {
+              "type": "terminal_snapshot",
+              "terminals": 0,
+              "leaked": false
+            }
+          },
+          "tail": {
+            "initial": {
+              "type": "terminal_tail",
+              "chunks": 2,
+              "lastSeq": 2,
+              "truncated": false
+            },
+            "writeFinal": true,
+            "next": {
+              "type": "terminal_tail",
+              "lastSeq": 3,
+              "markerSeen": true,
+              "truncated": false
+            },
+            "mismatch": {
+              "type": "error",
+              "code": "session_identity_mismatch",
+              "terminalTailFrames": 0
+            },
+            "foreign": {
+              "type": "error",
+              "code": null,
+              "terminalTailFrames": 0
+            }
+          },
+          "close": {
+            "requested": {
+              "status": "killed",
+              "requestIdEcho": "term-close-1"
+            },
+            "heartbeat": {
+              "before": 185,
+              "after1": 185,
+              "after2": 185
+            },
+            "unknown": {
+              "type": "terminal_close_result",
+              "status": "rejected",
+              "reason": "terminal_not_found_or_mismatch"
+            },
+            "foreign": {
+              "status": "rejected",
+              "reason": "terminal_not_found_or_mismatch",
+              "terminalStillRunning": true
+            },
+            "mismatch": {
+              "type": "error",
+              "status": null,
+              "code": "session_identity_mismatch"
+            },
+            "interactive": {
+              "status": "killed",
+              "requestIdEcho": "term-close-interactive"
+            }
+          }
+        },
+        "heartbeat": "/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02/workspace/r08-terminal-heartbeat-node-1793013312535-33370.txt",
+        "last0": 2,
+        "closeInteractiveStatus": "killed",
+        "tailNewLastSeq": 3,
+        "framesSample": [
+          ">>> {\"type\":\"terminal_close_request\",\"sessionId\":\"sess_0mvp5tybb_333ac1073af00abaada0\",\"sessionPath\":\"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02/",
+          "{\"type\":\"terminal_state\",\"sessionId\":\"sess_0mvp5tybb_333ac1073af00abaada0\",\"sessionPath\":\"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02/root-a-node/",
+          "{\"type\":\"terminal_close_result\",\"requestId\":\"term-close-interactive\",\"sessionId\":\"sess_0mvp5tybb_333ac1073af00abaada0\",\"sessionPath\":\"/private/tmp/lingxi-r08-ve",
+          "{\"type\":\"terminal_state\",\"sessionId\":\"sess_0mvp5tybb_333ac1073af00abaada0\",\"sessionPath\":\"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02/root-a-node/"
+        ]
+      },
+      "ms": 12473
+    }
+  }
+}

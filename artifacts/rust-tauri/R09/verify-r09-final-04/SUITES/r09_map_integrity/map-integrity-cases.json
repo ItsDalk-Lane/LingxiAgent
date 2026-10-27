@@ -1,0 +1,246 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_map_integrity",
+ "cases": [
+  {
+   "case": "map::base-scenario-set-16-equal-r00",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "map": [
+     "R09-A01",
+     "R09-A02",
+     "R09-A03",
+     "R09-A04",
+     "R09-A05",
+     "R09-A06",
+     "R09-A07",
+     "R09-A08",
+     "R09-A09",
+     "R09-A10",
+     "R09-A11",
+     "R09-A12",
+     "R09-A13",
+     "R09-A14",
+     "R09-A15",
+     "R09-A16"
+    ]
+   }
+  },
+  {
+   "case": "map::deduped-leaf-coverage-74-equal-r00",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "count": 74
+   }
+  },
+  {
+   "case": "map::original-assertions-168-verbatim",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "count": 168
+   }
+  },
+  {
+   "case": "map::task-share-counts",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "t03t07": 46,
+    "t04": 9,
+    "t05": 19
+   }
+  },
+  {
+   "case": "map::contract-valid",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "exit": 0,
+    "stdout": "check-map R09 OK {\"baseScenarios\":16,\"commands\":21,\"executedCommands\":21,\"leafAssertionContracts\":15,\"r00SupplementalLeaves\":74,\"specMirrors\":16,\"stage\":\"R09\",\"supplementalLeaves\":74}"
+   }
+  },
+  {
+   "case": "map::dropped-leaf-rejected",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "expectedExitNot0": 0,
+    "actualExit": 1,
+    "expectedSubstrings": [
+     "drops 1 REQUIRED_SUPPLEMENTAL"
+    ],
+    "outputTail": "error: stage map R09 contract invalid: stage map for R09 drops 1 REQUIRED_SUPPLEMENTAL leaf scenario(s) that the R00 acceptance ledger binds to this stage: [\"R00-T02-LA-03A9E92909C6\"] — required leaves may not be filtered out of the stage gate (R13-F01)",
+    "fixtureSha256": "03188bb9c6e817bc85aacde983a1f744d6bd3232eeb7163a50282baa78c9587f"
+   }
+  },
+  {
+   "case": "map::deleted-task-share-rejected",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "expectedExitNot0": 0,
+    "actualExit": 1,
+    "expectedSubstrings": [
+     "drops 9 REQUIRED_SUPPLEMENTAL"
+    ],
+    "outputTail": "error: stage map R09 contract invalid: stage map for R09 drops 9 REQUIRED_SUPPLEMENTAL leaf scenario(s) that the R00 acceptance ledger binds to this stage: [\"R00-T02-LA-38B14B7B34BD\", \"R00-T02-LA-3FA31D4C3100\", \"R00-T02-LA-54DC0A05A0DE\", \"R00-T02-LA-6E8307F57F42\", \"R00-T02-LA-CA446FE1DB71\", \"R00-T02-LA-D2575672A18D\", \"R00-T02-LA-D34F2D718CF3\", \"R00-T02-LA-EF9EEE38D8F6\", \"R00-T02-LA-FD5B420182C6\"] — required leaves may not be filtered out of the stage gate (R13-F01)",
+    "fixtureSha256": "e344c0d29246061dc0133a2bb76ca98977c514ae4c3265483e56a9e7f580d05b"
+   }
+  },
+  {
+   "case": "map::deleted-shared-task-share-rejected",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "expectedExitNot0": 0,
+    "actualExit": 1,
+    "expectedSubstrings": [
+     "drops 46 REQUIRED_SUPPLEMENTAL"
+    ],
+    "outputTail": "R00-T02-LA-ACA2C4C1158D\", \"R00-T02-LA-B6A97A19F2CB\", \"R00-T02-LA-B72A6D3886B7\", \"R00-T02-LA-BEC2074CC33C\", \"R00-T02-LA-C5AAF360D10F\", \"R00-T02-LA-CD873C715D96\", \"R00-T02-LA-D15E0ADC0608\", \"R00-T02-LA-D29DE479076C\", \"R00-T02-LA-DF4B5168ABB5\", \"R00-T02-LA-E6FB08FBBFAA\", \"R00-T02-LA-E84F01456B6C\", \"R00-T02-LA-F5DBF2A80E28\", \"R00-T02-LA-F6235778F816\", \"R00-T02-LA-F9786414DD11\", \"R00-T02-LA-FB5C78308878\", \"R00-T02-LA-FF1B331F1019\"] — required leaves may not be filtered out of the stage gate (R13-F01)",
+    "fixtureSha256": "5a2684778c4b00a647939423c32318d48b1848421d923dfdb13b34f80ce552e3"
+   }
+  },
+  {
+   "case": "map::unknown-leaf-rejected",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "expectedExitNot0": 0,
+    "actualExit": 1,
+    "expectedSubstrings": [
+     "unknown to the R00 acceptance ledger"
+    ],
+    "outputTail": "error: stage map R09 contract invalid: stage map for R09 declares 1 supplemental leaf scenario(s) unknown to the R00 acceptance ledger: [\"R00-T02-LA-PROBE-UNKNOWN-000\"] — only R00-bound leaves belong in the gate",
+    "fixtureSha256": "d93a75b80122560d44f045d7a2f859056f5acafa674c7e21540e9e4fdd9a34bc"
+   }
+  },
+  {
+   "case": "map::rewritten-original-assertion-rejected",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "expectedExitNot0": 0,
+    "actualExit": 1,
+    "expectedSubstrings": [
+     "r00Assertions"
+    ],
+    "outputTail": "error: stage map R09 contract invalid: supplemental leaf R00-T02-LA-03A9E92909C6 mirrors an R00 record that does not match the ledgers — the stage map may not re-bind or re-grade an R00 obligation (R14-F01): r00Assertions map=[\"执行“清除内置浏览器站点资料”后核对：清除 Cookie 与站点数据后返回成功，失败时返回错误（已被放宽）\", \"失败、冲突或拒绝时核对返回的状态与实际副作用一致（已被放宽）\"] (2 entries) r00=[\"执行“清除内置浏览器站点资料”后核对：清除 Cookie 与站点数据后返回成功，失败时返回错误\", \"失败、冲突或拒绝时核对返回的状态与实际副作用一致\"] (2 entries)",
+    "fixtureSha256": "6f281ca46616d879e6f4baecfbb49dd41fd24334d0e54ac6def06c66d3740123"
+   }
+  },
+  {
+   "case": "map::base-mirror-drift-rejected",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "expectedExitNot0": 0,
+    "actualExit": 1,
+    "expectedSubstrings": [
+     "specMirror drifted"
+    ],
+    "outputTail": "error: stage map R09 contract invalid: base scenario \"R09-A01\" specMirror drifted from the R00 ledger: then: map=\"只需启动一次即可\" r00=\"核心页面和服务行为一致，无重写第二套业务组件\"",
+    "fixtureSha256": "57ca52732f5392cbeb8c7cc9f7f0b4c3e6bcc85a0be1f0f15bd357aa74f5a235"
+   }
+  },
+  {
+   "case": "map::orphan-command-rejected",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "expectedExitNot0": 0,
+    "actualExit": 1,
+    "expectedSubstrings": [
+     "command(s) that no scenario/leaf references"
+    ],
+    "outputTail": "error: stage map R09 contract invalid: stage map for R09 registers 1 command(s) that no scenario/leaf references (an orphan command would never run): [\"r09_probe_orphan\"]",
+    "fixtureSha256": "045f5ece6a5066525e9aa191484190012ec98a442f8953ab05bba3c05422054d"
+   }
+  },
+  {
+   "case": "map::missing-command-rejected",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "expectedExitNot0": 0,
+    "actualExit": 2,
+    "expectedSubstrings": [
+     "references unknown command"
+    ],
+    "outputTail": "error: invalid stage map for R09: stage map invalid: scenario \"R09-A01\" references unknown command \"r09_inputs_check\"",
+    "fixtureSha256": "51fa18ef7787b8e81de61a6d6eac98548128f7564940a3f9f92d7d2388c37c07"
+   }
+  },
+  {
+   "case": "map::empty-scenario-rejected",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "expectedExitNot0": 0,
+    "actualExit": 2,
+    "expectedSubstrings": [
+     "commandRefs"
+    ],
+    "outputTail": "error: invalid stage map for R09: stage map invalid: scenario \"R09-A01\" commandRefs must not be empty (a scenario bound to no test is a hole in the map, not a pass)",
+    "fixtureSha256": "9355ca2e3823bf6d6ef2082ad79438b6968c9210e65b970e278db6c08fa26278"
+   }
+  },
+  {
+   "case": "map::incomplete-assertion-coverage-rejected",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "expectedExitNot0": 0,
+    "actualExit": 2,
+    "expectedSubstrings": [
+     "originalAssertionCases"
+    ],
+    "outputTail": "error: invalid stage map for R09: stage map invalid: supplemental leaf \"R00-T02-LA-03A9E92909C6\" full_original_behavior requires originalAssertionCases for every R00 assertion",
+    "fixtureSha256": "0d95d571a194a0f8560b9e88780f663a20ecbc4b85862f334a7cd8ac9e70786d"
+   }
+  },
+  {
+   "case": "map::missing-evidence-paths-rejected",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "expectedExitNot0": 0,
+    "actualExit": 2,
+    "expectedSubstrings": [
+     "evidencePaths must not be empty"
+    ],
+    "outputTail": "error: invalid stage map for R09: stage map invalid: command \"r09_service_seam_probe\" evidencePaths must not be empty (missing evidence must be a hard failure, never a pass)",
+    "fixtureSha256": "6b82583e7cda5cf75ef11cd33136b1dcfb011ba24d30198e48b2e4591ce166ee"
+   }
+  },
+  {
+   "case": "map::source-drift-rejected",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "exit": 2,
+    "outputTail": "error: stale xtask binary: source inventory differs; added=[\"stage_maps/_r09_map_integrity_drift_probe.json\"], missing=[]"
+   }
+  },
+  {
+   "case": "map::source-tree-restored",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "before": "6b3849f59580fb543a97dca5a3e41808d96e22b68420d344f2318bc7db96c560",
+    "after": "6b3849f59580fb543a97dca5a3e41808d96e22b68420d344f2318bc7db96c560"
+   }
+  },
+  {
+   "case": "map::restored-map-valid",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "exit": 0
+   }
+  }
+ ]
+}

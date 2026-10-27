@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { lingxiUrl } from '../hooks/use-hana-fetch';
+import { lingxiUrl } from '../services/service-client';
 import type { Agent } from '../types';
 import { userFallbackAvatar, yuanFallbackAvatar } from './agent-helpers';
 import { displayInitial } from './grapheme';

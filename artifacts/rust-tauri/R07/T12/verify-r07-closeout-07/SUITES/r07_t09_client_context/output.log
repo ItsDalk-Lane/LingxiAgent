@@ -1,0 +1,11 @@
+
+running 4 tests
+test bootstrap_and_models_project_real_context_without_secrets ... ok
+test unconfigured_plane_reports_empty_catalog_honestly ... ok
+test credentials_and_scope_are_enforced ... ok
+test explicit_agent_and_session_targets_are_validated ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 12.30s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_t09_client_context.rs (rust/target/debug/deps/r07_t09_client_context-3fe9f0f08115d2ee)

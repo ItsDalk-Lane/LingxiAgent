@@ -1,0 +1,36 @@
+{
+  "recordedAt": "2026-10-18T07:15:19.229961+00:00",
+  "status": "READONLY_PRE_REVIEW4_STATIC_CLOSURE_NOT_ACCEPTANCE",
+  "previous": "artifacts/rust-tauri/R07/T08/independent-mcp-pre-review3.json",
+  "findingDisposition": [
+    {
+      "id": "MCP-HTTP-QUEUED-ORIGINAL-AUTHORITY",
+      "state": "STATIC_CLOSED_AWAITING_REAL_QUEUED_HTTP_REGRESSION",
+      "evidence": "public manager.request现在强制接收&Arc<AuthService>，从真实Principal构造Some(SettingsAuthority)；HTTP action_route传state.auth()；request_tool原路径也传Some。handle获得runtime锁后统一再次认证，无原None生产wrapper。",
+      "originalFindingPreserved": "pre-review3保留当时来源摘要和原哈希，不改成当时通过。"
+    }
+  ],
+  "currentReviewConclusion": "本轮指定新变更链中尚无其他已证实必须修补的遗漏；不能以静态闭合代替当前候选实际门禁。",
+  "remainingNecessaryChecks": [
+    "最新真实SDK出站背压与总预算/取消（不仅响应等待的原3项）。",
+    "真实MCP管理HTTP已过认证而等待材料锁期间owner token轮换，之后零写且明确拒绝。",
+    "真实后台User+Full设置继承与非User/子代理/workflow拒绝不能从前台单个成功检查外推；现源码明确后台条件及两个None边界。",
+    "同ID重装旧批准/准备调用拒绝与真实审批排队重核，按实际被测层登记。"
+  ],
+  "queueObservationRecommendation": "未发现现成外部HTTP队列观测可替代窄只读observer。可在owner+JSON校验后、材料锁等待前通知非秘密动作标识；默认None/无返回值/不改变权限或结果，测试持真实锁、等待真实handler通知后轮换token，再验证正式存储零写。不能用sleep或仅发请求假定已入队。",
+  "runs": [],
+  "sourceHashes": {
+    "rust/crates/lingxi-service/src/mcp_settings.rs": "5311a3746706c592285a98a1bf99928e776c6e9cf2f7543e2e41ab97fda7bb49",
+    "rust/crates/lingxi-service/src/mcpbridge.rs": "c13aa3292fe6c3273dba42f673f3c514096f241b5ddf93a6faa8114dbf32b73c",
+    "rust/crates/lingxi-service/src/sessions.rs": "8450a617ffc3a1db4aea8f2bdd8c6e16f7c77ccbb71d0d67f21fdbf8317b14ec",
+    "rust/crates/lingxi-service/src/runs.rs": "d9cd4faa5e67b0958e5cf03b294d3ae5ede8bfd76c18280ebad27a67bd1a3072",
+    "rust/crates/lingxi-service/src/toolgateway.rs": "da0f31701f141338791d7307252758ccd7b0ffc7a20bb5b5a5e4598ee1426383",
+    "rust/crates/lingxi-service/src/auth.rs": "7dfb32cb903197c96c8bdad4775bc951a7868913184dfb5fe0cf28ddcf7820e3",
+    "rust/crates/lingxi-service/src/subagents.rs": "8528dfc2c5cbc7d6782eb71975e8c4bb6a09ad28e4ae2c3675f63d62489a12cc",
+    "rust/crates/lingxi-service/src/workflow.rs": "34982376f7945a00751279d9b7a62c6e633b8ee179b4b451fa14ee87d57cb5a8"
+  },
+  "notes": [
+    "未修改产品、旧失败或叶状态；不运行Cargo或GUI。",
+    "根端与作者仍并行完善检查，此记录不是冻结候选审阅。"
+  ]
+}

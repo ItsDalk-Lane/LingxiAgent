@@ -1,0 +1,31 @@
+{
+  "stage": "R07-T05",
+  "candidate": "t05b",
+  "name": "lib",
+  "purpose": "final_acceptance",
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-service",
+    "--lib"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-16T04:48:56.569912+00:00",
+  "sourceFingerprint": "618ca688717a3092835963be74e421e951176b5d625d5f714200f771489121fe",
+  "log": "t05b-lib.log",
+  "endedAt": "2026-10-16T04:49:04.824705+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "618ca688717a3092835963be74e421e951176b5d625d5f714200f771489121fe",
+  "logSha256": "ae9dbb0e587279cf28ab64d8f46c2c97158b82715601874cb8b7a337dcc6dcaa",
+  "sourceUnchanged": true
+}

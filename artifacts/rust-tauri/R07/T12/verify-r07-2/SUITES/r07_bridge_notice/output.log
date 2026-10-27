@@ -1,0 +1,27 @@
+
+running 3 tests
+test notice_is_retained_at_the_fork_boundary_and_receipt_does_not_replay_after_clear ... ok
+test forged_or_changed_notice_material_is_refused_instead_of_becoming_user_text ... ok
+test only_confirmed_delivery_becomes_a_distinct_notice_and_survives_restart_once ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.96s
+     Running tests/r07_bridge_notice.rs (rust/target-r07/debug/deps/r07_bridge_notice-ccd7b1e2edb06913)

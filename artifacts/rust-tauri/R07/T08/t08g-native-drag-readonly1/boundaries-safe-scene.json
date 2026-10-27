@@ -1,0 +1,381 @@
+{
+  "scenario": "boundaries",
+  "originalUiResult": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-boundaries-58431-1792325989726543000/home/ui-result.json",
+  "originalUiResultSha256": "33df3909ae3cc78ed6b58d9e3af79235a75bb71560e0520b2d1f1c20dd63707f",
+  "originalTrace": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-boundaries-58431-1792325989726543000/home/electron-failure-trace.json",
+  "originalTraceSha256": "b093593f1267d2f2c1e49f46740bd86e52fcb39cb405215865fe294212da1ac2",
+  "startTimeUnixMs": 1792326012739,
+  "endTimeUnixMs": 1792326026596.878,
+  "durationMs": 13857.877958,
+  "status": "failed",
+  "errorFirstLine": "AssertionError [ERR_ASSERTION]: 18-order-real-io-failure-then-get-recovery",
+  "checks": [
+    "production-settings-entry",
+    "actual-agents-list",
+    "actual-settings-snapshot",
+    "actual-model-catalog",
+    "actual-current-model-binding",
+    "explicit-maintenance-state",
+    "14-write-persisted-before-refresh-error",
+    "14-success-post-failed-get-old-list-and-error",
+    "14-readback-confirms-no-fake-rollback",
+    "17-disabled-clears-old-health-and-zero-get",
+    "17-actual-read-error-unavailable",
+    "17-disabled-clears-error-and-zero-get",
+    "18-native-trusted-pointercancel-zero-order-put",
+    "18-pointercancel-keeps-real-order"
+  ],
+  "requests": [
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/server/identity",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/server/identity",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/settings/config",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/settings/config",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/models",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/settings/snapshot",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/settings/avatar-health",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/settings/avatar-health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/settings/snapshot",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/providers/summary",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agent-deletions",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/health",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agent-deletions",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/server/identity",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/providers/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/identity",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/user-profile",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/agents-md",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/public-agents-md",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/user-profile",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/public-agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/identity",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/providers/summary",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 409
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/health",
+      "status": 400
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/health",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agent-deletions",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/health",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/server/identity",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agent-deletions",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/server/identity",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents",
+      "status": 200
+    }
+  ],
+  "orderRequests": [],
+  "windowDestroyedAtFailure": false,
+  "dragConsoleLines": [],
+  "excluded": [
+    "tokens",
+    "credentials",
+    "config/preferences files",
+    "identity/body form values",
+    "query strings",
+    "raw HTTP request/response bodies"
+  ]
+}

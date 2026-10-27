@@ -1,0 +1,27 @@
+{
+  "stage": "R07-T05",
+  "candidate": "t05c",
+  "name": "ui-hana-fetch",
+  "purpose": "final_acceptance",
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-16T04:55:53.794437+00:00",
+  "sourceFingerprint": "316fb6da889c6e3605aeb778ba52958094d6f08989fae73628b20cd19a7b7676",
+  "log": "t05c-ui-hana-fetch.log",
+  "endedAt": "2026-10-16T04:55:55.434105+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "316fb6da889c6e3605aeb778ba52958094d6f08989fae73628b20cd19a7b7676",
+  "logSha256": "28dd989a8af8c8460aca79b67bb239d30ff9eb07cb3b048f07154801268b2233",
+  "sourceUnchanged": true
+}

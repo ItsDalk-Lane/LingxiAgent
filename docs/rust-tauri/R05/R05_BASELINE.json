@@ -1,0 +1,92 @@
+{
+  "schema": "lingxi.r05-baseline.v1",
+  "recorded_at": "2026-10-02",
+  "repo": {
+    "repository": "ItsDalk-Lane/LingxiAgent",
+    "branch": "codex/rust-tauri-migration",
+    "head_sha": "c549ff654508ab951e2cf39cf9d309fc9c6b8656",
+    "research_baseline_sha": "c549ff654508ab951e2cf39cf9d309fc9c6b8656",
+    "head_equals_research_baseline": true,
+    "commits_ahead_of_baseline": 0,
+    "worktree_at_baseline_check": "clean (git status --porcelain empty, no stash)",
+    "prior_r05_work_found": false,
+    "notes": "docs/rust-tauri/R05/, artifacts/rust-tauri/R05/, rust/crates/xtask/src/stage_maps/R05.json did not exist at baseline check."
+  },
+  "environment": {
+    "platform": "macOS arm64 (aarch64-apple-darwin)",
+    "rust_toolchain": "1.98.1 pinned by rust-toolchain.toml; MUST invoke via ~/.cargo/bin (rustup proxy). Homebrew cargo 1.93.0 earlier in default PATH does NOT honor the pin.",
+    "python3": "default /usr/bin/python3 is 3.9.6 (no tomllib). Gate scripts requiring tomllib must run with /opt/homebrew/bin (Python 3.14.3) preceding /usr/bin in PATH.",
+    "node": ">=24.12 <25 per package.json engines (TS side not modified in R05)",
+    "evidence_path_rules": "evidence under artifacts/rust-tauri/R05/<round>/; /tmp not used for evidence (macOS symlink/sandbox semantics); artifacts/rust-tauri/ is NOT gitignored, so evidence accumulation shows as untracked files in git status (worktreeDirty=true in nested runs) — same behavior as accepted R04 runs."
+  },
+  "prior_stage_results": {
+    "verify_R04_ENTRY-01": {
+      "evidence": "artifacts/rust-tauri/R05/ENTRY-01/verify-R04",
+      "overall": "FAIL",
+      "root_cause": "environment: a16_seed_mechanism P1 probe generation failed — system python3 3.9.6 lacks tomllib (ModuleNotFoundError). Not a code regression; all other 7 commands PASSed.",
+      "disposition": "environment fix (PATH), rerun as ENTRY-02; ENTRY-01 evidence retained per spec"
+    },
+    "verify_R04_ENTRY-02": {
+      "evidence": "artifacts/rust-tauri/R05/ENTRY-02/verify-R04",
+      "overall": "PASS",
+      "tested_sha": "c549ff654508ab951e2cf39cf9d309fc9c6b8656",
+      "command": "PATH=$HOME/.cargo/bin:/opt/homebrew/bin:$PATH cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R04 --evidence artifacts/rust-tauri/R05/ENTRY-02/verify-R04",
+      "notes": "includes nested R03 (with R02 chain) regression and RR1 repair suites; all scenarios PASS or DEFERRED_TO_LATER_STAGE per R04 stage map"
+    }
+  },
+  "authorizations": {
+    "source_config_test_docs_changes": true,
+    "isolated_environment_verification": true,
+    "real_provider_credentials": false,
+    "paid_endpoints": false,
+    "real_outbound_to_production_services": false,
+    "real_user_home_access": false,
+    "real_data_migration": false,
+    "release_or_publish": false,
+    "git_commit_push_pr_tag": false,
+    "git_note": "No explicit commit/push authorization in the R05 tasking session. R05 delivers reviewable working-tree diffs plus gate evidence; if final candidate binding requires commits, the user will be asked explicitly.",
+    "live_tests": "BLOCKED_NOT_AUTHORIZED (carries RR-BLK-CREDENTIALS, resolve by R10 at latest)"
+  },
+  "r05_preregistered_limits": {
+    "note": "Registered BEFORE implementation per spec section 8. Values are pre-set caps; tests must respect them; loosening after seeing results is forbidden, tightening with justification is allowed.",
+    "http_connect_timeout_ms": 10000,
+    "http_first_byte_timeout_ms": 30000,
+    "http_idle_stream_timeout_ms": 60000,
+    "model_call_total_budget_ms": 300000,
+    "total_budget_includes": ["queue_wait", "credential_refresh", "backoff", "network", "streaming"],
+    "transport_retry_max_attempts": 3,
+    "retry_429_5xx_bounded": true,
+    "sse_single_frame_max_bytes": 1048576,
+    "tool_arguments_max_bytes": 1048576,
+    "stream_total_buffer_max_bytes": 16777216,
+    "model_concurrency_default": "reuse quotas.rs DEFAULT_MODEL; nested-worker tests use 1",
+    "wait_queue_capacity": 64,
+    "worker_callbacks_max_per_invocation": "reuse BoundedWorkerModel budget; registered cap 8",
+    "worker_callback_max_output_tokens": "reuse BoundedWorkerModel budget; registered cap 4096",
+    "evidence_case_log_max_bytes": 52428800,
+    "cancel_settle_window_ms": 10000
+  },
+  "scope_sources": {
+    "r00_base_scenarios": 16,
+    "r00_supplemental_leaves_bound_to_r05": 130,
+    "supplemental_breakdown": {"D10": 67, "D11": 6, "D12": 38, "D22": 19},
+    "cross_stage_binding": "124 leaves R05+R07 (R05 declares stage share; R07 consumes remainder), 6 D11 OAuth leaves R05-only",
+    "assertions_to_pin": 386,
+    "ts_provider_plugins": 39,
+    "protocol_families_in_use": ["openai-completions", "anthropic-messages", "google-generative-ai", "openai-responses", "openai-codex-responses", "volcengine-bigasr", "system-speech"],
+    "auxiliary_slots": ["title", "summarize", "memory", "knowledge(dead slot, no production caller)", "vision", "approval", "guard"],
+    "auth_modes_in_use": ["api_key", "auth_header", "oauth(openai-codex builtin; xai self device-code)", "none(ollama, system-speech local)"]
+  },
+  "known_doc_errata_carried": [
+    {
+      "path": "docs/rust-tauri/R04/R04_HANDOFF.json:158",
+      "issue": "adversarial_review_baseline is a 37-hex truncated SHA (unresolvable); correct 40-hex value 773d5a6968b87650cd135cc5684707f81d1acda0 verified in docs/rust-tauri/R04/repair-current/R04_RR1_FIX_ISSUES.json",
+      "disposition": "fix in T08 with historical note preserved; acceptance-conclusion source unchanged"
+    },
+    {
+      "path": "docs/rust-tauri/R02/RISK_REGISTER.json (RR-R05-REDACTION-BOUNDARY)",
+      "issue": "redactor misses standard base64 tokens containing / or =; entry names R05 but lacks resolve stage field",
+      "disposition": "adopted into R05-T02 redaction scope by orchestrator ruling"
+    }
+  ]
+}

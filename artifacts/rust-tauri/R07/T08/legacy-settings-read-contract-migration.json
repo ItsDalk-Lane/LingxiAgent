@@ -1,0 +1,52 @@
+{
+  "recordedAt": "2026-10-18T06:17:41.656820+00:00",
+  "status": "IMPLEMENTED_AWAITING_ROOT_REAL_RUN",
+  "originalFailureLog": "artifacts/rust-tauri/R07/T08/legacy-settings1.log",
+  "originalScenes": "artifacts/rust-tauri/R07/T08/legacy-settings1-scenes/MANIFEST.json",
+  "changes": [
+    {
+      "test": "native_settings_reads_keep_real_failures_and_paid_dream_consumption",
+      "old": "损坏 provider-catalog.json 后三个读取均应 500",
+      "new": "旧目录损坏时真实已发布 Source 的供应商、模型和 memory 绑定仍非空且正确；真实 chat-input-settings 损坏使模型读取500，真实 preferences 损坏使快照和模型偏好读取500，均不得空成功",
+      "why": "R07 Source 已成为权威，旧目录不再是实际读取入口；保留并增强实际损坏检测，不恢复过时磁盘依赖。原拒权、其他损坏、Dream消费断言不变。"
+    },
+    {
+      "test": "native_settings_current_electron_real_io_failures_and_partial_writes",
+      "old": "宽泛选择最后一个 ✕；损坏旧目录等待模型错误",
+      "new": "按实际记忆弹窗标题关闭该弹窗；损坏真实 chat-input-settings，要求新增实际 HTTP500、现有模型列表保留和用户可见错误",
+      "why": "原现场在已销毁窗口读取时失败；不能关闭设置窗口来代替弹窗。现役模型读取已不依赖旧目录。真实不可写、部分写入及失败断言保留。"
+    },
+    {
+      "test": "native_initialization_cache_summary_and_real_fifteen_second_timeout",
+      "old": "延迟摘要时坏旧目录应导致摘要500",
+      "new": "同一真实延迟转发下证明已发布摘要非空成功；另从真实 chat-input-settings 注入模型读取500并要求显式错误和保留旧列表，恢复后再验证缓存与15秒强制就绪",
+      "why": "摘要读取已发布快照，不应重新依赖损坏旧目录；实际读取失败另有明确真实入口。初始化检查从12增至13，新增而非删除覆盖；缓存、真实15秒预算和迟到结果断言不变。"
+    }
+  ],
+  "validation": [
+    {
+      "command": "node --check desktop/src/react/settings/__tests__/r06-settings-electron-main.cjs",
+      "exit": 0,
+      "kind": "syntax_only"
+    },
+    {
+      "command": "Cargo/native Electron integration",
+      "status": "NOT_RUN_BY_SUBAGENT",
+      "reason": "由 root 唯一运行；旧失败仍然保留，不能据静态检查标为通过。"
+    }
+  ],
+  "sourceHashes": {
+    "rust/crates/lingxi-service/tests/r06_agent_settings_live.rs": "40cef564b158469dd1033cb59620bf30609e880d31d224ad22861dbdcadb2fc2",
+    "desktop/src/react/settings/__tests__/r06-settings-electron-main.cjs": "f879a9896b3cf242c52bc137b828b16ca5a2e889fcac2288317f172b84de882a",
+    "desktop/src/react/settings/__tests__/R06AgentSettingsElectronLive.test.ts": "74ae68f08108d4fd3bf08e4e1b505950d00a40cff0372b8c4a594a2b034b296f",
+    "rust/crates/lingxi-service/src/chat_settings.rs": "2ac01f59c6391dcd1d45bc71e2334d6326f7d296160e8371d7300e7aa1ad3c92",
+    "rust/crates/lingxi-service/src/chat_wire.rs": "e62b40a6d1ca126ff50f1ff7228be999f6435eda2a2e46a27008672f81a6c001",
+    "rust/crates/lingxi-service/src/provider_routes.rs": "b757b5b878624d615e44c8a3622a5bab36c4af231abdd4e62d155b23f4c878f4",
+    "rust/crates/lingxi-service/src/settings_ui.rs": "d46e208dad3ea4cba13ce504e179f209b6c72988a5bc42d6cb6116dde33d61af"
+  },
+  "notes": [
+    "所有修改仅限指定三个测试/辅助文件，未改生产读取行为。",
+    "未来子检查失败额外写 electron-failure-trace.json，继续退出1且不会生成成功回执；旧现场缺失的跟踪不补造。",
+    "Windows 只读目录兼容另有 windows-default-model-read-implementation.json，未声称 Windows 实机验证。"
+  ]
+}

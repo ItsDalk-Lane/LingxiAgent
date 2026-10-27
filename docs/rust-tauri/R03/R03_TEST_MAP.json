@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "R03_TEST_MAP",
+  "stage_id": "R03",
+  "generated_by": "R03 orchestrator (startup prep, one-shot)",
+  "generated_at": "2026-09-29",
+  "evidence_root": "artifacts/rust-tauri/R03/<unique-run-id>/",
+  "workspace_manifest": "rust/Cargo.toml (cargo fmt/clippy/test --manifest-path rust/Cargo.toml)",
+  "verification_tiers": {
+    "per_task_T01_T07": [
+      "cargo fmt --manifest-path rust/Cargo.toml --all -- --check",
+      "cargo clippy --manifest-path rust/Cargo.toml --workspace --all-targets --locked -- -D warnings",
+      "cargo test --manifest-path rust/Cargo.toml --workspace --locked (定向：本 Task 新增/受影响测试 + 受影响 R02 回归子集)",
+      "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-contracts",
+      "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-boundaries"
+    ],
+    "stage_gate_T08": [
+      "以上全部 + cargo test --manifest-path rust/Cargo.toml --workspace --locked（全量）",
+      "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R03 --evidence <全新证据目录>",
+      "R02 基础链回归：认证与隔离/单写者与事务/事件快照与续读/损坏库与备份/关闭与恢复/A15 真实重启链/A16 默认入口（经 verify-stage R02 或等效定向命令重跑）"
+    ],
+    "note": "verify-stage R03 在 T08 注册前不得伪造运行成功；T01–T07 只运行已存在定向验证。"
+  },
+  "acceptance_producers": {
+    "R03-A01": { "task": "R03-T01", "producer": "lingxi-kernel 状态机 + lingxi-service 集成测试（真实 service 入口/替身 Provider 三次模型调用）", "evidence": "事件与数据库断言" },
+    "R03-A02": { "task": "R03-T01", "producer": "属性测试（重复/乱序 settled 输入）+ 结果计数", "evidence": "属性测试及结果计数" },
+    "R03-A03": { "task": "R03-T02", "producer": "SessionSupervisor 调度轨迹测试（可控调度并发提交）", "evidence": "调度轨迹" },
+    "R03-A04": { "task": "R03-T02", "producer": "并发测试（会话A工具暂停/会话B纯文本/取消A）+ 配额断言", "evidence": "并发及配额断言" },
+    "R03-A05": { "task": "R03-T03", "producer": "参数化取消测试（队列/审批/流读取三等待态）", "evidence": "参数化取消测试" },
+    "R03-A06": { "task": "R03-T03", "producer": "监督关系测试（父子+无关后台，取消父）", "evidence": "监督关系和活动断言" },
+    "R03-A07": { "task": "R03-T04", "producer": "跨 attempt 迟到结果测试（attempt1 取消后投递）", "evidence": "跨 attempt 断言" },
+    "R03-A08": { "task": "R03-T04", "producer": "requestId 幂等冲突测试（同 ID 改内容）", "evidence": "幂等冲突测试" },
+    "R03-A09": { "task": "R03-T05", "producer": "崩溃恢复测试（外部计数器已增/本地未提交/kill 重启）", "evidence": "外部计数器和恢复库" },
+    "R03-A10": { "task": "R03-T05", "producer": "幂等恢复测试（固定 idempotency key 替身，断开恢复）", "evidence": "幂等替身请求记录" },
+    "R03-A11": { "task": "R03-T06", "producer": "权限继承测试（只读父派子尝试写，真实授权边界拒绝）", "evidence": "权限继承测试" },
+    "R03-A12": { "task": "R03-T06", "producer": "断连恢复测试（断开重连不重复提交可查询）", "evidence": "断连恢复测试" },
+    "R03-A13": { "task": "R03-T07", "producer": "崩溃点测试（持久化后强杀进程重启读取）", "evidence": "崩溃前后轨迹" },
+    "R03-A14": { "task": "R03-T07", "producer": "退出窗口竞态测试（shutdown 开始后并发提交）", "evidence": "退出窗口竞态测试" },
+    "R03-A15": { "task": "R03-T08", "producer": "真实 service 入口集成（替身只给协议输出，状态全由真实 Supervisor/存储产生）", "evidence": "调用观测与集成日志" },
+    "R03-A16": { "task": "R03-T08", "producer": "固定 seed 重放（属性测试异常捕获→修复→同 seed+全组通过）", "evidence": "seed 和测试前后日志" }
+  },
+  "r02_regression_chain": [
+    "认证与隔离（a05_a06_auth_matrix 等）",
+    "单写者与事务",
+    "事件快照与续读（a09_a10_events_matrix）",
+    "损坏库与备份",
+    "关闭与恢复",
+    "A15 真实重启链（a15_full_chain）",
+    "A16 默认入口与相关旧栈回归（npm 定向，按需）"
+  ],
+  "test_hygiene": [
+    "测试过滤器匹配 0 项不算通过",
+    "业务竞态失败不得通过串行化掩盖；顺序执行仅限已证实环境/共享资源干扰且保留首次失败",
+    "本阶段测试启动的进程/文件/监听必须有边界、归属与清理证据",
+    "离线缓存缺失不冒称 --offline 通过"
+  ]
+}

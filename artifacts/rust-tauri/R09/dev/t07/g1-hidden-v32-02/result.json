@@ -1,0 +1,51 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t07_native_e2e",
+ "status": "PASS",
+ "exitCode": 0,
+ "durationSecs": 5.955,
+ "caseCount": 30,
+ "casesSha256": "c9295c8c7366faff5f296ef804f315580b5e1b2e96dedc568cde4b79d319c8e1",
+ "commands": [
+  {
+   "id": "t07-fixtures",
+   "argv": [
+    "python3",
+    "-B",
+    "scripts/rust-tauri/r09_t07_fixture.py",
+    "--home",
+    "/private/tmp/lingxi-r09-runtime/r09_t07_native_e2e-53329-1793030155950/home-t07-fixtures",
+    "--evidence",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t07/g1-hidden-v32-02/fixtures"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.18,
+   "logSha256": "7e38775ed75ff81108bc5488ecd58622595089755e15279f6aaa106e8c57da45"
+  }
+ ],
+ "logSha256": "7e38775ed75ff81108bc5488ecd58622595089755e15279f6aaa106e8c57da45",
+ "finishedAtUnixMs": 1793030161905,
+ "hostFacts": {
+  "os": "27.0.1",
+  "osBuild": "26A434",
+  "arch": "arm64",
+  "kernel": "27.0.0",
+  "hostPlatform": "macos-arm64",
+  "webkit": "22625.1.29.11.28",
+  "display": "Chipset Model: Apple M3 Ultra\n          Resolution: 2560 x 1440 (QHD/WQHD - Wide Quad High Definition)"
+ },
+ "webdriverPort": 19465,
+ "appBinary": "/private/tmp/lingxi-r09-t07/evidence-app-v32-20261026-235549/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+ "candidateSha256": "992f0a7b78bfc6b53a1b3931a591dd11a5631448a504bcc32b85e48df07b02ab",
+ "platform": "macos-arm64",
+ "blockedPlatforms": [
+  "macos-x64",
+  "windows-x64",
+  "linux-x64"
+ ],
+ "pending": [
+  "scroll-long-list: 长会话/虚拟列表渲染依赖 server/React 非宿主面（native-caps §9），当前 rust-mode app-init 不加载会话；本轮只记录可滚动性指标，不冒充通过",
+  "tool-card-expand: 同上（long-session fixture 候选 schema 未验证）"
+ ],
+ "note": "G1-hidden：真实 wdio WebDriver 驱动产品主窗；合成 IME ≠ 系统输入法；visible 交互批次另行 cleared"
+}

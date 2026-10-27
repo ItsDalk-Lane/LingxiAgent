@@ -311,6 +311,9 @@ export interface SettingsUpdatePayload {
   title: string;
   summary: string;
   target?: {
+    sessionId?: string;
+    sessionTitle?: string;
+    agentId?: string;
     type?: string;
     id?: string | null;
     label?: string | null;
@@ -321,6 +324,10 @@ export interface SettingsUpdatePayload {
 export interface SuggestionCardBlock {
   type: 'suggestion_card';
   kind: 'automation_draft' | string;
+  frozenApply?: Record<string, unknown>;
+  result?: Record<string, unknown>;
+  resultSessionId?: string;
+  decisionPersisted?: boolean;
   confirmId?: string;
   suggestionId?: string;
   suggestionShortCode?: string;
@@ -329,6 +336,9 @@ export interface SuggestionCardBlock {
   title: string;
   description?: string;
   target?: {
+    sessionId?: string;
+    sessionTitle?: string;
+    agentId?: string;
     type?: string;
     id?: string | null;
     label?: string | null;
@@ -361,7 +371,7 @@ export type TextDecorator = ContentBlockSemantics & (
 // 物种 B：富内容块（通过 content_block 事件 push，不 upsert）
 export type RichBlock = ContentBlockSemantics & (
   | { type: 'file'; fileId?: string; filePath: string; label: string; ext: string; mime?: string; kind?: string; storageKind?: string; presentation?: 'attachment' | 'voice-input' | string; listed?: boolean; status?: 'available' | 'expired' | string; missingAt?: number | null; resource?: ResourceEnvelope; mtimeMs?: number; size?: number | null; version?: FileVersion | null; waveform?: AudioWaveform; replacesTaskId?: string }
-  | { type: 'media_generation'; taskId: string; kind: 'image' | 'video' | string; status: 'pending' | 'failed' | 'aborted' | string; prompt?: string; batchId?: string; reason?: string }
+  | { type: 'media_generation'; taskId: string; kind: 'image' | 'video' | string; status: 'pending' | 'failed' | 'aborted' | string; prompt?: string; batchId?: string; reason?: string; nativeMedia?: boolean; nativePhase?: string; remoteOutcome?: string; remoteCancel?: string; localDeliveryStopped?: boolean }
   // COMPAT(create_artifact, remove no earlier than v0.133 after legacy sessions are migrated)
   | { type: 'artifact'; artifactId: string; artifactType: string; title: string; content: string; deferred?: DeferredHistoryContent; language?: string | null; fileId?: string; filePath?: string; label?: string; ext?: string; mime?: string; kind?: string; storageKind?: string; presentation?: 'attachment' | 'voice-input' | string; listed?: boolean; status?: 'available' | 'expired' | string; missingAt?: number | null; resource?: ResourceEnvelope; mtimeMs?: number; size?: number | null; version?: FileVersion | null }
   | { type: 'screenshot'; base64?: string; mimeType: string; deferred?: DeferredHistoryContent }
@@ -554,6 +564,10 @@ export interface SessionModel {
 // 不要为了存别的东西（例如模型快照）就写 stub 进来——会把这个语义打破。
 
 export interface SessionMessages {
+  /** 与当前连接的会话历史同寿命；revision用十进制字符串精确比较。 */
+  nativeMediaJobs?: Record<string, import('../../../../contracts/generated/ts/lingxi-protocol').MediaJobReceipt>;
+  /** Rust 原始历史与显示缓存同寿命；保全未知记录并支持跨页重投影。 */
+  nativeRawItems?: unknown[];
   items: ChatListItem[];
   hasMore: boolean;
   loadingMore: boolean;

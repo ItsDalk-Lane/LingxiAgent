@@ -1,0 +1,69 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "zhipu",
+  "case": "opencode-go-never-emits-clear-thinking",
+  "model": {
+    "provider": "opencode-go",
+    "id": "glm-4.7",
+    "baseUrl": "https://opencode.ai/zen/go/v1",
+    "api": "openai-completions",
+    "reasoning": true,
+    "compat": {
+      "thinkingFormat": "zhipu"
+    }
+  },
+  "payload": {
+    "model": "glm-4.7",
+    "messages": [
+      {
+        "role": "assistant",
+        "content": "a",
+        "tool_calls": [
+          {
+            "id": "c1",
+            "type": "function",
+            "function": {
+              "name": "f",
+              "arguments": "{}"
+            }
+          }
+        ]
+      }
+    ],
+    "thinking": {
+      "type": "enabled",
+      "clear_thinking": true
+    }
+  },
+  "options": {
+    "mode": "chat",
+    "reasoningReplay": "clear"
+  },
+  "expected": {
+    "thinkingFormat": "zhipu",
+    "reasoningProfile": null,
+    "matched": "zhipu",
+    "result": {
+      "model": "glm-4.7",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "a",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "f",
+                "arguments": "{}"
+              }
+            }
+          ]
+        }
+      ],
+      "thinking": {
+        "type": "enabled"
+      }
+    }
+  }
+}

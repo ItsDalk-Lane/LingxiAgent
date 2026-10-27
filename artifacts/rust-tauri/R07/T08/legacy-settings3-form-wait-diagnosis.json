@@ -1,0 +1,51 @@
+{
+  "status": "HELPER_MODAL_PREDICATE_UPDATED_NOT_EXECUTED",
+  "originalFailures": [
+    {
+      "home": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-failures-27618-1792304565487508000/home",
+      "traceSha256": "9161c4150d45d79336124ed3cf3b8bffb3b5e4609f08757119a63c51fb029213",
+      "firstError": "Error: actual selected agent form has rendered returned configuration"
+    },
+    {
+      "home": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-workflow-27618-1792304565487494000/home",
+      "traceSha256": "c19750e51b9b0428ac49aec901903802eb7e06d7fabdc22928c8601ccc79577d",
+      "firstError": "Error: actual selected agent form has rendered returned configuration"
+    },
+    {
+      "home": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-references-pending-27618-1792304565487516000/home",
+      "traceSha256": "e89961e262e7d706b62c623b58ec17a651017d57a421d0f2497c7623a1bd99e5",
+      "firstError": "Error: actual selected agent form has rendered returned configuration"
+    }
+  ],
+  "facts": [
+    "legacy-settings3三个用例均在新加表单等待处失败，原现场只有body文字，未保留实际姓名/textarea值，不能据此断言产品渲染错误。",
+    "现役AgentTab使用placeholder=agentNameHint的姓名input、rows=3身份textarea、rows=10行为textarea；组件值采用agent.name||空串、_identity||空串、_agents||空串。",
+    "workflow在改元后等待store ready立即输入persona，仍可能早于相应useLayoutEffect更新实际表单；只有初次selectAgent同步不足以约束后续重新加载。"
+  ],
+  "changes": [
+    "保留原15秒等待预算，使用真实placeholder和rows定位，按组件相同默认语义同时绑定selected/dataAgentId/configStatus和3个实际控件值。",
+    "每次persona输入前重新确认实际表单已和当前助手配置同步；只向明确身份/行为textarea发原生DOM input事件，并确认两项DOM值保留；不直接调用React内部回调/产品保存函数。",
+    "等待失败及统一失败trace新增全部[data-tab=agent]内姓名和textarea当前值与配置预期，限2048字；只输出合成夹具这三个字段，不输出完整config、headers、token或含token的settingsConfigKey(仅记录hasConfigKey)。",
+    "原workflow 00-18动作、全部部分成功/失败、真实HTTP和磁盘断言未放宽；未改产品AgentTab或新造成功回执。"
+  ],
+  "validation": {
+    "nodeSyntaxCheck": "node --check 自有helper，退出0",
+    "diffCheck": "自有helper退出0",
+    "realElectron": "未运行，root统一复跑目标。"
+  },
+  "source": {
+    "path": "desktop/src/react/settings/__tests__/r06-settings-electron-main.cjs",
+    "sha256": "8ccd4ff8d280cbfbc11e75be246207e54ce3605b67738af05cf21214903a030b"
+  },
+  "nativeSettings4Followup": {
+    "log": "artifacts/rust-tauri/R07/T08/native-settings4.log",
+    "logSha256": "fe0a470728be3f815d15b3f2ae10ba8c6a197f4c05494b94c5f3a5a26055e93b",
+    "trace": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-failures-33894-1792305230492782000/home/electron-failure-trace.json",
+    "traceSha256": "3ed7e55dcc0b7c5dbe2ee769473c9ec3b86b3e2c7ce852d645f17a37482390fc",
+    "result": "原检查真实13/14通过，唯一failures用例等待memory modal actually closed超时；persona一成功一失败及磁盘部分事实均已通过，原失败不删除。",
+    "cause": "原关闭等待只找任意同名h3，底页当下记忆也匹配；真实弹窗已经消失。修为与已有workflow closeViewer相同的标题+其父节点具有实际✕按钮判定，不能将底页同名标题当弹窗。",
+    "change": "仅替换该until的识别条件，保留15秒预算、真实IO、全部原动作/断言、产品不改。",
+    "priorFormEvidence": "新安全诊断实际显示第一个[data-tab=agent]没有姓名或textarea，其后真实表单才有3/10行控件；此前改为选择含真实姓名控件的tab有现场支持。",
+    "validation": "node --check及diff-check退出0；新真实Electron未执行，root唯一目标复验。"
+  }
+}

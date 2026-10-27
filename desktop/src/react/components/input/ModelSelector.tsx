@@ -1,13 +1,36 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useStore } from '../../stores';
 import { sessionScopedValue } from '../../stores/session-slice';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { chatFetch as lingxiFetch } from '../../services/service-client';
 import { useI18n } from '../../hooks/use-i18n';
 import type { Model } from '../../types';
 import type { SessionModel } from '../../stores/chat-types';
 import { SelectWidget, ProviderIcon, ProviderGroupHeader, selectWidgetStyles, type SelectOption } from '@/ui';
 import { settleModelSwitchResidue } from '../../services/model-switch-settlement';
+import { resolveServerConnection } from '../../services/service-client';
+import { captureSessionConnection, ownsSessionConnection, sessionSelectionRevision, subscribeSessionConnection } from '../../services/session-connection-owner';
 import styles from './InputArea.module.css';
+
+// 切换会话或连接后立即归还本次忙碌状态，迟到的旧请求不能清掉新请求的状态。
+const activeRustChoices = new Set<symbol>();
+function beginRustChoice(onSettled: () => void, targetPath?: string | null) {
+  if (resolveServerConnection(useStore.getState())?.serverNodeKind !== 'lingxi-service') return null;
+  const owner = captureSessionConnection();
+  if (owner?.connection.serverNodeKind !== 'lingxi-service') return null;
+  const token = Symbol('model-choice');
+  const revision = sessionSelectionRevision();
+  const side = !!targetPath && useStore.getState().sideChat.sessionPath === targetPath;
+  const scope = () => { const s = useStore.getState(); return JSON.stringify(side ? [s.sideChat.open, s.sideChat.createdAt, s.sideChat.sessionPath] : [s.currentSessionId, s.currentSessionPath, s.pendingNewSession]); };
+  const initial = scope();
+  activeRustChoices.add(token);
+  const valid = () => activeRustChoices.has(token) && ownsSessionConnection(owner) && (side || revision === sessionSelectionRevision()) && scope() === initial;
+  const release = () => { if (activeRustChoices.delete(token)) { useStore.getState().setModelSwitching(activeRustChoices.size > 0); onSettled(); } };
+  const changed = () => { if (!valid()) release(); };
+  const stopConnection = subscribeSessionConnection(changed);
+  const stopStore = useStore.subscribe(changed);
+  useStore.getState().setModelSwitching(true);
+  return { valid, finish: () => { stopConnection(); stopStore(); release(); } };
+}
 
 export function ModelSelector({ models, sessionModel, isStreaming = false, sessionPath, onSessionModelChange }: {
   models: Model[];
@@ -52,6 +75,7 @@ export function ModelSelector({ models, sessionModel, isStreaming = false, sessi
   })();
 
   const switchModel = useCallback(async (modelId: string, provider?: string) => {
+    let choice: ReturnType<typeof beginRustChoice> = null;
     try {
       const state = useStore.getState();
       const { pendingNewSession, chatSessions, sessionModelsByPath } = state;
@@ -60,7 +84,13 @@ export function ModelSelector({ models, sessionModel, isStreaming = false, sessi
       const targetSessionPath = sessionPath ?? state.currentSessionPath;
       const sessionHasMessages = !!(targetSessionPath && sessionScopedValue(state, chatSessions, targetSessionPath)?.items?.length);
 
-      if (sessionHasMessages && targetSessionPath) {
+      const useExistingSession = sessionHasMessages && !!targetSessionPath && (!!sessionPath || !pendingNewSession);
+      const selected = useExistingSession ? (sessionPath ? sessionModel : sessionScopedValue(state, sessionModelsByPath, targetSessionPath!)) : undefined;
+      const effective = selected?.id && selected.provider ? selected : models.find(m => m.isCurrent);
+      if (effective?.id === modelId && effective.provider === provider && selected?.available !== false) return;
+      choice = beginRustChoice(() => setLoading(false), sessionPath);
+      if (choice) setLoading(true);
+      if (useExistingSession && targetSessionPath) {
         // Same-model guard：严格复合键比较。sm 缺 provider 时视为不可比，走 global 当前。
         const sm = sessionPath
           ? sessionModel
@@ -81,7 +111,8 @@ export function ModelSelector({ models, sessionModel, isStreaming = false, sessi
           body: JSON.stringify({ sessionPath: targetSessionPath, modelId, provider }),
           throwOnHttpError: false,
         });
-        const data = await res.json().catch(() => ({}));
+        const data = await res.json();
+        if (choice && !choice.valid()) return;
         if (!res.ok) throw new Error(data.error || 'switch failed');
 
         // 切换成功的瞬间必处于两轮空档：把「进行中」账本归零，防止上一轮收口
@@ -110,8 +141,7 @@ export function ModelSelector({ models, sessionModel, isStreaming = false, sessi
           useStore.getState().addToast(text, 'info');
         }
 
-        setLoading(false);
-        useStore.getState().setModelSwitching(false);
+        if (!choice) { setLoading(false); useStore.getState().setModelSwitching(false); }
       } else {
         // New session path: persist the model selection and mirror its thinking default into the draft.
         const setRes = await lingxiFetch('/api/models/set', {
@@ -119,7 +149,9 @@ export function ModelSelector({ models, sessionModel, isStreaming = false, sessi
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ modelId, provider }),
         });
-        const setData = await setRes.json().catch(() => ({}));
+        const setData = await setRes.json();
+        if (choice && !choice.valid()) return;
+        if (!setRes.ok || setData?.ok === false) throw new Error(setData.error || 'failed to save default model');
         if (setData.thinkingLevel) {
           useStore.getState().setThinkingLevel(setData.thinkingLevel);
           useStore.getState().setPendingNewSessionThinkingLevel(setData.thinkingLevel);
@@ -128,13 +160,18 @@ export function ModelSelector({ models, sessionModel, isStreaming = false, sessi
         // 这里保持不动（sessionPath 显式传入时不再触发全局 createNewSession）。
         if (!sessionPath && state.currentSessionPath && !pendingNewSession) {
           const { createNewSession } = await import('../../stores/session-actions');
+          if (choice && !choice.valid()) return;
           await createNewSession();
+          if (choice && !choice.valid()) return;
         }
         const res = await lingxiFetch('/api/models');
         const data = await res.json();
+        if (choice && !choice.valid()) return;
+        if (!res.ok) throw new Error(data?.error || 'failed to load models');
         useStore.setState({ models: data.models || [] });
       }
     } catch (err) {
+      if (choice && !choice.valid()) return;
       const message = err instanceof Error ? err.message : String(err);
       if (message.includes('cannot switch model while streaming')) {
         useStore.getState().addToast(t('model.switchWhileStreaming'), 'warning', 4000, {
@@ -144,9 +181,8 @@ export function ModelSelector({ models, sessionModel, isStreaming = false, sessi
         console.error('[model] switch failed:', err);
         useStore.getState().addToast(message || t('model.switchFailed'), 'error');
       }
-      setLoading(false);
-      useStore.getState().setModelSwitching(false);
-    }
+      if (!choice) { setLoading(false); useStore.getState().setModelSwitching(false); }
+    } finally { choice?.finish(); }
   }, [models, onSessionModelChange, sessionModel, sessionPath, t]);
 
   // 按 provider 分组

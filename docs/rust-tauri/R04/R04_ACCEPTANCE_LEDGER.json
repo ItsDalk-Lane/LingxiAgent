@@ -1,0 +1,246 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "R04_ACCEPTANCE_LEDGER",
+  "stage_id": "R04",
+  "generated_by": "EXECUTOR-R04-T08-E01",
+  "generated_at": "2026-09-30",
+  "baseline": "ded3467bf (R04-T07 independently PASSed and pushed)",
+  "note": "16 base A-IDs + the stage's supplemental duties → evidence pointers. A01-A14 were produced by T01-T07 and are re-pinned here through the R04 stage gate (rust_test_workspace runs every T0x suite; r04_tool_matrix re-verifies the cross-family cells on the final candidate). A15/A16 are produced by T08. This ledger binds pointers, not verdicts: the stage verdict belongs to the independent stage review.",
+  "acceptances": [
+    {
+      "id": "R04-A01",
+      "task": "R04-T01",
+      "name": "目录与执行同源",
+      "requirement": "REQUIRED",
+      "producers": [
+        "lingxi-kernel::toolcatalog unit battery (identity/no-overwrite/alias/schema-budget/normalization/generation)",
+        "lingxi-service --test r04_t01_tool_catalog (6)",
+        "r04_tool_matrix: matrix-tool-family-count + registry identity cells"
+      ],
+      "evidence": "artifacts/rust-tauri/R04/T08-E01/verify-R04/verify-stage-result.json (scenarios[R04-A01]); artifacts/rust-tauri/R04/T01-E01/"
+    },
+    {
+      "id": "R04-A02",
+      "task": "R04-T01",
+      "name": "陈旧目录拒绝错误目标",
+      "requirement": "REQUIRED",
+      "producers": [
+        "lingxi-kernel::toolcatalog::tests::stale_catalog_generation_refuses_and_requires_refresh",
+        "lingxi-service --test r04_t01_tool_catalog r04_a02_stale_catalog_generation_is_refused_until_refresh",
+        "r04_tool_matrix: matrix-lifecycle-generation-refusals (pinned=0 holes)"
+      ],
+      "evidence": "artifacts/rust-tauri/R04/T08-E01/verify-R04/verify-stage-result.json (scenarios[R04-A02])"
+    },
+    {
+      "id": "R04-A03",
+      "task": "R04-T02",
+      "name": "各入口权限不变",
+      "requirement": "REQUIRED",
+      "producers": [
+        "lingxi-service --test r04_t02_tool_gateway (13, incl. the R1-F01 repair legs)",
+        "r04_tool_matrix: matrix-permission-consistency + matrix-route-consistency (7 families × operate/ask/read_only × subagent contexts; direct vs full-run-chain)"
+      ],
+      "evidence": "artifacts/rust-tauri/R04/T08-E01/verify-R04/verify-stage-result.json (scenarios[R04-A03])"
+    },
+    {
+      "id": "R04-A04",
+      "task": "R04-T02",
+      "name": "伪造执行凭证失败",
+      "requirement": "REQUIRED",
+      "producers": [
+        "lingxi-service --test r04_t02_tool_gateway r04_a04_* + adversarial_* (forged/stale/single-use/concurrent-spend)",
+        "lingxi-service --lib toolgateway::tests (expired/foreign handles, unique single-use, bounded memory)"
+      ],
+      "evidence": "artifacts/rust-tauri/R04/T08-E01/verify-R04/verify-stage-result.json (scenarios[R04-A04])"
+    },
+    {
+      "id": "R04-A05",
+      "task": "R04-T03",
+      "name": "批准后改参不能执行",
+      "requirement": "REQUIRED",
+      "producers": [
+        "lingxi-service --test r04_t03_approval_service r04_a05_approved_digest_a_cannot_execute_payload_b (waiting + preauthorization forms)",
+        "lingxi-service --lib approval_service::tests::preauthorization_key_discrimination_and_use_budget"
+      ],
+      "evidence": "artifacts/rust-tauri/R04/T08-E01/verify-R04/verify-stage-result.json (scenarios[R04-A05])"
+    },
+    {
+      "id": "R04-A06",
+      "task": "R04-T03",
+      "name": "等待审批期间禁用工具",
+      "requirement": "REQUIRED",
+      "producers": [
+        "lingxi-service --test r04_t03_approval_service r04_a06_wait_disabled_then_approved_still_refuses (disable + uninstall legs, zero executions)",
+        "r04_tool_matrix: matrix-lifecycle-disable-holes + uninstall/generation legs (A16 cross-pin)"
+      ],
+      "evidence": "artifacts/rust-tauri/R04/T08-E01/verify-R04/verify-stage-result.json (scenarios[R04-A06])"
+    },
+    {
+      "id": "R04-A07",
+      "task": "R04-T04",
+      "name": "并发编辑不覆盖用户修改",
+      "requirement": "REQUIRED",
+      "producers": [
+        "lingxi-service --test r04_t04_file_tools r04_a07_concurrent_edit_never_overwrites_the_user_version (full real chain)",
+        "r04_tool_matrix: tool-edit-conflict-preserves-user-version (direct-route re-pin on the final candidate)"
+      ],
+      "evidence": "artifacts/rust-tauri/R04/T08-E01/verify-R04/verify-stage-result.json (scenarios[R04-A07])"
+    },
+    {
+      "id": "R04-A08",
+      "task": "R04-T04",
+      "name": "符号链接不能逃逸授权目录",
+      "requirement": "REQUIRED",
+      "producers": [
+        "lingxi-service --test r04_t04_file_tools r04_a08_symlinks_are_judged_by_their_real_targets + r04_a08_resource_refusal_on_the_full_chain_is_never_dispatched",
+        "lingxi-service --lib resourceaccess (7 unit tests)"
+      ],
+      "evidence": "artifacts/rust-tauri/R04/T08-E01/verify-R04/verify-stage-result.json (scenarios[R04-A08])"
+    },
+    {
+      "id": "R04-A09",
+      "task": "R04-T05",
+      "name": "真实孙进程被清理且哨兵存活",
+      "requirement": "REQUIRED",
+      "producers": [
+        "lingxi-service --test r04_t05_process_tools r04_a09_managed_tree_is_killed_and_the_unrelated_sentinel_survives (real user cancel_run + ESRCH-level reaping)",
+        "r04_tool_matrix: tool-exec-cancel-cleanup (light re-pin on the final candidate)"
+      ],
+      "evidence": "artifacts/rust-tauri/R04/T08-E01/verify-R04/verify-stage-result.json (scenarios[R04-A09])"
+    },
+    {
+      "id": "R04-A10",
+      "task": "R04-T05",
+      "name": "PTY交互不退化",
+      "requirement": "REQUIRED",
+      "producers": [
+        "lingxi-service --test r04_t05_process_tools r04_a10_pty_input_reads_resize_interrupt_and_exit",
+        "r04_tool_matrix: terminal-tail-cursor-continuation + terminal-snapshot-current-transcript + terminal-close-stops-terminal (write_stdin cursor/close semantics on the final candidate)"
+      ],
+      "evidence": "artifacts/rust-tauri/R04/T08-E01/verify-R04/verify-stage-result.json (scenarios[R04-A10])"
+    },
+    {
+      "id": "R04-A11",
+      "task": "R04-T06",
+      "name": "缺沙盒不裸跑",
+      "requirement": "REQUIRED",
+      "producers": [
+        "lingxi-service --test r04_t06_sandbox r04_a11_* (missing/replaced helper, unsupported backend — loud refusals through the real chain)",
+        "lingxi-service --lib sandbox (seatbelt dual-leg mandatory probes)"
+      ],
+      "evidence": "artifacts/rust-tauri/R04/T08-E01/verify-R04/verify-stage-result.json (scenarios[R04-A11])"
+    },
+    {
+      "id": "R04-A12",
+      "task": "R04-T06",
+      "name": "隔离保证实际成立",
+      "requirement": "REQUIRED",
+      "producers": [
+        "lingxi-service --test r04_t06_sandbox r04_a12_* (real sentinels: fs write isolation, loopback network, env whitelist, sandboxed tree cancellation) — macos-arm64 real-machine per PLATFORM_CAPABILITIES v2; linux source-level; windows backend refuses"
+      ],
+      "evidence": "artifacts/rust-tauri/R04/T08-E01/verify-R04/verify-stage-result.json (scenarios[R04-A12]); docs/rust-tauri/R04/R04_PLATFORM_CAPABILITIES.json"
+    },
+    {
+      "id": "R04-A13",
+      "task": "R04-T07",
+      "name": "MCP重连不重复执行副作用",
+      "requirement": "REQUIRED",
+      "producers": [
+        "lingxi-service --test r04_t07_mcp_and_workers r04_a13_mcp_reconnect_never_replays_the_side_effect + r04_a13_full_chain_journals_unknown_and_a_new_decision_sees_the_real_count"
+      ],
+      "evidence": "artifacts/rust-tauri/R04/T08-E01/verify-R04/verify-stage-result.json (scenarios[R04-A13])"
+    },
+    {
+      "id": "R04-A14",
+      "task": "R04-T07",
+      "name": "worker无法绕过权限",
+      "requirement": "REQUIRED",
+      "producers": [
+        "lingxi-service --test r04_t07_mcp_and_workers r04_a14_worker_cannot_bypass_grants_or_model_credentials"
+      ],
+      "evidence": "artifacts/rust-tauri/R04/T08-E01/verify-R04/verify-stage-result.json (scenarios[R04-A14])"
+    },
+    {
+      "id": "R04-A15",
+      "task": "R04-T08",
+      "name": "空产物不算成功",
+      "requirement": "REQUIRED",
+      "producers": [
+        "lingxi-service --test r04_t08_tool_matrix a15_empty_and_invalid_products_never_register (worker claims: out-of-grant / missing (fixture deletes its own deliverable) / directory-replacement / JSON-contract violation → explicit FAILED, nothing registered, sentinel untouched)",
+        "lingxi-service --test r04_t08_tool_matrix a15_gateway_registration_audit_converts_fake_refs (gateway delivery-registration audit: bogus/directory file:// refs on a SUCCESS convert to gateway_artifact_verification_failed with dispatched-facts-accurate message; real refs pass)",
+        "lingxi-service --lib artifactverify (4 unit tests: directory claims, scope/missing, bounded content contracts, audit shape)",
+        "r04_tool_matrix cases: a15-real-delivery-registered, a15-out-of-grant-claim-refused, a15-missing-claim-refused, a15-directory-claim-refused, a15-structure-violation-refused, a15-gateway-audit-*"
+      ],
+      "evidence": "artifacts/rust-tauri/R04/T08-E01/verify-R04/verify-stage-result.json (scenarios[R04-A15]); artifacts/rust-tauri/R04/T08-E01/verify-R04/R04_MATRIX/leaf-cases.json"
+    },
+    {
+      "id": "R04-A16",
+      "task": "R04-T08",
+      "name": "禁用状态覆盖所有路线",
+      "requirement": "REQUIRED",
+      "producers": [
+        "lingxi-service --test r04_t08_tool_matrix a16_disabled_state_covers_every_route (cached description+handle, then disable → 6 routes: fresh prepare / cached handle / alias ByName / cached alias handle / full run chain / pinned old generation — all refused, zero dispatched; historical Succeeded receipt preserved; uninstall and generation-bump legs)",
+        "r04_tool_matrix cases: matrix-lifecycle-disable-holes=0, matrix-lifecycle-uninstall-holes=0, matrix-lifecycle-generation-refusals=0, a16-history-preserved=1, a16-alias-route-covered=1"
+      ],
+      "evidence": "artifacts/rust-tauri/R04/T08-E01/verify-R04/verify-stage-result.json (scenarios[R04-A16]); artifacts/rust-tauri/R04/T08-E01/verify-R04/R04_MATRIX/leaf-cases.json"
+    }
+  ],
+  "supplemental_duty_results": [
+    {
+      "id": "R04-SUP-01",
+      "origin": "R03_HANDOFF r04_obligation_t06_o1 (ask-tier subagent approval gap)",
+      "result": "CLOSED at R04-T03 (ApprovalService production policy face; TOOL_APPROVAL_UNAVAILABLE structured refusal, never an operate collapse); re-pinned on the final candidate by r04_tool_matrix case sup01-ask-subagent-write-refused (code+deny_on_prompt+allowHumanApproval+'the action was not run') and the T03 suite.",
+      "evidence": "artifacts/rust-tauri/R04/T08-E01/verify-R04/verify-stage-result.json (scenarios[R04-SUP01])"
+    },
+    {
+      "id": "R04-SUP-02",
+      "origin": "R03_HANDOFF ToolExecutorPort journal_contract + authorization_boundary",
+      "result": "HELD for the whole stage: the gateway owns no grant logic and no storage port; every refusal becomes a driver-written never-dispatched receipt; the single authorization point (RunGrant application at the journal authorized step) is untouched (T02 SUP-02 evidence; the T08 matrix runs entirely through this wiring).",
+      "evidence": "rust/crates/lingxi-service/src/toolgateway.rs ownership docs; R04-T02_TEST_MAP entry; verify-R04 rust_test_workspace"
+    },
+    {
+      "id": "R04-SUP-03",
+      "origin": "R02/R01 RISK_REGISTER RR-T02-F1..F4",
+      "result": "F1 CLOSED at T01 (UTF-16 key order + cross-language parity); F2 CLOSED at the tool-arguments digest boundary (safe-integer hard-fail parity + PROTOCOL_SPEC §9 ruling); F3/F4 not consumed by R04 (event surfaces, R04/R08 consumption points) — carried unchanged; canonical serialization unchanged this task (check-contracts zero drift).",
+      "evidence": "R04-T01_TEST_MAP supplemental; artifacts/rust-tauri/R04/T08-E01/verify-R04/check_contracts/stdout.log"
+    },
+    {
+      "id": "R04-SUP-04",
+      "origin": "R03 stage map laterShare pointing at R04's catalog face",
+      "result": "Mechanism delivered and pinned: unmigrated tool shapes register honestly (Availability::Future: discoverable, never callable, never 'available'); the R04 stage map pins 11 per-name future-tool cases + the delegation-family anti-recursion semantics remain in the T02 suite.",
+      "evidence": "artifacts/rust-tauri/R04/T08-E01/verify-R04/R04_MATRIX/leaf-cases.json (future-tool-shape-*)"
+    },
+    {
+      "id": "R04-SUP-05",
+      "origin": "R03 repair-round frozen semantics (F01-F08 + RR2-F05)",
+      "result": "HELD: the FULL R03 stage gate (13 commands incl. the ten pinned repair suites, A15 matrix, A16 seed mechanism and the seven directed R02 chains) re-runs inside the R04 gate on the final candidate via the r03_regression_gate command.",
+      "evidence": "artifacts/rust-tauri/R04/T08-E01/verify-R04/R03_REGRESSION/verify-stage-result.json"
+    }
+  ],
+  "review_carryovers_closed_here": [
+    {
+      "id": "T07-R1-F1",
+      "origin": "R04-T07 review R1 (unique_dir microsecond collision, ~25% loud flake)",
+      "result": "FIXED in R04-T08: per-process AtomicUsize counter suffix (the T04-T06 helper convention). Reproduced before the fix (3/8 full-suite failures, panic 'table invocation_journal already exists' at the recorded line); 15/15 green after.",
+      "evidence": "artifacts/rust-tauri/R04/T08-E01/t07f1_reproduce_before_fix.log; t07f1_panic_signature.txt; t07f1_after_fix_15runs.txt"
+    },
+    {
+      "id": "T07-R1-O4",
+      "origin": "R04-T07 review R1 (worker tool read_only cell uncovered in the T03-face test)",
+      "result": "CLOSED: the read_only leg is asserted in mcp_and_worker_tools_follow_the_t03_permission_face (ACTION_BLOCKED_BY_READ_ONLY).",
+      "evidence": "rust/crates/lingxi-service/tests/r04_t07_mcp_and_workers.rs (T03-face test)"
+    },
+    {
+      "id": "T04-R1-OBS-1",
+      "origin": "R04-T04 review R1 (edit duplicate counting space diverged from the incumbent)",
+      "result": "FIXED in R04-T08 (fix chosen over adjudication): count_occurrences now counts in the fuzzy-normalized space exactly like the incumbent edit-diff.js countOccurrences (both sides normalized regardless of the matching layer). The it's/it’s mixed file refuses 'Found 2 occurrences'; regression test edit_duplicate_counting_runs_in_the_fuzzy_space_like_the_incumbent pins the case + two legal contrasts. The NFKC fold itself remains the registered T04 §8.6 gap (not ported, unchanged).",
+      "evidence": "rust/crates/lingxi-service/src/filetools.rs count_occurrences; tests/r04_t04_file_tools.rs regression; T04 suite 10/10"
+    },
+    {
+      "id": "T05-R1-OBS-2",
+      "origin": "R04-T05 review R1 (RegistryFull refusal path leaves an already-spawned child unsupervised)",
+      "result": "REGISTERED, not fixed in T08 (frozen-surface discipline: T05 source is out of T08's repair scope; the observation is non-blocking per the T05 review verdict). Tracked for the R05+/stage-review disposition list in R04_HANDOFF.deferred_registrations.",
+      "evidence": "docs/rust-tauri/R04/reviews/R04-T05_REVIEW_R1.md §8 OBS-2; R04_HANDOFF.json deferred_registrations[t05-obs2-registryfull-tail]"
+    }
+  ]
+}

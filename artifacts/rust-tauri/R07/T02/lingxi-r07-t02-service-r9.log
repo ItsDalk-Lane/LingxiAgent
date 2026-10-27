@@ -1,0 +1,73 @@
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 45.05s
+     Running tests/r07_bridge_diagnostic.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_diagnostic-ca9cb0e76954a72b)
+
+running 2 tests
+test concurrent_diagnostics_cannot_register_a_process_after_shutdown_returns ... ok
+test normal_qrcode_long_poll_can_exceed_twenty_seconds_and_is_reaped ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 21.04s
+
+     Running tests/r07_bridge_flow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_flow-94971086ecc22585)
+
+running 8 tests
+test stopping_immediately_after_start_does_not_lose_shutdown ... ok
+test sent_without_receipt_becomes_unknown_on_restart_and_is_not_sent_again ... ok
+test manual_file_delivery_uses_actual_managed_bytes_and_retry_keeps_one_send ... ok
+test actual_owner_can_take_over_only_selected_desktop_session_and_exit_restores_bridge ... ok
+test clearing_owner_changes_new_messages_to_guest_without_replaying_old_owner_task ... ok
+test delivered_owner_notice_is_context_only_after_real_receipt_and_survives_restart ... ok
+test unknown_owner_notice_never_claims_delivery_or_enters_context ... ok
+test all_five_platforms_use_real_runs_and_stable_reply_receipts ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.98s
+
+     Running tests/r07_bridge_guest_context.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_guest_context-3657c8860753b4bb)
+
+running 2 tests
+test damaged_public_material_is_a_visible_error_and_cannot_fall_back_to_private_files ... ok
+test guest_reads_only_public_persona_and_never_private_preferences_or_memory ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/r07_bridge_notice.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_notice-be866d8508168bfe)
+
+running 3 tests
+test forged_or_changed_notice_material_is_refused_instead_of_becoming_user_text ... ok
+test notice_is_retained_at_the_fork_boundary_and_receipt_does_not_replay_after_clear ... ok
+test only_confirmed_delivery_becomes_a_distinct_notice_and_survives_restart_once ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/r07_bridge_permission.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_permission-ba00e6b4e0a37f98)
+
+running 2 tests
+test real_gateway_bans_gui_before_an_allowing_policy_and_rejects_identity_context_mismatch ... ok
+test guest_has_no_tools_and_owner_keeps_read_only_and_no_human_approval ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/r07_bridge_session_routes.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_session_routes-d3e88fe48174c241)
+
+running 4 tests
+test bridge_document_bytes_are_owned_and_invalid_names_mimes_or_sessions_create_no_file_fact ... ok
+test history_uses_canonical_final_and_reset_obeys_live_lease_then_starts_new_context ... ok
+test manual_send_queues_real_file_without_fake_run_and_http_retries_return_same_fact ... ok
+test manual_media_accepts_safe_bytes_above_old_snapshot_cap_and_refuses_qq_group_documents ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s
+
+     Running tests/r07_bridge_worker.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_worker-04fabb3eee7040dd)
+
+running 5 tests
+test worker_uses_real_pipe_and_does_not_inherit_service_secrets ... ok
+test command_limit_refuses_dispatch_and_existing_worker_remains_stoppable ... ok
+test oversized_output_is_bounded_and_worker_is_reaped ... ok
+test incomplete_frame_and_malformed_output_never_become_messages ... ok
+test cancelled_read_preserves_partial_frame ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+

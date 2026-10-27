@@ -1,0 +1,2 @@
+desktop/src/react/services/mcp-session-permissions.ts(1,15): error TS2305: Module '"../../../../contracts/generated/ts/lingxi-protocol"' has no exported member 'McpSessionPermissionRequest'.
+desktop/src/react/services/mcp-session-permissions.ts(1,44): error TS2305: Module '"../../../../contracts/generated/ts/lingxi-protocol"' has no exported member 'McpSessionPermissionResponse'.

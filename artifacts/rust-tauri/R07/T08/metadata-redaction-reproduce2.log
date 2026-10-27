@@ -1,0 +1,20 @@
+{"shutdown":{"code":0,"signal":null},"binarySha256After":"e3c682aa7c5cbc6259fb5dfe01087394da3283a8db7021b9e94fb87abadf2cc4","binaryUnchanged":true,"stderrSha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: 实际设置保存必须成功：{"error":"values belong to a specific agent; use PUT /api/agents/{agentId}/config"}
+
+400 !== 200
+
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R07/T08/evidence-tools/model_metadata_probe.mjs:42:10
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 400,
+  expected: 200,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.16.0

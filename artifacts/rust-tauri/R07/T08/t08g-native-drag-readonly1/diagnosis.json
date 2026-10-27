@@ -1,0 +1,81 @@
+{
+  "label": "t08g-native-drag-readonly1",
+  "createdAt": "2026-10-18T12:23:53.257837+00:00",
+  "scope": "READ_ONLY_DURING_T08G_FREEZE",
+  "finalAcceptance": false,
+  "cases": [
+    {
+      "scenario": "boundaries",
+      "safeSnapshot": "artifacts/rust-tauri/R07/T08/t08g-native-drag-readonly1/boundaries-safe-scene.json",
+      "snapshotSha256": "14690d3b6dc0570b40ae07a0a76aa58844f6bba9d0cff6c4331d67007e8f1831",
+      "uiResultSha256": "33df3909ae3cc78ed6b58d9e3af79235a75bb71560e0520b2d1f1c20dd63707f",
+      "traceSha256": "b093593f1267d2f2c1e49f46740bd86e52fcb39cb405215865fe294212da1ac2",
+      "durationMs": 13857.877958,
+      "orderRequestCount": 0,
+      "completedChecks": 14
+    },
+    {
+      "scenario": "workflow",
+      "safeSnapshot": "artifacts/rust-tauri/R07/T08/t08g-native-drag-readonly1/workflow-safe-scene.json",
+      "snapshotSha256": "bfc8c6e6852fab72a17cbaf36d83b6bd7ecbe81449919b3739d438ebc8a00534",
+      "uiResultSha256": "70f045394e316ab6478a663f449ab1b5c717fda30bf0e819ae08078775006f48",
+      "traceSha256": "38bb4b720175a58833c97491cfd2e4c1d490c7accd52824e14a2d66ece387440",
+      "durationMs": 36852.717833,
+      "orderRequestCount": 0,
+      "completedChecks": 41
+    }
+  ],
+  "confirmedFacts": [
+    {
+      "evidence": "two safe scene request arrays",
+      "finding": "两场 /lingxi/v1/agents/order 请求均0，既无PUT也无OPTIONS；排序持久化和500失败回读路径本次均未被触发，不能称Rust排序写回错误。"
+    },
+    {
+      "evidence": "workflow ui-result DRAG-FIXTURE / AFTER",
+      "finding": "mousedown之前日志hover=false；mouseup之后hover=true，wasDragged字段省略，顺序为原agent,agentA,agentB,card-...。after hover不能证明pointerdown发生时通过真实handler的:hover前置条件。wasDragged可能被随后onClick清除，单独缺省不能证明从未进入move。"
+    },
+    {
+      "evidence": "AgentCardStack.tsx:170-174,193-197,235-254,260-280",
+      "finding": "实际原生pointerdown只在button0且container:hover时setPointerCapture；move超过5px才置拖动；pointerup且moved且dropIdx变化才乐观改store并PUT。pointercancel/lostcapture/agents更新卸载都会取消。现场未录可信事件序列，无法确定是哪一分支。"
+    },
+    {
+      "evidence": "r06-settings-electron-main.cjs:387-401,691-708",
+      "finding": "夹具show/focus仅调用后固定睡200/300ms，move后固定睡400ms；没有核window.isFocused/document.hasFocus、hover就绪、pointercapture或可信event链。workflow已实际录hover=false仍继续mousedown。"
+    },
+    {
+      "evidence": "workflow DRAG-FIXTURE point and actual sendInputEvent",
+      "finding": "命中检测用分数(512.6229248046875,236.38937377929688)，真实鼠标发整数(513,236)，未重新验证整数命中；这是明确缺少前提检查，不能据静态直接宣称这次整数坐标命中了别处。"
+    },
+    {
+      "evidence": "r06_agent_settings_live.rs:503-541 and two ui-results",
+      "finding": "无原生窗口专属互斥：每个Rust test各起Vitest(maxWorkers1)与Electron进程；单个子Vitest的maxWorkers1不能串行同Rust binary并行的14项。两失败子test运行区间重叠（12:20:12.739—26.597Z与12:20:13.177—50.030Z），独立userData只隔离文件，不隔离OS焦点。"
+    }
+  ],
+  "notProven": [
+    "没有记录实际show/focus/gesture时刻，不能由子test总体时间重叠推定两个可见窗口在同一鼠标手势时互抢焦点。",
+    "没有isFocused、document.hasFocus、原始trusted pointerdown/move/up/cancel/lostcapture、整数elementFromPoint或hasPointerCapture日志，不能唯一判定焦点、命中、捕获丢失或effect替换。",
+    "两场都未发排序请求，故不能据此诊断服务磁盘写入失败或恢复逻辑损坏。",
+    "不重跑，也不拿旧成功记录推翻本次正式失败。"
+  ],
+  "minimalCorrectionProposalAfterUnfreeze": [
+    "在原预算内共享真实gesture readiness屏障：聚焦后要求window.isFocused+document.hasFocus；把候选点先取整，再以该整数elementFromPoint验证目标卡；发送mouseMove到同整数后等真实container:hover/目标仍命中，再mousedown。不能只加固定sleep或延长超时。",
+    "加入有限安全可信pointer事件观测（isTrusted/type/pointerId/target/capture/focus/原相对坐标），原断言不动，以明确失败是准入前未就绪还是产品拖动中取消。",
+    "若确认其它可见原生进程争用焦点，对实际可见gesture段使用唯一跨场排他资源，预算仍沿原deadline并finally隐藏/释放；未证实前不把互斥当已证明根因修复。",
+    "边界场景须先观察真实order PUT500，再等真实GET与原顺序恢复；不能以本来没变的顺序作为已经恢复。原18/19动作与全部断言不删不降级。"
+  ],
+  "sourceSha256": {
+    "rust/crates/lingxi-service/tests/r06_agent_settings_live.rs": "ed66d5247ea877d65a284b3e55cf691a746bc559285859955fefa77724583690",
+    "desktop/src/react/settings/__tests__/r06-settings-electron-main.cjs": "887117ef8c4862adf33b807a16d4a8689cbec8713d27f7e477aa801c97f3a298",
+    "desktop/src/react/settings/__tests__/r06-settings-electron-launch.mjs": "6ce1e16f309e75f847c7d45c83df4cf6789cec0b383710e574083be760839bec",
+    "desktop/src/react/settings/__tests__/R06AgentSettingsElectronLive.test.ts": "74ae68f08108d4fd3bf08e4e1b505950d00a40cff0372b8c4a594a2b034b296f",
+    "desktop/src/react/settings/tabs/agent/AgentCardStack.tsx": "509715ae3ec1157c10b4a5fa0bb029f88c7d2790a6f889634197536ad25f27fd",
+    "desktop/src/react/settings/tabs/RustAgentTab.tsx": "ef3f81615d3de6cf84a9c0f0d111c315f0daa1438c0988d3f71d5bec9bbc5fcc"
+  },
+  "executed": {
+    "cargo": false,
+    "build": false,
+    "gui": false,
+    "rerun": false,
+    "sourceChanges": false
+  }
+}

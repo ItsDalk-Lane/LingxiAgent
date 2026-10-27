@@ -1,0 +1,9 @@
+
+running 2 tests
+test guest_has_no_tools_and_owner_keeps_read_only_and_no_human_approval ... ok
+test real_gateway_bans_gui_before_an_allowing_policy_and_rejects_identity_context_mismatch ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/r07_bridge_permission.rs (rust/target/debug/deps/r07_bridge_permission-32a2908e9042e011)

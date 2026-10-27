@@ -1,0 +1,5 @@
+
+> lingxi@0.1.43 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+desktop/src/react/__tests__/settings/R07BrowserRustUI.test.tsx(39,118): error TS2322: Type 'string' is not assignable to type 'number'.

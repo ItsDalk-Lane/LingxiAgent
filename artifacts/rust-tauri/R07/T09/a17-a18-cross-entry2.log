@@ -1,0 +1,43 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/r07-a17-a18-cross-entry.test.mjs (2 tests | 2 skipped) 479ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/r07-a17-a18-cross-entry.test.mjs > R07-T09 A17/A18 跨入口真实验收
+AssertionError: CLI exit=1
+stdout:
+LingxiAgent · A17 验收助手
+Session session-cab89f61f92dfa9adcd7379767386ff5 · native:session-cab89f61f92dfa9adcd7379767386ff5
+
+Unexpected server response: 401
+
+stderr:
+
+
+1 !== 0
+
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/r07-a17-a18-cross-entry.test.mjs:175:12
+    173|     // CLI 腿：真实子进程发 prompt，驱动真实 Run 与真实工具。
+    174|     const cli = await runCli(ctx.home);
+    175|     assert.equal(cli.code, 0, `CLI exit=${cli.code}\nstdout:\n${cli.st…
+       |            ^
+    176|     assert.ok(cli.stdout.includes(FINAL), `CLI 未输出模型最终答复\nstdout:\n${c…
+    177|     assert.ok(cli.stdout.includes('◇'), `CLI 未展示工具执行\nstdout:\n${cli.s…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 skipped (2)
+   Start at  23:00:48
+   Duration  584ms (transform 21ms, setup 20ms, import 19ms, tests 479ms, environment 0ms)
+

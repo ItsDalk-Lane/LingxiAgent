@@ -30,6 +30,20 @@ type MemoryHealthPayload = {
   lastErrorAt: string | null;
 };
 
+/** 原生健康读面保留真实失败步骤，不能把 ticker 缺失或读取失败显示成健康。 */
+function normalizeMemoryHealth(data: MemoryHealthPayload & { healthy?: boolean; steps: any }): MemoryHealthPayload {
+  if (Array.isArray(data.steps)) {
+    const failed = data.steps.filter(step => step.ok !== true);
+    const steps = Object.fromEntries(data.steps.map(step => [step.step, { lastSuccessAt: null, lastErrorAt: null, lastErrorMsg: step.error || step.reason || null, failCount: step.ok === true ? 0 : 1 }]));
+    return { agentId: data.agentId, enabled: data.enabled,
+      status: !data.enabled ? 'disabled' : failed.some(step => step.error) ? 'unhealthy' : failed.length ? 'degraded' : 'healthy',
+      reason: failed.map(step => step.error || step.reason).filter(Boolean).join('; ') || null,
+      steps, failedSteps: failed.map(step => step.step), maxFailCount: failed.length ? 1 : 0, lastSuccessAt: null, lastErrorAt: null };
+  }
+  if (!data || !['healthy', 'degraded', 'unhealthy', 'disabled', 'unavailable'].includes(data.status) || !Array.isArray(data.failedSteps) || !data.steps || typeof data.steps !== 'object') throw new Error('记忆健康响应格式无效');
+  return data;
+}
+
 const healthToneByStatus: Record<MemoryHealthStatus, string> = {
   healthy: 'ok',
   degraded: 'attention',
@@ -133,7 +147,7 @@ export function MemorySection({ agentId, hasUtilityModel, memoryEnabled, autoDre
       .then((res) => res.json())
       .then((data: MemoryHealthPayload) => {
         if (!active) return;
-        setHealth(data);
+        setHealth(normalizeMemoryHealth(data));
       })
       .catch((err) => {
         if (!active || controller.signal.aborted) return;

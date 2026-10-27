@@ -1,7 +1,11 @@
 import { useStore } from './index';
+import { resolveServerConnection, type ServerConnectionSource } from '../services/server-connection';
 import { sessionScopedKey, sessionScopedValue, type SessionLocatorState } from './session-slice';
 
 export interface BrowserSessionState {
+  executionNode?: string;
+  /** 仅含公开连接坐标，用于快照清理时核对当前资料归属。 */
+  connectionScope?: string;
   running: boolean;
   url: string | null;
   thumbnail: string | null;
@@ -39,13 +43,21 @@ const DEFAULT_BROWSER_STATE = {
   collapsed: false,
 };
 
+export function browserConnectionScope(state: ServerConnectionSource): string {
+  const connection = resolveServerConnection(state);
+  return JSON.stringify(connection ? [connection.connectionId, connection.kind, connection.baseUrl, connection.serverId, connection.serverNodeId, connection.userId, connection.studioId] : null);
+}
+
 export function browserStateForPath(
-  state: SessionLocatorState & Pick<BrowserSlice, 'browserBySession'>,
+  state: SessionLocatorState & Pick<BrowserSlice, 'browserBySession'> & ServerConnectionSource,
   sessionPath?: string | null,
 ): BrowserSessionState {
   const sp = sessionPath ?? state.currentSessionPath;
   if (!sp) return DEFAULT_BROWSER_STATE;
-  return sessionScopedValue(state, state.browserBySession, sp) || DEFAULT_BROWSER_STATE;
+  const value = sessionScopedValue(state, state.browserBySession, sp);
+  const connection = resolveServerConnection(state);
+  if (connection?.serverNodeKind === 'lingxi-service' && (value?.executionNode !== connection.serverId || (value.connectionScope !== undefined && value.connectionScope !== browserConnectionScope(state)))) return DEFAULT_BROWSER_STATE;
+  return value || DEFAULT_BROWSER_STATE;
 }
 
 export function setBrowserStateForPath(
@@ -53,9 +65,11 @@ export function setBrowserStateForPath(
   value: BrowserSessionState,
 ): void {
   useStore.setState((state) => {
+    const connection = resolveServerConnection(state);
+    if (connection?.serverNodeKind === 'lingxi-service' && (!sessionPath.startsWith('native:') || value.executionNode !== connection.serverId)) return {};
     const key = sessionScopedKey(state, sessionPath) || sessionPath;
     // 把归属会话路径一并存进值里：map 键可能是 sessionId，跨会话显示时仍要能拿到真实路径。
-    const browserBySession = { ...(state.browserBySession || {}), [key]: { ...value, sessionPath } };
+    const browserBySession = { ...(state.browserBySession || {}), [key]: { ...value, sessionPath, ...(connection?.serverNodeKind === 'lingxi-service' ? { connectionScope: browserConnectionScope(state) } : {}) } };
     if (key !== sessionPath) delete browserBySession[sessionPath];
     return { browserBySession };
   });

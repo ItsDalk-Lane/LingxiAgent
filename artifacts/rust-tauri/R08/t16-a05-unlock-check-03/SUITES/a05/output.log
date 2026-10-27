@@ -1,0 +1,2 @@
+[r08-t03-a05] verdict=fail failures=1 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a05-u8G70z out=/private/tmp/lingxi-r08-verify/r08_t03_a05_drill-2650-1792873471616
+  FAIL[row1-hide] Cmd+W 后 visibilityState=hidden（hide 实测；实测 visible）

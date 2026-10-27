@@ -1,0 +1,7 @@
+target: sess-parent-0001
+archive status: 200 {"sessionId":"sess-parent-0001","archivedChildren":1,"detachedChildren":0,"skippedStreamingChildren":0,"errors":0}
+archived list keys: [ 'sessions' ] | count: 3
+contains target: true
+cleanup(30): 200 {"deleted":1,"maxAgeDays":30,"skippedBusy":0}
+after cleanup contains target: true | count: 2
+ARCHIVE_PROBE_DONE

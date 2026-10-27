@@ -1,0 +1,87 @@
+{
+  "label": "mcp-remote-resource-cleanup-diagnosis2",
+  "createdAt": "2026-10-18T11:47:06.549352+00:00",
+  "scope": "DEVELOPMENT_DIAGNOSIS_AND_NOT_RUN_INSTRUMENTATION",
+  "finalAcceptance": false,
+  "original": {
+    "receipt": "artifacts/rust-tauri/R07/T08/mcp-remote-and-permission-fixed1.json",
+    "log": "artifacts/rust-tauri/R07/T08/mcp-remote-and-permission-fixed1.log",
+    "logSha256": "a7ed858d5526fbdca9beb3165de16e17039a217e0c183e79576c97cf2514295a",
+    "sourceUnchanged": true,
+    "exitCode": 101,
+    "remote": {
+      "passed": 5,
+      "failed": 2
+    },
+    "permission": {
+      "passed": 5,
+      "failed": 0
+    },
+    "resourceObserved": [
+      "local stop returned200",
+      "pending resource request returned non200",
+      "server handler ct.cancelled branch not observed in original3seconds"
+    ],
+    "notEstablished": [
+      "remote future still alive versus aborted/dropped",
+      "wire cancellation emitted/delivered",
+      "DELETE expected or delivered"
+    ]
+  },
+  "sdkReadOnlyReferences": [
+    {
+      "file": "/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rmcp-3.4.1/src/transport/streamable_http_server/tower.rs",
+      "start": 1260,
+      "end": 1318,
+      "sha256": "acce5fc6486d35baecd0bca61b470be3fb10669cda80000d2d287ae83c43d084",
+      "finding": "LATEST negotiated stateless request owns per-request token; first receiver message awaited before SSE response is constructed; cancellation guard belongs to actual HTTP handler future."
+    },
+    {
+      "file": "/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rmcp-3.4.1/src/transport/streamable_http_server/tower.rs",
+      "start": 2145,
+      "end": 2182,
+      "sha256": "acce5fc6486d35baecd0bca61b470be3fb10669cda80000d2d287ae83c43d084",
+      "finding": "Actual response body stream Drop cancels token; observation of a ct branch alone does not prove whether handler future was dropped."
+    },
+    {
+      "file": "/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rmcp-3.4.1/src/transport/streamable_http_client.rs",
+      "start": 1797,
+      "end": 1825,
+      "sha256": "72a36d33f4906ba9c50f99ce2cd8252fad193e7efb65d24b411c873fdfa6df39",
+      "finding": "SDK client cleanup drops active posts/streams; DELETE is only available when a real session cleanup identity exists."
+    },
+    {
+      "file": "/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rmcp-3.4.1/tests/test_streamable_http_disconnect_cancel.rs",
+      "start": 117,
+      "end": 151,
+      "sha256": "f5ffdbf1dea1db30815264513343e013db6a59248afdd5eb1415dc9f07ea05dc",
+      "finding": "Official disconnect regression uses legacy 2025-03-26 stateless request, returned SSE response and10-second observation; not equivalent to LATEST first-message wait or our unchanged3-second budget."
+    }
+  ],
+  "changesNotRun": [
+    {
+      "file": "rust/crates/lingxi-service/tests/r07_t08_mcp_remote.rs",
+      "purpose": "Actual official server-side RAII counts active/drop independently of cancellation token branch; additionally record incoming wire cancel, handler callback, current token flag, token-at-drop and DELETE. Still require true remote zero-active/drop within original3seconds, print observations before assertion. No local client Drop can increment these server counters."
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r07_t08_mcp_remote.rs",
+      "purpose": "UI parent saves real owned provider and Chat binding through ModelConfiguration.save and requires saved/applied; does not mock model gateway or storage."
+    },
+    {
+      "file": "rust/crates/lingxi-service/src/mcp_settings.rs",
+      "purpose": "Old unit apply adds required original-semantics authority None argument; assertions unchanged."
+    }
+  ],
+  "sourceSha256": {
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_remote.rs": "fb9bc101217895a344859a74ebfd68d3bfb4377f92f30006b9105ec4048bae1d",
+    "rust/crates/lingxi-service/src/mcp_settings.rs": "54d58546530a0480800c856504fdbf0173bec2a39c93bee18c22f83de6078f69",
+    "rust/crates/lingxi-service/src/mcpbridge.rs": "e938c313cfd12cc6da34e60e685d23afbc17ff34f43993e184c55f7c79323bd3"
+  },
+  "execution": "No Cargo or functional test executed by this agent. Parent sole runner must record actual new observations.",
+  "limitations": [
+    "No timeout widened; original failure kept unchanged.",
+    "No claim original resource leak fixed before RAII real-run result.",
+    "LATEST stateless has no session DELETE expectation by itself.",
+    "No real external account or network supplier used; owned loopback only."
+  ]
+}

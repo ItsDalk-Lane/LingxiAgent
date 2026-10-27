@@ -6,6 +6,7 @@ import React from 'react';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { getDesktopHost } from '../../host/desktop-host';
 
 type MockState = Record<string, any>;
 
@@ -385,6 +386,7 @@ describe('AccessTab', () => {
         displayName: 'Desktop Frontend',
         scopes: [
           'chat',
+          'sessions.write',
           'resources.read',
           'files.read',
           'files.write',
@@ -424,7 +426,7 @@ describe('AccessTab', () => {
         credentials: 'include',
         headers: { Authorization: 'Bearer fixture-key' },
       }));
-      expect(window.hana.reloadMainWindow).toHaveBeenCalledTimes(1);
+      expect(getDesktopHost().api.reloadMainWindow).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -450,7 +452,7 @@ describe('AccessTab', () => {
 
     expect(mockState.activeServerConnectionId).toBe('local');
     expect(mockState.activeServerConnection).toBe(localConnection);
-    expect(window.hana.reloadMainWindow).toHaveBeenCalledTimes(1);
+    expect(getDesktopHost().api.reloadMainWindow).toHaveBeenCalledTimes(1);
   });
 
   it('saves the local owner profile and password from the account section', async () => {

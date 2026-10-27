@@ -1,0 +1,29 @@
+{
+  "family": "anthropic-messages",
+  "case": "error",
+  "route": {"provider": "anthropic-golden", "model": "claude-golden-3-7"},
+  "auth": {"kind": "bearer", "token": "sk-golden-anthropic-secret"},
+  "input": {
+    "submission": "ping",
+    "tools": [],
+    "prior": []
+  },
+  "http_error": {
+    "status": 400,
+    "body": "{\"error\":{\"message\":\"invalid x-api-key sk-golden-anthropic-secret provided\"}}"
+  },
+  "expected_transport": {
+    "path": "/v1/messages",
+    "headers": [
+      ["x-api-key", "sk-golden-anthropic-secret"],
+      ["anthropic-version", "2023-06-01"],
+      ["content-type", "application/json"]
+    ],
+    "absent_headers": ["authorization"]
+  },
+  "expected_failure": {
+    "code": "invalid_message",
+    "retryable": false,
+    "message": "provider returned HTTP 400 Bad Request: {\"error\":{\"message\":\"invalid x-api-key [redacted] provided\"}}"
+  }
+}

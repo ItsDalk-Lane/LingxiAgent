@@ -1,0 +1,81 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > identity: server identity reachable with loopback token
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > sessions.list: 查看可见会话列表
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.list.fields: 列表投影字段形状
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > sessions.switch: 切换焦点会话 + 消息页
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.rename.negative: 空标题/无效会话显式拒绝
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.pin.negative: 无效会话置顶显式拒绝
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.todos.negative: 无效会话计划操作显式拒绝
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.mcp.state: 查看连接器状态 + 延迟加载开关（投影形状）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.permission.session-mode: 查看当前会话权限模式（switch 投影 mode 字段）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.permission.default-set: 设置新会话默认权限（写-回读-非法值拒绝）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.memory-snapshot: 记忆开关查看/设置 + 提示词快照（已翻译读端口）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.prompt-snapshot: 查看会话提示词快照（冻结 sidecar 读面 + 无效会话拒）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.auth-folders: 授权目录四操作（读/增/撤/替换 + 负路径）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.read-ports: 消息页/历史概览/摘要（已翻译读端口双内核对拍）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.pin.projection: 置顶状态投影（pinnedAt/pinOrder 落列表）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.archive.workspace: 归档工作台会话（正路径入可恢复归档 + 无效目标拒）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.find.in-session: 在指定会话内查找（正路径命中 + 无效会话拒）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.pin-order: 置顶区整体重编号（正路径 + 重复 id 拒绝）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.archived-delete: 永久删除归档会话（正路径 + 删除后不可恢复）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.search: 跨会话搜索（正路径命中 + 空查询空结果）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > sessions.rename: 重命名会话（持久化回读）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > sessions.pin: 置顶/重排/取消
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > sessions.todos: 完成/取消/收纳
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > sessions.capabilities: 刷新能力并压缩
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > sessions.maintenance: 清理过期归档 + 清扫孤儿
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.permissions: 默认权限读取 + 幂等（含预热重试）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > preferences.appearance: 读/编辑/回读
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.archive.negative: 无效归档/恢复/清理目标显式拒绝
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.cleanup.boundary: 期限边界 + 显式永久删除
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > sessions.archive: 归档/查看归档/恢复
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > sessions.create: 创建并切换会话
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > drift-guard
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.mcp.state.unauthorized: 无效令牌显式拒绝（置于最末——连接换装不毒化前序动作）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > error-path.unauthorized: 无效令牌被拒
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > error-path.not-found: 不存在会话读取明确拒绝
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.projects: 会话项目目录十叶（目录/文件夹/项目 CRUD/重排/归属/删除语义 + 负路径）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.conversation-map: 布局读/回合读/位置合并/位置替换/折叠替换 + 无效输入不持久化
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.checkpoints: 列表/用户编辑创建（绝对路径+原因校验）/恢复写回与 404/删除
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.workspace-rollback: 查看/设置文件回退开关（布尔写回读、非法值拒、不回退文件）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.sessions.create: 创建并切换会话 / 创建独立会话（元数据落列表、无效 Agent 拒）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.prefs.quick-chat: 快捷聊天偏好读面/更新（写-回读 + 非法 body 拒）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.drafts: 输入草稿读/主页存/会话存/清空（surface 作用域 + 非法 surface 拒）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.ws.compact: WS compact 帧（compaction_accepted → succeeded/noop 结果 + 无会话拒）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.plan-mode: 规划模式读面（enabled/mode/accessMode）+ 切换（enabled 两向 + 无 mode 由 !!enabled 决定）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.mcp.crud: MCP 连接器全生命周期（确定性 stdio 替身：增/启/刷/停/改/删/批量/全局开关/延迟设置/apps/agent 配置/会话权限）
+ ✓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.ws.terminal: 终端帧族传输面（帧识别 + 显式能力错误 + 连接不断） 9889ms
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.permission-mode: 会话权限模式读面/按作用域切换（当前会话/指定会话/全局）/非法值拒
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.chat.transport: WS 连接/登记 + 会话事件转发 + 无权票据拒
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.chat.round: 真实 prompt 回合（模型替身 A06 聊天腿）→ 助手回复 + 快照 sidecar 落地
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.slash: /reset 清史 + /compact 应答序（真实 slash 通路）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.slash.new: /new 轮换归档（旧栈 phase-1 desktop rotate 限制如实暴露）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.chat.abort: 活动流中止（abort 帧形双内核）+ 无会话显式拒
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.sessions.admin: fork/子会话归档×2/rollback-preview/sweep/续接已删 Agent/处置删除/fresh-compact/turns-retry/延迟内容负例
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.tool.todos: todo_write 工具回合落面板 → 完成/取消/收纳正路径 + 错误清单不覆盖 + 版本/目标负路径
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.tool.checkpoint: checkpoint 工具 create→list 可见 / drop→list 不可见 / drop 不存在不伪报
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.tool.rewind: checkpoint→rewind 确认卡（拒绝不回退 / 确认后分支回到锚点、文件不动）+ confirm 路由 400/404/广播 + /confirm /reject 斜杠
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.tool.session: session 工具 list/read 范围受控（未知会话拒）+ send 只生成指定目标草稿卡（不直写目标历史、拒发给自己、未知目标拒）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.tool.current-status: current_status 工具 list 键目录 → 逐键 get 全部可解（目录与 get 一致）+ 模型/agent/会话值与运行时一致 + 未知键显式错误
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.tool.session-folders: session_folders 工具 list 范围 → operate 下 add 仅改当前会话 → ask 下 add 被拒范围不变 → remove 复原 + 不存在目录拒
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.ws.stream: WS 入站帧族——prompt 流式阶段/工具/终结 + 空内容·非法图片类型化拒 / steer 活动流 steered·到达模型·空闲回落 prompt / interject 回执·新回复·媒体超限拒 / resume_stream 补发·无流空事件·越权拒 / slash(ws) 同一 dispatcher·未知命令·Agent 不匹配 / compact·fresh-compact·stop
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.cleanup.expiry: 清理过期归档——窗口内保留、窗口外按期限永久删除并清理生命周期与标题、活动会话不受影响、越权不删
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.lazy-content: 历史延迟内容——大工具结果以引用落历史，按 contentId 只在授权会话内取回；他会话定位 404；未知 404
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.replay-latest: 重新提交最近用户消息——按版本重放（新一轮回复）、可选替换文字、运行中 409、无效目标显式错误
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.switch.focus: 切换焦点会话——改变当前会话并返回会话投影 + 浏览器恢复尝试显式回执（无浏览器时 typed 结果）、来回切换旧会话不挂起、无效目标显式错误
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.prompt-snapshot.real: 真实模型回合后的会话提示词快照——读到冻结系统提示词与工具名；无效会话显式拒
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.mcp.face: 连接器资源读取（ui:// 资源内容/缺 uri·未知 uri 拒）+ 应用启动（launchInput 交接/未知工具拒/未知连接器拒）
+ ↓ desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.mcp.oauth: 连接器 OAuth——start 返回浏览器所需授权资料（发现/动态注册真跑）+ cancel 结束等待且已存配置不变 + logout 清凭证回公开状态 + 负路径
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 66 skipped (67)
+   Start at  19:16:08
+   Duration  10.80s (transform 606ms, setup 21ms, import 535ms, tests 9.91s, environment 256ms)
+
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts > R08-T07 kernel A/B [rust] > leaf.ws.terminal: 终端帧族传输面（帧识别 + 显式能力错误 + 连接不断）
+[has-dbg] called sessionPath= native:ab-real-gamma sessionId= ab-real-gamma
+[has-dbg] recordsSize= 0 limit= 50
+

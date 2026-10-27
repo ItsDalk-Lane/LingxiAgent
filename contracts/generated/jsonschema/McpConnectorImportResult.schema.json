@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "error": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "runtimeApplied": {
+      "type": "boolean"
+    },
+    "saved": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "ok",
+    "saved",
+    "runtimeApplied"
+  ],
+  "title": "McpConnectorImportResult",
+  "type": "object"
+}

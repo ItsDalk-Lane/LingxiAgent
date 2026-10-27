@@ -1,0 +1,7 @@
+{
+  "archive": "source-snapshot.tar.gz",
+  "sha256": "588d726f2e22e8910cbdb80e83b4ec0e81a9a5550493eb6a2d0c3148a26c7eca",
+  "codeFingerprintUnchanged": "f33ab49b1e8b638eb19d9c3d89c2fcf3f85dee22b7326b8f2ded665e65f78479",
+  "verifiedCodeFiles": 89,
+  "reason": "保留原字节证据，同时避免测试工具把历史源码副本当现行测试执行。恢复时仅在独立目录解包，不覆盖当前工作区。"
+}

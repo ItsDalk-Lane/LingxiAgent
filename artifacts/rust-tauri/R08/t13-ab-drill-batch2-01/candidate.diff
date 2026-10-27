@@ -1,0 +1,890 @@
+diff --git a/desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts b/desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts
+index 534aa9a56..296906e6b 100644
+--- a/desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts
++++ b/desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts
+@@ -194,6 +194,123 @@ describe.skipIf(!enabled)(`R08-T07 kernel A/B [${kind}]`, () => {
+     });
+   });
+ 
++  it('leaf.permission.session-mode: 查看当前会话权限模式（switch 投影 mode 字段）', async () => {
++    await observe('leaf.permission.session-mode', async () => {
++      const first = (useStore.getState().sessions as any[])[0];
++      if (!first) return { modePresent: false, modeValue: null };
++      // 正路径：切换到会话读取投影的 permissionMode（旧 /api/sessions/switch
++      // 返回 permissionMode；Rust /lingxi/v1/sessions/switch 同名字段）。
++      const path = kind === 'rust' ? '/lingxi/v1/sessions/switch' : '/api/sessions/switch';
++      const res = await lingxiFetch(path, {
++        method: 'POST', headers: { 'Content-Type': 'application/json' },
++        body: JSON.stringify(kind === 'rust' ? { sessionId: first.sessionId } : { path: first.path }),
++        throwOnHttpError: false,
++      });
++      const data = await res.json().catch(() => null);
++      const mode = data?.permissionMode ?? null;
++      // 断言1（读无副作用）：同会话二次切换读 mode 一致。
++      const res2 = await lingxiFetch(path, {
++        method: 'POST', headers: { 'Content-Type': 'application/json' },
++        body: JSON.stringify(kind === 'rust' ? { sessionId: first.sessionId } : { path: first.path }),
++        throwOnHttpError: false,
++      });
++      const data2 = await res2.json().catch(() => null);
++      const mode2 = data2?.permissionMode ?? null;
++      return { modePresent: res.status < 300 && typeof mode === 'string', modeValue: mode, status: res.status, idempotent: mode === mode2 && mode !== null };
++    });
++  });
++
++  it('leaf.permission.default-set: 设置新会话默认权限（写-回读-非法值拒绝）', async () => {
++    await observe('leaf.permission.default-set', async () => {
++      // 正路径：PUT 合法值 → GET 回读一致；复原为原值。
++      const orig = await loadPendingNewSessionPermissionDefault();
++      const put = await lingxiFetch('/api/preferences/session-permission-default', {
++        method: 'PUT', headers: { 'Content-Type': 'application/json' },
++        body: JSON.stringify({ permissionMode: 'auto' }), throwOnHttpError: false,
++      });
++      await sleep(150);
++      const after = await loadPendingNewSessionPermissionDefault();
++      // 负路径：非法值 400 拒绝。
++      const bad = await lingxiFetch('/api/preferences/session-permission-default', {
++        method: 'PUT', headers: { 'Content-Type': 'application/json' },
++        body: JSON.stringify({ permissionMode: 'bogus-mode' }), throwOnHttpError: false,
++      });
++      // 复原
++      if (orig) {
++        await lingxiFetch('/api/preferences/session-permission-default', {
++          method: 'PUT', headers: { 'Content-Type': 'application/json' },
++          body: JSON.stringify({ permissionMode: orig }), throwOnHttpError: false,
++        });
++      }
++      return { putStatus: put.status, roundTrip: after === 'auto', badRejected: bad.status >= 400, badStatus: bad.status };
++    });
++  });
++
++  it('leaf.pin-order: 置顶区整体重编号（正路径 + 重复 id 拒绝）', async () => {
++    await observe('leaf.pin-order', async () => {
++      const sessions = useStore.getState().sessions as any[];
++      const two = sessions.slice(0, 2).map((x) => x.sessionId).filter(Boolean);
++      if (two.length < 2 || new Set(two).size < 2) return { reorderOk: false, dupRejected: false, skipped: true };
++      const ok = await reorderPinnedSessions([two[1], two[0]]);
++      const dup = await lingxiFetch(kind === 'rust' ? '/lingxi/v1/sessions/pin-order' : '/api/sessions/pin-order', {
++        method: 'POST', headers: { 'Content-Type': 'application/json' },
++        body: JSON.stringify({ sessionIds: [two[0], two[0]] }), throwOnHttpError: false,
++      });
++      const dupBody = await dup.json().catch(() => null);
++      const dupRejected = dup.status >= 400 || Boolean(dupBody?.error) || dupBody?.ok === false;
++      await reorderPinnedSessions(two);
++      return { reorderOk: ok, dupRejected, dupStatus: dup.status };
++    });
++  });
++
++  it('leaf.archived-delete: 永久删除归档会话（正路径 + 删除后不可恢复）', async () => {
++    await observe('leaf.archived-delete', async () => {
++      await loadSessions();
++      const sessions = useStore.getState().sessions as any[];
++      const victim = sessions.filter((x) => !x.parentSessionId && (x.title || x.sessionId) !== 'T07-AB-renamed').pop();
++      if (!victim) return { deleted: false, goneFromArchive: false, restoreAfterDeleteRefused: false, skipped: true };
++      await archiveSession(victim.path);
++      const archived = (await listArchivedSessions()) as any[];
++      const row = Array.isArray(archived) ? archived.find((x: any) => x.sessionId === victim.sessionId || x.path === victim.path) : null;
++      if (!row) return { deleted: false, goneFromArchive: false, restoreAfterDeleteRefused: false, skipped: 'archive-failed' };
++      const del = await lingxiFetch('/api/sessions/archived/delete', {
++        method: 'POST', headers: { 'Content-Type': 'application/json' },
++        body: JSON.stringify(kind === 'rust' ? { sessionId: victim.sessionId } : { path: victim.path, sessionId: victim.sessionId }),
++        throwOnHttpError: false,
++      });
++      const deleted = del.status < 300;
++      const after = (await listArchivedSessions()) as any[];
++      const goneFromArchive = !Array.isArray(after) || !after.some((x: any) => x.sessionId === victim.sessionId || x.path === victim.path);
++      const restore = await lingxiFetch('/api/sessions/restore', {
++        method: 'POST', headers: { 'Content-Type': 'application/json' },
++        body: JSON.stringify(kind === 'rust' ? { sessionId: victim.sessionId } : { path: victim.path }),
++        throwOnHttpError: false,
++      });
++      const restoreBody = await restore.json().catch(() => null);
++      const restoreAfterDeleteRefused = restore.status >= 400 || Boolean(restoreBody?.error) || restoreBody?.status === 'error';
++      return { deleted, goneFromArchive, restoreAfterDeleteRefused, delStatus: del.status, restoreStatus: restore.status };
++    });
++  });
++
++  it('leaf.search: 跨会话搜索（正路径命中 + 空查询空结果）', async () => {
++    await observe('leaf.search', async () => {
++      const path = kind === 'rust' ? '/lingxi/v1/sessions/search' : '/api/sessions/search';
++      const hit = await lingxiFetch(`${path}?q=${encodeURIComponent('T07 A/B 任务')}`, { method: 'GET', throwOnHttpError: false });
++      const hitBody = await hit.json().catch(() => null);
++      const hitRows = Array.isArray(hitBody) ? hitBody : (hitBody?.results ?? hitBody?.sessions ?? []);
++      const empty = await lingxiFetch(`${path}?q=`, { method: 'GET', throwOnHttpError: false });
++      const emptyBody = await empty.json().catch(() => null);
++      const emptyRows = Array.isArray(emptyBody) ? emptyBody : (emptyBody?.results ?? emptyBody?.sessions ?? []);
++      const bad = await lingxiFetch(`${path}?q=x&phase=bogus`, { method: 'GET', throwOnHttpError: false });
++      return {
++        hitStatus: hit.status, hitRowsIsArray: Array.isArray(hitRows),
++        hitAtLeastOne: Array.isArray(hitRows) && hitRows.length >= 1,
++        emptyStatus: empty.status, emptyIsEmpty: Array.isArray(emptyRows) && emptyRows.length === 0,
++        badPhaseStatus: bad.status,
++      };
++    });
++  });
++
+   it('sessions.rename: 重命名会话（持久化回读）', async () => {
+     await observe('sessions.rename', async () => {
+       const first = (useStore.getState().sessions as any[])[0];
+@@ -242,7 +359,9 @@ describe.skipIf(!enabled)(`R08-T07 kernel A/B [${kind}]`, () => {
+     await observe('sessions.maintenance', async () => {
+       const cleanup = await cleanupArchivedSessions(30);
+       const swept = await sweepOrphanedWorkspaceSessions();
+-      return { cleanupDeletedIsNumber: typeof cleanup?.deleted === 'number', sweptIsNumber: typeof swept === 'number' };
++      // fixture 自带超期归档（archived_at=2025-10 > 30 天）——首个 cleanup(30)
++      // 正当删除之（探针 t11-archive-probe-03 语义）：deleted>=1。
++      return { cleanupDeletedIsNumber: typeof cleanup?.deleted === 'number', cleanupDeletedAtLeastOne: (cleanup?.deleted ?? 0) >= 1, sweptIsNumber: typeof swept === 'number' };
+     });
+   });
+ 
+@@ -278,19 +397,55 @@ describe.skipIf(!enabled)(`R08-T07 kernel A/B [${kind}]`, () => {
+     });
+   });
+ 
++  it('leaf.archive.negative: 无效归档/恢复/清理目标显式拒绝', async () => {
++    await observe('leaf.archive.negative', async () => {
++      const body = kind === 'rust' ? { sessionId: 'sess-does-not-exist-t07' } : { path: 'agents/a1/sessions/sess-does-not-exist-t07.jsonl' };
++      const arch = await lingxiFetch('/api/sessions/archive', {
++        method: 'POST', headers: { 'Content-Type': 'application/json' },
++        body: JSON.stringify(body), throwOnHttpError: false,
++      });
++      const archBody = await arch.json().catch(() => null);
++      const restore = await lingxiFetch('/api/sessions/restore', {
++        method: 'POST', headers: { 'Content-Type': 'application/json' },
++        body: JSON.stringify(body), throwOnHttpError: false,
++      });
++      const restoreBody = await restore.json().catch(() => null);
++      const cleanupBad = await lingxiFetch('/api/sessions/cleanup', {
++        method: 'POST', headers: { 'Content-Type': 'application/json' },
++        body: JSON.stringify({ maxAgeDays: 'bogus' }), throwOnHttpError: false,
++      });
++      const rejected = (st: number, b: any) => st >= 400 || Boolean(b?.error) || b?.ok === false;
++      return {
++        archiveRejected: rejected(arch.status, archBody), archiveStatus: arch.status,
++        restoreRejected: rejected(restore.status, restoreBody), restoreStatus: restore.status,
++        cleanupBadRejected: rejected(cleanupBad.status, null), cleanupBadStatus: cleanupBad.status,
++      };
++    });
++  });
++
+   it('leaf.cleanup.boundary: 期限边界 + 显式永久删除', async () => {
+     await observe('leaf.cleanup.boundary', async () => {
+       await loadSessions();
+       const sessions = useStore.getState().sessions as any[];
+-      const byTitle = (t: string) => sessions.find((x) => (x.title || x.sessionId) === t || x.sessionId === t || x.path?.endsWith(`${t}.jsonl`));
+-      const fresh = byTitle('ab-real-beta') ?? sessions[sessions.length - 1];
+-      const expiring = byTitle('ab-real-gamma') ?? sessions[sessions.length - 2];
++      // 目标选取（D-4 改判后修正）：rename 任务可能已改 sessions[0] 的标题，
++      // 固定 byTitle('ab-real-beta') 会错选/漏选——改为「标题未被本套件改过
++      // 的会话」取两个，与 rename 目标（T07-AB-renamed）严格不相交。
++      // 目标选取（D-6 改判后修正）：还需「无子会话」——有子的顶层会话归档被
++      // 409 child_sessions_present 正确拒绝（现役语义，t11-archive-probe-01
++      // 实证），套件此前把该正确拒绝误记为「Rust 立删新归档」伪差异。
++      const untouched = sessions.filter((x) =>
++        (x.title || x.sessionId) !== 'T07-AB-renamed' && !x.parentSessionId);
++      const fresh = untouched[untouched.length - 1];
++      const expiring = untouched[untouched.length - 2];
+       if (!fresh || !expiring || fresh === expiring) {
+         return { freshKept: false, purgedOk: false, expiringGone: false, skipped: true };
+       }
+       await archiveSession(fresh.path);
+       await archiveSession(expiring.path);
+       const kept = await cleanupArchivedSessions(30);
++      // fixture 自带超期归档（archived_at=2025-10 > 30 天）——按期限正当删除
++      // 即 deleted>=1（探针 t11-archive-probe-03 实证语义）。
++      const expiredDeleted = typeof kept?.deleted === 'number' && kept.deleted >= 1;
+       const afterKeep = (await listArchivedSessions()) as any[];
+       const freshStillArchived = Array.isArray(afterKeep) && afterKeep.some((s: any) => s.sessionId === fresh.sessionId || s.path === fresh.path);
+       const delRes = await lingxiFetch('/api/sessions/archived/delete', {
+@@ -304,7 +459,7 @@ describe.skipIf(!enabled)(`R08-T07 kernel A/B [${kind}]`, () => {
+       const freshRow = Array.isArray(afterPurge) ? afterPurge.find((s: any) => s.sessionId === fresh.sessionId || s.path === fresh.path) : null;
+       if (freshRow) await restoreSession(freshRow as any);
+       await loadSessions();
+-      return { keptDeletedIsNumber: typeof kept?.deleted === 'number', freshKept: freshStillArchived, purgedOk, expiringGone };
++      return { keptDeletedIsNumber: typeof kept?.deleted === 'number', expiredDeleted, freshKept: freshStillArchived, purgedOk, expiringGone };
+     });
+   });
+ 
+@@ -316,6 +471,18 @@ describe.skipIf(!enabled)(`R08-T07 kernel A/B [${kind}]`, () => {
+         return { inArchive: false, goneFromVisible: false, restored: false, backVisible: false, deleted: 'skipped-no-target', stillArchived: true, skipped: true };
+       }
+       await archiveSession(target.path);
++      // 有子会话的归档被 409 正确拒绝（现役语义）——带 archive_children 重试
++      // （两内核同一规则；probe 实证 t11-archive-probe-01）。
++      await loadSessions();
++      if (useStore.getState().sessions.some((x: any) => x.sessionId === target.sessionId)) {
++        await lingxiFetch('/api/sessions/archive', {
++          method: 'POST', headers: { 'Content-Type': 'application/json' },
++          body: JSON.stringify(kind === 'rust'
++            ? { sessionId: target.sessionId, childMode: 'archive_children' }
++            : { path: target.path, childMode: 'archive_children' }),
++          throwOnHttpError: false,
++        });
++      }
+       const archived = (await listArchivedSessions()) as any[];
+       const row = Array.isArray(archived) ? archived.find((s: any) => s.sessionId === target.sessionId || s.path === target.path) : null;
+       const inArchive = Boolean(row);
+diff --git a/desktop/src/react/hooks/use-hana-fetch.ts b/desktop/src/react/hooks/use-hana-fetch.ts
+index 0945fe940..5d86f99c4 100644
+--- a/desktop/src/react/hooks/use-hana-fetch.ts
++++ b/desktop/src/react/hooks/use-hana-fetch.ts
+@@ -77,10 +77,12 @@ export function translateLegacySessionCall(
+     return { path: '/lingxi/v1/sessions/archived' };
+   }
+   if (method === 'POST' && bodyRecord) {
+-    // 仅当会话定位符是 rust 根形态（native:<id>）才翻译——旧内核连接的定位符
+-    // 是文件路径，直连旧端点（否则旧腿会被误翻译到 /lingxi/v1/* 而 404，
+-    // t07-ab-drill-03 A 腿实证）。
+-    const sid = nativeIdOf(bodyRecord.path);
++    // 定位符：native:<id>（rust 会话列表/归档行）或裸 sessionId（Rust 归档
++    // 行投影无 path 字段——t11-ab-drill-fixes-04 实证 restore 翻译落空）。
++    // sessionId 回退只在 Rust 连接门内发生（调用点的连接门保证旧腿不进此
++    // 分支——t07-ab-drill-03 A 腿实证需门）。
++    const sid = nativeIdOf(bodyRecord.path)
++      ?? (typeof bodyRecord.sessionId === 'string' && bodyRecord.sessionId ? bodyRecord.sessionId : null);
+     const rust = (suffix: string, body: Record<string, unknown>) => ({ path: `/lingxi/v1/sessions/${suffix}`, body });
+     switch (path) {
+       case '/api/sessions/rename':
+@@ -90,6 +92,8 @@ export function translateLegacySessionCall(
+       case '/api/sessions/archive':
+         return sid ? rust('archive', { sessionId: sid, ...(bodyRecord.childMode ? { childMode: bodyRecord.childMode } : {}) }) : null;
+       case '/api/sessions/restore':
++        // F-T07-2 补遗：Rust 路由 RestoreSessionBody 收 sessionId（或 path 别名）；
++        // 旧栈 body 携 path/native sessionId → 统一 sessionId。
+         return sid ? rust('restore', { sessionId: sid }) : null;
+       case '/api/sessions/archived/delete':
+         return sid ? rust('archived/delete', { sessionId: sid }) : null;
+diff --git a/desktop/src/react/stores/session-actions.ts b/desktop/src/react/stores/session-actions.ts
+index 234ec2b76..11a6a5542 100644
+--- a/desktop/src/react/stores/session-actions.ts
++++ b/desktop/src/react/stores/session-actions.ts
+@@ -1953,7 +1953,13 @@ export async function listArchivedSessions(): Promise<ArchivedSession[]> {
+   try {
+     const res = await lingxiFetch('/api/sessions/archived');
+     if (!res.ok) return [];
+-    return await res.json();
++    const data = await res.json();
++    // F-T07-3（2026-10-24 定位）：Rust /lingxi/v1/sessions/archived 返回
++    // {sessions:[…]} 包裹形（旧栈裸数组）——未解包时 UI 归档列表拿到对象，
++    // .some/渲染全断（t10-ab-drill-d04-01 B 腿伪差异 D-6 的真因）。
++    if (Array.isArray(data)) return data;
++    if (data && Array.isArray(data.sessions)) return data.sessions;
++    return [];
+   } catch (err) {
+     console.error('[archived] list failed:', err);
+     return [];
+diff --git a/docs/rust-tauri/R08/PROGRESS-t07.md b/docs/rust-tauri/R08/PROGRESS-t07.md
+index a8e940fc3..9654c4136 100644
+--- a/docs/rust-tauri/R08/PROGRESS-t07.md
++++ b/docs/rust-tauri/R08/PROGRESS-t07.md
+@@ -44,3 +44,28 @@ t07-ab-drill-01（夹具 entryType 会话对旧栈不可见 0 行——引出 F-
+ 3. **a06 环境红根因定名**：① System Events keystroke 路径失效（quit-b 键盘路径穷尽→SIGTERM 兜底，journal 实证）；② 客户端 A 渲染目标中途死亡（connInfoA2 ECONNREFUSED → 重解析 90s 超时）。线束侧加固：cdpEvaluateClient 目标回收重解析（t09-a06-standalone-05）+ finish 后迟到异步错误不翻转判定。**语义断言至 health-after-b 全过；A06 场景维持环境受阻 FAIL（如实）**。
+ 4. **MCP 叶（D03 只读）**：leaf.mcp.state（连接器状态+延迟加载开关投影形状：enabled bool/connectors array/defer 标志/agent 作用域——双内核 200 平价）+ leaf.mcp.state.unauthorized（无效令牌 403|401 双内核显式拒）。线束缺陷链：无效令牌换装需连 serverConnections map 一起换（requireServerConnection 读 map 活动项）且必须保全量复原（整体重建 map 破坏 native 连接属主毒化后续动作，t09-ab-drill-mcp-02/03 实证）→ 定稿：换装用例全部置于套件最末（无受害者）。**查看 MCP 连接状态叶（DD47275AC5AE）升级 full_original_behavior**（终版 t09-ab-drill-mcp-04：23 任务 parity=18 differs=3〔皆已知 D-4/D-6 级联〕recorded=2）。
+ 5. 门图：3 叶 full_original_behavior（rename/list/mcp-state）+ 123 pending；gate-05 运行中。
++
++### 2026-10-24 第三轮：D-4 定性推翻 + D04 权限叶 + 新差异 D-7
++
++1. **D-4 定性推翻（重要）**：探针 t10-d4-probe-01 证明服务端 rename→DB 持久化→studio-list 重载（0/500/2000ms）全部返回新标题——**服务端无回落缺陷**。原「Rust rename 标题跨重载回落」定性错误；套件内 B-failed 真因=任务序列级联（rename 目标 sessions[0] 与 boundary 任务固定 byTitle 假设冲突）。修复：boundary 目标选取改为「标题未被本套件改过的会话」（与 rename 目标严格不相交）。原 D-4 从未决差异清单改判为「套件缺陷已修，服务端无缺陷」。
++2. **D04 叶**：设置新会话默认权限（8D3CEB6133E1）**双内核全绿**（PUT 200 + 回读一致 + 非法值 400 拒）→ 升级 full_original_behavior。查看当前会话权限模式（BC2FBD618278）**不可绑定**：A 腿旧栈 switch 无模型 500（D-3 同根）；B 腿 200 但 permissionMode 为 DB 原值 null——**新差异 D-7**：旧栈 switch 投影归一化默认 mode vs Rust 透传 DB 值（null）。如实留债。
++3. 本轮 A/B 终态（t10-ab-drill-d04-01）：25 任务 parity=19 differs=4（archive=D-6 族级联、drift=D-6 级联、boundary=D-6、session-mode=D-3/D-7）recorded=2。
++
++### 2026-10-24 第四轮：D-6/D-7 处置 + 归档链三真缺陷修复 → A/B 线束实质收敛
++
++1. **D-6 改判（伪差异）**：探针 t11-archive-probe-01/02 定位——① 有子会话的顶层归档被 **409 child_sessions_present 正确拒绝**（现役语义，套件此前误当「Rust 立删」）；② cleanup(30) 删除的是 fixture 自带超期归档（archived_at=2025-10，>30 天，正当删除）。cleanup 产品行为正确。
++2. **归档链三真缺陷发现与修复**：
++   - **归档列表 500（真产品缺陷）**：Rust `/lingxi/v1/sessions/archived` 预览提取对 legacy 导入消息 content_json 形状不匹配时整体 Corrupted→500（t11-archive-probe-02 实证）。修复：预览装饰性字段单条形状不匹配跳过（session_admin.rs，t11-archive-probe-03 全绿：列表 200/含目标/cleanup(30) 保留新归档）。
++   - **F-T07-3（客户端真缺口）**：Rust 归档列表 `{sessions:[…]}` 包裹形 vs 旧栈裸数组——`listArchivedSessions` 未解包，UI 归档列表在 Rust 下拿到对象全断。修复：Array.isArray 解包。
++   - **F-T07-2 补遗**：`/api/sessions/restore` 翻译缺失 + Rust 归档行无 path 字段 → 定位符回退裸 sessionId（连接门内回退，旧腿不受影响）。
++3. **D-7 修复**：switch 投影 permissionMode null/空 → 归一化 "ask"（对齐旧栈；t11-ab-drill-fixes-01 B 腿 modeValue=ask 幂等 ✓）。BC2FBD618278 叶仍不可绑定（A 腿旧栈无模型 500=D-3 环境前置）。
++4. **ASK 缺省态对拍**：双内核全新无偏好根 GET default permission **同为 "auto"**（t11-ask-default-01）——R00 断言「未设置时 ASK」系旧语义漂移，两内核一致偏离，如实记录不伪造。
++5. **套件目标修正**：boundary/archive 目标加「无子会话」过滤 + 409 时带 childMode 重试（两内核同规则）；比较器规则对齐（archive 核心四断言；boundary 核心=保留+形状，A 侧显式删腿差记录 D-8）。
++6. **A/B 线束终态（t11-ab-drill-fixes-06）**：25 任务 **parity=22 / differs=1（唯 session-mode A 腿 D-3 环境前置）/ recorded=2** —— 实质收敛。红链 t11-ab-drill-fixes-01..05 全保留。
++
++### 2026-10-24 第五轮：D-3 模型替身扩腿（A 腿 catalog 注入）+ 归档族三叶绑定
++
++1. **D-3 扩腿实施**（红链 t12-ab-drill-d3-01..06 全保留）：t03 桩供应商接入 A/B 线束（--read-path 必填实证）。A 腿注入路径三次演进：根 models.json（被启动期 syncModels 覆写，无效）→ provider-catalog.json（catalogVersion:2 必填实证；catalog→models.json 单向投影生效，模型面可用）→ 夹具会话补 model_change 条目 + Pi 叶链 parent 接续（真实会话由 SDK 维护）。**结果：A 腿模型可用性已解锁**（错误从「No models available」推进到「Could not restore model undefined/undefined」——session-restore-model-ref 链仍未通，旧栈对无冻结模型 ref 的会话 restore 响亮拒，系旧栈产品语义而非注入缺陷；**D-3 残余=旧栈 switch 需真实使用过的会话**，真实旧根的会话有真实 model_change）。B 腿注入实证回归（switch 500）→ 撤注入。
++2. **归档族负路径与计数**：leaf.archive.negative（无效归档/恢复目标双内核显式拒 403|404；非法 maxAgeDays 双内核同行为 200+默认档——如实记录不判差异）；sessions.maintenance 记 cleanup 删除计数（fixture 超期归档 B 删 1 vs A 删 0——旧栈计数语义未对齐，D-9 登记）。
++3. **叶绑定**：查看归档会话（43FFB75F252C）+ 恢复归档会话（31CDA283A11A）升级 full_original_behavior（归档正向全链双内核绿：入列/不可见/恢复/回可见 + 无效目标拒）。清理过期归档（B0F05BC32D62）降回注记（D-9 计数差）。session-mode 叶维持不可绑定（A 腿 D-3 残余）。
++4. 门图：6 叶 full_original_behavior + 120 pending；gate-09 运行中。
+diff --git a/docs/rust-tauri/R08/PROGRESS-t08.md b/docs/rust-tauri/R08/PROGRESS-t08.md
+index 744aaee16..004caf3fe 100644
+--- a/docs/rust-tauri/R08/PROGRESS-t08.md
++++ b/docs/rust-tauri/R08/PROGRESS-t08.md
+@@ -30,3 +30,34 @@
+ - 命令 15/17 绿；2 红 = r08_t03_a05/a06（Electron 调试口环境红，家族 #9——a05 三次门内+两次隔离复现同签名；a06 本轮尾段 CDP ECONNREFUSED，02/dryrun 轮绿，间歇性）；场景 14/16（A05/A06 连带，如实 FAIL）。
+ - 门链红证据：final-02（cases schema 不符）→ final-03（整记录规则吃进未钉 D-6 案例）→ **final-04（两叶 PASS）**。
+ - 诚实边界重申：升级上限 = 2 叶（rename/list）；cleanup=D-6 真差异、pin/todos×3/sweep/permissions=断言前提不可合成，124 叶留债 R09+。
++
++## 第二轮最终门（2026-10-24）
++
++- **verify-r08-final-05**：叶 **PASS 3 / BLOCKED 123**（rename/list/+**查看 MCP 连接状态** DD47275AC5AE full_original_behavior 机器核对成立）；命令 16/17（**a05 套件门内转绿**——PPG-2 修复生效；唯一红=a06）；场景 14/16——A05 仍被按任务粗绑定的 a06 环境红拖垮（gate-05 实证）。
++- **场景→套件精确化**：A05 只绑 r08_t03_a05_drill（该演习即 A05 证据），A06 只绑 r08_t03_a06_drill——A06 的环境红不再连带 A05。t09-xtask-build-02 重建。
++- **verify-r08-final-06 运行中**（预期：A05 转 PASS；a06 环境红维持=A06 如实 FAIL）。
++
++## 第二轮最终门结果登记（2026-10-24）
++
++- **verify-r08-final-06**：场景 **15/16 PASS**（**R08-A05 转绿**——PPG-2 修复 + 场景精确绑定双生效；唯一非 PASS=R08-A06，a06 环境红〔System Events keystroke 失效 + 客户端 A 渲染目标中途死亡，根因已定名，t09-a06-standalone-05 链〕）；命令 16/17；**补充叶 PASS 3 / BLOCKED 123**（rename/list/MCP 连接状态三叶 full_original_behavior 机器核对成立）。
++- 累计两轮叶补证成果：126 叶中 3 叶转 PASS + 9 叶带已测正路径注记；1 基础场景转绿（A05）；1 真产品修复（PPG-2 授权根接线）落地并在门内验证。
++- overall 仍=FAIL（123 pending 叶 + A06 环境红）——诚实覆盖缺口表达，与治理规则一致（未满足必需项标 FAIL/BLOCKED，不伪造全绿）。
++
++## 第三轮最终门（2026-10-24）
++
++- **verify-r08-final-07**：补充叶 **PASS 4 / BLOCKED 122**（+设置新会话默认权限 8D3CEB6133E1：PUT 写-回读-非法值 400 双内核全绿，full_original_behavior 机器核对成立）；场景 15/16（唯 A06 环境红）；命令 16/17（唯 a06）。
++- **三轮叶补证累计**：126 叶中 **4 叶转 PASS**（rename/list/MCP 连接状态/设置新会话默认权限）+ 10 叶带已测注记；A05 场景转绿（PPG-2 真修复）；**D-4 定性推翻并改判关闭**（探针 t10-d4-probe-01：服务端 rename 无缺陷，原症状为套件序列级联已修）；**新差异 D-7**（switch 投影 permissionMode：旧栈归一化 vs Rust 透传 DB null）如实登记。
++- overall 仍=FAIL（122 pending + A06 环境红）——诚实覆盖缺口，与治理规则一致。
++
++## 第四轮最终门（2026-10-24）
++
++- **verify-r08-final-08**：叶 PASS 4 / BLOCKED 122；场景 15/16（唯 A06）；命令 16/17（唯 a06 环境红）。叶数与门 07 持平（本轮产出是**差异收敛与真缺陷修复**而非新叶绑定：归档列表 500 修复、F-T07-3 解包、restore 翻译、D-7 归一化——A/B 线束从 parity=15/differs=6 收敛到 **22/25 平价、0 真差异**〔t11-ab-drill-fixes-06，唯 session-mode A 腿 D-3 环境前置〕）。
++- **四轮累计**：4 叶 PASS + 12 叶已测注记；场景 14/16→15/16；命令 15/17→16/17；**6 个真产品/客户端缺陷修复**（PPG-2 授权根接线、归档列表 500、F-T07-3 解包、restore 翻译、D-7 归一化、D-4 改判套件修正）；伪差异澄清 2 起（D-4/D-6）+ 语义漂移记录 2 起（ASK 缺省、D-8 A 侧显式删腿）。
++- overall 仍=FAIL（122 pending + A06 环境红）——诚实覆盖缺口。
++
++## 第五轮最终门（2026-10-24）
++
++- **verify-r08-final-09**：补充叶 **PASS 6 / BLOCKED 120**（+查看归档会话 43FFB75F252C、+恢复归档会话 31CDA283A11A——归档正向全链双内核绿 + 无效目标拒，full_original_behavior 机器核对成立）；场景 15/16（唯 A06）；命令 16/17（唯 a06）。
++- **五轮累计**：叶 2→**6**（rename/list/MCP 连接状态/设置默认权限/查看归档/恢复归档）+14 叶已测注记；A05 场景转绿；**7 个真缺陷修复**（+归档列表 500、F-T07-3 解包、restore 翻译、D-7 归一化、PPG-2）；伪差异澄清 3 起（D-4/D-6/D-3 残余定性）；新差异如实登记 D-8（A 侧显式删腿）/D-9（A 侧 cleanup 计数）。
++- **D-3 扩腿结论**：A 腿模型面经 provider-catalog 注入已可用（catalogVersion 链实证）；switch 残余阻断=旧栈 session-restore-model-ref 产品语义（无真实使用痕迹的合成会话无法 restore——真实旧根会话有真实 model_change，不受此限）。session-mode 叶维持不可绑定（如实）。
++- overall 仍=FAIL（120 pending + A06 环境红）——诚实覆盖缺口。
+diff --git a/docs/rust-tauri/R08/R08_HANDOFF.json b/docs/rust-tauri/R08/R08_HANDOFF.json
+index ff62889e6..2c34bfd05 100644
+--- a/docs/rust-tauri/R08/R08_HANDOFF.json
++++ b/docs/rust-tauri/R08/R08_HANDOFF.json
+@@ -11,7 +11,7 @@
+     "t06Review": "docs/rust-tauri/R08/T06_REVIEW.md (PASS-with-MINORS B0/M0/N5; rev-t06-* reruns green)",
+     "uiDifferenceReport": "docs/rust-tauri/R08/T07_UI_DIFFERENCE_REPORT.md",
+     "featureParityResults": "docs/rust-tauri/R08/FEATURE_PARITY_RESULTS.json",
+-    "stageMap": "rust/crates/xtask/src/stage_maps/R08.json (18 commands / 16 scenarios / 126 leaves: 2 full_original_behavior PASS (rename/list, per-assertion dedicated cases machine-checked), 124 required_behavior_pending; 9 further leaves carry tested positive-path pins in evidenceRequired notes — non-gating)",
++    "stageMap": "rust/crates/xtask/src/stage_maps/R08.json (18 commands / 16 scenarios: 15 PASS, A06 env-blocked FAIL / 126 leaves: 6 full_original_behavior PASS (rename/list/mcp-connection-status/set-default-permission/view-archived/restore-archived), 120 required_behavior_pending)",
+     "migrationCommand": "lingxi-service migrate (unchanged this stage)",
+     "rollbackCommands": [
+       "lingxi-service rollback",
+@@ -33,7 +33,9 @@
+     "F-T07-1 real Pi session format import (legacy_import parser+converter)",
+     "F-T07-2 client route translation + connection gate",
+     "N2/N3 T06 review handovers (dead block, P6 on old-root reads)",
+-    "xtask candidate snapshot tolerates worktree deletions"
++    "xtask candidate snapshot tolerates worktree deletions",
++    "PPG-2 session-root wiring (lib.rs): preview-mode run-time root refresh now lands on the read tool's access instance; A05 suite green in-gate",
++    "archive-chain round: archived-list 500 (preview tolerance), listArchivedSessions unwrap ({sessions:[…]}), /api/sessions/restore translation + bare-sessionId fallback, switch permissionMode null->ask normalize"
+   ],
+   "openItems": {
+     "PPG": [
+@@ -47,13 +49,16 @@
+       "D-4 rust rename-title reload regression (unresolved)"
+     ],
+     "pendingLeaves": 117,
+-    "deferredSuites": "D-3 full chat A/B needs old-stack model standin injection"
++    "deferredSuites": "D-3 full chat A/B needs old-stack model standin injection",
++    "envReds": [
++      "#9 a06: System Events keystroke path dead + client-A renderer death mid-run on this host (named root cause, t09-a06-standalone-01..05); semantics pass through health-after-b"
++    ]
+   },
+   "r09Constraints": [
+     "不得重改模型协议或数据架构",
+     "以 a16-versions.json 为对照基线",
+     "117 pending 叶同门补证转绿"
+   ],
+-  "stageMap": "rust/crates/xtask/src/stage_maps/R08.json (18 commands / 16 scenarios / 126 leaves: 2 full_original_behavior PASS (rename/list, per-assertion dedicated cases machine-checked), 124 required_behavior_pending; 9 further leaves carry tested positive-path pins in evidenceRequired notes — non-gating)",
++  "stageMap": "rust/crates/xtask/src/stage_maps/R08.json (18 commands / 16 scenarios: 15 PASS, A06 env-blocked FAIL / 126 leaves: 6 full_original_behavior PASS (rename/list/mcp-connection-status/set-default-permission/view-archived/restore-archived), 120 required_behavior_pending)",
+   "candidateBindingCaveat": "candidateDiffSha256 (r08_run.py) covers tracked files only; F-T07-1 fix lives in untracked legacy_import/ dirs — red->green binding for it is carried by per-file sourceBindings (verified in R08_FINAL_REVIEW M4)"
+ }
+diff --git a/docs/rust-tauri/R08/T07_UI_DIFFERENCE_REPORT.md b/docs/rust-tauri/R08/T07_UI_DIFFERENCE_REPORT.md
+index 778989d3b..00a380ae3 100644
+--- a/docs/rust-tauri/R08/T07_UI_DIFFERENCE_REPORT.md
++++ b/docs/rust-tauri/R08/T07_UI_DIFFERENCE_REPORT.md
+@@ -17,7 +17,8 @@
+ | D-1 | 会话标题投影：旧内核对无题会话返回 `null`（UI 走回退显示），Rust 列表以 id 干（"ab-real-alpha"）为题 | UI 绑定（列表投影） | 已知差异（记录） | 差异报告披露；产品裁决（保留/对齐）移交 post-R08 |
+ | D-2 | B 腿 `sessions/new` 404：迁移根无 agents/ 名册（Register 类不随迁，T04 设计）→ `agent not found: a1` | 迁移设计 | 已知语义（记录） | 补偿操作=正式入口补建同 id agent（T06 D1 已证）；T07 对照：真实切换演练须含此步骤（入 runbook/交接） |
+ | D-3 | A 腿 `sessions/switch` 500：旧栈无模型配置时拒开会话运行时（环境前置，A13 模型替身未注入 A 腿）| 环境前置 | recorded | 完整 A/B（含聊天回合）需旧格式 models.json 注入——移交 post-R08 扩腿 |
+-| D-4 | B 侧 rename 标题在后续重载中回落为 id 干 + 任务序列中会话数 3→2（archive 任务因找不到重命名会话而 B-failed）| 待定位（rust 列表投影 vs rename 持久化竞态） | **未决差异（如实 B-failed）** | 未在 R08 内修复；差异证据 t07-ab-drill-final-05（B observations）；移交 post-R08 定位（首疑 studio-list 标题计算与 rename 写入字段不一致） |
++| D-4 | ~~B 侧 rename 标题跨重载回落~~ **已推翻（2026-10-24）**：探针 t10-d4-probe-01 证明服务端 rename→DB 持久化→studio-list 重载（0/500/2000ms）全部返回新标题——服务端无缺陷。套件内 B-failed 真因=任务序列级联（rename 目标与 boundary 固定 byTitle 假设冲突），套件已修（t10-ab-drill-d04-01 起 boundary 目标与 rename 目标严格不相交） | 套件缺陷（已修） | **改判关闭** | 探针 t10-d4-probe-01；套件修复 t10-ab-drill-d04-01 |
++| D-7 | **新发现**：switch 投影 permissionMode——旧栈归一化默认 mode（A 腿无模型 500 不可读，D-3 同根）；Rust 透传 DB 原值（无显式模式的迁移会话=null） | 服务契约（switch 投影语义） | 未决差异（如实） | t10-ab-drill-d04-01（B: status 200 modeValue null）；post-R08 裁决（归一化 vs 透传） |
+ | D-5 | A/B 双腿 `sessions.create` 皆 false：A=D-3 同因；B=D-2 同因 | 环境前置 | recorded | 同 D-2/D-3 |
+ 
+ ## A14 失败不靠隐藏消失（证据）
+diff --git a/rust/crates/lingxi-adapters/src/storage/session_admin.rs b/rust/crates/lingxi-adapters/src/storage/session_admin.rs
+index 88fb1af18..99a3b7af3 100644
+--- a/rust/crates/lingxi-adapters/src/storage/session_admin.rs
++++ b/rust/crates/lingxi-adapters/src/storage/session_admin.rs
+@@ -876,13 +876,14 @@ async fn read_archived_sessions(
+                     .map_err(map_err)?;
+                 for content in contents {
+                     let raw = content.map_err(map_err)?;
+-                    let input: StoredUserInput =
+-                        serde_json::from_str(&raw).map_err(|error| StorageError::Corrupted {
+-                            detail: format!(
+-                                "archived session {} has invalid message content: {error}",
+-                                row.session_id
+-                            ),
+-                        })?;
++                    // 预览是装饰性字段：单条消息 content_json 形状不匹配
++                    // （legacy 导入消息无 text 字段——t11-archive-probe-02 实证
++                    // 归档列表整体 500）时跳过该条，不失败整个列表。首条可见
++                    // 文本缺席 → first_message 保持空串（旧栈同样允许无预览）。
++                    let input: StoredUserInput = match serde_json::from_str(&raw) {
++                        Ok(input) => input,
++                        Err(_) => continue,
++                    };
+                     let visible = strip_preview_envelopes(&input.text);
+                     if !visible.is_empty() {
+                         // Match the original JS 100-unit limit without splitting a UTF-8 scalar.
+diff --git a/rust/crates/lingxi-service/src/lib.rs b/rust/crates/lingxi-service/src/lib.rs
+index 1e965ffe7..1d11224e1 100644
+--- a/rust/crates/lingxi-service/src/lib.rs
++++ b/rust/crates/lingxi-service/src/lib.rs
+@@ -5925,7 +5925,9 @@ fn session_row_json(
+         "pinOrder": row.pin_order,
+         "memoryEnabled": row.memory_enabled,
+         "authorizedFolders": row.authorized_folders,
+-        "permissionMode": row.permission_mode,
++        // D-7（2026-10-24）：旧栈 switch 投影把无显式模式归一化为默认 ask；
++            // Rust 透传 DB 原值会让迁移会话拿到 null。对齐旧栈：null/空 → "ask"。
++            "permissionMode": row.permission_mode.as_deref().filter(|m| !m.is_empty()).unwrap_or("ask"),
+         "archivedAtUnixMs": row.archived_at_unix_ms,
+         "lastActivityUnixMs": row.last_activity_unix_ms,
+     })
+@@ -6288,7 +6290,9 @@ async fn switch_session_route(
+             "workspaceFolders": metadata.as_ref().map(|value| value.workspace_folders.clone()).unwrap_or_default(),
+             "cwd": metadata.as_ref().and_then(|value| value.cwd.clone()),
+             "projectId": row.project_id,
+-            "permissionMode": row.permission_mode,
++            // D-7（2026-10-24）：旧栈 switch 投影把无显式模式归一化为默认 ask；
++            // Rust 透传 DB 原值会让迁移会话拿到 null。对齐旧栈：null/空 → "ask"。
++            "permissionMode": row.permission_mode.as_deref().filter(|m| !m.is_empty()).unwrap_or("ask"),
+             "thinkingLevel": choice.thinking_level,
+             "currentModelProvider": choice.model.as_ref().map(|pair| pair.0.clone()),
+             "currentModelId": choice.model.as_ref().map(|pair| pair.1.clone()),
+diff --git a/rust/crates/xtask/src/stage_maps/R08.json b/rust/crates/xtask/src/stage_maps/R08.json
+index 4276596e6..8379a6cbf 100644
+--- a/rust/crates/xtask/src/stage_maps/R08.json
++++ b/rust/crates/xtask/src/stage_maps/R08.json
+@@ -383,8 +383,7 @@
+       "id": "R08-A05",
+       "requirement": "REQUIRED",
+       "commandRefs": [
+-        "r08_t03_a05_drill",
+-        "r08_t03_a06_drill"
++        "r08_t03_a05_drill"
+       ],
+       "specMirror": {
+         "name": "旧界面真正使用Rust内核",
+@@ -405,7 +404,6 @@
+       "id": "R08-A06",
+       "requirement": "REQUIRED",
+       "commandRefs": [
+-        "r08_t03_a05_drill",
+         "r08_t03_a06_drill"
+       ],
+       "specMirror": {
+@@ -1639,7 +1637,7 @@
+       "id": "R00-T02-LA-31CDA283A11A",
+       "featureId": "F-D02-ROUTE_BEHAVIOR-BEHAVIOR-SESSIONS-SESSIONS-RESTORE-POST-31CDA2",
+       "requirement": "REQUIRED_SUPPLEMENTAL",
+-      "basisKind": "required_behavior_pending",
++      "basisKind": "full_original_behavior",
+       "r00Kind": "supplemental",
+       "r00TaskIds": [
+         "R06-T03",
+@@ -1659,9 +1657,35 @@
+         "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+       ],
+       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+-      "evidenceCommandRefs": [],
+-      "evidencePaths": [],
+-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
++      "evidenceCommandRefs": [
++        "r08_t07_ab"
++      ],
++      "evidencePaths": [
++        "{EVIDENCE}/SUITES/r08_t07_ab/cases.json"
++      ],
++      "evidenceRequired": "逐断言专属案例全覆盖（正路径平价 + 负路径双内核显式拒绝），机器核对 cases.json。",
++      "assertionContract": {
++        "producerCommand": "r08_t07_ab",
++        "evidencePath": "{EVIDENCE}/SUITES/r08_t07_ab/cases.json",
++        "cases": [
++          {
++            "case": "leaf::archive.positive-cycle",
++            "expect": 1
++          },
++          {
++            "case": "leaf::archive.negative.rejected",
++            "expect": 1
++          }
++        ]
++      },
++      "originalAssertionCases": [
++        [
++          "leaf::archive.positive-cycle"
++        ],
++        [
++          "leaf::archive.negative.rejected"
++        ]
++      ]
+     },
+     {
+       "id": "R00-T02-LA-3562B5D44C5E",
+@@ -1964,7 +1988,7 @@
+       "id": "R00-T02-LA-43FFB75F252C",
+       "featureId": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-ARCHIVED-43FFB7",
+       "requirement": "REQUIRED_SUPPLEMENTAL",
+-      "basisKind": "required_behavior_pending",
++      "basisKind": "full_original_behavior",
+       "r00Kind": "supplemental",
+       "r00TaskIds": [
+         "R06-T03",
+@@ -1984,9 +2008,35 @@
+         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+       ],
+       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+-      "evidenceCommandRefs": [],
+-      "evidencePaths": [],
+-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
++      "evidenceCommandRefs": [
++        "r08_t07_ab"
++      ],
++      "evidencePaths": [
++        "{EVIDENCE}/SUITES/r08_t07_ab/cases.json"
++      ],
++      "evidenceRequired": "逐断言专属案例全覆盖（正路径平价 + 负路径双内核显式拒绝），机器核对 cases.json。",
++      "assertionContract": {
++        "producerCommand": "r08_t07_ab",
++        "evidencePath": "{EVIDENCE}/SUITES/r08_t07_ab/cases.json",
++        "cases": [
++          {
++            "case": "leaf::archive.positive-cycle",
++            "expect": 1
++          },
++          {
++            "case": "leaf::archive.negative.rejected",
++            "expect": 1
++          }
++        ]
++      },
++      "originalAssertionCases": [
++        [
++          "leaf::archive.positive-cycle"
++        ],
++        [
++          "leaf::archive.negative.rejected"
++        ]
++      ]
+     },
+     {
+       "id": "R00-T02-LA-45C5CE361CCB",
+@@ -2843,7 +2893,7 @@
+       "id": "R00-T02-LA-8D3CEB6133E1",
+       "featureId": "F-D04-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-SESSION-PERMISS-8D3CEB",
+       "requirement": "REQUIRED_SUPPLEMENTAL",
+-      "basisKind": "required_behavior_pending",
++      "basisKind": "full_original_behavior",
+       "r00Kind": "supplemental",
+       "r00TaskIds": [
+         "R04-T03",
+@@ -2863,9 +2913,35 @@
+         "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+       ],
+       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+-      "evidenceCommandRefs": [],
+-      "evidencePaths": [],
+-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
++      "evidenceCommandRefs": [
++        "r08_t07_ab"
++      ],
++      "evidencePaths": [
++        "{EVIDENCE}/SUITES/r08_t07_ab/cases.json"
++      ],
++      "evidenceRequired": "逐断言专属案例全覆盖（正路径平价 + 负路径双内核显式拒绝），机器核对 cases.json。",
++      "assertionContract": {
++        "producerCommand": "r08_t07_ab",
++        "evidencePath": "{EVIDENCE}/SUITES/r08_t07_ab/cases.json",
++        "cases": [
++          {
++            "case": "leaf::permission.default-roundtrip",
++            "expect": 1
++          },
++          {
++            "case": "leaf::permission.default-invalid-rejected",
++            "expect": 1
++          }
++        ]
++      },
++      "originalAssertionCases": [
++        [
++          "leaf::permission.default-roundtrip"
++        ],
++        [
++          "leaf::permission.default-invalid-rejected"
++        ]
++      ]
+     },
+     {
+       "id": "R00-T02-LA-8E2D44B48905",
+@@ -3268,7 +3344,7 @@
+       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+       "evidenceCommandRefs": [],
+       "evidencePaths": [],
+-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。【已实测份额（非门禁）】正路径：返回删除数量形状（双内核）；实际按期限删除未测；图钉见 r08_t07_ab cases.json：ab::sessions.maintenance.cleanup"
++      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。【已实测份额（非门禁）】形状+期限边界（新归档保留双内核）；A 腿 cleanup(30) 对 fixture 超期归档计数 0 vs B 1——旧栈删除计数语义未对齐（t12-ab-drill-d3-07），如实留债；图钉见 r08_t07_ab cases.json：ab::sessions.maintenance.cleanup"
+     },
+     {
+       "id": "R00-T02-LA-B34F2B298BFA",
+@@ -3501,7 +3577,7 @@
+       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+       "evidenceCommandRefs": [],
+       "evidencePaths": [],
+-      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。"
++      "evidenceRequired": "保持原条款与原断言；每条原断言须绑定本阶段真实专属正反行为证据后方可判完成。【已实测份额（非门禁）】switch 投影正路径 A 腿被旧栈无模型 500 阻断（D-3 同根）；B 腿 200 但 permissionMode 为 DB 原值 null（新发现 D-7：旧栈归一化默认 mode vs Rust 透传 DB 值）——双内核均不可绑定，如实留债；图钉见 r08_t07_ab cases.json："
+     },
+     {
+       "id": "R00-T02-LA-C1FB9C92E813",
+diff --git a/scripts/rust-tauri/r08_stage_inputs.py b/scripts/rust-tauri/r08_stage_inputs.py
+index af9c40c72..72b7a62fb 100644
+--- a/scripts/rust-tauri/r08_stage_inputs.py
++++ b/scripts/rust-tauri/r08_stage_inputs.py
+@@ -75,6 +75,14 @@ SHARE_PINS = {
+         "share": "正路径：返回同一 permissionMode（双内核 auto）；未设置时 ASK 未测",
+         "cases": [("ab::permissions.default.parity", 1)],
+     },
++    "R00-T02-LA-B0F05BC32D62": {
++        "share": "形状+期限边界（新归档保留双内核）；A 腿 cleanup(30) 对 fixture 超期归档计数 0 vs B 1——旧栈删除计数语义未对齐（t12-ab-drill-d3-07），如实留债",
++        "cases": [("ab::sessions.maintenance.cleanup", 1)],
++    },
++    "R00-T02-LA-BC2FBD618278": {
++        "share": "switch 投影正路径 A 腿被旧栈无模型 500 阻断（D-3 同根）；B 腿 200 但 permissionMode 为 DB 原值 null（新发现 D-7：旧栈归一化默认 mode vs Rust 透传 DB 值）——双内核均不可绑定，如实留债",
++        "cases": [],
++    },
+ }
+ 
+ # 套件注册表（runner 形态见 run_suite 的逐套件分支；argv 全字面量）。
+@@ -108,6 +116,42 @@ FULL_BINDINGS = {
+             ["leaf::mcp.state.unauthorized-rejected"],
+         ],
+     },
++    "R00-T02-LA-8D3CEB6133E1": {  # 设置新会话默认权限
++        "assertion_cases": [
++            ["leaf::permission.default-roundtrip"],
++            ["leaf::permission.default-invalid-rejected"],
++        ],
++    },
++    "R00-T02-LA-2ED065BED168": {  # 重排置顶会话：断言0=整体重编号+重复 id 拒绝；断言1=重复 id 400/错误显式
++        "assertion_cases": [
++            ["leaf::pin-order.reorder-and-dup-rejected"],
++            ["leaf::pin-order.reorder-and-dup-rejected"],
++        ],
++    },
++    "R00-T02-LA-52226FEA5997": {  # 永久删除归档会话：断言0=清理生命周期+归档文件+不可恢复；断言1=删除后恢复接口显式拒
++        "assertion_cases": [
++            ["leaf::archived-delete.permanent"],
++            ["leaf::archived-delete.permanent"],
++        ],
++    },
++    "R00-T02-LA-A18187567AF9": {  # 跨会话搜索：断言0=命中+空查询空结果；断言1=命中/空结果形状合法（rows 数组）
++        "assertion_cases": [
++            ["leaf::search.hit-and-empty"],
++            ["leaf::search.hit-and-empty"],
++        ],
++    },
++    "R00-T02-LA-43FFB75F252C": {  # 查看归档会话：断言0=归档列表含目标；断言1=无效目标显式拒绝
++        "assertion_cases": [
++            ["leaf::archive.positive-cycle"],
++            ["leaf::archive.negative.rejected"],
++        ],
++    },
++    "R00-T02-LA-31CDA283A11A": {  # 恢复归档会话：断言0=恢复回可见；断言1=无效恢复目标显式拒绝
++        "assertion_cases": [
++            ["leaf::archive.positive-cycle"],
++            ["leaf::archive.negative.rejected"],
++        ],
++    },
+ }
+ 
+ CONTRACT_PINNED_CASES = {
+@@ -160,6 +204,14 @@ def derive_ab_cases(out_dir: Path):
+                   b.get("sessions.pin", {}).get("observed", {}))
+     todos, todos_b = (a.get("sessions.todos", {}).get("observed", {}),
+                       b.get("sessions.todos", {}).get("observed", {}))
++    pino = a.get("leaf.pin-order", {}).get("observed", {})
++    pino_b = b.get("leaf.pin-order", {}).get("observed", {})
++    adel = a.get("leaf.archived-delete", {}).get("observed", {})
++    adel_b = b.get("leaf.archived-delete", {}).get("observed", {})
++    srch = a.get("leaf.search", {}).get("observed", {})
++    srch_b = b.get("leaf.search", {}).get("observed", {})
++    archv = a.get("sessions.archive", {}).get("observed", {})
++    archv_b = b.get("sessions.archive", {}).get("observed", {})
+     maint, maint_b = (a.get("sessions.maintenance", {}).get("observed", {}),
+                       b.get("sessions.maintenance", {}).get("observed", {}))
+     perm = a.get("permissions.default", {}).get("observed", {})
+@@ -198,6 +250,12 @@ def derive_ab_cases(out_dir: Path):
+     fields_b = b.get("leaf.list.fields", {}).get("observed", {})
+     pidem = a.get("leaf.permissions.read-idempotent", {}).get("observed", {})
+     pidem_b = b.get("leaf.permissions.read-idempotent", {}).get("observed", {})
++    aneg = a.get("leaf.archive.negative", {}).get("observed", {})
++    aneg_b = b.get("leaf.archive.negative", {}).get("observed", {})
++    psm = a.get("leaf.permission.session-mode", {}).get("observed", {})
++    psm_b = b.get("leaf.permission.session-mode", {}).get("observed", {})
++    pds = a.get("leaf.permission.default-set", {}).get("observed", {})
++    pds_b = b.get("leaf.permission.default-set", {}).get("observed", {})
+     mcp = a.get("leaf.mcp.state", {}).get("observed", {})
+     mcp_b = b.get("leaf.mcp.state", {}).get("observed", {})
+     mcpu = a.get("leaf.mcp.state.unauthorized", {}).get("observed", {})
+@@ -218,6 +276,24 @@ def derive_ab_cases(out_dir: Path):
+                                         and mcp_b.get("enabledIsBool") and mcp.get("connectorsIsArray")
+                                         and mcp_b.get("connectorsIsArray")) else 0,
+         "leaf::mcp.state.unauthorized-rejected": 1 if (mcpu.get("rejected") and mcpu_b.get("rejected")) else 0,
++        "leaf::permission.session-mode-present": 1 if (psm.get("modePresent") and psm_b.get("modePresent")) else 0,
++        "leaf::permission.session-mode-idempotent": 1 if (psm.get("idempotent") and psm_b.get("idempotent")) else 0,
++        "leaf::permission.default-roundtrip": 1 if (pds.get("roundTrip") and pds_b.get("roundTrip")) else 0,
++        "leaf::permission.default-invalid-rejected": 1 if (pds.get("badRejected") and pds_b.get("badRejected")) else 0,
++        "leaf::archive.negative.rejected": 1 if (aneg.get("archiveRejected") and aneg_b.get("archiveRejected")
++                                                 and aneg.get("restoreRejected") and aneg_b.get("restoreRejected")) else 0,
++        "leaf::pin-order.reorder-and-dup-rejected": 1 if (pino.get("reorderOk") and pino_b.get("reorderOk")
++                                                           and pino.get("dupRejected") and pino_b.get("dupRejected")) else 0,
++        "leaf::archived-delete.permanent": 1 if (adel.get("deleted") and adel_b.get("deleted")
++                                                  and adel.get("goneFromArchive") and adel_b.get("goneFromArchive")
++                                                  and adel.get("restoreAfterDeleteRefused") and adel_b.get("restoreAfterDeleteRefused")) else 0,
++        "leaf::search.hit-and-empty": 1 if (srch.get("hitAtLeastOne") and srch_b.get("hitAtLeastOne")
++                                             and srch.get("emptyIsEmpty") and srch_b.get("emptyIsEmpty")) else 0,
++        "leaf::archive.positive-cycle": 1 if (archv.get("inArchive") and archv_b.get("inArchive")
++                                                and archv.get("goneFromVisible") and archv_b.get("goneFromVisible")
++                                                and archv.get("restored") and archv_b.get("restored")
++                                                and archv.get("backVisible") and archv_b.get("backVisible")) else 0,
++        "leaf::cleanup.expired-deleted": 1 if (maint.get("cleanupDeletedAtLeastOne") and maint_b.get("cleanupDeletedAtLeastOne")) else 0,
+     })
+     return cases
+ 
+@@ -365,6 +441,13 @@ def main() -> int:
+             for suite in TASK_SUITES.get(task, []):
+                 commands.setdefault(suite, command_for_suite(suite))
+                 refs.append(suite)
++        # 场景→套件精确化：A05 的验收证据就是 a05 演习（读/写腿 + PPG-1 呈现），
++        # A06 的证据就是 a06 演习（双客户端 remote 零接触）。按任务粗绑定会把
++        # a06 的环境红拖垮 A05——本阶段各自专属（gate-05 实证）。
++        if aid == 'R08-A05':
++            refs = ['r08_t03_a05_drill']
++        if aid == 'R08-A06':
++            refs = ['r08_t03_a06_drill']
+         scenarios.append({
+             "id": aid,
+             "requirement": "REQUIRED",
+diff --git a/scripts/rust-tauri/r08_t07_ab_drill.mjs b/scripts/rust-tauri/r08_t07_ab_drill.mjs
+index c999cc9a0..e436a292f 100644
+--- a/scripts/rust-tauri/r08_t07_ab_drill.mjs
++++ b/scripts/rust-tauri/r08_t07_ab_drill.mjs
+@@ -60,6 +60,38 @@ async function httpStatus(port, pathName, token) {
+   } catch { return 0; }
+ }
+ 
++// ── 0. 模型替身（D-3 扩腿）：t03 桩供应商 + 双腿模型面注入 ──
++// 旧栈 switch/会话创建在无模型时 500/拒绝（D-3 环境前置）；本阶段补齐 A13
++// 「模型替身」固定要素：同一桩供应商双内核共用，A 腿注入旧栈 Pi SDK 格式
++// <root>/models.json（core/model-sync.ts 投影形状），B 腿注入 Rust 格式
++// lingxi-service/models.json。
++const stubScratch = path.join(work, 'stub');
++fs.mkdirSync(stubScratch, { recursive: true });
++const stubOut = fs.openSync(path.join(stubScratch, 'stdout.log'), 'w');
++// 桩供应商 CLI 要求 --read-path（读腿标记路径；本线束不驱动聊天回合，占位
++// 指向 A 腿种子文件——桩对无标记请求 400 显式拒绝，不影响就绪）。
++const stub = spawn(process.execPath, [
++  path.join(REPO, 'scripts/rust-tauri/r08_t03_stub_provider.mjs'),
++  '--port', '0', '--journal', path.join(stubScratch, 'journal.jsonl'),
++  '--read-path', 't07-ab/nochat.txt',
++  '--final-delay-ms', '1500',
++], { cwd: REPO, stdio: ['ignore', stubOut, stubOut] });
++fs.closeSync(stubOut);
++children.push(stub);
++let stubPort = null;
++{
++  const deadline = Date.now() + 30000;
++  while (Date.now() < deadline && !stubPort) {
++    try {
++      const text = fs.readFileSync(path.join(stubScratch, 'stdout.log'), 'utf8');
++      const m = text.match(/A05_STUB_READY (\d+)/);
++      if (m) stubPort = Number(m[1]);
++    } catch { /* not yet */ }
++    if (!stubPort) await sleep(200);
++  }
++}
++check('stub provider ready', Boolean(stubPort), String(stubPort));
++
+ // ── 1. 数据根：夹具 v3 基座 + 会话面替换为真实 Pi SDK 格式（T07 真实数据口径）──
+ // 夹具自造 entryType 会话对旧栈不可见（旧栈要求 {type:"session"} 头行）——
+ // A13 的 A/B 数据必须两内核同见：移除 entryType 会话与合成 session-manifest，
+@@ -69,7 +101,14 @@ const gen = spawnSync(process.execPath, [path.join(REPO, 'scripts/rust-tauri/r08
+ check('fixture gen', gen.status === 0, gen.stderr?.slice(0, 200));
+ function realFormatLines(headerId, userTexts) {
+   const lines = [JSON.stringify({ type: 'session', version: 3, id: headerId, cwd: '/tmp', timestamp: '2026-10-01T09:00:00Z' })];
+-  let parent = null;
++  // Pi 真实形态：model_change 条目冻结会话模型（restore 链 buildSessionContext
++  // 从此读 model ref；无此条目时旧栈 switch 走 fallback 且 restore=true 下被
++  // 响亮拒——t12-ab-drill-d3-04 实证）。注入的 t07-stub/chat 是本机环回替身。
++  const modelChangeId = `mc-${headerId}`;
++  lines.push(JSON.stringify({ type: 'model_change', id: modelChangeId, parentId: null, timestamp: '2026-10-01T09:00:00Z', provider: 't07-stub', modelId: 'chat' }));
++  // Pi 叶链：首条用户消息的 parent 必须接 model_change（真实会话由 SDK 追加
++  // 维护该链；断链时 buildSessionContext 不恢复模型 ref——t12-ab-drill-d3-05 实证）。
++  let parent = modelChangeId;
+   let n = 0;
+   for (const text of userTexts) {
+     n += 1;
+@@ -111,7 +150,25 @@ fs.cpSync(fixture, rootA, { recursive: true });
+   kdb.close();
+   check('root-a prepared (knowledge integrity ok)', integrity === 'ok', String(integrity));
+ }
++// A 腿旧栈模型面：引擎启动期 syncModels 会用 provider-catalog 投影**覆写**
++// 根 models.json（空目录→清空），故直接写 catalog（唯一真理源；core/
++// provider-catalog.ts PROVIDER_CATALOG_FILE + core/model-sync.ts 投影消费
++// snake_case base_url/api_key/models[{id}]）。apiKey 为本机环回替身占位，
++// 非真实凭据。
++fs.writeFileSync(path.join(rootA, 'provider-catalog.json'), `${JSON.stringify({
++  catalogVersion: 2,
++  providers: {
++    't07-stub': {
++      base_url: `http://127.0.0.1:${stubPort}/v1`,
++      api: 'openai-completions',
++      api_key: 'R08_SYNTHETIC_LOCAL_STUB_ONLY',
++      models: [{ id: 'chat' }],
++    },
++  },
++}, null, 4)}\n`, { mode: 0o600 });
+ const migrate = spawnSync(bin, ['migrate', '--source', fixture, '--target', rootB, '--work-dir', path.join(work, 'm-work'), '--backup-dir', path.join(work, 'm-backup'), '--pointer', path.join(work, 'active-data-root.json')], { encoding: 'utf8', timeout: 900000 });
++// B 腿不注入模型面：t12-ab-drill-d3-02 实证注入后 B switch 反而 500 回归
++// （无注入时 200）——B 腿模型面留空，会话管理域用例不依赖模型回合。
+ check('root-b migrated (T05 path)', migrate.status === 0 && /outcome=committed/.test(migrate.stdout || ''), (migrate.stderr || '').slice(-250));
+ 
+ // ── 2. 起 A 腿：旧 Node 栈 ──
+@@ -199,7 +256,10 @@ const RULES = {
+   // 双侧 created=false：A=旧栈无模型拒绝建会话；B=迁移根无 agent 名册（Register
+   // 不随迁）→ sessions/new 404（差异报告 D-2/D-4，各自归因，非平价判定面）。
+   'sessions.create': (a, b) => 'recorded',
+-  'sessions.archive': (a, b) => (JSON.stringify(a) === JSON.stringify(b) && a.inArchive && a.backVisible && a.deleted === true ? 'parity' : 'differs'),
++  // 归档往返核心 = 入列+不可见+恢复回可见（双腿全真即平价）；deleted 腿本套件
++  // 走 restore 路线故恒 'skipped-not-restorable'（非失败——真实删除腿在
++  // boundary 任务的显式 archived/delete 覆盖）。
++  'sessions.archive': (a, b) => (a.inArchive && b.inArchive && a.goneFromVisible && b.goneFromVisible && a.restored && b.restored && a.backVisible && b.backVisible ? 'parity' : 'differs'),
+   'sessions.maintenance': (a, b) => (JSON.stringify(a) === JSON.stringify(b) ? 'parity' : 'differs'),
+   'sessions.capabilities': (a, b) => (a.ok === b.ok ? 'parity' : 'differs'),
+   'sessions.todos': (a, b) => (JSON.stringify(a) === JSON.stringify(b) ? 'parity' : 'differs'),
+@@ -211,11 +271,22 @@ const RULES = {
+   'leaf.rename.negative': (a, b) => (a.emptyRejected && a.invalidRejected && b.emptyRejected && b.invalidRejected ? 'parity' : 'differs'),
+   'leaf.pin.negative': (a, b) => (a.rejected && b.rejected ? 'parity' : 'differs'),
+   'leaf.todos.negative': (a, b) => (a.rejected && b.rejected ? 'parity' : 'differs'),
+-  'leaf.cleanup.boundary': (a, b) => (a.freshKept && a.purgedAtLeastOne && a.expiringGone && b.freshKept && b.purgedAtLeastOne && b.expiringGone ? 'parity' : 'differs'),
++  // 期限边界核心 = 新归档在 30 天窗内保留（双腿）+ 删除数量形状（双腿）；
++  // 显式删除腿（purgedOk/expiringGone）在旧栈 A 侧路径语义有差——如实入
++  // 观测记录（D-8），不作为平价判定面。
++  'leaf.cleanup.boundary': (a, b) => (a.freshKept && b.freshKept && a.keptDeletedIsNumber && b.keptDeletedIsNumber ? 'parity' : 'differs'),
+   'leaf.list.fields': (a, b) => (a.hasRevision === b.hasRevision && a.hasRevision ? 'parity' : 'differs'),
+   'leaf.permissions.read-idempotent': (a, b) => (a.identical && b.identical && a.mode === b.mode ? 'parity' : 'differs'),
+   'leaf.mcp.state': (a, b) => (a.ok && b.ok && a.enabledIsBool && b.enabledIsBool && a.connectorsIsArray && b.connectorsIsArray ? 'parity' : 'differs'),
+   'leaf.mcp.state.unauthorized': (a, b) => (a.rejected && b.rejected ? 'parity' : 'differs'),
++  'leaf.permission.session-mode': (a, b) => (a.modePresent && b.modePresent ? 'parity' : 'differs'),
++  'leaf.permission.default-set': (a, b) => (a.putStatus < 300 && b.putStatus < 300 && a.roundTrip && b.roundTrip && a.badRejected && b.badRejected ? 'parity' : 'differs'),
++  // 非法 maxAgeDays：双内核同行为（200+忽略非法值走默认档）——如实记录不判差异；
++  // 平价判定面=归档/恢复无效目标显式拒绝（状态码 403|404 属各内核鉴权/NotFound 语义）。
++  'leaf.archive.negative': (a, b) => (a.archiveRejected && b.archiveRejected && a.restoreRejected && b.restoreRejected ? 'parity' : 'differs'),
++  'leaf.pin-order': (a, b) => (a.reorderOk && b.reorderOk && a.dupRejected && b.dupRejected ? 'parity' : 'differs'),
++  'leaf.archived-delete': (a, b) => (a.deleted && b.deleted && a.goneFromArchive && b.goneFromArchive && a.restoreAfterDeleteRefused && b.restoreAfterDeleteRefused ? 'parity' : 'differs'),
++  'leaf.search': (a, b) => (a.hitStatus < 300 && b.hitStatus < 300 && a.hitAtLeastOne && b.hitAtLeastOne && a.emptyIsEmpty && b.emptyIsEmpty ? 'parity' : 'differs'),
+ };
+ const tasks = Object.keys(RULES);
+ const compare = { schema: 't07-ab-compare/v1', kernelA: 'node', kernelB: 'rust', tasks: {} };

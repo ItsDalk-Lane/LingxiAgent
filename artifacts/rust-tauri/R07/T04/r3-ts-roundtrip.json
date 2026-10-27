@@ -1,0 +1,27 @@
+{
+  "candidate": "r3",
+  "name": "ts-roundtrip",
+  "command": [
+    "node",
+    "tests/migration/r01-t02/roundtrip.mjs",
+    "--generated",
+    "contracts/generated",
+    "--out",
+    "/private/tmp/lingxi-r07-t04-r3-roundtrip"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-15T22:46:28.354566+00:00",
+  "sourceFingerprint": "db2891f6e2c8fb03a513af30806ce459c35a1946abe101ac9cd85c07107f312f",
+  "log": "r3-ts-roundtrip.log",
+  "endedAt": "2026-10-15T22:46:28.399893+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "db2891f6e2c8fb03a513af30806ce459c35a1946abe101ac9cd85c07107f312f",
+  "logSha256": "c4262a8dee425ecb6444a97b8262e6309408a83bc17a3664edea218c315a463b",
+  "sourceUnchanged": true
+}

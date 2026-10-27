@@ -1,0 +1,19 @@
+{
+ "schema": "lingxi.r08.suite-receipt.v1",
+ "suite": "r08_t01_env_deps",
+ "exitCode": 0,
+ "guardFailures": [],
+ "argv": [
+  "cargo",
+  "test",
+  "--manifest-path",
+  "rust/Cargo.toml",
+  "--locked",
+  "-p",
+  "lingxi-service",
+  "--test",
+  "r08_t01_env_deps"
+ ],
+ "durationSecs": 12.849,
+ "logSha256": "9b6cf74316efca7999796ca74b4c9cc7b19e3e26cf6cfe367c4861ae444d0fa7"
+}

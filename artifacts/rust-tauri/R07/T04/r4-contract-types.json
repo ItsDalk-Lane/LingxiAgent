@@ -1,0 +1,24 @@
+{
+  "candidate": "r4",
+  "name": "contract-types",
+  "command": [
+    "./node_modules/.bin/tsc",
+    "-p",
+    "tests/migration/r01-t02/tsconfig.json"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-15T22:55:31.466509+00:00",
+  "sourceFingerprint": "23e0342b92e66cf8856575dc29f87a9cd10db34ccd675f63d481c915b3d1986f",
+  "log": "r4-contract-types.log",
+  "endedAt": "2026-10-15T22:55:31.677179+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "23e0342b92e66cf8856575dc29f87a9cd10db34ccd675f63d481c915b3d1986f",
+  "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sourceUnchanged": true
+}

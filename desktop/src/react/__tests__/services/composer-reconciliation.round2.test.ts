@@ -11,6 +11,7 @@ const historyMocks = vi.hoisted(() => ({ fetch: vi.fn() }));
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
+import { resetDesktopHostForTests } from '../../host/desktop-host';
 
 const previewRefreshMocks = vi.hoisted(() => ({
   changeOptions: { retryMissing: true, retryUnchanged: true },
@@ -243,7 +244,7 @@ afterEach(() => {
   resetComposerSendCoordinatorForTests();
   vi.useRealTimers();
   vi.unstubAllGlobals();
-  delete (window as { platform?: unknown }).platform;
+  resetDesktopHostForTests();
 });
 
 

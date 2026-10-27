@@ -1,0 +1,32 @@
+{
+ "stage": "R07-T06",
+ "purpose": "candidate_gate",
+ "candidate": "t06b",
+ "label": "t06b-media-admin",
+ "command": [
+  "/Users/study_superior/.cargo/bin/cargo",
+  "test",
+  "--manifest-path",
+  "rust/Cargo.toml",
+  "--locked",
+  "-p",
+  "lingxi-service",
+  "--test",
+  "r07_media_admin",
+  "--",
+  "--nocapture"
+ ],
+ "environment": {
+  "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+  "CARGO_BUILD_JOBS": "4",
+  "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+  "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+ },
+ "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+ "manifestFingerprintBefore": "190b0c25f184eaacc23c53a02bafb54845f25dc05d8b7fa5c86550a7705b49bb",
+ "manifestFingerprintAfter": "190b0c25f184eaacc23c53a02bafb54845f25dc05d8b7fa5c86550a7705b49bb",
+ "manifestFingerprintMatchesCandidate": true,
+ "exitCode": 0,
+ "durationSec": 8.5,
+ "logSha256": "afe364b4ee822bd276571d831701d8696e148a99f4c7ba5f874c3653894bd1d9"
+}

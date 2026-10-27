@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSettingsStore, type ProviderSummary } from '../../store';
 import { lingxiFetchJson } from '../../api';
+import { captureSettingsConnection, ownsSettingsConnection } from '../../connection-owner';
 import { invalidateConfigCache } from '../../../hooks/use-config';
 import { t } from '../../helpers';
 import { useMediaSettingsData } from '../../hooks/useMediaSettingsData';
@@ -24,8 +25,10 @@ export function ProviderDetail({ providerId, summary, providerConfig, isPresetSe
   const onProviderRefresh = onRefresh;
   // 凭据/OAuth 状态变化：额外刷新 image/video/speech，让能力状态立即可见。
   const onCredentialRefresh = async () => {
+    const owner = captureSettingsConnection();
     await onRefresh();
-    await media.refreshAll();
+    // 登录完成后的第二段刷新仍属于原连接，不能串到中途切换的新服务。
+    if (ownsSettingsConnection(owner)) await media.refreshAll();
   };
 
   return (

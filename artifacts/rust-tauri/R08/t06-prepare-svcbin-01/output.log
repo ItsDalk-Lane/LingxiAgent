@@ -1,0 +1,53 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0599]: no method named `map_err` found for enum `std::option::Option<T>` in the current scope
+    --> crates/lingxi-service/src/cutover_rollback.rs:1395:45
+     |
+1395 |         while let Some(name) = names.next().map_err(|e| format!("table_info step {table}: {e}"))? {
+     |                                             ^^^^^^^
+     |
+note: the method `map_err` exists on the type `Result<std::string::String, rusqlite::Error>`
+    --> /private/tmp/rust-20260123-8344-1t53h/rustc-1.93.0-src/library/core/src/result.rs:962:5
+help: there is a method `map_or` with a similar name, but with different arguments
+    --> /private/tmp/rust-20260123-8344-1t53h/rustc-1.93.0-src/library/core/src/option.rs:1224:5
+help: consider using `Option::expect` to unwrap the `Result<std::string::String, rusqlite::Error>` value, panicking if the value is an `Option::None`
+     |
+1395 |         while let Some(name) = names.next().expect("REASON").map_err(|e| format!("table_info step {table}: {e}"))? {
+     |                                            +++++++++++++++++
+
+warning: value assigned to `leases_note` is never read
+    --> crates/lingxi-service/src/cutover_rollback.rs:1212:27
+     |
+1212 |     let mut leases_note = Value::Null;
+     |                           ^^^^^^^^^^^
+     |
+     = help: maybe it is overwritten before being read?
+     = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: value assigned to `knowledge_note` is never read
+    --> crates/lingxi-service/src/cutover_rollback.rs:1311:30
+     |
+1311 |     let mut knowledge_note = Value::Null;
+     |                              ^^^^^^^^^^^
+     |
+     = help: maybe it is overwritten before being read?
+
+error[E0382]: use of moved value: `to`
+    --> crates/lingxi-service/src/cutover_rollback.rs:1439:41
+     |
+1429 |             let to = format!("fixture_synthetic_{from}");
+     |                 -- move occurs because `to` has type `std::string::String`, which does not implement the `Copy` trait
+...
+1438 |             preserved.insert(to, after);
+     |                              -- value moved here
+1439 |             renamed.push((from.clone(), to));
+     |                                         ^^ value used here after move
+     |
+help: consider cloning the value if the performance cost is acceptable
+     |
+1438 |             preserved.insert(to.clone(), after);
+     |                                ++++++++
+
+Some errors have detailed explanations: E0382, E0599.
+For more information about an error, try `rustc --explain E0382`.
+warning: `lingxi-service` (bin "lingxi-service" test) generated 2 warnings
+error: could not compile `lingxi-service` (bin "lingxi-service" test) due to 2 previous errors; 2 warnings emitted

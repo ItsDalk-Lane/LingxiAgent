@@ -1,0 +1,16 @@
+
+running 8 tests
+test r07_desk_files::no_workspace_fallbacks ... ok
+test r07_desk_files::files_listing_and_subdir_guards ... ok
+test r07_desk_files::path_default_override_and_approval ... ok
+test r07_desk_files::jian_cycle_and_locale ... ok
+test r07_desk_files::search_files_flow ... ok
+test r07_desk_files::create_and_actions_flow ... ok
+test r07_desk_files::upload_gate_and_flow ... ok
+test r07_desk_files::scope_gates ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 48.30s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 15.36s
+     Running tests/r07_desk_files.rs (rust/target/debug/deps/r07_desk_files-a6f5214d77f1c479)

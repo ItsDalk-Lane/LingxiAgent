@@ -1,0 +1,12 @@
+
+running 7 tests
+test actual_vm_escape_cannot_read_write_connect_or_delegate_a_host_write ... ok
+test cancelling_actual_program_reaps_its_real_node_process ... ok
+test later_program_failure_keeps_real_completed_effect_and_exposes_it_in_receipts ... ok
+test real_child_approval_is_separate_from_outer_approval_and_denial_writes_nothing ... ok
+test real_file_child_receipts_bound_arguments_and_outputs_without_losing_head_tail ... ok
+test real_parallel_children_only_return_selected_summary_and_keep_bounded_ui_receipts ... ok
+test unknown_recursive_and_sandbox_failures_are_explicit_and_catchable ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 2.11s
+

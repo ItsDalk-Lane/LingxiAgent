@@ -1,0 +1,5 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.11s
+  File "<stdin>", line 11
+    print(f"on-disk receipt v{row[\"version\"]}: name={row[\"name\"]} fingerprint={row[\"fingerprint\"]}")
+                                   ^
+SyntaxError: unexpected character after line continuation character

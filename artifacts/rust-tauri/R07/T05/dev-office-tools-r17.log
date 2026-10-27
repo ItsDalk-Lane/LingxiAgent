@@ -1,0 +1,31 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.56s
+     Running tests/r07_office_tools.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_office_tools-ca0717eb6a989f9e)
+
+running 13 tests
+test office::cancelled_pdf_waits_for_actual_external_cleanup_and_never_registers_a_file ... ok
+test office::pdf_private_asset_is_refused_before_any_external_renderer_call ... ok
+
+thread 'office::capabilities_and_cover_style_guide_deliver_real_catalog_content' (1611638) panicked at crates/lingxi-service/tests/r07_office/mod.rs:1055:36:
+called `Option::unwrap()` on a `None` value
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test office::capabilities_and_cover_style_guide_deliver_real_catalog_content ... FAILED
+test office::cover_requires_confirmation_and_preserves_markdown_and_actual_image ... ok
+test office::guide_state_is_owned_by_the_actual_session_and_plugin_toggle_is_effective ... ok
+test office::read_only_and_live_toggle_revocation_prevent_cover_writes ... ok
+test office::real_document_worker_reads_docx_xlsx_and_paged_pdf_without_changing_inputs ... ok
+test office::pdf_collects_authorized_assets_and_three_bundled_fonts_then_registers_real_file ... ok
+test office::actual_http_apply_preserves_old_shape_and_refuses_self_reported_identity ... ok
+test office::bundled_preset_apply_uses_real_gallery_bytes_and_rejects_unknown_presets ... ok
+test office::background_cover_job_refuses_to_apply_after_document_changed ... ok
+test office::background_cover_job_completes_with_real_media_and_applies_frozen_write ... ok
+test office::remote_cover_clients_cannot_turn_absolute_paths_into_local_owner_authority ... ok
+
+failures:
+
+failures:
+    office::capabilities_and_cover_style_guide_deliver_real_catalog_content
+
+test result: FAILED. 12 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.20s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_office_tools`

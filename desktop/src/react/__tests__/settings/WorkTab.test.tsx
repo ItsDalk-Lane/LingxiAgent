@@ -5,6 +5,7 @@
 import React from 'react';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { getDesktopHost } from '../../host/desktop-host';
 
 type MockState = Record<string, any>;
 
@@ -133,7 +134,7 @@ describe('WorkTab workspace persistence', () => {
         body: JSON.stringify({ desk: { home_folder: '/new-home' } }),
       }));
     });
-    expect(window.platform.settingsChanged).not.toHaveBeenCalled();
+    expect(getDesktopHost().api.settingsChanged).not.toHaveBeenCalled();
   });
 
   it('clears the selected agent workspace without sending frontend business IPC', async () => {
@@ -149,7 +150,7 @@ describe('WorkTab workspace persistence', () => {
         body: JSON.stringify({ desk: { home_folder: '' } }),
       }));
     });
-    expect(window.platform.settingsChanged).not.toHaveBeenCalled();
+    expect(getDesktopHost().api.settingsChanged).not.toHaveBeenCalled();
   });
 
   it('shows 31 minutes when the agent config omits the patrol interval', async () => {
@@ -253,7 +254,7 @@ describe('WorkTab workspace persistence', () => {
         body: JSON.stringify({ workspace_context: { inject_agents_md: true } }),
       }));
     });
-    expect(window.platform.settingsChanged).not.toHaveBeenCalled();
+    expect(getDesktopHost().api.settingsChanged).not.toHaveBeenCalled();
   });
 
   it('saves the selected agent CLAUDE.md injection toggle', async () => {
@@ -269,7 +270,7 @@ describe('WorkTab workspace persistence', () => {
         body: JSON.stringify({ workspace_context: { inject_claude_md: false } }),
       }));
     });
-    expect(window.platform.settingsChanged).not.toHaveBeenCalled();
+    expect(getDesktopHost().api.settingsChanged).not.toHaveBeenCalled();
   });
 
   it('saves the two project skill discovery switches independently', async () => {

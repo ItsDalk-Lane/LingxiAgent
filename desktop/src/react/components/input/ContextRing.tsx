@@ -5,7 +5,7 @@ import { getSessionCompactionMode, isSessionCompacting } from '../../stores/cont
 import { sessionScopedListIncludes, sessionScopedValue } from '../../stores/session-slice';
 import { useI18n } from '../../hooks/use-i18n';
 import { getWebSocket } from '../../services/websocket';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../services/service-client';
 import { refreshSessionCapabilities } from '../../stores/session-actions';
 import { AnchoredPortal, Tooltip } from '../../ui';
 import { shouldShowContextRingTokenLabel } from './context-ring-visibility';

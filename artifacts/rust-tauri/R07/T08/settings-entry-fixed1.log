@@ -1,0 +1,37 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面
+R07_SETTINGS_ENTRY_RESULT {"blocked":[],"requests":[{"path":"/lingxi/v1/access/summary","method":"GET","status":200},{"path":"/lingxi/v1/server/identity","method":"GET","status":200},{"path":"/lingxi/v1/settings/config","method":"GET","status":200},{"path":"/lingxi/v1/agents","method":"GET","status":200},{"path":"/lingxi/v1/models","method":"GET","status":200},{"path":"/lingxi/v1/settings/snapshot","method":"GET","status":200},{"path":"/lingxi/v1/settings/avatar-health","method":"GET","status":200},{"path":"/lingxi/v1/providers/summary","method":"GET","status":200}]}
+
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面
+[skills] load failed: [TypeError: fetch failed] {
+  [cause]: Error: connect ECONNREFUSED 127.0.0.1:52855
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 52855
+  }
+}
+
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面
+[skills] load external paths failed: [TypeError: fetch failed] {
+  [cause]: Error: connect ECONNREFUSED 127.0.0.1:52855
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1705:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 52855
+  }
+}
+
+ ✓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面 3021ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  17:49:41
+   Duration  4.84s (transform 1.01s, setup 21ms, import 1.32s, tests 3.02s, environment 402ms)
+

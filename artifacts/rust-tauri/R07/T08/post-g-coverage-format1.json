@@ -1,0 +1,32 @@
+{
+  "label": "post-g-coverage-format1",
+  "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "fmt",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--all",
+    "--",
+    "--check"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "PATH": "/Users/study_superior/.cargo/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/share/dotnet:/Users/study_superior/.codex/tmp/arg0-macos/codex-arg0vSRIw5:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/Users/study_superior/.lmstudio/bin:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/study_superior/.lmstudio/bin",
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp",
+    "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib"
+  },
+  "startedAt": "2026-10-18T12:48:16.489709+00:00",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "7d3eac1cdf00816824bd7b0b8026342c02ad48b83df31c3ca26ea2ba6aacc2d1",
+  "finalAcceptance": false,
+  "exitCode": 0,
+  "endedAt": "2026-10-18T12:48:22.118466+00:00",
+  "sourceFingerprintAfter": "7d3eac1cdf00816824bd7b0b8026342c02ad48b83df31c3ca26ea2ba6aacc2d1",
+  "log": "artifacts/rust-tauri/R07/T08/post-g-coverage-format1.log",
+  "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sourceUnchanged": true
+}

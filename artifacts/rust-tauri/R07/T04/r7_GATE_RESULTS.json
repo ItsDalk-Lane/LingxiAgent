@@ -1,0 +1,489 @@
+{
+  "candidate": "r7",
+  "status": "AUTOMATED_GATES_PASS_NATIVE_INTERACTION_PENDING",
+  "updatedAt": "2026-10-15T23:29:38.122541+00:00",
+  "gates": [
+    {
+      "gate": "browser-flows",
+      "receipt": "r7-browser-flows.json",
+      "exitCode": 0,
+      "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+      "logSha256": "ece965175527b2eebe6143753812ab1473f6d53707ad2553562a97e55df0583c",
+      "testTargets": [
+        {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 13,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 8,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "startedAt": "2026-10-15T23:21:30.892998+00:00",
+      "endedAt": "2026-10-15T23:22:00.988799+00:00"
+    },
+    {
+      "gate": "service",
+      "receipt": "r7-service.json",
+      "exitCode": 0,
+      "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+      "logSha256": "c838a25eb1b0acb6dfb1db6d93a8d3b52aac03884716b1b477bd9d56de64e8f8",
+      "testTargets": [
+        {
+          "passed": 476,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 15,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 11,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 19,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 11,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 6,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 12,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 12,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 5,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 14,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 7,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 11,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 8,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 15,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 8,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 11,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 5,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 7,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 6,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 6,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 15,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 7,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "startedAt": "2026-10-15T23:22:01.070078+00:00",
+      "endedAt": "2026-10-15T23:25:07.971048+00:00"
+    },
+    {
+      "gate": "adapter",
+      "receipt": "r7-adapter.json",
+      "exitCode": 0,
+      "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+      "logSha256": "cf114a0f26a0eba32a8f88ae47379a0735be7ea3b2df53d5353ef6016bb81fa2",
+      "testTargets": [
+        {
+          "passed": 133,
+          "failed": 0,
+          "ignored": 9
+        },
+        {
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 6,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 12,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 8,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 14,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 8,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 13,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "startedAt": "2026-10-15T23:25:08.037375+00:00",
+      "endedAt": "2026-10-15T23:25:45.856650+00:00"
+    },
+    {
+      "gate": "native-startup-faults",
+      "receipt": "r7-native-startup-faults.json",
+      "exitCode": 0,
+      "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+      "logSha256": "62878d57bb7b2bf5b39d4b83847712c2594a1f5906bb157e0fb3da8e991ba4a5",
+      "testTargets": [
+        {
+          "passed": 7,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "startedAt": "2026-10-15T23:25:45.924154+00:00",
+      "endedAt": "2026-10-15T23:25:53.133873+00:00"
+    },
+    {
+      "gate": "kernel",
+      "receipt": "r7-kernel.json",
+      "exitCode": 0,
+      "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+      "logSha256": "fe94358edd56134b828d2fb0bc076e1fdbad3cd724b4512b9542054728938c08",
+      "testTargets": [
+        {
+          "passed": 126,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "startedAt": "2026-10-15T23:25:53.202653+00:00",
+      "endedAt": "2026-10-15T23:25:55.485218+00:00"
+    },
+    {
+      "gate": "protocol",
+      "receipt": "r7-protocol.json",
+      "exitCode": 0,
+      "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+      "logSha256": "93ca11d4645f84d166c94250ac993fe69aa52734a0859f72728afed945855c89",
+      "testTargets": [
+        {
+          "passed": 36,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "startedAt": "2026-10-15T23:25:55.555105+00:00",
+      "endedAt": "2026-10-15T23:26:01.486133+00:00"
+    },
+    {
+      "gate": "generated",
+      "receipt": "r7-generated.json",
+      "exitCode": 0,
+      "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+      "logSha256": "091fc04159806ab675c0f5b3d11fdc46e9a5ae369e41796d9b600cbd0148a188",
+      "testTargets": [],
+      "startedAt": "2026-10-15T23:26:01.557171+00:00",
+      "endedAt": "2026-10-15T23:26:01.959579+00:00"
+    },
+    {
+      "gate": "rust-roundtrip",
+      "receipt": "r7-rust-roundtrip.json",
+      "exitCode": 0,
+      "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+      "logSha256": "51081166031d89b615bad26c227206f7bec165fb02811130f1b9f1af8d5867b3",
+      "testTargets": [],
+      "startedAt": "2026-10-15T23:26:02.027019+00:00",
+      "endedAt": "2026-10-15T23:26:02.415082+00:00"
+    },
+    {
+      "gate": "clippy",
+      "receipt": "r7-clippy.json",
+      "exitCode": 0,
+      "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+      "logSha256": "48cde75e94e284098b3760d71b704249b661558b0d02ce753cd7987b2006012e",
+      "testTargets": [],
+      "startedAt": "2026-10-15T23:26:02.481036+00:00",
+      "endedAt": "2026-10-15T23:26:45.433352+00:00"
+    },
+    {
+      "gate": "format",
+      "receipt": "r7-format.json",
+      "exitCode": 0,
+      "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testTargets": [],
+      "startedAt": "2026-10-15T23:26:45.500009+00:00",
+      "endedAt": "2026-10-15T23:26:48.301057+00:00"
+    },
+    {
+      "gate": "ui",
+      "receipt": "r7-ui.json",
+      "exitCode": 0,
+      "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+      "logSha256": "616bb1f0620db95b021c67d91cb71c890bd185787bfd5f66507b4c5d8a841061",
+      "testTargets": [],
+      "startedAt": "2026-10-15T23:21:32.169873+00:00",
+      "endedAt": "2026-10-15T23:21:36.325593+00:00"
+    },
+    {
+      "gate": "typecheck",
+      "receipt": "r7-typecheck.json",
+      "exitCode": 0,
+      "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+      "logSha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "testTargets": [],
+      "startedAt": "2026-10-15T23:21:36.405599+00:00",
+      "endedAt": "2026-10-15T23:22:02.856645+00:00"
+    },
+    {
+      "gate": "ts-roundtrip",
+      "receipt": "r7-ts-roundtrip.json",
+      "exitCode": 0,
+      "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+      "logSha256": "8448b24ebf54a6920b77b2da352d5d759138ab9d45c8de8c11a382c0d23fbaea",
+      "testTargets": [],
+      "startedAt": "2026-10-15T23:22:02.941617+00:00",
+      "endedAt": "2026-10-15T23:22:02.992136+00:00"
+    },
+    {
+      "gate": "browser-contract",
+      "receipt": "r7-browser-contract.json",
+      "exitCode": 0,
+      "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+      "logSha256": "ff5729a691071e6d448d4b3fc52f299ecb12157dd829a3efaf7d0102240fc17f",
+      "testTargets": [],
+      "startedAt": "2026-10-15T23:22:03.069907+00:00",
+      "endedAt": "2026-10-15T23:22:04.945977+00:00"
+    },
+    {
+      "gate": "contract-types",
+      "receipt": "r7-contract-types.json",
+      "exitCode": 0,
+      "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testTargets": [],
+      "startedAt": "2026-10-15T23:22:05.032911+00:00",
+      "endedAt": "2026-10-15T23:22:05.258531+00:00"
+    },
+    {
+      "gate": "ownership",
+      "receipt": "r7-ownership.json",
+      "exitCode": 0,
+      "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+      "logSha256": "6dc7719ffb1097c9dd467706778cca362dfd004de8f4f66da07aaa2d5b225796",
+      "testTargets": [],
+      "startedAt": "2026-10-15T23:22:05.345568+00:00",
+      "endedAt": "2026-10-15T23:22:06.035476+00:00"
+    },
+    {
+      "gate": "dependency-boundaries",
+      "receipt": "r7-dependency-boundaries.json",
+      "exitCode": 0,
+      "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+      "logSha256": "db38fc81337716b2f26bd5433a62222bdb39b8d26466d48f1897e9788f7149eb",
+      "testTargets": [],
+      "startedAt": "2026-10-15T23:22:06.213533+00:00",
+      "endedAt": "2026-10-15T23:22:08.547644+00:00"
+    },
+    {
+      "gate": "main-build",
+      "receipt": "r7-main-build.json",
+      "exitCode": 0,
+      "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+      "logSha256": "0d5872b29e03650a7baa63aee7adf12d12ac77ccb31c36183af4b1f2d1f90957",
+      "testTargets": [],
+      "startedAt": "2026-10-15T23:22:08.628113+00:00",
+      "endedAt": "2026-10-15T23:22:10.388141+00:00"
+    },
+    {
+      "gate": "preload-build",
+      "receipt": "r7-preload-build.json",
+      "exitCode": 0,
+      "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+      "logSha256": "b402e7ea64e0ce387308df3b7c60dbf1a1022b9a8f5246c5c11ca68e6dc03afb",
+      "testTargets": [],
+      "startedAt": "2026-10-15T23:22:10.472029+00:00",
+      "endedAt": "2026-10-15T23:22:10.661243+00:00"
+    }
+  ],
+  "note": "19项适用自动门禁通过；人工接管与可见性证据另列，不由默认ignored结果替代。"
+}

@@ -1,0 +1,22 @@
+{
+ "available": true,
+ "value": {
+  "allowedCanonical": true,
+  "allowedRaw": true,
+  "assetProtocolEnable": false,
+  "assetUrl": "asset://localhost/%2Fprivate%2Ftmp%2Flingxi-r09-runtime%2Fr09_t07_native_e2e-56499-1793066788292%2Fhome-native-e2e%2Ft07-asset-probe.png",
+  "assetUrlCanonical": "asset://localhost/%2Fprivate%2Ftmp%2Flingxi-r09-runtime%2Fr09_t07_native_e2e-56499-1793066788292%2Fhome-native-e2e%2Ft07-asset-probe.png",
+  "canonicalPath": "/private/tmp/lingxi-r09-runtime/r09_t07_native_e2e-56499-1793066788292/home-native-e2e/t07-asset-probe.png",
+  "configScope": [
+   "$HOME/.lingxi/**",
+   "$HOME/.lingxi-dev/**",
+   "$HOME/.hanako-dev/**",
+   "$TEMP/**"
+  ],
+  "exists": true,
+  "forbiddenRaw": false,
+  "path": "/private/tmp/lingxi-r09-runtime/r09_t07_native_e2e-56499-1793066788292/home-native-e2e/t07-asset-probe.png",
+  "runtimePatternCount": 6,
+  "size": 70
+ }
+}

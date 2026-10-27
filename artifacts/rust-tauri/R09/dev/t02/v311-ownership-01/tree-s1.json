@@ -1,0 +1,58 @@
+{
+ "label": "s1",
+ "unixMs": 1793066811089,
+ "app": [
+  {
+   "pid": 56597,
+   "ppid": 56595,
+   "pgid": 56495,
+   "command": "/private/tmp/lingxi-r09-t07/evidence-app-gate-v311-20261027-100346.app/Contents/MacOS/lingxi-resource-desktop"
+  }
+ ],
+ "services": [
+  {
+   "pid": 56598,
+   "ppid": 56597,
+   "pgid": 56598,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-56595-1793066808749/home-own-local"
+  }
+ ],
+ "allServices": [
+  {
+   "pid": 46710,
+   "ppid": 1,
+   "pgid": 46710,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/../../rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t03_native_matrix-46633-1793065619486/home"
+  },
+  {
+   "pid": 49025,
+   "ppid": 1,
+   "pgid": 49025,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/../../rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t03_native_matrix-48864-1793065828447/home"
+  },
+  {
+   "pid": 51173,
+   "ppid": 1,
+   "pgid": 51173,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/../../rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t03_native_matrix-51091-1793066008560/home"
+  },
+  {
+   "pid": 52121,
+   "ppid": 1,
+   "pgid": 52121,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/../../rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t03_native_matrix-52044-1793066183978/home"
+  },
+  {
+   "pid": 56596,
+   "ppid": 56595,
+   "pgid": 56495,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-56595-1793066808749/home-remote"
+  },
+  {
+   "pid": 56598,
+   "ppid": 56597,
+   "pgid": 56598,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-56595-1793066808749/home-own-local"
+  }
+ ]
+}

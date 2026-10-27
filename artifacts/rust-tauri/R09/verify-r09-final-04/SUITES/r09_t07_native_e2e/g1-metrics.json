@@ -1,0 +1,38 @@
+{
+ "shell": {
+  "dpr": 1,
+  "hasHana": false,
+  "hasTauri": true,
+  "location": "tauri://localhost",
+  "platform": "darwin",
+  "title": "Lingxi · Rust 预览"
+ },
+ "ime": {
+  "available": true,
+  "boundary": "合成 CompositionEvent，不是系统输入法",
+  "compositionSynthetic": true,
+  "inserted": "灵犀中文输入测试",
+  "matches": true,
+  "observed": "灵犀中文输入测试",
+  "tag": "DIV"
+ },
+ "selection": {
+  "anchorTag": "DIV",
+  "available": true,
+  "selected": 9
+ },
+ "scroll": {
+  "maxOverflow": 0,
+  "scrollContainers": 0
+ },
+ "dpi": {
+  "dpr": 1,
+  "innerHeight": 788,
+  "innerWidth": 960,
+  "visualViewportScale": 1
+ },
+ "focus": {
+  "documentHasFocus": false,
+  "listenersReady": true
+ }
+}

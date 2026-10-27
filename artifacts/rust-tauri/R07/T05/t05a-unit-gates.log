@@ -1,0 +1,44 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.14s
+     Running unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_service-4f3f510b8411a33d)
+
+running 4 tests
+test file_safety::artifact_budget_tests::artifact_over_limit_is_rejected_before_target_or_witness_creation ... ok
+test file_safety::artifact_budget_tests::artifact_replacement_keeps_large_original_and_unknown_recovery_facts ... ok
+test file_safety::artifact_budget_tests::large_conflict_rollback_uses_artifact_budget_and_preserves_external_original ... ok
+test file_safety::artifact_budget_tests::artifact_exact_fifty_mib_succeeds_without_expanding_text_or_json_limits ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 488 filtered out; finished in 0.71s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s
+     Running unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_service-4f3f510b8411a33d)
+
+running 8 tests
+test resourceio::artifacts::tests::resource_alias_cannot_hide_a_foreign_session_in_nested_input ... ok
+test resourceio::artifacts::tests::missing_parent_preflight_is_read_only_and_detects_same_path_replacement ... ok
+test resourceio::artifacts::tests::persistent_facts_keep_original_content_hash_and_reject_changed_snapshot ... ok
+test resourceio::artifacts::tests::durable_original_stamp_refuses_same_size_same_mtime_edit_without_any_write_effect ... ok
+test resourceio::artifacts::tests::replaced_parent_or_inserted_symlink_cannot_receive_a_frozen_artifact ... ok
+test resourceio::artifacts::tests::actual_fork_alias_reads_only_the_current_session_copy_and_foreign_ids_stay_denied ... ok
+test resourceio::artifacts::tests::actual_mount_read_keeps_typed_write_scope_and_live_revocation ... ok
+test resourceio::artifacts::tests::actual_io_accepts_fifty_mib_without_expanding_text_or_json_and_preflight_is_read_only ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 484 filtered out; finished in 1.48s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.14s
+     Running unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_service-4f3f510b8411a33d)
+
+running 2 tests
+test office_pdf::tests::paper_and_margins_keep_existing_inches_and_landscape_printable_area ... ok
+test office_pdf::tests::loaded_assets_are_distinct_from_links_and_external_assets_fail_explicitly ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 490 filtered out; finished in 0.00s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s
+     Running unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_service-4f3f510b8411a33d)
+
+running 2 tests
+test office_tools::tests::markdown_frontmatter_keeps_unrelated_fields_and_rejects_ambiguous_shapes ... ok
+test office_tools::tests::document_package_is_never_expanded_outside_its_bounded_archive ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 490 filtered out; finished in 0.31s
+

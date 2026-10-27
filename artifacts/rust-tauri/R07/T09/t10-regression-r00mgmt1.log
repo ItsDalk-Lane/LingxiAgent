@@ -1,0 +1,59 @@
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r00_management_leaves") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.45s
+     Running tests/r00_management_leaves.rs (/private/tmp/lingxi-r07-build/debug/deps/r00_management_leaves-4039275bc51f76a9)
+
+running 1 test
+test r00_management_positive_and_negative_branches_on_real_service ... FAILED
+
+failures:
+
+---- r00_management_positive_and_negative_branches_on_real_service stdout ----
+LINGXI_AUTH_REJECTED request_id="req-7805bcad35239fcf0e5a94a97452b90c" method=GET path=/lingxi/v1/me status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64718
+LINGXI_AUTH_REJECTED request_id="req-45ce0a4a0a23f86f73a9509cd9a7dc9f" method=GET path=/lingxi/v1/access/summary status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64722
+LINGXI_AUTH_REJECTED request_id="req-fefb763b5d4646636e249e94ed50e064" method=PUT path=/lingxi/v1/access/account/profile status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64727
+LINGXI_AUTH_REJECTED request_id="req-7b9b5d5eb179c3bc497c2f9f635b3431" method=PUT path=/lingxi/v1/access/network status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64730
+LINGXI_AUTH_REJECTED request_id="req-c1c4f35f63d86fa9763bb8aeb4247f54" method=GET path=/lingxi/v1/access/mobile-qr.svg status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64732
+LINGXI_AUTH_REJECTED request_id="req-909cd354a37d6eca76bd9b99920fa33b" method=PUT path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64738
+LINGXI_AUTH_REJECTED request_id="req-504151e23e70d512feef3620bf3ecc47" method=DELETE path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64745
+LINGXI_AUTH_REJECTED request_id="req-51ff00db614eb446fa67aa7664ad369d" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64752
+LINGXI_AUTH_REJECTED request_id="req-fd05a0eecd29543203948b8b75c79588" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64754
+LINGXI_AUTH_REJECTED request_id="req-e8487636020cdba7f3437871abbacc68" method=GET path=/lingxi/v1/devices status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64757
+LINGXI_AUTH_REJECTED request_id="req-c61bfa584e74eceabd11e8eed22fd993" method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:64760
+LINGXI_AUTH_REJECTED request_id="req-d4ef309d3b7342730795ba3ec7b99499" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64763
+LINGXI_AUTH_REJECTED request_id="req-ab2c3800e632a75074732d72c82a8e50" method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:64767
+LINGXI_AUTH_REJECTED request_id="req-725002f3b38cf011877f9076db11eaf6" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64770
+LINGXI_AUTH_REJECTED request_id="req-85ad86c556dc916f0429503edb901f07" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64772
+LINGXI_AUTH_REJECTED request_id="req-266bb291d7df611ba52bb8031c1045ab" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64778
+
+thread 'r00_management_positive_and_negative_branches_on_real_service' (4781225) panicked at crates/lingxi-service/tests/r00_management_leaves.rs:49:5:
+request to 192.168.3.96:64873 stalled during write/read exchange (POST /lingxi/v1/web-auth/login, 0 bytes read so far) — if addr is a non-loopback self-address, the macOS application firewall / proxy TUN may be blocking inbound connections to this unsigned test binary; this is an environment failure surfaced honestly, not a skipped assertion
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    r00_management_positive_and_negative_branches_on_real_service
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 51.42s
+
+error: test failed, to rerun pass `-p lingxi-service --test r00_management_leaves`

@@ -1,0 +1,93 @@
+{
+  "schema": "r07-t08-independent-session-epoch-browser-receipt-review-v1",
+  "reviewedAt": "2026-10-18T11:26:47.689750+00:00",
+  "finalAcceptance": "pending",
+  "reviewerTestsRun": [],
+  "mode": "product/tests/plans/protocol read-only; new independent evidence only",
+  "sourceObservationSha256": {
+    "rust/crates/lingxi-service/src/mcp_session_permissions.rs": "0abd1ca27cdd7260b13da19f087edc1eeb99fe66769b8124a6e35f66f2085215",
+    "rust/crates/lingxi-service/src/toolgateway.rs": "e16bb3bcae3959aca9a92a10f2ee75174f1e5bb200941a06a157fb7b90b27d20",
+    "desktop/main.cjs": "bc8afa8a2f0894863b264e6a950f0430afca4dc6cb44184646b98741f2feafcf",
+    "desktop/src/react/types.ts": "e54a11d32eff39b6acf581fcb2237872b46556586fe4db5543da98be290eeeda",
+    "desktop/src/react/settings/tabs/McpTab.tsx": "c3a920af2f0a2b778705e14eb90a3db6562c432d817fd8aa9e4ad77710deedb4",
+    "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx": "c9b1e096235e4e96244044f9e98ed46346b09aca3e5a0e1aa5330a71e5790b00",
+    "desktop/src/react/mobile/mobile-platform.ts": "336e86b0cfcaab79d74964edbc01c8a5d67e20395514f1cac9bd86ec9ec872d4",
+    "tests/desktop-open-external.test.ts": "0325800207e1ae8ee24fa16845ffb534e430354bb74dd294a0be2558be0b7c06",
+    "desktop/src/react/settings/tabs/__tests__/McpTab.test.tsx": "aadf3dc092b4e7cb72b7d7310d55eac899600b9c567b303a8176f27d6c97012c"
+  },
+  "verifiedExistingReceipts": [
+    {
+      "receipt": "artifacts/rust-tauri/R07/T08/mcp-session-permission-fixed1.json",
+      "receiptSha256": "4d29159d01997068b9320c44d85aa1f240d94c8e9f91c50cf1a55abc1668336f",
+      "log": "artifacts/rust-tauri/R07/T08/mcp-session-permission-fixed1.log",
+      "logSha256Verified": "9c7ceac564220f9234ec1a04b34f86329526a3feda9a22657d453ba72a9e6dad",
+      "exitCode": 101,
+      "sourceUnchanged": false,
+      "sourceFingerprintBefore": "7db0560c8d6f6bc75265b3bddfe05779b65cada38981bdf53b0b0fb18f1ba8eb",
+      "sourceFingerprintAfter": "083897a092b4a693ec920bc1e9718cf8cf3de755f608399231e57af98f10912c"
+    },
+    {
+      "receipt": "artifacts/rust-tauri/R07/T08/oauth-browser-open-reproduce2.json",
+      "receiptSha256": "73819d95ec9063b8eb384dc2c991f6287ddf82919bd2bb7117c615d215f0a47d",
+      "log": "artifacts/rust-tauri/R07/T08/oauth-browser-open-reproduce2.log",
+      "logSha256Verified": "efc0c71ef8c1c677aeed3ac114152f4af5a13343a742d1ee3dcfd00e4b63db8d",
+      "exitCode": 1,
+      "sourceUnchanged": true,
+      "sourceFingerprintBefore": "fb3d0e9191b76a4d3a879b95e705c6b09cab671498a66a820be0d9c1e1b7ad26",
+      "sourceFingerprintAfter": "fb3d0e9191b76a4d3a879b95e705c6b09cab671498a66a820be0d9c1e1b7ad26"
+    },
+    {
+      "receipt": "artifacts/rust-tauri/R07/T08/oauth-browser-open-fixed1.json",
+      "receiptSha256": "3479813eed4873792a4191fa43cf56b145fc29ffb640544dc0fd409510c3085f",
+      "log": "artifacts/rust-tauri/R07/T08/oauth-browser-open-fixed1.log",
+      "logSha256Verified": "d88849afa15e60ba9f12bff46739bf617f5eb0baf097fcf033eef4204f68e0f5",
+      "exitCode": 1,
+      "sourceUnchanged": true,
+      "sourceFingerprintBefore": "7db0560c8d6f6bc75265b3bddfe05779b65cada38981bdf53b0b0fb18f1ba8eb",
+      "sourceFingerprintAfter": "7db0560c8d6f6bc75265b3bddfe05779b65cada38981bdf53b0b0fb18f1ba8eb"
+    },
+    {
+      "receipt": "artifacts/rust-tauri/R07/T08/oauth-browser-open-fixed2.json",
+      "receiptSha256": "27eec75ba1a24e4876a67b755000ed55a5e17cfcbd297fe6924f8b479e9aa494",
+      "log": "artifacts/rust-tauri/R07/T08/oauth-browser-open-fixed2.log",
+      "logSha256Verified": "cccf22a1532ecac5d5f49e99bacacc07292eeaf87ac3ea40a2900f8fc953f88e",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "sourceFingerprintBefore": "083897a092b4a693ec920bc1e9718cf8cf3de755f608399231e57af98f10912c",
+      "sourceFingerprintAfter": "083897a092b4a693ec920bc1e9718cf8cf3de755f608399231e57af98f10912c"
+    }
+  ],
+  "epochReview": {
+    "staticConclusion": "GrantEpoch is captured before the first asynchronous session read. Its RAII in-flight count prevents pruning/reuse while requests remain. Reclaim increments the same locked generation; final generation+table identity check and insertion share the lock. Ticket drop bounds retained epochs. Original principal, target generation, review scope and execution validation remain in place. No new correctness issue found in this narrow epoch implementation.",
+    "runtimeEvidence": "mcp-session-permission-fixed1 contains actual 409 after read/archive/restore and that named test passed, but target exit101 with 3 passed/2 failed. Global source changed during execution, so this remains development evidence, not frozen acceptance.",
+    "remainingFailures": [
+      "actual_ws_prompt_reuses_session_capability_for_second_different_arguments_without_approval: Elapsed at test line866",
+      "credential_revocation_and_same_home_real_restart_do_not_restore_temporary_grants: shutdown mcp_cleanup_unconfirmed EPERM actual_pgid=-1"
+    ]
+  },
+  "browserReview": {
+    "staticConclusion": "Actual Electron handler now awaits shell.openExternal then returns {ok:true}, and converts expected failure into a fulfilled {ok:false,error}; old fire-and-forget callers continue to have a fulfilled IPC result. MCP requires the capability, awaits it, rejects explicit failure, attempts cancellation for a current failed opening, and exposes cancellation-unconfirmed errors. Both before polling and after awaits, current operation/connection checks suppress old owners. Model OAuth similarly rechecks live operation after opening.",
+    "interleavingReasoning": [
+      "If connection/selection changes while open is pending, current() is false after success or failure; old poll/cleanup/toast/finally cannot mutate the new operation.",
+      "If user cancels while open is pending, oauthCancelled suppresses later polling; repeated new operation uses a distinct owner sequence, preventing old finally clearing it.",
+      "Failed cleanup after opening failure remains explicit and is not reported as confirmed cancellation."
+    ],
+    "runtimeEvidence": "oauth-browser-open-fixed2 actual 4 files/38 passed, exit0/sourceUnchangedtrue; covers component API mocks plus extracted current shell handler with a substituted shell Promise and IPC wrapper checks. Does not launch a real native browser or prove all new promise interleavings.",
+    "missingSpecificNamedChecks": [
+      "No named delayed open Promise -> connection switch/cancel case was found in this 38-case selection; reasoning above is static, not a fabricated pass."
+    ]
+  },
+  "newCompatibilityFinding": {
+    "id": "mobile-openExternal-legacy-return",
+    "status": "STATIC_CONFIRMED_PATH_NOT_RUNTIME_EXECUTED",
+    "location": "desktop/src/react/mobile/mobile-platform.ts:28 plus new opened && !opened.ok guards",
+    "finding": "Existing mobile platform returns window.open result directly. A successful browser Window has no ok property, so the new consumers treat it as a negative receipt; MCP then cancels the valid login waiting flow. The changed PlatformApi return union also needs this implementation checked for type compatibility.",
+    "minimalFix": "Preserve old void contract by discarding window.open return in the mobile implementation, or handle only an explicit receipt shape as negative. With noopener, null is not a reliable assertion that a popup was blocked; do not claim OS/window success from that value.",
+    "minimalCheck": "Use actual installMobilePlatform and actual OAuth consumer with window.open returning a Window-like object; confirm legacy successful invocation is not treated as an explicit error. This is local consumer mechanism evidence, not mobile account/browser validation."
+  },
+  "limits": [
+    "No product, tests, contracts, plans, original failures or frozen f records changed by reviewer.",
+    "No Cargo/Node/GUI/new runtime execution by reviewer.",
+    "New OAuth remote credential/capacity risks from prior report remain separate root-owned work."
+  ]
+}

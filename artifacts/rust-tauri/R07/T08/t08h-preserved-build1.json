@@ -1,0 +1,12 @@
+{
+  "candidate": "t08h",
+  "createdAt": "2026-10-18T13:00:02.705930+00:00",
+  "scope": "同候选正式构建的只读保留副本；后继Cargo可能覆盖共享路径，此副本不随其改变",
+  "path": "/private/tmp/lingxi-r07-tests/binaries/t08h-formal-build1/lingxi-service",
+  "sha256": "0aa124e8db5e2c791d2c568145e3b75a897df9ac988dbccb9ae01c7af0cdfb2b",
+  "bytes": 270651408,
+  "buildReceipt": "t08h-build.json",
+  "buildReceiptSha256": "94fe5dc5b50f9c4a08e619633c7a5924bfff16fbf2352b1acb1a3fb8bda5c651",
+  "sourceFingerprint": "f0dd4aa5092b31eb121c3977da8e65cbe2035ab3f4581b6c5898cf73f8da354e",
+  "acceptanceClaimed": false
+}

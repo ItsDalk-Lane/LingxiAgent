@@ -1,0 +1,95 @@
+{
+  "scope": "INDEPENDENT_READ_ONLY_PROVIDER_NEGATIVES_AND_MIXED_SEARCH_TESTS_NOT_H_ACCEPTANCE",
+  "createdAt": "2026-10-18T12:49:42.877929+00:00",
+  "newBlockers": [],
+  "files": [
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs",
+      "gSha256": "0c8dda8542b193417d8c9037fcc7fb53393ded762f51c1d4828054ef6373c0f1",
+      "currentSha256": "792ca3507003b072bbbb58784c3c2ef70bb16ca3509bdcb25ea76a94d06d5cf0"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_t08_search_clear.rs",
+      "gSha256": "809406bc49b65f87ef074a28fb84a92f282554676ce44309a95c1774c57f4920",
+      "currentSha256": "429b64df560e12b992b8fe2d5fcdb6f26bcd9498162860d9c57fd1b9c2b3494c"
+    }
+  ],
+  "gArchiveSha256": "5de9acb993c52b0f7b36f735eae9978c3439c42f3f2129388de1ccd28eb4c0f3",
+  "preservation": {
+    "oldProviderPositiveBodyByteEquivalent": true,
+    "meaning": "原一例35品牌逐一健康调用、编辑A后再次调用B，共36次外送和36独立usage、删除/未注册/OAuth未登录/语音边界全部断言逐字保留。不是36个原测试用例。",
+    "oldSearchThreeTestsAndHelpersByteUnchanged": true,
+    "externalFixtureChange": "仅自有外端handler克隆headers以便核对协议对应凭据，再对缺失/错误凭据返回真实HTTP401；此变更加强外端约束，不改内部实现。"
+  },
+  "providerNegativeCases": {
+    "count": 35,
+    "identities": [
+      "agnes",
+      "dashscope",
+      "openai",
+      "anthropic",
+      "deepseek",
+      "deepseek-responses",
+      "gemini",
+      "openrouter",
+      "opencode",
+      "opencode-go",
+      "ollama",
+      "minimax",
+      "minimax-token-plan",
+      "siliconflow",
+      "zhipu",
+      "moonshot",
+      "baichuan",
+      "stepfun",
+      "volcengine",
+      "hunyuan",
+      "baidu-cloud",
+      "modelscope",
+      "infini",
+      "mimo",
+      "mimo-token-plan",
+      "groq",
+      "together",
+      "fireworks",
+      "mistral",
+      "perplexity",
+      "xai",
+      "dashscope-coding",
+      "kimi-coding",
+      "volcengine-coding",
+      "zhipu-coding"
+    ],
+    "realChain": "真实服务run和HTTP PUT settings/config→权威ModelConfiguration保存/发布→真实凭据服务/ConfigModelGateway→正式HTTP models/health→自有供应商HTTP→原协议执行与数据库usage。只替换外部供应商响应，不替换内部执行判断或记录。",
+    "keyless": "空key按原合同保存AuthNone。34密钥聊天身份实际外端返回401，健康接口按原合同HTTP200、okfalse/status0/code unauthorized；每个实际外送1、transport_attempts1、失败usage1且无伪token。Ollama原none身份实际200且独立token值准确。不是本地保存时拒绝缺key，也未验证真实账号。",
+    "invalidModel": "空和未注册模型在正式健康入口400，额外外送与usage零，Source与代次不变。",
+    "invalidProtocol": "非法协议的证据仅为PUT保存400、Source/代次不变及零额外外送/usage；没有把它登记成已保存模型运行失败。",
+    "savedEmbeddingBoundary": "先真实HTTP保存合法openai-embeddings专用模型，断言Source provider原默认协议保留、model protocol与operations正确；共享gateway.resolve_dispatch(Chat)明确OperationUnsupportedByProvider，正式健康Chat调用HTTP400且零额外外送/usage、不自动改绑。",
+    "limit": "这里的运行入口是健康生成Chat调用和共享网关；不是一整段聊天会话/任务Run。未补真实品牌付费、账号、OAuth、专用语音或非空错误key的逐品牌实调。"
+  },
+  "mixedTwoCases": {
+    "realPreparation": "真实HTTP创建mixed-fixture两个模型并把title绑定first，真实GET和gateway.configured_routes确认first；模型来源和用户偏好使用原文件与原存储。",
+    "validationFailure": "混合请求中模型not-registered、search切brave并清tavily；HTTP400/preferencesSavedfalse，GET模型与search均保持旧值，Source原字节和preferences原字节不变，真实title runtime仍first、零models-changed、响应无已知秘密。",
+    "projectionFailure": "仅破坏真实provider-catalog兼容投影，混合请求把title切second并改search；HTTP500 code model_projection_unconfirmed、result.appliedtrue、preferencesSavedfalse。真实GET、Source字节变化和gateway title均确认模型已应用；search读面和preferences字节保持旧值、models-changed恰1、不伪回滚。",
+    "restart": "先恢复测试破坏的catalog，再真实停服务/关存储、同home从Source models.json解析校验新建服务；GET仍second、search仍旧、真实runtime仍second。未声称损坏catalog持续存在时重启成功。",
+    "limit": "没有外部搜索调用/付费搜索；证明设置保存和部分成功回执及重启事实，不能代真实搜索功能验收。"
+  },
+  "readOnlyRuntimeEvidenceVerified": {
+    "receipt": "artifacts/rust-tauri/R07/T08/mixed-search-provider-negative-real2.json",
+    "receiptSha256": "74233005628c89f3d3c8f1725b8bcd801b7e98c9e31010a7e2e7f4c91569ad5f",
+    "logSha256": "6e28241574bf78b562589ecbb73353c11269e5ce307e3fd82ec52d1e41e74344",
+    "exitCode": 0,
+    "sourceFingerprintBefore": "7d3eac1cdf00816824bd7b0b8026342c02ad48b83df31c3ca26ea2ba6aacc2d1",
+    "sourceFingerprintAfter": "7d3eac1cdf00816824bd7b0b8026342c02ad48b83df31c3ca26ea2ba6aacc2d1",
+    "sourceUnchanged": true,
+    "totals": "provider36/36 + search5/5 = 41/41",
+    "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+    "finalAcceptance": false
+  },
+  "reviewExecution": {
+    "cargoRun": false,
+    "productOrTestsModified": false,
+    "newEvidenceOnly": true
+  },
+  "acceptance": "无新静态阻断；h尚未完成冻结完整验收，不能把本批开发41/41替代h全通过，g原失败记录保持。"
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "case": 0,
+    "outcome": "PDF_ASSET_LOAD_FAILED: 文档所需资源未成功加载",
+    "requestLines": [],
+    "tcpConnections": 0
+  },
+  {
+    "case": 1,
+    "outcome": "PDF_ASSET_LOAD_FAILED: 文档所需资源未成功加载",
+    "requestLines": [],
+    "tcpConnections": 0
+  },
+  {
+    "case": 2,
+    "outcome": "printed",
+    "requestLines": [],
+    "tcpConnections": 0
+  },
+  {
+    "case": 3,
+    "outcome": "printed",
+    "requestLines": [],
+    "tcpConnections": 0
+  },
+  {
+    "case": 4,
+    "outcome": "printed",
+    "requestLines": [],
+    "tcpConnections": 0
+  },
+  {
+    "case": 5,
+    "outcome": "browser_remote: 浏览器命令失败: Page.getNavigationHistory (CDP -32000: Not attached to an active page) [method=Page.getNavigationHistory, session=2FC369B8AD3BE8C3CCF6920243ACF461] [worker_phase=refresh, event_sequence=22]",
+    "requestLines": [],
+    "tcpConnections": 0
+  }
+]

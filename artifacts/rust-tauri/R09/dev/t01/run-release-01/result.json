@@ -1,0 +1,35 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t01_release_offline",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 158.516,
+ "caseCount": 2,
+ "casesSha256": "46bb7d62fd2be003d78426c5d8617902850dc73c1261438409d615da1c77ec2b",
+ "commands": [
+  {
+   "id": "service-stage-verify",
+   "argv": [
+    "node",
+    "scripts/build-rust-desktop-service.mjs",
+    "--verify"
+   ],
+   "exitCode": 1,
+   "durationSecs": 0.174,
+   "logSha256": "71222a73eebce786533aac27f8d26bf4b45c7b35a3a0a59d2d7a90effece6abd"
+  },
+  {
+   "id": "service-build",
+   "argv": [
+    "node",
+    "scripts/build-rust-desktop-service.mjs"
+   ],
+   "exitCode": 1,
+   "durationSecs": 157.015,
+   "logSha256": "6df2beade9e0e67105922fb033df383634608efc81597fb99ae1ecdfbf5d611c"
+  }
+ ],
+ "logSha256": "4c9ec036eb287c0ff949182956f9975b7ca6073939de0cbbe4b67a86a44d6e4b",
+ "finishedAtUnixMs": 1793023918932,
+ "failureDetail": "service-build failed (exit 1):  qrcodegen v1.8.0\n   Compiling icu_provider v2.3.1\n   Compiling icu_provider v1.5.0\n   Compiling icu_properties v2.3.0\n   Compiling icu_normalizer v2.3.0\n   Compiling schemars v1.2.2\n   Compiling boa_ast v0.20.0\n   Compiling tokio-util v0.7.19\n   Compiling tower v0.5.3\n   Compiling icu_locid_transform v1.5.0\n   Compiling idna_adapter v1.2.2\n   Compiling h2 v0.4.19\n   Compiling idna v1.1.0\n   Compiling tokio-stream v0.1.19\n   Compiling icu_properties v1.5.1\n   Compiling url v2.5.8\n   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)\n   Compiling tower-http v0.6.11\n   Compiling oauth2 v5.0.0\n   Compiling boa_parser v0.20.0\n   Compiling icu_normalizer v1.5.0\n   Compiling pdf-extract v0.12.1\n   Compiling hyper v1.11.1\n   Compiling hyper-util v0.1.21\n   Compiling boa_engine v0.20.0\n   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)\n   Compiling axum v0.8.9\n   Compiling rusqlite v0.40.2\n   Compiling rustls-webpki v0.103.15\n   Compiling tokio-rustls v0.26.5\n   Compiling rustls-platform-verifier v0.7.1\n   Compiling hyper-rustls v0.27.10\n   Compiling reqwest v0.13.5\n   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)\n   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)\n    Finished `release` profile [optimized] target(s) in 2m 36s\n[rust-desktop-service] Error: Rust source or package version changed during release build\n    at buildStage (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/build-rust-desktop-service.mjs:138:11)\n    at file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/build-rust-desktop-service.mjs:187:69\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:633:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)\n"
+}

@@ -1,0 +1,16 @@
+ok kill-selfcheck: selfcheck phase entered within deadline
+ok kill-selfcheck: no leftover process
+FAIL kill-selfcheck-resume: exit 0 :: status=2 stderr=error: migrate: journal /private/tmp/t05d2-matrix/d2-kill-selfcheck-pL8h6O/work/journal.json already exists (cutoverId "cut-1792737703589-65101", phase "selfcheck"); pass --resume <cutoverId> to continue (double-run guard)
+FAIL kill-selfcheck-resume: CUTOVER_RESULT present :: 
+FAIL kill-selfcheck-resume: outcome=committed phase=committed :: 
+FAIL kill-selfcheck-resume: journal.phase == committed :: selfcheck
+FAIL kill-selfcheck-resume: nine phases ok in order + committed terminal state :: ["preflight","stop_write_probe","quiesce_snapshot","backup","import","import_verify","epoch_adopt","pointer_switch"]
+ok kill-selfcheck-resume: no refused entry
+ok kill-selfcheck-resume: pointer valid
+ok kill-selfcheck-resume: target stamp epoch 2 (R08_CUTOVER)
+FAIL kill-selfcheck-resume: ruling in work-dir :: 
+FAIL kill-selfcheck-resume: ruling copy in target legacy-import/ :: 
+ok kill-selfcheck-resume: legacy root byte-equal (zero-mutation red line)
+SCRATCH_KEPT /private/tmp/t05d2-matrix/d2-kill-selfcheck-pL8h6O
+D2_RESULT {"verdict":"FAIL","leg":"kill-selfcheck","failures":["kill-selfcheck-resume: exit 0","kill-selfcheck-resume: CUTOVER_RESULT present","kill-selfcheck-resume: outcome=committed phase=committed","kill-selfcheck-resume: journal.phase == committed","kill-selfcheck-resume: nine phases ok in order + committed terminal state","kill-selfcheck-resume: ruling in work-dir","kill-selfcheck-resume: ruling copy in target legacy-import/"]}
+D2_EXIT=1

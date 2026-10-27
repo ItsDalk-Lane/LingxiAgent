@@ -1,0 +1,49 @@
+{
+  "providers": {
+    "fixture": {
+      "api": "openai-completions",
+      "apiKey": "hana-runtime-api-key:fixture",
+      "baseUrl": "http://127.0.0.1:51866/v1",
+      "headers": {
+        "x-fixture": "saved-header"
+      },
+      "models": [
+        {
+          "api": "openai-completions",
+          "baseUrl": "http://127.0.0.1:51866/v1",
+          "id": "fixture-chat",
+          "name": "Fixture Chat",
+          "provider": "fixture"
+        },
+        {
+          "api": "openai-completions",
+          "baseUrl": "http://127.0.0.1:51866/v1",
+          "id": "health-model",
+          "name": "Health Model",
+          "provider": "fixture"
+        },
+        {
+          "api": "openai-completions",
+          "baseUrl": "http://127.0.0.1:51866/v1",
+          "id": "fixture-chat2",
+          "name": "Fixture Chat2",
+          "provider": "fixture"
+        }
+      ]
+    },
+    "fixture-anthropic": {
+      "api": "anthropic-messages",
+      "apiKey": "hana-runtime-api-key:fixture-anthropic",
+      "baseUrl": "http://127.0.0.1:51866",
+      "models": [
+        {
+          "api": "anthropic-messages",
+          "baseUrl": "http://127.0.0.1:51866",
+          "id": "claude-fixture",
+          "name": "Claude Fixture",
+          "provider": "fixture-anthropic"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,12 @@
+
+> lingxi@0.1.43 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+desktop/src/react/host/web-desktop-host.ts(180,5): error TS2322: Type '() => null' is not assignable to type '(role: string) => Promise<string | null>'.
+  Type 'null' is not assignable to type 'Promise<string | null>'.
+desktop/src/react/host/web-desktop-host.ts(193,5): error TS2322: Type '(url: string) => { ok: boolean; error: string; } | undefined' is not assignable to type '(url: string) => void | Promise<void | { ok: boolean; error?: string | undefined; }>'.
+  Type '{ ok: boolean; error: string; } | undefined' is not assignable to type 'void | Promise<void | { ok: boolean; error?: string | undefined; }>'.
+    Type '{ ok: boolean; error: string; }' is not assignable to type 'void | Promise<void | { ok: boolean; error?: string | undefined; }>'.
+desktop/src/react/mobile/mobile-platform.ts(63,5): error TS2322: Type '(url: string) => { ok: boolean; error: string; } | undefined' is not assignable to type '(url: string) => void | Promise<void | { ok: boolean; error?: string | undefined; }>'.
+  Type '{ ok: boolean; error: string; } | undefined' is not assignable to type 'void | Promise<void | { ok: boolean; error?: string | undefined; }>'.
+    Type '{ ok: boolean; error: string; }' is not assignable to type 'void | Promise<void | { ok: boolean; error?: string | undefined; }>'.

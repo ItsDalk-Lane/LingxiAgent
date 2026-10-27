@@ -1,0 +1,23 @@
+
+running 14 tests
+test sf_identity_formulas_match_incumbent_golden ... ok
+test cleanup_skips_cold_managed_file_still_referenced_by_live_session ... ok
+test inspect_local_import_enforces_incumbent_security_gate ... ok
+test reference_checker_collects_marker_identities_and_reports_broken ... ok
+test fork_session_files_rewrites_ids_and_keeps_legacy_aliases ... ok
+test a09_import_legacy_sidecar_preserves_ids_and_readability ... ok
+test register_file_dedups_by_source_key_and_real_path ... ok
+test cleanup_never_touches_warm_sessions ... ok
+test a10_cleanup_keeps_delivered_external_and_cleans_cold_managed ... ok
+test bootstrap_cleanup_reaps_cold_managed_payloads_once_at_startup ... ok
+test attachments_blob_route_enforces_whitelist_limits_and_registers_managed ... ok
+test attachments_local_route_maps_security_gate_errors ... ok
+test attachments_local_snapshot_mode_copies_bytes_and_dedupes ... ok
+test attachments_routes_register_list_and_enforce_ownership ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 21.27s
+
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 03s
+     Running tests/r06_t05_session_files.rs (rust/target/debug/deps/r06_t05_session_files-56089537b10c332a)

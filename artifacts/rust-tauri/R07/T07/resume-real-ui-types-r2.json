@@ -1,0 +1,13 @@
+{
+  "command": [
+    "npx",
+    "tsc",
+    "--noEmit",
+    "-p",
+    "tsconfig.test.json"
+  ],
+  "exitCode": 0,
+  "scope": "test TypeScript only after real WorkTab UI fixture extension",
+  "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "time": "2026-10-18T01:40:41.089104+00:00"
+}

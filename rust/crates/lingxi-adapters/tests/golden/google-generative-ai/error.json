@@ -1,0 +1,42 @@
+{
+  "family": "google-generative-ai",
+  "case": "error",
+  "route": {
+    "provider": "google-golden",
+    "model": "gemini golden"
+  },
+  "auth": {
+    "kind": "bearer",
+    "token": "sk-golden-google-secret"
+  },
+  "input": {
+    "submission": "ping",
+    "tools": [],
+    "prior": []
+  },
+  "http_error": {
+    "status": 500,
+    "body": "{\"error\":{\"message\":\"backend exploded with sk-golden-google-secret inside\"}}"
+  },
+  "expected_transport": {
+    "path": "/models/gemini%20golden:streamGenerateContent?alt=sse",
+    "headers": [
+      [
+        "x-goog-api-key",
+        "sk-golden-google-secret"
+      ],
+      [
+        "content-type",
+        "application/json"
+      ]
+    ],
+    "absent_headers": [
+      "authorization"
+    ]
+  },
+  "expected_failure": {
+    "code": "upstream_unavailable",
+    "retryable": true,
+    "message": "provider returned HTTP 500 Internal Server Error: {\"error\":{\"message\":\"backend exploded with [redacted] inside\"}}"
+  }
+}

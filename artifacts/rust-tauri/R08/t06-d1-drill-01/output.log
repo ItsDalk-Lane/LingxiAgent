@@ -1,0 +1,15 @@
+PASS fixture gen exit 0
+PASS migrate exit 0 :: CUTOVER_RESULT cutoverId=cut-1792756893283-39686 phase=committed outcome=committed detail=cutover committed; ruling at /private/tmp/t06-d1-drill-01/rollback-work/single-writer-ruling.json
+
+PASS migrate committed :: CUTOVER_RESULT cutoverId=cut-1792756893283-39686 phase=committed outcome=committed detail=cutover committed; ruling at /private/tmp/t06-d1-drill-01/rollback-work/single-writer-ruling.json
+
+PASS standin worker emitted
+file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t06_d1_drill.mjs:55
+  throw new Error(`timeout: ${label}`);
+        ^
+
+Error: timeout: service ready
+    at until (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t06_d1_drill.mjs:55:9)
+    at async file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t06_d1_drill.mjs:114:19
+
+Node.js v24.16.0

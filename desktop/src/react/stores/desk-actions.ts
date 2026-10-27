@@ -6,6 +6,7 @@
 
 import { useStore } from './index';
 import { lingxiFetch } from '../hooks/use-hana-fetch';
+import { captureSessionConnection, ownsSessionConnection, sessionOwnerFetch, sessionSelectionRevision } from '../services/session-connection-owner';
 import { clearChat } from './agent-actions';
 import type { DeskFile, DeskSearchResult, StudioWorkspace } from '../types';
 import type { WorkspaceDeskState } from './desk-slice';
@@ -23,7 +24,9 @@ import {
 import { isWebRuntime } from '../utils/platform-runtime';
 import { mergeWorkspaceHistory, normalizeWorkspacePath, removeWorkspaceHistoryEntries } from '../../../../shared/workspace-history.ts';
 import { pendingNewSessionIdentityPatch } from './session-actions';
+import { rustWorkbenchRoute } from '../services/rust-workbench';
 import { persistLastProjectIdentity } from './last-project-identity';
+import { usePlatform } from '../hooks/use-platform';
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- store setState 回调及 IPC callback data */
 
@@ -63,7 +66,8 @@ function canUseNativeDeskPath(s: ReturnType<typeof useStore.getState>): boolean 
 }
 
 function shouldUseWorkbenchDeskAction(s: ReturnType<typeof useStore.getState>): boolean {
-  return isWebRuntime() || !!activeDeskMountId(s) || !canUseNativeDeskPath(s);
+  return resolveServerConnection(s)?.serverNodeKind === 'lingxi-service'
+    || isWebRuntime() || !!activeDeskMountId(s) || !canUseNativeDeskPath(s);
 }
 
 function activeDeskRoot(s: ReturnType<typeof useStore.getState>, overrideDir?: string | null): string | undefined {
@@ -545,6 +549,10 @@ export function deskCurrentDir(): string | null {
 
 export async function loadDeskFiles(subdir?: string, overrideDir?: string | null, overrideMountId?: string | null): Promise<void> {
   const s = useStore.getState();
+  const owner = captureSessionConnection();
+  const native = owner?.connection.serverNodeKind === 'lingxi-service';
+  const selection = sessionSelectionRevision();
+  const owns = () => !native || (ownsSessionConnection(owner) && selection === sessionSelectionRevision() && useStore.getState().currentSessionId === s.currentSessionId);
   if (!hasServerConnection(s)) return;
   if (subdir !== undefined) s.setDeskCurrentPath('');
   const myVersion = ++_deskLoadVersion;
@@ -565,9 +573,13 @@ export async function loadDeskFiles(subdir?: string, overrideDir?: string | null
     const curPath = '';
     if (curPath) params.set('subdir', curPath);
     const qs = params.toString() ? `?${params}` : '';
-    const res = await lingxiFetch(`${mountId ? '/api/workbench/files' : '/api/desk/files'}${qs}`);
+    const listPath = `${mountId ? '/api/workbench/files' : '/api/desk/files'}${qs}`;
+    const res = native ? await sessionOwnerFetch(owner, rustWorkbenchRoute(owner.connection, listPath))
+      : await lingxiFetch(`${mountId ? '/api/workbench/files' : '/api/desk/files'}${qs}`);
     const data = await responseJsonOrEmpty(res);
-    if (myVersion !== _deskLoadVersion) return;
+    if (!owns() || myVersion !== _deskLoadVersion) return;
+    if (native && (!Array.isArray(data.files) || (mountId ? data.mountId !== mountId
+      : dir && workspaceCompareKey(normalizeWorkspaceComparePath(data.basePath)) !== workspaceCompareKey(normalizeWorkspaceComparePath(dir))))) throw new Error('工作区列表归属或格式无效');
     if (!mountId && dir && isMissingLocalDeskRootResponse(res, data)) {
       await pruneStaleLocalDeskRoot(dir);
       updateDeskContextBtn();
@@ -594,9 +606,10 @@ export async function loadDeskFiles(subdir?: string, overrideDir?: string | null
       st.setDeskWorkspaceMount(null);
       if (data.basePath) st.setDeskBasePath(data.basePath);
     }
-    loadJianContent();
+    void loadJianContent();
     updateDeskContextBtn();
   } catch (err) {
+    if (!owns()) return;
     console.error('[jian-desk] load failed:', err);
     if (myVersion !== _deskLoadVersion) return;
     updateDeskContextBtn();
@@ -701,6 +714,10 @@ async function blobToBase64(blob: Blob): Promise<string> {
 
 export async function loadDeskTreeFiles(subdir = '', options: { force?: boolean; overrideDir?: string | null; overrideMountId?: string | null } = {}): Promise<boolean> {
   const s = useStore.getState();
+  const owner = captureSessionConnection();
+  const native = owner?.connection.serverNodeKind === 'lingxi-service';
+  const selection = sessionSelectionRevision();
+  const owns = () => !native || (ownsSessionConnection(owner) && selection === sessionSelectionRevision() && useStore.getState().currentSessionId === s.currentSessionId);
   if (!hasServerConnection(s)) return false;
   const mountId = activeDeskMountId(s, options.overrideMountId);
   const dir = mountId ? undefined : activeDeskRoot(s, options.overrideDir);
@@ -722,9 +739,13 @@ export async function loadDeskTreeFiles(subdir = '', options: { force?: boolean;
     if (normalizedSubdir) params.set('subdir', normalizedSubdir);
     if (!mountId) addSelectedDeskAgentParam(params, s);
     const qs = params.toString() ? `?${params}` : '';
-    const res = await lingxiFetch(`${mountId ? '/api/workbench/files' : '/api/desk/files'}${qs}`);
+    const listPath = `${mountId ? '/api/workbench/files' : '/api/desk/files'}${qs}`;
+    const res = native ? await sessionOwnerFetch(owner, rustWorkbenchRoute(owner.connection, listPath))
+      : await lingxiFetch(`${mountId ? '/api/workbench/files' : '/api/desk/files'}${qs}`);
     const data = await res.json();
-    if (_deskTreeLoadVersion.get(key) !== myVersion) return false;
+    if (!owns() || _deskTreeLoadVersion.get(key) !== myVersion) return false;
+    if (native && (!Array.isArray(data.files) || (mountId ? data.mountId !== mountId
+      : dir && workspaceCompareKey(normalizeWorkspaceComparePath(data.basePath)) !== workspaceCompareKey(normalizeWorkspaceComparePath(dir))))) throw new Error('工作区列表归属或格式无效');
     if (data.error) throw new Error(String(data.error));
     const st = useStore.getState();
     if (mountId) {
@@ -746,6 +767,7 @@ export async function loadDeskTreeFiles(subdir = '', options: { force?: boolean;
     if (!normalizedSubdir) st.setDeskFiles(data.files || []);
     return true;
   } catch (err) {
+    if (!owns()) return false;
     console.error('[desk-tree] load failed:', err);
     if (_deskTreeLoadVersion.get(key) !== myVersion) return false;
     return false;
@@ -831,9 +853,14 @@ export async function revealDeskDirectory(directoryPath: string): Promise<boolea
 export async function loadJianContent(): Promise<void> {
   const s = useStore.getState();
   if (!hasServerConnection(s)) return;
+  const owner = captureSessionConnection();
+  const native = owner?.connection.serverNodeKind === 'lingxi-service';
+  const selection = sessionSelectionRevision();
+  const mountId = activeDeskMountId(s);
+  const owns = () => !native || (ownsSessionConnection(owner) && selection === sessionSelectionRevision()
+    && useStore.getState().deskBasePath === s.deskBasePath && activeDeskMountId(useStore.getState()) === mountId);
   try {
     const params = new URLSearchParams();
-    const mountId = activeDeskMountId(s);
     if (mountId) {
       params.set('mountId', mountId);
       params.set('name', 'jian.md');
@@ -844,19 +871,24 @@ export async function loadJianContent(): Promise<void> {
       addSelectedDeskAgentParam(params, s);
     }
     const qs = params.toString() ? `?${params}` : '';
-    const res = await lingxiFetch(`${mountId ? '/api/workbench/content' : '/api/desk/jian'}${qs}`);
+    const path = `${mountId ? '/api/workbench/content' : '/api/desk/jian'}${qs}`;
+    const res = native ? await sessionOwnerFetch(owner, rustWorkbenchRoute(owner.connection, path)) : await lingxiFetch(path);
+    if (!owns()) return;
     if (mountId) {
       if (res.status === 404) {
         useStore.getState().setDeskJianContent(null);
         return;
       }
       if (!res.ok) throw new Error(`jian.md load failed: ${res.status}`);
-      useStore.getState().setDeskJianContent(await res.text() || null);
+      const content = await res.text();
+      if (owns()) useStore.getState().setDeskJianContent(content || null);
       return;
     }
     const data = await res.json();
+    if (!owns()) return;
     useStore.getState().setDeskJianContent(data.content || null);
   } catch (err) {
+    if (!owns()) return;
     console.error('[jian] load jian.md failed:', err);
     useStore.getState().setDeskJianContent(null);
   }
@@ -1188,7 +1220,7 @@ export async function deskTrashTreeItems(items: DeskTreeMoveItem[]): Promise<boo
   if (shouldUseWorkbenchDeskAction(s)) {
     return deskSafeDeleteMobileWorkbenchItems(items);
   }
-  const trashItem = window.platform?.trashItem;
+  const trashItem = usePlatform()?.trashItem;
   if (!trashItem) {
     console.error('[desk] system trash is not available');
     return false;
@@ -1228,6 +1260,7 @@ async function deskSafeDeleteMobileWorkbenchItems(items: DeskTreeMoveItem[]): Pr
   const s = useStore.getState();
   if (!s.deskBasePath || items.length === 0) return false;
   const mountId = activeDeskMountId(s) || 'default';
+  const rustDirectory = resolveServerConnection(s)?.serverNodeKind === 'lingxi-service' && !activeDeskMountId(s);
 
   const paths = items.map(item => ({
     ...item,
@@ -1239,12 +1272,12 @@ async function deskSafeDeleteMobileWorkbenchItems(items: DeskTreeMoveItem[]): Pr
   try {
     for (const item of paths) {
       if (!isPlainFileName(item.name)) break;
-      const res = await lingxiFetch('/api/workbench/actions', {
+      const res = await lingxiFetch(rustDirectory ? '/api/desk/files' : '/api/workbench/actions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'safeDelete',
-          mountId,
+          ...(rustDirectory ? { ...selectedDeskAgentBody(s), action: 'remove', dir: s.deskBasePath }
+            : { action: 'safeDelete', mountId }),
           subdir: item.sourceSubdir,
           name: item.name,
         }),

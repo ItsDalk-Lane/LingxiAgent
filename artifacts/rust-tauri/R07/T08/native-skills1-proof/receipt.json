@@ -1,0 +1,19 @@
+{
+  "checks": [
+    "actual_tauri_main_entry",
+    "invalid_relative_and_non_directory_empty",
+    "oversize_null",
+    "actual_separate_skill_window",
+    "default_document_content",
+    "actual_file_tree_selected_text",
+    "installed_true_no_copy",
+    "foreign_path_refused",
+    "write_command_refused",
+    "source_bytes_unchanged",
+    "read_never_installs"
+  ],
+  "main": "main",
+  "screenshot": "/private/tmp/lingxi-r07-tests/tmp/lingxi-skills-native-proof-f86ed5f8515db2b2/skill-viewer.png",
+  "source": "/private/tmp/lingxi-r07-tests/tmp/lingxi-skills-native-proof-f86ed5f8515db2b2/sample-skill/SKILL.md",
+  "viewer": "skill-viewer-0"
+}

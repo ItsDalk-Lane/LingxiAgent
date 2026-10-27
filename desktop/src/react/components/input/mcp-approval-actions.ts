@@ -1,4 +1,4 @@
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../services/service-client';
 import type { SessionConfirmationBlock } from '../../stores/chat-types';
 
 /** The bridge tool that fronts every deferred MCP tool. */

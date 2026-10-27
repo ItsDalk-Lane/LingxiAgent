@@ -1,0 +1,119 @@
+{
+  "scope": "真实合成SQLite只读核验；不读取或导出凭证表",
+  "database": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r08-independent-default-d8_jwy97/home/lingxi-r07-t12-default-composition-33769-1792611360299101000/data/lingxi-service/data/runs.db",
+  "journalRows": [
+    {
+      "journal_id": "run_000001a15ff69ecb_000001-tc0001",
+      "run_id": "run_000001a15ff69ecb_000001",
+      "target": "tool:first-party:mcp_describe_tool",
+      "phase": "succeeded",
+      "receipt_outcome": "succeeded",
+      "dispatched": 1,
+      "args_digest": "0f81dda45e97f5cc99688a7d6c87c9c0ee5dbc67f989cf9f0a59235debcd2e04"
+    },
+    {
+      "journal_id": "run_000001a15ff69ecb_000001-tc0002",
+      "run_id": "run_000001a15ff69ecb_000001",
+      "target": "tool:first-party:run_code",
+      "phase": "succeeded",
+      "receipt_outcome": "succeeded",
+      "dispatched": 1,
+      "args_digest": "6df6e4db4486283a4211a6521ea16f3df564089e4d31bc00428e1942b7ea3404"
+    },
+    {
+      "journal_id": "run_000001a15ff69f50_000002-tc0001",
+      "run_id": "run_000001a15ff69f50_000002",
+      "target": "tool:first-party:mcp_describe_tool",
+      "phase": "succeeded",
+      "receipt_outcome": "succeeded",
+      "dispatched": 1,
+      "args_digest": "0f81dda45e97f5cc99688a7d6c87c9c0ee5dbc67f989cf9f0a59235debcd2e04"
+    },
+    {
+      "journal_id": "run_000001a15ff69f50_000002-tc0002",
+      "run_id": "run_000001a15ff69f50_000002",
+      "target": "tool:first-party:run_code",
+      "phase": "succeeded",
+      "receipt_outcome": "succeeded",
+      "dispatched": 1,
+      "args_digest": "880eeb7b14f5a7c0bb361e0fb0163d3135c409157f46983e3bf1a7ae0807fbc1"
+    },
+    {
+      "journal_id": "run_000001a15ff69fa5_000003-tc0001",
+      "run_id": "run_000001a15ff69fa5_000003",
+      "target": "tool:first-party:mcp_describe_tool",
+      "phase": "succeeded",
+      "receipt_outcome": "succeeded",
+      "dispatched": 1,
+      "args_digest": "8a3c60da791cc27ab9dcd95ce8d129fd02c3719b8937fc63899e1b92dbadfb4f"
+    },
+    {
+      "journal_id": "run_000001a15ff69fa5_000003-tc0002",
+      "run_id": "run_000001a15ff69fa5_000003",
+      "target": "tool:first-party:security_scan",
+      "phase": "succeeded",
+      "receipt_outcome": "succeeded",
+      "dispatched": 1,
+      "args_digest": "156a86c38ec724b1aaeb64a1ea1cbe38d6bce4cd9293f06e82e9418adc20dc24"
+    },
+    {
+      "journal_id": "run_000001a15ff6a04a_000004-tc0001",
+      "run_id": "run_000001a15ff6a04a_000004",
+      "target": "tool:first-party:mcp_describe_tool",
+      "phase": "succeeded",
+      "receipt_outcome": "succeeded",
+      "dispatched": 1,
+      "args_digest": "6a7296be2d50ccb2ca26b9ea6ec1692b395c27c07fdfe9a1a705c0e1c04a3b99"
+    },
+    {
+      "journal_id": "run_000001a15ff6a04a_000004-tc0002",
+      "run_id": "run_000001a15ff6a04a_000004",
+      "target": "tool:first-party:mcp_describe_tool",
+      "phase": "succeeded",
+      "receipt_outcome": "succeeded",
+      "dispatched": 1,
+      "args_digest": "2e2013f993e38029b14552ef1d520f3e0ab52508532dc8d5a5bfcdf84c8fdac0"
+    },
+    {
+      "journal_id": "run_000001a15ff6a04a_000004-tc0003",
+      "run_id": "run_000001a15ff6a04a_000004",
+      "target": "tool:first-party:mcp_describe_tool",
+      "phase": "succeeded",
+      "receipt_outcome": "succeeded",
+      "dispatched": 1,
+      "args_digest": "5d4215318ee6fec31f7dae3be74805f999fd6ff6f4a72710649b4e5579bb205c"
+    },
+    {
+      "journal_id": "run_000001a15ff6a04a_000004-tc0004",
+      "run_id": "run_000001a15ff6a04a_000004",
+      "target": "tool:first-party:run_tools",
+      "phase": "succeeded",
+      "receipt_outcome": "succeeded",
+      "dispatched": 1,
+      "args_digest": "cb7d4ec2d48abaf4398cc3ea54fee46a5cef8f36100b0df47eef01140656a514"
+    },
+    {
+      "journal_id": "run_000001a15ff6a04a_000004-tc0004:ptc:1",
+      "run_id": "run_000001a15ff6a04a_000004",
+      "target": "tool:first-party:read",
+      "phase": "succeeded",
+      "receipt_outcome": "succeeded",
+      "dispatched": 1,
+      "args_digest": "fcee7b0508e65c095e42b7b31034d56df0db815b303cf209827cebe25be3d97e"
+    },
+    {
+      "journal_id": "run_000001a15ff6a04a_000004-tc0004:ptc:2",
+      "run_id": "run_000001a15ff6a04a_000004",
+      "target": "tool:first-party:write",
+      "phase": "succeeded",
+      "receipt_outcome": "succeeded",
+      "dispatched": 1,
+      "args_digest": "b7626c4f56cc21def7d28d7dab521ab7df4c1146ee51d08e2bce16c81e5b550f"
+    }
+  ],
+  "childRows": 2,
+  "externalRequests": 14,
+  "externalWireSha256": "a58fa8fece85beea62f453c89f3125973f05ce1ca8aa4d72420772bdff8c5351",
+  "rawPtcChildInExternalWire": false,
+  "outputStatus": "PASS_LOCAL_DEFAULT_COMPOSITION_ONLY"
+}

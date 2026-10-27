@@ -1,0 +1,46 @@
+{
+  "recordedAt": "2026-10-18T11:57:56.507102+00:00",
+  "files": [
+    {
+      "path": "rust/crates/lingxi-service/src/auth.rs",
+      "sha256": "1c748aa64b6f43d1d6ad79692154489a8593d1f9e3fb6445f7cb91176f3294bd"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/chat_wire.rs",
+      "sha256": "0a027b4a21e9fb8f941da0a4eed95cc65a434443ecb1f0263668b71df9d52f33"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "sha256": "82fd37409cbeaaf66bde0fee84c7db867e756dd09c1fc55df5d3839d041c43d6"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/mcp_session_permissions.rs",
+      "sha256": "0abd1ca27cdd7260b13da19f087edc1eeb99fe66769b8124a6e35f66f2085215"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/runs.rs",
+      "sha256": "bb0ddfe8329b01ba2a45c7850f3c7bb28170c146a04fb0e8b34980d9eead998b"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_admin.rs",
+      "sha256": "d2e7cb8b33f4c794f5b1a9a6751678af03737353ca9588c3f84270a1f8292868"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/sessions.rs",
+      "sha256": "6d4b34690362f5b9edcfec4acf4b127740a32e48f8b6a08e43fef47bf5f0e7b2"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/sessiontools.rs",
+      "sha256": "6ac49c6f272b1d40d1117b941c33274f3a1ebddaa52663eb69a60eddb8456500"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/toolgateway.rs",
+      "sha256": "e16bb3bcae3959aca9a92a10f2ee75174f1e5bb200941a06a157fb7b90b27d20"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_t08_mcp_session_permissions.rs",
+      "sha256": "1fffa3b18244bf56748fcba3c2b2032b55dd0901f1c7ac97f2211cea329cfe60"
+    }
+  ],
+  "scope": "仅格式检查列出的本轮模块；skip_children避免改其他所有者"
+}

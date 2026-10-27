@@ -1,0 +1,37 @@
+$ /bin/sh -c strings -a /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E "devUrl" || true
+--- exit=0 duration=0.18s ---
+0
+
+$ /bin/sh -c strings -a /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E "localhost:5173" || true
+--- exit=0 duration=0.18s ---
+0
+
+$ /bin/sh -c strings -a /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E "127\\.0\\.0\\.1:5173" || true
+--- exit=0 duration=0.18s ---
+0
+
+$ /bin/sh -c strings -a /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E "dist-tauri-resources" || true
+--- exit=0 duration=0.19s ---
+0
+
+$ /bin/sh -c strings -a /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E "wdio|webdriver" || true
+--- exit=0 duration=0.19s ---
+0
+
+$ codesign --verify --deep --strict /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app
+--- exit=0 duration=0.08s ---
+
+$ codesign -dv --verbose=2 /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app
+--- exit=0 duration=0.01s ---
+Executable=/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop
+Identifier=com.lingxi.app
+Format=app bundle with Mach-O thin (arm64)
+CodeDirectory v=20500 size=116591 flags=0x10002(adhoc,runtime) hashes=3637+3 location=embedded
+Signature=adhoc
+Info.plist entries=16
+TeamIdentifier=not set
+Runtime Version=27.0.0
+Sealed Resources version=2 rules=13 files=3
+Internal requirements count=0 size=12
+Total signatures=1
+Chosen signature=1

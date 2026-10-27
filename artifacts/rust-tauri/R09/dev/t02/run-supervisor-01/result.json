@@ -1,0 +1,280 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t02_supervisor_ready",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 119.704,
+ "caseCount": 17,
+ "casesSha256": "d1af76647772191fa313e39ec019d7553b5fc3886661fbaa225eb7053abde136",
+ "commands": [
+  {
+   "id": "debug-renderer-build",
+   "argv": [
+    "npm",
+    "run",
+    "build:renderer"
+   ],
+   "exitCode": 0,
+   "durationSecs": 7.506,
+   "logSha256": "e6f7d8c9fb212c774dc3b2bc570456fbe01158fb1c14a70a4949711d2c97dca5"
+  },
+  {
+   "id": "debug-theme-build",
+   "argv": [
+    "npm",
+    "run",
+    "build:theme"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.255,
+   "logSha256": "f883e9526bf7d9a6ef5124889e61921875888b9f039d8252dc7cd8e290a3fccd"
+  },
+  {
+   "id": "tauri-build-debug",
+   "argv": [
+    "node",
+    "scripts/tauri-build.mjs",
+    "--debug",
+    "--receipt",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t02/run-supervisor-01/tauri-build-debug.json"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.182,
+   "logSha256": "e9fed1bcad7066e64a6a7446be7842b014214b4e7c0e56eb03546e9884c1ebb5"
+  },
+  {
+   "id": "release-renderer-build",
+   "argv": [
+    "npm",
+    "run",
+    "build:renderer"
+   ],
+   "exitCode": 0,
+   "durationSecs": 7.374,
+   "logSha256": "f04d6db4dd067f75f1f277fded37e0a3895eba5ab3a5416b101f4b99e97cf707"
+  },
+  {
+   "id": "release-theme-build",
+   "argv": [
+    "npm",
+    "run",
+    "build:theme"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.241,
+   "logSha256": "bd391f2ec238ab47eb999b1e77d3c42eab74adb4d1b158a39ff918d17c34f23a"
+  },
+  {
+   "id": "service-stage-verify-1",
+   "argv": [
+    "node",
+    "scripts/build-rust-desktop-service.mjs",
+    "--verify"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.169,
+   "logSha256": "fa787f55ed4619ee7a8392564e8b83416c71f9d1e19c8b425eaf62d62439c2a1"
+  },
+  {
+   "id": "tauri-build-release",
+   "argv": [
+    "node",
+    "scripts/tauri-build.mjs",
+    "--receipt",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t02/run-supervisor-01/tauri-build-release.json"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.442,
+   "logSha256": "2329fc6671f1d4667b8e94ebdc398a0a7e1228b8d353b34bc27c0ba5e434c1f0"
+  },
+  {
+   "id": "cargo-supervisor-tests",
+   "argv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "test",
+    "--manifest-path",
+    "desktop/src-tauri/Cargo.toml",
+    "--locked",
+    "--features",
+    "r09-host",
+    "--test",
+    "service_supervisor",
+    "--",
+    "--nocapture"
+   ],
+   "exitCode": 0,
+   "durationSecs": 14.15,
+   "logSha256": "e8d29038e77233eaaf5cea65de5fa166f1a387b99af04e56eb080fdc41c9615c"
+  },
+  {
+   "id": "release-renderer-build",
+   "argv": [
+    "npm",
+    "run",
+    "build:renderer"
+   ],
+   "exitCode": 0,
+   "durationSecs": 7.347,
+   "logSha256": "1d35201f887aa1c7efbd6e43be21d6467b9000c832ad52b6bb7f507930bbe60f"
+  },
+  {
+   "id": "release-theme-build",
+   "argv": [
+    "npm",
+    "run",
+    "build:theme"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.255,
+   "logSha256": "eec461dea6ff1a9d13f85d6390d1121f725c662e31e23689c08f880eddf84c9f"
+  },
+  {
+   "id": "service-stage-verify-1",
+   "argv": [
+    "node",
+    "scripts/build-rust-desktop-service.mjs",
+    "--verify"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.17,
+   "logSha256": "fa787f55ed4619ee7a8392564e8b83416c71f9d1e19c8b425eaf62d62439c2a1"
+  },
+  {
+   "id": "tauri-build-release",
+   "argv": [
+    "node",
+    "scripts/tauri-build.mjs",
+    "--receipt",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t02/run-supervisor-01/tauri-build-release.json"
+   ],
+   "exitCode": 0,
+   "durationSecs": 21.465,
+   "logSha256": "d8bc385d0ec11729dc1761e55cbaad16032b466280e03d3f03f21994762417b5"
+  },
+  {
+   "id": "strings-hana-server",
+   "argv": [
+    "/bin/sh",
+    "-c",
+    "strings -a /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E \"hana-server\" || true"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.187,
+   "logSha256": "ba5061c8f54d6e89380aadf94104231226b33bdbf2239aeecf252ab42d778a13"
+  },
+  {
+   "id": "strings-server-bootstrap",
+   "argv": [
+    "/bin/sh",
+    "-c",
+    "strings -a /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E \"server/bootstrap\" || true"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.19,
+   "logSha256": "e5d148b1921882e5a8bd21b8458dabd027b24f90e9b4caa3efbdd809db6c74df"
+  },
+  {
+   "id": "strings-bridge-worker",
+   "argv": [
+    "/bin/sh",
+    "-c",
+    "strings -a /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E \"bridge-sdk-worker\" || true"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.187,
+   "logSha256": "ce254c3d3717d543461cba964826ce9c48763e8b19da874c9999f9fdce6b2ed7"
+  },
+  {
+   "id": "strings-runtime-env",
+   "argv": [
+    "/bin/sh",
+    "-c",
+    "strings -a /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E \"LINGXI_DESKTOP_SERVER_RUNTIME\" || true"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.187,
+   "logSha256": "cbbadcf8135912f96e1dd6cf5e2bf7fa1fd4ef42a1411e731f86890336d773c9"
+  }
+ ],
+ "logSha256": "ee2e1cd846ef180543fd45a9485fcb056b5d0d8addc1bdeba8d0c018c800881f",
+ "finishedAtUnixMs": 1793024326767,
+ "failures": {
+  "protocolMismatch": {
+   "actual": "lingxi-service wire 1..=2 data-epoch 2",
+   "appVersion": "0.1.43",
+   "atUnixMs": 1793024273537,
+   "debugBuild": false,
+   "detail": null,
+   "expected": "lingxi-service wire 1..=1 data-epoch 2",
+   "fallbackAttempts": 0,
+   "home": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-84976-1793024207063/home-protocol-mismatch",
+   "message": "bundled Rust service protocol/data epoch is incompatible with this host",
+   "nodeFallback": "none",
+   "packaged": true,
+   "reason": "RUST_SERVICE_PROTOCOL_INCOMPATIBLE",
+   "schema": "lingxi.r09.service-launch-failure.v1"
+  },
+  "digestMismatch": {
+   "actual": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+   "appVersion": "0.1.43",
+   "atUnixMs": 1793024277900,
+   "debugBuild": false,
+   "detail": {
+    "binarySha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+    "codesign": "codesign --verify --deep --strict failed: /private/tmp/lingxi-r09-injected-84976/DigestMismatch.app: a sealed resource is missing or invalid",
+    "contentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+    "manifestContentSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "manifestSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+   },
+   "expected": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "fallbackAttempts": 0,
+   "home": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-84976-1793024207063/home-digest-mismatch",
+   "message": "bundled Rust service bytes do not match the build manifest",
+   "nodeFallback": "none",
+   "packaged": true,
+   "reason": "RUST_SERVICE_DIGEST_MISMATCH",
+   "schema": "lingxi.r09.service-launch-failure.v1"
+  },
+  "runtimeIdentityMismatch": {
+   "actual": "wire 1..=3 epoch 2",
+   "appVersion": "0.1.43",
+   "atUnixMs": 1793024279860,
+   "debugBuild": true,
+   "detail": {
+    "instanceId": "0123456789abcdef0123456789abcdef"
+   },
+   "expected": "wire 1..=1 epoch 2",
+   "fallbackAttempts": 0,
+   "home": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-84976-1793024207063/home-runtime-mismatch",
+   "message": "runtime instance record announces an incompatible protocol/data epoch",
+   "nodeFallback": "none",
+   "packaged": false,
+   "reason": "RUNTIME_IDENTITY_MISMATCH",
+   "schema": "lingxi.r09.service-launch-failure.v1"
+  }
+ },
+ "releaseManifest": {
+  "stage": "/Users/study_superior/Desktop/Code/LingxiAgent/dist-rust-service/mac-arm64",
+  "sidecar": "desktop/src-tauri/binaries/lingxi-service-aarch64-apple-darwin",
+  "sidecarSha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+  "resourcesManifest": "desktop/src-tauri/resources/rust-service/build.json",
+  "manifestSha256": "bb73f7f2df49f0bd6b1f776db6dfe7e60a9c6276f13a5eaa0bc3d15d33eca8d3",
+  "protocol": {
+   "serverKind": "lingxi-service",
+   "wireProtocolMin": 1,
+   "wireProtocolMax": 1,
+   "dataEpoch": 2
+  },
+  "binarySha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+  "contentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0"
+ },
+ "platform": "macos-arm64",
+ "injectedRoot": "/private/tmp/lingxi-r09-injected-84976",
+ "failedCases": [
+  "t02::packaged-exit-graceful",
+  "t02::no-node-fallback-in-release-binary"
+ ]
+}

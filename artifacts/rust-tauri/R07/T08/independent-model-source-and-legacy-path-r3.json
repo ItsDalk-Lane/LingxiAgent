@@ -1,0 +1,67 @@
+{
+  "schema": "lingxi.r07.independent-source-closure-review.v1",
+  "recordedAt": "2026-10-18T06:10:15.573868+00:00",
+  "mode": "READ_ONLY_NO_CARGO_NO_SOURCE_EDITS",
+  "status": "LOCAL_SOURCE_CLOSED_RUNTIME_NOT_CLAIMED",
+  "sources": [
+    {
+      "path": "rust/crates/lingxi-service/src/provider_routes.rs",
+      "sha256": "b757b5b878624d615e44c8a3622a5bab36c4af231abdd4e62d155b23f4c878f4"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/management.rs",
+      "sha256": "ec92411f46574aa976aff3da667cc1e0fe25a37f87195de2579a3f1df005d20b"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/chat_settings.rs",
+      "sha256": "4fe5b833cebe500c69483bdfa1972b5e7511495316bc1474a054fada1903251c"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/filetools.rs",
+      "sha256": "65de7ec880afd431d0ea69d02f19f91ba1a0563ec115d27e4962e21dd820cc3e"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_t08_provider_http.rs",
+      "sha256": "da4f20e0b276c7f8c541e2cba7fe67ebf18629175f7e73b93cc7614fff1fb74b"
+    }
+  ],
+  "priorFinding": {
+    "id": "T08-AUDIT-MISSING-AGENT-PARENT-LINK",
+    "sourceReview": "independent-final-chain-short-review-20261018.json",
+    "status": "STATIC_CLOSED_ON_UNIX",
+    "basis": "choice_for_agent先打开home，再经held root.child_directory(agents,false)及agents.child_directory(agent,false)。Unix child_directory实际openat O_DIRECTORY|O_NOFOLLOW，现有悬空链接或指向无config目录的链接均不会被当作NotFound兼容。存在目录而缺config时还核对home/agents/agent目录身份；读到配置后继续有界快照及path_is_current。",
+    "newUnitProofPresent": "原正常missing兼容断言保留；新增dangling和linked empty target均assert is_err；本审未运行。"
+  },
+  "modelReadProjection": {
+    "status": "STATIC_CLOSED",
+    "basis": "auxiliary_vision_route优先统一configured_routes vision；仅model_configuration.is_active()==false才读取legacy vision_model。已经激活但清掉vision槽时，旧合法图像模型偏好不会复活。",
+    "actualHttpTestPresent": "实际source清vision绑定前先向真实preferences写入有效legacy vision_model，随后PUT清绑定、GET断言configured=false/model=null/not_configured，并核网关绑定；外部模型响应才替身。",
+    "executedByThisReviewer": false
+  },
+  "modelChangeEvents": {
+    "status": "STATIC_CLOSED",
+    "basis": [
+      "provider update_model_route/delete_model_route成功各publish一次；错误仅report.applied时publish，保留原错误回执。",
+      "management reload成功publish；409且未applied走原invalid错误；其余error在applied时publish后原错误返回。"
+    ],
+    "actualHttpTest": "provider_edits_deletes_and_reload_notify_real_applied_state_even_when_projection_fails",
+    "testBasis": "真实损坏provider-catalog投影后，对PUT/DELETE/reload分别要求model_projection_unconfirmed、result.applied=true、models-changed恰好一次；恢复后reload成功仍恰好一次，且不产生模型外部请求。",
+    "executedByThisReviewer": false
+  },
+  "additionalConfirmedLocalDefects": [],
+  "knownPlatformGap": [
+    {
+      "platform": "Windows",
+      "status": "KNOWN_UNSUPPORTED_SOURCE_PATH_NOT_JUST_UNTESTED",
+      "source": "filetools.rs cfg(windows) DirFd::child_directory",
+      "basis": "该实现直接返回Unsupported；新增choice_for_agent调用时未特殊处理Unsupported。因此无显式会话/owner模型的普通默认读取及旧缺失目录兼容会错误返回，不会完成Unix同等路径。显式已有choice.model可提前绕过该路径。",
+      "boundary": "不能把本机静态闭合或本机实际检查说成Windows兼容通过；由root按原阶段责任记录具体未完成项。",
+      "reportedToRoot": true
+    }
+  ],
+  "limits": [
+    "未运行Cargo/产品/新增测试，实际验证统一由root执行。",
+    "源摘要为本次只读时点，不代替完整固定候选绑定或独立运行门禁。",
+    "原失败/原账/生产源未修改，未提交未推送。"
+  ]
+}

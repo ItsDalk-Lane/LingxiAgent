@@ -85,6 +85,8 @@ export interface ServerConnectionSource {
   activeServerConnection?: ServerConnection | null;
   serverPort?: string | number | null;
   serverToken?: string | null;
+  serverNodeKind?: string | null;
+  serverNodeTransport?: string | null;
 }
 
 const LOCAL_CAPABILITIES = ['chat', 'resources', 'files', 'tools'];
@@ -131,6 +133,14 @@ function normalizePort(port: string | number | null | undefined): string | null 
 function normalizeToken(token: string | null | undefined): string | null {
   if (token === null || token === undefined || token === '') return null;
   return String(token);
+}
+
+/** 重启事件只能使用本轮提供且格式有效的端口和令牌。 */
+export function validateRestartTransport(port: unknown, token: unknown): { port: string; token: string } | null {
+  const number = typeof port === 'string' && port.trim() ? Number(port) : port;
+  if (typeof number !== 'number' || !Number.isInteger(number) || number <= 0 || number > 65535) return null;
+  if (typeof token !== 'string' || !token.trim() || token !== token.trim()) return null;
+  return { port: String(number), token };
 }
 
 function trimTrailingSlash(value: string): string {
@@ -188,12 +198,59 @@ function headersToRecord(headers: HeadersInit | undefined): Record<string, strin
 export function createLocalServerConnection({
   serverPort,
   serverToken,
+  serverNodeKind,
+  serverNodeTransport,
+  serverHost,
 }: {
   serverPort: string | number | null | undefined;
   serverToken?: string | null;
+  serverNodeKind?: string | null;
+  serverNodeTransport?: string | null;
+  /** R08-T03：远端模式下由主进程下发的真实 host；缺省/loopback 保持既有 local 形态。 */
+  serverHost?: string | null;
 }): ServerConnection | null {
   const port = normalizePort(serverPort);
   if (!port) return null;
+  if (serverNodeKind && serverNodeKind !== 'lingxi-service') {
+    throw new Error(`invalid local server kind: ${serverNodeKind}`);
+  }
+  if (serverNodeTransport && serverNodeTransport !== 'http' && serverNodeTransport !== 'https') {
+    throw new Error(`invalid local server transport: ${serverNodeTransport}`);
+  }
+  const transport = serverNodeTransport || 'http';
+  const wsTransport = transport === 'https' ? 'wss' : 'ws';
+
+  // R08-T03：远端 host 走手动连接形态（对齐 normalizeBrowser* 助手），
+  // 非 loopback 绝不再产出 local/loopback_token 语义。
+  if (serverHost && !isLoopbackHost(serverHost)) {
+    if (serverNodeKind !== 'lingxi-service') {
+      throw new Error('remote server host is only valid for the lingxi-service preview');
+    }
+    // 括号包裹的 IPv6 字面量是合法 host；其余含冒号形态视为端口/用户信息注入。
+    const bracketedIpv6 = /^\[[0-9a-fA-F:.]+\]$/.test(serverHost);
+    if (!bracketedIpv6 && (serverHost.includes(':') || serverHost.includes('@') || serverHost.includes('/'))) {
+      throw new Error(`invalid remote server host: ${serverHost}`);
+    }
+    const kind = normalizeBrowserConnectionKind(undefined, serverHost);
+    return {
+      connectionId: LOCAL_CONNECTION_ID,
+      kind,
+      serverId: `remote:${serverHost}`,
+      studioId: 'local',
+      label: `Rust 预览（远端）@${serverHost}`,
+      serverNodeKind,
+      serverNodeTransport: transport,
+      baseUrl: `${transport}://${serverHost}:${port}`,
+      wsUrl: `${wsTransport}://${serverHost}:${port}`,
+      token: normalizeToken(serverToken),
+      authState: 'paired',
+      trustState: normalizeBrowserTrustState(undefined, kind),
+      credentialKind: normalizeBrowserCredentialKind(undefined, kind),
+      platformAccountId: null,
+      officialServiceKind: null,
+      capabilities: [...LOCAL_CAPABILITIES],
+    };
+  }
 
   return {
     connectionId: LOCAL_CONNECTION_ID,
@@ -201,8 +258,10 @@ export function createLocalServerConnection({
     serverId: 'local',
     studioId: 'local',
     label: 'Local Lingxi',
-    baseUrl: `http://127.0.0.1:${port}`,
-    wsUrl: `ws://127.0.0.1:${port}`,
+    ...(serverNodeKind ? { serverNodeKind } : {}),
+    ...(serverNodeKind ? { serverNodeTransport: transport } : {}),
+    baseUrl: `${transport}://127.0.0.1:${port}`,
+    wsUrl: `${wsTransport}://127.0.0.1:${port}`,
     token: normalizeToken(serverToken),
     authState: 'paired',
     trustState: 'local',
@@ -319,17 +378,45 @@ export async function connectDeviceServerConnection({
   const token = normalizeToken(credential);
   if (!token) throw new Error('server access key required');
 
-  await requestJson(fetchImpl, `${normalizedBaseUrl}/api/web-auth/login`, {
+  const loginRequest: RequestInit = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
     body: JSON.stringify({ credential: token }),
-  });
+  };
+  let identityPath = '/api/server/identity';
+  const nodeLogin = await fetchImpl(`${normalizedBaseUrl}/api/web-auth/login`, loginRequest);
+  if (nodeLogin.status === 401 || nodeLogin.status === 403 || nodeLogin.status === 404) {
+    // Rust 对未知旧路由会先拒绝身份（401/403），旧服务则通常返回 404。
+    // 仅当 Rust 的公开健康信息明确确认身份时切换协议。
+    const health = await fetchImpl(`${normalizedBaseUrl}/lingxi/v1/health`, { credentials: 'include' });
+    let rustHealth: unknown = null;
+    if (health.ok) {
+      try { rustHealth = await health.json(); } catch { /* 旧服务可能对未知路径返回 HTML */ }
+    }
+    if (!rustHealth || typeof rustHealth !== 'object'
+      || (rustHealth as Record<string, unknown>).status !== 'ok'
+      || (rustHealth as Record<string, unknown>).serverKind !== 'lingxi-service') {
+      if (nodeLogin.status !== 404) {
+        throw new Error(`server connection request failed: ${nodeLogin.status} ${nodeLogin.statusText}`);
+      }
+      throw new Error('server connection request failed: unknown server protocol');
+    }
+    await requestJson(fetchImpl, `${normalizedBaseUrl}/lingxi/v1/web-auth/login`, loginRequest);
+    identityPath = '/lingxi/v1/server/identity';
+  } else if (!nodeLogin.ok) {
+    throw new Error(`server connection request failed: ${nodeLogin.status} ${nodeLogin.statusText}`);
+  } else {
+    await nodeLogin.json();
+  }
 
-  const identity = await requestJson(fetchImpl, `${normalizedBaseUrl}/api/server/identity`, {
+  const identity = await requestJson(fetchImpl, `${normalizedBaseUrl}${identityPath}`, {
     headers: { Authorization: `Bearer ${token}` },
     credentials: 'include',
   }) as ServerIdentity;
+  if (identityPath === '/lingxi/v1/server/identity' && identity.serverNodeKind !== 'lingxi-service') {
+    throw new Error('server connection request failed: Rust identity mismatch');
+  }
 
   return createDeviceServerConnection({
     baseUrl: normalizedBaseUrl,
@@ -342,16 +429,20 @@ export function refreshLocalServerConnection({
   existingConnection,
   serverPort,
   serverToken,
+  serverNodeKind,
+  serverNodeTransport,
 }: {
   existingConnection?: ServerConnection | null;
   serverPort: string | number | null | undefined;
   serverToken?: string | null;
+  serverNodeKind?: string | null;
+  serverNodeTransport?: string | null;
 }): ServerConnection | null {
-  const nextTransport = createLocalServerConnection({ serverPort, serverToken });
+  const nextTransport = createLocalServerConnection({ serverPort, serverToken, serverNodeKind, serverNodeTransport });
   if (!nextTransport) return null;
   if (!existingConnection) return nextTransport;
 
-  return {
+  const refreshed: ServerConnection = {
     ...existingConnection,
     connectionId: LOCAL_CONNECTION_ID,
     kind: 'local',
@@ -367,6 +458,14 @@ export function refreshLocalServerConnection({
       ? [...existingConnection.capabilities]
       : [...nextTransport.capabilities],
   };
+  if (nextTransport.serverNodeKind) {
+    refreshed.serverNodeKind = nextTransport.serverNodeKind;
+    refreshed.serverNodeTransport = nextTransport.serverNodeTransport;
+  } else if (serverNodeKind !== undefined || existingConnection.serverNodeKind === 'lingxi-service') {
+    delete refreshed.serverNodeKind;
+    delete refreshed.serverNodeTransport;
+  }
+  return refreshed;
 }
 
 export function refreshLocalServerConnectionState({
@@ -375,6 +474,8 @@ export function refreshLocalServerConnectionState({
   activeServerConnection,
   serverPort,
   serverToken,
+  serverNodeKind,
+  serverNodeTransport,
 }: ServerConnectionSource): {
   serverConnections: ServerConnectionRegistry;
   activeServerConnectionId: string | null;
@@ -390,6 +491,8 @@ export function refreshLocalServerConnectionState({
     existingConnection: existingLocal,
     serverPort,
     serverToken,
+    serverNodeKind,
+    serverNodeTransport,
   });
   let nextRegistry = existingRegistry;
   if (localConnection) {
@@ -504,6 +607,8 @@ export function resolveServerConnection(source: ServerConnectionSource): ServerC
   return createLocalServerConnection({
     serverPort: source.serverPort,
     serverToken: source.serverToken,
+    serverNodeKind: source.serverNodeKind,
+    serverNodeTransport: source.serverNodeTransport,
   });
 }
 
@@ -664,6 +769,9 @@ export function buildConnectionUrl(
   opts: { includeTokenQuery?: boolean } = {},
 ): string {
   assertRoutePath(path);
+  if (connection.serverNodeKind === 'lingxi-service' && !path.startsWith('/lingxi/v1/')) {
+    throw new Error(`Rust service has no migrated endpoint for ${path}`);
+  }
   const url = `${trimTrailingSlash(connection.baseUrl)}${path}`;
   if (!opts.includeTokenQuery || !connection.token || !canUseQueryToken(connection)) return url;
   return appendQueryParam(url, 'token', connection.token);
@@ -675,6 +783,9 @@ export function buildConnectionWsUrl(
   opts: { wsTicket?: string | null } = {},
 ): string {
   assertRoutePath(path);
+  if (connection.serverNodeKind === 'lingxi-service' && path !== '/lingxi/v1/ws') {
+    throw new Error(`Rust service has no migrated WebSocket endpoint for ${path}`);
+  }
   const url = `${trimTrailingSlash(connection.wsUrl)}${path}`;
   if (opts.wsTicket) return appendQueryParam(url, 'wsTicket', opts.wsTicket);
   if (!connection.token || !canUseQueryToken(connection)) return url;
@@ -686,7 +797,10 @@ export async function requestConnectionWsTicket(
   fetchImpl: typeof fetch = fetch,
 ): Promise<string | null> {
   if (canUseQueryToken(connection)) return null;
-  const res = await fetchImpl(buildConnectionUrl(connection, '/api/ws-ticket'), {
+  const ticketPath = connection.serverNodeKind === 'lingxi-service'
+    ? '/lingxi/v1/ws-ticket'
+    : '/api/ws-ticket';
+  const res = await fetchImpl(buildConnectionUrl(connection, ticketPath), {
     method: 'POST',
     headers: appendConnectionAuth(connection, { 'Content-Type': 'application/json' }),
     credentials: 'include',
@@ -695,7 +809,10 @@ export async function requestConnectionWsTicket(
     throw new Error(`websocket ticket request failed: ${res.status} ${res.statusText}`);
   }
   const body = await res.json();
-  return typeof body?.ticket === 'string' && body.ticket.trim() ? body.ticket : null;
+  if (typeof body?.ticket !== 'string' || !body.ticket.trim() || body.ticket !== body.ticket.trim()) {
+    throw new Error('websocket ticket response missing ticket');
+  }
+  return body.ticket;
 }
 
 function originOf(value: string | null | undefined): string | null {

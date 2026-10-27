@@ -1,0 +1,4 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.07s
+     Running `rust/target/debug/xtask verify-stage R08 --evidence artifacts/rust-tauri/R08/t08-xtask-validate-02`
+error: evidence root /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/t08-xtask-validate-02 is not empty; preserving its prior evidence
+GATE_EXIT=1

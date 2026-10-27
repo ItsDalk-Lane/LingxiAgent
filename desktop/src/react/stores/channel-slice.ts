@@ -2,6 +2,12 @@ import type { AgentPhoneToolMode, Channel, ChannelAgentActivities, ChannelMessag
 
 export interface ChannelSlice {
   channels: Channel[];
+  channelListError: string | null;
+  channelListLoading: boolean;
+  channelHistoryError: string | null;
+  channelHistoryLoading: boolean;
+  channelSettingsError: string | null;
+  channelSettingsLoading: boolean;
   currentChannel: string | null;
   channelMessages: ChannelMessage[];
   channelMessageCache: Record<string, ChannelMessage[]>;
@@ -34,6 +40,12 @@ export const createChannelSlice = (
   set: (partial: Partial<ChannelSlice>) => void,
 ): ChannelSlice => ({
   channels: [],
+  channelListError: null,
+  channelListLoading: false,
+  channelHistoryError: null,
+  channelHistoryLoading: false,
+  channelSettingsError: null,
+  channelSettingsLoading: false,
   currentChannel: null,
   channelMessages: [],
   channelMessageCache: {},

@@ -1,0 +1,35 @@
+{"row":[1,"initial_run_message_schema","479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[2,"stale_result_audit","64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[3,"invocation_journal","3bd5388f090ab0ae0e137d91d59a8e48f82f409bbd0de657abf29b897a4252c1",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[4,"run_lineage","371d415462b7e8d698693f50a7b9c9f493fbb4e653ee30e5d3e8930f77e161b5",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[5,"model_call_usage_ledger","16dce1c9d5106b74ef00df7348591f5fad11bf8a7bc0244effba804dfde7606d",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[6,"model_call_usage_rr1_f21","cd875eae835e6a5ecdee8480b7c7c223eea5a180eaf8ee3c2b43416a7deadb86",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[7,"model_call_usage_rr1_f38_attempts_nullable","b3189ef9c77630918436df07291bccd8f5a6a55f21109153ff73841cef58e3fb",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[8,"r06_t03_session_tree","7bd00e017f81fb225d8de3aa75efb6a9080f5a452674a8e2156b2360367150d7",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[9,"r06_t05_session_files_resources","a690bb5f33adb924d58adaecbf38c1ada6875768f1e1884150cef1cea8de4397",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[10,"session_operation_receipts","508bd3d05fdee521df6de273bf0d6958ba9851490a09d50554954b397c0e2849",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[11,"r06_ar_f04_run_history_anchors","b2703d86026435bd3bdef3e2d5bc551f0e90083217c7403d88f7c0327718f593",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[12,"r06_session_project_assignment","2acdb34c6f2c5d060185979973f07b5824d329da5ba762d90e5d6cd4c4c04ca1",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[13,"r06_session_workspace_identity","ffae0eb452ebb94df83667e22c4788f7f17b072f4190f4dc35e7419a27c38bd0",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[14,"session_proactive_delegation_at_creation","4c3c36afd3f7f84e0168bdd12fcd3ebea38de6b12b1c566dac1407a1374712c6",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[15,"r07_automation_receipts","0d18730f33d5aafb4fb302ed969025d2e71cba0cd5fd3ed63c5d7d597d89ec37",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[16,"r07_bridge_inbox_outbox","e4b910009a7a1c21599b43c918fb53900ba7ee58bda3ae6093ae1a6bccf27869",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[17,"r07_bridge_effect_receipts","3acf38748a3921ff99ef809ad95aecd56e57a39dd83b5484af1f91ef6edc0773",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[18,"r07_bridge_independent_receipt","ff916d2332e1e35b9fcfad0a8bed46973639b645ed15e58c7e9b3dffeb2e31f4",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[19,"r07_conversation_phone_collab_receipts","ad7496e374aeae2f6faeebaf46ee35e29013af39e95dfcc1c8303de5d477f20e",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[20,"r07_browser_authority","6379466e6c3d1d60c13cca6d314e172f95316f0d56da85fdb8433adc3a4d88fa",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[21,"r07_media_jobs","9eee2a9b7ba1ec2ee5a02065919b856637464357c9d03ed7b8cb6cb95fde3e70",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[22,"r07_beautify_jobs","66623eb4489e9f8ce343af5ba2c6bd046ef7a582d0424be42a91e09ceb50820c",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[23,"r07_media_gallery","e2f684b93d2e3b373709345f74a088ce331464fd73dc8169778e3ad780d8de0d",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[24,"r07_observability_legacy_trace","36e3c7502d6d09b78cad4a23f88050a101b82631126953100670fe7d58c073c9",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[25,"r07_bridge_loop_deliveries","a0ab64ddaa44db7ecefb0b78b284043d7b5e498b6c9d30bd1be2d18be7d252f1",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[26,"r07_bridge_outbox_loop_source","8923899f64cb03d226344bfd08dcd40c2c3a9b8734c0ff4d367ffe4e225cafdb",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[27,"r08_legacy_import_bookkeeping","1c317b4249efb63ceca729a9dd27050dc101c83d7d83b69f30dd2fd7b04cd654",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[28,"r08_legacy_import_extensions_registry","a82dacc2305bdffbfc4d339aceb2673cea84e07de226cd7e0d6a186d9ac1eaf4",1792735607042,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":["sess_local_alpha","lingxi","user_local","Synthetic session alpha",1792735607067,null,null,0,"active",null,null,1,"[]",null,null,1792735607149,null,null,null,0],"table":"sessions"}
+{"row":["sess_local_beta","lingxi","user_local","Synthetic session beta",1792735607067,null,null,0,"active",null,null,1,"[]",null,null,null,null,null,null,0],"table":"sessions"}
+{"row":["run_000001a1675e796d_000001","sess_local_alpha","local_user","user_local","principal_local",1,"interrupted_needs_attention","interrupted_needs_attention.recovery_unsafe",1,1792735607149,1792735607249,2],"table":"runs"}
+{"row":["run_000001a1675e796d_000001","run_000001a1675e796d_000001#a1",1,1792735607149],"table":"run_attempts"}
+{"row":["user:run_000001a1675e796d_000001","sess_local_alpha",null,"user","{\"text\":\"v6 wal seed\"}",null,1792735607149,1,null,null,"message"],"table":"messages"}
+{"row":["run_000001a1675e796d_000001-start","sess_local_alpha",1,"sess_local_alpha","run_000001a1675e796d_000001","run_000001a1675e796d_000001#a1","run_state_changed","{\"from\":\"queued\",\"to\":\"running\",\"type\":\"run_state_changed\"}",1792735607149],"table":"key_events"}
+{"row":["run_000001a1675e796d_000001-recovery","sess_local_alpha",2,"sess_local_alpha","run_000001a1675e796d_000001","run_000001a1675e796d_000001#a1","run_state_changed","{\"from\":\"running\",\"reason\":\"interrupted_needs_attention.recovery_unsafe; service restarted while the task was in flight; the invocation journal holds no unresolved external side effect (no tool call was in its crash window), and no final model reply existed when the service stopped; next actions: safe to resubmit the task\",\"to\":\"interrupted_needs_attention\",\"type\":\"run_state_changed\"}",1792735607249],"table":"key_events"}

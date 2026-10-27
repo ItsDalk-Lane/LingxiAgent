@@ -1,5 +1,6 @@
 import { sessionScopedKey } from './session-slice';
 import type { PresentedError } from '../errors/error-presenter';
+import type { LoopStatusSnapshot } from '../../../../contracts/generated/ts/lingxi-protocol';
 
 /**
  * 一条 inline error：text 是给用户看的人话，detail 与 code 是排障用的原始信息，
@@ -21,12 +22,8 @@ export interface StreamingStatusIdentity {
  * 循环任务的实时状态（按 sessionId 存）。来自 loop_status WS 推送 + 会话列表冷启动注入，
  * 驱动会话列表循环徽章与 interlude 气泡上的控制按钮态。
  */
-export type LoopStatus = {
-  status: 'running' | 'paused' | 'stopped' | 'completed';
-  turnCount: number;
-  maxTurns: number | null;
-  pausedReason: string | null;
-  prompt: string | null;
+export type LoopStatus = Omit<LoopStatusSnapshot, 'runtimeError'> & {
+  runtimeError?: NonNullable<LoopStatusSnapshot['runtimeError']>;
 };
 
 export interface StreamingSlice {

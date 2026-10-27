@@ -1,0 +1,57 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 26.48s
+     Running tests/r07_daily_fresh_compact.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_daily_fresh_compact-721b7d0e0468a5ec)
+
+running 5 tests
+test logical_day_changes_at_local_four_am ... ok
+test started_unknown_and_closed_intake_never_replay_or_claim_next_day ... ok
+test known_failure_waits_an_hour_and_retries_with_new_attempt ... ok
+test actual_bridge_only_compacts_once_then_replays_day_receipt_after_restart ... ok
+test permission_change_during_real_summary_cancels_and_keeps_unknown_receipt ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.51s
+
+     Running tests/r07_heartbeat_plan.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_heartbeat_plan-86e03a440e093c51)
+
+running 10 tests
+test daily_boundaries_are_local_and_failures_or_remaining_work_retry_after_one_hour ... ok
+test slots_are_unix_aligned_and_manual_requests_have_independent_cooldown ... ok
+test auto_heartbeat_requires_explicit_agent_opt_in_and_master_gate ... ok
+test real_resource_listing_shape_is_strict_and_no_bad_entry_becomes_an_empty_scan ... ok
+test output_segments_preserve_current_locale_labels_and_cannot_traverse ... ok
+test patrol_plan_excludes_own_outputs_and_includes_both_root_and_first_level_jian ... ok
+test unchanged_jian_is_still_planned_so_model_can_continue_or_skip_using_saved_state ... ok
+test jian_status_keeps_concurrent_user_body_and_program_owned_start_snapshot ... ok
+test patrol_log_is_utf8_and_display_is_limited_without_modifying_original_material ... ok
+test deeper_hidden_unknown_and_duplicate_jian_roots_are_refused ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/r07_scheduler.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_scheduler-cfa258b8f5871d0d)
+
+running 5 tests
+test revoked_source_is_rejected_without_a_run ... ok
+test edits_preserve_unknown_fields_and_stale_revisions_are_rejected ... ok
+test unknown_claim_after_restart_is_not_reexecuted ... ok
+test one_shot_is_disabled_after_real_execution has been running for over 60 seconds
+test real_management_dispatch_and_restart_keep_one_trigger_one_run has been running for over 60 seconds
+
+=== LINGXI_TEST_GUARD: ABORTING TEST PROCESS TO PROTECT THE MACHINE ===
+  reason  : wall clock 600.02s exceeded the 600.00s limit (TEST_TIME_LIMIT_SEC)
+  process : r07_scheduler-cfa258b8f5871d0d (pid 31285)
+  memory  : now 0.06 GiB (65093632 bytes) / limit 8.00 GiB (8589934592 bytes)
+  elapsed : 600.02s / time budget 600.00s
+  live test threads (libtest names each thread after its test function):
+    - lingxi-db-worker
+    - main
+    - one_shot_is_disabled_after_real_execution
+    - real_management_dispatch_and_restart_keep_one_trigger_one_run
+  next    : reproduce single-threaded (`cargo test <name> -- --test-threads=1 --nocapture`);
+            adjust or disable: TEST_MEM_LIMIT_MB=16384, TEST_MEM_LIMIT_MB=0,
+            TEST_TIME_LIMIT_SEC=0 (0 = off), LINGXI_TEST_GUARD=0 (off entirely)
+===========================================================================
+error: test failed, to rerun pass `-p lingxi-service --test r07_scheduler`
+
+Caused by:
+  process didn't exit successfully: `/private/tmp/lingxi-r07-build/debug/deps/r07_scheduler-cfa258b8f5871d0d` (signal: 6, SIGABRT: process abort signal)

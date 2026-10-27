@@ -1,0 +1,20 @@
+[
+  {
+    "attempt": 1,
+    "exitCode": 1,
+    "status": "FAILED_DIAGNOSTIC_INPUT",
+    "why": "实际组件登记并加载成功，但原生鼠标未命中按钮；未观测导航不能据此称安全。随后报告读取ENOENT是脚本错误回收路径，非产品故障。",
+    "scratch": "/private/tmp/lingxi-card-nav-aIgQAH",
+    "uiLog": "artifacts/rust-tauri/R07/T08/card-navigation-baseline/attempt1-ui.log",
+    "uiLogSha256": "3693294f368d39ce997ef85a5f9daa41ad8149392374ea0602cdaef9ffc9c348"
+  },
+  {
+    "attempt": 2,
+    "exitCode": 1,
+    "status": "FAILED_DIAGNOSTIC_INPUT",
+    "why": "实际组件登记并加载成功，但原生鼠标未命中按钮；未观测导航不能据此称安全。随后报告读取ENOENT是脚本错误回收路径，非产品故障。",
+    "scratch": "/private/tmp/lingxi-card-nav-ey4L8U",
+    "uiLog": "artifacts/rust-tauri/R07/T08/card-navigation-baseline/attempt2-ui.log",
+    "uiLogSha256": "d43ca55e5ae86baa4dce4e3683095a0b4349016d210ac216953b503e5da92654"
+  }
+]

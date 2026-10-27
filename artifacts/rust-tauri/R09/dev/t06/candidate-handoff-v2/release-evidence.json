@@ -1,0 +1,46 @@
+{
+ "schema": "lingxi.r09.t06.release-evidence.v1",
+ "builtAt": "2026-10-26T23:36:19+0800",
+ "sourceCandidate": "v2 frozen（app tree d01ece202a42c0a70a292d384d5ceb938982f414ce1cc00e369cad579149ecdc）",
+ "crateSourceDigest": "26acc476b5fe78c45338577609fb5afd527ed204b4cec4498b1e2746bbcbc903",
+ "crateSourceFileCount": 165,
+ "isolatedTargetDir": "/private/tmp/lingxi-r09-t06-release-evidence-target",
+ "features": [
+  "r09-host",
+  "r09-test-hooks"
+ ],
+ "evidenceBuild": true,
+ "releaseEvidence": true,
+ "app": "/private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app",
+ "appTreeSha256": "d28d56618c21780f959201bdcd7cd5afd2ffeefbd188906695c19d0a7a8cae88",
+ "files": {
+  "Contents/Info.plist": "da9ebff0b848d9ff1e3e6e5ac545c7270904ceb2a65677095cbb3e400e01919a",
+  "Contents/MacOS/lingxi-resource-desktop": "44e30fb037a0a63c5842a2bbe9e39fa007595f587952c7b3e2026f9e4a90d7bf",
+  "Contents/MacOS/lingxi-service": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+  "Contents/Resources/Lingxi.icns": "0951f493d51b3537f2b5826d45e117bba1ead1802c38658e2c0ebb1d7706b4d3",
+  "Contents/Resources/rust-service/build.json": "c05697e0de1b74e7e40481a9b5c142cd799b442cabff39d4d973bca25a3b47a2",
+  "Contents/_CodeSignature/CodeResources": "80c108066353c5ad46351fc3582ab5013d0300581091732345be2bc21dd58172"
+ },
+ "exeSha256": "44e30fb037a0a63c5842a2bbe9e39fa007595f587952c7b3e2026f9e4a90d7bf",
+ "sidecarSha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+ "buildJsonSha256": "c05697e0de1b74e7e40481a9b5c142cd799b442cabff39d4d973bca25a3b47a2",
+ "rendererSha256InBuildJson": "c0a5719f9e9ddd79b71eb0a440a78479aac3489a2679898121b2db633adf150b",
+ "rendererMatchesFrozenV2": true,
+ "codesignVerifyExit": 0,
+ "codesignVerifyCommand": "/usr/bin/codesign --verify --deep --strict /private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app",
+ "codesignSummary": {
+  "Identifier": "Identifier=com.lingxi.app",
+  "Format": "Format=app bundle with Mach-O thin (arm64)",
+  "Signature": "Signature=adhoc",
+  "TeamIdentifier": "TeamIdentifier=not set"
+ },
+ "buildLog": "/private/tmp/r09-t06-release-evidence-build.log",
+ "buildConfig": "desktop/src-tauri/tauri.release.generated.conf.json（v2 frozen，version 0.1.43）",
+ "repoGeneratedRestore": "构建前后 desktop/src-tauri/{permissions,gen,Cargo.lock} 快照恢复（sha256 对照一致）",
+ "deliveryCandidateUntouched": {
+  "exeSha256": "63250ddb00c92536424ecefc07b55079d7ee4d3a1c3445ac9336105678a7a278",
+  "appTreeSha256": "d01ece202a42c0a70a292d384d5ceb938982f414ce1cc00e369cad579149ecdc"
+ },
+ "purpose": "T02 supervisor/ownership release 负向用例（协议/摘要注入、fake identity、拒远端、pid 复用）在 hidden+automation+sink 下运行，不产生用户可见原生弹窗；交付 release（无 hooks）仍用于正路径/G2。",
+ "notes": "v3 重建后需以 v3 源码重新生成本文件（releaseEvidence）。"
+}

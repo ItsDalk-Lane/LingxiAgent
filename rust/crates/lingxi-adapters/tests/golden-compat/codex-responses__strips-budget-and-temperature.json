@@ -1,0 +1,32 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "codex-responses",
+  "case": "strips-budget-and-temperature",
+  "model": {
+    "provider": "openai-codex",
+    "id": "gpt-5.3-codex",
+    "baseUrl": "https://chatgpt.com/backend-api",
+    "api": "openai-codex-responses"
+  },
+  "payload": {
+    "model": "gpt-5.3-codex",
+    "input": [],
+    "max_output_tokens": 1024,
+    "max_tokens": 1024,
+    "temperature": 0.2,
+    "store": false
+  },
+  "options": {
+    "mode": "chat"
+  },
+  "expected": {
+    "thinkingFormat": null,
+    "reasoningProfile": null,
+    "matched": "codex-responses",
+    "result": {
+      "model": "gpt-5.3-codex",
+      "input": [],
+      "store": false
+    }
+  }
+}

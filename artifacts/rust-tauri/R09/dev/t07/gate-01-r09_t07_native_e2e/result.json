@@ -1,0 +1,29 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t07_native_e2e",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 2.083,
+ "caseCount": 8,
+ "casesSha256": "4b4edf74f0cbbb4ca0d6e82fd3c593094ac045e625f6a831119876db17dd2ce2",
+ "commands": [
+  {
+   "id": "t07-fixtures",
+   "argv": [
+    "python3",
+    "-B",
+    "scripts/rust-tauri/r09_t07_fixture.py",
+    "--home",
+    "/private/tmp/lingxi-r09-runtime/r09_t07_native_e2e-13616-1793026377041/home-t07-fixtures",
+    "--evidence",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t07/gate-01-r09_t07_native_e2e/fixtures"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.189,
+   "logSha256": "135953e5815b19c556486e30d04f1b3da042e5b2ae6aaab27e947eb2a0e5b089"
+  }
+ ],
+ "logSha256": "efe88ca7fd6931ec6755986e5f7c7b1ae4b9dca0d56f6c7ffc597a9d3e7c978c",
+ "finishedAtUnixMs": 1793026379124,
+ "failureDetail": "CANDIDATE_REQUIRED: 需要 T06/Lead 提供的 features≥[r09-host,e2e-test] evidence 构建（LINGXI_R09_T07_APP_BIN）"
+}

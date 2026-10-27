@@ -1,0 +1,9 @@
+
+DevTools listening on ws://127.0.0.1:9938/devtools/browser/7e4c44c8-dcd3-4d7d-a45d-bcd28d5adfb7
+[desktop] network proxy applied (startup): system
+[desktop] 启动 LingxiAgent Server...
+[desktop] Server 就绪，端口: 49230
+(electron) 'console-message' arguments are deprecated and will be removed. Please use Event<WebContentsConsoleMessageEventParams> object instead.
+[desktop] 主窗口 HTML 加载完成，等待前端 init...
+2026-10-22 22:48:00.047 Electron[71718:13704383] TSM AdjustCapsLockLEDForKeyTransitionHandling - _ISSetPhysicalKeyboardCapsLockLED Inhibit
+[desktop] shutdownServer: 正在关闭 owned server...

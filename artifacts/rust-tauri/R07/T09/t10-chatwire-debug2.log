@@ -1,0 +1,161 @@
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r06_chat_wire") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r06_chat_wire.rs (rust/target-r07/debug/deps/r06_chat_wire-852446ea84bd0de7)
+
+running 1 test
+test native_current_app_pages_side_preview_attachment_and_model_response_generation ... FAILED
+
+failures:
+
+---- native_current_app_pages_side_preview_attachment_and_model_response_generation stdout ----
+APP-PAGES-NATIVE: 
+▲ [WARNING] The "assert" keyword is not supported in the configured target environment ("node24.16.0") [assert-to-with]
+
+    ../../../vite.config.ts:7:33:
+      7 │ import pkg from './package.json' assert { type: 'json' };
+        │                                  ~~~~~~
+        ╵                                  with
+
+  Did you mean to use "with" instead of "assert"?
+
+(electron) 'console-message' arguments are deprecated and will be removed. Please use Event<WebContentsConsoleMessageEventParams> object instead.
+Error: canonical saved image real Chromium decoding: runtimeCapsule.title
+
+暂无情绪轨迹
+
+User
+
+APP-FIRST
+
+05:54
+Lingxi
+
+CHAT-FINAL-1
+
+05:54
+用量 20 tok
+用时 0秒
+User
+app-attachment.txt
+
+APP-WITH-FILE
+
+05:54
+Lingxi
+
+CHAT-FINAL-2
+
+05:54
+用量 20 tok
+用时 0秒
+User
+
+APP-WITH-IMAGE
+
+05:54
+Lingxi
+
+CHAT-FINAL-3
+
+05:54
+用量 20 tok
+用时 0秒
+
+
+
+
+chat.send
+chat |||DEBUG||| SENT:[{"text":"APP-FIRST","images":0,"keys":["type","clientMessageId","snapshotVersion","text","sessionId","sessionPath","uiContext","displayMessage","clientAttemptId"]},{"text":"APP-WITH-FILE\n\ninput","images":0,"keys":["type","clientMessageId","snapshotVersion","text","sessionId","sessionPath","uiContext","displayMessage","sessionFileRefs","clientAttemptId"]},{"text":"APP-WITH-IMAGE","images":0,"keys":["type","clientMessageId","snapshotVersion","text","sessionId","sessionPath","uiContext","displayMessage","clientAttemptId"]}] RECV:["{\"clientMessageId\":\"client-user-d2d04762-9e4e-4c38-b219-102536cdf1d4\",\"message\":{\"attachments\":[],\"clientMessageId\":\"client-user-d2d04762-9e4e-4c38-b219-102536cdf1d4\",\"hasImages\":false,\"id\":\"user:run_000001a15101fff0_000004\",\"quotedText\":null,\"sessionRefs\":null,\"snapshotVersion\":1,\"sourceEntryId\":\"user:run_000001a15101fff0_000004\",\"text\":\"APP-WITH-IMAGE\",\"timestamp\":1792360447986},\"seq\":1,\"sessionId\":\"desktop\",\"sessionPath\":\"native:desktop\",\"sessionRefVersion\":2,\"snapshotVersion\":1,\"streamId\":\"run_000001a15101fff0_000004\",\"ts\":1792360447986,\"turnId\":\"run_000001a15101fff0_000004\",\"type\":\"sessio","{\"clientMessageId\":\"client-user-d2d04762-9e4e-4c38-b219-102536cdf1d4\",\"message\":{\"attachments\":[],\"clientMessageId\":\"client-user-d2d04762-9e4e-4c38-b219-102536cdf1d4\",\"hasImages\":false,\"id\":\"user:run_000001a15101fff0_000004\",\"quotedText\":null,\"sessionRefs\":null,\"snapshotVersion\":1,\"sourceEntryId\":\"user:run_000001a15101fff0_000004\",\"text\":\"APP-WITH-IMAGE\",\"timestamp\":1792360447986},\"seq\":1,\"sessionId\":\"desktop\",\"sessionPath\":\"native:desktop\",\"sessionRefVersion\":2,\"snapshotVersion\":1,\"streamId\":\"run_000001a15101fff0_000004\",\"ts\":1792360447986,\"turnId\":\"run_000001a15101fff0_000004\",\"type\":\"sessio"]
+    at until (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/chat-app-live/main.cjs:9:73)
+    at async /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/chat-app-live/main.cjs:30:381
+file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/chat-app-live/launch.mjs:23
+try{await vite.listen();const child=spawn(fs.realpathSync(path.join(repo,'node_modules/electron/dist/Electron.app/Contents/MacOS/Electron')),[path.join(here,'main.cjs')],{env:{...process.env,R06_CHAT_URL:`http://127.0.0.1:${proxy.address().port}`,R06_CHAT_RENDERER:`http://127.0.0.1:${vite.httpServer.address().port}/settings.html`},stdio:['ignore','pipe','pipe']});child.stdout.pipe(process.stdout);child.stderr.pipe(process.stderr);const timeout=setTimeout(()=>child.kill(),90000);const code=await new Promise((resolve,reject)=>{child.on('exit',resolve);child.on('error',reject);});clearTimeout(timeout);if(code!==0)throw Error(`actual AppPages failed ${code}`);}finally{for(const timer of delayed)clearInterval(timer);proxy.closeAllConnections();proxy.close();await vite.close();fs.writeFileSync(path.join(home,'app-proxy-receipt.json'),JSON.stringify({delayed:index,dropped}));}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ^
+
+Error: actual AppPages failed 1
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/chat-app-live/launch.mjs:23:625
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+Node.js v24.16.0
+
+
+thread 'native_current_app_pages_side_preview_attachment_and_model_response_generation' (5360970) panicked at crates/lingxi-service/tests/r06_chat_wire.rs:1839:5:
+Error: canonical saved image real Chromium decoding: runtimeCapsule.title
+
+暂无情绪轨迹
+
+User
+
+APP-FIRST
+
+05:54
+Lingxi
+
+CHAT-FINAL-1
+
+05:54
+用量 20 tok
+用时 0秒
+User
+app-attachment.txt
+
+APP-WITH-FILE
+
+05:54
+Lingxi
+
+CHAT-FINAL-2
+
+05:54
+用量 20 tok
+用时 0秒
+User
+
+APP-WITH-IMAGE
+
+05:54
+Lingxi
+
+CHAT-FINAL-3
+
+05:54
+用量 20 tok
+用时 0秒
+
+
+
+
+chat.send
+chat |||DEBUG||| SENT:[{"text":"APP-FIRST","images":0,"keys":["type","clientMessageId","snapshotVersion","text","sessionId","sessionPath","uiContext","displayMessage","clientAttemptId"]},{"text":"APP-WITH-FILE\n\ninput","images":0,"keys":["type","clientMessageId","snapshotVersion","text","sessionId","sessionPath","uiContext","displayMessage","sessionFileRefs","clientAttemptId"]},{"text":"APP-WITH-IMAGE","images":0,"keys":["type","clientMessageId","snapshotVersion","text","sessionId","sessionPath","uiContext","displayMessage","clientAttemptId"]}] RECV:["{\"clientMessageId\":\"client-user-d2d04762-9e4e-4c38-b219-102536cdf1d4\",\"message\":{\"attachments\":[],\"clientMessageId\":\"client-user-d2d04762-9e4e-4c38-b219-102536cdf1d4\",\"hasImages\":false,\"id\":\"user:run_000001a15101fff0_000004\",\"quotedText\":null,\"sessionRefs\":null,\"snapshotVersion\":1,\"sourceEntryId\":\"user:run_000001a15101fff0_000004\",\"text\":\"APP-WITH-IMAGE\",\"timestamp\":1792360447986},\"seq\":1,\"sessionId\":\"desktop\",\"sessionPath\":\"native:desktop\",\"sessionRefVersion\":2,\"snapshotVersion\":1,\"streamId\":\"run_000001a15101fff0_000004\",\"ts\":1792360447986,\"turnId\":\"run_000001a15101fff0_000004\",\"type\":\"sessio","{\"clientMessageId\":\"client-user-d2d04762-9e4e-4c38-b219-102536cdf1d4\",\"message\":{\"attachments\":[],\"clientMessageId\":\"client-user-d2d04762-9e4e-4c38-b219-102536cdf1d4\",\"hasImages\":false,\"id\":\"user:run_000001a15101fff0_000004\",\"quotedText\":null,\"sessionRefs\":null,\"snapshotVersion\":1,\"sourceEntryId\":\"user:run_000001a15101fff0_000004\",\"text\":\"APP-WITH-IMAGE\",\"timestamp\":1792360447986},\"seq\":1,\"sessionId\":\"desktop\",\"sessionPath\":\"native:desktop\",\"sessionRefVersion\":2,\"snapshotVersion\":1,\"streamId\":\"run_000001a15101fff0_000004\",\"ts\":1792360447986,\"turnId\":\"run_000001a15101fff0_000004\",\"type\":\"sessio"]
+    at until (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/chat-app-live/main.cjs:9:73)
+    at async /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/chat-app-live/main.cjs:30:381; home=/private/tmp/lingxi-r07-tests/home/lingxi-r06-ex01-chat-app-native-11333-1792360445082396000
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    native_current_app_pages_side_preview_attachment_and_model_response_generation
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 16 filtered out; finished in 25.29s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_chat_wire`

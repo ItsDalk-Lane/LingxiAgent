@@ -1,0 +1,72 @@
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.70s
+     Running tests/r07_bridge_effect_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_effect_store-433f0ce7588e767b)
+
+running 8 tests
+test concurrent_claims_have_one_external_lease_and_revisions_can_return_to_prior_text ... ok
+test one_connector_exit_does_not_abandon_other_live_workers_and_receipt_unknown_allows_batch_final ... ok
+test restart_marks_confirmed_but_open_native_stream_unknown_without_recreating_it ... ok
+test receipt_refresh_keys_and_sequence_survive_restart_and_cleanup_remains_scoped_after_revoke ... ok
+test native_update_unknown_blocks_new_content_and_plain_mode_downgrade_but_allows_frozen_cleanup ... ok
+test native_finish_and_actual_outbox_receipt_commit_atomically_or_both_roll_back ... ok
+test independent_typing_unknown_does_not_poison_native_content_but_text_receipts_remain_conservative ... ok
+test v17_candidate_upgrade_keeps_all_old_receipts_and_defaults_typing_independence_to_false ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+
+     Running tests/r07_bridge_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_store-b62578fad13edb50)
+
+running 14 tests
+test run_binding_checks_frozen_subject_and_exact_real_message_lineage ... ok
+test delivery_context_is_frozen_in_enqueue_transaction_and_duplicate_does_not_follow_reset ... ok
+test started_manual_delivery_rechecks_live_authority_without_reclaiming_or_mutating_receipt ... ok
+test attachments_need_real_owned_files_and_failed_prepare_rolls_back ... ok
+test explicit_owner_takeover_is_one_inbox_scope_and_never_relaxes_ordinary_bridge_binding ... ok
+test authority_role_changes_isolate_context_and_unproven_legacy_context_is_never_reused ... ok
+test restart_preserves_prepared_queue_and_recovers_durable_run_before_bind_without_replay ... ok
+test concurrent_claims_and_config_edits_are_atomic ... ok
+test conversation_reset_is_atomic_keeps_metadata_and_pins_replayed_inbox_to_original_epoch ... ok
+test outbox_has_one_send_lease_and_requires_real_receipt_or_stays_unknown_after_restart ... ok
+test five_platform_roles_are_host_derived_and_message_replays_survive_reconfiguration ... ok
+test owner_notification_target_and_context_are_frozen_from_actual_owner_dm_and_revoke_stops_queue ... ok
+test commands_use_durable_receipts_without_fake_runs_and_recover_unqueued_reply ... ok
+test manual_send_has_real_user_file_authority_and_atomic_outbox_without_fake_run_or_inbound ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+
+     Running tests/session_file_store.rs (/private/tmp/lingxi-r07-build/debug/deps/session_file_store-bff2eccd9b14bcc7)
+
+running 13 tests
+test supported_tip_matches_the_current_migration_registry ... ok
+test v7_to_tip_chain_preserves_prior_data_and_creates_new_tables ... FAILED
+test file_history_store_lists_files_versions_and_reads_content ... ok
+test v14_delegation_accepts_only_boolean_values_and_rejects_null ... ok
+test upsert_session_activity_marks_coldness_for_cleanup_probe ... ok
+test status_transitions_record_expiry_timestamp ... ok
+test list_for_owner_orders_by_registration_then_id ... ok
+test insert_and_get_roundtrip_preserves_all_fields ... ok
+test alias_resolution_maps_legacy_ids_to_canonical ... ok
+test file_history_prune_enforces_age_and_total_bytes ... ok
+test source_key_dedup_is_scoped_to_owner ... ok
+test delete_session_file_removes_row_and_aliases ... ok
+test refs_roundtrip_and_session_scoped_delete ... ok
+
+failures:
+
+---- v7_to_tip_chain_preserves_prior_data_and_creates_new_tables stdout ----
+
+thread 'v7_to_tip_chain_preserves_prior_data_and_creates_new_tables' (483097) panicked at crates/lingxi-adapters/tests/session_file_store.rs:203:5:
+assertion `left == right` failed
+  left: 18
+ right: 15
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    v7_to_tip_chain_preserves_prior_data_and_creates_new_tables
+
+test result: FAILED. 12 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+
+error: test failed, to rerun pass `-p lingxi-adapters --test session_file_store`

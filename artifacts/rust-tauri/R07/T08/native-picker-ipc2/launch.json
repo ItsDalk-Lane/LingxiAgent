@@ -1,0 +1,31 @@
+{
+  "scratch": "/private/tmp/lingxi-r07-t08-native-picker-ipc-hptt_1oc",
+  "home": "/private/tmp/lingxi-r07-t08-native-picker-ipc-hptt_1oc/home",
+  "port": 51959,
+  "app": "/private/tmp/lingxi-r07-t08-native-picker-ipc-hptt_1oc/Lingxi Directory Proof.app",
+  "sourceHashes": {
+    "desktop/src-tauri/src/resource_bridge.rs": "2fd9d8bb2b438656348397a508eb2d9492359f08fcbbfe40afcba463cbc67868",
+    "desktop/src-tauri/src/lib.rs": "62700408c1f581934546ff0e7e89db202903232c48bc5b57d9127f80c0e5aa9e",
+    "desktop/src-tauri/src/skills.rs": "e955f6636c849d3ac013463c8cab2ed1e1eeaa33fefaa61e6695de637a46ace1",
+    "desktop/src-tauri/src/files.rs": "955cbfc0bd428a1195fea4a0f82624d479ecddc9b2f2c5537619a54c498e9a80",
+    "desktop/src-tauri/src/main.rs": "3b051cd46c97bba8dfafc7ffdc4107306571188ffb457fe8f42992f3a01a5f76",
+    "desktop/src/tauri-resources/App.tsx": "2a793c3518e31e67d01053ac1726451fef69634dc28db842b55b1d5c8c9d209f",
+    "desktop/src/tauri-resources/main.tsx": "c903e321014e5a84a4bf1e16100e98a552b67dc1d3f04552744610b5a93f16f4",
+    "desktop/src/tauri-resources/index.html": "a7a79cc03a62b7909efd433c91378d167e09618c52ac663f376fda47e29fce7c",
+    "desktop/src/tauri-resources/content.ts": "bedd7b296e5335536f536647b84720e5603e5d8f04d6d96d79122b6997d78017",
+    "desktop/src/tauri-resources/SkillViewer.tsx": "754413e17dbc70753df5caae4a4c9fde36e525ae39a747493e598c085626a920",
+    "desktop/src/tauri-resources/mammoth-browser.d.ts": "081ab9befdc7d1c1ebd8ab475e040a3add7744b54cbf3f741b300ea33a679f2f",
+    "desktop/src/tauri-resources/bridge.ts": "a2658aedbf6b5c1acb5a4daca9812b9b08b42d8198e6808433b4dcc147e525ab",
+    "desktop/src/tauri-resources/style.css": "709e9ca83f305e71e38aca05b8a3d32a3e346dffb79381920f06085c1dad5622",
+    "desktop/src/tauri-resources/__tests__/resource-desktop.test.tsx": "eae2a4debc8e9e0d9fd08c6adfba0769ca11ef9b097d65d22cf60525c4b54a28",
+    "desktop/src-tauri/tests/directory_picker_host.rs": "6f1a6a4b2d7717b803ce0eee3eae1509d6dca60fb480d0dc20fec3c4dde2fd79",
+    "desktop/src-tauri/Cargo.toml": "57564574d5995ac9b0125938f48538c7c173804e98b848339a09d546af6fde72",
+    "desktop/src-tauri/Cargo.lock": "b8a875b8feaa1898886788ac0bacfa17b05877206c38937af3c0b2be98faea5d",
+    "desktop/src-tauri/tauri.conf.json": "a81d14f1e8f0186a3a45a61b69681e4c299426225b47ecb336e4707b8ac08583"
+  },
+  "nativeTarget": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target",
+  "scope": "真实原生选择与取消的直接IPC检查；当前开发版本，不宣称后继冻结候选已运行",
+  "excludedNonSources": [
+    "desktop/src/tauri-resources/node_modules cache"
+  ]
+}

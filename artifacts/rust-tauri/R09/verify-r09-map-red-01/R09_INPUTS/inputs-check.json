@@ -1,0 +1,16 @@
+{
+ "schema": "lingxi.r09.inputs-check.v1",
+ "digestMatch": true,
+ "expectedDigestSha256": "e8d2d5c0dfc587c9444e3c602b7f11cfab16d9e0d8f42eb69e70f1a4bff7548b",
+ "mapDigestSha256": "e8d2d5c0dfc587c9444e3c602b7f11cfab16d9e0d8f42eb69e70f1a4bff7548b",
+ "graphByteMatch": true,
+ "counts": {
+  "tasks": 8,
+  "baseScenarios": 16,
+  "dedupedSupplementalLeaves": 74,
+  "originalAssertions": 168,
+  "t03t07SharedLeaves": 46,
+  "t05Leaves": 19,
+  "t04Leaves": 9
+ }
+}

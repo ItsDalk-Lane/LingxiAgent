@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "audio": {
+      "type": "boolean"
+    },
+    "audioTransport": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "audioTransportSupported": {
+      "type": "boolean"
+    },
+    "defaultThinkingLevel": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "id": {
+      "type": "string"
+    },
+    "input": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "isCurrent": {
+      "type": "boolean"
+    },
+    "name": {
+      "type": "string"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "reasoning": {
+      "type": "boolean"
+    },
+    "thinkingLevels": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "xhigh": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "provider",
+    "isCurrent",
+    "reasoning",
+    "xhigh",
+    "thinkingLevels",
+    "audio",
+    "audioTransportSupported",
+    "input"
+  ],
+  "title": "ClientModelSummary",
+  "type": "object"
+}

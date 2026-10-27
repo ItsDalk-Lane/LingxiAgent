@@ -1,0 +1,65 @@
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r06_agent_settings_live") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r06_agent_settings_live.rs (rust/target-r07/debug/deps/r06_agent_settings_live-1a9fa48163f384cd)
+
+running 14 tests
+test native_character_card_duplicate_skill_source_and_sparse_path_refuse_without_public_mutation ... ok
+test native_character_card_application_and_http_delete_never_recreate_deleted_directory ... ok
+test native_character_card_real_zip_refuses_escape_links_and_expansion_without_agents ... ok
+test native_character_card_zip_roundtrip_real_materials_and_memory_choice ... ok
+test native_settings_reads_keep_real_failures_and_paid_dream_consumption ... ok
+test native_pending_reference_deletion_current_electron_shows_and_retries_truthfully ... ok
+test native_settings_current_electron_real_io_failures_and_partial_writes ... ok
+test native_agent_settings_current_electron_entry_smoke ... ok
+test native_pending_receipt_owner_switch_two_real_services_never_posts_to_other_service ... ok
+test native_character_card_owner_two_real_services_and_delayed_import_response ... ok
+test native_settings_current_electron_actual_read_permission_denied_is_error ... ok
+test native_initialization_cache_summary_and_real_fifteen_second_timeout ... ok
+test native_remaining_tenet_health_and_order_real_failures_and_pointer_cancel ... FAILED
+test native_settings_nineteen_actions_actual_electron_and_service has been running for over 60 seconds
+test native_settings_nineteen_actions_actual_electron_and_service ... FAILED
+
+failures:
+
+---- native_remaining_tenet_health_and_order_real_failures_and_pointer_cancel stdout ----
+SETTINGS-UI-CHILD[boundaries]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/settings-completion-boundaries-53815-1792349545944868000/home/ui-result.json
+
+thread 'native_remaining_tenet_health_and_order_real_failures_and_pointer_cancel' (4941709) panicked at crates/lingxi-service/tests/r06_agent_settings_live.rs:542:5:
+actual Electron UI failed
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- native_settings_nineteen_actions_actual_electron_and_service stdout ----
+SETTINGS-UI-CHILD[workflow]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/settings-completion-workflow-53815-1792349545944805000/home/ui-result.json
+
+thread 'native_settings_nineteen_actions_actual_electron_and_service' (4941712) panicked at crates/lingxi-service/tests/r06_agent_settings_live.rs:542:5:
+actual Electron UI failed
+
+
+failures:
+    native_remaining_tenet_health_and_order_real_failures_and_pointer_cancel
+    native_settings_nineteen_actions_actual_electron_and_service
+
+test result: FAILED. 12 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 63.92s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_agent_settings_live`

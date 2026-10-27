@@ -1,0 +1,73 @@
+{
+  "recordedAt": "2026-10-18T07:14:42.193677+00:00",
+  "status": "READONLY_PRE_REVIEW3_NOT_FINAL_CANDIDATE",
+  "ran": [],
+  "productEdited": false,
+  "currentFinding": [
+    {
+      "id": "MCP-HTTP-QUEUED-ORIGINAL-AUTHORITY",
+      "kind": "STATIC_CONFIRMED_ENTRY_OMISSION_AWAITING_REAL_CHECK",
+      "evidence": [
+        "mcp_settings::action_route verifies is_local_owner, then awaits media authority lease",
+        "route then calls public McpSettingsManager::request",
+        "public request passes request_inner(...cancel=None,expected_review=None,authority=None)",
+        "handle only revalidates the current original credential when authority is Some(SettingsAuthority)",
+        "tool request_tool now passes Some(SettingsAuthority), so HTTP and tool queue paths differ"
+      ],
+      "effect": "原HTTP请求在首次认证后排队期间，即使owner token被实际替换，handle仍按旧Principal快照写入。工具审批后轮换拒绝的检查不能覆盖此入口。",
+      "minimumFix": "管理HTTP走携带真实AuthService+原Principal的受认证请求入口，handle获锁后复核同一SettingsAuthority；可信宿主/fixture公开request可保留明确的内部边界。",
+      "neededCheck": "确证HTTP请求已通过认证并等队列，再真实轮换owner token，放队列后原请求403/零磁盘与运行时变更。若只能窄unit证明则按真实覆盖登记，不编造排队时序。",
+      "reportedTo": [
+        "root",
+        "MCP author"
+      ]
+    }
+  ],
+  "staticClosed": [
+    {
+      "id": "WEB-ORIGINAL-SETTINGS-AUTHORITY",
+      "evidence": [
+        "DriveAuthorization.settings_principal不是wire反序列化字段，普通构造缺省None",
+        "sessions前台execute冻结真实Principal；后台只在最终RunOrigin::User且RunGrant::Full时冻结，其他后台来源None",
+        "runs同步prepare前with_settings_principal；thread_local Restore保存并恢复嵌套范围，无跨await暴露",
+        "prepare记录副本且比对kernel principal；PreparedRecord→TrustedSettingsContext保留同一副本",
+        "auth mint检查真实原is_local_owner/settings.write/kernel吻合和validate_principal，之后再核UserSession非只读",
+        "mcp request_tool携真实Auth/原Principal，handle获得runtime锁后再次validate",
+        "subagents/workflow DriveAuthorization明确settings_principal:None，拒绝继承父设置授权"
+      ],
+      "claim": "静态闭合之前网页LocalUser身份压缩导致补铸权限问题；root报告manager3真实Web cookie与token轮换拒绝已通过，非本人运行/最终候选。"
+    },
+    {
+      "id": "MCP-SEND-ADMISSION-BUDGET",
+      "evidence": [
+        "call_raw取得scope后预先拒绝已取消",
+        "一个timeout_at(deadline)和scope select覆盖连接锁、官方send_cancellable_request mpsc排队、await_response",
+        "handle返回后在下一个await前同步安装外部Option guard，丢future仍发送精确请求取消",
+        "超时/取消仍返回unknown候选、不杀共享server、不自动重放"
+      ],
+      "claim": "静态闭合旧发送排队不受预算窗口；根端背压真实SDK新增检查尚待运行，原3类取消绿不代替最新源码。"
+    },
+    {
+      "id": "LISTEN-FAILURE-LOOP-RESOURCES",
+      "evidence": "begin_background_shutdown已由正常signal和监听失败共用；停止idle、alarm/controller、workflows/resources等入口一致。",
+      "claim": "静态闭合；恢复loop/retained state真实实证由作者补。"
+    }
+  ],
+  "importantLimits": [
+    "只审本轮变更与已知遗漏，不扩大到T09或额外平台产品重构。",
+    "无Cargo/GUI；未修改产品、原失败、原叶状态。",
+    "root和作者并行工作，最终候选需重新绑定；本记录不升级任何验收通过。"
+  ],
+  "sourceHashes": {
+    "rust/crates/lingxi-service/src/sessions.rs": "8450a617ffc3a1db4aea8f2bdd8c6e16f7c77ccbb71d0d67f21fdbf8317b14ec",
+    "rust/crates/lingxi-service/src/runs.rs": "d9cd4faa5e67b0958e5cf03b294d3ae5ede8bfd76c18280ebad27a67bd1a3072",
+    "rust/crates/lingxi-service/src/toolgateway.rs": "da0f31701f141338791d7307252758ccd7b0ffc7a20bb5b5a5e4598ee1426383",
+    "rust/crates/lingxi-service/src/auth.rs": "7dfb32cb903197c96c8bdad4775bc951a7868913184dfb5fe0cf28ddcf7820e3",
+    "rust/crates/lingxi-service/src/mcp_settings.rs": "5311a3746706c592285a98a1bf99928e776c6e9cf2f7543e2e41ab97fda7bb49",
+    "rust/crates/lingxi-service/src/mcpbridge.rs": "c13aa3292fe6c3273dba42f673f3c514096f241b5ddf93a6faa8114dbf32b73c",
+    "rust/crates/lingxi-service/src/subagents.rs": "8528dfc2c5cbc7d6782eb71975e8c4bb6a09ad28e4ae2c3675f63d62489a12cc",
+    "rust/crates/lingxi-service/src/workflow.rs": "34982376f7945a00751279d9b7a62c6e633b8ee179b4b451fa14ee87d57cb5a8",
+    "rust/crates/lingxi-service/src/lib.rs": "c49f4d41ca104a1e25e678b96bbf6fd7fba323e57f8d92031b06465bb19e3ba1",
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_settings.rs": "610c8190318e79b568b34591be5d0c717316a0351acf3c80f780c6595922ca9f"
+  }
+}

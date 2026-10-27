@@ -1,0 +1,263 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t05_browser_pdf",
+ "cases": [
+  {
+   "case": "env::chromium-installed",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "candidates": [
+     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+     "/Applications/Chromium.app/Contents/MacOS/Chromium",
+     "/usr/bin/chromium",
+     "/usr/bin/chromium-browser",
+     "/usr/bin/google-chrome"
+    ],
+    "LINGXI_TEST_CHROMIUM": null
+   }
+  },
+  {
+   "case": "a09::environment-recorded",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "platform": "macos-arm64",
+    "chromePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "chromeVersion": "Google Chrome 155.0.8059.85",
+    "chromeSha256": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d",
+    "rustToolchain": "rustup run 1.98.1",
+    "python": "3.14.3",
+    "node": "v24.16.0",
+    "electronReferenceVersion": "v42.8.1",
+    "isolation": {
+     "LINGXI_HOME": "/private/tmp/lingxi-r09-t05/runtime-a09/r09_t05_browser_pdf-25128-1793022588619/home",
+     "TMPDIR": "/private/tmp/lingxi-r09-t05/runtime-a09/r09_t05_browser_pdf-25128-1793022588619/tmp"
+    },
+    "oldChainEnvironment": "独立对照目录/隔离 HOME；旧链不进测试安装",
+    "platformBlocked": [
+     "macos-x64",
+     "windows-x64",
+     "linux-x64"
+    ]
+   }
+  },
+  {
+   "case": "a09::r01-frozen-baseline-verified",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "files": 4,
+    "commit": "15fa0cee3^"
+   }
+  },
+  {
+   "case": "a09::electron-available-for-reference-only",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "electron": "/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/.bin/electron",
+    "note": "旧链只在独立对照环境运行，不进测试安装"
+   }
+  },
+  {
+   "case": "a09::old-chain-exit-zero",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "job": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-browser-pdf/old-chain/job-s1.json",
+    "exit_code": 0,
+    "signal": null,
+    "spawn_error": null,
+    "wall_ms": 1226,
+    "timed_out": false,
+    "output_exists": true,
+    "output_size": 994832
+   }
+  },
+  {
+   "case": "a09::old-chain-s1-pdf-produced",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "bytes": 994832
+   }
+  },
+  {
+   "case": "a09::pdfkit-probe-built",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "executable": "/private/tmp/lingxi-r09-t05/runtime-a09/r09_t05_browser_pdf-25128-1793022588619/bin/pdf_probe"
+   }
+  },
+  {
+   "case": "a09::old-chain-74-pages",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "pageCount": 74
+   }
+  },
+  {
+   "case": "a09::old-chain-reproduction-matches-r01-frozen",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "pageCountFrozen": 74,
+    "pageCountRegenerated": 74,
+    "perPageLumaGridMaxDiff": 0.0,
+    "textLengthFrozen": 91198,
+    "textLengthRegenerated": 91198,
+    "note": "R01 冻结 old probe 来自 git 15fa0cee3^；重生成基线必须逐页一致"
+   }
+  },
+  {
+   "case": "a09::pdf-chromium-7-green",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": {
+     "passed": 7,
+     "failed": 0,
+     "ignored": 0
+    },
+    "serial": true,
+    "note": "MAX_LEASES=2 的进程级 PDF 上限要求 --test-threads=1；默认并行会 PDF_CAPACITY（运行参数问题，非产品缺陷）"
+   }
+  },
+  {
+   "case": "a09::pdf-static-utf8-cleanup-confirmed",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "static_utf8_pdf_is_returned_only_after_confirmed_private_cleanup",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-s1-quality-rendered-real-chromium",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "actual_r01_documents_preserve_fonts_images_pagination_and_js_contract",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-network-canary-zero-hit",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "html_network_frames_and_workers_never_reach_loopback_canary",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-timeout-cancel-cleanup",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "total_deadline_and_explicit_cancel_reap_before_returning_failure",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-broken-assets-explicit-failure",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "broken_background_font_and_unfrozen_stylesheet_are_explicit_failures",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-print-isolates-logged-in-workspace",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "printing_never_switches_or_clears_the_regular_logged_in_workspace",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-lease-scope-and-quota",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "two_auxiliary_leases_are_scoped_and_dropped_future_is_cancelled",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-compare-old-vs-rust-all-pass",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "failed": [],
+    "old": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-browser-pdf/old-chain/s1-long-zh.pdf",
+    "new": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-browser-pdf/rust-pdf/r01-quality-14f57134490a739128d7ceddf1874127/s1-long-zh.pdf"
+   }
+  },
+  {
+   "case": "a09::pdf-compare-page-count-equal-74",
+   "ok": true,
+   "actual": 1,
+   "detail": "old=74 new=74"
+  },
+  {
+   "case": "a09::pdf-compare-no-blank-pages-old",
+   "ok": true,
+   "actual": 1,
+   "detail": "blank pages: []"
+  },
+  {
+   "case": "a09::pdf-compare-no-blank-pages-rust",
+   "ok": true,
+   "actual": 1,
+   "detail": "blank pages: []"
+  },
+  {
+   "case": "a09::pdf-compare-table-rows-old",
+   "ok": true,
+   "actual": 1,
+   "detail": "140/140"
+  },
+  {
+   "case": "a09::pdf-compare-table-rows-rust",
+   "ok": true,
+   "actual": 1,
+   "detail": "140/140"
+  },
+  {
+   "case": "a09::pdf-compare-text-similarity-ge-0.99",
+   "ok": true,
+   "actual": 1,
+   "detail": "normalized ratio=0.99910 len old=87161 new=87148"
+  },
+  {
+   "case": "a09::pdf-compare-visual-grid-le-20",
+   "ok": true,
+   "actual": 1,
+   "detail": "per-page 16x16 luma grid mean|Δ|: max=7.15 mean=6.45 warn>20 (0-255 scale)"
+  },
+  {
+   "case": "a09::pdf-rust-embeds-font-EBGaramond",
+   "ok": true,
+   "actual": 1,
+   "detail": "new fonts=['AAAAAA+NotoSerifSC-Bold', 'ABAAAA+NotoSerifSC-Bold', 'ACAAAA+NotoSerifSC-Regular', 'BAAAAA+NotoSerifSC-Bold', 'BBAAAA+STSongti-SC-Bold', 'BCAAAA+NotoSerifSC-Regular', 'CAAAAA+NotoSerifSC-Bold', 'CBAAAA+NotoSerifSC-Bold']…"
+  },
+  {
+   "case": "a09::pdf-rust-embeds-font-NotoSerifSC",
+   "ok": true,
+   "actual": 1,
+   "detail": "new fonts=['AAAAAA+NotoSerifSC-Bold', 'ABAAAA+NotoSerifSC-Bold', 'ACAAAA+NotoSerifSC-Regular', 'BAAAAA+NotoSerifSC-Bold', 'BBAAAA+STSongti-SC-Bold', 'BCAAAA+NotoSerifSC-Regular', 'CAAAAA+NotoSerifSC-Bold', 'CBAAAA+NotoSerifSC-Bold']…"
+  },
+  {
+   "case": "a09::pdf-rust-embeds-font-JetBrainsMono",
+   "ok": true,
+   "actual": 1,
+   "detail": "new fonts=['AAAAAA+NotoSerifSC-Bold', 'ABAAAA+NotoSerifSC-Bold', 'ACAAAA+NotoSerifSC-Regular', 'BAAAAA+NotoSerifSC-Bold', 'BBAAAA+STSongti-SC-Bold', 'BCAAAA+NotoSerifSC-Regular', 'CAAAAA+NotoSerifSC-Bold', 'CBAAAA+NotoSerifSC-Bold']…"
+  }
+ ]
+}

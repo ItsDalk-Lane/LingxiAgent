@@ -1,0 +1,9 @@
+
+running 2 tests
+test r07_t10_query_page_aggregate_detail_export_import ... ok
+test r07_t10_closeout_settings_traces_storage_and_maintenance ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.18s
+     Running tests/r07_t10_observability.rs (rust/target/debug/deps/r07_t10_observability-cda8a0344f0ab3c2)

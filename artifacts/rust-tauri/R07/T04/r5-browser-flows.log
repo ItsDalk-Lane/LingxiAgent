@@ -1,0 +1,32 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0061]: this function takes 5 arguments but 4 arguments were supplied
+   --> crates/lingxi-service/src/phone_tools.rs:67:9
+    |
+ 67 |           crate::phone_run_authority::validate(
+    |  _________^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^-
+ 68 | |             Some(&self.api.storage),
+ 69 | |             &authorization,
+ 70 | |             ctx,
+ 71 | |             Some(self.api.memory.home()),
+ 72 | |         )
+    | |_________- argument #5 of type `bool` is missing
+    |
+note: function defined here
+   --> crates/lingxi-service/src/phone_run_authority.rs:133:21
+    |
+133 | pub(crate) async fn validate(
+    |                     ^^^^^^^^
+...
+138 |     admitted_parentless_subagent: bool,
+    |     ----------------------------------
+help: provide the argument
+    |
+ 67 |         crate::phone_run_authority::validate(
+...
+ 71 |             Some(self.api.memory.home()),
+ 72 ~             /* bool */,
+ 73 ~         )
+    |
+
+For more information about this error, try `rustc --explain E0061`.
+error: could not compile `lingxi-service` (lib) due to 1 previous error

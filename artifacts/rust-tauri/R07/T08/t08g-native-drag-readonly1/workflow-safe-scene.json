@@ -1,0 +1,1391 @@
+{
+  "scenario": "workflow",
+  "originalUiResult": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-workflow-58431-1792325989726549000/home/ui-result.json",
+  "originalUiResultSha256": "70f045394e316ab6478a663f449ab1b5c717fda30bf0e819ae08078775006f48",
+  "originalTrace": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-workflow-58431-1792325989726549000/home/electron-failure-trace.json",
+  "originalTraceSha256": "38bb4b720175a58833c97491cfd2e4c1d490c7accd52824e14a2d66ece387440",
+  "startTimeUnixMs": 1792326013177,
+  "endTimeUnixMs": 1792326050029.7178,
+  "durationMs": 36852.717833,
+  "status": "failed",
+  "errorFirstLine": "Error: actual pointer reorder",
+  "checks": [
+    "production-settings-entry",
+    "actual-agents-list",
+    "actual-settings-snapshot",
+    "actual-model-catalog",
+    "actual-current-model-binding",
+    "explicit-maintenance-state",
+    "00-container-real-load",
+    "01-browse-six-real-reads",
+    "02-name-persist-and-readback",
+    "02-primary-actual-preferences",
+    "02-chat-model-real-save",
+    "03-yuan-persona-independent-writes",
+    "04-memory-real-toggle",
+    "05-experience-real-request",
+    "05-experience-real-edit",
+    "06-character-export-real-file-and-reveal",
+    "07-optional-tools-real-save",
+    "08-beautify-actual-registered-toggle",
+    "09-office-actual-registered-toggle",
+    "05-experience-cache-survives-config-refresh",
+    "05-experience-category-deleted-real",
+    "10-avatar-cancel-no-post",
+    "10-avatar-canvas-upload-real",
+    "11-real-day-loaded",
+    "11-compiled-three-real-writes",
+    "11-daily-edit-real-file",
+    "12-whole-memory-cancel-no-delete",
+    "13-embedding-persist",
+    "13-embedding-clear",
+    "14-tenets-add-and-approve-real",
+    "14-tenet-reject-real",
+    "14-tenet-delete-real",
+    "15-auto-enabled-actual-distinct-completed-run",
+    "15-paid-dream-real-success",
+    "16-revision-real-list-and-diff",
+    "17-health-real-degraded",
+    "01-create-empty-no-post",
+    "01-manual-create-real-switch",
+    "01-import-plan-does-not-write-agent",
+    "01-import-unchecked-excludes-memory",
+    "18-order-visible-real-drag-target"
+  ],
+  "requests": [
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/server/identity",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/server/identity",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/settings/config",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/settings/config",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/models",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/settings/snapshot",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/settings/avatar-health",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/settings/avatar-health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/settings/snapshot",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/providers/summary",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agent-deletions",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/health",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agent-deletions",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/server/identity",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/providers/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/identity",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/user-profile",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/public-agents-md",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/agents-md",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/public-agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/user-profile",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/identity",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/providers/summary",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentB/agents-md",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentB/identity",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentB/config",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentB/public-agents-md",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentB/public-agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentB/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentB/identity",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/user-profile",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentB/agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/health",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentB/tenets",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentB/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/public-agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/user-profile",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/identity",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/health",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/public-agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/user-profile",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/identity",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/primary",
+      "status": 204
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/primary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/identity",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/public-agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/user-profile",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/agentA/identity",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/agentA/agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/identity",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/public-agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/user-profile",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/health",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/public-agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/user-profile",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/identity",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/agents-md",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/experience",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/experience",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/agentA/experience",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/character-cards/export/preview",
+      "status": 204
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/character-cards/export/preview",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/character-cards/export/preview",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/character-cards/export",
+      "status": 204
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/character-cards/export",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/agentA/experience",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/avatar",
+      "status": 204
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/agents/agentA/avatar",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/avatar",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/compiled",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/compiled",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/compiled/week/days",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/compiled/week/days",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/compiled/today",
+      "status": 204
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/memories/compiled/today",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/compiled/facts",
+      "status": 204
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/memories/compiled/facts",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/compiled/longterm",
+      "status": 204
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/memories/compiled/longterm",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/compiled/week/days/2026-10-17",
+      "status": 204
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/memories/compiled/week/days/2026-10-17",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/compiled",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/tenets/pending-real/decide",
+      "status": 204
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/agents/agentA/tenets/pending-real/decide",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/tenets/pending-reject/decide",
+      "status": 204
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/agents/agentA/tenets/pending-reject/decide",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/tenets/tenet-6892c6c674d0f797",
+      "status": 204
+    },
+    {
+      "method": "DELETE",
+      "path": "/lingxi/v1/agents/agentA/tenets/tenet-6892c6c674d0f797",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/dream/runs",
+      "status": 204
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/memories/dream/runs",
+      "status": 202
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/dream/revisions",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/dream/revisions",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/dream/revisions/2026-10-18T12-20-21-874Z-021860-1",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/dream/revisions/2026-10-18T12-20-21-874Z-021860-1",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/dream/revisions/2026-10-18T12-20-21-874Z-021860-1",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/dream/revisions/2026-10-18T12-20-21-874Z-021860-1/restore",
+      "status": 204
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/memories/dream/revisions/2026-10-18T12-20-21-874Z-021860-1/restore",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/dream/revisions",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/dream/revisions/2026-10-18T12-20-21-874Z-021860-1",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents",
+      "status": 204
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/agents",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/switch",
+      "status": 204
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/agents/switch",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agent/config",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agent/identity",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agent/agents-md",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agent/public-agents-md",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/user-profile",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agent/identity",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/user-profile",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agent/public-agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agent/agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agent/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/health",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agent/tenets",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agent/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agent/tenets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/agents-md",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/public-agents-md",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/identity",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/user-profile",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/public-agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/identity",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/experience",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/experience",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/health",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/character-cards/export/preview",
+      "status": 204
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/character-cards/export/preview",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/character-cards/export/agentA/assets/cardFront",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/character-cards/export/agentA/assets/avatar",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/character-cards/export",
+      "status": 204
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/character-cards/export",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/character-cards/plan",
+      "status": 204
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/character-cards/plan",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/character-cards/plans/zWlU1Wu1l3NVlZx-C0LLNETqyzsUjlFG/assets/cardFront",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/character-cards/plans/zWlU1Wu1l3NVlZx-C0LLNETqyzsUjlFG/assets/avatar",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/character-cards/import",
+      "status": 204
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/character-cards/import",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/agents/switch",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/card-zWlU1Wu1l3NVlZx-/config",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/card-zWlU1Wu1l3NVlZx-/identity",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/card-zWlU1Wu1l3NVlZx-/agents-md",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/card-zWlU1Wu1l3NVlZx-/public-agents-md",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/user-profile",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/card-zWlU1Wu1l3NVlZx-/public-agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/card-zWlU1Wu1l3NVlZx-/agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/card-zWlU1Wu1l3NVlZx-/identity",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/card-zWlU1Wu1l3NVlZx-/config",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/health",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/card-zWlU1Wu1l3NVlZx-/tenets",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/card-zWlU1Wu1l3NVlZx-/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/card-zWlU1Wu1l3NVlZx-/tenets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/card-zWlU1Wu1l3NVlZx-/avatar",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/public-agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/user-profile",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/identity",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/agents-md",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/experience",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200
+    }
+  ],
+  "orderRequests": [],
+  "windowDestroyedAtFailure": false,
+  "dragConsoleLines": [
+    "DRAG-FIXTURE:{\"point\":{\"x\":512.6229248046875,\"y\":236.38937377929688},\"hover\":false,\"indices\":[{\"x\":\"\"},{\"id\":\"agent\",\"x\":\"18px\"},{\"id\":\"agentA\",\"x\":\"90px\"},{\"id\":\"agentB\",\"x\":\"162px\"},{\"id\":\"card-zWlU1Wu1l3NVlZx-\",\"x\":\"234px\"},{\"x\":\"306px\"}]}",
+    "DRAG-FIXTURE-AFTER:{\"hover\":true,\"order\":[\"agent\",\"agentA\",\"agentB\",\"card-zWlU1Wu1l3NVlZx-\"]}"
+  ],
+  "excluded": [
+    "tokens",
+    "credentials",
+    "config/preferences files",
+    "identity/body form values",
+    "query strings",
+    "raw HTTP request/response bodies"
+  ]
+}

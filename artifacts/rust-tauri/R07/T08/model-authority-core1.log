@@ -1,0 +1,104 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 47s
+     Running tests/r06_chat_wire.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_chat_wire-f73bf56901f8b5c8)
+
+running 17 tests
+test real_ws_resume_recovers_exact_missing_events_and_marks_stale_or_empty ... ok
+test actual_attachment_preparation_abort_is_immediately_idle_zero_run_and_no_late_submit ... ok
+test real_ws_delta_is_visible_before_provider_terminal_and_abort_stale_guard ... ok
+test model_switch_uses_real_session_admission_and_rejections_preserve_choice ... ok
+test deleted_agent_steer_is_rejected_without_cancelling_neighbour_session ... ok
+test file_refs_real_owner_snapshots_office_bytes_transaction_and_negative_zero_run ... ok
+test ws_interject_interrupts_only_target_and_preserves_real_user_receipt ... ok
+test real_ws_prompt_enters_run_tools_and_live_final_with_typed_input_refusals ... ok
+test ws_compaction_refusals_then_real_local_checkpoint_zero_fee_and_next_run ... ok
+test actual_model_switch_default_thinking_and_image_survive_restart_into_provider ... ok
+test ws_compaction_real_accepted_success_noop_failure_and_streaming_negative ... ok
+test real_provider_many_deltas_resume_reports_truncation_and_retains_contiguous_tail ... ok
+test referenced_images_real_20mib_limit_owned_bytes_and_no_run_on_refusal ... ok
+test ws_real_steering_tool_continuation_idle_prompt_and_foreign_controls_do_not_mutate ... ok
+test session_id_references_are_authorized_preserved_and_never_read_source_body_implicitly ... ok
+test native_current_chat_page_inputarea_tiptap_true_network_and_queue_interject ... ok
+test native_current_app_pages_side_preview_attachment_and_model_response_generation ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.22s
+
+     Running tests/r07_t08_model_configuration.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_model_configuration-ac1cc7bd96006499)
+
+running 10 tests
+test malformed_provider_endpoint_is_rejected_without_falling_back_to_saved_address ... FAILED
+test legacy_custom_provider_omitted_protocol_first_save_dispatches_openai_and_explicit_invalid_never_falls_back ... ok
+test embedded_source_preserves_envelope_rejects_secret_metadata_before_write_and_reload_recovers ... ok
+test first_save_activates_shared_catalog_credentials_and_independent_knowledge_without_restart ... ok
+test operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes ... ok
+test compatibility_projection_failure_reports_applied_snapshot_and_reload_can_confirm_it ... ok
+test explicit_codex_display_alias_edits_one_source_and_login_state_comes_from_credentials ... ok
+test headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials ... ok
+test existing_embedded_and_models_file_sources_and_retained_originals_become_private_when_saving_first_key ... ok
+test malformed_headers_never_clear_saved_settings_or_publish_a_generation ... ok
+
+failures:
+
+---- malformed_provider_endpoint_is_rejected_without_falling_back_to_saved_address stdout ----
+
+thread 'malformed_provider_endpoint_is_rejected_without_falling_back_to_saved_address' (2642832) panicked at crates/lingxi-service/tests/r07_t08_model_configuration.rs:600:18:
+显式损坏的地址不能静默回退到旧值并报告已保存: ModelConfigurationApplyReport { saved: true, applied: true, generation: 3, activated: true, cleared_bindings: [], audit_recorded: true, projection_confirmed: true }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    malformed_provider_endpoint_is_rejected_without_falling_back_to_saved_address
+
+test result: FAILED. 9 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.68s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t08_model_configuration`
+     Running tests/r07_t08_network_preferences.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_network_preferences-75a0c51af6b70f8b)
+
+running 1 test
+test saved_network_proxy_reaches_actual_next_model_dispatch_without_restart_or_loopback_bypass ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.12s
+
+     Running tests/r07_t08_provider_http.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_provider_http-9597e57d2d7c2a07)
+
+running 7 tests
+test health_pins_catalog_model_and_anthropic_connection_have_real_usage ... ok
+test catalog_draft_mask_and_cache_never_publish_remote_models_or_count_usage ... ok
+test provider_edits_deletes_and_reload_notify_real_applied_state_even_when_projection_fails ... ok
+test model_patch_and_removal_preserve_other_settings_and_stop_new_dispatch ... ok
+test actual_local_run_settings_search_apply_target_agent_and_security_refusals ... ok
+test api_key_reveal_requires_both_scopes_and_discovery_secret_drafts_cannot_bypass ... ok
+test auxiliary_vision_http_tracks_same_gateway_catalog_binding_and_preferences_without_generation ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 15.81s
+
+     Running tests/r07_t08_provider_matrix.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_provider_matrix-7431f11362a71f88)
+
+running 1 test
+test every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.55s
+
+     Running tests/r07_t08_settings.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_settings-5a3bca7a61891857)
+
+running 15 tests
+test snapshots_and_default_exports_hide_all_saved_secret_shapes ... ok
+test invalid_import_and_unknown_global_fields_never_write_any_preferences ... ok
+test existing_machine_default_workspace_get_and_ensure_do_not_depend_on_service_home_or_modify_user_files ... ok
+test rejected_agent_provider_and_yuan_patches_do_not_save_global_values_first ... ok
+test user_profile_parent_directory_link_cannot_redirect_reads_or_writes ... ok
+test corrupt_preferences_are_preserved_and_profile_writes_reject_symlinks ... ok
+test partial_global_save_still_emits_only_the_changes_that_really_happened ... ok
+test saved_proxy_credentials_never_leave_read_or_export_and_new_unsupported_credentials_are_refused ... ok
+test applied_model_projection_error_still_notifies_current_model_consumers ... ok
+test export_import_roundtrip_preserves_masked_secrets_and_unmentioned_preferences ... ok
+test partial_proxy_and_editor_updates_publish_complete_saved_values_for_desktop_consumers ... ok
+test deleting_one_recent_workspace_keeps_the_other_workspace_and_other_agent ... ok
+test one_global_edit_and_masked_search_edit_preserve_other_values_and_restart ... ok
+test workspace_history_uses_explicit_agent_and_profile_survives_restart ... ok
+test remote_settings_scope_cannot_use_local_only_settings_archive ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.77s
+
+error: 1 target failed:
+    `-p lingxi-service --test r07_t08_model_configuration`

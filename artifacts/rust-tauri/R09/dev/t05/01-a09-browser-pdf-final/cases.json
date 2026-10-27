@@ -1,0 +1,755 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t05_browser_pdf",
+ "cases": [
+  {
+   "case": "env::chromium-installed",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "candidates": [
+     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+     "/Applications/Chromium.app/Contents/MacOS/Chromium",
+     "/usr/bin/chromium",
+     "/usr/bin/chromium-browser",
+     "/usr/bin/google-chrome"
+    ],
+    "LINGXI_TEST_CHROMIUM": null
+   }
+  },
+  {
+   "case": "a09::environment-recorded",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "platform": "macos-arm64",
+    "chromePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "chromeVersion": "Google Chrome 155.0.8059.85",
+    "chromeSha256": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d",
+    "rustToolchain": "rustup run 1.98.1",
+    "python": "3.14.3",
+    "node": "v24.16.0",
+    "electronReferenceVersion": "v42.8.1",
+    "isolation": {
+     "LINGXI_HOME": "/private/tmp/lingxi-r09-t05/runtime-a09d/r09_t05_browser_pdf-37512-1793022888346/home",
+     "TMPDIR": "/private/tmp/lingxi-r09-t05/runtime-a09d/r09_t05_browser_pdf-37512-1793022888346/tmp"
+    },
+    "oldChainEnvironment": "独立对照目录/隔离 HOME；旧链不进测试安装",
+    "platformBlocked": [
+     "macos-x64",
+     "windows-x64",
+     "linux-x64"
+    ]
+   }
+  },
+  {
+   "case": "a09::r01-frozen-baseline-verified",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "files": 4,
+    "commit": "15fa0cee3^"
+   }
+  },
+  {
+   "case": "a09::electron-available-for-reference-only",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "electron": "/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/.bin/electron",
+    "note": "旧链只在独立对照环境运行，不进测试安装"
+   }
+  },
+  {
+   "case": "a09::old-chain-exit-zero",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "job": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-browser-pdf-final/old-chain/job-s1.json",
+    "exit_code": 0,
+    "signal": null,
+    "spawn_error": null,
+    "wall_ms": 1015,
+    "timed_out": false,
+    "output_exists": true,
+    "output_size": 994832
+   }
+  },
+  {
+   "case": "a09::old-chain-s1-pdf-produced",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "bytes": 994832
+   }
+  },
+  {
+   "case": "a09::pdfkit-probe-built",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "executable": "/private/tmp/lingxi-r09-t05/runtime-a09d/r09_t05_browser_pdf-37512-1793022888346/bin/pdf_probe"
+   }
+  },
+  {
+   "case": "a09::old-chain-74-pages",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "pageCount": 74
+   }
+  },
+  {
+   "case": "a09::old-chain-reproduction-matches-r01-frozen",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "pageCountFrozen": 74,
+    "pageCountRegenerated": 74,
+    "perPageLumaGridMaxDiff": 0.0,
+    "textLengthFrozen": 91198,
+    "textLengthRegenerated": 91198,
+    "note": "R01 冻结 old probe 来自 git 15fa0cee3^；重生成基线必须逐页一致"
+   }
+  },
+  {
+   "case": "a09::pdf-chromium-7-green",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": {
+     "passed": 7,
+     "failed": 0,
+     "ignored": 0
+    },
+    "serial": true,
+    "note": "MAX_LEASES=2 的进程级 PDF 上限要求 --test-threads=1；默认并行会 PDF_CAPACITY（运行参数问题，非产品缺陷）"
+   }
+  },
+  {
+   "case": "a09::pdf-static-utf8-cleanup-confirmed",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "static_utf8_pdf_is_returned_only_after_confirmed_private_cleanup",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-s1-quality-rendered-real-chromium",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "actual_r01_documents_preserve_fonts_images_pagination_and_js_contract",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-network-canary-zero-hit",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "html_network_frames_and_workers_never_reach_loopback_canary",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-timeout-cancel-cleanup",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "total_deadline_and_explicit_cancel_reap_before_returning_failure",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-broken-assets-explicit-failure",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "broken_background_font_and_unfrozen_stylesheet_are_explicit_failures",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-print-isolates-logged-in-workspace",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "printing_never_switches_or_clears_the_regular_logged_in_workspace",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-lease-scope-and-quota",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "test": "two_auxiliary_leases_are_scoped_and_dropped_future_is_cancelled",
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::pdf-compare-old-vs-rust-all-pass",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "failed": [],
+    "old": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-browser-pdf-final/old-chain/s1-long-zh.pdf",
+    "new": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t05/01-a09-browser-pdf-final/rust-pdf/r01-quality-ad63db57c193eec917febbe518c7e0de/s1-long-zh.pdf"
+   }
+  },
+  {
+   "case": "a09::pdf-compare-page-count-equal-74",
+   "ok": true,
+   "actual": 1,
+   "detail": "old=74 new=74"
+  },
+  {
+   "case": "a09::pdf-compare-no-blank-pages-old",
+   "ok": true,
+   "actual": 1,
+   "detail": "blank pages: []"
+  },
+  {
+   "case": "a09::pdf-compare-no-blank-pages-rust",
+   "ok": true,
+   "actual": 1,
+   "detail": "blank pages: []"
+  },
+  {
+   "case": "a09::pdf-compare-table-rows-old",
+   "ok": true,
+   "actual": 1,
+   "detail": "140/140"
+  },
+  {
+   "case": "a09::pdf-compare-table-rows-rust",
+   "ok": true,
+   "actual": 1,
+   "detail": "140/140"
+  },
+  {
+   "case": "a09::pdf-compare-text-similarity-ge-0.99",
+   "ok": true,
+   "actual": 1,
+   "detail": "normalized ratio=0.99910 len old=87161 new=87148"
+  },
+  {
+   "case": "a09::pdf-compare-visual-grid-le-20",
+   "ok": true,
+   "actual": 1,
+   "detail": "per-page 16x16 luma grid mean|Δ|: max=7.15 mean=6.45 warn>20 (0-255 scale)"
+  },
+  {
+   "case": "a09::pdf-rust-embeds-font-EBGaramond",
+   "ok": true,
+   "actual": 1,
+   "detail": "new fonts=['AAAAAA+NotoSerifSC-Bold', 'ABAAAA+NotoSerifSC-Bold', 'ACAAAA+NotoSerifSC-Regular', 'BAAAAA+NotoSerifSC-Bold', 'BBAAAA+STSongti-SC-Bold', 'BCAAAA+NotoSerifSC-Regular', 'CAAAAA+NotoSerifSC-Bold', 'CBAAAA+NotoSerifSC-Bold']…"
+  },
+  {
+   "case": "a09::pdf-rust-embeds-font-NotoSerifSC",
+   "ok": true,
+   "actual": 1,
+   "detail": "new fonts=['AAAAAA+NotoSerifSC-Bold', 'ABAAAA+NotoSerifSC-Bold', 'ACAAAA+NotoSerifSC-Regular', 'BAAAAA+NotoSerifSC-Bold', 'BBAAAA+STSongti-SC-Bold', 'BCAAAA+NotoSerifSC-Regular', 'CAAAAA+NotoSerifSC-Bold', 'CBAAAA+NotoSerifSC-Bold']…"
+  },
+  {
+   "case": "a09::pdf-rust-embeds-font-JetBrainsMono",
+   "ok": true,
+   "actual": 1,
+   "detail": "new fonts=['AAAAAA+NotoSerifSC-Bold', 'ABAAAA+NotoSerifSC-Bold', 'ACAAAA+NotoSerifSC-Regular', 'BAAAAA+NotoSerifSC-Bold', 'BBAAAA+STSongti-SC-Bold', 'BCAAAA+NotoSerifSC-Regular', 'CAAAAA+NotoSerifSC-Bold', 'CBAAAA+NotoSerifSC-Bold']…"
+  },
+  {
+   "case": "a09::browser-chromium-10-green",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": {
+     "passed": 10,
+     "failed": 0,
+     "ignored": 0
+    },
+    "serial": true,
+    "attempts": [
+     {
+      "attempt": 1,
+      "exitCode": 0,
+      "passed": 10,
+      "failed": 0,
+      "failedTests": [],
+      "log": "r07-browser-chromium-attempt1.log"
+     }
+    ],
+    "note": "默认并行曾出现 cookie-resume/页面分离类真实 Chrome 抖动；串行 + 至多一次重试后全绿，R07 红历史保留"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A67D342381C0::tabs-active-sync-empty-workspace",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "same_real_target_input_snapshot_generations_and_empty_workspace"
+    ],
+    "serial": true
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A67D342381C0::bounded-tabs-and-cold-metadata",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "pool_lru_is_bounded_and_idle_reap_keeps_cold_metadata"
+    ],
+    "serial": true
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A09B78985A14::revoke-interrupts-pending-page",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "scope_revoke_interrupts_real_pending_page_and_stale_node_never_launches"
+    ],
+    "serial": true
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A09B78985A14::permanent-forget-rejects-late-scopes",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "permanent_forget_removes_owned_profile_and_rejects_late_scopes"
+    ],
+    "serial": true
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-8A45B19A18B4::navigation-back-forward-reload-real-document",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "same_real_target_input_snapshot_generations_and_empty_workspace"
+    ],
+    "serial": true
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A30E4BDF2FA2::real-snapshot-png-click-type-eval",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "same_real_target_input_snapshot_generations_and_empty_workspace",
+     "trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock"
+    ],
+    "serial": true
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A30E4BDF2FA2::session-isolated-password-not-in-snapshot",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "password_values_never_enter_normal_or_compact_snapshots_and_stay_in_the_page",
+     "page_cannot_move_or_forge_a_snapshot_reference_to_another_element"
+    ],
+    "serial": true
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A30E4BDF2FA2::download-owned-bytes-and-ack",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "downloads_are_actual_owned_bytes_and_ack_removes_only_confirmed_guid"
+    ],
+    "serial": true
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A30E4BDF2FA2::real-popup-and-dialog-nonblocking",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock"
+    ],
+    "serial": true
+   }
+  },
+  {
+   "case": "a09::service-browser-routes-green",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": {
+     "passed": 10,
+     "failed": 0,
+     "ignored": 0
+    }
+   }
+  },
+  {
+   "case": "a09::service-browser-tools-green",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": {
+     "passed": 13,
+     "failed": 0,
+     "ignored": 0
+    }
+   }
+  },
+  {
+   "case": "a09::service-web-tools-green",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": {
+     "passed": 8,
+     "failed": 0,
+     "ignored": 0
+    }
+   }
+  },
+  {
+   "case": "a09::service-office-tools-green",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": {
+     "passed": 15,
+     "failed": 0,
+     "ignored": 0
+    }
+   }
+  },
+  {
+   "case": "a09::service-preview-regression-green",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": {
+     "passed": 5,
+     "failed": 0,
+     "ignored": 0
+    }
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A09B78985A14::http-command-replay-and-emergency-receipt",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "actual_http_command_replay_changed_input_and_emergency_receipt_never_repeat_external_actions"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_browser_routes.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-367052089D11::states-cold-metadata-restored",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "restart_restores_cold_metadata_and_confirmed_receipt_without_automatically_opening_a_page"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_browser_routes.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-593534A4F2AB::session-directory-cold-url-retained",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "restart_restores_cold_metadata_and_confirmed_receipt_without_automatically_opening_a_page"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_browser_routes.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-DCD85A04A7E9::open-session-explicit-resume-cold-metadata",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "restart_restores_cold_metadata_and_confirmed_receipt_without_automatically_opening_a_page"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_browser_routes.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-178C8CBA29C2::close-session-state-projection",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "actual_http_command_replay_changed_input_and_emergency_receipt_never_repeat_external_actions"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_browser_routes.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-1809C8E13EA3::preferences-read-preserves-unknown-fields",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "partial_preferences_preserve_unknown_fields_and_external_cookie_failure_is_not_success"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_browser_routes.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-03A9E92909C6::clear-cookies-failure-not-success",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "partial_preferences_preserve_unknown_fields_and_external_cookie_failure_is_not_success"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_browser_routes.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-ED5FD5B469B8::preferences-apply-rollback-unknown-explicit",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "partial_external_configuration_is_rolled_back_and_unconfirmed_rollback_is_explicit_unknown"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_browser_routes.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-F1A5597E3E78::revoke-receipt-never-repeats",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "unknown_external_revoke_receipt_never_repeats_the_stop_or_reopens_content"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_browser_routes.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-178C8CBA29C2::shutdown-cleanup-failure-visible",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "concurrent_and_repeated_shutdown_waiters_preserve_failure_and_panic_results"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_browser_routes.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A30E4BDF2FA2::screenshot-real-png-session-file",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "screenshot_registers_a_real_png_session_file_and_http_content_preserves_its_type_and_bytes"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_browser_routes.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A30E4BDF2FA2::browser-tool-approval-binds-exact-reviewed-url",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "actual_navigation_waits_for_approval_and_dispatches_exact_reviewed_url"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_browser_tools.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A30E4BDF2FA2::stale-approval-after-page-change-or-foreign-tab",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "page_change_and_foreign_tab_invalidate_approval_before_external_dispatch"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_browser_tools.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A30E4BDF2FA2::readonly-snapshot-receipt-write-never-dispatches",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "actual_readonly_snapshot_persists_receipt_but_write_never_dispatches"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_browser_tools.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A09B78985A14::emergency-stop-released-only-by-new-user-submission",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "new_actual_user_submission_releases_emergency_stop_with_a_new_epoch"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_browser_tools.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A09B78985A14::unknown-emergency-not-reported-success",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "unconfirmed_http_emergency_keeps_last_page_and_live_process_explicitly_unknown",
+     "external_unknown_effect_is_persisted_and_never_reported_as_success"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_browser_tools.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A09B78985A14::restart-cold-state-after-confirmed-emergency",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "confirmed_http_emergency_persists_empty_cold_state_across_restart_and_new_user_start"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_browser_tools.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-A09B78985A14::older-steer-never-lifts-later-stop",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "actual_service_interleaving_keeps_new_http_emergency_over_earlier_accepted_steer",
+     "accepted_real_websocket_steer_reauthorizes_only_current_run_and_old_request_never_lifts_later_stop"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_browser_tools.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-F1A5597E3E78::tool-cancel-reaches-external-cleanup",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "actual_run_cancellation_reaches_external_cleanup_and_settles_both_records"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_browser_tools.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-FD7A5A76B8EA::web-fetch-body-final-url-session-file",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "public_fetch_keeps_five_hop_guard_and_registers_readable_full_session_file"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_web_tools.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-FD7A5A76B8EA::fetch-proxy-pin-limitation-explicit-no-request",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "public_fetch_proxy_pin_limitation_is_explicit_without_sending_any_request"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_web_tools.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-D1B56A275C3A::search-auto-real-attempts-and-explicit-failure",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "auto_records_each_real_http_attempt_then_all_three_browser_page_diagnostics",
+     "auto_all_failed_is_explicit_and_fixed_provider_never_silently_falls_back"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_web_tools.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-D1B56A275C3A::five-http-providers-real-gateway-distinct-auth",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "all_five_http_providers_use_real_gateway_and_distinct_authentication"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_web_tools.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-7D212CBD9EEF::search-verify-persists-only-after-real-success",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "verification_real_http_masks_same_provider_and_only_persists_after_success"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_web_tools.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-7D212CBD9EEF::search-verify-failure-keeps-real-error-diagnostics",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "provider_auth_redirect_and_rate_limit_keep_real_error_diagnostics"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_web_tools.rs"
+   }
+  },
+  {
+   "case": "leaf:R00-T02-LA-4173A08A51CC::service-side-docx-xlsx-pdf-read-no-change",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tests": [
+     "office::real_document_worker_reads_docx_xlsx_and_paged_pdf_without_changing_inputs"
+    ],
+    "source": "rust/crates/lingxi-service/tests/r07_office_tools.rs",
+    "note": "服务侧文档读取；Tauri 文件预览宿主/只读窗口仍 blocked"
+   }
+  },
+  {
+   "case": "isolation::real-home-untouched",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "before": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    },
+    "after": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    }
+   }
+  }
+ ]
+}

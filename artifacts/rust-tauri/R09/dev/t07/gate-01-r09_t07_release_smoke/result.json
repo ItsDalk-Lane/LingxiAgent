@@ -1,0 +1,13 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t07_release_smoke",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 2.386,
+ "caseCount": 6,
+ "casesSha256": "cd6f703c533cda10cf52aeb5991909f8bef791a59baec6f2f4e6d144b8dad4b7",
+ "commands": [],
+ "logSha256": "71c63ab3f77aba18aabe6691f59780ee3ebad95c49b3b999053427e25e27bcbf",
+ "finishedAtUnixMs": 1793026381587,
+ "failureDetail": "CANDIDATE_REQUIRED: 需要 Lead/T06 交付的 release .app 与可执行（LINGXI_R09_T07_RELEASE_APP / LINGXI_R09_T07_RELEASE_EXE）"
+}

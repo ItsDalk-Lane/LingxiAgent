@@ -1,0 +1,461 @@
+{
+  "schema_version": 1,
+  "task_id": "R00-T02",
+  "group": "UI_FILE_EDIT_SPLITS",
+  "source_sha": "16aeb380d58d68ff1a38bb46f5cc5d18f985f084",
+  "review_count": 5,
+  "reviews": [
+    {
+      "original_feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-READ-CC7380",
+      "entry_id": "desktop-behavior:file-read",
+      "kind": "desktop_behavior",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "经桌面桥读取本地文件",
+      "call_chain": [
+        "desktop/preload.cjs:111",
+        "desktop/main.cjs:6023",
+        "desktop/src/react/utils/file-preview.ts:76",
+        "desktop/src/react/utils/preview-file-content.ts:103",
+        "desktop/src/react/utils/screenshot.ts:308",
+        "desktop/src/viewer-window-entry.tsx:46",
+        "desktop/src/viewer-window-entry.tsx:111",
+        "desktop/preload.cjs:113",
+        "desktop/main.cjs:6030",
+        "desktop/src/react/components/file-history/FileHistoryModal.tsx:69",
+        "desktop/src/react/components/preview/MarkdownChrome.tsx:228",
+        "desktop/src/react/components/preview/PreviewRenderer.tsx:266",
+        "desktop/src/react/components/preview/PreviewRenderer.tsx:293",
+        "desktop/src/react/components/preview/PreviewRenderer.tsx:529",
+        "desktop/src/react/utils/preview-file-content.ts:100",
+        "desktop/src/react/utils/screenshot.ts:303",
+        "desktop/preload.cjs:124",
+        "desktop/main.cjs:6189",
+        "desktop/src/react/MainContent.tsx:84",
+        "desktop/src/react/components/input/composer-send.ts:342",
+        "desktop/src/react/components/input/composer-send.ts:365",
+        "desktop/src/react/components/input/composer-send.ts:393",
+        "desktop/src/react/components/preview/FloatingActions.tsx:322",
+        "desktop/src/react/utils/preview-file-content.ts:96",
+        "desktop/main.cjs:6030",
+        "desktop/file-text-io.cjs:1",
+        "desktop/src/react/utils/file-preview.ts:1"
+      ],
+      "source_refs": [
+        "desktop/preload.cjs:111",
+        "desktop/main.cjs:6023",
+        "desktop/src/react/utils/file-preview.ts:76",
+        "desktop/src/react/utils/preview-file-content.ts:103",
+        "desktop/src/react/utils/screenshot.ts:308",
+        "desktop/src/viewer-window-entry.tsx:46",
+        "desktop/src/viewer-window-entry.tsx:111",
+        "desktop/preload.cjs:113",
+        "desktop/main.cjs:6030",
+        "desktop/src/react/components/file-history/FileHistoryModal.tsx:69",
+        "desktop/src/react/components/preview/MarkdownChrome.tsx:228",
+        "desktop/src/react/components/preview/PreviewRenderer.tsx:266",
+        "desktop/src/react/components/preview/PreviewRenderer.tsx:293",
+        "desktop/src/react/components/preview/PreviewRenderer.tsx:529",
+        "desktop/src/react/utils/preview-file-content.ts:100",
+        "desktop/src/react/utils/screenshot.ts:303",
+        "desktop/preload.cjs:124",
+        "desktop/main.cjs:6189",
+        "desktop/src/react/MainContent.tsx:84",
+        "desktop/src/react/components/input/composer-send.ts:342",
+        "desktop/src/react/components/input/composer-send.ts:365",
+        "desktop/src/react/components/input/composer-send.ts:393",
+        "desktop/src/react/components/preview/FloatingActions.tsx:322",
+        "desktop/src/react/utils/preview-file-content.ts:96",
+        "desktop/main.cjs:6030",
+        "desktop/file-text-io.cjs:1",
+        "desktop/src/react/utils/file-preview.ts:1"
+      ],
+      "user_action": "经桌面桥读取本地文件",
+      "success_result": "文本读取返回文本，快照含版本，base64 读取返回不超过 20MB 的真实文件字节",
+      "refusal_or_boundary": "路径不是绝对路径、文件不存在或超出限制时返回 null/失败；只读操作不改磁盘",
+      "branch_variants": [
+        "文本",
+        "版本快照",
+        "base64"
+      ],
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R04-A07",
+          "fit": "INDIRECT",
+          "reason": "旧场景涉及此文件或权限边界，但没有逐项执行并核对本 IPC 的最终结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R04-A08",
+          "fit": "INDIRECT",
+          "reason": "旧场景涉及此文件或权限边界，但没有逐项执行并核对本 IPC 的最终结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A09",
+          "fit": "INDIRECT",
+          "reason": "旧场景涉及此文件或权限边界，但没有逐项执行并核对本 IPC 的最终结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A10",
+          "fit": "GAP",
+          "reason": "旧场景未操作此 IPC 结果，交 R00-T07 补场景",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "在隔离工作区准备合法文件、无效路径及失败条件",
+        "when": "经桌面桥读取本地文件",
+        "then": "文本读取返回文本，快照含版本，base64 读取返回不超过 20MB 的真实文件字节",
+        "assertions": [
+          "文本读取返回文本，快照含版本，base64 读取返回不超过 20MB 的真实文件字节",
+          "路径不是绝对路径、文件不存在或超出限制时返回 null/失败；只读操作不改磁盘"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "本机 Electron 现役行为；未来 Tauri 迁移场景未执行"
+      ],
+      "reviewed_source_sha256": {
+        "desktop/preload.cjs": "33bb30705f1cd2819cf08bf253f43b5b178711e8e3030b6eff6f7aabb290fcb2",
+        "desktop/main.cjs": "23445a3574a305d3404f63ab9f0fead079c6e1d43e7c3d4685440ef332438e55",
+        "desktop/src/react/utils/file-preview.ts": "6bb66dd379072a6f6059ce70784bde8046c3e11d89b5fd399bf5efbff57954c1",
+        "desktop/src/react/utils/preview-file-content.ts": "d6e4b16a4f138cfdb38bc407d292e524094102e1cdd35195595ef778429a4827",
+        "desktop/src/react/utils/screenshot.ts": "841104269b29f7143cfd61e72c6fee1b5483a632d2502ead9a2c0d671e6f251c",
+        "desktop/src/viewer-window-entry.tsx": "75fbef71cb848b6b62d3f222c557036994bbcc168e7cf2bc55c2ef1b77a47f6a",
+        "desktop/src/react/components/file-history/FileHistoryModal.tsx": "ba08f3f450f5d6317851bf25787ea77ab4fb1dc3888b4f9dae285bd01ad8c5df",
+        "desktop/src/react/components/preview/MarkdownChrome.tsx": "bebcf34630bf478655914f5f5711eb61d0a2c95685a6371803a3ea6f77714952",
+        "desktop/src/react/components/preview/PreviewRenderer.tsx": "be6837ce30ca30aef5ca559fc79c7fd16f00f9a55dc6fd1d5108c6f1759e05ad",
+        "desktop/src/react/MainContent.tsx": "c7248598e03b5d767b85632dc9ae08bf417a7d2497e8fa4cd95c906250749e0b",
+        "desktop/src/react/components/input/composer-send.ts": "a2055e31977ca0a1a5d39be40a0b5d57aa6799b9af614b5176b2d7a84737658f",
+        "desktop/src/react/components/preview/FloatingActions.tsx": "5841c02c3addf1ba4f872872f5ceeca5d83940913773475a3ef7c919f5009c4f",
+        "desktop/file-text-io.cjs": "7033d8a43a9c6e87f50d49a7aaae2ada1a42d2e1fb7031411425c70daa191651"
+      }
+    },
+    {
+      "original_feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-WRITE-LEGACY-D65090",
+      "entry_id": "desktop-behavior:file-write-legacy",
+      "kind": "desktop_behavior",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "经旧桌面桥写入文本",
+      "call_chain": [
+        "desktop/preload.cjs:112",
+        "desktop/main.cjs:6038",
+        "desktop/src/react/components/PreviewEditor.tsx:647",
+        "desktop/main.cjs:6036",
+        "desktop/src/react/components/PreviewEditor.tsx:1"
+      ],
+      "source_refs": [
+        "desktop/preload.cjs:112",
+        "desktop/main.cjs:6038",
+        "desktop/src/react/components/PreviewEditor.tsx:647",
+        "desktop/main.cjs:6036",
+        "desktop/src/react/components/PreviewEditor.tsx:1"
+      ],
+      "user_action": "经旧桌面桥写入文本",
+      "success_result": "有效绝对路径时 fs.writeFileSync 写入 UTF-8 内容并返回 true",
+      "refusal_or_boundary": "相对路径或写入失败返回 false；旧桥没有版本保护，外部改动可能被覆盖",
+      "branch_variants": [],
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R04-A07",
+          "fit": "INDIRECT",
+          "reason": "旧场景涉及此文件或权限边界，但没有逐项执行并核对本 IPC 的最终结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R04-A08",
+          "fit": "INDIRECT",
+          "reason": "旧场景涉及此文件或权限边界，但没有逐项执行并核对本 IPC 的最终结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A09",
+          "fit": "INDIRECT",
+          "reason": "旧场景涉及此文件或权限边界，但没有逐项执行并核对本 IPC 的最终结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A10",
+          "fit": "GAP",
+          "reason": "旧场景未操作此 IPC 结果，交 R00-T07 补场景",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "在隔离工作区准备合法文件、无效路径及失败条件",
+        "when": "经旧桌面桥写入文本",
+        "then": "有效绝对路径时 fs.writeFileSync 写入 UTF-8 内容并返回 true",
+        "assertions": [
+          "有效绝对路径时 fs.writeFileSync 写入 UTF-8 内容并返回 true",
+          "相对路径或写入失败返回 false；旧桥没有版本保护，外部改动可能被覆盖"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "本机 Electron 现役行为；未来 Tauri 迁移场景未执行"
+      ],
+      "reviewed_source_sha256": {
+        "desktop/preload.cjs": "33bb30705f1cd2819cf08bf253f43b5b178711e8e3030b6eff6f7aabb290fcb2",
+        "desktop/main.cjs": "23445a3574a305d3404f63ab9f0fead079c6e1d43e7c3d4685440ef332438e55",
+        "desktop/src/react/components/PreviewEditor.tsx": "059b3c44f1e2b28827fccc8f6ae71f8de8a0943be0593286c19f5d41e8d532b7"
+      }
+    },
+    {
+      "original_feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-WRITE-BINARY-45627E",
+      "entry_id": "desktop-behavior:file-write-binary",
+      "kind": "desktop_behavior",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "将二进制内容保存为本地文件",
+      "call_chain": [
+        "desktop/preload.cjs:115",
+        "desktop/main.cjs:6056",
+        "desktop/src/react/components/PreviewEditor.tsx:342",
+        "desktop/main.cjs:6056",
+        "desktop/src/react/utils/screenshot.ts:1"
+      ],
+      "source_refs": [
+        "desktop/preload.cjs:115",
+        "desktop/main.cjs:6056",
+        "desktop/src/react/components/PreviewEditor.tsx:342",
+        "desktop/main.cjs:6056",
+        "desktop/src/react/utils/screenshot.ts:1"
+      ],
+      "user_action": "将二进制内容保存为本地文件",
+      "success_result": "解码 base64 并写入目标文件；可展开 ~ 路径并创建父目录",
+      "refusal_or_boundary": "无路径、非绝对路径或写失败返回 false；不能把失败回包当作有效附件",
+      "branch_variants": [],
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R04-A07",
+          "fit": "INDIRECT",
+          "reason": "旧场景涉及此文件或权限边界，但没有逐项执行并核对本 IPC 的最终结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R04-A08",
+          "fit": "INDIRECT",
+          "reason": "旧场景涉及此文件或权限边界，但没有逐项执行并核对本 IPC 的最终结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A09",
+          "fit": "INDIRECT",
+          "reason": "旧场景涉及此文件或权限边界，但没有逐项执行并核对本 IPC 的最终结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A10",
+          "fit": "GAP",
+          "reason": "旧场景未操作此 IPC 结果，交 R00-T07 补场景",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "在隔离工作区准备合法文件、无效路径及失败条件",
+        "when": "将二进制内容保存为本地文件",
+        "then": "解码 base64 并写入目标文件；可展开 ~ 路径并创建父目录",
+        "assertions": [
+          "解码 base64 并写入目标文件；可展开 ~ 路径并创建父目录",
+          "无路径、非绝对路径或写失败返回 false；不能把失败回包当作有效附件"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "本机 Electron 现役行为；未来 Tauri 迁移场景未执行"
+      ],
+      "reviewed_source_sha256": {
+        "desktop/preload.cjs": "33bb30705f1cd2819cf08bf253f43b5b178711e8e3030b6eff6f7aabb290fcb2",
+        "desktop/main.cjs": "23445a3574a305d3404f63ab9f0fead079c6e1d43e7c3d4685440ef332438e55",
+        "desktop/src/react/components/PreviewEditor.tsx": "059b3c44f1e2b28827fccc8f6ae71f8de8a0943be0593286c19f5d41e8d532b7",
+        "desktop/src/react/utils/screenshot.ts": "841104269b29f7143cfd61e72c6fee1b5483a632d2502ead9a2c0d671e6f251c"
+      }
+    },
+    {
+      "original_feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-COPY-ADB6B0",
+      "entry_id": "desktop-behavior:file-copy",
+      "kind": "desktop_behavior",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "复制已有本地文件到目标路径",
+      "call_chain": [
+        "desktop/preload.cjs:116",
+        "desktop/main.cjs:6069",
+        "desktop/src/react/components/PreviewEditor.tsx:331",
+        "desktop/src/react/utils/markdown-cover-actions.ts:28",
+        "desktop/main.cjs:6069",
+        "desktop/src/react/utils/markdown-cover-actions.ts:1"
+      ],
+      "source_refs": [
+        "desktop/preload.cjs:116",
+        "desktop/main.cjs:6069",
+        "desktop/src/react/components/PreviewEditor.tsx:331",
+        "desktop/src/react/utils/markdown-cover-actions.ts:28",
+        "desktop/main.cjs:6069",
+        "desktop/src/react/utils/markdown-cover-actions.ts:1"
+      ],
+      "user_action": "复制已有本地文件到目标路径",
+      "success_result": "真实普通源文件复制到目标，源文件仍在",
+      "refusal_or_boundary": "相对路径、软链接、非普通文件或复制失败返回 false；目标不应伪称有效",
+      "branch_variants": [],
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R04-A07",
+          "fit": "INDIRECT",
+          "reason": "旧场景涉及此文件或权限边界，但没有逐项执行并核对本 IPC 的最终结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R04-A08",
+          "fit": "INDIRECT",
+          "reason": "旧场景涉及此文件或权限边界，但没有逐项执行并核对本 IPC 的最终结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A09",
+          "fit": "INDIRECT",
+          "reason": "旧场景涉及此文件或权限边界，但没有逐项执行并核对本 IPC 的最终结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A10",
+          "fit": "GAP",
+          "reason": "旧场景未操作此 IPC 结果，交 R00-T07 补场景",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "在隔离工作区准备合法文件、无效路径及失败条件",
+        "when": "复制已有本地文件到目标路径",
+        "then": "真实普通源文件复制到目标，源文件仍在",
+        "assertions": [
+          "真实普通源文件复制到目标，源文件仍在",
+          "相对路径、软链接、非普通文件或复制失败返回 false；目标不应伪称有效"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "本机 Electron 现役行为；未来 Tauri 迁移场景未执行"
+      ],
+      "reviewed_source_sha256": {
+        "desktop/preload.cjs": "33bb30705f1cd2819cf08bf253f43b5b178711e8e3030b6eff6f7aabb290fcb2",
+        "desktop/main.cjs": "23445a3574a305d3404f63ab9f0fead079c6e1d43e7c3d4685440ef332438e55",
+        "desktop/src/react/components/PreviewEditor.tsx": "059b3c44f1e2b28827fccc8f6ae71f8de8a0943be0593286c19f5d41e8d532b7",
+        "desktop/src/react/utils/markdown-cover-actions.ts": "45f7e0b4f1d6b8a8b7065b6857090270b858f0862dc67a1aa307495a028c2522"
+      }
+    },
+    {
+      "original_feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-EDIT-COMMAND-BDE3AC",
+      "entry_id": "desktop-behavior:edit-command",
+      "kind": "desktop_behavior",
+      "decision": "INDEPENDENT",
+      "semantic_identity": "使用桌面编辑菜单执行剪切、复制、粘贴或全选",
+      "call_chain": [
+        "desktop/preload.cjs:36",
+        "desktop/main.cjs:5396",
+        "desktop/src/react/components/InputContextMenu.tsx:204",
+        "desktop/src/react/components/InputContextMenu.tsx:229",
+        "desktop/src/react/components/InputContextMenu.tsx:241",
+        "desktop/src/react/components/InputContextMenu.tsx:248",
+        "desktop/src/react/components/InputContextMenu.tsx:254",
+        "desktop/src/react/components/InputContextMenu.tsx:264",
+        "desktop/src/react/components/preview/EditorContextMenu.tsx:238",
+        "desktop/src/react/components/preview/EditorContextMenu.tsx:305",
+        "desktop/main.cjs:5396",
+        "desktop/src/react/components/InputContextMenu.tsx:1"
+      ],
+      "source_refs": [
+        "desktop/preload.cjs:36",
+        "desktop/main.cjs:5396",
+        "desktop/src/react/components/InputContextMenu.tsx:204",
+        "desktop/src/react/components/InputContextMenu.tsx:229",
+        "desktop/src/react/components/InputContextMenu.tsx:241",
+        "desktop/src/react/components/InputContextMenu.tsx:248",
+        "desktop/src/react/components/InputContextMenu.tsx:254",
+        "desktop/src/react/components/InputContextMenu.tsx:264",
+        "desktop/src/react/components/preview/EditorContextMenu.tsx:238",
+        "desktop/src/react/components/preview/EditorContextMenu.tsx:305",
+        "desktop/main.cjs:5396",
+        "desktop/src/react/components/InputContextMenu.tsx:1"
+      ],
+      "user_action": "使用桌面编辑菜单执行剪切、复制、粘贴或全选",
+      "success_result": "只允许 cut/copy/paste/selectAll，并向当前 webContents 派发该命令",
+      "refusal_or_boundary": "任意其他命令抛 Unknown edit command；不能执行 shell 或未列出的系统操作",
+      "branch_variants": [
+        "cut",
+        "copy",
+        "paste",
+        "selectAll"
+      ],
+      "supported_feature_ids": [],
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "old_acceptance_relations": [
+        {
+          "id": "R04-A07",
+          "fit": "INDIRECT",
+          "reason": "旧场景涉及此文件或权限边界，但没有逐项执行并核对本 IPC 的最终结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R04-A08",
+          "fit": "INDIRECT",
+          "reason": "旧场景涉及此文件或权限边界，但没有逐项执行并核对本 IPC 的最终结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A09",
+          "fit": "INDIRECT",
+          "reason": "旧场景涉及此文件或权限边界，但没有逐项执行并核对本 IPC 的最终结果",
+          "covers_leaf_result": false
+        },
+        {
+          "id": "R06-A10",
+          "fit": "GAP",
+          "reason": "旧场景未操作此 IPC 结果，交 R00-T07 补场景",
+          "covers_leaf_result": false
+        }
+      ],
+      "scenario": {
+        "given": "在隔离工作区准备合法文件、无效路径及失败条件",
+        "when": "使用桌面编辑菜单执行剪切、复制、粘贴或全选",
+        "then": "只允许 cut/copy/paste/selectAll，并向当前 webContents 派发该命令",
+        "assertions": [
+          "只允许 cut/copy/paste/selectAll，并向当前 webContents 派发该命令",
+          "任意其他命令抛 Unknown edit command；不能执行 shell 或未列出的系统操作"
+        ]
+      },
+      "confidence": "SOURCE_REVIEWED_NOT_LIVE_MIGRATION",
+      "limitations": [
+        "本机 Electron 现役行为；未来 Tauri 迁移场景未执行"
+      ],
+      "reviewed_source_sha256": {
+        "desktop/preload.cjs": "33bb30705f1cd2819cf08bf253f43b5b178711e8e3030b6eff6f7aabb290fcb2",
+        "desktop/main.cjs": "23445a3574a305d3404f63ab9f0fead079c6e1d43e7c3d4685440ef332438e55",
+        "desktop/src/react/components/InputContextMenu.tsx": "117870379ebbce182302225ba5fdafbc35dc7beeded0ae62a55b416bc51dfd71",
+        "desktop/src/react/components/preview/EditorContextMenu.tsx": "0e7b21dee70dcfc66490a2fa394c4fb2682cd5d2edcb8403563b1f8a5c861c76"
+      }
+    }
+  ]
+}

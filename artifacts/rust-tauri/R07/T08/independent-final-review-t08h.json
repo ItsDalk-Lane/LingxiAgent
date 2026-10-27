@@ -1,0 +1,673 @@
+{
+  "kind": "INDEPENDENT_FINAL_REVIEW_T08H_LOCAL_IMPLEMENTATION_AND_APPLICABLE_GATES",
+  "createdAt": "2026-10-18T13:06:13.229330+00:00",
+  "decision": "ACCEPT_LOCAL_T08_IMPLEMENTATION_AND_RECORDED_APPLICABLE_GATES_WITH_EXPLICIT_OPEN_CLAUSES",
+  "newImplementationAuthorizationOrEvidenceBlockers": [],
+  "acceptanceScope": "允许按顺序进入T09；只接受本机T08实现与h完整20项适用门禁份额。不是109叶/343原断言全部PASS，不是最终R07，不关闭未直接输入的分支、其它OS、真实账号或最终统一回归。",
+  "binding": {
+    "results": "artifacts/rust-tauri/R07/T08/RESULTS_t08h.json",
+    "resultsSha256": "ca6866e8c7f8a4fcb39ed9da093e7117b463e5f33778665872bec03a63645b33",
+    "sourceFiles": 755,
+    "currentAtReviewMatchesFrozenH": true,
+    "sourceFingerprint": "f0dd4aa5092b31eb121c3977da8e65cbe2035ab3f4581b6c5898cf73f8da354e",
+    "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+    "manifestSha256": "dfed102c2fd8eff025c8c64df378fbf18ebb8b113ab10b338b171719f789c8aa",
+    "planSha256": "8d8cc95b5a16fd9c26c60e76ccf5391ac32e0c4ec3de10590cc249d9ad6ac7b8",
+    "archiveSha256": "ca8bee635a1b93fc0c49945a49f31b1f699c9b371d2857143ea809e94c2798bd",
+    "archiveEveryEntryMatchesManifest": true,
+    "runnerSha256": "27313b3d06c1996160e2dd6f8d74becb5dca23ddf9fc7bc442d70aa5eb8be813",
+    "verificationToolHashes": {
+      "run_gate_group.py": "3c56ff235f5b28edef5609888eb976f7c82e0e6d9e777b0c5f597bf70cfe049b",
+      "run_ui_bound.py": "77a507461d37c22e82fcc9941e4860b462e28d67288421c1ee276fddf3490134",
+      "verify_native_picker_binding.py": "199575b6bb86cb776d2ec61bfc09968664b2601f061103cbf6176071fc191eef",
+      "model_metadata_probe.mjs": "2a9a207f9087c6e5525fb15898005aabd5fa2132f13e65bca6f56d0ad6b74ffd"
+    },
+    "all20ReceiptsCommandsAndLogsMatch": true
+  },
+  "actualGateRecords": [
+    {
+      "gate": "fmt",
+      "actualExitCode": 0,
+      "receiptSha256": "84ddc7d041ba30e1e9ee8578c8bdd694d6667686735a7d86e0c0fb22ad21e23a",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sameFrozenSource": true,
+      "commandExactlyMatchesFrozenPlan": true
+    },
+    {
+      "gate": "diff",
+      "actualExitCode": 0,
+      "receiptSha256": "3f01f0cdf248b82e257b1251f86da56b54bdd4369c06809f5880cebf3d14eb46",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sameFrozenSource": true,
+      "commandExactlyMatchesFrozenPlan": true
+    },
+    {
+      "gate": "clippy",
+      "actualExitCode": 0,
+      "receiptSha256": "3f9824f085b9fade7e393f7763c66583316156a5a77584c50f4ec984519d8a9f",
+      "logSha256": "0b53209db424367e80c52cd8cde8b75e37af110438a0efde777104a1463956de",
+      "sameFrozenSource": true,
+      "commandExactlyMatchesFrozenPlan": true
+    },
+    {
+      "gate": "protocol",
+      "actualExitCode": 0,
+      "receiptSha256": "51e12929818c512ce981bb334ff0e6d69eba6a03620cd68150a81296bec9b94c",
+      "logSha256": "d4a1872efcdb40c349cfc97ae461e8b863d3b11bebd30fe9a18d2d8dad8ddad7",
+      "sameFrozenSource": true,
+      "commandExactlyMatchesFrozenPlan": true
+    },
+    {
+      "gate": "protocol-roundtrip",
+      "actualExitCode": 0,
+      "receiptSha256": "5738674e17121f10ff3f9b371f1bf0e71e552d1068eb0b5e69c77fe2a3212ff6",
+      "logSha256": "9c93319d25deb40dad43d081f033427d01a05098a49e5f5d205a2b0136872df7",
+      "sameFrozenSource": true,
+      "commandExactlyMatchesFrozenPlan": true
+    },
+    {
+      "gate": "protocol-tests",
+      "actualExitCode": 0,
+      "receiptSha256": "79014a33662dc4243e48b5ce97788e9505915df4f77b18fa9b15d0872d38716c",
+      "logSha256": "85dfb3e94712dafb143b9ae025eb2f567c3c8dd7476e7f43a26d8de60c385097",
+      "sameFrozenSource": true,
+      "commandExactlyMatchesFrozenPlan": true
+    },
+    {
+      "gate": "kernel",
+      "actualExitCode": 0,
+      "receiptSha256": "0b80520574fbb23d3516232f402256b73b5614bb1742ed67d07f996e6782b5b3",
+      "logSha256": "d6fcb7a2340095d05920d9c2e0f89d0f83653e038a59566866c86465002fe5ac",
+      "sameFrozenSource": true,
+      "commandExactlyMatchesFrozenPlan": true
+    },
+    {
+      "gate": "boundaries",
+      "actualExitCode": 0,
+      "receiptSha256": "85e769232d68de6278ec9fedbc1270f5ffd31134942a5a6075fcf996a0471e5e",
+      "logSha256": "1d972dd5cb804944f1b94e5be6773948dae69aa2a623d591ab7743b888cf8396",
+      "sameFrozenSource": true,
+      "commandExactlyMatchesFrozenPlan": true
+    },
+    {
+      "gate": "adapter",
+      "actualExitCode": 0,
+      "receiptSha256": "fc62d678a91e99028c36f827bdab32115521e668153bfd4abc7a44ea03394a60",
+      "logSha256": "7734969515236f18b06deb21eee797eecebe03adfa84494f1519c49e1a53eca3",
+      "sameFrozenSource": true,
+      "commandExactlyMatchesFrozenPlan": true
+    },
+    {
+      "gate": "service",
+      "actualExitCode": 0,
+      "receiptSha256": "8a93c8d0ac24c61a986c9827cee34f772362eaed04306119147c96898202a2dd",
+      "logSha256": "b58d4838796f89b57a18b4722c1c27ea3afe0e12f3c9da95b23dc7f9885387d8",
+      "sameFrozenSource": true,
+      "commandExactlyMatchesFrozenPlan": true
+    },
+    {
+      "gate": "model-regression",
+      "actualExitCode": 0,
+      "receiptSha256": "2200f133df2dd8b5557d3b54d704157aba475c540ce7b1402b1dbd09a4a385c3",
+      "logSha256": "7dd6b4aed605f8aa85c530443fdddfb06b1f0a1d54b2feb3ec1ac663a9935033",
+      "sameFrozenSource": true,
+      "commandExactlyMatchesFrozenPlan": true
+    },
+    {
+      "gate": "native-skills",
+      "actualExitCode": 0,
+      "receiptSha256": "df5c8afaccea983a103695c469c589030a7d8b602baf8e72235287bfd9d8a4e4",
+      "logSha256": "8be8dafb318849347c4431c56ca5bca4cd02bf53ce43034d4d9cd8a200bde8cc",
+      "sameFrozenSource": true,
+      "commandExactlyMatchesFrozenPlan": true
+    },
+    {
+      "gate": "native-picker-binding",
+      "actualExitCode": 0,
+      "receiptSha256": "56de0c3f12c71c2905572c75f0c5437a76412961d5ea7924006ea9c1a78344ae",
+      "logSha256": "475907d8a3308bddcb3977ff3e2cf2abd09976330a655f74c7413d57e7b401b0",
+      "sameFrozenSource": true,
+      "commandExactlyMatchesFrozenPlan": true
+    },
+    {
+      "gate": "skills-current",
+      "actualExitCode": 0,
+      "receiptSha256": "edca5c46e71efc47c31edd24ef8d46dcac6fe5b29cd179d0f9e776c7f7433857",
+      "logSha256": "758cda85bc8c4544d089d7b1ef491069858c48d9a40f2563124c67c3dada5bdb",
+      "sameFrozenSource": true,
+      "commandExactlyMatchesFrozenPlan": true
+    },
+    {
+      "gate": "build",
+      "actualExitCode": 0,
+      "receiptSha256": "94fe5dc5b50f9c4a08e619633c7a5924bfff16fbf2352b1acb1a3fb8bda5c651",
+      "logSha256": "b07c706d46d6f8ca69ef21e986a014bd1684eec7b325c2d8fd51c94dbf9e616c",
+      "sameFrozenSource": true,
+      "commandExactlyMatchesFrozenPlan": true
+    },
+    {
+      "gate": "ui",
+      "actualExitCode": 0,
+      "receiptSha256": "632c8bba48b8be9168ed274b4cd5101ef353fbc3da3f6efebb29cb6d256edc16",
+      "logSha256": "a7a69923a27e99d5c7df80c7c145a0a73d98914cb9fabd52881e01ca9e2a3a24",
+      "sameFrozenSource": true,
+      "commandExactlyMatchesFrozenPlan": true
+    },
+    {
+      "gate": "types",
+      "actualExitCode": 0,
+      "receiptSha256": "5c685156b0aae573867f1962285f831a0750281fdd433fe337472623872ccce3",
+      "logSha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "sameFrozenSource": true,
+      "commandExactlyMatchesFrozenPlan": true
+    },
+    {
+      "gate": "card-navigation-desktop",
+      "actualExitCode": 0,
+      "receiptSha256": "e1f89f954a259a1d75a9d6beaa4acbc7d55d09d9c345fb4c32865671dec1c05b",
+      "logSha256": "269bf246ccba030e78e46b72a6efbcb03237148b67c91462e974ffaf4cbc7b02",
+      "sameFrozenSource": true,
+      "commandExactlyMatchesFrozenPlan": true
+    },
+    {
+      "gate": "card-navigation-mobile",
+      "actualExitCode": 0,
+      "receiptSha256": "a1545694ee9b004af67fee53ffc1215ed8945bd0c00eac794553e8a0c9cfd0ab",
+      "logSha256": "0a00b0cf5809db3bc96a9adb8ee6cf6c8c321e03014267c1ccccd522ffdb46be",
+      "sameFrozenSource": true,
+      "commandExactlyMatchesFrozenPlan": true
+    },
+    {
+      "gate": "metadata-redaction-binary",
+      "actualExitCode": 0,
+      "receiptSha256": "93c94504539427e2b05dcc242503b847f8a4044e2f26e4ac3a131da5fae0a080",
+      "logSha256": "6446b2fd0ede781fbc9216abc0d140096c0e85916e6e6a43853d70bba8f9544a",
+      "sameFrozenSource": true,
+      "commandExactlyMatchesFrozenPlan": true
+    }
+  ],
+  "actualCounts": {
+    "protocol-roundtrip": {
+      "summaries": 5,
+      "passed": 44,
+      "failed": 0,
+      "ignored": 0
+    },
+    "protocol-tests": {
+      "summaries": 5,
+      "passed": 44,
+      "failed": 0,
+      "ignored": 0
+    },
+    "kernel": {
+      "summaries": 4,
+      "passed": 194,
+      "failed": 0,
+      "ignored": 0
+    },
+    "adapter": {
+      "summaries": 7,
+      "passed": 223,
+      "failed": 0,
+      "ignored": 13
+    },
+    "service": {
+      "summaries": 40,
+      "passed": 948,
+      "failed": 0,
+      "ignored": 0
+    },
+    "model-regression": {
+      "summaries": 11,
+      "passed": 156,
+      "failed": 0,
+      "ignored": 0
+    },
+    "native-skills": {
+      "summaries": 1,
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0
+    },
+    "skills-current": {
+      "summaries": 1,
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "countRules": "各命令数量不可简单相加成去重功能或原条款数；protocol-roundtrip与protocol-tests有重复。20项退出0不代表子项全部运行或所有平台通过。",
+  "ui": {
+    "namedJsonSha256": "6b1a1d584bc5def39361818b24e25931bfc82108baa256f4aa3667de69aeb074",
+    "actualFiles": 89,
+    "actualCases": 718,
+    "passed": 718,
+    "failed": 0,
+    "pendingOrSkipped": 0,
+    "limitation": "包含mock机制检查、真实Rust子进程页面检查、父Rust驱动真实Electron/原生检查等不同层次，不能统一称718次真实端到端操作。目录选择确实包括AccessTab，已据JSON核实。"
+  },
+  "formalBuildBindings": {
+    "serviceBinarySha256": "0aa124e8db5e2c791d2c568145e3b75a897df9ac988dbccb9ae01c7af0cdfb2b",
+    "fourPostBuildChecks": [
+      {
+        "gate": "ui",
+        "bindingSha256": "05081e0012ad8d0328b67db164d3ea18d13231627165a8da90363a0fe772a1c5",
+        "sameFormalBuildBeforeAfter": true,
+        "wrapperExitCode": 0
+      },
+      {
+        "gate": "card-navigation-desktop",
+        "bindingSha256": "910a753a7fa0e0e468a3dca3d8bbe760dc14c9843b4e1b08a1a10e7752271791",
+        "sameFormalBuildBeforeAfter": true,
+        "wrapperExitCode": 0
+      },
+      {
+        "gate": "card-navigation-mobile",
+        "bindingSha256": "fcab65875c86a1fd09eb94b9f6ae59f3a50fe5cffedce16de3d2a582d3c19f15",
+        "sameFormalBuildBeforeAfter": true,
+        "wrapperExitCode": 0
+      },
+      {
+        "gate": "metadata-redaction-binary",
+        "bindingSha256": "de7301a09e8ff3904ab7c5755fed98cca84d1cd0438008ae0ddb93220105f50c",
+        "sameFormalBuildBeforeAfter": true,
+        "wrapperExitCode": 0
+      }
+    ],
+    "preservedCopyReceiptSha256": "b4e968854f21549eb33bae69b1912573df9565447050d107568633aff3dfc77e",
+    "preservedCopySha256Matches": true,
+    "preservedCopyReadonly": true,
+    "scope": "全部是本候选实际正式build后的服务程序绑定，不借当前后继共享target。"
+  },
+  "nativePickerReuse": {
+    "proofSha256": "fae06d133d6ae40a1312376f8e796d18112d729df3c7d0e78e878dca074880b1",
+    "freshNativeSkillsBeforeBinding": true,
+    "nativeSourceClosureFiles": 35,
+    "closureAndLaunchEvidenceHashesMatch": true,
+    "nativeBinarySha256": "dd7582b9b59de8f4b3739a97309f10b4790e5e3167932e5b6fd4d15d3a125281",
+    "exactSameBytesAsActualManualOperation": true,
+    "cancelRawNull": true,
+    "readonlyWindowRejected": true,
+    "rawApplicationExitCode": "NOT_CAPTURED;测试NativeApp Drop已kill/wait，不推断应用exit0",
+    "scope": "h实际执行fresh native viewer并验证原人工操作的同字节产物与源码闭包；本命令未再次手动操作目录选择器，也不证明其他OS。"
+  },
+  "adapterNotRun": {
+    "passedInH": 223,
+    "ignoredInH": 13,
+    "namedOriginalLines": [
+      {
+        "line": 5,
+        "originalLine": "test browser::host::manual_capture::externally_restored_suspended_window_is_never_reaped_or_evicted ... ignored, 需要可见Chrome窗口，单独执行原生恢复与回收检查",
+        "hExecution": "IGNORED_NOT_RUN_NOT_PASS"
+      },
+      {
+        "line": 6,
+        "originalLine": "test browser::host::manual_capture::same_page_native_human_takeover_records_only_owned_target ... ignored, 需要显式提供证据目录，并在原生Chrome测试表单中手动输入",
+        "hExecution": "IGNORED_NOT_RUN_NOT_PASS"
+      },
+      {
+        "line": 7,
+        "originalLine": "test browser::host::pdf_lifecycle_tests::browser_revoke_cancels_matching_pdf_without_conflating_run_and_workspace_epochs ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "hExecution": "IGNORED_NOT_RUN_NOT_PASS"
+      },
+      {
+        "line": 8,
+        "originalLine": "test browser::host::pdf_lifecycle_tests::invalid_pdf_or_wrong_node_never_spawns_or_reserves_a_lease ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "hExecution": "IGNORED_NOT_RUN_NOT_PASS"
+      },
+      {
+        "line": 9,
+        "originalLine": "test browser::host::pdf_lifecycle_tests::pdf_cancel_startup_gap_unknown_keeps_late_owner_and_wrong_owner_cannot_clear_it ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "hExecution": "IGNORED_NOT_RUN_NOT_PASS"
+      },
+      {
+        "line": 10,
+        "originalLine": "test browser::host::pdf_lifecycle_tests::pdf_initialization_unknown_retains_scope_process_and_profile_until_retry ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "hExecution": "IGNORED_NOT_RUN_NOT_PASS"
+      },
+      {
+        "line": 11,
+        "originalLine": "test browser::host::startup_tests::auxiliary_initialization_unknown_preserves_profile_and_owner_until_retry ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "hExecution": "IGNORED_NOT_RUN_NOT_PASS"
+      },
+      {
+        "line": 12,
+        "originalLine": "test browser::host::startup_tests::cdp_preparation_failure_happens_before_any_real_spawn ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "hExecution": "IGNORED_NOT_RUN_NOT_PASS"
+      },
+      {
+        "line": 13,
+        "originalLine": "test browser::host::startup_tests::first_target_failure_keeps_actual_process_and_target_until_cleanup_retry ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "hExecution": "IGNORED_NOT_RUN_NOT_PASS"
+      },
+      {
+        "line": 14,
+        "originalLine": "test browser::host::startup_tests::forget_rechecks_late_startup_unknown_before_purging_profile ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "hExecution": "IGNORED_NOT_RUN_NOT_PASS"
+      },
+      {
+        "line": 15,
+        "originalLine": "test browser::host::startup_tests::live_initialization_failure_keeps_real_owner_until_cleanup_retry_confirms ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "hExecution": "IGNORED_NOT_RUN_NOT_PASS"
+      },
+      {
+        "line": 16,
+        "originalLine": "test browser::host::startup_tests::revoke_startup_timeout_preserves_late_unknown_live_until_same_epoch_retry ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "hExecution": "IGNORED_NOT_RUN_NOT_PASS"
+      },
+      {
+        "line": 17,
+        "originalLine": "test browser::host::startup_tests::revoke_waits_for_real_spawn_owner_registration_and_confirmed_reap ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "hExecution": "IGNORED_NOT_RUN_NOT_PASS"
+      }
+    ],
+    "scope": "这13项在h没有运行，不能计通过。T04/T05历史原候选的通过另列，未升级成h实际运行。",
+    "historicalCandidateEvidenceOnly": [
+      {
+        "receipt": "artifacts/rust-tauri/R07/T04/r7-native-startup-faults.json",
+        "receiptSha256": "e256e62ef28cdffe60dcec5c8ada0ac38f6e56b6e07b75c9d18045916e3159e8",
+        "logSha256": "62878d57bb7b2bf5b39d4b83847712c2594a1f5906bb157e0fb3da8e991ba4a5",
+        "candidate": "r7",
+        "exitCode": 0,
+        "hExecution": false
+      },
+      {
+        "receipt": "artifacts/rust-tauri/R07/T04/r7-native-visibility.json",
+        "receiptSha256": "b285185a72444c4a25c58ace608e55f92b9318def4d86c27967c1eeafa9be8c8",
+        "logSha256": "c550126e3922795956f29f216f1bc6c548670a24f26dec7c98032913f18e70cf",
+        "candidate": "r7",
+        "exitCode": 0,
+        "hExecution": false
+      },
+      {
+        "receipt": "artifacts/rust-tauri/R07/T04/a07-t05-local-native-handoff.json",
+        "receiptSha256": "125a3fdba91a877065a2decb300021c7542aecbdc43ffaf6a9d3c18ccc519e57",
+        "logSha256": "f81bb8c806c028448146eb9b7941c0762b7ad94c32ae273f4e0bf8ae030bbe51",
+        "candidate": "a07-t05-local",
+        "exitCode": 0,
+        "hExecution": false
+      },
+      {
+        "receipt": "artifacts/rust-tauri/R07/T05/t05c-pdf-chromium.json",
+        "receiptSha256": "215fa032e4d5bd0729083ceaddc36ee69a0acca4f0ac35be9c588b76254d4ac3",
+        "logSha256": "0a2c9ee3a87b82ca3e989eafcf790aa7c67dbe69908ff8bd4873946e3c9568f4",
+        "candidate": "t05c",
+        "exitCode": 0,
+        "hExecution": false
+      }
+    ],
+    "historicalBoundary": [
+      "T04 r7显式启动故障7项、窗口可见性1项以及后续a07-t05-local人工接管1项有独立原候选通过记录，原锁屏失败仍保留；非h重跑。",
+      "T05 t05c真实PDF专用7项通过；其adapter lib同样保留四项pdf_lifecycle ignored，不能用不同专用7项自动证明这四项具名分支已运行。",
+      "T07既有浏览器失败与最终T12需重跑的适用浏览器/PDF/人工检查仍留账；其他OS、真实远端机器未由这些本机材料验证。"
+    ]
+  },
+  "oldFindingsClosure": {
+    "gToHChangedFiles": [
+      "desktop/src/react/__tests__/settings/AccessTab.test.tsx",
+      "desktop/src/react/settings/__tests__/r06-settings-electron-main.cjs",
+      "rust/crates/lingxi-service/tests/r07_t08_interface_preferences.rs",
+      "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs",
+      "rust/crates/lingxi-service/tests/r07_t08_search_clear.rs"
+    ],
+    "productSourceChangedFromG": false,
+    "sourceReviewReferences": [
+      {
+        "path": "artifacts/rust-tauri/R07/T08/independent-prefreeze-review-t08g.json",
+        "sha256": "eaef4a567d2cc7b588c9142f1ca560350137aa0e9a99dfc14a0097470126fa0c"
+      },
+      {
+        "path": "artifacts/rust-tauri/R07/T08/independent-post-g-three-fixture-review1.json",
+        "sha256": "9abad75e8b9d06a1c15cd15b987c565cef91d9e2e59dac17758ac7fc6685aaf7"
+      },
+      {
+        "path": "artifacts/rust-tauri/R07/T08/independent-provider-negatives-mixed-search-review1.json",
+        "sha256": "9d08368b6bbdacbf334ae2a577561ebeabb0c1807a4da9fbe678ef75a5bf5fe5"
+      },
+      {
+        "path": "artifacts/rust-tauri/R07/T08/independent-interface-corrupt-fixture-scope-review1.json",
+        "sha256": "530ce5b65cbd525d63310381fa922087dd723af623d39124fb698ed7704bb0cb"
+      },
+      {
+        "path": "artifacts/rust-tauri/R07/T08/lan-layer-diagnosis-g2/independent-interpretation.json",
+        "sha256": "f5489e295a7ea47dd063e895f4e46a06c327e4ae0d0efdfc2d2e08246080f1cc"
+      }
+    ],
+    "actualHClosures": [
+      "原两个native输入前提对应真实原生设置目标14/14通过，原失败保留。",
+      "偏好坏输入单项及接口偏好4/4通过；停止无关Bridge后仍保真实HTTP/原子拒绝/最终退出，明确不证明损坏期间Bridge常驻。",
+      "AccessTab桌面sessions.write精确预期修正后10/10，手机权限未扩。",
+      "35品牌负例+原正例36/36，搜索原三例+新混合2例5/5，真实Source/runtime/记账断言保留。",
+      "真实当前设置容器8场景、跨连接四例、凭据/脱敏/资源清理/SDK/OAuth/session权限正式目标均在本h原命令执行。"
+    ],
+    "LAN": "h原r00管理完整目标1/1实际通过72.43秒；g原LAN20秒0字节失败、g1慢health、g2快速拒绝都保留并列。没有源码修复因果或系统裁决轨迹，不能称已根治LAN不稳定。",
+    "gFailedResultsStillPresentSha256": "7f3c7ee52f356a1b3a87314b4370366e254100ae4d94c823920287c13146974e",
+    "failureHistorySha256": "848207076daaccf352d499394cd3031684a0c4a892eaf3f0caf251c450e2260c"
+  },
+  "openClauseLedger": {
+    "preparationPath": "artifacts/rust-tauri/R07/T08/t08h-t12-clause-followup-preparation1.json",
+    "preparationSha256": "c8b93e2a963731961563351c78d6df748bee39c039ffd83f3462733e83ef1a9b",
+    "notAutomaticDeferralOrPass": true,
+    "mixedSearchNowActuallyCovered": [
+      "mixed_models_search_validation_failure_reads_both_sections_and_unchanged_runtime",
+      "mixed_models_search_projection_failure_keeps_applied_model_and_unapplied_search_after_restart"
+    ],
+    "remainingUiConsumerBranches": [
+      {
+        "originalID": "R00-T02-LA-0DDB5AA05072",
+        "assertionIndex": 2,
+        "unproven": [
+          "Panel真实安装服务拒绝→error未输入；无agent零写不是服务安装失败。"
+        ]
+      },
+      {
+        "originalID": "R00-T02-LA-0DDB5AA05072",
+        "assertionIndex": 3,
+        "unproven": [
+          "Panel toggle自身实际失败→乐观回滚未输入；Tab toggle403和Panel move404不是相同消费动作。"
+        ]
+      },
+      {
+        "originalID": "R00-T02-LA-F92121640419",
+        "assertionIndex": 3,
+        "unproven": [
+          "七槽直接组件case只断言7个widget；未逐槽UI保存→同Rust读回provider/id，Knowledge真实操作不是7槽UI逐一输入。"
+        ]
+      },
+      {
+        "originalID": "R00-T02-LA-F92121640419",
+        "assertionIndex": 4,
+        "unproven": [
+          "vision具体保存拒绝/重读失败显示未输入；helper spy与真HTTP分别证明。"
+        ]
+      },
+      {
+        "originalID": "R00-T02-LA-F92121640419",
+        "assertionIndex": 6,
+        "unproven": [
+          "image默认PUT拒绝保旧/error未直接输入；TTS同helper失败是共享代表。"
+        ]
+      },
+      {
+        "originalID": "R00-T02-LA-F92121640419",
+        "assertionIndex": 7,
+        "unproven": [
+          "video独立默认PUT拒绝/首GET失败显示未直接输入。"
+        ]
+      },
+      {
+        "originalID": "R00-T02-LA-F92121640419",
+        "assertionIndex": 9,
+        "unproven": [
+          "ASR默认PUT拒绝/首GET失败显示未在该成功case输入。"
+        ]
+      },
+      {
+        "originalID": "R00-T02-LA-F92121640419",
+        "assertionIndex": 10,
+        "unproven": [
+          "ASR开关独立PUT拒绝/error未输入；不新增原文未承诺的回滚要求。"
+        ]
+      },
+      {
+        "originalID": "R00-T02-LA-D50161CE274A",
+        "assertionIndex": 3,
+        "unproven": [
+          "自定义provider空name/URL表单错误未定位g具名；APIkey preset setup不是自定义空表单。"
+        ]
+      },
+      {
+        "originalID": "R00-T02-LA-D50161CE274A",
+        "assertionIndex": 4,
+        "unproven": [
+          "删除已成功后重读失败未在真实页面直接输入；BaseURL更新不写成删除也实跑。"
+        ]
+      },
+      {
+        "originalID": "R00-T02-LA-D50161CE274A",
+        "assertionIndex": 5,
+        "unproven": [
+          "Header输入控件实际修改保存未定位g UI动作；后端headers null/credential消费为独立真handler。"
+        ]
+      },
+      {
+        "originalID": "R00-T02-LA-99F8CD228733",
+        "assertionIndex": 3,
+        "unproven": [
+          "无本机路径上传只有mock组件合同；真实上传→Rust落文件链不在该live。"
+        ]
+      },
+      {
+        "originalID": "R00-T02-LA-99F8CD228733",
+        "assertionIndex": 4,
+        "unproven": [
+          "Tab删除按钮自身服务拒绝后提示未在live输入，后端删除拒绝/Panel删除是不同事实。"
+        ]
+      },
+      {
+        "originalID": "R00-T02-LA-99F8CD228733",
+        "assertionIndex": 7,
+        "unproven": [
+          "live目录操作是取消/添加成功；页面移除路径、PUT成功后重载失败提示未输入。"
+        ]
+      },
+      {
+        "originalID": "R00-T02-LA-99F8CD228733",
+        "assertionIndex": 8,
+        "unproven": [
+          "live line50只点learnCreate/enabled总开关，allow_github_fetch/safety_review的风险确认取消/保存未点。",
+          "本能力组保存后重读失败未输入；BaseURL真实刷新失败是共享调用者代表。"
+        ]
+      },
+      {
+        "originalID": "R00-T02-LA-99F8CD228733",
+        "assertionIndex": 9,
+        "unproven": [
+          "goal/autolearn各自GET失败保持undefined未加载无此页面具名输入。"
+        ]
+      },
+      {
+        "originalID": "R00-T02-LA-99F8CD228733",
+        "assertionIndex": 10,
+        "unproven": [
+          "goal/autolearn各自PUT失败回滚/error未输入；live47–48仅两次成功PUT200。"
+        ]
+      }
+    ],
+    "otherNarrowNegatives": [
+      {
+        "originalID": "R00-T02-LA-43DDCE21A45C",
+        "originalAssertionIndex": 4,
+        "originalText": "本地Ollama未启动、模型未拉取或端点不通时明确失败；不要求API Key。",
+        "providerIdentity": "ollama",
+        "gActuallyCoveredSharedHandlerOrConsumerScope": [
+          "g此identity无key实际正例；通用错误/其它identity未知模型是代表。"
+        ],
+        "specificUnprovenCondition": [
+          "原句Ollama未启动/未拉取/端点不通没有此identity直接失败输入；不能换成要求无key拒绝。"
+        ],
+        "hAddedCoverageNotAssumed": "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::builtin_ollama_rejects_invalid_requests",
+        "disposition": "T12_NARROW_NEGATIVE_RECHECK_NOT_IMPLEMENTATION_BUG",
+        "status": "WAITING_H_RESULTS_AND_EXPLICIT_SCOPE_REVIEW",
+        "isKnownProductFailure": false
+      },
+      {
+        "originalID": "R00-T02-LA-ABAC28922F7A",
+        "originalAssertionIndex": 4,
+        "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。 auth.json键为openai-codex，缺登录时不可借其他OpenAI API Key。",
+        "providerIdentity": "openai-codex-oauth",
+        "gActuallyCoveredSharedHandlerOrConsumerScope": [
+          "g未登录标记+未登记not-logged-in-model拒绝；真实Codex alias/PKCE和UI的PKCE/xai device、summary/私密落盘/logout已有。",
+          "通用c07缺登录fixture只代表机制，不是该identity有效模型缺登录。"
+        ],
+        "specificUnprovenCondition": [
+          "该identity有效已登记模型只缺自己OAuth的隔离负例未输入；g未登录与未登记模型同时存在。",
+          "该identity空模型选择未直接输入。"
+        ],
+        "hAddedCoverageNotAssumed": null,
+        "disposition": "T12_NARROW_NEGATIVE_RECHECK_NOT_IMPLEMENTATION_BUG",
+        "status": "WAITING_H_RESULTS_AND_EXPLICIT_SCOPE_REVIEW",
+        "isKnownProductFailure": false
+      },
+      {
+        "originalID": "R00-T02-LA-A9ACB7418FC4",
+        "originalAssertionIndex": 4,
+        "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。 BigASR为独立语音凭证与协议，不可拿Ark聊天凭证替代。",
+        "providerIdentity": "volcengine-speech",
+        "gActuallyCoveredSharedHandlerOrConsumerScope": [
+          "真实HTTP→原Operation BigASR独立key/header/WAV、转写/ledger；generic probe unavailable。"
+        ],
+        "specificUnprovenCondition": [
+          "专用speech key缺失且不能借Ark key、空模型/不支持能力没有在此成功typed场景输入。"
+        ],
+        "hAddedCoverageNotAssumed": null,
+        "disposition": "T12_NARROW_NEGATIVE_RECHECK_NOT_IMPLEMENTATION_BUG",
+        "status": "WAITING_H_RESULTS_AND_EXPLICIT_SCOPE_REVIEW",
+        "isKnownProductFailure": false
+      },
+      {
+        "originalID": "R00-T02-LA-3D8337A8088F",
+        "originalAssertionIndex": 4,
+        "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。 OAuth资源URL仅允许指定HTTPS来源，不能改成任意主机。",
+        "providerIdentity": "xai-oauth",
+        "gActuallyCoveredSharedHandlerOrConsumerScope": [
+          "g未登录标记+未登记not-logged-in-model拒绝；真实Codex alias/PKCE和UI的PKCE/xai device、summary/私密落盘/logout已有。",
+          "通用c07缺登录fixture只代表机制，不是该identity有效模型缺登录。"
+        ],
+        "specificUnprovenCondition": [
+          "该identity有效已登记模型只缺自己OAuth的隔离负例未输入；g未登录与未登记模型同时存在。",
+          "该identity空模型选择未直接输入。",
+          "xai资源URL非允许主机/非HTTPS专用g断言未定位；通用redirect不是精确allowlist。"
+        ],
+        "hAddedCoverageNotAssumed": null,
+        "disposition": "T12_NARROW_NEGATIVE_RECHECK_NOT_IMPLEMENTATION_BUG",
+        "status": "WAITING_H_RESULTS_AND_EXPLICIT_SCOPE_REVIEW",
+        "isKnownProductFailure": false
+      }
+    ],
+    "specConflict": {
+      "originalID": "R00-T02-LA-9194C0F0D909",
+      "originalAssertionIndex": 3,
+      "originalText": "仅宣称源码登记的聊天模型能力",
+      "specificIssue": "原chat-only文字与既有imageGeneration runtime=minimax/lane=minimax-token-plan矛盾；保原文/原能力，不因声明或负例通过自动消掉。",
+      "disposition": "T12_SPEC_CONFLICT_EXPLICIT_REVIEW",
+      "isKnownProductFailure": false,
+      "status": "SPEC_CONFLICT_RETAINED"
+    },
+    "status": "这些项没有证据就继续未验，最终T12按原ID逐项核算；不从718或948套件通过推导原343条全通过。"
+  },
+  "externalBoundaries": [
+    "真实账号、付费供应商、实物手机、其它OS、正式安装包未验；最迟R10外部边界及最终T12清账按用户计划保留。",
+    "旧独立SSE明确未实现/拒绝，不拿Streamable HTTP通过代替；扩展完整生命周期按T11责任。",
+    "Tauri资源壳不宣称完整聊天/设置宿主，现役设置React/Electron入口实际接Rust有具体具名证据。",
+    "Apps launch返回描述及资源binding不等于调用工具；不虚构原清单外入口。"
+  ],
+  "reviewActions": {
+    "cargoOrGatesExecuted": false,
+    "sourceTestsProtocolsPlansToolsOrResultsModified": false,
+    "newIndependentArtifactOnly": true,
+    "commitOrPush": false
+  },
+  "fullOriginal343AssertionsPass": false,
+  "finalR07Acceptance": false
+}

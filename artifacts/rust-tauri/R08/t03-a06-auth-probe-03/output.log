@@ -1,0 +1,5 @@
+PASS token-shape :: local-token.json token matches desktop regex shape (len=32)
+FAIL p1-missing-credential :: GET identity no-auth via LAN -> 0 fetch error: The operation was aborted due to timeout
+FAIL p2-loopback-token-refused-on-lan :: GET identity Bearer loopback-token via LAN -> 0 fetch error: The operation was aborted due to timeout
+PASS p3-desktop-regex-rejects-device-secret :: desktop token regex rejects device secret sample "hana_dev_AAAAAAA..."
+verdict=probe-unexpected checks=4 failed=2

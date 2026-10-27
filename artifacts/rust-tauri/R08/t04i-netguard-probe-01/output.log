@@ -1,0 +1,20 @@
+node: v24.16.0
+agent.prototype.createConnection === net.createConnection (before patch): false
+agent.prototype.createConnection sees patch after patch: false
+file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t04_netguard_probe.mjs:22
+net.createConnection = function patched() { throw new Error('PROBE_PATCH_MARKER'); };
+                                                  ^
+
+Error: PROBE_PATCH_MARKER
+    at Object.patched [as createConnection] (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t04_netguard_probe.mjs:22:51)
+    at Agent.createConnection (node:_http_agent:240:16)
+    at Agent.createSocket (node:_http_agent:399:26)
+    at Agent.addRequest (node:_http_agent:339:10)
+    at new ClientRequest (node:_http_client:406:16)
+    at Object.request (node:http:108:10)
+    at verdict (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t04_netguard_probe.mjs:24:20)
+    at new Promise (<anonymous>)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t04_netguard_probe.mjs:23:23
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+
+Node.js v24.16.0

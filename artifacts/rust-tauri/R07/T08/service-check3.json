@@ -1,0 +1,31 @@
+{
+  "label": "service-check3",
+  "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "check",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-service",
+    "--all-targets"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-18T04:12:16.325422+00:00",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "4fa9cf64cfc2c9fb001d1e86aaa2cdfc8c94cdce6039bd554d24590a4f127b62",
+  "finalAcceptance": false,
+  "exitCode": 101,
+  "endedAt": "2026-10-18T04:12:49.443886+00:00",
+  "sourceFingerprintAfter": "4fa9cf64cfc2c9fb001d1e86aaa2cdfc8c94cdce6039bd554d24590a4f127b62",
+  "log": "artifacts/rust-tauri/R07/T08/service-check3.log",
+  "logSha256": "51965f51f623c052734c2610b5e846f3cb428db312c621931dafaa9ffb2d3a66",
+  "sourceUnchanged": true
+}

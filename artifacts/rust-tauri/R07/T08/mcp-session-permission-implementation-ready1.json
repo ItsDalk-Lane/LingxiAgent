@@ -1,0 +1,132 @@
+{
+  "schema": "r07-t08-mcp-session-permission-ready-v1",
+  "recordedAt": "2026-10-18T10:46:13.840636+00:00",
+  "status": "IMPLEMENTED_WAITING_ROOT_ONLY_RUST_COMPILE_AND_PROTOCOL_GENERATION",
+  "originalID": "R00-T02-LA-67256417FB2B",
+  "semantic": "本会话余期的唯一MCP target+exact capability可跨参数重复使用；不是固定digest、不是一次使用预算，不持久化。单次ApprovalService grant_preauthorization保持原语义不变。",
+  "productChain": [
+    "精确POST /lingxi/v1/mcp/session-permissions，统一McpSessionPermissionRequest/Response严格字段，sessions.write+真实存在/所有权/active会话。",
+    "设备scope实际签发链：LOCAL_OWNER_SCOPES、management desktop profile与共享DESKTOP_REMOTE_ACCESS_SCOPES加sessions.write，既有device凭证不扩权，mobile默认不变；配对必须显式批准scope。",
+    "真实目录读取target origin/availability/permission，匹配capability并派生同manager review scope，绑定唯一target generation和原凭证，防同名跨connector及重装复活。",
+    "gateway纯内存4096上限会话授权；同一请求幂等，弱持auth/management/storage，原身份撤销/过期失效。",
+    "只有sessions真实前台execute设置foreground_mcp_session_permissions；默认、background、subagent和workflow为false，模型没有该字段入口。",
+    "仅MCP UserSession Ask NeedsApproval可由此授权变Allowed；Denied/read_only/自动化/bridge/子代理不被扩大。",
+    "prepared记录冻结所用grant编号，派发前真实数据库核对会话且重新核凭证；DB await后再次核目录generation与真实review scope。",
+    "SessionAdmin既有reclaim_context清会话授权，覆盖关闭归档/恢复/删除/子会话；服务统一begin_background_shutdown清空并封闭表；同home新bootstrap无授权恢复。",
+    "现役RustSessionReviewPanel根据真实approvals输出capability显示按钮，先真实grant再原approval确认；连接/会话切换守卫，回执匹配验证，已授权但确认失败如实显示部分结果。Node旧审批组件与通路未替换。"
+  ],
+  "ownedReadySources": {
+    "rust/crates/lingxi-service/src/mcp_session_permissions.rs": "cf98acb8d62c1e6876b0b0722e77ab084e9776ae32f3c9fb79cc46805ace35cc",
+    "rust/crates/lingxi-service/src/toolgateway.rs": "80ce29045a3ce6fa321b3bd88311b3727a4ebd98009136e40de505e984d3c49d",
+    "rust/crates/lingxi-service/src/runs.rs": "bb0ddfe8329b01ba2a45c7850f3c7bb28170c146a04fb0e8b34980d9eead998b",
+    "rust/crates/lingxi-service/src/sessions.rs": "41306327eebc0a5e43e9c74aa6740e14de7e16610a290b8cf6e7673b2a9c622e",
+    "rust/crates/lingxi-service/src/sessiontools.rs": "6ac49c6f272b1d40d1117b941c33274f3a1ebddaa52663eb69a60eddb8456500",
+    "rust/crates/lingxi-service/src/session_admin.rs": "d2e7cb8b33f4c794f5b1a9a6751678af03737353ca9588c3f84270a1f8292868",
+    "rust/crates/lingxi-service/src/auth.rs": "1c748aa64b6f43d1d6ad79692154489a8593d1f9e3fb6445f7cb91176f3294bd",
+    "rust/crates/lingxi-service/src/management.rs": "8b1acbed4fdccc54bf36dcdadb1795fd73c44b19351f6d52945dcff932d12875",
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_session_permissions.rs": "9cbdd38363d401a620f5d3fc2bf18b5129a2dd4b5fce0131ab7fff1d5e15b4b4",
+    "rust/crates/lingxi-service/tests/r04_t02_tool_gateway.rs": "603ba70627efd81e1d232da529d378718c7057c162c40cbbae4e69f814c00112",
+    "rust/crates/lingxi-service/tests/r05_t07_usage_trace.rs": "b4ce6ff2d0d429b39669dc5b0d2678ed81f8a1db5ccc5d410b82c7cc064b7d3e",
+    "rust/crates/lingxi-protocol/src/mcp_session_permissions.rs": "ef7254af2e9db0bb7045306a3113f7e080bceccb23be9fc03a59ca56b9f1dcf1",
+    "shared/access-scope-profiles.ts": "9adfedf7c5c4dd7cd771b0ff8c25885ff074df82046fce79e2cdd55917e62a6f",
+    "desktop/src/react/services/mcp-session-permissions.ts": "2a11b5f14285d580b0db2e85000a6e7c86d97645e949fb3b3acf2e1593b34d84",
+    "desktop/src/react/components/session/RustSessionReviewPanel.tsx": "d57dc1e9b07122569c8eade345c30e9090468a39eb91b635101d838dedee4535",
+    "desktop/src/react/__tests__/components/rust-mcp-session-permissions.test.tsx": "52c098266d5352ab99e4cffc9e0aa955609c0eed926acbc0140c42b9257ebdf1"
+  },
+  "sharedRegistrations": [
+    "service lib新增module+router merge、attach_mcp_gateway、统一shutdown清表；依MCP作者约定加attach_network(deps.network_plane.as_ref())。",
+    "auth精确GET /lingxi/v1/mcp/oauth/callback Public仅供MCP作者单次state callback，其他MCP路径不公开。",
+    "subagents.rs/workflow.rs显式DriveAuthorization字面量仅新增foreground_mcp_session_permissions:false。",
+    "protocol lib/gen/verify已注册两类DTO与2golden样本，交MCP作者继续注册其DTO；根统一generate，不手写生成文件。"
+  ],
+  "checksExecuted": [
+    {
+      "command": [
+        "npx",
+        "vitest",
+        "run",
+        "desktop/src/react/__tests__/components/rust-mcp-session-permissions.test.tsx",
+        "--maxWorkers=1"
+      ],
+      "exitCode": 0,
+      "evidence": "mcp-session-ui1.json",
+      "logSha256": "fb36a2f4c546d042a0f594697d98cb81e21126a5a06d7ae827e9c29603eaf26a",
+      "result": "6 passed; 1 suite; mocked HTTP"
+    },
+    {
+      "command": [
+        "/Users/study_superior/.cargo/bin/rustfmt",
+        "--edition",
+        "2024",
+        "--config",
+        "skip_children=true",
+        "8 owned Rust files listed in commentary"
+      ],
+      "exitCode": 0,
+      "result": "解析/格式化成功，仅源语法检查；没有编译、执行或测试证明"
+    }
+  ],
+  "necessaryRootChecks": [
+    {
+      "command": "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r07_t08_mcp_session_permissions -- --nocapture",
+      "status": "NOT_RUN",
+      "note": "根唯一Cargo；当前MCP作者仍修改同库，等待整合停稳。"
+    },
+    {
+      "test": "paired_scope_grants_same_session_exact_capability_across_arguments_without_persisting",
+      "status": "NOT_RUN",
+      "assertions": [
+        "正式HTTP配对获chat+sessions.write设备，非owner bypass",
+        "真实pending→grant→approve后实际MCP调用",
+        "同会话alpha不同参数第二次不再待批",
+        "不同会话和beta仍须批准，拒绝零派发",
+        "真实后台用户受理不能消费前台会话grant",
+        "MCP配置原字节不变"
+      ]
+    },
+    {
+      "test": "missing_scope_foreign_session_and_damaged_payload_never_grant_and_connector_restart_invalidates",
+      "status": "NOT_RUN",
+      "assertions": [
+        "chat-only403/外人403/无会话404/错误能力403",
+        "null/夹带principal/空白标识400",
+        "归档409且恢复不复活旧授权",
+        "connector stop/start旧generation不复活授权",
+        "外端调用文件保持空"
+      ]
+    },
+    {
+      "test": "credential_revocation_and_same_home_real_restart_do_not_restore_temporary_grants",
+      "status": "NOT_RUN",
+      "assertions": [
+        "实际凭证撤销401",
+        "新凭证同用户不继承旧授权",
+        "同home真实stop/bootstrap旧授权不恢复",
+        "真实MCP子进程PID退出与存储close"
+      ]
+    },
+    {
+      "command": "root protocol generation + protocol verify/roundtrip + frontend typecheck",
+      "status": "NOT_RUN",
+      "note": "新generated TS需根generate后检查，不用手写临时类型冒充统一协议。"
+    },
+    {
+      "command": "root relevant gateway/approval/session lifecycle regression and immutable candidate gates",
+      "status": "NOT_RUN"
+    }
+  ],
+  "appToolsBoundary": {
+    "originalID": "R00-T02-LA-15AD6ED13B4D",
+    "executionStageIds": [
+      "R04"
+    ],
+    "partOfInherited35OrR07_408": false,
+    "observed": "旧launchApp仅返回mcp_app descriptor/binding/launchInput；旧app-tools/call仅带arguments，无session/agent，Node直接client.callTool。现役desktop未发现callToolUrl/mcp_app消费者。",
+    "decision": "根已撤回本轮顺带新增固定Run app-tools入口的要求。未创造sessionId契约或应用会话；MCP作者六叶工作不将descriptor计为实际工具调用。"
+  },
+  "limits": [
+    "未运行Cargo、真实Rust新场景或生成器；不领Rust通过，不改原叶/失败最终状态。",
+    "root唯一后续编译有精确失败再修；本轮产品停更并释放并行位。",
+    "无提交、推送、真实账号或对外发送。"
+  ]
+}

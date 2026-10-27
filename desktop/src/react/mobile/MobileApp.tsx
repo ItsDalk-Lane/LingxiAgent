@@ -14,10 +14,12 @@ import { useStore } from '../stores';
 import { createNewSession, reconcileCurrentSessionMessages } from '../stores/session-actions';
 import {
   initializeMobileRuntime,
+  invalidateMobileRuntime,
   loadMobileSessions,
   readMobileAuthSession,
   type MobilePrincipal,
 } from './mobile-init';
+import { usePlatform } from '../hooks/use-platform';
 
 type AuthState = 'checking' | 'login' | 'ready';
 type LoginMode = 'device' | 'password';
@@ -48,7 +50,9 @@ type MobileEdgeGesture = {
 };
 
 export function MobileApp(): React.ReactElement {
+  const authRevision = useRef(0);
   const [authState, setAuthState] = useState<AuthState>('checking');
+  const [authBackend, setAuthBackend] = useState<'node' | 'rust' | null>(null);
   const [principal, setPrincipal] = useState<MobilePrincipal | null>(null);
   const [loginMode, setLoginMode] = useState<LoginMode>('device');
   const [loginSecret, setLoginSecret] = useState('');
@@ -58,20 +62,30 @@ export function MobileApp(): React.ReactElement {
   const [mobileUpdateAvailable, setMobileUpdateAvailable] = useState(() => window.__hanaMobileUpdateAvailable === true);
 
   const bootstrap = useCallback(async () => {
+    const revision = ++authRevision.current;
+    const isCurrent = () => authRevision.current === revision;
     await ensureMobileAuthLocale();
+    if (!isCurrent()) return;
     const session = await readMobileAuthSession();
+    if (!isCurrent()) return;
+    setAuthBackend(session.backend);
     if (!session.authenticated || !session.principal) {
       setAuthState('login');
       return;
     }
     if (!principalHasRequiredScopes(session.principal, MOBILE_REQUIRED_SCOPES)) {
-      await apiJson('/api/web-auth/logout', { method: 'POST' }).catch(() => null);
+      await apiJson(session.backend === 'rust'
+        ? '/lingxi/v1/web-auth/logout'
+        : '/api/web-auth/logout', { method: 'POST' }).catch(() => null);
+      if (!isCurrent()) return;
+      invalidateMobileRuntime();
       setPrincipal(null);
       setLoginError((window.t ?? ((p: string) => p))('mobile.auth.scopeError'));
       setAuthState('login');
       return;
     }
-    await initializeMobileRuntime(session.principal);
+    await initializeMobileRuntime(session.principal, session.backend, { isCurrent });
+    if (!isCurrent()) return;
     setPrincipal(session.principal);
     setAuthState('ready');
   }, []);
@@ -80,10 +94,15 @@ export function MobileApp(): React.ReactElement {
     let cancelled = false;
     bootstrap().catch((err) => {
       console.warn('[mobile] bootstrap failed', err);
-      if (!cancelled) setAuthState('login');
+      if (!cancelled) {
+        setLoginError(err instanceof Error ? err.message : String(err));
+        setAuthState('login');
+      }
     });
     return () => {
       cancelled = true;
+      authRevision.current++;
+      invalidateMobileRuntime();
     };
   }, [bootstrap]);
 
@@ -103,19 +122,29 @@ export function MobileApp(): React.ReactElement {
 
   const login = async (event: React.FormEvent) => {
     event.preventDefault();
+    const revision = ++authRevision.current;
+    let activeRevision = revision;
+    invalidateMobileRuntime();
     setLoginError(null);
     try {
+      if (!authBackend) throw new Error('mobile server identity could not be verified');
       const body = loginMode === 'device'
         ? { credential: loginSecret.trim() }
         : { username: loginUsername.trim(), password: loginPassword };
-      await apiJson('/api/web-auth/login', {
+      await apiJson(authBackend === 'rust'
+        ? '/lingxi/v1/web-auth/login'
+        : '/api/web-auth/login', {
         method: 'POST',
-        body: JSON.stringify(body),
+        body: JSON.stringify(authBackend === 'rust' ? { ...body, clientKind: 'mobile' } : body),
       });
+      if (authRevision.current !== revision) return;
       setLoginSecret('');
       setLoginPassword('');
-      await bootstrap();
+      const initializing = bootstrap();
+      activeRevision = authRevision.current;
+      await initializing;
     } catch (err) {
+      if (authRevision.current !== activeRevision) return;
       setLoginError(err instanceof Error ? err.message : (window.t ?? ((p: string) => p))('mobile.auth.loginFailed'));
     }
   };
@@ -190,7 +219,7 @@ function MobileDesktopShell({
   }, [isNarrow]);
 
   useEffect(() => {
-    const unsubscribe = window.platform?.onOpenSettingsModal?.((tab?: string) => {
+    const unsubscribe = usePlatform()?.onOpenSettingsModal?.((tab?: string) => {
       openSettingsModal(tab);
     });
     return typeof unsubscribe === 'function' ? unsubscribe : undefined;

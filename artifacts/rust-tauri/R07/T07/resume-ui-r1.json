@@ -1,0 +1,20 @@
+{
+  "purpose": "T07接续前端定向开发验证",
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "desktop/src/react/__tests__/services/rust-workbench.test.ts",
+    "desktop/src/react/__tests__/services/resource-events.test.ts",
+    "desktop/src/react/__tests__/services/app-event-actions.test.ts",
+    "desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts",
+    "desktop/src/react/__tests__/services/rust-automation.test.ts",
+    "desktop/src/react/__tests__/services/websocket.test.ts",
+    "desktop/src/react/__tests__/services/ws-message-handler.test.ts",
+    "--maxWorkers=2"
+  ],
+  "exitCode": 1,
+  "log": "artifacts/rust-tauri/R07/T07/resume-ui-r1.log",
+  "logSha256": "cc0d7366a2145314097ac2cde93ec652817a285742670429c3376f7da01b7ecf",
+  "time": "2026-10-18T01:14:48.251639+00:00"
+}

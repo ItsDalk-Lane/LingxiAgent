@@ -1,0 +1,32 @@
+{
+  "label": "t12-xtask-units1",
+  "stage": "R07-T09",
+  "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+  "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "-p",
+    "xtask"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "PATH": "/Users/study_superior/.cargo/bin:/Users/study_superior/Desktop/Code/LingxiAgent/.venv/bin:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/share/dotnet:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/Users/study_superior/.lmstudio/bin:/Users/study_superior/.lmstudio/bin",
+    "CARGO_TARGET_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target-r07",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/",
+    "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib"
+  },
+  "startedAt": "2026-10-19T07:55:35.165760+00:00",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "525436e5a9c8b151c5c2afc50a8784527ffc52acb10162c4e1e1cad9b6ee779b",
+  "finalAcceptance": false,
+  "exitCode": 0,
+  "endedAt": "2026-10-19T07:55:53.173304+00:00",
+  "sourceFingerprintAfter": "525436e5a9c8b151c5c2afc50a8784527ffc52acb10162c4e1e1cad9b6ee779b",
+  "log": "artifacts/rust-tauri/R07/T09/t12-xtask-units1.log",
+  "logSha256": "e4950f8b36f5f38622aae44ffe65f9aefbebb074aa7a011d945ff2e342354337",
+  "sourceUnchanged": true
+}

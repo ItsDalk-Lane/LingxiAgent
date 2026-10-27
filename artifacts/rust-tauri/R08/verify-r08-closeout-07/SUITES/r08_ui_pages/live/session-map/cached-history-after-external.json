@@ -1,0 +1,736 @@
+[
+  [
+    {
+      "type": "message",
+      "data": {
+        "id": "user:run_000001a17807c5da_000007",
+        "sourceEntryId": "user:run_000001a17807c5da_000007",
+        "role": "user",
+        "text": "MAP-NO-WORKSPACE",
+        "textHtml": "<p>MAP-NO-WORKSPACE</p>\n",
+        "timestamp": 1793015137754
+      }
+    },
+    {
+      "type": "message",
+      "data": {
+        "id": "native-run:map-no-workspace:run_000001a17807c5da_000007",
+        "role": "assistant",
+        "sourceEntryId": "run_000001a17807c5da_000007-final",
+        "turnInputEntryId": "user:run_000001a17807c5da_000007",
+        "turnInputVisible": true,
+        "blocks": [
+          {
+            "type": "tool_group",
+            "id": "native-tool:run_000001a17807c5da_000007-tc0001",
+            "collapsed": true,
+            "tools": [
+              {
+                "id": "run_000001a17807c5da_000007-tc0001",
+                "name": "tool:first-party:mcp_describe_tool",
+                "done": true,
+                "success": true,
+                "status": "succeeded",
+                "details": {
+                  "content": [
+                    {
+                      "text": "{\"availability\":\"available\",\"catalogGeneration\":91,\"description\":\"Native Rust read tool (R04-T04): the incumbent pi-coding-agent read semantics behind the unified gateway\",\"dialect\":\"json-schema/2020-12\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"limit\":{\"minimum\":1,\"type\":\"integer\"},\"offset\":{\"minimum\":1,\"type\":\"integer\"},\"path\":{\"minLength\":1,\"type\":\"string\"}},\"required\":[\"path\"],\"type\":\"object\"},\"server\":\"first-party\",\"targetGeneration\":1,\"targetId\":\"tool:first-party:read\",\"tool\":\"read\"}",
+                      "type": "text"
+                    }
+                  ],
+                  "status": "success",
+                  "truncated": false
+                }
+              }
+            ],
+            "lifecycle": "sealed",
+            "surfaceRole": "process",
+            "semanticPhase": "tool"
+          },
+          {
+            "type": "tool_group",
+            "id": "native-tool:run_000001a17807c5da_000007-tc0002",
+            "collapsed": true,
+            "tools": [
+              {
+                "id": "run_000001a17807c5da_000007-tc0002",
+                "name": "tool:first-party:read",
+                "done": true,
+                "success": true,
+                "status": "succeeded",
+                "args": {
+                  "summary": "{path:str}"
+                },
+                "details": {
+                  "content": [
+                    {
+                      "text": "WRONG GLOBAL WORKSPACE",
+                      "type": "text"
+                    }
+                  ],
+                  "details": {
+                    "format": "text-or-binary",
+                    "source": {
+                      "path": "owned.txt",
+                      "sha256": "e06e55ef359b8666a38173d541dab3595db41c841926c6c776fbae4ee8764c8b",
+                      "sizeBytes": 22
+                    }
+                  },
+                  "status": "success",
+                  "truncated": false
+                }
+              }
+            ],
+            "lifecycle": "sealed",
+            "surfaceRole": "process",
+            "semanticPhase": "tool"
+          },
+          {
+            "id": "native-run:map-no-workspace:run_000001a17807c5da_000007:segment:final:run_000001a17807c5da_000007-final",
+            "type": "text",
+            "source": "真实焦点会话完成",
+            "semanticPhase": "final_answer",
+            "surfaceRole": "answer",
+            "lifecycle": "sealed"
+          }
+        ],
+        "turnProjection": {
+          "id": "native-run:map-no-workspace:run_000001a17807c5da_000007:turn",
+          "inputMessageId": "user:run_000001a17807c5da_000007",
+          "assistantMessageIds": [
+            "run_000001a17807c5da_000007-final"
+          ],
+          "processBlockIds": [
+            "native-tool:run_000001a17807c5da_000007-tc0001",
+            "native-tool:run_000001a17807c5da_000007-tc0002"
+          ],
+          "provisionalBlockIds": [],
+          "answerBlockIds": [
+            "native-run:map-no-workspace:run_000001a17807c5da_000007:segment:final:run_000001a17807c5da_000007-final"
+          ],
+          "resultBlockIds": [],
+          "controlBlockIds": [],
+          "status": "completed",
+          "outcome": "completed_with_answer"
+        },
+        "timestamp": 1793015137793
+      }
+    }
+  ],
+  [
+    {
+      "type": "message",
+      "data": {
+        "id": "user:run_000001a17807a7fa_000003",
+        "sourceEntryId": "user:run_000001a17807a7fa_000003",
+        "role": "user",
+        "text": "MAP-TARGET-ONE",
+        "textHtml": "<p>MAP-TARGET-ONE</p>\n",
+        "timestamp": 1793015130106
+      }
+    },
+    {
+      "type": "message",
+      "data": {
+        "id": "native-run:session-71875e34bfb228d92eeddffcaf02931f:run_000001a17807a7fa_000003",
+        "role": "assistant",
+        "sourceEntryId": "run_000001a17807a7fa_000003-final",
+        "turnInputEntryId": "user:run_000001a17807a7fa_000003",
+        "turnInputVisible": true,
+        "blocks": [
+          {
+            "type": "tool_group",
+            "id": "native-tool:run_000001a17807a7fa_000003-tc0001",
+            "collapsed": true,
+            "tools": [
+              {
+                "id": "run_000001a17807a7fa_000003-tc0001",
+                "name": "tool:first-party:mcp_describe_tool",
+                "done": true,
+                "success": true,
+                "status": "succeeded",
+                "details": {
+                  "content": [
+                    {
+                      "text": "{\"availability\":\"available\",\"catalogGeneration\":91,\"description\":\"Native Rust read tool (R04-T04): the incumbent pi-coding-agent read semantics behind the unified gateway\",\"dialect\":\"json-schema/2020-12\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"limit\":{\"minimum\":1,\"type\":\"integer\"},\"offset\":{\"minimum\":1,\"type\":\"integer\"},\"path\":{\"minLength\":1,\"type\":\"string\"}},\"required\":[\"path\"],\"type\":\"object\"},\"server\":\"first-party\",\"targetGeneration\":1,\"targetId\":\"tool:first-party:read\",\"tool\":\"read\"}",
+                      "type": "text"
+                    }
+                  ],
+                  "status": "success",
+                  "truncated": false
+                }
+              }
+            ],
+            "lifecycle": "sealed",
+            "surfaceRole": "process",
+            "semanticPhase": "tool"
+          },
+          {
+            "type": "tool_group",
+            "id": "native-tool:run_000001a17807a7fa_000003-tc0002",
+            "collapsed": true,
+            "tools": [
+              {
+                "id": "run_000001a17807a7fa_000003-tc0002",
+                "name": "tool:first-party:read",
+                "done": true,
+                "success": true,
+                "status": "succeeded",
+                "args": {
+                  "summary": "{path:str}"
+                },
+                "details": {
+                  "content": [
+                    {
+                      "text": "SELECTED SESSION WORKSPACE",
+                      "type": "text"
+                    }
+                  ],
+                  "details": {
+                    "format": "text-or-binary",
+                    "source": {
+                      "path": "owned.txt",
+                      "sha256": "ceb302b37d43acd6b98dd435f8bbac6dfb2e976e37704e3ff2e1b182e4ef8b5d",
+                      "sizeBytes": 26
+                    }
+                  },
+                  "status": "success",
+                  "truncated": false
+                }
+              }
+            ],
+            "lifecycle": "sealed",
+            "surfaceRole": "process",
+            "semanticPhase": "tool"
+          },
+          {
+            "id": "native-run:session-71875e34bfb228d92eeddffcaf02931f:run_000001a17807a7fa_000003:segment:final:run_000001a17807a7fa_000003-final",
+            "type": "text",
+            "source": "真实焦点会话完成",
+            "semanticPhase": "final_answer",
+            "surfaceRole": "answer",
+            "lifecycle": "sealed"
+          }
+        ],
+        "turnProjection": {
+          "id": "native-run:session-71875e34bfb228d92eeddffcaf02931f:run_000001a17807a7fa_000003:turn",
+          "inputMessageId": "user:run_000001a17807a7fa_000003",
+          "assistantMessageIds": [
+            "run_000001a17807a7fa_000003-final"
+          ],
+          "processBlockIds": [
+            "native-tool:run_000001a17807a7fa_000003-tc0001",
+            "native-tool:run_000001a17807a7fa_000003-tc0002"
+          ],
+          "provisionalBlockIds": [],
+          "answerBlockIds": [
+            "native-run:session-71875e34bfb228d92eeddffcaf02931f:run_000001a17807a7fa_000003:segment:final:run_000001a17807a7fa_000003-final"
+          ],
+          "resultBlockIds": [],
+          "controlBlockIds": [],
+          "status": "completed",
+          "outcome": "completed_with_answer"
+        },
+        "timestamp": 1793015130156
+      }
+    }
+  ],
+  [
+    {
+      "type": "message",
+      "data": {
+        "id": "user:run_000001a17807a76e_000001",
+        "sourceEntryId": "user:run_000001a17807a76e_000001",
+        "role": "user",
+        "text": "MAP-SOURCE-ONE",
+        "textHtml": "<p>MAP-SOURCE-ONE</p>\n",
+        "timestamp": 1793015129966
+      }
+    },
+    {
+      "type": "message",
+      "data": {
+        "id": "native-run:map-child:unknown-final:run_000001a17807a76e_000001-final",
+        "role": "assistant",
+        "sourceEntryId": "run_000001a17807a76e_000001-final",
+        "blocks": [
+          {
+            "id": "native-run:map-child:unknown-final:run_000001a17807a76e_000001-final:segment:final:run_000001a17807a76e_000001-final",
+            "type": "text",
+            "source": "真实焦点会话完成",
+            "semanticPhase": "final_answer",
+            "surfaceRole": "answer",
+            "lifecycle": "sealed"
+          }
+        ],
+        "turnProjection": {
+          "id": "native-run:map-child:unknown-final:run_000001a17807a76e_000001-final:turn",
+          "inputMessageId": null,
+          "assistantMessageIds": [
+            "run_000001a17807a76e_000001-final"
+          ],
+          "processBlockIds": [],
+          "provisionalBlockIds": [],
+          "answerBlockIds": [
+            "native-run:map-child:unknown-final:run_000001a17807a76e_000001-final:segment:final:run_000001a17807a76e_000001-final"
+          ],
+          "resultBlockIds": [],
+          "controlBlockIds": [],
+          "status": "completed",
+          "outcome": "completed_with_answer"
+        },
+        "timestamp": 1793015130022
+      }
+    },
+    {
+      "type": "message",
+      "data": {
+        "id": "user:run_000001a17807c4fc_000004",
+        "sourceEntryId": "user:run_000001a17807c4fc_000004",
+        "role": "user",
+        "text": "MAP-CHILD-ACTUAL-WORKSPACE",
+        "textHtml": "<p>MAP-CHILD-ACTUAL-WORKSPACE</p>\n",
+        "timestamp": 1793015137532
+      }
+    },
+    {
+      "type": "message",
+      "data": {
+        "id": "native-run:map-child:run_000001a17807c4fc_000004",
+        "role": "assistant",
+        "sourceEntryId": "run_000001a17807c4fc_000004-final",
+        "turnInputEntryId": "user:run_000001a17807c4fc_000004",
+        "turnInputVisible": true,
+        "blocks": [
+          {
+            "type": "tool_group",
+            "id": "native-tool:run_000001a17807c4fc_000004-tc0001",
+            "collapsed": true,
+            "tools": [
+              {
+                "id": "run_000001a17807c4fc_000004-tc0001",
+                "name": "tool:first-party:mcp_describe_tool",
+                "done": true,
+                "success": true,
+                "status": "succeeded",
+                "details": {
+                  "content": [
+                    {
+                      "text": "{\"availability\":\"available\",\"catalogGeneration\":91,\"description\":\"Native Rust read tool (R04-T04): the incumbent pi-coding-agent read semantics behind the unified gateway\",\"dialect\":\"json-schema/2020-12\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"limit\":{\"minimum\":1,\"type\":\"integer\"},\"offset\":{\"minimum\":1,\"type\":\"integer\"},\"path\":{\"minLength\":1,\"type\":\"string\"}},\"required\":[\"path\"],\"type\":\"object\"},\"server\":\"first-party\",\"targetGeneration\":1,\"targetId\":\"tool:first-party:read\",\"tool\":\"read\"}",
+                      "type": "text"
+                    }
+                  ],
+                  "status": "success",
+                  "truncated": false
+                }
+              }
+            ],
+            "lifecycle": "sealed",
+            "surfaceRole": "process",
+            "semanticPhase": "tool"
+          },
+          {
+            "type": "tool_group",
+            "id": "native-tool:run_000001a17807c4fc_000004-tc0002",
+            "collapsed": true,
+            "tools": [
+              {
+                "id": "run_000001a17807c4fc_000004-tc0002",
+                "name": "tool:first-party:read",
+                "done": true,
+                "success": true,
+                "status": "succeeded",
+                "args": {
+                  "summary": "{path:str}"
+                },
+                "details": {
+                  "content": [
+                    {
+                      "text": "SELECTED SESSION WORKSPACE",
+                      "type": "text"
+                    }
+                  ],
+                  "details": {
+                    "format": "text-or-binary",
+                    "source": {
+                      "path": "owned.txt",
+                      "sha256": "ceb302b37d43acd6b98dd435f8bbac6dfb2e976e37704e3ff2e1b182e4ef8b5d",
+                      "sizeBytes": 26
+                    }
+                  },
+                  "status": "success",
+                  "truncated": false
+                }
+              }
+            ],
+            "lifecycle": "sealed",
+            "surfaceRole": "process",
+            "semanticPhase": "tool"
+          },
+          {
+            "id": "native-run:map-child:run_000001a17807c4fc_000004:segment:final:run_000001a17807c4fc_000004-final",
+            "type": "text",
+            "source": "真实焦点会话完成",
+            "semanticPhase": "final_answer",
+            "surfaceRole": "answer",
+            "lifecycle": "sealed"
+          }
+        ],
+        "turnProjection": {
+          "id": "native-run:map-child:run_000001a17807c4fc_000004:turn",
+          "inputMessageId": "user:run_000001a17807c4fc_000004",
+          "assistantMessageIds": [
+            "run_000001a17807c4fc_000004-final"
+          ],
+          "processBlockIds": [
+            "native-tool:run_000001a17807c4fc_000004-tc0001",
+            "native-tool:run_000001a17807c4fc_000004-tc0002"
+          ],
+          "provisionalBlockIds": [],
+          "answerBlockIds": [
+            "native-run:map-child:run_000001a17807c4fc_000004:segment:final:run_000001a17807c4fc_000004-final"
+          ],
+          "resultBlockIds": [],
+          "controlBlockIds": [],
+          "status": "completed",
+          "outcome": "completed_with_answer"
+        },
+        "timestamp": 1793015137578
+      }
+    }
+  ],
+  [
+    {
+      "type": "message",
+      "data": {
+        "id": "user:run_000001a17807a76e_000001",
+        "sourceEntryId": "user:run_000001a17807a76e_000001",
+        "role": "user",
+        "text": "MAP-SOURCE-ONE",
+        "textHtml": "<p>MAP-SOURCE-ONE</p>\n",
+        "timestamp": 1793015129966
+      }
+    },
+    {
+      "type": "message",
+      "data": {
+        "id": "native-run:session-1a915726f984a01ecf6a6a3e3bf592b6:run_000001a17807a76e_000001",
+        "role": "assistant",
+        "sourceEntryId": "run_000001a17807a76e_000001-final",
+        "turnInputEntryId": "user:run_000001a17807a76e_000001",
+        "turnInputVisible": true,
+        "blocks": [
+          {
+            "type": "tool_group",
+            "id": "native-tool:run_000001a17807a76e_000001-tc0001",
+            "collapsed": true,
+            "tools": [
+              {
+                "id": "run_000001a17807a76e_000001-tc0001",
+                "name": "tool:first-party:mcp_describe_tool",
+                "done": true,
+                "success": true,
+                "status": "succeeded",
+                "details": {
+                  "content": [
+                    {
+                      "text": "{\"availability\":\"available\",\"catalogGeneration\":91,\"description\":\"Native Rust read tool (R04-T04): the incumbent pi-coding-agent read semantics behind the unified gateway\",\"dialect\":\"json-schema/2020-12\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"limit\":{\"minimum\":1,\"type\":\"integer\"},\"offset\":{\"minimum\":1,\"type\":\"integer\"},\"path\":{\"minLength\":1,\"type\":\"string\"}},\"required\":[\"path\"],\"type\":\"object\"},\"server\":\"first-party\",\"targetGeneration\":1,\"targetId\":\"tool:first-party:read\",\"tool\":\"read\"}",
+                      "type": "text"
+                    }
+                  ],
+                  "status": "success",
+                  "truncated": false
+                }
+              }
+            ],
+            "lifecycle": "sealed",
+            "surfaceRole": "process",
+            "semanticPhase": "tool"
+          },
+          {
+            "type": "tool_group",
+            "id": "native-tool:run_000001a17807a76e_000001-tc0002",
+            "collapsed": true,
+            "tools": [
+              {
+                "id": "run_000001a17807a76e_000001-tc0002",
+                "name": "tool:first-party:read",
+                "done": true,
+                "success": true,
+                "status": "succeeded",
+                "args": {
+                  "summary": "{path:str}"
+                },
+                "details": {
+                  "content": [
+                    {
+                      "text": "SELECTED SESSION WORKSPACE",
+                      "type": "text"
+                    }
+                  ],
+                  "details": {
+                    "format": "text-or-binary",
+                    "source": {
+                      "path": "owned.txt",
+                      "sha256": "ceb302b37d43acd6b98dd435f8bbac6dfb2e976e37704e3ff2e1b182e4ef8b5d",
+                      "sizeBytes": 26
+                    }
+                  },
+                  "status": "success",
+                  "truncated": false
+                }
+              }
+            ],
+            "lifecycle": "sealed",
+            "surfaceRole": "process",
+            "semanticPhase": "tool"
+          },
+          {
+            "id": "native-run:session-1a915726f984a01ecf6a6a3e3bf592b6:run_000001a17807a76e_000001:segment:final:run_000001a17807a76e_000001-final",
+            "type": "text",
+            "source": "真实焦点会话完成",
+            "semanticPhase": "final_answer",
+            "surfaceRole": "answer",
+            "lifecycle": "sealed"
+          }
+        ],
+        "turnProjection": {
+          "id": "native-run:session-1a915726f984a01ecf6a6a3e3bf592b6:run_000001a17807a76e_000001:turn",
+          "inputMessageId": "user:run_000001a17807a76e_000001",
+          "assistantMessageIds": [
+            "run_000001a17807a76e_000001-final"
+          ],
+          "processBlockIds": [
+            "native-tool:run_000001a17807a76e_000001-tc0001",
+            "native-tool:run_000001a17807a76e_000001-tc0002"
+          ],
+          "provisionalBlockIds": [],
+          "answerBlockIds": [
+            "native-run:session-1a915726f984a01ecf6a6a3e3bf592b6:run_000001a17807a76e_000001:segment:final:run_000001a17807a76e_000001-final"
+          ],
+          "resultBlockIds": [],
+          "controlBlockIds": [],
+          "status": "completed",
+          "outcome": "completed_with_answer"
+        },
+        "timestamp": 1793015130022
+      }
+    },
+    {
+      "type": "message",
+      "data": {
+        "id": "user:run_000001a17807a7a9_000002",
+        "sourceEntryId": "user:run_000001a17807a7a9_000002",
+        "role": "user",
+        "text": "MAP-SOURCE-TWO",
+        "textHtml": "<p>MAP-SOURCE-TWO</p>\n",
+        "timestamp": 1793015130025
+      }
+    },
+    {
+      "type": "message",
+      "data": {
+        "id": "native-run:session-1a915726f984a01ecf6a6a3e3bf592b6:run_000001a17807a7a9_000002",
+        "role": "assistant",
+        "sourceEntryId": "run_000001a17807a7a9_000002-final",
+        "turnInputEntryId": "user:run_000001a17807a7a9_000002",
+        "turnInputVisible": true,
+        "blocks": [
+          {
+            "type": "tool_group",
+            "id": "native-tool:run_000001a17807a7a9_000002-tc0001",
+            "collapsed": true,
+            "tools": [
+              {
+                "id": "run_000001a17807a7a9_000002-tc0001",
+                "name": "tool:first-party:mcp_describe_tool",
+                "done": true,
+                "success": true,
+                "status": "succeeded",
+                "details": {
+                  "content": [
+                    {
+                      "text": "{\"availability\":\"available\",\"catalogGeneration\":91,\"description\":\"Native Rust read tool (R04-T04): the incumbent pi-coding-agent read semantics behind the unified gateway\",\"dialect\":\"json-schema/2020-12\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"limit\":{\"minimum\":1,\"type\":\"integer\"},\"offset\":{\"minimum\":1,\"type\":\"integer\"},\"path\":{\"minLength\":1,\"type\":\"string\"}},\"required\":[\"path\"],\"type\":\"object\"},\"server\":\"first-party\",\"targetGeneration\":1,\"targetId\":\"tool:first-party:read\",\"tool\":\"read\"}",
+                      "type": "text"
+                    }
+                  ],
+                  "status": "success",
+                  "truncated": false
+                }
+              }
+            ],
+            "lifecycle": "sealed",
+            "surfaceRole": "process",
+            "semanticPhase": "tool"
+          },
+          {
+            "type": "tool_group",
+            "id": "native-tool:run_000001a17807a7a9_000002-tc0002",
+            "collapsed": true,
+            "tools": [
+              {
+                "id": "run_000001a17807a7a9_000002-tc0002",
+                "name": "tool:first-party:read",
+                "done": true,
+                "success": true,
+                "status": "succeeded",
+                "args": {
+                  "summary": "{path:str}"
+                },
+                "details": {
+                  "content": [
+                    {
+                      "text": "[Duplicate read: owned.txt is unchanged since your identical read 1s ago. The earlier tool result is still current — refer to it instead of re-reading. Read with a different offset or limit to force fresh content.]",
+                      "type": "text"
+                    }
+                  ],
+                  "status": "success",
+                  "truncated": false
+                }
+              }
+            ],
+            "lifecycle": "sealed",
+            "surfaceRole": "process",
+            "semanticPhase": "tool"
+          },
+          {
+            "id": "native-run:session-1a915726f984a01ecf6a6a3e3bf592b6:run_000001a17807a7a9_000002:segment:final:run_000001a17807a7a9_000002-final",
+            "type": "text",
+            "source": "真实焦点会话完成",
+            "semanticPhase": "final_answer",
+            "surfaceRole": "answer",
+            "lifecycle": "sealed"
+          }
+        ],
+        "turnProjection": {
+          "id": "native-run:session-1a915726f984a01ecf6a6a3e3bf592b6:run_000001a17807a7a9_000002:turn",
+          "inputMessageId": "user:run_000001a17807a7a9_000002",
+          "assistantMessageIds": [
+            "run_000001a17807a7a9_000002-final"
+          ],
+          "processBlockIds": [
+            "native-tool:run_000001a17807a7a9_000002-tc0001",
+            "native-tool:run_000001a17807a7a9_000002-tc0002"
+          ],
+          "provisionalBlockIds": [],
+          "answerBlockIds": [
+            "native-run:session-1a915726f984a01ecf6a6a3e3bf592b6:run_000001a17807a7a9_000002:segment:final:run_000001a17807a7a9_000002-final"
+          ],
+          "resultBlockIds": [],
+          "controlBlockIds": [],
+          "status": "completed",
+          "outcome": "completed_with_answer"
+        },
+        "timestamp": 1793015130076
+      }
+    },
+    {
+      "type": "message",
+      "data": {
+        "id": "user:run_000001a17807cfec_000008",
+        "sourceEntryId": "user:run_000001a17807cfec_000008",
+        "role": "user",
+        "text": "MAP-EXTERNAL-UPDATED",
+        "textHtml": "<p>MAP-EXTERNAL-UPDATED</p>\n",
+        "timestamp": 1793015140332
+      }
+    },
+    {
+      "type": "message",
+      "data": {
+        "id": "native-run:session-1a915726f984a01ecf6a6a3e3bf592b6:run_000001a17807cfec_000008",
+        "role": "assistant",
+        "sourceEntryId": "run_000001a17807cfec_000008-final",
+        "turnInputEntryId": "user:run_000001a17807cfec_000008",
+        "turnInputVisible": true,
+        "blocks": [
+          {
+            "type": "tool_group",
+            "id": "native-tool:run_000001a17807cfec_000008-tc0001",
+            "collapsed": true,
+            "tools": [
+              {
+                "id": "run_000001a17807cfec_000008-tc0001",
+                "name": "tool:first-party:mcp_describe_tool",
+                "done": true,
+                "success": true,
+                "status": "succeeded",
+                "details": {
+                  "content": [
+                    {
+                      "text": "{\"availability\":\"available\",\"catalogGeneration\":91,\"description\":\"Native Rust read tool (R04-T04): the incumbent pi-coding-agent read semantics behind the unified gateway\",\"dialect\":\"json-schema/2020-12\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"limit\":{\"minimum\":1,\"type\":\"integer\"},\"offset\":{\"minimum\":1,\"type\":\"integer\"},\"path\":{\"minLength\":1,\"type\":\"string\"}},\"required\":[\"path\"],\"type\":\"object\"},\"server\":\"first-party\",\"targetGeneration\":1,\"targetId\":\"tool:first-party:read\",\"tool\":\"read\"}",
+                      "type": "text"
+                    }
+                  ],
+                  "status": "success",
+                  "truncated": false
+                }
+              }
+            ],
+            "lifecycle": "sealed",
+            "surfaceRole": "process",
+            "semanticPhase": "tool"
+          },
+          {
+            "type": "tool_group",
+            "id": "native-tool:run_000001a17807cfec_000008-tc0002",
+            "collapsed": true,
+            "tools": [
+              {
+                "id": "run_000001a17807cfec_000008-tc0002",
+                "name": "tool:first-party:read",
+                "done": true,
+                "success": true,
+                "status": "succeeded",
+                "args": {
+                  "summary": "{path:str}"
+                },
+                "details": {
+                  "content": [
+                    {
+                      "text": "[Duplicate read: owned.txt is unchanged since your identical read 10s ago. The earlier tool result is still current — refer to it instead of re-reading. Read with a different offset or limit to force fresh content.]",
+                      "type": "text"
+                    }
+                  ],
+                  "status": "success",
+                  "truncated": false
+                }
+              }
+            ],
+            "lifecycle": "sealed",
+            "surfaceRole": "process",
+            "semanticPhase": "tool"
+          },
+          {
+            "id": "native-run:session-1a915726f984a01ecf6a6a3e3bf592b6:run_000001a17807cfec_000008:segment:final:run_000001a17807cfec_000008-final",
+            "type": "text",
+            "source": "真实焦点会话完成",
+            "semanticPhase": "final_answer",
+            "surfaceRole": "answer",
+            "lifecycle": "sealed"
+          }
+        ],
+        "turnProjection": {
+          "id": "native-run:session-1a915726f984a01ecf6a6a3e3bf592b6:run_000001a17807cfec_000008:turn",
+          "inputMessageId": "user:run_000001a17807cfec_000008",
+          "assistantMessageIds": [
+            "run_000001a17807cfec_000008-final"
+          ],
+          "processBlockIds": [
+            "native-tool:run_000001a17807cfec_000008-tc0001",
+            "native-tool:run_000001a17807cfec_000008-tc0002"
+          ],
+          "provisionalBlockIds": [],
+          "answerBlockIds": [
+            "native-run:session-1a915726f984a01ecf6a6a3e3bf592b6:run_000001a17807cfec_000008:segment:final:run_000001a17807cfec_000008-final"
+          ],
+          "resultBlockIds": [],
+          "controlBlockIds": [],
+          "status": "completed",
+          "outcome": "completed_with_answer"
+        },
+        "timestamp": 1793015140393
+      }
+    }
+  ]
+]

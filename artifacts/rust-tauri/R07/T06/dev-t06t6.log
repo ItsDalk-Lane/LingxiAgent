@@ -1,0 +1,55 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.22s
+     Running tests/r07_media_admin.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_media_admin-1a9afb5adae975fd)
+
+running 8 tests
+test r07_media_admin::asr_transcribe_roundtrip_events_and_failure_honesty ... FAILED
+test r07_media_admin::read_only_session_generate_is_forbidden_without_dispatch ... ok
+test r07_media_admin::ask_mode_waits_for_real_decision_and_blocks_concurrent_admission ... ok
+test r07_media_admin::admin_models_config_and_asr_preferences_roundtrip ... ok
+test r07_media_admin::failed_image_task_retries_into_new_task_with_attempt_continuity ... FAILED
+test r07_media_admin::unified_generate_dispatch_accepts_kind_vocabulary_and_rejects_unknown ... FAILED
+test r07_media_admin::http_image_generate_acceptance_then_gallery_done_and_real_bytes_served ... FAILED
+test r07_media_admin::speech_response_delivery_waits_for_terminal_and_returns_real_files ... FAILED
+
+failures:
+
+---- r07_media_admin::asr_transcribe_roundtrip_events_and_failure_honesty stdout ----
+
+thread 'r07_media_admin::asr_transcribe_roundtrip_events_and_failure_honesty' (2025740) panicked at crates/lingxi-service/tests/r07_media_admin/mod.rs:993:5:
+assertion `left == right` failed: {"code":"invalid_message","details":{"causeId":"request.invalid_message","requestId":"req-89a44e757576b52c1c36f6a72a0302d1"},"message":"session file not found: sf_616f33ff2e09733b","retryable":false}
+  left: 400
+ right: 200
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- r07_media_admin::failed_image_task_retries_into_new_task_with_attempt_continuity stdout ----
+
+thread 'r07_media_admin::failed_image_task_retries_into_new_task_with_attempt_continuity' (2025741) panicked at crates/lingxi-service/tests/r07_media_admin/mod.rs:289:78:
+called `Result::unwrap()` on an `Err` value: reqwest::Error { kind: Request, url: "http://127.0.0.1:62018/lingxi/v1/media/image/generate", source: TimedOut }
+
+---- r07_media_admin::unified_generate_dispatch_accepts_kind_vocabulary_and_rejects_unknown stdout ----
+
+thread 'r07_media_admin::unified_generate_dispatch_accepts_kind_vocabulary_and_rejects_unknown' (2025745) panicked at crates/lingxi-service/tests/r07_media_admin/mod.rs:289:78:
+called `Result::unwrap()` on an `Err` value: reqwest::Error { kind: Request, url: "http://127.0.0.1:62020/lingxi/v1/media/generate", source: TimedOut }
+
+---- r07_media_admin::http_image_generate_acceptance_then_gallery_done_and_real_bytes_served stdout ----
+
+thread 'r07_media_admin::http_image_generate_acceptance_then_gallery_done_and_real_bytes_served' (2025742) panicked at crates/lingxi-service/tests/r07_media_admin/mod.rs:289:78:
+called `Result::unwrap()` on an `Err` value: reqwest::Error { kind: Request, url: "http://127.0.0.1:62016/lingxi/v1/media/image/generate", source: TimedOut }
+
+---- r07_media_admin::speech_response_delivery_waits_for_terminal_and_returns_real_files stdout ----
+
+thread 'r07_media_admin::speech_response_delivery_waits_for_terminal_and_returns_real_files' (2025744) panicked at crates/lingxi-service/tests/r07_media_admin/mod.rs:289:78:
+called `Result::unwrap()` on an `Err` value: reqwest::Error { kind: Request, url: "http://127.0.0.1:62021/lingxi/v1/media/speech/generate", source: TimedOut }
+
+
+failures:
+    r07_media_admin::asr_transcribe_roundtrip_events_and_failure_honesty
+    r07_media_admin::failed_image_task_retries_into_new_task_with_attempt_continuity
+    r07_media_admin::http_image_generate_acceptance_then_gallery_done_and_real_bytes_served
+    r07_media_admin::speech_response_delivery_waits_for_terminal_and_returns_real_files
+    r07_media_admin::unified_generate_dispatch_accepts_kind_vocabulary_and_rejects_unknown
+
+test result: FAILED. 3 passed; 5 failed; 0 ignored; 0 measured; 0 filtered out; finished in 31.89s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_media_admin`

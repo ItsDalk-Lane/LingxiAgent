@@ -1,0 +1,80 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.34s
+     Running tests/r06_agent_delete_skills_live.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_agent_delete_skills_live-afcf2ac8af2cef1f)
+
+running 2 tests
+LINGXI_AUTH_REJECTED request_id="req-6c5ed94fab829f4630649af8a9c8c834" method=DELETE path=/lingxi/v1/agents/victim status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57337
+UI-CHILD[complete]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-1-1792319015256764000/ui-result.json
+LINGXI_AUTH_REJECTED request_id="req-27392d9c2fbca3c253f1e974fe0e0449" method=DELETE path=/lingxi/v1/agents/victim status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57376
+UI-CONNECTION[guard-original]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-0-1792319015256763000/ui-result.json
+UI-CHILD[changed]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-3-1792319020099081000/ui-result.json
+UI-CONNECTION[guard-node-new-id]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-4-1792319020304770000/ui-result.json
+LINGXI_AUTH_REJECTED request_id="req-7f0aee2ebd280d6fe896222124e508a4" method=DELETE path=/lingxi/v1/agents/victim status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57435
+UI-CONNECTION[guard-node-same-id]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-7-1792319024284754000/ui-result.json
+UI-CHILD[failed]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-6-1792319024194397000/ui-result.json
+LINGXI_AUTH_REJECTED request_id="req-8ae9ce4c84dbcf8fb86b999717ffd3e5" method=DELETE path=/lingxi/v1/agents/victim status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57485
+UI-CONNECTION[guard-rust-endpoint]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-9-1792319028376560000/ui-result.json
+UI-CONNECTION[guard-transport]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-12-1792319032502729000/ui-result.json
+UI-CONNECTION[guard-instance]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-14-1792319036195098000/ui-result.json
+UI-CONNECTION[guard-kind]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-16-1792319039226626000/ui-result.json
+UI-CHILD[last]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-11-1792319028527364000/ui-result.json
+
+thread 'agent_delete_orphan_skills_current_desktop_rust_api_and_ui' (3265818) panicked at crates/lingxi-service/tests/r06_agent_delete_skills_live.rs:260:9:
+当前桌面入口真实HTTP/UI子用例失败：last
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test agent_delete_orphan_skills_current_desktop_rust_api_and_ui ... FAILED
+LINGXI_AUTH_REJECTED request_id="req-e7f5a3865c5c0cda8ef33057c469b96b" method=GET path=/lingxi/v1/server/identity status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:57618
+UI-CONNECTION[guard-token]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-18-1792319042413094000/ui-result.json
+UI-CONNECTION[guard-roundtrip]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-20-1792319045268234000/ui-result.json
+UI-CONNECTION[guard-stable]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-22-1792319048276415000/ui-result.json
+UI-CONNECTION[guard-registry-original]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-24-1792319051293477000/ui-result.json
+UI-CONNECTION[guard-registry-endpoint]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-26-1792319055505329000/ui-result.json
+UI-CONNECTION[guard-registry-roundtrip]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-28-1792319058506678000/ui-result.json
+UI-CONNECTION[guard-registry-stable]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-30-1792319061343109000/ui-result.json
+UI-CONNECTION[guard-registry-source]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-32-1792319064399679000/ui-result.json
+UI-CONNECTION[guard-registry-fallback]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-34-1792319067228184000/ui-result.json
+UI-CONNECTION[guard-registry-unrelated]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-18390-36-1792319070080879000/ui-result.json
+test agent_delete_connection_changes_preserve_both_real_service_roots ... ok
+
+failures:
+
+failures:
+    agent_delete_orphan_skills_current_desktop_rust_api_and_ui
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 57.84s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_agent_delete_skills_live`
+     Running tests/r06_agent_settings_live.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_agent_settings_live-49278c6a1fd55505)
+
+running 14 tests
+test native_character_card_duplicate_skill_source_and_sparse_path_refuse_without_public_mutation ... ok
+test native_character_card_application_and_http_delete_never_recreate_deleted_directory ... ok
+test native_character_card_zip_roundtrip_real_materials_and_memory_choice ... ok
+test native_character_card_real_zip_refuses_escape_links_and_expansion_without_agents ... ok
+LINGXI_AUTH_REJECTED request_id="req-155de1e3d4aeb2dc53502f2308d2f0fc" method=GET path=/lingxi/v1/settings/snapshot status=403 reason=insufficient_scope remote=127.0.0.1:57968
+LINGXI_AUTH_REJECTED request_id="req-1cebe2e04804bb8b1fa6eee5ebe5bbb5" method=GET path=/lingxi/v1/models status=403 reason=insufficient_scope remote=127.0.0.1:57973
+test native_settings_reads_keep_real_failures_and_paid_dream_consumption ... ok
+LINGXI_AUTH_REJECTED request_id="req-9dc6a597598dcc64e022658e930dba08" method=GET path=/lingxi/v1/settings/config status=403 reason=insufficient_scope remote=127.0.0.1:58046
+SETTINGS-UI-CHILD[smoke]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/settings-completion-smoke-18733-1792319075349872000/home/ui-result.json
+SETTINGS-UI-CHILD[read-denied]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/settings-completion-read-denied-18733-1792319075349802000/home/ui-result.json
+test native_agent_settings_current_electron_entry_smoke ... ok
+SETTINGS-UI-CHILD[boundaries]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/settings-completion-boundaries-18733-1792319075349942000/home/ui-result.json
+test native_settings_current_electron_actual_read_permission_denied_is_error ... ok
+SETTINGS-UI-CHILD[references-pending]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/settings-completion-references-pending-18733-1792319075349790000/home/ui-result.json
+SETTINGS-UI-CHILD[failures]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/settings-completion-failures-18733-1792319075349811000/home/ui-result.json
+test native_remaining_tenet_health_and_order_real_failures_and_pointer_cancel ... ok
+test native_settings_current_electron_real_io_failures_and_partial_writes ... ok
+test native_pending_reference_deletion_current_electron_shows_and_retries_truthfully ... ok
+SETTINGS-UI-CHILD[receipt-owner]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/settings-completion-receipt-owner-a-18733-1792319075349799000/home/ui-result.json
+test native_pending_receipt_owner_switch_two_real_services_never_posts_to_other_service ... ok
+SETTINGS-UI-CHILD[card-owner]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/settings-completion-card-owner-a-18733-1792319075349827000/home/ui-result.json
+test native_character_card_owner_two_real_services_and_delayed_import_response ... ok
+SETTINGS-UI-CHILD[initialization]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/settings-completion-initialization-18733-1792319075349920000/home/ui-result.json
+test native_initialization_cache_summary_and_real_fifteen_second_timeout ... ok
+SETTINGS-UI-CHILD[workflow]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/settings-completion-workflow-18733-1792319075349793000/home/ui-result.json
+test native_settings_nineteen_actions_actual_electron_and_service ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 47.80s
+
+error: 1 target failed:
+    `-p lingxi-service --test r06_agent_delete_skills_live`

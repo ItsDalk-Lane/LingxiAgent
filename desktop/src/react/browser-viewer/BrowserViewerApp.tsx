@@ -1,13 +1,13 @@
 /**
- * BrowserViewerApp.tsx — 浏览器查看器工具栏
- *
- * 工具栏只负责按钮和标签页显示。
- * WebContentsView 由 main.cjs 管理，attach 在工具栏下方区域。
+ * 浏览器窗口入口：原生服务展示受控 Chromium 状态与同页操作；
+ * 旧 Node 连接保留由主进程挂载网页的工具栏。
  */
 
 import { useState, useEffect, useMemo, useRef, type WheelEvent } from 'react';
-import type { BrowserViewerTab, BrowserViewerUpdate } from '../types';
+import type { BrowserViewerTab, BrowserViewerUpdate, RustBrowserViewerContext } from '../types';
+import { RustBrowserViewer } from './RustBrowserViewer';
 import { initTheme } from '../bootstrap';
+import { usePlatform } from '../hooks/use-platform';
 
 declare function t(key: string): string;
 declare function setTheme(name: string): void;
@@ -44,6 +44,24 @@ function tabTitle(tab: BrowserViewerTab) {
 }
 
 export function BrowserViewerApp() {
+  // 模式标记不携带身份；实际控制范围仍只能从主进程领取。
+  const nativeMode = new URLSearchParams(window.location.search).get('mode') === 'native';
+  const [context, setContext] = useState<RustBrowserViewerContext | null | undefined>(nativeMode ? undefined : null);
+  const [error, setError] = useState('');
+  useEffect(() => {
+    if (!nativeMode) return;
+    let alive = true;
+    Promise.resolve(usePlatform()?.getBrowserViewerContext?.() ?? null)
+      .then(value => { if (!value) throw new Error('browser_connection_required'); if (alive) setContext(value); })
+      .catch(cause => { if (alive) setError(cause instanceof Error ? cause.message : String(cause)); });
+    return () => { alive = false; };
+  }, [nativeMode]);
+  if (error) return <p role="alert">{error}</p>;
+  if (context === undefined) return null;
+  return context ? <RustBrowserViewer context={context} /> : <LegacyBrowserViewer />;
+}
+
+function LegacyBrowserViewer() {
   const [canBack, setCanBack] = useState(false);
   const [canForward, setCanForward] = useState(false);
   const [sessionPath, setSessionPath] = useState<string | null>(null);
@@ -53,7 +71,7 @@ export function BrowserViewerApp() {
   const tabListRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const hana = window.hana;
+    const hana = usePlatform();
 
     // 监听主题切换
     hana?.onSettingsChanged?.((type: string, data: unknown) => {
@@ -61,7 +79,7 @@ export function BrowserViewerApp() {
     });
 
     // 接收浏览器状态更新
-    hana?.onBrowserUpdate?.((data: BrowserViewerUpdate) => {
+    const unsubscribe = hana?.onBrowserUpdate?.((data: BrowserViewerUpdate) => {
       if (Array.isArray(data.tabs)) setTabs(data.tabs);
       if (data.activeTabId !== undefined) setActiveTabId(data.activeTabId);
       if (data.canGoBack !== undefined) setCanBack(data.canGoBack);
@@ -84,9 +102,10 @@ export function BrowserViewerApp() {
 
     // i18n
     window.i18n?.load?.(navigator.language || 'zh');
+    return () => { if (typeof unsubscribe === 'function') unsubscribe(); };
   }, []);
 
-  const hana = window.hana;
+  const hana = usePlatform();
   const activeTab = useMemo(
     () => tabs.find((tab) => tab.tabId === activeTabId) || tabs[0] || null,
     [tabs, activeTabId],

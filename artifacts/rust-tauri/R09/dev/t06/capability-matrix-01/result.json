@@ -1,0 +1,34 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t06_capability_matrix",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 2.942,
+ "caseCount": 81,
+ "casesSha256": "38de69447262715d69fadf2c1174df8582a55e68bd88cffca57b0a9382d8d730",
+ "commands": [
+  {
+   "id": "static::capability-audit",
+   "argv": [
+    "python3",
+    "-B",
+    "scripts/rust-tauri/r09_capability_audit.py",
+    "--evidence",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t06/capability-matrix-01/capability-audit"
+   ],
+   "exitCode": 2,
+   "durationSecs": 0.485,
+   "logSha256": "2166dadf1105b1e3f1d89f1d13d445d7356f67bf9d8b50e733a40b015a7de7ac"
+  }
+ ],
+ "logSha256": "2166dadf1105b1e3f1d89f1d13d445d7356f67bf9d8b50e733a40b015a7de7ac",
+ "finishedAtUnixMs": 1793025664355,
+ "blockedKind": "BLOCKED_GUI_SMOKE",
+ "blockedReason": "运行期逐窗口 invoke 负向/正路径矩阵需要 Tauri GUI + wdio；Lead 明确 cleared 前禁止启动 Tauri app/安装包",
+ "policySha256": "ff6495941e20dbba2d4b49ce002680959d947d9783b4f3d378112a2e873eb23f",
+ "auditStatus": "FAIL",
+ "auditExitCode": 2,
+ "gapRemaining": 66,
+ "runtimeMatrixPlan": "runtime-matrix-plan.json",
+ "note": "静态半边已真实执行；套件因运行期矩阵 blocked 保持 exit 2（门真红）"
+}

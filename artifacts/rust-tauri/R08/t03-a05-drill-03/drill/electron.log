@@ -1,0 +1,18 @@
+
+DevTools listening on ws://127.0.0.1:9792/devtools/browser/eef52145-5ebd-4bfc-9a33-ae93d2dfd8cf
+[desktop] network proxy applied (startup): system
+[desktop] 启动 LingxiAgent Server...
+[desktop] Server 就绪，端口: 65391
+(electron) 'console-message' arguments are deprecated and will be removed. Please use Event<WebContentsConsoleMessageEventParams> object instead.
+[desktop] 主窗口 HTML 加载完成，等待前端 init...
+[65572:1022/214159.055373:ERROR:content/browser/network_service_instance_impl.cc:703] Network service crashed or was terminated, restarting service.
+[65572:1022/214159.057720:ERROR:content/browser/gpu/gpu_process_host.cc:998] GPU process exited unexpectedly: exit_code=15
+[desktop] Server 意外退出 (退出码 0)
+[desktop] 尝试自动重启 Server...
+[desktop] renderer 崩溃: killed (code: 15)
+[desktop] Server 重启成功
+[65572:1022/214205.992790:ERROR:content/browser/network_service_instance_impl.cc:703] Network service crashed or was terminated, restarting service.
+[65572:1022/214205.993435:ERROR:content/browser/gpu/gpu_process_host.cc:998] GPU process exited unexpectedly: exit_code=9
+[desktop] Server 意外退出 (信号 SIGKILL)
+[66200:1022/214206.040944:ERROR:base/apple/mach_port_rendezvous_mac.cc:256] bootstrap_look_up com.github.Electron.MachPortRendezvousServer.1: Permission denied (1100)
+[66200:1022/214206.041165:ERROR:base/memory/shared_memory_switch.cc:261] No rendezvous client, terminating process (parent died?)

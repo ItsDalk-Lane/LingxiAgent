@@ -5,6 +5,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AssistantMessage } from '../../components/chat/AssistantMessage';
 import { useStore } from '../../stores';
+import { resetDesktopHostForTests } from '../../host/desktop-host';
 
 const mocks = vi.hoisted(() => ({
   openSkillPreview: vi.fn(),
@@ -42,7 +43,7 @@ describe('AssistantMessage skill blocks', () => {
 
   afterEach(() => {
     cleanup();
-    delete (window as any).platform;
+    resetDesktopHostForTests();
   });
 
   it('opens the installed skill preview from the chat resource card', () => {

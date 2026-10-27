@@ -1,0 +1,100 @@
+    Checking lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+    Checking lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: field `pending` is never read
+  --> crates/lingxi-service/src/slash.rs:23:5
+   |
+20 | struct Attachments {
+   |        ----------- field in this struct
+...
+23 |     pending: HashMap<String, ActualBridgeSelection>,
+   |     ^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `identity` and `target` are never read
+  --> crates/lingxi-service/src/slash.rs:36:5
+   |
+35 | struct ActualBridgeAttachment {
+   |        ---------------------- fields in this struct
+36 |     identity: ActualBridgeIdentity,
+   |     ^^^^^^^^
+37 |     target: String,
+   |     ^^^^^^
+   |
+   = note: `ActualBridgeAttachment` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: fields `identity`, `options`, and `expires` are never read
+  --> crates/lingxi-service/src/slash.rs:41:5
+   |
+40 | struct ActualBridgeSelection {
+   |        --------------------- fields in this struct
+41 |     identity: ActualBridgeIdentity,
+   |     ^^^^^^^^
+42 |     options: Vec<(String, String)>,
+   |     ^^^^^^^
+43 |     expires: u64,
+   |     ^^^^^^^
+   |
+   = note: `ActualBridgeSelection` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: method `bridge_command_kind` is never used
+   --> crates/lingxi-service/src/slash.rs:253:19
+    |
+ 87 | impl SlashService {
+    | ----------------- method in this implementation
+...
+253 |     pub(crate) fn bridge_command_kind(
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: function `current_actual_owner` is never used
+   --> crates/lingxi-service/src/slash.rs:770:10
+    |
+770 | async fn current_actual_owner(
+    |          ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `same_actual_actor` is never used
+   --> crates/lingxi-service/src/slash.rs:854:4
+    |
+854 | fn same_actual_actor(a: &ActualBridgeIdentity, b: &ActualBridgeIdentity) -> bool {
+    |    ^^^^^^^^^^^^^^^^^
+
+warning: function `actual_desktop_target` is never used
+   --> crates/lingxi-service/src/slash.rs:861:10
+    |
+861 | async fn actual_desktop_target(
+    |          ^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `publish_actual_detached` is never used
+   --> crates/lingxi-service/src/slash.rs:869:4
+    |
+869 | fn publish_actual_detached(state: &ServiceState, source: &str, target: &str) {
+    |    ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `clear_bridge_takeover` is never used
+   --> crates/lingxi-service/src/slash.rs:875:15
+    |
+875 | pub(crate) fn clear_bridge_takeover(state: &ServiceState, source: &str) -> Result<(), String> {
+    |               ^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `revoke_bridge_takeovers` is never used
+   --> crates/lingxi-service/src/slash.rs:890:15
+    |
+890 | pub(crate) fn revoke_bridge_takeovers(
+    |               ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `resolve_takeover` is never used
+   --> crates/lingxi-service/src/slash.rs:920:21
+    |
+920 | pub(crate) async fn resolve_takeover(
+    |                     ^^^^^^^^^^^^^^^^
+
+warning: function `dispatch_bridge_message` is never used
+   --> crates/lingxi-service/src/slash.rs:969:21
+    |
+969 | pub(crate) async fn dispatch_bridge_message(
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `lingxi-service` (lib) generated 12 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 17.48s

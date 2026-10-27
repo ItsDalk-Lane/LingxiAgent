@@ -16,6 +16,7 @@ import {
 } from './preview-document-refresh';
 import { encodeWorkbenchContentPath } from './remote-file-preview';
 import type { RemoteWorkbenchContentRef } from '../types';
+import { usePlatform } from '../hooks/use-platform';
 
 function draggedFileIsImage(file: AppDraggedFile): boolean {
   if (file.isDirectory || !file.path) return false;
@@ -29,7 +30,7 @@ export function getMarkdownCoverDropImagePath(dataTransfer?: DataTransfer | null
   const file = payload?.files.find(draggedFileIsImage);
   if (file?.path) return file.path;
   const browserFile = getMarkdownCoverDropImageFile(dataTransfer);
-  return browserFile ? window.platform?.getFilePath?.(browserFile) || null : null;
+  return browserFile ? usePlatform()?.getFilePath?.(browserFile) || null : null;
 }
 
 export function hasMarkdownCoverDropImage(dataTransfer?: DataTransfer | null): boolean {

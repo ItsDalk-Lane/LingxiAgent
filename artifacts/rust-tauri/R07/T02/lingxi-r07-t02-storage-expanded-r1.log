@@ -1,0 +1,44 @@
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.43s
+     Running tests/r06_ar_f14_migration_receipts.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f14_migration_receipts-fe46dcb901f1aa80)
+
+running 3 tests
+test c01_fresh_database_receipts_equal_registry_and_inspector ... ok
+test c01_v7_upgrade_preserves_receipts_and_restarts_are_idempotent ... ok
+test c01_v8_upgrade_preserves_receipts_and_restarts_are_idempotent ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.52s
+
+     Running tests/r07_bridge_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_store-b62578fad13edb50)
+
+running 10 tests
+test concurrent_claims_and_config_edits_are_atomic ... FAILED
+test run_binding_checks_frozen_subject_and_exact_real_message_lineage ... ok
+test restart_preserves_prepared_queue_and_recovers_durable_run_before_bind_without_replay ... ok
+test explicit_owner_takeover_is_one_inbox_scope_and_never_relaxes_ordinary_bridge_binding ... ok
+test attachments_need_real_owned_files_and_failed_prepare_rolls_back ... ok
+test conversation_reset_is_atomic_keeps_metadata_and_pins_replayed_inbox_to_original_epoch ... ok
+test owner_notification_target_and_context_are_frozen_from_actual_owner_dm_and_revoke_stops_queue ... ok
+test outbox_has_one_send_lease_and_requires_real_receipt_or_stays_unknown_after_restart ... ok
+test commands_use_durable_receipts_without_fake_runs_and_recover_unqueued_reply ... ok
+test five_platform_roles_are_host_derived_and_message_replays_survive_reconfiguration ... ok
+
+failures:
+
+---- concurrent_claims_and_config_edits_are_atomic stdout ----
+
+thread 'concurrent_claims_and_config_edits_are_atomic' (345403) panicked at crates/lingxi-adapters/tests/r07_bridge_store.rs:239:5:
+assertion `left == right` failed
+  left: 0
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    concurrent_claims_and_config_edits_are_atomic
+
+test result: FAILED. 9 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+
+error: test failed, to rerun pass `-p lingxi-adapters --test r07_bridge_store`

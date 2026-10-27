@@ -1,0 +1,18 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_capability_audit",
+ "status": "FAIL",
+ "exitCode": 2,
+ "caseCount": 52,
+ "failedCases": [
+  "caps::window-plugin-permissions::browser-viewer",
+  "caps::window-plugin-permissions::main",
+  "caps::window-plugin-permissions::skill-viewer-*",
+  "caps::window-plugin-permissions::viewer-*",
+  "caps::no-dangerous-plugin-permissions",
+  "caps::test-control-env-not-in-release-paths"
+ ],
+ "audit": "capability-audit.json",
+ "policy": "docs/rust-tauri/R09/R09_COMMAND_POLICY.json",
+ "gapLedgerRemaining": 66
+}

@@ -1,0 +1,1 @@
+{"attempt":"attempt-1","eventId":"evt-0002","eventType":"run_state_changed","payload":{"from":"running","reason":"模型调用失败：上游超时（示例错误）","to":"failed","type":"run_state_changed"},"runId":"run-0001","schemaVersion":1,"seq":"9007","sessionId":"sess-灵犀-0001","streamId":"stream-session-1"}

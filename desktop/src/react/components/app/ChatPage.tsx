@@ -1,8 +1,11 @@
 import { lazy, Suspense } from 'react';
 import { useStore } from '../../stores';
 import { InputArea, type InputAreaProps } from '../InputArea';
+import { InteractiveToolsPanel } from '../interactive/InteractiveToolsPanel';
 import { WelcomeScreen } from '../WelcomeScreen';
 import { ChatArea } from '../chat/ChatArea';
+import RustSessionReviewPanel from '../session/RustSessionReviewPanel';
+import { RustMoodPanel } from '../chat/RustMoodPanel';
 import { RegionalErrorBoundary } from '../RegionalErrorBoundary';
 
 // 运行信息胶囊仅桌面 chat 使用；懒加载避免移动端主包吃进运行卡模块树
@@ -33,13 +36,17 @@ export function ChatPage({
   return (
     <>
       {inputSurface === 'desktop' && (
-        <Suspense fallback={null}>
-          <LazyRuntimeInfoCapsule />
-        </Suspense>
+        <RegionalErrorBoundary region={`${regionPrefix}runtime`} resetKeys={[currentSessionPath]}>
+          <Suspense fallback={null}>
+            <LazyRuntimeInfoCapsule />
+          </Suspense>
+        </RegionalErrorBoundary>
       )}
       <div className={`chat-area${hasPanels ? ' has-panels' : ''}`}>
         <WelcomeContainer />
         <RegionalErrorBoundary region={`${regionPrefix}chat`} resetKeys={[currentSessionPath]}>
+          <RustMoodPanel />
+          <RustSessionReviewPanel />
           <ChatArea />
         </RegionalErrorBoundary>
       </div>
@@ -49,6 +56,7 @@ export function ChatPage({
           resetKeys={[currentSessionPath]}
           autoRetry={inputSurface === 'mobile' ? { attempts: 2, delayMs: 120 } : undefined}
         >
+          <InteractiveToolsPanel />
           <InputArea key={currentSessionPath || '__new'} surface={inputSurface} />
         </RegionalErrorBoundary>
       </div>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>R01-T05-S5 危险资源(decoy)</title>
+<style>
+  body { font-family: 'EB Garamond', 'Noto Serif SC', serif; margin: 0; color: #1a1a1a; }
+  main { padding: 24px 32px; }
+  h1, h2 { font-family: 'EB Garamond', 'Noto Serif SC', serif; }
+  code, pre { font-family: 'JetBrains Mono', monospace; }
+  table { border-collapse: collapse; width: 100%; font-size: 12px; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  th, td { border: 1px solid #888; padding: 3px 8px; }
+  .rare { font-size: 28px; letter-spacing: 6px; }
+  .marker { white-space: nowrap; font-family: 'JetBrains Mono', monospace; font-size: 10px; }
+  .codeblock { background: #f5f2ec; border: 1px solid #d8d2c4; padding: 12px;
+               white-space: pre; font-size: 12px; break-inside: avoid; }
+  .math { font-size: 20px; }
+</style>
+
+</head>
+<body>
+<main>
+
+<h1>危险资源样本 S5-DECOY（旧链对照专用）</h1>
+<p>DANGER-DECOY-DOC-START</p>
+<iframe src="../decoy/passwd" width="600" height="200"></iframe>
+<p><img src="../decoy/passwd" alt="decoy-as-img" width="100" height="40"></p>
+<p><img src="https://canary.invalid/t05-beacon.png" alt="remote-beacon" width="100" height="40"></p>
+<p><img src="http://127.0.0.1:18291/t05-loopback-canary.png" alt="loopback-canary" width="100" height="40"></p>
+<script>
+  try {
+    const x = new XMLHttpRequest(); x.open('GET', '../decoy/passwd'); x.onload = () => {
+      const d = document.createElement('div'); d.id = 'exfil-decoy'; d.textContent = x.responseText; document.body.appendChild(d);
+    }; x.send();
+  } catch (e) {}
+</script>
+<p>DANGER-DECOY-DOC-END</p>
+
+</main>
+</body>
+</html>

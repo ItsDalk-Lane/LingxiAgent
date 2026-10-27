@@ -1,0 +1,152 @@
+{
+  "reviewer": "independent-subagent-r07_t08_final_review",
+  "reviewedAt": "2026-10-18T07:56:20.783169+00:00",
+  "stage": "R07-T08",
+  "candidate": "t08b",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprint": "2b35cc84f1f48edfdb26bde1053e91d6254dbc59fe252fe92a31f1dbfd40f443",
+  "sourceManifestSha256": "a6720a856e5af63821d5fec5e40807f0b4dbd778fb6282365ce7a7faa2837112",
+  "gatePlanSha256": "f66638499a09521b191533d066e7aff65d95cbc55a2d1b0f98c1d5865c4989b1",
+  "finalAcceptance": "pending",
+  "reviewMode": "READ_ONLY_SOURCE_ARCHIVE_AND_RECEIPTS; no Cargo/GUI/real account/external send/commit/push",
+  "sourceVerification": {
+    "fileCount": 641,
+    "allManifestRowsMatchedCurrentAtInspection": true,
+    "recomputedFingerprintMatches": true,
+    "archiveSha256Matches": true,
+    "allArchiveMembersMatchedManifestAtInspection": true,
+    "runnerSha256Matches": true,
+    "currentAndCandidateSnapshotGatePlanSha256Matches": true
+  },
+  "findingClosure": [
+    {
+      "id": "T08-REVIEW-MODEL-HEADERS-SHAPE",
+      "status": "SOURCE_FIXED_AND_REAL_DEV_RECHECK_PASSED; FROZEN_SERVICE_GATE_PENDING",
+      "proof": "Original same-source headers-invalid-reproduce1 failed exit101; final-review-fixes1 source unchanged includes malformed_headers...pass, and total model_configuration10/10. This aggregate receipt remains exit101 due independent card preview panic, never rewritten."
+    },
+    {
+      "id": "T08-REVIEW-MODEL-REVOKED-QUEUED-WRITE",
+      "status": "SOURCE_FIXED_AND_REAL_DEV_RECHECK_PASSED; FROZEN_SERVICE_GATE_PENDING",
+      "proof": "ModelAuthority uses original Principal and same Auth Arc; actual mutex wait and FileSafety authorization recheck, probe dispatch/cache recheck, trusted internal validation preserved and Unknown write fact retained. final-review-fixes1 source unchanged has model_authority5/5 actual HTTP tests passing with live-device/owner controls."
+    },
+    {
+      "id": "T08-ROOT-MODEL-ENDPOINT-SHAPE",
+      "status": "SOURCE_FIXED_AND_REAL_DEV_RECHECK_PASSED; FROZEN_SERVICE_GATE_PENDING",
+      "proof": "Explicit endpoint/base_url type guards reject malformed values; empty endpoint remains compatible. model_configuration10/10 in final-review-fixes1. Prior mixed-source core1 failure remains an actual development failure, not uniform current-source candidate evidence."
+    },
+    {
+      "id": "T08-ROOT-CARD-UNKNOWN-ASSET-PANIC",
+      "status": "SOURCE_FIXED_AND_REAL_DEV_RECHECK_PASSED; FROZEN_SERVICE_GATE_PENDING",
+      "proof": "assets.get(&key).and_then(Value::as_str) returns existing404 for unknown key. final-card-fix2 source unchanged exit0, card_previews3/3 and skills_cards5/5. Original final-review-fixes1 HTTP disconnect failure preserved."
+    }
+  ],
+  "currentSourceNewBlockingFindings": [],
+  "verifiedCompletedOrPendingGates": [
+    {
+      "name": "fmt",
+      "status": "PASS",
+      "receipt": "t08b-fmt.json",
+      "sha256": "5bbf83068468b0198ff2885f0d8104b70d3ab04d5be6f08bb93bbe07f68dbe15",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "sourceFingerprintMatches": true,
+      "commandMatchesPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "name": "diff",
+      "status": "PASS",
+      "receipt": "t08b-diff.json",
+      "sha256": "fdf4b61f58e0bf2e54116591ca88f1c349a9796dfca6787b69fd718b1858699a",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "sourceFingerprintMatches": true,
+      "commandMatchesPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "name": "clippy",
+      "status": "PENDING_OR_RUNNING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "protocol",
+      "status": "PENDING_OR_RUNNING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "protocol-roundtrip",
+      "status": "PENDING_OR_RUNNING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "protocol-tests",
+      "status": "PENDING_OR_RUNNING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "kernel",
+      "status": "PENDING_OR_RUNNING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "boundaries",
+      "status": "PENDING_OR_RUNNING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "adapter",
+      "status": "PENDING_OR_RUNNING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "service",
+      "status": "PENDING_OR_RUNNING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "model-regression",
+      "status": "PENDING_OR_RUNNING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "native-skills",
+      "status": "PENDING_OR_RUNNING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "skills-current",
+      "status": "PENDING_OR_RUNNING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "build",
+      "status": "PENDING_OR_RUNNING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "ui",
+      "status": "PENDING_OR_RUNNING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "types",
+      "status": "PASS",
+      "receipt": "t08b-types.json",
+      "sha256": "1a9d7868eb13619b211d70fb9ff572cd2e1bcb469a2a4f58e67e117e2a5aad06",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "sourceFingerprintMatches": true,
+      "commandMatchesPlan": true,
+      "logSha256Matches": true
+    }
+  ],
+  "acceptanceConditions": [
+    "All frozen gates require actual completed exit0, same source fingerprint, correct command and log hash; do not borrow earlier candidate/development success",
+    "UI requires fresh t08b build receipt binary hash and unchanged binary binding wrapper",
+    "Actual card self-navigation desktop/mobile collector0 proof is still development supplementary evidence unless rerun with the fresh candidate binary; not promoted to formal fresh-build proof",
+    "109 leaves/343 assertions need explicit evidence mapping; suite counts alone do not prove all leaf behaviors"
+  ],
+  "boundaries": [
+    "T08 local implementation review only; not full R07 acceptance",
+    "T11 MCP remote HTTP/SSE/OAuth, complete lazy/idle/pinned lifecycle and old settings page connection remain separately tracked",
+    "True accounts, paid providers, other operating systems and release packages unverified",
+    "T07 browser failures remain T12 responsibility; accepted R06 not reopened",
+    "Native picker prior current-host manual proof is supplementary, not new-candidate binary manual acceptance"
+  ],
+  "historyPreserved": [
+    "SOURCE_MANIFEST_t08a.json",
+    "source-t08a.tar.gz",
+    "t08a-protocol.json",
+    "independent-final-review-t08a.json",
+    "independent-fix-review-pre-freeze1.json",
+    "docs/rust-tauri/R07/T08_FAILURE_HISTORY.json"
+  ]
+}

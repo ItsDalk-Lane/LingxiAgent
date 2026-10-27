@@ -1,0 +1,439 @@
+{
+  "id": "R06-EX-01",
+  "title": "压缩的真实入口、设置与自定义关注内容",
+  "original_requirements": [
+    {
+      "id": "R06-T02-S01",
+      "clause": "迁移现役compaction触发、手动压缩、摘要上下文、缓存保留与错误恢复语义；不要仅按字符数切断聊天。"
+    },
+    {
+      "id": "R06-T02-S02",
+      "clause": "预算为系统约束/当前请求/工具定义/历史/引用/输出留空间；用模型实际tokenizer或明确保守估算并标来源。"
+    },
+    {
+      "id": "R06-T02-S04",
+      "clause": "压缩本身使用ModelGateway，失败保留原上下文并返回可诊断策略，不能截断重要内容继续宣称成功。"
+    },
+    {
+      "id": "R06-T04-S02",
+      "clause": "实时/历史分页/重连/导出/不同客户端共享语义投影，前端不独立解析模型结束或补造最终答案。"
+    }
+  ],
+  "r00_feature_ids": [
+    "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-FRESH-COMPACT-D62A81",
+    "F-D01-SLASH_COMMAND-SLASH-COMMAND-COMPACT-0FE8BE",
+    "F-D01-SLASH_COMMAND-SLASH-COMMAND-FRESH-COMPACT-5A6E0D",
+    "F-D01-WS_IN-WS-IN-COMPACT-421EEA"
+  ],
+  "reported_gap": "T02差异#3/#9/#13：compact_now缺少真实提交入口；enabled/keepRecent/reserve仍常量，自定义关注为None；现役/合法关停条件不能用申报替代。",
+  "deadline": "R06 阶段验收前：这里只要求当前核心/服务份额",
+  "status": "NOT_RUN",
+  "evidence_level": "SOURCE_ONLY",
+  "runtime_evidence": [],
+  "coverage_by_existing_f": "R06-AR-F15要求完整性，但F01-F14的具体修复不自动涵盖此行为；保留为extra，不改原F编号",
+  "production_paths": [
+    "rust/crates/lingxi-service/src/compaction.rs",
+    "rust/crates/lingxi-service/src/runs.rs"
+  ],
+  "proposed_real_checks": [
+    "经真实会话提交压缩及fresh-compact，检查持久历史与下一Run request一致",
+    "关闭压缩/修改保留预算/自定义关注分别影响真实请求；失败原历史完整且明确错误"
+  ],
+  "legal_later_basis": [
+    {
+      "task_id": "R08-T02",
+      "original_goal": "为换壳做准备但不顺便重写组件和布局。",
+      "original_steps": [
+        "清点window.hana、preload和Electron直接依赖，分为业务服务调用与宿主能力调用。",
+        "业务调用转到唯一ServiceClient；宿主调用转到DesktopHost接口，提供现有Electron实现和Web受限实现。",
+        "保留现有React/Zustand/CSS/i18n、控件布局和快捷操作；不把整个前端迁成Rust/WASM。",
+        "工具卡、思考/MOOD卡、附件、终端、观测弹窗和历史页面继续用稳定ID和规范化事件；清理仅有充分替代证据的重复解析。",
+        "在禁止Electron API的普通浏览器环境跑组件测试，验证缺原生能力时明确提示而非报空对象错误。"
+      ]
+    },
+    {
+      "task_id": "R08-T07",
+      "original_goal": "用稳定界面定位真正的内核兼容缺口。",
+      "original_steps": [
+        "按FEATURE_INVENTORY逐叶操作，验证设置、会话、工具、文件、浏览器、媒体、记忆、知识、自动化、Bridge状态和观测。",
+        "对比旧Electron＋旧内核与旧Electron＋Rust，固定UI版本、模型替身、数据与测试步骤；不把不同前端版本混入比较。",
+        "错误路径包含凭证失效、文件冲突、工具禁用、网络断线、无final回复和重启恢复。",
+        "每个失败先定位服务契约/兼容转换/UI绑定，不通过修改预期或隐藏控件消除失败。"
+      ]
+    },
+    {
+      "task_id": "R07-T08",
+      "original_goal": "设置页不是迁移后的空壳。",
+      "original_steps": [
+        "迁移Agent管理、provider/model管理、权限、偏好、语言、工具启停、设备管理、角色卡/技能包等真实API。",
+        "配置变更采用版本/并发检查及原子写入；影响运行中的凭证/权限/工具配置时按generation或快照策略生效。",
+        "保留未知但兼容的配置字段与用户定制，不把旧配置读成默认值后整体覆盖。",
+        "导入导出按白名单保留人格/头像/可选记忆/Skills及必要元信息，默认不外带秘密。"
+      ]
+    }
+  ],
+  "current_vs_later": "完整旧UI按钮/设置面板可以R08/R07接入；R06核心须已经消费真实设置并可通过服务行为验证。",
+  "suggested_work_unit": {
+    "id": "R06-EX-W01",
+    "scope": "压缩的真实入口、设置与自定义关注内容",
+    "agent_policy": "一次性边界明确的工作单，主代理整合；不创建长期代理",
+    "prerequisites": [
+      "先核对原生产调用链与有效配置，再以当前真实服务/模型替身验证；不得mock被验收核心"
+    ],
+    "review_required": "全新审查者在实际候选上独立实验，资料核对不签关闭"
+  },
+  "r00_original_assertions": [
+    {
+      "feature_id": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-FRESH-COMPACT-D62A81",
+      "task_ids": [
+        "R06-T03",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "assertions": [
+        "给定目标与相应权限，执行“刷新能力并压缩会话”后核对：压缩旧上下文后按当前 Agent 配置重建提示词和工具快照",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-D62A81C2AEB2",
+        "feature_id": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-FRESH-COMPACT-D62A81",
+        "task_ids": [
+          "R06-T03",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户刷新能力并压缩会话",
+        "then": "压缩旧上下文后按当前 Agent 配置重建提示词和工具快照",
+        "assertions": [
+          "给定目标与相应权限，执行“刷新能力并压缩会话”后核对：压缩旧上下文后按当前 Agent 配置重建提示词和工具快照",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R06-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R06-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R08-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R08-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R06-T03",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "execution_owner": "Rust Session/Storage",
+        "execution_stage_ids": [
+          "R06",
+          "R08"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D01-SLASH_COMMAND-SLASH-COMMAND-COMPACT-0FE8BE",
+      "task_ids": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "assertions": [
+        "先回复正在压缩，再返回 token 前后数或完成说明",
+        "失败回传压缩失败；接管态目标为被接管桌面会话"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-0FE8BED686E2",
+        "feature_id": "F-D01-SLASH_COMMAND-SLASH-COMMAND-COMPACT-0FE8BE",
+        "task_ids": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "发送 /compact",
+        "then": "先回复正在压缩，再返回 token 前后数或完成说明",
+        "assertions": [
+          "先回复正在压缩，再返回 token 前后数或完成说明",
+          "失败回传压缩失败；接管态目标为被接管桌面会话"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R03-A01",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R03-A02",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R06-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R06-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R08-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R08-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "execution_owner": "Rust Run/Session＋React",
+        "execution_stage_ids": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D01-SLASH_COMMAND-SLASH-COMMAND-FRESH-COMPACT-5A6E0D",
+      "task_ids": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "assertions": [
+        "刷新提示词和记忆后压缩，回传 token 变化或原因",
+        "接管态拒绝；失败明确回报且原始历史保留"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-5A6E0D526903",
+        "feature_id": "F-D01-SLASH_COMMAND-SLASH-COMMAND-FRESH-COMPACT-5A6E0D",
+        "task_ids": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "发送 /fresh-compact",
+        "then": "刷新提示词和记忆后压缩，回传 token 变化或原因",
+        "assertions": [
+          "刷新提示词和记忆后压缩，回传 token 变化或原因",
+          "接管态拒绝；失败明确回报且原始历史保留"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R03-A01",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R03-A02",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R06-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R06-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R08-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R08-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "execution_owner": "Rust Run/Session＋React",
+        "execution_stage_ids": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    },
+    {
+      "feature_id": "F-D01-WS_IN-WS-IN-COMPACT-421EEA",
+      "task_ids": [
+        "R03-T01",
+        "R06-T04",
+        "R08-T07"
+      ],
+      "assertions": [
+        "先回 compaction_accepted，再按实际结果回 succeeded/noop/failed",
+        "未知 method、实验关闭、会话不存在/正在流式时明确失败，不能改历史"
+      ],
+      "scenario": {
+        "id": "R00-T02-LA-421EEA1AC8D5",
+        "feature_id": "F-D01-WS_IN-WS-IN-COMPACT-421EEA",
+        "task_ids": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "在界面请求压缩上下文",
+        "then": "先回 compaction_accepted，再按实际结果回 succeeded/noop/failed",
+        "assertions": [
+          "先回 compaction_accepted，再按实际结果回 succeeded/noop/failed",
+          "未知 method、实验关闭、会话不存在/正在流式时明确失败，不能改历史"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R03-A01",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R03-A02",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R06-A07",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R06-A08",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R08-A13",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R08-A14",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "execution_owner": "Rust Run/Session＋React",
+        "execution_stage_ids": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      }
+    }
+  ],
+  "report_sources": [
+    "docs/rust-tauri/R06/R06-T02_REPORT.md",
+    "docs/rust-tauri/R06/R06-T04_REPORT.md"
+  ],
+  "triage": "原义务需真实实验与范围核对，未确证当前Bug；不得因本清单推定修复完成/无需验证",
+  "legacy_comparison_excerpt": [
+    {
+      "path": "core/session-compaction-runtime.ts",
+      "line": 1,
+      "end_line": 45,
+      "original_source": "/**\n * Auto-compaction runtime wiring for a live session.\n *\n * Two pieces, both installed right after a session is created:\n *\n *   1. A proportional compaction reserve. The Pi SDK triggers auto-compaction\n *      when contextTokens exceeds `contextWindow - reserveTokens`, and a fixed\n *      reserve of 16384 tokens is meaningless once the model window is in the\n *      millions: the trigger point sits at 98%+ of the window, so in practice\n *      the session overflows before it ever compacts. The reserve is therefore\n *      derived from the live window as `max(16384, 20% of window)`, which puts\n *      the trigger at the FORCE line (80% of window) for windows >= 80K and\n *      keeps the absolute 16384-token headroom as the floor for small windows.\n *\n *   2. Mid-run compaction. The SDK only checks the threshold after a whole\n *      agentic run finishes and before a new prompt, so a single long tool loop\n *      can run far past the window with zero checks. The agent loop hands every\n *      turn to `prepareNextTurnWithContext` and adopts the context that call\n *      returns, which makes it the one supported seam where history can be\n *      swapped mid-run. The hook is wrapped (never replaced) so the SDK's own\n *      layer keeps working, and a compaction failure is swallowed: the run\n *      continues and the SDK's post-run check remains the backstop.\n *\n *   3. Dual thresholds. At every turn boundary the usage ratio is checked\n *      against two lines (shared/compaction-thresholds.ts):\n *\n *      - ASK line (50%): crossing it emits `compaction_suggested` to the\n *        desktop renderer, which shows a dialog asking the user whether to\n *        compact now. Core never blocks the run on the answer; re-prompts are\n *        throttled until usage grows by a further 5% of the window, and the\n *        prompt state resets after any compaction (a >=20% drop).\n *\n *      - FORCE line (80%): reaching it compacts unconditionally (the reserve\n *        derived in (1) makes the SDK's own check agree) and emits\n *        `compaction_auto` so the renderer can toast \"context compacted\".\n *\n * After a mid-run compaction the model would otherwise wake up to a summary\n * with no idea it was interrupted mid-task, so a hidden custom message is\n * appended telling it to keep going from the summary's remaining work.\n */\n\nimport { calculateContextTokens, estimateTokens, shouldCompact } from \"../lib/pi-sdk/index.ts\";\nimport { createModuleLogger } from \"../lib/debug-log.ts\";\nimport {\n  COMPACTION_ASK_RATIO,",
+      "status": "SOURCE_ONLY"
+    },
+    {
+      "path": "lib/llm/cache-preserving-compaction-agent-run.ts",
+      "line": 1,
+      "end_line": 65,
+      "original_source": "import {\n  runAgentLoop,\n  type AgentContext,\n  type AgentEvent,\n  type AgentLoopConfig,\n  type AgentMessage,\n  type AgentTool,\n  type StreamFn,\n} from \"../pi-sdk/index.ts\";\nimport {\n  CACHE_STRATEGIES,\n  buildCacheStrategyMetadata,\n} from \"./cache-strategy-contract.ts\";\nimport { stripClosedInternalNarrationBlocks } from \"../text/internal-narration.ts\";\nimport { mintModelCallId } from \"./model-call-identity.ts\";\nimport { modelCallFieldsFromUsageContext } from \"./model-call-observer.ts\";\nimport { runWithModelCallScope } from \"./model-call-scope.ts\";\nimport { resolveModelTraceContext } from \"./model-trace-scope.ts\";\nimport {\n  createSemanticInputProvenance,\n  provenanceSection,\n} from \"./semantic-input-provenance.ts\";\n\nconst SUMMARY_HEADINGS = [\n  \"Goal\",\n  \"Constraints & Preferences\",\n  \"Progress\",\n  \"Key Decisions\",\n  \"Next Steps\",\n  \"Critical Context\",\n];\nconst PROGRESS_HEADINGS = [\"Done\", \"In Progress\", \"Blocked\"];\nconst SUMMARY_HEADING_SEQUENCE = [\n  \"## Goal\",\n  \"## Constraints & Preferences\",\n  \"## Progress\",\n  \"### Done\",\n  \"### In Progress\",\n  \"### Blocked\",\n  \"## Key Decisions\",\n  \"## Next Steps\",\n  \"## Critical Context\",\n];\nconst INTERNAL_NARRATION_TYPES = [\"mood\", \"pulse\", \"reflect\"] as const;\nconst THINKING_LEVELS = new Set([\"off\", \"minimal\", \"low\", \"medium\", \"high\", \"xhigh\"]);\n\ntype InternalNarrationType = typeof INTERNAL_NARRATION_TYPES[number];\n\nexport type CachePreservingCompactionAgentRunDiagnostics = {\n  providerRequests: number;\n  toolIntentCount: number;\n  repaired: boolean;\n  sanitizedNarrationTypes: InternalNarrationType[];\n  toolResults: Array<{\n    toolCallId: string;\n    toolName: string;\n    text: string;\n    isError: boolean;\n  }>;\n};\n\nexport interface CachePreservingCompactionCacheMetadata {\n  cacheStrategy?: string;\n  cacheGroup?: string;\n  templateVersion?: string;",
+      "status": "SOURCE_ONLY"
+    }
+  ]
+}

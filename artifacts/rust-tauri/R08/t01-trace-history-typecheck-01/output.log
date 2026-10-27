@@ -1,0 +1,6 @@
+
+> lingxi@0.1.43 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+desktop/src/react/services/rust-chat-history.ts(415,47): error TS2339: Property 'rawItems' does not exist on type 'RustHistoryResult'.
+  Property 'rawItems' does not exist on type '{ notModified: true; etag: string | null; }'.

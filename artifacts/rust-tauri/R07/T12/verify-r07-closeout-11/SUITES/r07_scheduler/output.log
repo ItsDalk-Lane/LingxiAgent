@@ -1,0 +1,17 @@
+
+running 7 tests
+test edits_preserve_unknown_fields_and_stale_revisions_are_rejected ... ok
+test revoked_source_is_rejected_without_a_run ... ok
+test one_shot_is_disabled_after_real_execution ... ok
+test cancellation_drops_pending_automatic_review_before_any_tool_dispatch ... ok
+test unknown_claim_after_restart_is_not_reexecuted ... ok
+test real_management_dispatch_and_restart_keep_one_trigger_one_run ... ok
+test background_input_and_real_tool_results_reload_after_restart_without_user_messages ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.13s
+
+   Compiling ring v0.17.14
+   Compiling rcgen v0.14.10
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.89s
+     Running tests/r07_scheduler.rs (rust/target/debug/deps/r07_scheduler-0189f811d16c711f)

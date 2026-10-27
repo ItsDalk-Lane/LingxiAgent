@@ -1,0 +1,39 @@
+{
+  "label": "t10-service-regression18",
+  "stage": "R07-T09",
+  "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+  "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "-p",
+    "lingxi-service",
+    "--",
+    "--skip",
+    "r00_management_positive_and_negative_branches_on_real_service",
+    "--skip",
+    "native_remaining_tenet_health_and_order_real_failures_and_pointer_cancel",
+    "--skip",
+    "native_settings_nineteen_actions_actual_electron_and_service"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "PATH": "/Users/study_superior/.cargo/bin:/Users/study_superior/Desktop/Code/LingxiAgent/.venv/bin:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/share/dotnet:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/Users/study_superior/.lmstudio/bin:/Users/study_superior/.lmstudio/bin",
+    "CARGO_TARGET_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target-r07",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp",
+    "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib"
+  },
+  "startedAt": "2026-10-18T21:00:29.131580+00:00",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "8e88e3acd150f0731e33b59326dcfb9d447ff563d84efd3a124af32ef07e4f21",
+  "finalAcceptance": false,
+  "exitCode": 101,
+  "endedAt": "2026-10-18T21:18:53.495008+00:00",
+  "sourceFingerprintAfter": "8e88e3acd150f0731e33b59326dcfb9d447ff563d84efd3a124af32ef07e4f21",
+  "log": "artifacts/rust-tauri/R07/T09/t10-service-regression18.log",
+  "logSha256": "50ec35c5a8996d935efb64a793dd95865c3eb6e1a6735c5bcaa0208cb198bf52",
+  "sourceUnchanged": true
+}

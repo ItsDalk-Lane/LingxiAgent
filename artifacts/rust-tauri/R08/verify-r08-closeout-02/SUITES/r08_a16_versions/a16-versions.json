@@ -1,0 +1,21 @@
+{
+  "schema": "lingxi.r08.a16-versions.v1",
+  "generatedAt": "2026-10-25T11:07:10.032Z",
+  "gitHead": "aa99d2ec1dae7f0aef5971bab049734f22fcf7d8",
+  "branch": "codex/rust-tauri-migration",
+  "uncommittedWorkspaceIsSoleCopy": true,
+  "node": "v24.16.0",
+  "packageVersion": "0.1.43",
+  "rustBinary": "d72ee6293cd3fb42240dff30edbca1032826a5a1be96e6002469c100325e572e",
+  "rendererDist": "82dc49755131f658193814c7a0500020727fe2fcba98fe44cea0ed33901cd186",
+  "contractVersions": "6d86934755a23e4f35a6dbd68957ff3d302a3ce5f6d61d40066efd68f33a6f96",
+  "fixtureAnchors": {
+    "v3Base": "80a8d2c2640e2b2974b299a10f36679bc19daf0911e51f82f0c43399cb32feaa",
+    "v2Bulk": "40f42dc1fdb7dc026ee1ce6444914a02a085c12c53b7598e70fc453fdb388c9e"
+  },
+  "stageMapInputDigest": "70b7505462adda72ebd97b3e361ecc78e7e8509ea92187ef50db1706fce3cf3b",
+  "handoffBoundaries": {
+    "noDriftingMain": "R08 成果全部锚定上述 HEAD + 工作区副本；R09 起以本清单为对照基线",
+    "protocolFreeze": "R09 不得趁机重改模型协议或数据架构（任务书 T08 步骤 4）"
+  }
+}

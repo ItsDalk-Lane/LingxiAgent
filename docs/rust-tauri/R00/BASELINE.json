@@ -1,0 +1,354 @@
+{
+  "schema_version": 1,
+  "task_id": "R00-T01",
+  "stage_id": "R00",
+  "status": "READY_FOR_REVIEW",
+  "captured_utc": "2026-09-23T04:57:21.523459+00:00",
+  "research_sha": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
+  "candidate": {
+    "head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
+    "branch": "codex/rust-tauri-migration",
+    "origin_default_ref": "refs/remotes/origin/main",
+    "origin_default_sha": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
+    "head_equals_research": true,
+    "dirty_worktree": true,
+    "committed_diff_from_research": [],
+    "commit_created": false,
+    "working_tree_input_digest": "8866ff76394cfc372da6d783b047dfb3d587967e1ce71e8a25310386f339a8cd",
+    "working_tree_input_digest_scope": "HEAD + preexisting tracked deletion diff + original untracked taskbook file hashes + package-lock; generated R00 evidence excluded to avoid self-reference"
+  },
+  "environment": {
+    "os": "macOS",
+    "os_version": "27.0",
+    "os_build": "26A428",
+    "kernel": "27.0.0",
+    "architecture": "arm64",
+    "hardware_model": "Mac15,14",
+    "physical_memory_bytes": 103079215104,
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "python": "3.14.3",
+    "vitest": "4.1.10"
+  },
+  "rules": {
+    "root_agents_md_exists": true,
+    "root_agents_md_git_ignored": true,
+    "local_rules_in_scope": [],
+    "contributing_read": true,
+    "tests_readme_read": true
+  },
+  "source_sha256": {
+    "AGENTS.md": "3f98359bc0c6ab7038aec8326419a03cdbf0de6f3f185555d051ad3e489b531b",
+    "CONTRIBUTING.md": "e29599bdbccea8adba9e1932ec1bd2074d95bcc9e0ede6b367169356fc634fbf",
+    "tests/README.md": "cdd031a6999bdd60fef677dd1d3f50a3a9a9f07bda83a379cd855185e5307ac2",
+    "package.json": "473d36a785d6d16db7b08a684e65855823cb15e1c7fb21003a63dd5c7cc4acfc",
+    "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+    "scripts/launch.js": "34762c7f688f45de36540fcca9e6d45237865ed7a08e7453fdd0d9a996bed35d",
+    "scripts/dev-env.js": "feb29ecfe595a2ac0317eec60a53af5441470374d020f3ee83b4a50841f9b01d",
+    "desktop/main.cjs": "533d468df2b02e95f8f11d5c3f965a3af2afc8e15a38caa9c1e532b5af17a319",
+    "server/bootstrap.ts": "e90a18ee7ce51367ae5f44f66b3a386de99f58308343108f27fec4232bedc2e8",
+    "server/main-full.ts": "e3838c3af5e9ea4c8f56389bd135b789735f9612b923529cd41dec6b521243d7",
+    "server/index.ts": "0f16d567d1800417318608a1944bb42b0121082ce05593f7facb078ffc09cc17",
+    "core/first-run.ts": "840b60d2ec5d1fb7bc96b2ba9e8ffb402f1cae4f74d5ffedc2b6d1748b2bd8f2",
+    "shared/hana-runtime-paths.cjs": "0247e5c2dc644ffde2603d0a60c24534e0101263566a5eb82649751d244e2c65",
+    "tests/startup-contract.test.ts": "44d1c5afb00c7fe7edda11b3edf2cf55b14159448c14c9bed8904629c347ac71",
+    "tests/hana-runtime-paths.test.ts": "4aefa97a08f7b1de3f3400c558f2cf9eb74e01d5445385a68bba71c42f55c64a",
+    "tests/server-composition-boundary.test.ts": "a1d3015cf36d556dcf729c9771619c15a699cf526eca9564ec0d1afaaf2330d0"
+  },
+  "preexisting_worktree": {
+    "old_taskbook_deleted_tracked_files": 17,
+    "old_taskbook_diff_sha256": "55789bbdb322dc1ea6e64af683e5820238c5083ed67f23ca5d6d1f1f5876b54b",
+    "new_taskbook_untracked_files": 33,
+    "new_taskbook_file_hashes": "artifacts/rust-tauri/R00/T01/worktree-before.json",
+    "other_tracked_diff": [],
+    "orchestrator_ledger_owned_by": "parent; not edited",
+    "new_taskbook_aggregate_sha256": "655348a5c4a34037053027dd74dc0f25b1020d74d090198c8f2754abf620345c",
+    "final_preservation_evidence": "artifacts/rust-tauri/R00/T01/worktree-preservation-r2.json",
+    "all_preserved": true
+  },
+  "prior_stage_handoff_report": "none found under docs/rust-tauri at task start",
+  "startup_chain": [
+    "desktop/main.cjs dev spawn (source evidence)",
+    "server/bootstrap.ts (executed)",
+    "server/main-full.ts (executed)",
+    "server/index.ts:startServer (executed)",
+    "core/first-run.ts and LingxiEngine.init (observed)"
+  ],
+  "launcher_override": {
+    "requested": "/tmp/r00-requested",
+    "actual": "/Users/study_superior/.lingxi-dev",
+    "overridden": true
+  },
+  "isolated_probe": {
+    "command": "python3 artifacts/rust-tauri/R00/T01/startup_probe.py",
+    "execution_type": "real source server, local HTTP health; no provider call",
+    "exit_code": 0,
+    "test_root": "/tmp/lingxi-r00-t01-bdmbvepw",
+    "home_env": "/tmp/lingxi-r00-t01-bdmbvepw/isolated",
+    "lingxi_home_env": "/tmp/lingxi-r00-t01-bdmbvepw/isolated/lingxi-home",
+    "actual_home_evidence": [
+      "artifacts/rust-tauri/R00/T01/server-stdout.txt:2",
+      "artifacts/rust-tauri/R00/T01/startup-probe.json:startup.server_info_path",
+      "artifacts/rust-tauri/R00/T01/startup-probe.json:after.isolated"
+    ],
+    "health": {
+      "http_status": 200,
+      "body_status": "ok",
+      "version": "0.1.43"
+    },
+    "process_pid": 64379,
+    "process_args": "64379 64365 /Users/study_superior/.nvm/versions/node/v24.16.0/bin/node server/bootstrap.ts",
+    "server_info_removed_on_shutdown": true,
+    "protected_sentinel_unchanged": true,
+    "real_production_inventory_unchanged": true,
+    "real_development_inventory_unchanged": true,
+    "real_production_file_sentinel_unchanged": true,
+    "sandbox_denial": "EPERM for attempted write in repository; artifacts/rust-tauri/R00/T01/sandbox-denial.txt",
+    "active_production_app": true,
+    "real_directory_hash_kind": "recursive metadata inventory; path/type/mode/size/mtime_ns, no user file content copied",
+    "acceptance_checks": {
+      "health_ok": true,
+      "closed_cleanly": true,
+      "actual_home_logged": true,
+      "isolated_data_and_logs_present": true,
+      "protected_production_unchanged": true,
+      "real_production_inventory_unchanged": true,
+      "real_development_inventory_unchanged": true,
+      "real_production_sentinel_unchanged": true
+    },
+    "evidence_status": "R1 historical attempt; metadata-only inventory did not satisfy R00-A01"
+  },
+  "targeted_tests": {
+    "command": "HOME=<isolated /tmp home> TMPDIR=<isolated /tmp tmp> LINGXI_HOME=<isolated /tmp lingxi-home> ./node_modules/.bin/vitest run tests/startup-contract.test.ts tests/hana-runtime-paths.test.ts tests/server-composition-boundary.test.ts",
+    "exit_code": 0,
+    "test_files_passed": 3,
+    "tests_passed": 26,
+    "evidence": "artifacts/rust-tauri/R00/T01/targeted-tests-r3.txt"
+  },
+  "requirements": {
+    "R00-A01": {
+      "status": "PASS",
+      "evidence": [
+        "artifacts/rust-tauri/R00/T01/startup-probe-r3-b0e1de4a10026986fc615e34.json",
+        "artifacts/rust-tauri/R00/T01/startup-probe-r3-81810c93302dd6e4dbd26aef.json",
+        "artifacts/rust-tauri/R00/T01/startup-probe-r3-e0d8c213225442074a0373b0.json",
+        "artifacts/rust-tauri/R00/T01/startup-probe-r3-5cc673966167ef10c4b0332f.json",
+        "artifacts/rust-tauri/R00/T01/probe-regression-r3-final.txt",
+        "artifacts/rust-tauri/R00/T01/targeted-tests-r3.txt",
+        "artifacts/rust-tauri/R00/T01/R00-A01.result.json"
+      ],
+      "historical_failures_retained": [
+        "R2 first directory digest change while app ran",
+        "R3 first probe used a nonexistent server-info field; raw exit 1 retained"
+      ],
+      "limitation": "本机独立服务链和 OS 沙盒验证；尚非图形桌面或安装包验收。"
+    },
+    "R00-A02": {
+      "status": "PASS",
+      "evidence": [
+        "artifacts/rust-tauri/R00/T01/worktree-before.json",
+        "artifacts/rust-tauri/R00/T01/worktree-preservation-r2.json",
+        "artifacts/rust-tauri/R00/T01/worktree-regression-r3.txt"
+      ],
+      "limitation": "仅保护原有 17 个已跟踪删除与 33 个未跟踪任务书文件及暂存区；生成的 R00 证据由候选摘要另行封存。"
+    }
+  },
+  "not_verified": [
+    "Desktop Electron UI startup",
+    "packaged runtime",
+    "Windows/Linux/macOS x64",
+    "provider account and external protocol",
+    "independent R3 reviewer decision"
+  ],
+  "isolated_probe_r2": {
+    "command": "python3 artifacts/rust-tauri/R00/T01/startup_probe_r2.py",
+    "attempts": [
+      {
+        "evidence": "artifacts/rust-tauri/R00/T01/startup-probe-r2-attempt1.json",
+        "single_probe_status": "BLOCKED",
+        "single_probe_exit_code": 1,
+        "test_root": "/tmp/lingxi-r00-a01-r2-90kzhfah",
+        "health": {
+          "http_status": 200,
+          "body_status": "ok"
+        },
+        "server_exit_code": 0,
+        "server_info_removed": true,
+        "lingxi_app_pids_before": [
+          29489
+        ],
+        "lingxi_app_pids_after": [
+          29489
+        ],
+        "real_directories": {
+          "production": {
+            "before_full": "5d573013af4f455d30e1bd1d023496855274935544fe1afb890404af545656f8",
+            "after_full": "d12088452f325e252d1eff4f70748e05b822238196b925c5a0a84827633eb683",
+            "before_content": "3c4adb56e292994fc2bb4b78dc24c713f49ffa755734d3c979f56941b8519f4a",
+            "after_content": "3c4adb56e292994fc2bb4b78dc24c713f49ffa755734d3c979f56941b8519f4a",
+            "sentinel_cleanup": {
+              "removed": true,
+              "absent_after": true,
+              "removed_utc": "2026-09-23T04:16:11.323299+00:00"
+            }
+          },
+          "development": {
+            "before_full": "8289749ad12eff0f90acb2ef760596b3aa0dfb784a337f1eca8ec365abb20733",
+            "after_full": "8289749ad12eff0f90acb2ef760596b3aa0dfb784a337f1eca8ec365abb20733",
+            "before_content": "05f91628d0d1f1742a88b49d3f7a8109e908d170619de01daa22f933d13731e5",
+            "after_content": "05f91628d0d1f1742a88b49d3f7a8109e908d170619de01daa22f933d13731e5",
+            "sentinel_cleanup": {
+              "removed": true,
+              "absent_after": true,
+              "removed_utc": "2026-09-23T04:16:11.323396+00:00"
+            }
+          }
+        },
+        "acceptance_checks": {
+          "production_full_content_unchanged": false,
+          "production_sentinel_unchanged": true,
+          "production_denied_by_os": true,
+          "production_cleanup": true,
+          "development_full_content_unchanged": true,
+          "development_sentinel_unchanged": true,
+          "development_denied_by_os": true,
+          "development_cleanup": true,
+          "service_health": true,
+          "service_closed": true,
+          "isolated_home_effective": true,
+          "isolated_data_and_logs": true,
+          "real_app_preserved": true
+        }
+      },
+      {
+        "evidence": "artifacts/rust-tauri/R00/T01/startup-probe-r2.json",
+        "single_probe_status": "PASS",
+        "single_probe_exit_code": 0,
+        "test_root": "/tmp/lingxi-r00-a01-r2-4cw__r86",
+        "health": {
+          "http_status": 200,
+          "body_status": "ok"
+        },
+        "server_exit_code": 0,
+        "server_info_removed": true,
+        "lingxi_app_pids_before": [
+          29489
+        ],
+        "lingxi_app_pids_after": [
+          29489
+        ],
+        "real_directories": {
+          "production": {
+            "before_full": "28dc64551f5974e2dc7e29c6f19fa5d5cff2194136b009ac05816af458fc7e2c",
+            "after_full": "28dc64551f5974e2dc7e29c6f19fa5d5cff2194136b009ac05816af458fc7e2c",
+            "before_content": "c6e39481ec9e1848c5e9806b461ea5b6d939caf9f560b8eb3fe0da59cd796640",
+            "after_content": "c6e39481ec9e1848c5e9806b461ea5b6d939caf9f560b8eb3fe0da59cd796640",
+            "sentinel_cleanup": {
+              "removed": true,
+              "absent_after": true,
+              "removed_utc": "2026-09-23T04:22:25.520928+00:00"
+            }
+          },
+          "development": {
+            "before_full": "b62ef74df490405be2772939555d4871461dbd176671f38ce0432bbe4117d18f",
+            "after_full": "b62ef74df490405be2772939555d4871461dbd176671f38ce0432bbe4117d18f",
+            "before_content": "ebf6f9f0aca4235ec061ce9dc481a5809065941dadfb2c56b9010da221f19533",
+            "after_content": "ebf6f9f0aca4235ec061ce9dc481a5809065941dadfb2c56b9010da221f19533",
+            "sentinel_cleanup": {
+              "removed": true,
+              "absent_after": true,
+              "removed_utc": "2026-09-23T04:22:25.520999+00:00"
+            }
+          }
+        },
+        "acceptance_checks": {
+          "production_full_content_unchanged": true,
+          "production_sentinel_unchanged": true,
+          "production_denied_by_os": true,
+          "production_cleanup": true,
+          "development_full_content_unchanged": true,
+          "development_sentinel_unchanged": true,
+          "development_denied_by_os": true,
+          "development_cleanup": true,
+          "service_health": true,
+          "service_closed": true,
+          "isolated_home_effective": true,
+          "isolated_data_and_logs": true,
+          "real_app_preserved": true
+        }
+      }
+    ],
+    "scenario_status": "BLOCKED",
+    "reason": "The first full real-directory scan observed ~/.lingxi metadata change while Lingxi.app ran. A later single probe was stable, but no writer-free window was established."
+  },
+  "isolated_probe_r3": {
+    "command": "python3 -B artifacts/rust-tauri/R00/T01/startup_probe_r2.py",
+    "exit_codes": [
+      1,
+      0,
+      0,
+      0
+    ],
+    "attempts": [
+      {
+        "evidence": "artifacts/rust-tauri/R00/T01/startup-probe-r3-b0e1de4a10026986fc615e34.json",
+        "status": "BLOCKED",
+        "quiet_before": true,
+        "quiet_after": true,
+        "all_checks": false,
+        "cleanup_safe": true,
+        "health": {
+          "http_status": 200,
+          "body_status": "ok"
+        },
+        "server_exit_code": 0,
+        "probe_sha256": null
+      },
+      {
+        "evidence": "artifacts/rust-tauri/R00/T01/startup-probe-r3-81810c93302dd6e4dbd26aef.json",
+        "status": "OBSERVED_STABLE",
+        "quiet_before": true,
+        "quiet_after": true,
+        "all_checks": true,
+        "cleanup_safe": true,
+        "health": {
+          "http_status": 200,
+          "body_status": "ok"
+        },
+        "server_exit_code": 0,
+        "probe_sha256": null
+      },
+      {
+        "evidence": "artifacts/rust-tauri/R00/T01/startup-probe-r3-e0d8c213225442074a0373b0.json",
+        "status": "OBSERVED_STABLE",
+        "quiet_before": true,
+        "quiet_after": true,
+        "all_checks": true,
+        "cleanup_safe": true,
+        "health": {
+          "http_status": 200,
+          "body_status": "ok"
+        },
+        "server_exit_code": 0,
+        "probe_sha256": "f95987ae4135bda2cea2361b3fdde1ef1e776e67de564f5779d71e9c87248307"
+      },
+      {
+        "evidence": "artifacts/rust-tauri/R00/T01/startup-probe-r3-5cc673966167ef10c4b0332f.json",
+        "status": "OBSERVED_STABLE",
+        "quiet_before": true,
+        "quiet_after": true,
+        "all_checks": true,
+        "cleanup_safe": true,
+        "health": {
+          "http_status": 200,
+          "body_status": "ok"
+        },
+        "server_exit_code": 0,
+        "probe_sha256": "48ee576a64be1d4da4a07606c557497e5a638c8f11862a9601f76de44f765226"
+      }
+    ],
+    "scenario_status": "PASS",
+    "prior_R2_status": "BLOCKED",
+    "prior_R2_evidence_retained": true
+  }
+}

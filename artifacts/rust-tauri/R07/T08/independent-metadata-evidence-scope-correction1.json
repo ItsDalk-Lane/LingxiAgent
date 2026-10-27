@@ -1,0 +1,77 @@
+{
+  "reviewer": "independent-subagent-r07_t08_final_review",
+  "reviewedAt": "2026-10-18T08:43:21.683222+00:00",
+  "stage": "R07-T08",
+  "finalAcceptance": "pending",
+  "purpose": "Correct evidence scope in prior independent reports without overwriting actual failures or original reports",
+  "priorStatementsCorrected": [
+    {
+      "files": [
+        "independent-model-metadata-fix-source-review1.json",
+        "independent-model-metadata-redaction-static-review1.json"
+      ],
+      "correction": "Earlier wording treating reproduce4 HTTP200 as an actual submitted ProviderPatch model save was inaccurate. Request used values.providers at agent config, while this route extracts providers only at body root; Source already contained extension metadata. Original200 proves successful request/unknown-compatible agent field save, not model Source save."
+    },
+    {
+      "file": "independent-model-metadata-fix-source-review1.json",
+      "correction": "Read review accepted /agents/a/config as preserving ProviderPatch entry but missed erroneous values envelope in the actual test. First metadata target run strict saved/applied assertion rightly failed. Preserve this failure and fix fixture body, do not relax assertions or change product route."
+    }
+  ],
+  "priorEvidenceStillValid": [
+    "reproduce4 actual existing Source read leaked api_key/access_token/refresh_token in summary and snake-case tokens in config/export",
+    "fixed-binary1 actual existing Source read masked known secrets; not itself proof of model save",
+    "metadata-source-permissions-fixed1 original3-case target2/3 result remains failed; actual passing authHeader/publisher cases can be cited individually only"
+  ],
+  "newVerifiedActualSaveEvidence": {
+    "receipt": "metadata-redaction-fixed-binary2.json",
+    "exitCode": 0,
+    "sourceUnchanged": true,
+    "binarySha256BeforeAndAfter": "21458f19bdc4f1becc1366c3e395ed63dd60a769357713cf77fca97196479383",
+    "actualRequest": "PUT /lingxi/v1/agents/a/config body.providers.fixture.models (no values wrapper)",
+    "strictAssertionsInProbe": [
+      "modelConfiguration.saved=true",
+      "modelConfiguration.applied=true",
+      "Source model name actually changed to requested name",
+      "Source extension bytes preserved",
+      "summary/config/export status200 with no exact known synthetic secret values and ordinary extension intact",
+      "binary hash unchanged and actual service shutdown exit0"
+    ],
+    "runtimeClaim": "Real development actual save plus three read surfaces proven, not next frozen candidate acceptance"
+  },
+  "checkedReceipts": [
+    {
+      "receipt": "metadata-redaction-reproduce4.json",
+      "receiptSha256": "d8de315ca847d80eb2eb37598b89bd6529c2e126b6e1e2eceb98ae57f527e751",
+      "exitCode": 1,
+      "sourceUnchanged": true,
+      "logSha256Matches": true
+    },
+    {
+      "receipt": "metadata-redaction-fixed-binary1.json",
+      "receiptSha256": "df0ef82006eeedc1b88db707d2e212d8ab3cc95123a30ebfc5430a408b17ab52",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "logSha256Matches": true
+    },
+    {
+      "receipt": "metadata-redaction-fixed-binary2.json",
+      "receiptSha256": "33c2096942916c5d9da2e978ad51686da178150917adefe72af8c74011aac382",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "logSha256Matches": true
+    },
+    {
+      "receipt": "metadata-source-permissions-fixed1.json",
+      "receiptSha256": "f98881c2c33fa905a921a2580d423167eee018128db4e044f5ffea447d2017c0",
+      "exitCode": 101,
+      "sourceUnchanged": true,
+      "logSha256Matches": true
+    }
+  ],
+  "pending": [
+    "Correct metadata_redaction test envelope to bare providers while retaining strict saved/applied/reorder/clear/id-preservation checks",
+    "Run corrected3-case target",
+    "Freeze successor candidate with actual-binary redaction probe and unchanged evidence helper hashes",
+    "Complete all applicable gates including existing LAN target; no skip/retirement"
+  ]
+}

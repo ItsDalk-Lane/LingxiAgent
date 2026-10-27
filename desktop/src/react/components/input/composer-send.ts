@@ -15,6 +15,7 @@ import { sessionScopedValue } from '../../stores/session-slice';
 import type { AttachedFile, QuotedSelection } from '../../stores/input-slice';
 import { upsertOptimisticSessionFirstMessage } from '../../stores/session-actions';
 import { getWebSocket } from '../../services/websocket';
+import { resolveServerConnection } from '../../services/service-client';
 import { renderMarkdown } from '../../utils/markdown';
 import { isImageFile, isVideoFile } from '../../utils/format';
 import { isAudioFileName } from '../../utils/file-kind';
@@ -65,6 +66,7 @@ import {
   isChatVideoBase64ContentCompatible,
   isChatVideoBase64WithinLimit,
 } from '../../../../../shared/video-mime.ts';
+import { usePlatform } from '../../hooks/use-platform';
 
 export type { ComposerSendBundle };
 
@@ -325,8 +327,8 @@ export async function prepareComposerSend(
 
   // 图片 / 视频读 base64。统一走 platform 层：Electron 里 platform 代理到 hana，
   // Web/PWA 里 platform 代理到 HTTP fallback。
-  const platform = window.platform;
-  const images: Array<{ type: 'image'; data: string; mimeType: string }> = [];
+  const platform = usePlatform();
+  const images: Array<{ type: 'image'; data?: string; fileId?: string; mimeType: string }> = [];
   const videos: Array<{ type: 'video'; data: string; mimeType: string }> = [];
   const audios: Array<{ type: 'audio'; data: string; mimeType: string }> = [];
   const imageBase64Map = new Map<string, { base64Data: string; mimeType: string }>();
@@ -336,6 +338,11 @@ export async function prepareComposerSend(
   const imageFileOnlyPaths = new Set<string>();
   for (const img of imagesAsFileOnly ? [] : imageFiles) {
     try {
+      // Rust 用已登记的会话身份读取大图，避免把大块 base64 塞入控制帧。
+      if (resolveServerConnection(state)?.serverNodeKind === 'lingxi-service' && img.fileId) {
+        images.push({ type: 'image', fileId: img.fileId, mimeType: chatImageMimeTypeForName(img.name, img.mimeType) });
+        continue;
+      }
       if (img.base64Data && img.mimeType) {
         images.push({ type: 'image', data: img.base64Data, mimeType: img.mimeType });
       } else {

@@ -1,0 +1,77 @@
+{
+ "kind": "r09-a10-preview-report",
+ "href": "http://127.0.0.1:51873/lingxi/v1/preview/html/pv_b780797e6889edc21f23498e1afec293?previewToken=e6L8bCEOioy0M1Mre1jJAerjIqVOlDf6M54WJqkDgvM",
+ "previewTokenFromUrl": "e6L8bCEOioy0M1Mre1jJAerjIqVOlDf6M54WJqkDgvM",
+ "checks": {
+  "tauriGlobalType": "undefined",
+  "tauriInternalsType": "undefined",
+  "tauriCanaryInvoke": "not-attempted",
+  "parentDocument": "blocked:SecurityError",
+  "parentLocationHref": "blocked:SecurityError",
+  "parentLocalStorage": "blocked:SecurityError",
+  "topDocument": "blocked:SecurityError",
+  "topLocalStorage": "blocked:SecurityError",
+  "parentTauriInternals": "blocked:SecurityError"
+ },
+ "attempts": [
+  {
+   "name": "tauri-invoke-direct",
+   "outcome": "threw",
+   "error": "Error"
+  },
+  {
+   "name": "tauri-invoke-parent",
+   "outcome": "threw",
+   "error": "SecurityError"
+  },
+  {
+   "name": "tauri-global-parent",
+   "outcome": "threw",
+   "error": "SecurityError"
+  },
+  {
+   "name": "hana-parent",
+   "outcome": "threw",
+   "error": "SecurityError"
+  },
+  {
+   "name": "fetch-service-api",
+   "outcome": "rejected",
+   "error": "TypeError"
+  },
+  {
+   "name": "fetch-service-fs",
+   "outcome": "rejected",
+   "error": "TypeError"
+  },
+  {
+   "name": "fetch-relative-fs",
+   "outcome": "rejected",
+   "error": "TypeError"
+  },
+  {
+   "name": "fetch-canary-token",
+   "outcome": "rejected",
+   "error": "TypeError"
+  },
+  {
+   "name": "beacon-canary",
+   "outcome": "initiated"
+  },
+  {
+   "name": "image-canary",
+   "outcome": "initiated"
+  },
+  {
+   "name": "websocket-canary",
+   "outcome": "initiated"
+  },
+  {
+   "name": "popup-canary",
+   "outcome": "threw",
+   "error": "Error"
+  }
+ ],
+ "cspViolations": [],
+ "tokenRequest": "requested"
+}

@@ -1,0 +1,33 @@
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r00_management_leaves") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.24s
+     Running tests/r00_management_leaves.rs (/private/tmp/lingxi-r07-build/debug/deps/r00_management_leaves-4c2478101d26e1c4)
+
+running 1 test
+LINGXI_AUTH_REJECTED request_id="req-117bb9463d8959bd0826f0fc951482ad" method=GET path=/lingxi/v1/me status=401 Unauthorized reason=missing_credential remote=127.0.0.1:53744
+LINGXI_AUTH_REJECTED request_id="req-14d84f0168a20a547ed5f86d873a2952" method=GET path=/lingxi/v1/access/summary status=401 Unauthorized reason=missing_credential remote=127.0.0.1:53748
+LINGXI_AUTH_REJECTED request_id="req-a9fc9d9a1ab372277b7ac45faca43494" method=PUT path=/lingxi/v1/access/account/profile status=401 Unauthorized reason=missing_credential remote=127.0.0.1:53754
+LINGXI_AUTH_REJECTED request_id="req-885629dd12df1ea940f33dc496eb2eba" method=PUT path=/lingxi/v1/access/network status=401 Unauthorized reason=missing_credential remote=127.0.0.1:53757
+LINGXI_AUTH_REJECTED request_id="req-f421ce26d1f0b87e03f12e4553ee01f6" method=GET path=/lingxi/v1/access/mobile-qr.svg status=401 Unauthorized reason=missing_credential remote=127.0.0.1:53759
+LINGXI_AUTH_REJECTED request_id="req-8ff7c6d19dad8f59332489edacfc3413" method=PUT path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:53765
+LINGXI_AUTH_REJECTED request_id="req-6511fa79f60609558f113f30204ad67c" method=DELETE path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:53772
+LINGXI_AUTH_REJECTED request_id="req-880dea6200b02979f7cd5c98bf0273c3" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:53780
+LINGXI_AUTH_REJECTED request_id="req-c876c01313e920e0946d2f1303a0a54c" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:53782
+LINGXI_AUTH_REJECTED request_id="req-a1e045a91f8414e512799e016a6e5a56" method=GET path=/lingxi/v1/devices status=401 Unauthorized reason=missing_credential remote=127.0.0.1:53785
+LINGXI_AUTH_REJECTED request_id="req-765d16d35ccac96f6d9e6fd4f301ea8c" method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:53788
+LINGXI_AUTH_REJECTED request_id="req-04e50f4ae4cf6898419931dd5e0f570d" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:53791
+LINGXI_AUTH_REJECTED request_id="req-6fd57472bcf41cd02ba7339e7d39ea23" method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:53797
+LINGXI_AUTH_REJECTED request_id="req-0bf8322ced52f1d45793c62935a24146" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:53801
+LINGXI_AUTH_REJECTED request_id="req-f01d688b76a45933b03a1ceb0f2e9374" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:53803
+LINGXI_AUTH_REJECTED request_id="req-4a251eefd393d85cd5829a4d84abbc15" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:53811
+LINGXI_TRANSPORT_REJECTED request_id="req-c37875e91558ee61c7f62a33f1b68d2a" method=POST path=/lingxi/v1/web-auth/login status=403 reason=bad_origin origin=http://evil.example host=192.168.3.96:53848 remote=192.168.3.96:53851
+LINGXI_TRANSPORT_REJECTED request_id="req-c928e9ec8afcbaeb3edbd1c4d5ebf3bb" method=POST path=/lingxi/v1/web-auth/login status=403 reason=bad_origin origin=https://192.168.3.96:53848 host=192.168.3.96:53848 remote=192.168.3.96:53857
+test r00_management_positive_and_negative_branches_on_real_service has been running for over 60 seconds
+test r00_management_positive_and_negative_branches_on_real_service ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 62.68s
+

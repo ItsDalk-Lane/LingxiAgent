@@ -1,0 +1,15 @@
+
+thread 'c01_v7_upgrade_preserves_receipts_and_restarts_are_idempotent' (14728011) panicked at crates/lingxi-adapters/tests/r06_ar_f14_migration_receipts.rs:83:5:
+assertion `left == right` failed
+  left: Number(28)
+ right: Number(26)
+
+
+failures:
+    c01_fresh_database_receipts_equal_registry_and_inspector
+    c01_v7_upgrade_preserves_receipts_and_restarts_are_idempotent
+    c01_v8_upgrade_preserves_receipts_and_restarts_are_idempotent
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.64s
+
+error: test failed, to rerun pass `-p lingxi-adapters --test r06_ar_f14_migration_receipts`

@@ -1,0 +1,34 @@
+{
+  "stage": "R07-T05",
+  "candidate": "t05b",
+  "name": "office",
+  "purpose": "final_acceptance",
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r07_office_tools",
+    "--",
+    "--nocapture"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-16T04:48:44.493919+00:00",
+  "sourceFingerprint": "618ca688717a3092835963be74e421e951176b5d625d5f714200f771489121fe",
+  "log": "t05b-office.log",
+  "endedAt": "2026-10-16T04:48:53.146608+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "618ca688717a3092835963be74e421e951176b5d625d5f714200f771489121fe",
+  "logSha256": "5a06de860b79554b644a9309441abe8d72cd9460c6f6771fc59d1e56ead1a2a9",
+  "sourceUnchanged": true
+}

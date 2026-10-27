@@ -7,7 +7,7 @@ import { useStore } from '../../stores';
 import { deskNativeRootDir, jumpToDeskSearchResult, loadDeskFiles, searchDeskFiles } from '../../stores/desk-actions';
 import { togglePreviewPanel } from '../../stores/preview-actions';
 import { canUseNativeResourcePath } from '../../services/resource-access';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 import type { DeskSearchResult } from '../../types';
 import { isWebRuntime } from '../../utils/platform-runtime';
 import {
@@ -21,6 +21,7 @@ import {
   type CtxMenuState,
 } from './desk-types';
 import s from './Desk.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 // ── Open in Finder 按钮 ──
 //
@@ -36,7 +37,7 @@ function openDeskNativeFolder(): void {
   if (!canUseNativeDeskPath()) return;
   const root = deskNativeRootDir(useStore.getState());
   if (!root) return;
-  window.platform?.openFolder?.(root);
+  usePlatform()?.openFolder?.(root);
 }
 
 export function DeskOpenButton() {

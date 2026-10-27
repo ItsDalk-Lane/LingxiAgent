@@ -1,0 +1,111 @@
+{
+  "schema": "t07-ab-compare/v1",
+  "kernelA": "node",
+  "kernelB": "rust",
+  "suiteFiles": [
+    "desktop/src/react/__tests__/r08/r08-t07-terminal-ab.test.ts"
+  ],
+  "tasks": {
+    "leaf.terminal.positive": {
+      "verdict": "parity",
+      "A": {
+        "ok": true,
+        "observed": {
+          "cases": {
+            "snapshot.current-terminal-listed": true,
+            "snapshot.lists-both-session-terminals": true,
+            "snapshot.identity-mismatch-rejected": true,
+            "snapshot.other-session-no-leak": true,
+            "tail.initial-window": true,
+            "tail.new-output-after-since": true,
+            "tail.identity-mismatch-rejected": true,
+            "tail.foreign-terminal-rejected": true,
+            "close.reports-killed-or-already-stopped": true,
+            "close.process-really-stopped": true,
+            "close.unknown-id-rejected": true,
+            "close.foreign-terminal-rejected": true,
+            "close.identity-mismatch-rejected": true,
+            "transport.survives-frame-family": true
+          },
+          "infra": {
+            "final": true,
+            "echo": {
+              "steps": 2,
+              "last": "{\n  \"terminalId\": \"term_mvp5se2v_abd69a53\",\n  \"toolCallId\": \"r08-plan-term1-1\",\n  \"sessionId\": \"sess_0mvp5sd1l_e435d0703b6b42def9d3\",\n  \"sessionPath\": \"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/root-a-node/agents/a1/sessions/2026-10-26T11-13-58-266Z_01a177ea-c9fa-7617-b757-298e051ecca5.jsonl\",\n  \"agentId\": \"a1\",\n  \"cwd\": \"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/workspace\",\n  \"command\": \"cd '/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/workspace' && while true; do printf 'beat\\\\n' >> \\\"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/workspace/r08-terminal-heartbeat-node-1793013238312-31888.txt\\\"; sleep 0.2; done\",\n  \"label\": \"while true; do printf 'beat\\\\n' >> \\\"/private/tmp/lingxi-r08-verif\",\n  \"status\": \"running\",\n  \"seq\": 0,\n  \"createdAt\": 1793013239623,\n  \"lastActivityAt\": 1793013239623,\n  \"exitedAt\": null,\n  \"exitCode\": null,\n  \"signal\": null,\n  \"transcriptPath\": \"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/root-a-node/.ephemeral/terminal-sessions/term_mvp5se2v_abd69a53.jsonl\",\n  \"output\": \"\",\n  \"processId\": \"term_mvp5se2v_abd69a53\",\n  \"process_id\": \"term_mvp5se2v_abd69a53\",\n  \"execCommand\": {\n    \"cmd\": \"wh"
+            },
+            "terminalIds": [
+              "term_mvp5sdsl_803bf66b",
+              "term_mvp5se2v_abd69a53"
+            ],
+            "workspace": "/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/workspace"
+          },
+          "heartbeat": "/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/workspace/r08-terminal-heartbeat-node-1793013238312-31888.txt",
+          "last0": 3,
+          "closeInteractiveStatus": "killed",
+          "tailNewLastSeq": 4,
+          "framesSample": [
+            ">>> {\"type\":\"terminal_close_request\",\"sessionId\":\"sess_0mvp5sd1l_e435d0703b6b42def9d3\",\"sessionPath\":\"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/",
+            "{\"type\":\"terminal_state\",\"sessionId\":\"sess_0mvp5sd1l_e435d0703b6b42def9d3\",\"sessionPath\":\"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/root-a-node/",
+            "{\"type\":\"terminal_close_result\",\"requestId\":\"term-close-interactive\",\"sessionId\":\"sess_0mvp5sd1l_e435d0703b6b42def9d3\",\"sessionPath\":\"/private/tmp/lingxi-r08-ve",
+            "{\"type\":\"terminal_state\",\"sessionId\":\"sess_0mvp5sd1l_e435d0703b6b42def9d3\",\"sessionPath\":\"/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/root-a-node/"
+          ]
+        },
+        "ms": 12463
+      },
+      "B": {
+        "ok": true,
+        "observed": {
+          "cases": {
+            "snapshot.current-terminal-listed": true,
+            "snapshot.lists-both-session-terminals": true,
+            "snapshot.identity-mismatch-rejected": true,
+            "snapshot.other-session-no-leak": true,
+            "tail.initial-window": true,
+            "tail.new-output-after-since": true,
+            "tail.identity-mismatch-rejected": true,
+            "tail.foreign-terminal-rejected": true,
+            "close.reports-killed-or-already-stopped": true,
+            "close.process-really-stopped": true,
+            "close.unknown-id-rejected": true,
+            "close.foreign-terminal-rejected": true,
+            "close.identity-mismatch-rejected": true,
+            "transport.survives-frame-family": true
+          },
+          "infra": {
+            "final": true,
+            "echo": {
+              "steps": 2,
+              "last": "Interactive process started (pty).\nprocess_id: proc:6d7606fa2a06c6229983fb4cd9324187\nstatus: running\ncwd: /private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/workspace\nUse write_stdin (process_id, chars) to interact and read output; the process keeps running across tool calls until it exits or is closed.\n[process still running (handle: proc:6d7606fa2a06c6229983fb4cd9324187)]"
+            },
+            "terminalIds": [
+              "proc:ad063821eda3ae4c42f5ae1f7a8bba32",
+              "proc:6d7606fa2a06c6229983fb4cd9324187"
+            ],
+            "workspace": "/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/workspace"
+          },
+          "heartbeat": "/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01/workspace/r08-terminal-heartbeat-rust-1793013252739-32513.txt",
+          "last0": 2,
+          "closeInteractiveStatus": "killed",
+          "tailNewLastSeq": 20,
+          "framesSample": [
+            ">>> {\"type\":\"terminal_close_request\",\"sessionId\":\"sess-31805-1a177eb027d-0\",\"sessionPath\":\"native:sess-31805-1a177eb0281-1\",\"terminalId\":\"proc:ad063821eda3ae4c4",
+            "{\"code\":\"session_identity_mismatch\",\"message\":\"sessionId and sessionPath do not resolve to one session\",\"type\":\"error\"}",
+            ">>> {\"type\":\"terminal_close_request\",\"sessionId\":\"sess-31805-1a177eb027d-0\",\"sessionPath\":\"native:sess-31805-1a177eb027d-0\",\"terminalId\":\"proc:ad063821eda3ae4c4",
+            "{\"requestId\":\"term-close-interactive\",\"sessionId\":\"sess-31805-1a177eb027d-0\",\"sessionPath\":\"native:sess-31805-1a177eb027d-0\",\"status\":\"killed\",\"terminalId\":\"pro"
+          ]
+        },
+        "ms": 12329
+      }
+    }
+  },
+  "summary": {
+    "tasks": 1,
+    "parity": 1,
+    "differs": 0,
+    "recorded": 0,
+    "failedA": 0,
+    "failedB": 0,
+    "suiteExitA": 0,
+    "suiteExitB": 0
+  }
+}

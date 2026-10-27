@@ -1,0 +1,232 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t04_remote_boundary",
+ "cases": [
+  {
+   "case": "native::remote_boundary-unit-tests",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "passed": 6
+   }
+  },
+  {
+   "case": "native::permissions-unit-tests",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "passed": 9
+   }
+  },
+  {
+   "case": "native::speech-unit-tests",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "passed": 9
+   }
+  },
+  {
+   "case": "leaf::remote-boundary.no-grant-requires-local-auth",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::remote_boundary::tests::remote_request_without_grant_requires_local_authorization",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::remote-boundary.remote-cannot-self-grant",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::remote_boundary::tests::remote_cannot_grant_itself",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::remote-boundary.grant-scope-and-ttl",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::remote_boundary::tests::grant_scopes_device_subject_and_ttl",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::remote-boundary.expired-grant-and-tcc-conjunctive",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::remote_boundary::tests::expired_grant_does_not_allow_and_local_tcc_is_conjunctive",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::remote-boundary.local-principals-follow-tcc",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::remote_boundary::tests::local_principals_follow_host_permission_only",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::remote-boundary.revoke-grant",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::remote_boundary::tests::revoke_removes_grant_and_device_tcc_mapping_is_complete",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::remote-boundary.helper-remote-denied",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::permissions::tests::remote_sessions_can_never_start_leases",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::remote-boundary.speech-caller-gated",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "test": "native::speech::tests::caller_and_platform_errors",
+    "exitCode": 0
+   }
+  },
+  {
+   "case": "leaf::remote-boundary.unauth-computer-use-read",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 401
+   }
+  },
+  {
+   "case": "leaf::remote-boundary.unauth-request-permissions",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 401
+   }
+  },
+  {
+   "case": "leaf::remote-boundary.unauth-app-events",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 401
+   }
+  },
+  {
+   "case": "leaf::remote-boundary.unauth-media-transcribe",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 401
+   }
+  },
+  {
+   "case": "leaf::remote-boundary.local-owner-allowed",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": 200
+   }
+  },
+  {
+   "case": "leaf::remote-boundary.no-remote-permission-request-event",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "events": []
+   }
+  },
+  {
+   "case": "service::identity",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": null
+  },
+  {
+   "case": "service::terminated-no-residual",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "exitCode": 0,
+    "pid": 5588
+   }
+  },
+  {
+   "case": "blocked::remote-boundary.two-host-e2e",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "宿主已注册 + T02 远端模式已实现；双宿主端到端拒绝需真实 GUI 会话（Lead GUI 禁令）"
+   }
+  },
+  {
+   "case": "blocked::remote-boundary.remote-device-read-chain",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "远端任务实际调用本机麦克风/屏幕的完整链（服务→宿主命令→设备）需 helper 与宿主注册；当前仅策略/鉴权边可验"
+   }
+  },
+  {
+   "case": "blocked::remote-boundary.tcc-revoke-mid-task",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "blocked": true,
+    "reason": "任务进行中真实撤销屏幕/麦克风权限并观察采集停止需人工 TCC 操作（BLOCKED-SYSTEM-PERMISSIONS）"
+   }
+  },
+  {
+   "case": "isolation::real-home-untouched",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "before": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    },
+    "after": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    }
+   }
+  }
+ ]
+}

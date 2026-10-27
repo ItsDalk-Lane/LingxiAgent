@@ -1,0 +1,34 @@
+
+running 10 tests
+test r07_media_admin::read_only_session_generate_is_forbidden_without_dispatch ... ok
+test r07_media_admin::asr_transcribe_roundtrip_events_and_failure_honesty ... ok
+test r07_media_admin::http_image_generate_acceptance_then_gallery_done_and_real_bytes_served ... ok
+test r07_media_admin::unified_generate_dispatch_accepts_kind_vocabulary_and_rejects_unknown ... ok
+test r07_media_admin::http_video_generate_acceptance_then_gallery_done_and_real_bytes_served ... ok
+test r07_media_admin::ask_mode_waits_for_real_decision_and_blocks_concurrent_admission ... ok
+test r07_media_admin::failed_image_task_retries_into_new_task_with_attempt_continuity ... ok
+test r07_media_admin::speech_response_delivery_waits_for_terminal_and_returns_real_files ... ok
+test r07_media_admin::direct_media_action_waiting_for_approval_honors_cancel_and_live_plugin_revocation ... ok
+test r07_media_admin::admin_models_config_and_asr_preferences_roundtrip ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.90s
+
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.48s
+     Running tests/r07_media_admin.rs (rust/target-r07/debug/deps/r07_media_admin-dfe954fc597dca78)

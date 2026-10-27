@@ -86,6 +86,7 @@ function qqFileTypeForMedia(url: any, metadata: Record<string, any> = {}) {
 }
 
 function qqMediaEndpoints(chatId: any, metadata: Record<string, any> = {}, resource: any) {
+  if ((metadata.replyContext || metadata).guildId) throw new Error("QQ 频道私信暂不支持此富媒体发送方式");
   const targetType = qqTargetType(metadata);
   if (targetType === "group") return [`/v2/groups/${chatId}/${resource}`];
   if (targetType === "user") return [`/v2/users/${chatId}/${resource}`];
@@ -93,6 +94,9 @@ function qqMediaEndpoints(chatId: any, metadata: Record<string, any> = {}, resou
 }
 
 function qqMessageEndpoints(chatId, replyContext = {}) {
+  // 频道私信的 guild_id 来自真实入站事件，不能作为 C2C 的 user_openid 使用。
+  const guildId = (replyContext as any).guildId;
+  if (guildId) return [{ path: `/dms/${guildId}/messages`, label: "Direct", channel: true }];
   const targetType = qqTargetType(replyContext);
   if (targetType === "group") return [{ path: `/v2/groups/${chatId}/messages`, label: "Group" }];
   if (targetType === "user") return [{ path: `/v2/users/${chatId}/messages`, label: "C2C" }];
@@ -239,6 +243,7 @@ export function createQQAdapter({ appID, appSecret, agentId, onMessage, dmGuildM
   let lastSeq = null;
   let sessionId = null;
   let stopped = false;
+  let reconnectTimer = null;
   let reconnectAttempts = 0;
   let heartbeatAckReceived = true;
   let lastConnectedAt = 0;
@@ -363,7 +368,7 @@ export function createQQAdapter({ appID, appSecret, agentId, onMessage, dmGuildM
     try {
       const token = await getToken();
       const { url } = await apiRequest("GET", "/gateway", undefined, { stage: "gateway", idempotent: true });
-
+      if (stopped) return;
       ws = new WebSocket(url, webSocketOptionsForUrl(url));
 
       ws.on("open", () => {
@@ -413,7 +418,7 @@ export function createQQAdapter({ appID, appSecret, agentId, onMessage, dmGuildM
             op: OP.IDENTIFY,
             d: {
               token: `QQBot ${token}`,
-              intents: INTENTS.PUBLIC_GUILD_MESSAGES | INTENTS.GROUP_AND_C2C,
+              intents: INTENTS.PUBLIC_GUILD_MESSAGES | INTENTS.GROUP_AND_C2C | INTENTS.DIRECT_MESSAGE,
               shard: [0, 1],
             },
           });
@@ -543,6 +548,7 @@ export function createQQAdapter({ appID, appSecret, agentId, onMessage, dmGuildM
         isGroup: true,
         _msgId: data.id,
         replyTargetType: "channel",
+        replyContext: { channelId: data.channel_id },
         attachments: attachments.length ? attachments : undefined,
       });
     }
@@ -573,6 +579,8 @@ export function createQQAdapter({ appID, appSecret, agentId, onMessage, dmGuildM
         qqPrincipal: principal || undefined,
         isGroup: false,
         _msgId: data.id,
+        replyTargetType: "user",
+        replyContext: { guildId: data.guild_id, channelId: data.channel_id },
         attachments: attachments.length ? attachments : undefined,
       });
     }
@@ -615,7 +623,8 @@ export function createQQAdapter({ appID, appSecret, agentId, onMessage, dmGuildM
     const delay = delays[Math.min(reconnectAttempts, delays.length - 1)];
     reconnectAttempts++;
     debugLog()?.log("bridge", `[qq] ${delay / 1000}s 后重连（第 ${reconnectAttempts} 次）`);
-    setTimeout(() => connect(), delay);
+    if (reconnectTimer) clearTimeout(reconnectTimer);
+    reconnectTimer = setTimeout(() => { reconnectTimer = null; void connect(); }, delay);
   }
 
   // ── 启动 ──
@@ -643,8 +652,7 @@ export function createQQAdapter({ appID, appSecret, agentId, onMessage, dmGuildM
     const messageEndpoints = qqMediaEndpoints(chatId, metadata, "messages");
     for (const endpoint of messageEndpoints) {
       try {
-        await apiRequest("POST", endpoint, msgBody, { stage: "send_media_message" });
-        return;
+        return await apiRequest("POST", endpoint, msgBody, { stage: "send_media_message" });
       } catch (err) {
         if (endpoint === messageEndpoints.at(-1)) {
           debugLog()?.error("bridge", `[qq] 富媒体消息发送失败: ${err.message}`);
@@ -663,6 +671,7 @@ export function createQQAdapter({ appID, appSecret, agentId, onMessage, dmGuildM
       const context = normalizeQQReplyContext(replyContext);
       const messageEndpoints = qqMessageEndpoints(chatId, context);
       const MAX = 2000;
+      const results = [];
       for (let i = 0; i < text.length; i += MAX) {
         const chunk = text.slice(i, i + MAX);
         let lastError = null;
@@ -672,7 +681,7 @@ export function createQQAdapter({ appID, appSecret, agentId, onMessage, dmGuildM
           attachPassiveReplyFields(body, context);
           try {
             // 发送有副作用：网络层绝不自动重试，避免重复发消息
-            await apiRequest("POST", endpoint.path, body, { stage: "send_reply" });
+            results.push(await apiRequest("POST", endpoint.path, body, { stage: "send_reply" }));
             lastError = null;
             break;
           } catch (err) {
@@ -685,6 +694,7 @@ export function createQQAdapter({ appID, appSecret, agentId, onMessage, dmGuildM
           throw lastError;
         }
       }
+      return results;
     },
 
     async sendBlockReply(chatId, text, replyContext = null) {
@@ -735,7 +745,7 @@ export function createQQAdapter({ appID, appSecret, agentId, onMessage, dmGuildM
       if (!uploadResult?.file_info) {
         throw new Error("QQ 本地文件上传成功但未返回 file_info");
       }
-      await sendRichMediaMessage(chatId, uploadResult.file_info, metadata);
+      return sendRichMediaMessage(chatId, uploadResult.file_info, metadata);
     },
 
     /** QQ 本地文件入口必须保留文件归属和 realpath 校验，不接受裸 buffer。 */
@@ -746,6 +756,7 @@ export function createQQAdapter({ appID, appSecret, agentId, onMessage, dmGuildM
 
     stop() {
       stopped = true;
+      if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
       stopHeartbeat();
       clearInterval(tokenRefreshTimer);
       if (ws) {

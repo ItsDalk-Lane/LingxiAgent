@@ -1,0 +1,18 @@
+ok stop-half: exit 0
+ok stop-half: journal.phase == selfcheck
+ok stop-half: ruling absent before committed (§10)
+FAIL resume-half: exit 0 :: status=2 stderr=error: migrate: journal /private/tmp/t05d2-matrix/d2-resume-half-RO9cHU/work/journal.json already exists (cutoverId "cut-1792737702351-65087", phase "selfcheck"); pass --resume <cutoverId> to continue (double-run guard)
+FAIL resume-half: CUTOVER_RESULT present :: 
+FAIL resume-half: outcome=committed phase=committed :: 
+FAIL resume-half: journal.phase == committed :: selfcheck
+FAIL resume-half: nine phases ok in order + committed terminal state :: ["preflight","stop_write_probe","quiesce_snapshot","backup","import","import_verify","epoch_adopt","pointer_switch"]
+ok resume-half: no refused entry
+ok resume-half: pointer valid
+ok resume-half: target stamp epoch 2 (R08_CUTOVER)
+FAIL resume-half: ruling in work-dir :: 
+FAIL resume-half: ruling copy in target legacy-import/ :: 
+ok resume-half: legacy root byte-equal (zero-mutation red line)
+ok resume-half: no duplicated ok phase
+SCRATCH_KEPT /private/tmp/t05d2-matrix/d2-resume-half-RO9cHU
+D2_RESULT {"verdict":"FAIL","leg":"resume-half","failures":["resume-half: exit 0","resume-half: CUTOVER_RESULT present","resume-half: outcome=committed phase=committed","resume-half: journal.phase == committed","resume-half: nine phases ok in order + committed terminal state","resume-half: ruling in work-dir","resume-half: ruling copy in target legacy-import/"]}
+D2_EXIT=1

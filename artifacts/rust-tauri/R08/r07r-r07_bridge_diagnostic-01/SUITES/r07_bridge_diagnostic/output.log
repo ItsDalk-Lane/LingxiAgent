@@ -1,0 +1,15 @@
+
+running 2 tests
+test concurrent_diagnostics_cannot_register_a_process_after_shutdown_returns ... ok
+test normal_qrcode_long_poll_can_exceed_twenty_seconds_and_is_reaped ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 21.06s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.85s
+     Running tests/r07_bridge_diagnostic.rs (rust/target/debug/deps/r07_bridge_diagnostic-24950104081b4777)

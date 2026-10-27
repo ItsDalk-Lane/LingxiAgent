@@ -1,0 +1,28 @@
+PASS exactly one import run
+PASS run.state=completed
+PASS all batches terminal (done+skipped)
+PASS receipt.runId matches run row
+PASS receipt.status=complete
+PASS receipt.pendingConvert=0
+PASS resumedFromRunId chain present
+PASS receipt.resumed=true
+PASS receipt.sourceUnchanged=true
+PASS receipt.sourceRootSha256 stable (importer algorithm)
+PASS source manifest pair exists
+PASS source manifest before/after byte-equal
+PASS manifest covers fixture source files
+PASS kill recovery issue recorded exactly once
+PASS no conflict errors (no duplicate/merge attempts)
+FAIL table sessions row-for-row identical to full-run baseline sessions
+FAIL table messages row-for-row identical to full-run baseline messages
+PASS table session_file_refs row-for-row identical to full-run baseline
+PASS table model_call_usage row-for-row identical to full-run baseline
+PASS table automation_jobs_v1 row-for-row identical to full-run baseline
+PASS table session_files content-identical to baseline (run/ts/path columns normalized)
+PASS table observability_legacy_trace content-identical to baseline (run/ts/path columns normalized)
+PASS table legacy_runtime_state_registry content-identical to baseline (run/ts/path columns normalized)
+FAIL table import_batches content-identical to baseline (run/ts/path columns normalized) import_batches
+PASS import_batches total=435 matches baseline
+PASS messages PK unique (no duplicates)
+
+B4-ASSERT[killed] FAILURES: 23 pass, 3 fail

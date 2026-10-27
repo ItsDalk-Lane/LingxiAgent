@@ -1,0 +1,14 @@
+{
+  "identifier": "splash",
+  "description": "R09-T06 收口：启动画面。只读 splash 资料/头像/平台。",
+  "windows": [
+    "splash"
+  ],
+  "permissions": [
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    "allow-get-avatar-path",
+    "allow-get-platform",
+    "allow-get-splash-info"
+  ]
+}

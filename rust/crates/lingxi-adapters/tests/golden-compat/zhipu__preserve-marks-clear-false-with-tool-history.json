@@ -1,0 +1,62 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "zhipu",
+  "case": "preserve-marks-clear-false-with-tool-history",
+  "model": {
+    "provider": "zhipu",
+    "id": "glm-4.7",
+    "baseUrl": "https://open.bigmodel.cn/api/paas/v4",
+    "api": "openai-completions",
+    "reasoning": true
+  },
+  "payload": {
+    "model": "glm-4.7",
+    "messages": [
+      {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "c1",
+            "type": "function",
+            "function": {
+              "name": "f",
+              "arguments": "{}"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "options": {
+    "mode": "chat"
+  },
+  "expected": {
+    "thinkingFormat": "zhipu",
+    "reasoningProfile": "zhipu-openai",
+    "matched": "zhipu",
+    "result": {
+      "model": "glm-4.7",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "f",
+                "arguments": "{}"
+              }
+            }
+          ]
+        }
+      ],
+      "thinking": {
+        "type": "enabled",
+        "clear_thinking": false
+      }
+    }
+  }
+}

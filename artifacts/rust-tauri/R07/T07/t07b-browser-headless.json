@@ -1,0 +1,38 @@
+{
+  "candidate": "t07b",
+  "name": "browser-headless",
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-adapters",
+    "--lib",
+    "browser::",
+    "--",
+    "--ignored",
+    "--skip",
+    "same_page_native_human_takeover_records_only_owned_target",
+    "--skip",
+    "externally_restored_suspended_window_is_never_reaped_or_evicted",
+    "--test-threads=2"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-18T03:07:20.610623+00:00",
+  "sourceFingerprint": "7192fa54c9f314384b04f7b76453d3ae7917983801471fcb47db1dabe2d52a2b",
+  "log": "t07b-browser-headless.log",
+  "endedAt": "2026-10-18T03:07:28.975974+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "7192fa54c9f314384b04f7b76453d3ae7917983801471fcb47db1dabe2d52a2b",
+  "logSha256": "7ec1382d7fdca250a7f0408ec4486454a7a3102a62b76f3f5ca3995d8c06e774",
+  "baseCommitAfter": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceUnchanged": true
+}

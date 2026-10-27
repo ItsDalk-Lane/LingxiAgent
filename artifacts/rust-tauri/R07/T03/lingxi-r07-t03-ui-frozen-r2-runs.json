@@ -1,0 +1,51 @@
+[
+  {
+    "name": "ui",
+    "command": [
+      "./node_modules/.bin/vitest",
+      "run",
+      "desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts",
+      "desktop/src/react/__tests__/stores/channel-actions.test.ts",
+      "desktop/src/react/__tests__/components/SessionCollabDraftCard.test.tsx",
+      "desktop/src/react/__tests__/components/ChannelsPanel.requests.test.tsx",
+      "desktop/src/react/__tests__/services/conversation-request-scope.test.ts",
+      "desktop/src/react/__tests__/components/ChannelInput.focus.test.tsx",
+      "desktop/src/react/__tests__/components/ChannelMessages.scroll.test.tsx",
+      "desktop/src/react/__tests__/components/ChannelCreateOverlay.test.tsx",
+      "desktop/src/react/__tests__/services/app-event-actions.test.ts",
+      "desktop/src/react/__tests__/services/channel-new-message-ws.test.ts",
+      "desktop/src/react/__tests__/services/rust-chat-history.test.ts",
+      "desktop/src/react/__tests__/hooks/use-stream-buffer-dedupe.test.ts"
+    ],
+    "sourceFingerprint": "c450888b209b37ec02e9c19a6a1c71722551477866c3e056546b572bf3688fb4",
+    "exitCode": 0,
+    "startedAt": "2026-10-15T21:07:48.160338+00:00",
+    "endedAt": "2026-10-15T21:07:50.790945+00:00",
+    "log": "/private/tmp/lingxi-r07-t03-frozen-r2-ui.log"
+  },
+  {
+    "name": "typecheck",
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "sourceFingerprint": "c450888b209b37ec02e9c19a6a1c71722551477866c3e056546b572bf3688fb4",
+    "exitCode": 0,
+    "startedAt": "2026-10-15T21:07:50.791314+00:00",
+    "endedAt": "2026-10-15T21:08:14.660845+00:00",
+    "log": "/private/tmp/lingxi-r07-t03-frozen-r2-typecheck.log"
+  },
+  {
+    "name": "ownership",
+    "command": [
+      "python3",
+      "docs/rust-tauri/R01/r01_t01_check_ownership.py"
+    ],
+    "sourceFingerprint": "c450888b209b37ec02e9c19a6a1c71722551477866c3e056546b572bf3688fb4",
+    "exitCode": 0,
+    "startedAt": "2026-10-15T21:08:14.661219+00:00",
+    "endedAt": "2026-10-15T21:08:15.175225+00:00",
+    "log": "/private/tmp/lingxi-r07-t03-frozen-r2-ownership.log"
+  }
+]

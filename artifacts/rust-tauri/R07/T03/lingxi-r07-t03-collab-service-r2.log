@@ -1,0 +1,27 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 43.21s
+     Running tests/r07_session_collab.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_session_collab-e9ed2f26742c668c)
+
+running 4 tests
+
+thread 'registered_tool_only_cards_then_busy_queue_accepts_one_causal_run_and_records_edits' (608019) panicked at crates/lingxi-service/tests/r07_session_collab.rs:233:201:
+called `Result::unwrap()` on an `Err` value: Internal { detail: "no such column: started_at_unix_ms in SELECT run_id FROM runs WHERE session_id=?1 AND status='running' ORDER BY started_at_unix_ms DESC LIMIT 1 at offset 74" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test registered_tool_only_cards_then_busy_queue_accepts_one_causal_run_and_records_edits ... FAILED
+test reject_expiry_readonly_and_spoofed_source_are_checked_by_real_records ... ok
+test unconfirmed_started_create_recovers_existing_target_but_never_resends ... ok
+
+thread 'create_apply_is_single_target_and_survives_restart_without_replay' (608018) panicked at crates/lingxi-service/tests/r07_session_collab.rs:260:10:
+真实Run终结: Elapsed(())
+test create_apply_is_single_target_and_survives_restart_without_replay ... FAILED
+
+failures:
+
+failures:
+    create_apply_is_single_target_and_survives_restart_without_replay
+    registered_tool_only_cards_then_busy_queue_accepts_one_causal_run_and_records_edits
+
+test result: FAILED. 2 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.51s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_session_collab`

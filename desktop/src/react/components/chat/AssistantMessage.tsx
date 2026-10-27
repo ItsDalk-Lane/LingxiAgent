@@ -38,13 +38,14 @@ import { useStore } from '../../stores';
 import { sessionScopedValue } from '../../stores/session-slice';
 import { selectSessionFiles } from '../../stores/selectors/file-refs';
 import { sessionIdForPathFromLocatorState } from '../../stores/session-slice';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../services/service-client';
 import { openFilePreview, openSkillPreview } from '../../utils/file-preview';
 import { writeAppFileDragPayload, clearAppFileDragPayload } from '../../utils/app-file-drag';
 import { openMediaViewerForRef } from '../../utils/open-media-viewer';
 import { buildFileRefId, inferKindByExt, isImageOrSvgExt } from '../../utils/file-kind';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 import { resolveFileRefUrl } from '../../services/resource-url';
+import { cancelRustMediaJob, projectRustMediaItems } from '../../services/service-client';
 import type { FileRef } from '../../types/file-ref';
 import { openPreview } from '../../stores/preview-actions';
 import type { ForkedSessionHandler, SessionNodeTarget } from '../../stores/message-turn-actions';
@@ -73,6 +74,7 @@ import {
   asDeferredHistoryContent,
   useDeferredHistoryContent,
 } from '../../hooks/use-deferred-history-content';
+import { usePlatform } from '../../hooks/use-platform';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -128,7 +130,15 @@ export const AssistantMessage = memo(function AssistantMessage({
     readLiveAssistantMessage(sessionPath, message.id)
   ), [message.id, sessionPath]);
   const liveMessage = useSyncExternalStore(subscribeToLiveMessage, readLiveMessage, () => null);
-  const sourceBlocks = liveMessage?.blocks || message.blocks || EMPTY_CONTENT_BLOCKS;
+  const rawBlocks = liveMessage?.blocks || message.blocks || EMPTY_CONTENT_BLOCKS;
+  const nativeMediaJobs = useStore(useCallback(state => sessionScopedValue(state, state.chatSessions, sessionPath)?.nativeMediaJobs, [sessionPath]));
+  const mediaStudioId = useStore(state => resolveServerConnection(state)?.studioId);
+  // 流式正文有独立快照；展示时也应用持久媒体回执，后续正文不能盖回旧占位卡。
+  const sourceBlocks = useMemo(() => {
+    if (!sessionPath.startsWith('native:') || !nativeMediaJobs) return rawBlocks;
+    const item = projectRustMediaItems([{ type: 'message', data: { ...message, blocks: [...rawBlocks] } }], nativeMediaJobs, mediaStudioId)[0];
+    return item.type === 'message' ? item.data.blocks ?? EMPTY_CONTENT_BLOCKS : rawBlocks;
+  }, [sessionPath, nativeMediaJobs, rawBlocks, message, mediaStudioId]);
   recordChatPerformance('assistant_message_render', {
     sessionPath,
     messageId: message.id,
@@ -443,15 +453,18 @@ const EXT_LABELS: Record<string, string> = {
 
 const MediaGenerationBlock = memo(function MediaGenerationBlock({ block, sessionPath, readOnly }: { block: any; sessionPath: string; readOnly: boolean }) {
   const [retrying, setRetrying] = useState(false);
+  const [stopping, setStopping] = useState(false);
   const [retryError, setRetryError] = useState('');
   const [localBlock, setLocalBlock] = useState<any | null>(null);
   const t = window.t ?? ((k: string) => k);
   const viewBlock = localBlock?.taskId === block.taskId ? { ...block, ...localBlock } : block;
-  const failed = viewBlock.status === 'failed' || viewBlock.status === 'aborted';
+  const failed = ['failed', 'aborted', 'cancelled', 'unknown'].includes(viewBlock.status);
   const kindLabel = viewBlock.kind === 'video' ? t('chat.media.kindVideo')
     : viewBlock.kind === 'speech' ? t('chat.media.kindSpeech') : t('chat.media.kindImage');
-  const canRetry = failed && viewBlock.kind !== 'video' && !readOnly && typeof viewBlock.taskId === 'string';
-  const titleText = failed
+  const canRetry = failed && !viewBlock.nativeMedia && viewBlock.kind !== 'video' && !readOnly && typeof viewBlock.taskId === 'string';
+  const titleText = viewBlock.nativeMedia
+    ? t(viewBlock.nativePhase === 'failed' && viewBlock.remoteOutcome !== 'failed' ? 'chat.media.taskFailed' : `chat.media.phase.${viewBlock.nativePhase}`)
+    : failed
     ? t('chat.media.generationFailed').replace('{kind}', kindLabel)
     : t('chat.media.generationInProgress').replace('{kind}', kindLabel);
   const reason = retryError || (typeof viewBlock.reason === 'string' ? viewBlock.reason : '');
@@ -495,8 +508,27 @@ const MediaGenerationBlock = memo(function MediaGenerationBlock({ block, session
             <span>{titleText}</span>
             {!failed && <span className={styles.mediaGenerationDots} aria-hidden="true" />}
           </div>
-          {(failed ? reason : prompt) && (
-            <div className={styles.mediaGenerationPrompt}>{failed ? reason : prompt}</div>
+          {(failed || viewBlock.nativeMedia ? reason : prompt) && (
+            <div className={styles.mediaGenerationPrompt}>{failed || viewBlock.nativeMedia ? reason : prompt}</div>
+          )}
+          {viewBlock.nativeMedia && viewBlock.localDeliveryStopped && (
+            <div className={styles.mediaGenerationPrompt}>{t('chat.media.localDeliveryStopped')}</div>
+          )}
+          {viewBlock.nativeMedia && ['unknown', 'completed', 'failed'].includes(viewBlock.remoteOutcome) && (
+            <div className={styles.mediaGenerationPrompt}>{t(`chat.media.remoteOutcome.${viewBlock.remoteOutcome}`)}</div>
+          )}
+          {viewBlock.nativeMedia && viewBlock.remoteCancel && (
+            <div className={styles.mediaGenerationPrompt}>{t(`chat.media.remoteCancel.${viewBlock.remoteCancel}`)}</div>
+          )}
+          {viewBlock.nativeMedia && !failed && !readOnly && sessionPath.startsWith('native:') && (
+            <button type="button" disabled={stopping} className={styles.mediaGenerationRetryButton}
+              onClick={async () => {
+                setStopping(true); setRetryError('');
+                try {
+                  await cancelRustMediaJob(sessionPath.slice(7), viewBlock.taskId);
+                } catch (error) { setRetryError(error instanceof Error ? error.message : t('chat.media.stopFailed')); }
+                finally { setStopping(false); }
+              }}>{t('chat.media.stopWaiting')}</button>
           )}
           {canRetry && (
             <button
@@ -543,7 +575,7 @@ const ImageOutputCard = memo(function ImageOutputCard({ fileId, filePath, label,
     try {
       return resolveFileRefUrl(ref.resource || !resource ? ref : { ...ref, resource }, {
         connection: resolveServerConnection(state),
-        platform: window.platform,
+        platform: usePlatform(),
         preferLocalFile: false,
       }).url;
     } catch {
@@ -573,7 +605,7 @@ const ImageOutputCard = memo(function ImageOutputCard({ fileId, filePath, label,
     event.currentTarget.addEventListener('dragend', () => clearAppFileDragPayload(payload.dragId), { once: true });
     if (filePath) {
       event.preventDefault();
-      window.platform?.startDrag?.(filePath);
+      usePlatform()?.startDrag?.(filePath);
     }
   }, [fileId, filePath, displayName]);
 
@@ -629,7 +661,7 @@ const VideoOutputCard = memo(function VideoOutputCard({ fileId, filePath, label,
     try {
       return resolveFileRefUrl(ref.resource || !resource ? ref : { ...ref, resource }, {
         connection: resolveServerConnection(state),
-        platform: window.platform,
+        platform: usePlatform(),
         preferLocalFile: false,
       }).url;
     } catch {
@@ -659,7 +691,7 @@ const VideoOutputCard = memo(function VideoOutputCard({ fileId, filePath, label,
     event.currentTarget.addEventListener('dragend', () => clearAppFileDragPayload(payload.dragId), { once: true });
     if (filePath) {
       event.preventDefault();
-      window.platform?.startDrag?.(filePath);
+      usePlatform()?.startDrag?.(filePath);
     }
   }, [fileId, filePath, displayName]);
 
@@ -831,7 +863,7 @@ function useSessionFileDownloadUrl({
     try {
       const resolved = resolveFileRefUrl(ref.resource || !resource ? ref : { ...ref, resource }, {
         connection: resolveServerConnection(state),
-        platform: typeof window !== 'undefined' ? window.platform : null,
+        platform: typeof window !== 'undefined' ? usePlatform() : null,
         preferLocalFile: false,
       });
       if (resolved.mode === 'local-file') return null;

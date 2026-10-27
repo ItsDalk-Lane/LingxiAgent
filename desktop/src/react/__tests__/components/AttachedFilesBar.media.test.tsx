@@ -5,12 +5,13 @@ import '@testing-library/jest-dom/vitest';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { AttachedFilesBar } from '../../components/input/AttachedFilesBar';
+import { getDesktopHost, resetDesktopHostForTests } from '../../host/desktop-host';
 
 describe('AttachedFilesBar media chips', () => {
   afterEach(() => {
     cleanup();
     vi.unstubAllGlobals();
-    delete (window as unknown as { platform?: unknown }).platform;
+    resetDesktopHostForTests();
   });
 
   it('renders image attachments with rounded thumbnail previews', () => {
@@ -27,7 +28,7 @@ describe('AttachedFilesBar media chips', () => {
     expect(screen.getByText('pasted.png')).toBeInTheDocument();
     const image = container.querySelector('img');
     expect(image).toHaveAttribute('src', 'file:///tmp/pasted.png');
-    expect(window.platform.getFileUrl).toHaveBeenCalledWith('/tmp/pasted.png');
+    expect(getDesktopHost().api.getFileUrl).toHaveBeenCalledWith('/tmp/pasted.png');
 
     fireEvent.click(screen.getByLabelText('Remove pasted.png'));
     expect(onRemove).toHaveBeenCalledWith(0);

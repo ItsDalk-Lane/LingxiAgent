@@ -174,9 +174,20 @@ export async function deleteSessionProjectFromCatalog(projectId: string, fallbac
     useStore.getState().setSessionProjectCatalog(normalizeSessionProjectCatalogResponse(data));
   }
   const assignment = asObject(root?.assignment);
+  // R08-D02 接缝：旧栈回 assignment.sessionPaths；Rust 回 assignment.sessionIds
+  // （Rust 会话定位符 = native:<sessionId>）。两种形状都映射到本地会话路径，
+  // 否则 Rust 连接下受影响会话的本地归属不会落到未分类。
+  const sessionIds = Array.isArray(assignment?.sessionIds)
+    ? (assignment.sessionIds as unknown[]).filter((item): item is string => typeof item === 'string' && item.length > 0)
+    : [];
+  const sessionIdPaths = sessionIds.length > 0
+    ? useStore.getState().sessions
+      .filter(session => typeof session.sessionId === 'string' && sessionIds.includes(session.sessionId))
+      .map(session => session.path)
+    : [];
   const sessionPaths = Array.isArray(assignment?.sessionPaths)
     ? assignment.sessionPaths.filter((item): item is string => typeof item === 'string' && item.length > 0)
-    : fallbackSessionPaths;
+    : sessionIdPaths.length > 0 ? sessionIdPaths : fallbackSessionPaths;
   const nextProjectId = typeof assignment?.projectId === 'string' ? assignment.projectId : UNCATEGORIZED_PROJECT_ID;
   const pathSet = new Set(sessionPaths);
   if (pathSet.size > 0) {

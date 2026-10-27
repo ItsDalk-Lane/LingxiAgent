@@ -1,0 +1,497 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/mobile/MobileEntrySplit.test.ts (6 tests) 49ms
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > treats wechat as a connected bridge when bootstrapping the sidebar dot
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+ ✓ desktop/src/react/__tests__/mobile/mobile-platform.test.ts (4 tests) 37ms
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > treats wechat as a connected bridge when bootstrapping the sidebar dot
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:240:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:248:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > treats wechat as a connected bridge when bootstrapping the sidebar dot
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:328:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:248:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > treats wechat as a connected bridge when bootstrapping the sidebar dot
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes the HttpOnly device web session before opening WebSocket for a persisted LAN frontend
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:328:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:338:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes the HttpOnly device web session before opening WebSocket for a persisted LAN frontend
+[hana-launch] app-ready
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > stops startup explicitly when server identity cannot be loaded
+[hana-launch] app-ready {"reason":"server-identity-failed"}
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > stops startup explicitly when server identity cannot be loaded
+[init] server identity failed: identity unavailable
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > reconnects a saved Rust server through its own login and identity routes
+[hana-launch] app-ready {"reason":"server-identity-failed"}
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > reconnects a saved Rust server through its own login and identity routes
+[init] server identity failed: identity offline
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > uses the cold local Rust identity and does not call legacy bootstrap endpoints
+[hana-launch] app-ready {"reason":"rust-core-unavailable"}
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > keeps a failed remote connection selected and shows its failure without exposing its key
+[hana-launch] app-ready {"reason":"server-identity-failed"}
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > keeps a failed remote connection selected and shows its failure without exposing its key
+[init] server identity failed: credential denied [redacted]
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > initializes the pending workspace from agent home even when cwd history points elsewhere
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:240:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:542:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > initializes the pending workspace from agent home even when cwd history points elsewhere
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:328:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:542:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > initializes the pending workspace from agent home even when cwd history points elsewhere
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > loads the studio workspace list during bootstrap so the default-workspace merge key is ready for the first session list
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:240:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:595:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > loads the studio workspace list during bootstrap so the default-workspace merge key is ready for the first session list
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:328:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:595:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > loads the studio workspace list during bootstrap so the default-workspace merge key is ready for the first session list
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > hydrates the persisted permission default before showing the pending new-session draft
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:240:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:641:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > hydrates the persisted permission default before showing the pending new-session draft
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:328:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:641:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > hydrates the persisted permission default before showing the pending new-session draft
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local token and rebuilds websocket after server restart
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:240:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:690:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local token and rebuilds websocket after server restart
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:328:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:690:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local token and rebuilds websocket after server restart
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local restart credentials without stealing an active remote connection
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:240:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:782:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local restart credentials without stealing an active remote connection
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:328:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:782:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local restart credentials without stealing an active remote connection
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes the desk default workspace when settings change the current agent workspace
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:240:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:862:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes the desk default workspace when settings change the current agent workspace
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:328:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:862:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes the desk default workspace when settings change the current agent workspace
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > ignores workspace changes for non-current agents
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:240:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:924:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > ignores workspace changes for non-current agents
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:328:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:924:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > ignores workspace changes for non-current agents
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > clears the previous default desk root when settings clear the current agent workspace
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:240:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:986:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > clears the previous default desk root when settings clear the current agent workspace
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:328:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:986:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > clears the previous default desk root when settings clear the current agent workspace
+[hana-launch] app-ready
+
+ ✓ desktop/src/react/__tests__/mobile/R07RustMobileRuntime.test.ts (12 tests) 46ms
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > configures context usage requests before settings and websocket handlers dispatch app events
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:240:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:1052:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > configures context usage requests before settings and websocket handlers dispatch app events
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:328:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:1052:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > configures context usage requests before settings and websocket handlers dispatch app events
+[hana-launch] app-ready
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > opens the in-window settings modal when main process requests settings
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:240:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:1123:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > opens the in-window settings modal when main process requests settings
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:74:80)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:328:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:1123:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > opens the in-window settings modal when main process requests settings
+[hana-launch] app-ready
+
+ ✓ desktop/src/react/__tests__/app-init.test.ts (16 tests) 771ms
+     ✓ treats wechat as a connected bridge when bootstrapping the sidebar dot  679ms
+ ✓ desktop/src/react/__tests__/host/r08-a03-web-desktop-host.test.tsx (5 tests) 49ms
+ ✓ desktop/src/react/__tests__/mobile/R02MobileSessionResponse.test.ts (2 tests) 26ms
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > rejects an HTML response from the old session route without choosing a backend
+[mobile] bootstrap failed Error: mobile server returned non-JSON response for /api/web-auth/session
+    at mobileJson (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/mobile-init.ts:208:11)
+    at readMobileAuthSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/mobile-init.ts:176:27)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/MobileApp.tsx:69:21
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > rejects a legacy session server failure without silently trying Rust
+[mobile] bootstrap failed Error: mobile session request failed: 500 
+    at readMobileAuthSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/mobile-init.ts:180:11)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/MobileApp.tsx:69:21
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > rejects an HTML Rust health response after the old route is absent
+[mobile] bootstrap failed Error: mobile server returned non-JSON response for /lingxi/v1/health
+    at mobileJson (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/mobile-init.ts:208:11)
+    at readMobileAuthSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/mobile-init.ts:189:26)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/MobileApp.tsx:69:21
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > can submit a username and password login without sending a device credential
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > logs in through the Rust auth routes and boots the formal mobile chat surface
+[workspace-ui-state] load failed: Error: unexpected mobile request: /lingxi/v1/preferences/workspace-ui-state?workspace=%2Fworkspace&surface=electron
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/mobile/MobileApp.test.tsx:266:13
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/hooks/use-hana-fetch.ts:145:23)
+    at loadPersistedWorkspaceUiState (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:154:23)
+    at activateWorkspaceDesk (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/desk-actions.ts:490:29)
+    at activateMobileWelcomeDesk (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/mobile-init.ts:522:9)
+    at initializeMobileRuntime (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/mobile-init.ts:335:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/MobileApp.tsx:87:5
+    at login (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/MobileApp.tsx:145:7)
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > logs in through the Rust auth routes and boots the formal mobile chat surface
+[jian-desk] load failed: Error: unexpected mobile request: /lingxi/v1/desk/files?dir=%2Fworkspace
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/mobile/MobileApp.test.tsx:266:13
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at sessionOwnerFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/session-connection-owner.ts:76:28)
+    at loadDeskFiles (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/desk-actions.ts:576:32)
+    at activateWorkspaceDesk (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/desk-actions.ts:521:9)
+    at activateMobileWelcomeDesk (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/mobile-init.ts:522:3)
+    at async Promise.all (index 1)
+    at initializeMobileRuntime (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/mobile-init.ts:333:3)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/MobileApp.tsx:87:5
+    at login (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/MobileApp.tsx:145:7)
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > logs in through the Rust auth routes and boots the formal mobile chat surface
+Error: unexpected mobile request: /lingxi/v1/resource-io/subscribe
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/mobile/MobileApp.test.tsx:266:13
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at watchRequest (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/resource-events.ts:164:10)
+    at subscribeEntry (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/resource-events.ts:191:10)
+    at retainResourceWatch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/resource-events.ts:156:17)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/app/WorkspaceFileChangeBridge.tsx:93:41
+    at Object.react_stack_bottom_frame (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+    at runWithFiberInDEV (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+    at commitHookEffectListMount (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+    at commitHookPassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13336:11) {
+  [stack]: [Getter/Setter],
+  [message]: 'unexpected mobile request: /lingxi/v1/resource-io/subscribe'
+}
+
+The above error occurred in the <WorkspaceFileChangeBridge> component.
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+
+[ErrorBoundary] Error: unexpected mobile request: /lingxi/v1/resource-io/subscribe
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/mobile/MobileApp.test.tsx:266:13
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at watchRequest (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/resource-events.ts:164:10)
+    at subscribeEntry (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/resource-events.ts:191:10)
+    at retainResourceWatch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/resource-events.ts:156:17)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/app/WorkspaceFileChangeBridge.tsx:93:41
+    at Object.react_stack_bottom_frame (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+    at runWithFiberInDEV (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+    at commitHookEffectListMount (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+    at commitHookPassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13336:11) 
+    at WorkspaceFileChangeBridge (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/app/WorkspaceFileChangeBridge.tsx:51:58)
+    at WorkspaceCompanionRail (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/app/WorkspaceCompanionRail.tsx:13:54)
+    at Suspense (<anonymous>)
+    at div (<anonymous>)
+    at main (<anonymous>)
+    at MobileDesktopShell (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/MobileApp.tsx:194:3)
+    at ErrorBoundary (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/ErrorBoundary.tsx:7:1)
+    at MobileApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/MobileApp.tsx:50:56)
+[workspace] load studio workspaces failed: Error: unexpected mobile request: /lingxi/v1/studio/workspaces
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/mobile/MobileApp.test.tsx:266:13
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/hooks/use-hana-fetch.ts:145:23)
+    at loadStudioWorkspaces (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/desk-actions.ts:244:23)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/WelcomeScreen.tsx:258:10
+    at Object.react_stack_bottom_frame (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+    at runWithFiberInDEV (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+    at commitHookEffectListMount (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+    at commitHookPassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13336:11)
+    at commitPassiveMountOnFiber (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:15484:13)
+[desk-tree] load failed: Error: unexpected mobile request: /lingxi/v1/desk/files?dir=%2Fworkspace
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/mobile/MobileApp.test.tsx:266:13
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at sessionOwnerFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/session-connection-owner.ts:76:28)
+    at loadDeskTreeFiles (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/desk-actions.ts:742:32)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/desk/DeskTree.tsx:760:10
+    at Object.react_stack_bottom_frame (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+    at runWithFiberInDEV (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+    at commitHookEffectListMount (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+    at commitHookPassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13336:11)
+    at reconnectPassiveEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:15832:11)
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > fails closed when the Rust bootstrap request fails after login
+[mobile] bootstrap failed Error: lingxiFetch /lingxi/v1/mobile/bootstrap: 500 Internal Server Error
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/hooks/use-hana-fetch.ts:151:13)
+    at initializeMobileRuntime (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/mobile-init.ts:272:24)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/MobileApp.tsx:87:5
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > loads chat sessions, desktop input surface, and workbench files for an authenticated phone
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > hydrates persisted mobile runtime configuration from bootstrap
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > opens the settings modal from the mobile platform settings event
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > shows a controlled reload action when the PWA has an update ready
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > keeps a PWA update notice that arrives before the mobile shell is ready
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > starts authenticated phones on the welcome draft instead of auto-opening the first session
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > refreshes mobile sessions when the phone returns to the foreground
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > re-pulls the open session on foreground when its revision drifted while backgrounded (#1610)
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > re-pulls the open session on foreground when its revision drifted while backgrounded (#1610)
+[lm-entry] targetPath= /hana/sessions/rc.jsonl preloaded= false
+[cmf-entry] path= /hana/sessions/rc.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fhana%2Fsessions%2Frc.jsonl
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > re-pulls the open session on foreground when its revision drifted while backgrounded (#1610)
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > re-pulls the open session on foreground when its revision drifted while backgrounded (#1610)
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > re-pulls the open session on foreground when its revision drifted while backgrounded (#1610)
+[lm-entry] targetPath= /hana/sessions/rc.jsonl preloaded= false
+[cmf-entry] path= /hana/sessions/rc.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fhana%2Fsessions%2Frc.jsonl
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > re-pulls the open session on foreground when its revision drifted while backgrounded (#1610)
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > does not re-pull the open session on foreground when its revision is unchanged
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > does not re-pull the open session on foreground when its revision is unchanged
+[lm-entry] targetPath= hana/sessions/idle.jsonl preloaded= false
+[cmf-entry] path= hana/sessions/idle.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fhana%2Fsessions%2Fidle.jsonl
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > does not re-pull the open session on foreground when its revision is unchanged
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > does not re-pull the open session on foreground when its revision is unchanged
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > does not re-pull the open session on foreground when its revision is unchanged
+[has-dbg] called sessionPath= /hana/sessions/idle.jsonl sessionId= null
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > syncs the selected session permission mode from the mobile session list
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > syncs the selected session permission mode from the mobile session list
+[lm-entry] targetPath= /hana/sessions/one.jsonl preloaded= false
+[cmf-entry] path= /hana/sessions/one.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fhana%2Fsessions%2Fone.jsonl
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > syncs the selected session permission mode from the mobile session list
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > opens workbench files through the neutral workbench content route using the desktop preview panel
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > uses the desktop new-session draft flow on mobile instead of creating an empty session immediately
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > keeps the currently displayed workspace and current agent for mobile global new chat
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > keeps the currently displayed workspace and current agent for mobile global new chat
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace/mio' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > keeps the currently displayed workspace and current agent for mobile global new chat
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > renders server-broadcast user messages through the desktop websocket handler
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > shows server-created sessions from another LAN client without waiting for a refetch payload
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > opens the workbench drawer from a right-edge swipe on narrow mobile
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+ ✓ desktop/src/react/__tests__/mobile/MobileApp.test.tsx (29 tests) 753ms
+
+ Test Files  7 passed (7)
+      Tests  74 passed (74)
+   Start at  19:36:24
+   Duration  2.37s (transform 2.71s, setup 80ms, import 3.00s, tests 1.73s, environment 1.60s)
+

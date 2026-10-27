@@ -1,0 +1,182 @@
+=== kill-round final receipt (target-07) ===
+{
+  "batches": {
+    "byStrategy": {
+      "convert": {
+        "done": 421,
+        "failed": 0,
+        "inProgress": 0,
+        "planned": 0,
+        "skipped": 0
+      },
+      "out-of-scope": {
+        "done": 2,
+        "failed": 0,
+        "inProgress": 0,
+        "planned": 0,
+        "skipped": 0
+      },
+      "regenerable": {
+        "done": 1,
+        "failed": 0,
+        "inProgress": 0,
+        "planned": 0,
+        "skipped": 0
+      },
+      "register": {
+        "done": 11,
+        "failed": 0,
+        "inProgress": 0,
+        "planned": 0,
+        "skipped": 0
+      }
+    },
+    "done": 435,
+    "failed": 0,
+    "pendingConvert": 0,
+    "skipped": 0,
+    "total": 435
+  },
+  "extensions": {
+    "epoch": {
+      "stamp": 1,
+      "written": true
+    },
+    "knowledgeDb": {
+      "note": "源侧无 knowledge.db",
+      "present": false
+    },
+    "legacyCron": {
+      "alreadyPresent": 0,
+      "blocked": 0,
+      "entries": [
+        {
+          "detail": null,
+          "jobId": "legacy-job-6fa4327db5e7da55fa566f12a6cfb735d4d65933775684b00d1774047da4667f",
+          "legacyJobId": "legacy-job-1",
+          "source": "/private/tmp/t04i-src-a08b/agents/a1/desk/cron-jobs.json",
+          "status": "imported"
+        },
+        {
+          "detail": null,
+          "jobId": "legacy-job-563f9a03b2b03edd1ae13ccbbbbc36b301ba3db38193b28c0d70f224931742c6",
+          "legacyJobId": "legacy-job-2",
+          "source": "/private/tmp/t04i-src-a08b/agents/a1/desk/cron-jobs.json",
+          "status": "imported"
+        },
+        {
+          "detail": null,
+          "jobId": "legacy-job-26bd3e3ed37d99ccde64c671082ccab6a974ec0e54bc6d4d13ce602390c899a7",
+          "legacyJobId": "legacy-job-3",
+          "source": "/private/tmp/t04i-src-a08b/agents/a1/desk/cron-jobs.json",
+          "status": "imported"
+        }
+      ],
+      "imported": 3
+    },
+    "legacyPlugins": {
+      "count": 0,
+      "detected": [],
+      "note": "旧用户插件不加载；仅识别与取证"
+    },
+    "legacyTrace": {
+      "failedStores": false,
+      "importedCalls": 5,
+      "skippedExisting": 0,
+      "stores": [
+        {
+          "importedCalls": 5,
+          "skippedExisting": 0,
+          "sourceRelpath": "model-observability/observability.sqlite",
+          "sourceSha256": "6c72050ca481109143c29b8f186253c39a130746adc0c43b048d16bb05d6d4c9",
+          "status": "imported",
+          "traceRows": 4
+        }
+      ],
+      "traceRows": 4
+    },
+    "runtimeState": {
+      "archiveRoot": "legacy-import/runtime-state-archive",
+      "classes": [
+        {
+          "class": "conversation-map-layout",
+          "entries": 2,
+          "sourceRelpath": "conversation-map.json",
+          "status": "archived+registered"
+        },
+        {
+          "class": "deferred-result-state",
+          "entries": 1,
+          "sourceRelpath": ".ephemeral/deferred-tasks.json",
+          "status": "archived+registered"
+        },
+        {
+          "class": "execution-leases",
+          "entries": 1,
+          "sourceRelpath": "security/execution-leases.json",
+          "status": "archived+registered"
+        },
+        {
+          "class": "loop-state",
+          "entries": 1,
+          "sourceRelpath": ".ephemeral/loop-state.json",
+          "status": "archived+registered"
+        },
+        {
+          "class": "plugin-task-registry",
+          "entries": 1,
+          "sourceRelpath": ".ephemeral/plugin-tasks.json",
+          "status": "archived+registered"
+        },
+        {
+          "class": "subagent-state",
+          "entries": 1,
+          "sourceRelpath": "subagent-runs.json",
+          "status": "archived+registered"
+        },
+        {
+          "class": "terminal-session-state",
+          "entries": 1,
+          "sourceRelpath": ".ephemeral/terminal-sessions/t1.json",
+          "status": "archived+registered"
+        },
+        {
+          "class": "workflow-state",
+          "entries": 1,
+          "sourceRelpath": "agents/a1/workflow-journals/run-w1.jsonl",
+          "status": "archived+registered"
+        },
+        {
+          "class": "workflow-state",
+          "entries": 1,
+          "sourceRelpath": "workflow-activity.json",
+          "status": "archived+registered"
+        }
+      ],
+      "entries": 10,
+      "label": "已登记、消费端待对应任务"
+    }
+  },
+  "generatedAtUnixMs": 1792709816759,
+  "issues": {
+    "count": 5207,
+    "file": "issues.jsonl"
+  },
+  "phase": "R08-T04 B3 (slice A: sessionfiles convert; slice B: legacy trace + cron import; slice C: runtime-state registry; plugins/epoch/knowledge surfaces)",
+  "resumed": true,
+  "resumedFromRunId": "import:40f42dc1:1792709734730",
+  "runId": "import:40f42dc1:1792709734730",
+  "schema": "lingxi.legacy-import-receipt/v1",
+  "sourceRootSha256": "40f42dc1fdb7dc026ee1ce6444914a02a085c12c53b7598e70fc453fdb388c9e",
+  "sourceUnchanged": true,
+  "status": "complete",
+  "target": {
+    "db": "lingxi-service/data/runs.db",
+    "note": "target root mirrors the new home layout; T05 adoption consumes this receipt"
+  }
+}
+issues total: 5207 kill-recovery: 1
+{"batchKey":"run","kind":"run-recovered-from-kill","message":"run found in state 'running' while this process holds the target instance lock; no live writer can exist; judging interrupted and resuming","refId":"import:40f42dc1:1792709734730","seq":798,"severity":"warning"}
+=== SUMMARY.md resumedFrom line ===
+- status: **complete** (resumed=true)
+- resumedFromRunId: `import:40f42dc1:1792709734730`

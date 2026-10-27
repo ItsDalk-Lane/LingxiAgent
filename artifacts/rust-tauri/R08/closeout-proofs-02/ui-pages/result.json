@@ -1,0 +1,1233 @@
+{
+  "schema": "lingxi.r08.ui-pages-receipt.v1",
+  "stage": "R08",
+  "producer": "scripts/rust-tauri/r08_ui_pages.mjs",
+  "command": "node scripts/rust-tauri/r08_ui_pages.mjs --out artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages",
+  "node": "v24.16.0",
+  "generatedAt": "2026-10-26T11:25:55.302Z",
+  "exitCode": 0,
+  "cases": {
+    "total": 87,
+    "passed": 87,
+    "failed": 0
+  },
+  "leaves": [
+    {
+      "leaf": "chat",
+      "leafName": "R00-T02-LA-81B217A7E581 F-D01-UI-UI-PAGE-CHAT",
+      "assertions": 6,
+      "cases": 25,
+      "passed": 25,
+      "failed": 0
+    },
+    {
+      "leaf": "map",
+      "leafName": "R00-T02-LA-8E2D44B48905 F-D02-UI-UI-PAGE-MAP",
+      "assertions": 7,
+      "cases": 19,
+      "passed": 19,
+      "failed": 0
+    },
+    {
+      "leaf": "mcp-settings",
+      "leafName": "R00-T02-LA-B4BB2438E855 F-D03-UI-UI-SETTINGS-MCP",
+      "assertions": 7,
+      "cases": 21,
+      "passed": 21,
+      "failed": 0
+    },
+    {
+      "leaf": "security",
+      "leafName": "R00-T02-LA-DA5AD5C40098 F-D04-UI-UI-SETTINGS-SECURITY",
+      "assertions": 4,
+      "cases": 14,
+      "passed": 14,
+      "failed": 0
+    },
+    {
+      "leaf": "quick-chat",
+      "leafName": "R00-T02-LA-A2C385A33493 F-D01-DESKTOP_BEHAVIOR-QUICK-CHAT-WINDOW",
+      "assertions": 2,
+      "cases": 8,
+      "passed": 8,
+      "failed": 0
+    }
+  ],
+  "vitestGroups": [
+    {
+      "name": "r08-new-ui",
+      "exitCode": 0,
+      "ok": true,
+      "reportFound": true,
+      "missingFiles": [],
+      "failedUnmapped": []
+    },
+    {
+      "name": "r08-existing-ui",
+      "exitCode": 0,
+      "ok": true,
+      "reportFound": true,
+      "missingFiles": [],
+      "failedUnmapped": []
+    },
+    {
+      "name": "r08-composer-send",
+      "exitCode": 0,
+      "ok": true,
+      "reportFound": true,
+      "missingFiles": [],
+      "failedUnmapped": []
+    }
+  ],
+  "liveSuites": [
+    {
+      "name": "quickchat",
+      "exitCode": 0,
+      "status": "PASS",
+      "ok": true,
+      "checks": 9,
+      "evidenceDir": "artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/quickchat"
+    },
+    {
+      "name": "session-map",
+      "exitCode": 0,
+      "status": "PASS",
+      "ok": true,
+      "checks": 19,
+      "evidenceDir": "artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map"
+    }
+  ],
+  "caseDetails": [
+    {
+      "case": "ui::chat.a0.welcome-input-exclusive-projection",
+      "leaf": "chat",
+      "assertion": 0,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx",
+        "fullName": "R08 聊天页：欢迎态/消息流/输入区（断言 1） 无会话显示欢迎页与输入框；选中当前会话后欢迎页隐藏、消息区与输入区并存"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a0.mobile-disconnected-no-thinking-get",
+      "leaf": "chat",
+      "assertion": 0,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx",
+        "fullName": "R08 聊天页：欢迎态/消息流/输入区（断言 1） mobile 或服务未连接时不请求该会话思考档位 GET"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a0.regional-failure-boundary",
+      "leaf": "chat",
+      "assertion": 0,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx",
+        "fullName": "R08 聊天页：欢迎态/消息流/输入区（断言 1） 区域渲染失败由 RegionalErrorBoundary 捕获并显示重试，不冒充消息成功"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a1.optimistic-user-message-client-id",
+      "leaf": "chat",
+      "assertion": 1,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx",
+        "fullName": "InputArea paste and slash menu behavior adds an optimistic user message with a clientMessageId when sending a prompt"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a1.slash-sent-via-ws",
+      "leaf": "chat",
+      "assertion": 1,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/components/slash-commands-ws.test.ts",
+        "fullName": "executeSlashViaWs carries the agent that owns this input box so the server never has to guess"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a1.slash-result-inline-notice",
+      "leaf": "chat",
+      "assertion": 1,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/services/ws-message-handler.test.ts",
+        "fullName": "ws-message-handler turn_end side effects shows focused slash_result through the inline notice bridge"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a1.blank-input-blocked",
+      "leaf": "chat",
+      "assertion": 1,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/components/composer-send.transaction.test.ts",
+        "fullName": "composer-send 显式结果与快照（S01–S15） P07：全空白正文（无其他内容维度）不发，且不做破坏性清空"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a1.ws-unavailable-explicit-result",
+      "leaf": "chat",
+      "assertion": 1,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/components/composer-send.transaction.test.ts",
+        "fullName": "composer-send 显式结果与快照（S01–S15） S04：ws 不存在 / CONNECTING / CLOSING / CLOSED，明确结果、不清输入、不发消息"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a2.streaming-send-queues-then-interjects",
+      "leaf": "chat",
+      "assertion": 2,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/components/InputArea.media-send.test.tsx",
+        "fullName": "InputArea media send interjects streaming attachment sends with the same message envelope as prompt sends"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a2.stop-binds-current-stream",
+      "leaf": "chat",
+      "assertion": 2,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/components/InputArea.media-send.test.tsx",
+        "fullName": "InputArea media send binds Stop to the focused session current stream identity (#2078)"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a2.idle-vs-running-control",
+      "leaf": "chat",
+      "assertion": 2,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx",
+        "fullName": "R08 聊天页：运行状态控件（断言 3） 运行信息控件随真实运行态切换：无运行任务只有发送，会话在跑显示中止"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a2.resume-keeps-streaming-state",
+      "leaf": "chat",
+      "assertion": 2,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/services/stream-resume.test.ts",
+        "fullName": "stream-resume keeps the session marked streaming when resume replay is empty but runtime says it is still running"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a3.side-chat-transcript-composer",
+      "leaf": "chat",
+      "assertion": 3,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/components/SideChatPanel.test.tsx",
+        "fullName": "SideChatPanel renders the side session transcript and its own composer"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a3.side-chat-closed-empty",
+      "leaf": "chat",
+      "assertion": 3,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/components/SideChatPanel.test.tsx",
+        "fullName": "SideChatPanel renders nothing while the panel is closed"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a3.attachments-preview",
+      "leaf": "chat",
+      "assertion": 3,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/components/AttachedFilesBar.media.test.tsx",
+        "fullName": "AttachedFilesBar media chips renders image attachments with rounded thumbnail previews"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a3.runtime-capsule-pill",
+      "leaf": "chat",
+      "assertion": 3,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/components/RuntimeInfoCapsule.test.tsx",
+        "fullName": "RuntimeInfoCapsule renders collapsed as a pill outside the document flow of the transcript"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a4.existing-session-model-switch",
+      "leaf": "chat",
+      "assertion": 4,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/components/ModelSelector.test.tsx",
+        "fullName": "ModelSelector 显式 sessionPath 时按该会话切换，并把结果回调给调用方"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a4.new-session-default-model-set",
+      "leaf": "chat",
+      "assertion": 4,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/components/ModelSelector.test.tsx",
+        "fullName": "ModelSelector applies the selected model thinking default while preparing a new session"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a4.same-model-zero-request",
+      "leaf": "chat",
+      "assertion": 4,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx",
+        "fullName": "R08 聊天页：模型切换空态（断言 5） 已建会话选择相同且可用模型直接返回、不发 switch 请求；无可选模型不产生有效切换"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a4.switch-failure-explicit-toast",
+      "leaf": "chat",
+      "assertion": 4,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/components/ModelSelector.test.tsx",
+        "fullName": "ModelSelector maps a server streaming-switch rejection to the same explicit warning"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a5.thinking-session-save",
+      "leaf": "chat",
+      "assertion": 5,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/components/thinking-level-button.test.tsx",
+        "fullName": "ThinkingLevelButton saves thinking changes to the current session when a session is active"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a5.thinking-pending-default-only",
+      "leaf": "chat",
+      "assertion": 5,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/components/thinking-level-button.test.tsx",
+        "fullName": "ThinkingLevelButton saves pending new-session thinking changes as the model default draft"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a5.thinking-save-failure-console-only",
+      "leaf": "chat",
+      "assertion": 5,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx",
+        "fullName": "R08 聊天页：思考档位空态/错误态（断言 6） 未建立会话时只改默认档位（请求不带 sessionPath）；保存失败仅 console.error，不宣称已持久化"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::map.a0.loads-real-layout-and-turn-cards",
+      "leaf": "map",
+      "assertion": 0,
+      "evidence": {
+        "kind": "live",
+        "suite": "session-map",
+        "check": "production-map-loads-real-layout-and-turn-cards"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::map.a0.other-service-empty-map-zero-mutation",
+      "leaf": "map",
+      "assertion": 0,
+      "evidence": {
+        "kind": "live",
+        "suite": "session-map",
+        "check": "actual-other-service-empty-map-clears-old-owner-with-zero-put"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::map.a0.read-failure-explicit-warning",
+      "leaf": "map",
+      "assertion": 0,
+      "evidence": {
+        "kind": "live",
+        "suite": "session-map",
+        "check": "actual-read-failure-explicit-warning-without-success-or-disk-rewrite"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::map.a1.workspace-selector-no-cwd-zero-files-read",
+      "leaf": "map",
+      "assertion": 1,
+      "evidence": {
+        "kind": "live",
+        "suite": "session-map",
+        "check": "workspace-selector-real-focus-with-no-cwd-zero-files-read"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::map.a1.card-selects-real-session-same-session-zero-fetch",
+      "leaf": "map",
+      "assertion": 1,
+      "evidence": {
+        "kind": "live",
+        "suite": "session-map",
+        "check": "card-selects-real-session-files-models-and-same-session-zero-fetch"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::map.a1.same-revision-cache-zero-history-changed-revision-refresh",
+      "leaf": "map",
+      "assertion": 1,
+      "evidence": {
+        "kind": "live",
+        "suite": "session-map",
+        "check": "same-revision-cache-zero-history-and-changed-revision-real-history-refresh"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::map.a1.archive-refusal-retains-session-selected-card",
+      "leaf": "map",
+      "assertion": 1,
+      "evidence": {
+        "kind": "live",
+        "suite": "session-map",
+        "check": "archive-refusal-retains-current-session-but-selected-card-already-changes"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::map.a2.zoom-locate-only-change-real-camera",
+      "leaf": "map",
+      "assertion": 2,
+      "evidence": {
+        "kind": "live",
+        "suite": "session-map",
+        "check": "zoom-locate-only-change-real-camera"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::map.a2.invalid-coordinates-zero-put",
+      "leaf": "map",
+      "assertion": 2,
+      "evidence": {
+        "kind": "live",
+        "suite": "session-map",
+        "check": "invalid-local-coordinates-send-zero-put"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::map.a3.pointer-drag-persists-card-position",
+      "leaf": "map",
+      "assertion": 3,
+      "evidence": {
+        "kind": "live",
+        "suite": "session-map",
+        "check": "real-pointer-drag-persists-card-position"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::map.a3.drag-write-failure-keeps-local-disk-unchanged",
+      "leaf": "map",
+      "assertion": 3,
+      "evidence": {
+        "kind": "live",
+        "suite": "session-map",
+        "check": "real-write-failure-keeps-local-drag-but-disk-unchanged"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::map.a4.collapse-reload-and-external-reveal-replaces-list",
+      "leaf": "map",
+      "assertion": 4,
+      "evidence": {
+        "kind": "live",
+        "suite": "session-map",
+        "check": "collapse-reload-and-external-current-reveal-replace-list"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::map.a4.collapse-write-failure-keeps-local-old-disk",
+      "leaf": "map",
+      "assertion": 4,
+      "evidence": {
+        "kind": "live",
+        "suite": "session-map",
+        "check": "real-collapse-write-failure-keeps-local-collapse-and-old-disk-until-reload"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::map.a5.reset-replaces-all-positions-on-disk",
+      "leaf": "map",
+      "assertion": 5,
+      "evidence": {
+        "kind": "live",
+        "suite": "session-map",
+        "check": "reset-replaces-all-positions-on-disk"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::map.a5.reset-write-failure-keeps-local-old-disk",
+      "leaf": "map",
+      "assertion": 5,
+      "evidence": {
+        "kind": "live",
+        "suite": "session-map",
+        "check": "real-reset-write-failure-keeps-local-reset-but-old-disk"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::map.a6.empty-whitespace-zero-send-continue-no-fork",
+      "leaf": "map",
+      "assertion": 6,
+      "evidence": {
+        "kind": "live",
+        "suite": "session-map",
+        "check": "empty-whitespace-zero-send-and-continue-real-prompt-without-fork-or-switch"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::map.a6.fork-failure-missing-anchor-preserves-draft-then-branch",
+      "leaf": "map",
+      "assertion": 6,
+      "evidence": {
+        "kind": "live",
+        "suite": "session-map",
+        "check": "real-fork-IO-error-and-missing-anchor-preserve-draft-then-actual-branch-prompt-focus"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::map.a6.running-busy-queues-input-zero-extra-prompt",
+      "leaf": "map",
+      "assertion": 6,
+      "evidence": {
+        "kind": "live",
+        "suite": "session-map",
+        "check": "actual-running-provider-busy-queues-input-with-zero-extra-prompt"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::map.a6.paused-unknown-delivery-preserves-draft",
+      "leaf": "map",
+      "assertion": 6,
+      "evidence": {
+        "kind": "live",
+        "suite": "session-map",
+        "check": "real-paused-service-unknown-delivery-preserves-draft-and-zero-duplicate-submit"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a0.container-cold-start-mcp-page",
+      "leaf": "mcp-settings",
+      "assertion": 0,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-container.test.tsx",
+        "fullName": "R08 设置容器初始化（MCP 设置页叶 & 安全设置页叶共用断言 1） MCP 设置页冷启动：显示 loading mask，初始化完成后移除并真实渲染 MCP 页"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a0.cached-old-data-background-refresh",
+      "leaf": "mcp-settings",
+      "assertion": 0,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-container.test.tsx",
+        "fullName": "R08 设置容器初始化（MCP 设置页叶 & 安全设置页叶共用断言 1） 已有缓存直接显示旧数据并在后台刷新，不阻塞 ready、不显示全屏 mask"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a0.provider-summary-nonblocking",
+      "leaf": "mcp-settings",
+      "assertion": 0,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-container.test.tsx",
+        "fullName": "R08 设置容器初始化（MCP 设置页叶 & 安全设置页叶共用断言 1） 供应商摘要失败不阻塞 ready，也不冒充空列表成功"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a1.connector-list-status-tools",
+      "leaf": "mcp-settings",
+      "assertion": 1,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx",
+        "fullName": "R08 MCP 设置页：连接器状态与工具权限（断言 2） 读取真实连接器列表并逐条显示状态、工具数与助手权限；无连接器时显示添加入口"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a1.read-failure-keeps-old-state",
+      "leaf": "mcp-settings",
+      "assertion": 1,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx",
+        "fullName": "R08 MCP 设置页：连接器状态与工具权限（断言 2） 连接器读取失败显示显式错误并保留旧状态，不把失败冒充成空列表"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a2.global-toggle-save-reread",
+      "leaf": "mcp-settings",
+      "assertion": 2,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx",
+        "fullName": "R08 MCP 设置页：全局启停与延迟（断言 3） 总开关保存后按助手重读状态并显示真实成功提示"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a2.global-toggle-failure-restores",
+      "leaf": "mcp-settings",
+      "assertion": 2,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx",
+        "fullName": "R08 MCP 设置页：全局启停与延迟（断言 3） 总开关保存失败恢复旧配置并显示错误，不写成功状态"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a2.defer-threshold-save",
+      "leaf": "mcp-settings",
+      "assertion": 2,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx",
+        "fullName": "R08 MCP 设置页：全局启停与延迟（断言 3） 延迟加载开关与阈值保存到全局设置，并在保存后重读状态"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a2.no-agent-global-state-only",
+      "leaf": "mcp-settings",
+      "assertion": 2,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx",
+        "fullName": "R08 MCP 设置页：全局启停与延迟（断言 3） 无 agentId 时读取全局状态（不带 agentId 查询），不伪造助手权限"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a3.add-connector-with-start-intent",
+      "leaf": "mcp-settings",
+      "assertion": 3,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx",
+        "fullName": "R08 MCP 设置页：添加与批量导入（断言 4） 添加连接器提交真实动作与启动意图，成功后面板出现新连接器"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a3.bulk-import-per-row-partial",
+      "leaf": "mcp-settings",
+      "assertion": 3,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx",
+        "fullName": "R08 MCP 设置页：添加与批量导入（断言 4） 空表单不可提交；批量导入逐项反馈部分成功，不冒充全成功"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a4.remove-with-confirm",
+      "leaf": "mcp-settings",
+      "assertion": 4,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx",
+        "fullName": "R08 MCP 设置页：编辑/删除/启停/刷新（断言 5） 删除需确认，确认后提交真实移除动作；失败时保留连接器并显示错误"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a4.start-stop-refresh-actions-keep-credentials",
+      "leaf": "mcp-settings",
+      "assertion": 4,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx",
+        "fullName": "R08 MCP 设置页：编辑/删除/启停/刷新（断言 5） 启动、停止与刷新工具提交真实动作；停用不清凭据，成功后重读连接状态"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a5.agent-connector-tools-pinned",
+      "leaf": "mcp-settings",
+      "assertion": 5,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx",
+        "fullName": "R08 MCP 设置页：按助手权限/工具/置顶（断言 6） 按助手启停连接器并保存工具权限与置顶，动作携带当前助手身份"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a5.no-agent-refuses-detail",
+      "leaf": "mcp-settings",
+      "assertion": 5,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx",
+        "fullName": "R08 MCP 设置页：按助手权限/工具/置顶（断言 6） 无工具显示空目录；无助手时不伪造授权，打开详情被明确拒绝"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a6.oauth-login-open-external-poll-refresh",
+      "leaf": "mcp-settings",
+      "assertion": 6,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx",
+        "fullName": "R08 MCP 设置页：OAuth 登录/取消/退出（断言 7） 登录打开外链并轮询到 done 后刷新连接器并显示保存成功"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a6.oauth-cancel-post-only",
+      "leaf": "mcp-settings",
+      "assertion": 6,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx",
+        "fullName": "R08 MCP 设置页：OAuth 登录/取消/退出（断言 7） 取消只提交取消动作并关闭等待卡，不因取消本身重读状态"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a6.oauth-logout-reread",
+      "leaf": "mcp-settings",
+      "assertion": 6,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx",
+        "fullName": "R08 MCP 设置页：OAuth 登录/取消/退出（断言 7） 退出登录走统一动作并经真实状态刷新显示成功；启动失败不打开外链"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a6.oauth-start-failure-no-external",
+      "leaf": "mcp-settings",
+      "assertion": 6,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx",
+        "fullName": "R08 MCP 设置页：OAuth 登录/取消/退出（断言 7） 登录启动失败显示错误且不打开外链、不进入轮询"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::security.a0.container-cold-start-security-page",
+      "leaf": "security",
+      "assertion": 0,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-container.test.tsx",
+        "fullName": "R08 设置容器初始化（MCP 设置页叶 & 安全设置页叶共用断言 1） 安全设置页冷启动：初始化完成后移除 mask 并渲染沙箱/备份/代理配置"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::security.a0.init-error-ready-with-log",
+      "leaf": "security",
+      "assertion": 0,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-container.test.tsx",
+        "fullName": "R08 设置容器初始化（MCP 设置页叶 & 安全设置页叶共用断言 1） 初始化异常记录日志后仍 ready，并保留可操作的恢复入口（不装成成功空数据）"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::security.a0.fifteen-second-timeout-ready",
+      "leaf": "security",
+      "assertion": 0,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-container.test.tsx",
+        "fullName": "R08 设置容器初始化（MCP 设置页叶 & 安全设置页叶共用断言 1） 15 秒无响应强制 ready 并移除 loading mask，杜绝无限白屏"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::security.a1.sandbox-switches-save-and-reread",
+      "leaf": "security",
+      "assertion": 1,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-security.test.tsx",
+        "fullName": "R08 安全设置页：沙箱与沙箱网络（断言 1） 两个沙箱开关经每助手配置接口写入并重读当前助手合成配置视图"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::security.a1.uninitialized-loading-not-off",
+      "leaf": "security",
+      "assertion": 1,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-security.test.tsx",
+        "fullName": "R08 安全设置页：沙箱与沙箱网络（断言 1） 状态未初始化时开关为 loading/禁用，不把未加载当关闭，也不发保存请求"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::security.a1.save-failure-restores-and-snapshot-failure",
+      "leaf": "security",
+      "assertion": 1,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-security.test.tsx",
+        "fullName": "R08 安全设置页：沙箱与沙箱网络（断言 1） 保存失败恢复开关并提示错误；PUT 已成功但快照读取失败时如实报保存失败"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::security.a2.retention-and-backup-list",
+      "leaf": "security",
+      "assertion": 2,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-security.test.tsx",
+        "fullName": "R08 安全设置页：检查点保留策略与备份列表（断言 2） 保留天数写入每助手配置并展开读取真实检查点列表"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::security.a2.empty-and-read-failure-explicit",
+      "leaf": "security",
+      "assertion": 2,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-security.test.tsx",
+        "fullName": "R08 安全设置页：检查点保留策略与备份列表（断言 2） 无检查点显示空列表；读取失败显示显式错误并保留重试，不冒充空列表"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::security.a3.manual-proxy-save-and-notify",
+      "leaf": "security",
+      "assertion": 3,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-security.test.tsx",
+        "fullName": "R08 安全设置页：网络代理模式与字段保存（断言 3） 手工代理保存 HTTP/HTTPS/WS/WSS/noProxy 并广播 network-proxy-changed、重读配置"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::security.a3.system-mode-and-save-failure-keeps-draft",
+      "leaf": "security",
+      "assertion": 3,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-security.test.tsx",
+        "fullName": "R08 安全设置页：网络代理模式与字段保存（断言 3） 系统代理模式不渲染手工字段（保存仅模式）；保存失败提示并保留草稿，不广播"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::quick-chat.a0.visible-compact-bounds",
+      "leaf": "quick-chat",
+      "assertion": 0,
+      "evidence": {
+        "kind": "live",
+        "suite": "quickchat",
+        "check": "actual-production-show-visible-and-compact-bounds"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::quick-chat.a0.resize-increases-window",
+      "leaf": "quick-chat",
+      "assertion": 0,
+      "evidence": {
+        "kind": "live",
+        "suite": "quickchat",
+        "check": "actual-production-resize-increases-window-and-resizable"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::quick-chat.a0.switch-acks-focus-main-then-hide",
+      "leaf": "quick-chat",
+      "assertion": 0,
+      "evidence": {
+        "kind": "live",
+        "suite": "quickchat",
+        "check": "actual-owned-switch-ACK-focus-main-and-only-then-hide"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::quick-chat.a0.same-path-requires-real-service-focus",
+      "leaf": "quick-chat",
+      "assertion": 0,
+      "evidence": {
+        "kind": "live",
+        "suite": "quickchat",
+        "check": "same-path-still-requires-real-service-focus"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::quick-chat.a1.missing-session-refuses-keeps-floating",
+      "leaf": "quick-chat",
+      "assertion": 1,
+      "evidence": {
+        "kind": "live",
+        "suite": "quickchat",
+        "check": "actual-missing-session-refuses-and-keeps-floating-window"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::quick-chat.a1.destroyed-main-explicit-failure",
+      "leaf": "quick-chat",
+      "assertion": 1,
+      "evidence": {
+        "kind": "live",
+        "suite": "quickchat",
+        "check": "actual-destroyed-main-window-explicit-failure-keeps-floating"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::quick-chat.a1.changed-owner-refuses-without-hide",
+      "leaf": "quick-chat",
+      "assertion": 1,
+      "evidence": {
+        "kind": "live",
+        "suite": "quickchat",
+        "check": "changed-main-connection-owner-refuses-without-hide"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::quick-chat.a1.late-ack-cannot-hide-after-timeout",
+      "leaf": "quick-chat",
+      "assertion": 1,
+      "evidence": {
+        "kind": "live",
+        "suite": "quickchat",
+        "check": "late-actual-renderer-ACK-cannot-hide-after-timeout"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a3.bulk-partial-http200-mixed",
+      "leaf": "mcp-settings",
+      "assertion": 3,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx",
+        "fullName": "R08 MCP 设置页：批量成功/失败混合回执与权限保存失败（补充断言 4/6 未覆盖子句） 批量导入 HTTP 200 混合回执逐行呈现成功/runtimeApplied=false 事实，不弹全成功 toast"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::mcp-settings.a5.policy-save-failure-no-fake-grant",
+      "leaf": "mcp-settings",
+      "assertion": 5,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-mcp.test.tsx",
+        "fullName": "R08 MCP 设置页：批量成功/失败混合回执与权限保存失败（补充断言 4/6 未覆盖子句） 工具权限与置顶保存失败显示错误且不伪装授权已更新"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::security.a2.no-agent-load-settings-zero-request",
+      "leaf": "security",
+      "assertion": 2,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-guards.test.ts",
+        "fullName": "R08 安全设置页共用法守卫：loadSettingsConfig 请求边界 无 agentId 时 loadSettingsConfig 不发任何请求，并显式报 No settings agent selected"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::security.a3.experience-disabled-zero-request",
+      "leaf": "security",
+      "assertion": 3,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-guards.test.ts",
+        "fullName": "R08 安全设置页共用法守卫：loadSettingsConfig 请求边界 经验未启用时不 GET experience；显式启用后才发起 experience 读取"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::security.a3.notify-failure-no-success",
+      "leaf": "security",
+      "assertion": 3,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-security.test.tsx",
+        "fullName": "R08 安全设置页：代理通知失败不得冒充完成（补充断言 3 未覆盖子句） network-proxy-changed 通知抛错时仅记录未处理异常，不弹保存成功、不完成后续重读"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::security.a1.no-connection-zero-network-request",
+      "leaf": "security",
+      "assertion": 1,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-settings-guards.test.ts",
+        "fullName": "R08 安全设置页共用法守卫：loadSettingsConfig 请求边界 无可用连接（resourceKey 无法定位真实服务）时 loadSettingsConfig 不发出网络请求"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a1.ws-error-shown-in-page",
+      "leaf": "chat",
+      "assertion": 1,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx",
+        "fullName": "R08 聊天页：WS 拒绝/断线与恢复流状态（补充断言 2/3 未覆盖子句） WS 拒绝/断线事件在页面内显式呈现错误，不冒充消息成功"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    },
+    {
+      "case": "ui::chat.a2.resume-status-drives-control",
+      "leaf": "chat",
+      "assertion": 2,
+      "evidence": {
+        "kind": "vitest",
+        "file": "desktop/src/react/__tests__/r08/r08-ui-chat-page.test.tsx",
+        "fullName": "R08 聊天页：WS 拒绝/断线与恢复流状态（补充断言 2/3 未覆盖子句） 恢复流的运行状态经真实 ws 分发后与输入区控件态一致"
+      },
+      "actual": 1,
+      "ok": true,
+      "reason": ""
+    }
+  ]
+}

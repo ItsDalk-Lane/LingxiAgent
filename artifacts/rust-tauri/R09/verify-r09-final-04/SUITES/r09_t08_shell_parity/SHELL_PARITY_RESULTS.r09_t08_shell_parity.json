@@ -1,0 +1,387 @@
+{
+ "schema": "lingxi.r09.shell-parity.v1",
+ "stage": "R09",
+ "status": "DRAFT_T08_V33_SELFCHECK_PENDING_GUI_EVIDENCE",
+ "generatedAt": "2026-10-27T00:51:52+0800",
+ "candidate": {
+  "candidateVersion": "v3.3",
+  "source": "artifacts/rust-tauri/R09/dev/t06/candidate-handoff-v3.3/candidate-handoff.json",
+  "handoff": "artifacts/rust-tauri/R09/dev/t06/candidate-handoff-v3.3/candidate-handoff.json",
+  "gitHead": "aac8cb9fe6bb7bfa7a41d75528221136bfe55e50",
+  "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+  "serviceContentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+  "frozenAt": "2026-10-27T00:22:09+0800",
+  "deliveryAppTreeSha256": "97f226bffba064c7b408656c6be941b58f5e6e01b191d5ae6a30f89a1fbd4ccc",
+  "evidenceBuildSha256": "27bf075a70e57ccca607365276d261eed79764e02b663bfd881df472e51a31b6"
+ },
+ "note": "T08 生产者草稿：由 r09_t08_shell_parity 聚合既有证据生成；pending/blocked 未完成前不得引用为对照成立。Lead 汇总后覆盖 docs/rust-tauri/R09/SHELL_PARITY_RESULTS.json。",
+ "methodology": {
+  "variableUnderTest": "desktop host only (Electron host vs Tauri host)",
+  "heldConstant": [
+   "same Rust service (sidecar sha256 + build.json protocol/dataEpoch; T01 两壳注入同一 LINGXI_SERVICE_BIN)",
+   "same React renderer build (build-once-bind-once rendererDigest/themeBundleSha256)",
+   "same deterministic fixtures (R08 v3Base anchor; T07 实测 case)",
+   "same protocol/data epoch (wire 1..=1, data epoch 2)"
+  ],
+  "aSide": "R08 verified Electron host + Rust service (verify-r08-closeout-08, overall PASS)",
+  "bSide": "R09 frozen Tauri candidate + same Rust service/renderer",
+  "harness": "scripts/rust-tauri/r09_t08.py --suite r09_t08_shell_parity",
+  "recordedApprovalsRule": "Any host difference must be registered with a documented basis; unapproved differences fail A15"
+ },
+ "fixedHashes": {
+  "rustServiceSha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+  "rustServiceContentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+  "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+  "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+  "fixturesManifestSha256": "80a8d2c2640e2b2974b299a10f36679bc19daf0911e51f82f0c43399cb32feaa",
+  "electronBaselineReceipt": {
+   "path": "artifacts/rust-tauri/R08/verify-r08-closeout-08/verify-stage-result.json",
+   "testedSha": "aa99d2ec1dae7f0aef5971bab049734f22fcf7d8",
+   "candidateSourceDigest": "0f07f2f7a0cf9e8d5660237be6a26666ba314dc04e840a02b9b573d990050dc6",
+   "ab": {
+    "tasks": 71,
+    "parity": 68,
+    "recorded": 3,
+    "differs": 0
+   }
+  },
+  "tauriCandidateReceipt": {
+   "deliveryAppTreeSha256": "97f226bffba064c7b408656c6be941b58f5e6e01b191d5ae6a30f89a1fbd4ccc",
+   "hostExeSha256": "ddbd1fad42a8b172c85204cbba0e621fabd3bf52a0ced95dd0d2a1b06af40543",
+   "evidenceBuildSha256": "27bf075a70e57ccca607365276d261eed79764e02b663bfd881df472e51a31b6",
+   "featuresDelivery": [
+    "r09-host"
+   ],
+   "featuresEvidence": [
+    "e2e-test",
+    "r09-host",
+    "r09-test-hooks"
+   ]
+  }
+ },
+ "tasks": [
+  {
+   "taskId": "R09-A15",
+   "aSide": "R08 Electron host baseline (closeout-08 PASS, 71 A/B tasks = 68 parity + 3 recorded)",
+   "bSide": "R09 Tauri frozen candidate",
+   "verdict": "PARTIAL",
+   "measuredParityRows": 13,
+   "capabilityParity": 6,
+   "capabilityRecorded": 8,
+   "capabilityPending": 33,
+   "capabilityBlocked": 3,
+   "leafParity": 0,
+   "leafExcludedNonHost": 16,
+   "leafPending": 26,
+   "leafBlocked": 4
+  }
+ ],
+ "summary": {
+  "totalCapabilities": 50,
+  "parity": 6,
+  "recorded": 8,
+  "differs": 0,
+  "pending": 59,
+  "blocked": 7,
+  "hostPlaceholders": "由 r09_t08_host_completeness 产出",
+  "leafCoverage": {
+   "total": 74,
+   "bound": 15,
+   "pending": 59
+  }
+ },
+ "leafParity": [
+  {
+   "leafId": "R00-T02-LA-0DEEE4813B0A",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-1120B2AA320D",
+   "status": "blocked",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-1329EA46F72C",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-15DFB1AED8F2",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-15E163FBFBE8",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-1629CDD9EA4F",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-173C6332527D",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-18FE3FDFF9A5",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-1C41525D379C",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-1D4C7E9C713C",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-1E6EDB731186",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-322E02C7F2F9",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-37E6C3B9A7B8",
+   "status": "blocked",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-394DD07D2968",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-429D86C4F952",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-57728C0A6D0A",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-58822B6B138B",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-59987671E5AD",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-5D5938D61A00",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-6006FD0BF07D",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-6774E79F6714",
+   "status": "blocked",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-70B07E378F42",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-713E908B7B2F",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-8FE26C132D8B",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-9350C3E12165",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-98B458390B7E",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-9C679D21A188",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-A14D3027C881",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-A2E507EBDEF2",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-AC5B6EDA3FBD",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-ACA2C4C1158D",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-B6A97A19F2CB",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-B72A6D3886B7",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-BEC2074CC33C",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-C5AAF360D10F",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-CD873C715D96",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-D15E0ADC0608",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-D29DE479076C",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-DF4B5168ABB5",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-E6FB08FBBFAA",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-E84F01456B6C",
+   "status": "blocked",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-F5DBF2A80E28",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-F6235778F816",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-F9786414DD11",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-FB5C78308878",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-FF1B331F1019",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  }
+ ],
+ "unapprovedDifferences": [],
+ "pendingBeforePASS": [
+  "T01/T02/T05/T07 v2 候选证据重跑（candidate-binding 红项；正式门 in-gate 自动满足）",
+  "T03/T04/T07 hidden+visible GUI 真实动作批次（19 能力 + T03 26 叶）",
+  "T06 运行期 ACL hidden 批次（security:* 行为对照）",
+  "T07 release smoke（交付 release 启动/连接/文件任务）",
+  "file-url-asset T07 运行期证据（asset scope 命中 + 内容校验）"
+ ],
+ "sourceDrift": {
+  "crateSource": {
+   "sourceFileCount": 88,
+   "sourceFingerprint": "95e2c5fb39e7db4360e4a979948922fecbe868a7d3358af6c82a73a11db39f5a",
+   "generatedFileCount": 80,
+   "release": {
+    "sourceFingerprint": "95e2c5fb39e7db4360e4a979948922fecbe868a7d3358af6c82a73a11db39f5a",
+    "receipt": "desktop/src-tauri/.tauri-build/build-receipt-release.json",
+    "mtimeOnlyTouches": [
+     "Cargo.lock"
+    ],
+    "builtAtUnixMs": 1793031631428,
+    "receiptCrateDigest": "03b55518c9a0a5144ebfb29d15ac0caf47bd9bb4713971024c7100fa69921283",
+    "receiptCrateFileCount": 168,
+    "filesNewerThanReceipt": []
+   },
+   "evidence": {
+    "sourceFingerprint": "95e2c5fb39e7db4360e4a979948922fecbe868a7d3358af6c82a73a11db39f5a",
+    "receipt": "desktop/src-tauri/.tauri-build/build-receipt-debug.json",
+    "mtimeOnlyTouches": [
+     "Cargo.lock"
+    ],
+    "builtAtUnixMs": 1793031665042,
+    "receiptCrateDigest": "0214a25281735c65f4e707f754f753f4321479a652d6bb40d438dfc4bb94a934",
+    "receiptCrateFileCount": 165,
+    "filesNewerThanReceipt": []
+   }
+  },
+  "renderer": {
+   "distNewestMtime": 1793029972.1337142,
+   "sourcesNewerThanDist": []
+  },
+  "freezeEpochMs": 1793031729000,
+  "artifactsTouchedAfterFreeze": []
+ },
+ "evidence": "artifacts/rust-tauri/R09/dev/t08/<run>/ (shell-parity-cases.json / parity-matrix.json)",
+ "provenance": {
+  "r09_t01_react_parity": "in-gate",
+  "r09_t02_supervisor_ready": "in-gate",
+  "r09_t02_process_ownership": "in-gate",
+  "r09_t05_browser_pdf": "in-gate",
+  "r09_t05_untrusted_preview": "in-gate",
+  "r09_t07_native_e2e": "in-gate",
+  "r09_t01_release_offline": "in-gate",
+  "r09_t03_native_matrix": "in-gate",
+  "r09_t03_ipc_negative": "in-gate",
+  "r09_t04_permission_matrix": "in-gate",
+  "r09_t04_remote_boundary": "in-gate",
+  "r09_t06_capability_matrix": "in-gate",
+  "r09_t06_release_attack_surface": "in-gate",
+  "r09_t07_release_smoke": "in-gate",
+  "audit_capability": "dev-fallback",
+  "release_scan": "dev-fallback"
+ }
+}

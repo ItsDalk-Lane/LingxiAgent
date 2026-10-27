@@ -1,0 +1,19 @@
+{
+  "stage": "R07-T06",
+  "purpose": "development_not_final_acceptance",
+  "label": "dev-t06t2",
+  "command": "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-adapters --test session_file_store",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "2fdfdbca1d6468024bca2126fd5e77cd45352482f6b7cc077459bda954bfdfef",
+  "sourceFingerprintAfter": "2fdfdbca1d6468024bca2126fd5e77cd45352482f6b7cc077459bda954bfdfef",
+  "sourceUnchanged": true,
+  "exitCode": 0,
+  "durationSec": 0.5,
+  "logSha256": "ff6c9ff6bf4ca9c29dbcc5de17821070f97406e3492fb8402804d7d097ad0a72"
+}

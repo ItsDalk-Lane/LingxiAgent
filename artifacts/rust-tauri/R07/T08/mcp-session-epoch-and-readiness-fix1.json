@@ -1,0 +1,141 @@
+{
+  "recordedAt": "2026-10-18T11:21:46.344599+00:00",
+  "status": "SOURCE_STOPPED_FOR_ROOT_PERMISSIONS_FIXED1_NOT_EXECUTED",
+  "priorActualRun": {
+    "receipt": "artifacts/rust-tauri/R07/T08/mcp-session-permission-reproduce3.json",
+    "log": "artifacts/rust-tauri/R07/T08/mcp-session-permission-reproduce3.log",
+    "logSha256": "8f1b7cae564ec4533be2f63e8470b1e35e74863322b238ed4854db72027aa6eb",
+    "exitCode": 101,
+    "sourceUnchanged": true,
+    "passed": 2,
+    "failed": 3,
+    "passedCases": [
+      "actual_ws_prompt_reuses_session_capability_for_second_different_arguments_without_approval",
+      "missing_scope_foreign_session_and_damaged_payload_never_grant_and_connector_restart_invalidates"
+    ],
+    "failures": [
+      {
+        "case": "in_flight_grant_cannot_land_after_real_archive_restore_completed",
+        "observed": "旧grant真实读active后，archive+restore完成；迟到grant实际200，期望409",
+        "classification": "已证产品交错；原失败保留，本轮epoch修复待重跑"
+      },
+      {
+        "case": "paired_scope_grants_same_session_exact_capability_across_arguments_without_persisting",
+        "observed": "beta阶段认证GET两次200空；第三请求仍在途时5秒窗口结束，实际DB为waiting_approval",
+        "classification": "真实就绪与设备密钥派生认证耗时混计，尚未执行后台断言；本轮分离真实就绪观测待重跑"
+      },
+      {
+        "case": "credential_revocation_and_same_home_real_restart_do_not_restore_temporary_grants",
+        "observed": "fresh凭证审批已被实际正式HTTP读取并拒绝；真实close回收unconfirmed EPERM，owned_pid24956 actual_pgid=-1",
+        "classification": "真实进程回收未确认；尚未进入同home重启，不擅改process产品"
+      }
+    ]
+  },
+  "actualSyntheticScenes": [
+    {
+      "sourceSyntheticHome": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-session-permission-44874c7929adfad4",
+      "stage": "paired-beta-real-waiting-observation-timeout",
+      "runs": [
+        [
+          "mcp-session-a",
+          "run_000001a14eb8f4c3_000001",
+          "completed",
+          "completed.with_final",
+          1792322106563,
+          1792322110288
+        ],
+        [
+          "mcp-session-a",
+          "run_000001a14eb90cea_000002",
+          "completed",
+          "completed.with_final",
+          1792322112746,
+          1792322112765
+        ],
+        [
+          "mcp-session-b",
+          "run_000001a14eb911b5_000003",
+          "completed",
+          "completed.with_final",
+          1792322113973,
+          1792322118135
+        ],
+        [
+          "mcp-session-a",
+          "run_000001a14eb92b59_000004",
+          "waiting_approval",
+          null,
+          1792322120537,
+          1792322120537
+        ]
+      ],
+      "actualMcpCalls": [
+        {
+          "_meta": {
+            "progressToken": 1
+          },
+          "arguments": {
+            "n": 1
+          },
+          "name": "alpha"
+        },
+        {
+          "_meta": {
+            "progressToken": 2
+          },
+          "arguments": {
+            "n": 2
+          },
+          "name": "alpha"
+        }
+      ]
+    },
+    {
+      "sourceSyntheticHome": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-session-permission-3f556f7b44747a63",
+      "stage": "in-flight-grant-archive-restore-actual-200",
+      "runs": [],
+      "actualMcpCalls": []
+    },
+    {
+      "sourceSyntheticHome": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-session-permission-ce446e489efe8f06",
+      "stage": "fresh-credential-denied-then-real-close-unconfirmed-before-restart",
+      "runs": [
+        [
+          "mcp-restart-check",
+          "run_000001a14eb908eb_000001",
+          "completed",
+          "completed.with_final",
+          1792322111723,
+          1792322115901
+        ]
+      ],
+      "actualMcpCalls": []
+    }
+  ],
+  "changesNowReady": {
+    "epoch": "首次await前取临时代次票据；reclaim在无grant但有在途请求时推进代次；最终检查与插入同锁；容量4096，最后在途请求退出且无grant即回收，不落盘；begin以真实clock先清理已撤权授权，再检查容量，避免旧项占满前置门",
+    "pending": "新增窄只读ServiceState方法，live原身份+chat+WebSession校验，只读真实审批登记；保留5秒真实登记预算，之后单次正式设备HTTP核approvalId/runId/target；无mock storage/gateway、无扩rate limit",
+    "scope": "仅三个owned文件，无lib/auth/protocol/SDK/Cargo修改"
+  },
+  "sourceSha256": [
+    {
+      "path": "rust/crates/lingxi-service/src/mcp_session_permissions.rs",
+      "sha256": "0abd1ca27cdd7260b13da19f087edc1eeb99fe66769b8124a6e35f66f2085215"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/toolgateway.rs",
+      "sha256": "e16bb3bcae3959aca9a92a10f2ee75174f1e5bb200941a06a157fb7b90b27d20"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_t08_mcp_session_permissions.rs",
+      "sha256": "9fad50cdb98c4b14a66b2215b40e25333c19d0c04c44fcbcd53915bc1d8c6015"
+    }
+  ],
+  "checks": {
+    "rustfmt": "仅三个owned源，exit0",
+    "cargo": "NOT_RUN_BY_AGENT",
+    "rustRealRegression": "NOT_RUN_FOR_THIS_SOURCE",
+    "originalFailures": "保留原回执和日志，不改写为通过"
+  },
+  "acceptance": "T08 IMPLEMENTING；672564叶不提前PASS，原109/343最终状态不改"
+}

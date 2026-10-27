@@ -1,0 +1,114 @@
+{
+  "status": "IMPLEMENTED_NOT_EXECUTED",
+  "authorization": "主控明确授权：恢复自定义provider缺省协议旧语义；两旧测试按用户R07规则更新真实装配/权威Source/整批写前校验与真实写后部分事实；禁止删用例或削弱原功能。",
+  "originalFailure": {
+    "path": "artifacts/rust-tauri/R07/T08/legacy-settings1.log",
+    "sha256": "76c4a2888700aef478681664c18a236ed7ec5e5ec492ca6850f2cc25d6a910b1",
+    "retained": true
+  },
+  "productFix": {
+    "path": "rust/crates/lingxi-service/src/model_configuration.rs",
+    "line": 1192,
+    "old": "未知自定义provider缺api被误拒；已有协议时显式错误类型可能沿用旧值",
+    "now": "只在未声明协议时沿用旧值/静态默认/既有openai-completions默认；任一显式api或protocol非法、空、null、非字符串均拒绝，不把缺endpoint当可运行。",
+    "regression": {
+      "path": "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs",
+      "line": 143,
+      "proof": "首次保存前10种错误+无endpoint零Source/不激活；真实save恢复旧默认；既有provider10种错误零Source修改/零代次变动；随后同一服务真实health经OpenAI chat/completions到自有回环端，核Authorization/model/messages与单条真实用量的protocol/transport_attempts=1。"
+    }
+  },
+  "changes": [
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "line": 80,
+      "old": "只注入gateway/credentials，无权威Source/网络；保存时无法证明保留初始绑定",
+      "now": "相同合法plane写实际runtime Source并传ModelPlaneSource，提供真实共享network和activation；Source初始0600。原鉴权中间层/真实HTTP不替换。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "line": 435,
+      "old": "同批后模型含秘密metadata失败500，仍要求前provider已经存入",
+      "now": "按R07秘密不得进入来源、损坏输入写前拒绝，严格400、saved/applied均false、Source和catalog逐字节不变、同批两provider都不存在、原已存provider不丢。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "line": 475,
+      "old": "只用不合法输入模拟部分提交，未检查实际runtime发布",
+      "now": "实际损坏兼容catalog后提交合法provider；严格500 model_projection_unconfirmed、saved/applied真，实际Source有新provider且原chat绑定仍在，真实GET读新模型且掩码，坏compat字节不变；恢复自有故障后重发确认兼容投影。保留错误不代表回滚的原功能要求。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "line": 651,
+      "old": "新provider仅给key便认为已可执行，完整endpoint来源不明",
+      "now": "myprov经真实PUT先声明地址/目录，再验证只给key的旧补丁与明确目标YAML归属；首次新keptprov明确合法base_url，其余内联秘密清理、掩码保留、助手隔离要求不变。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "line": 636,
+      "old": "保留DeepSeek id和秘密metadata输入错误固定500",
+      "now": "严格400结构化写前拒绝，原已保存秘密/目录仍不变；这类校验不得为模拟部分成功而先写。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "line": 1794,
+      "old": "损坏兼容catalog→providers={}；无catalog→providers={}，即使注入已有有效模型",
+      "now": "两原用例保留，核真实published provider/model不被旧目录缺失/损坏抹掉；原YAML/权限/掩码/availableTools/读不修复仍保留，并核Source原字节不变。原函数名暂保留以对应失败记录。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_b7b_config_scope_prefs.rs",
+      "line": 78,
+      "old": "默认无模型链，无法产生真实写后模型故障",
+      "now": "空gateway+credentials+network+activation=false，Source=None；起点仍未配置，新增部分失败场景由真实HTTP首次激活。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_b7b_config_scope_prefs.rs",
+      "line": 327,
+      "old": "editor事件严格等于输入partial，桌面可能重置其余字段",
+      "now": "仍严格比较完整对象，但改为刚保存的归一editor；原serif/1.6/全局不触助手/跨助手断言保留。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_b7b_config_scope_prefs.rs",
+      "line": 455,
+      "old": "缺provider输入错误仍写keep_awake=false且零事件",
+      "now": "按R07写前纯校验，400、偏好完整字节不变、原keep_awake=true、助手字节不变、不创建Source、零事件。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_b7b_config_scope_prefs.rs",
+      "line": 493,
+      "old": "部分成功只靠先写后校验造错，不能证明实际runtime",
+      "now": "增加同一原用例中的实际坏compat故障：global已存、Source已存并已发布、助手未保存，HTTP明确500；真实GET仍见新模型且脱敏，坏compat不被GET修复，keep-awake和models各恰一条真实事实事件。恢复自有文件故障后继续原全部记忆/ticker检查。"
+    }
+  ],
+  "retainedTests": {
+    "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs": 14,
+    "rust/crates/lingxi-service/tests/r06_b7b_config_scope_prefs.rs": 2
+  },
+  "validation": {
+    "cargo": "未运行，主控统一执行",
+    "realRequests": "仅新增回归设计访问自有127.0.0.1响应端；未在本回合执行",
+    "rustfmt": "仅四个自有文件，退出0",
+    "diffCheck": "四文件退出0"
+  },
+  "sourceHashes": {
+    "rust/crates/lingxi-service/src/model_configuration.rs": "9702b02436bd140760c7f3b274243fc14d02ddf4c4aaee1dde69880c363587b1",
+    "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs": "f8bd2a22f5b493a37e2c42ec86d8f74cdd8aa85387c3c156c7bbc7eed2362898",
+    "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs": "4bb1de888032f7f72d2d95736b23e62e95fd50e9606984f9fdb11591ba10e8cd",
+    "rust/crates/lingxi-service/tests/r06_b7b_config_scope_prefs.rs": "f78e0830a4727ed2f40cdd1ad9a0d905f7165432e3b594cd659e194117ea4264"
+  },
+  "additionalFailureAlignment": {
+    "originalLog": "artifacts/rust-tauri/R07/T08/legacy-settings2.log",
+    "failure": "put_config_provider_save_readback B语义不变原字符串断言",
+    "preserved": true,
+    "actualScene": "主控核对原现场B姓名序列化为name: \"B\"；实际产品没有重写焦点，只因原字符串.contains(name: B)不支持合法引号格式而误判。",
+    "authorization": "主控明确授权：保留原语义，改用保存前后B字节严格相等与YAML agent.name==B，保留无provider污染及原A字节断言。",
+    "line": 385,
+    "now": "B字节完全不变且解析姓名为B、无my-custom数据；A原字节检查不变。未删除原失败文件/现场，未运行新检查。",
+    "originalLogSha256": "0b6420354171eb2d14bf164275e98f40375fee01439ec5cab3629f19f14454f3"
+  },
+  "privateSourceFix": {
+    "path": "rust/crates/lingxi-service/src/model_configuration.rs",
+    "change": "既有Source使用统一replace_private，新增create不变。",
+    "regression": "r07_t08_model_configuration新增明确existing EmbeddedInConfigFile/ModelsFile两种真实0644原文件首次写key，核新Source和实际原inode备份均0600、原件字节/dev/ino不变、保留future未知字段及embedded其它配置、完成日志私密证明。",
+    "status": "未执行，主控统一验证。"
+  }
+}

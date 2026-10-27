@@ -1,0 +1,455 @@
+{
+  "schema": "r07-t08-inherited-mcp-positive-responsibility-readonly-v1",
+  "recordedAt": "2026-10-18T10:25:22.920620+00:00",
+  "status": "READ_ONLY_CURRENT_IMPLEMENTATION_GAPS_NOT_ACCEPTANCE",
+  "scope": "原35已包含408；此次限定7个稳定ID正例及1个UI叶内OAuth交叠断言，不扩大或改写原35/109/343/叶状态。",
+  "authoritativeInputs": [
+    {
+      "path": "artifacts/rust-tauri/R07/T08/t08f-settings-navigation-responsibility-readonly2.json",
+      "sha256": "5ab9fff4c14104a2f34bd058adc56cd63dc8ca13eb40554d145751791510e5b4"
+    },
+    {
+      "path": "artifacts/rust-tauri/R07/T12/35-handoff-source-resolved-20261018.json",
+      "sha256": "a30b97a2dbeb1b3012632abbf725ee65c9e67ef0e212502077b5dcb3d6a83317"
+    }
+  ],
+  "counts": {
+    "primaryOriginalLeaves": 7,
+    "primaryOriginalAssertions": 14,
+    "uiOverlappingLeafNotAdditionalAction": "R00-T02-LA-B4BB2438E855",
+    "uiSelectedAssertions": 1
+  },
+  "summary": "7个指定Rust正例当前均有明确接线/实现缺口，未找到该正例具名真实Rust case；并非因缺证据推断缺实现。正常stdio工具/管理、模型OAuth、拒绝Unsupported都不能替代。以上本地自有外端可实现，不需要真实账号；真实第三方平台认证与正式外网互通仍需另列未验证。",
+  "mappings": [
+    {
+      "originalID": "R00-T02-LA-E1FBE1A59BC6",
+      "original": {
+        "id": "R00-T02-LA-E1FBE1A59BC6",
+        "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-APPS-MCP-E1FBE1",
+        "featureStageIds": [
+          "R04"
+        ],
+        "executionStageIds": [
+          "R04",
+          "R07",
+          "R08"
+        ],
+        "originalTaskIds": [
+          "R04-T02",
+          "R04-T07"
+        ],
+        "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+        "when": "用户查看 MCP 应用列表",
+        "then": "返回 MCP 应用及连接器状态；未初始化返回 503",
+        "assertions": [
+          "给定目标与相应权限，执行“查看 MCP 应用列表”后核对：返回 MCP 应用及连接器状态；未初始化返回 503",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+        "r07MapExactMirror": true,
+        "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+      },
+      "entry": "旧GET /api/mcp/apps；当前Rust无等价已注册route",
+      "status": "IMPLEMENTATION_GAP_NORMAL_POSITIVE_NOT_EXECUTED",
+      "currentRustTrace": [
+        "mcp_settings::router仅GET /lingxi/v1/mcp/state及POST /lingxi/v1/mcp/settings-action。",
+        "state_for_agent提供真实工具名称/描述/annotations与连接状态，但未提供apps列表；当前McpToolBinding仅tool_name/output_schema，无应用_meta目录使用方。"
+      ],
+      "namedRealCaseForThisPositive": null,
+      "relatedButNotEquivalentEvidence": [
+        "r07_t08_mcp_settings::real_run_nine_mcp_settings_actions_persist_and_gate_actual_sdk_consumers有真实工具目录与SDK消费者，未查询apps。",
+        "tests/mcp-runtime.test.ts MCP app resources/recognizes the openai/outputTemplate dialect as an app resource是旧Node行为测试且替换客户端，非Rust正例。"
+      ],
+      "minimumReuse": [
+        "复用manager当前真实SDK连接与工具目录，保留受本连接/目录generation约束的ui:// metadata视图；参照core/mcp/manager.ts listApps及appsForConnector识别逻辑。",
+        "不从手写配置自称应用可用；按已连接真实目录生成apps+state，延续未初始化与明确错误。"
+      ],
+      "minimumLocalPositiveAndBoundaries": [
+        "自有stdio MCP在tools/list返回_meta.ui.resourceUri与model-only对照；真实HTTP查询apps只能返回可见条目+真实连接状态。",
+        "缺manager/未初始化、身份拒绝、工具更新删除/同ID重装后旧元数据不能残留。"
+      ],
+      "dueRecommendation": "T08当前应补的本地可完成正例；本报告不改叶状态。真实第三方账号另列受限，不能用Unsupported或错误拒绝代替正例。"
+    },
+    {
+      "originalID": "R00-T02-LA-7FF8D4E48BC9",
+      "original": {
+        "id": "R00-T02-LA-7FF8D4E48BC9",
+        "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-APPS-TOOLNAME--7FF8D4",
+        "featureStageIds": [
+          "R04"
+        ],
+        "executionStageIds": [
+          "R04",
+          "R07",
+          "R08"
+        ],
+        "originalTaskIds": [
+          "R04-T02",
+          "R04-T07"
+        ],
+        "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+        "when": "用户启动连接器应用",
+        "then": "把 launchInput 交给指定连接器工具，返回启动结果或错误",
+        "assertions": [
+          "给定目标与相应权限，执行“启动连接器应用”后核对：把 launchInput 交给指定连接器工具，返回启动结果或错误",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+        "r07MapExactMirror": true,
+        "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+      },
+      "entry": "旧POST /api/mcp/connectors/{id}/apps/{toolName}/launch；当前Rust无等价route",
+      "status": "IMPLEMENTATION_GAP_NORMAL_POSITIVE_NOT_EXECUTED",
+      "currentRustTrace": [
+        "Rust普通tools/call链已真实实现，但没有应用launchInput→mcp_app绑定结果的handler。",
+        "旧launchApp返回type=mcp_app、resourceUri、launchInput和binding，并非单纯调用模型工具；不能以普通工具成功冒充launch正例。"
+      ],
+      "namedRealCaseForThisPositive": null,
+      "relatedButNotEquivalentEvidence": [
+        "r04_t07_mcp_and_workers::mcp_tool_success_flows_through_the_full_run_chain在t08f-service已通过，只证明普通工具Run链。"
+      ],
+      "minimumReuse": [
+        "复用同一manager真实目录、连接器启用/助手权限/目录代次；按旧_requireApp和visibility校验构建公开绑定。",
+        "保留launchInput与Rust真实resources/app-tools路由绑定；后续app工具调用应走同一真实gateway，不直接裸SDK绕过权限。"
+      ],
+      "minimumLocalPositiveAndBoundaries": [
+        "自有stdio应用目录→真实HTTP launch，核实际toolName/resourceUri/原launchInput及binding指向本服务；再真实读取ui资源。",
+        "不存在工具、非app可见工具、停用/撤权/目录变化均明确拒绝；不可用generic tools/call成功替代。"
+      ],
+      "dueRecommendation": "T08当前应补的本地可完成正例；本报告不改叶状态。真实第三方账号另列受限，不能用Unsupported或错误拒绝代替正例。"
+    },
+    {
+      "originalID": "R00-T02-LA-04A6A2BD1547",
+      "original": {
+        "id": "R00-T02-LA-04A6A2BD1547",
+        "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-RESOURCES-04A6A2",
+        "featureStageIds": [
+          "R04"
+        ],
+        "executionStageIds": [
+          "R04",
+          "R07",
+          "R08"
+        ],
+        "originalTaskIds": [
+          "R04-T02",
+          "R04-T07"
+        ],
+        "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+        "when": "用户读取连接器资源",
+        "then": "按 uri 返回连接器资源内容；缺 uri 或无内容拒绝",
+        "assertions": [
+          "给定目标与相应权限，执行“读取连接器资源”后核对：按 uri 返回连接器资源内容；缺 uri 或无内容拒绝",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+        "r07MapExactMirror": true,
+        "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+      },
+      "entry": "旧GET /api/mcp/connectors/{id}/resources?uri=ui://...；当前Rust无等价route",
+      "status": "IMPLEMENTATION_GAP_NORMAL_POSITIVE_NOT_EXECUTED",
+      "currentRustTrace": [
+        "McpServer没有resources/read使用方；mcpbridge map_content_block仅把远端资源内容/链接转为文本，不执行resource read。",
+        "/lingxi/v1/resources/{resource_id}是本机文件资源面，不等价连接器uri读取。"
+      ],
+      "namedRealCaseForThisPositive": null,
+      "relatedButNotEquivalentEvidence": [
+        "mcpbridge::tests::remote_resource_uris_never_map_to_local_refs不是读取正例。",
+        "tests/mcp-runtime.test.ts reads a ui:// resource through the connector client用vi.fn客户端，不能代替本Rust服务链。"
+      ],
+      "minimumReuse": [
+        "当前锁内官方rmcp3.4.1 SDK已提供RunningService::read_resource；复用现有连接、请求总预算/取消、重装代次与stop收敛，不新增第二连接池。",
+        "沿旧core manager.readResource只接受ui://、返回匹配uri内容/mime；远端URI保持远端，不能翻成本机路径。"
+      ],
+      "minimumLocalPositiveAndBoundaries": [
+        "自有stdio真实resources/read响应text与blob，真实HTTP读回内容和mime；缺uri400/无匹配内容404。",
+        "停用/撤权/下游失败/超时/取消/同ID重装迟到结果均保持明确结果，无自动重放。"
+      ],
+      "dueRecommendation": "T08当前应补的本地可完成正例；本报告不改叶状态。真实第三方账号另列受限，不能用Unsupported或错误拒绝代替正例。"
+    },
+    {
+      "originalID": "R00-T02-LA-2DA782C5C7B9",
+      "original": {
+        "id": "R00-T02-LA-2DA782C5C7B9",
+        "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-OAUTH-START-OA-2DA782",
+        "featureStageIds": [
+          "R04"
+        ],
+        "executionStageIds": [
+          "R04",
+          "R07",
+          "R08"
+        ],
+        "originalTaskIds": [
+          "R04-T02",
+          "R04-T07"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户启动连接器 OAuth 登录",
+        "then": "生成授权流程并返回浏览器所需资料，后续回调及轮询作内部步骤",
+        "assertions": [
+          "给定目标与相应权限，执行“启动连接器 OAuth 登录”后核对：生成授权流程并返回浏览器所需资料，后续回调及轮询作内部步骤",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+        "r07MapExactMirror": true,
+        "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+      },
+      "entry": "旧POST /api/mcp/connectors/{id}/oauth/start，GET /api/mcp/oauth/callback及GET /api/mcp/oauth/poll/{sessionId}；Rust均未接",
+      "status": "IMPLEMENTATION_GAP_NORMAL_POSITIVE_NOT_EXECUTED",
+      "currentRustTrace": [
+        "mcp-api.ts startMcpOAuth/pollMcpOAuth开头unsupportedRustOAuth主动拒绝Rust。",
+        "McpSettingsManager::endpoint非stdio返回Unsupported；state_for_agent对authType=oauth公开authStatus=unsupported。",
+        "模型供应商CredentialService已有PKCE/device原语，但以模型provider Source配置为边界，非MCP连接器OAuth入口。"
+      ],
+      "namedRealCaseForThisPositive": null,
+      "relatedButNotEquivalentEvidence": [
+        "r07_t08_oauth_alias::oauth_display_alias_reaches_pkce_device_registry_logout_revoke_and_actual_model_without_renaming_source属于模型供应商，不是连接器。",
+        "r04_t07_mcp_and_workers::mcp_unsupported_endpoint_refuses_loudly在t08f已通过，只证明拒绝，不是远程OAuth正例。"
+      ],
+      "minimumReuse": [
+        "优先启用官方rmcp auth/transport-streamable-http-client-reqwest，使用AuthorizationManager及自定义OAuthHttpClient/CredentialStore对接现有NetworkPlane/私密原子写入。不是自写协议，也不是恢复Node核心。",
+        "复用lingxi-adapters/models/oauth.rs实际PKCE/HTTP/取消原语；新增绑定真实connector实例/版本/owner的有界登录事务，所有写入仍通过同一MCP管理锁/私密存储通道。",
+        "参照core/mcp/manager.ts startOAuth/completeOAuth/getOAuthStatus；连接器认证不可借模型provider身份或通用本机令牌。",
+        "要声称登录后连接器实际可用，需补当前缺失的remote transport并用同一已授权connector端点，不只保存凭据；允许仍明确未实现的其他transport单列。"
+      ],
+      "minimumLocalPositiveAndBoundaries": [
+        "自有loopback authorize/token及MCP服务端，真实start生成state/PKCE→回环callback→真实poll done→私密凭据读回→实际连接器请求消费该凭据。",
+        "错state/重放/取消后迟到/重装/撤权/重启处理必须明确；真实供应商账号授权另列未验证。"
+      ],
+      "dueRecommendation": "T08当前应补的本地可完成正例；本报告不改叶状态。真实第三方账号另列受限，不能用Unsupported或错误拒绝代替正例。"
+    },
+    {
+      "originalID": "R00-T02-LA-E7F852F9BF60",
+      "original": {
+        "id": "R00-T02-LA-E7F852F9BF60",
+        "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-OAUTH-CANCEL-O-E7F852",
+        "featureStageIds": [
+          "R04"
+        ],
+        "executionStageIds": [
+          "R04",
+          "R07",
+          "R08"
+        ],
+        "originalTaskIds": [
+          "R04-T02",
+          "R04-T07"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户取消连接器 OAuth 等待",
+        "then": "结束尚在等待的浏览器往返，已保存凭证不变",
+        "assertions": [
+          "给定目标与相应权限，执行“取消连接器 OAuth 等待”后核对：结束尚在等待的浏览器往返，已保存凭证不变",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+        "r07MapExactMirror": true,
+        "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+      },
+      "entry": "旧POST /api/mcp/connectors/{id}/oauth/cancel；Rust未接",
+      "status": "IMPLEMENTATION_GAP_NORMAL_POSITIVE_NOT_EXECUTED",
+      "currentRustTrace": [
+        "cancelMcpOAuth在Rust主动unsupported；manager无连接器OAuth等待注册表/取消handler。",
+        "已实现MCP工具调用取消、SDK初始化取消不等于浏览器授权等待取消。"
+      ],
+      "namedRealCaseForThisPositive": null,
+      "relatedButNotEquivalentEvidence": [
+        "r07_t08_mcp_settings::cancelling_a_real_settings_run_interrupts_initialization_and_preserves_saved_intent属于初始化取消，非OAuth等待。"
+      ],
+      "minimumReuse": [
+        "复用同一个connector登录事务取消树，参照旧cancelOAuth只结束pending，不删原已保存凭据。",
+        "取消后在token网络等待与锁内写入前核同一事务代次；迟到callback/poll明确cancelled，不产生成功toast。"
+      ],
+      "minimumLocalPositiveAndBoundaries": [
+        "先保存合成旧凭据，再真实start→cancel，核旧凭据字节未变、poll cancelled、迟到callback零写。",
+        "已done后取消不可撤回已保存凭据；重复取消幂等且如实回报。"
+      ],
+      "dueRecommendation": "T08当前应补的本地可完成正例；本报告不改叶状态。真实第三方账号另列受限，不能用Unsupported或错误拒绝代替正例。"
+    },
+    {
+      "originalID": "R00-T02-LA-C70E819F8DA4",
+      "original": {
+        "id": "R00-T02-LA-C70E819F8DA4",
+        "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-OAUTH-LOGOUT-O-C70E81",
+        "featureStageIds": [
+          "R04"
+        ],
+        "executionStageIds": [
+          "R04",
+          "R07",
+          "R08"
+        ],
+        "originalTaskIds": [
+          "R04-T02",
+          "R04-T07"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户退出连接器 OAuth",
+        "then": "清除连接器 OAuth 凭证并返回公开状态",
+        "assertions": [
+          "给定目标与相应权限，执行“退出连接器 OAuth”后核对：清除连接器 OAuth 凭证并返回公开状态",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+        "r07MapExactMirror": true,
+        "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+      },
+      "entry": "旧POST /api/mcp/connectors/{id}/oauth/logout；Rust未接",
+      "status": "IMPLEMENTATION_GAP_NORMAL_POSITIVE_NOT_EXECUTED",
+      "currentRustTrace": [
+        "logoutMcpOAuth在Rust主动unsupported；没有清连接器OAuth并返回公开状态的真实handler。",
+        "connector.update虽可编辑OAuth形状，但不是登出语义：不能将任意config更新视为真实清凭据/停止旧连接/取消待登录。"
+      ],
+      "namedRealCaseForThisPositive": null,
+      "relatedButNotEquivalentEvidence": [
+        "模型供应商logout/revoke不等价MCP connector logout。"
+      ],
+      "minimumReuse": [
+        "复用同一MCP受控写锁、secret redaction、connector stop/代次无效化，专门动作清OAuth和authorizationToken并返回公开状态。",
+        "使同一connector所有pending登录失效，避免logout后迟到结果写回；保持其他连接器和非OAuth字段。"
+      ],
+      "minimumLocalPositiveAndBoundaries": [
+        "真实loopback登录完成后logout，核真实私密存储材料清除、公开state无secret、旧连接不再带token、新start要求登录。",
+        "并发迟到callback/重复logout/已撤权身份/损坏输入不得恢复旧材料或覆盖其他连接器。"
+      ],
+      "dueRecommendation": "T08当前应补的本地可完成正例；本报告不改叶状态。真实第三方账号另列受限，不能用Unsupported或错误拒绝代替正例。"
+    },
+    {
+      "originalID": "R00-T02-LA-67256417FB2B",
+      "original": {
+        "id": "R00-T02-LA-67256417FB2B",
+        "featureId": "F-D03-ROUTE_BEHAVIOR-BEHAVIOR-MCP-SESSION-PERMISSIONS-POST-672564",
+        "featureStageIds": [
+          "R04"
+        ],
+        "executionStageIds": [
+          "R04",
+          "R07",
+          "R08"
+        ],
+        "originalTaskIds": [
+          "R04-T03"
+        ],
+        "given": "该入口所需目标、身份和数据已准备",
+        "when": "用户批准当前会话的一次 MCP 工具能力",
+        "then": "校验会话与 sessions.write 范围后，仅在本次会话内放行指定 capability；不持久化",
+        "assertions": [
+          "执行“批准当前会话的一次 MCP 工具能力”后核对：校验会话与 sessions.write 范围后，仅在本次会话内放行指定 capability；不持久化",
+          "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+        "r07MapExactMirror": true,
+        "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+      },
+      "entry": "旧POST /api/mcp/session-permissions；Rust无等价route，现役审批辅助仍请求旧地址",
+      "status": "IMPLEMENTATION_GAP_NORMAL_POSITIVE_NOT_EXECUTED",
+      "currentRustTrace": [
+        "loadMcpApprovalIndex仍GET /api/mcp/state，grantForSession仍POST /api/mcp/session-permissions；rustSettingsRoute不映射MCP，Rust仅两个已注册MCP入口。",
+        "SessionConfirmationPrompt索引失败只退到普通approve；因此普通批准成功不能证明“仅当前会话记住MCP能力”成功。",
+        "ApprovalService有纯内存grant_preauthorization(principal,session,InvocationGrantKey,max_uses,ttl)，生产调用者仅库定义；HTTP/现役组件尚未用该能力。"
+      ],
+      "namedRealCaseForThisPositive": null,
+      "relatedButNotEquivalentEvidence": [
+        "t08f-service approval_service::tests::preauthorization_key_discrimination_and_use_budget通过，证明库内精确grant预算，不是HTTP正例。",
+        "r04_t03_approval_service::r04_a05_approved_digest_a_cannot_execute_payload_b、concurrent_spends_of_one_grant_produce_exactly_one_winner、restart_invalidates_old_approvals_and_grants是现有真Run/存储库面模板；此报告未新跑，也非所缺MCP路由。",
+        "tests/mcp-routes.test.ts grants a capability to the addressed session使用替换engine，desktop mcp-tool-approval-prompt同样mock fetch。"
+      ],
+      "minimumReuse": [
+        "复用现有ApprovalService和真实会话owner/现行会话写权限核验，使用统一接口定义并对接真实审批组件。",
+        "重要语义差异：现役Node grantForSession为该capability在本会话余期免重复确认；Rust底层现有grant是target+参数digest+使用预算/TTL。不可只改URL后把两者当相同；应按原叶明确的会话内capability语义补受会话与目录代次限制的临时授权，保留普通单次approval独立。",
+        "必须从真实目录/当前待批动作解析capability，不接任意自报目标扩权；全程不写持久配置，重启失效，撤权/重装同ID失效。"
+      ],
+      "minimumLocalPositiveAndBoundaries": [
+        "真实MCP pending→实际组件“本次会话”授权→同会话允许对应工具；另一会话/不同capability仍需批准；重启无记忆且磁盘配置不变。",
+        "会话不存在、非owner/缺所需范围、撤权/停用/同ID重装、重复批准不重复执行；至少一条真实SDK执行与审计读回。"
+      ],
+      "dueRecommendation": "T08当前应补的本地可完成正例；本报告不改叶状态。真实第三方账号另列受限，不能用Unsupported或错误拒绝代替正例。"
+    }
+  ],
+  "overlappingUIResponsibility": {
+    "originalID": "R00-T02-LA-B4BB2438E855",
+    "selectedOriginalAssertions": [
+      "OAuth 登录、取消、退出：成功核对 登录轮询返回 done 后刷新连接器并显示保存成功；退出接口成功后经统一 run 刷新并显示成功。；成功后有 agentId 时重读连接器状态与工具权限。；OAuth 授权 URL 成功返回后打开外链并轮询，完成/退出后重读状态；取消仅 POST cancel。；桌面 platform.openExternal 走 IPC，Web/mobile 使用浏览器 window.open。；空态/未初始化核对 未登录显示登录入口；等待中可点击取消，取消请求后关闭等待卡。；无 agentId 时不发 state GET。；错误/无权限核对 启动、轮询 error/超时或取消请求失败按各自 catch 显示错误；外链打开未等待，拒绝不会进入登录 catch，仍继续轮询；轮询 cancelled 直接返回，connectOAuth 随后仍刷新并可能显示保存成功，不能将取消断言为安静退出。；启动失败不打开外链；取消分支不因取消本身重读 state。；取消本身不直接重读，但在途轮询若回到 cancelled 并正常结束，登录回调仍可能间接 loadState，需按并发结果验。"
+    ],
+    "evidence": "现役MCP页调用start/poll/cancel/logout四helper；四helper在Rust一律主动unsupported。该UI叶其余初始化/管理部分不能据此全部归失败或全部通过。",
+    "minimumChecks": "同一Rust子进程+自有OAuth/MCP回环端，真实组件登录按钮/轮询/取消/退出，核页面真实状态、秘密磁盘及下游实际消费。打开外链若仅记录/请求URL须保留未证明原生浏览器启动边界。"
+  },
+  "evidenceReceipts": [
+    {
+      "path": "artifacts/rust-tauri/R07/T08/t08f-service.json",
+      "sha256": "7868cdc206f9a6ac823b205ab4fd0addcb1a956410e78f7091c65ceecb447f22",
+      "log": "artifacts/rust-tauri/R07/T08/t08f-service.log",
+      "logSha256Verified": "4909c5a02c6501d6d85b286a8cb92105479095151ac23216016f61cc14b6ea76",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "sourceFingerprint": "71924b54ab9c82a70b2327010d4287c3c04e73221b65b7699e744b20adbce836",
+      "limitedRelevance": "t08f的通用MCP工具执行、明确不支持、preauthorization library测试通过；peripheral管理13通过但同命令OAuth目标失败exit101。均未调用本报告缺失的7项Rust入口。"
+    },
+    {
+      "path": "artifacts/rust-tauri/R07/T08/t08-peripheral-check1.json",
+      "sha256": "7ae5f9dbe0e1ac803237ef5aa6a7d99afdb9bfd4cc9cc5fb57a7ef14585be4c7",
+      "log": "artifacts/rust-tauri/R07/T08/t08-peripheral-check1.log",
+      "logSha256Verified": "e72189087dfe60157547b95beb73f8a47085ff764d69bd55d6348914bae93788",
+      "exitCode": 101,
+      "sourceUnchanged": true,
+      "sourceFingerprint": "5cf732db8b0a69fad987f8e6ca41fce3f6096ce2a3894572cdfafe65517096c5",
+      "limitedRelevance": "t08f的通用MCP工具执行、明确不支持、preauthorization library测试通过；peripheral管理13通过但同命令OAuth目标失败exit101。均未调用本报告缺失的7项Rust入口。"
+    }
+  ],
+  "sourceHashes": {
+    "rust/crates/lingxi-service/src/lib.rs": "81be72c80783d1e0712ce74f2d03792b48758dbab07db7621ea47b505361005f",
+    "rust/crates/lingxi-service/src/mcp_settings.rs": "04c602567ad8653c4c682a3a8cf5b5c27586722a858bcb93566832a3f8a221bf",
+    "rust/crates/lingxi-service/src/mcpbridge.rs": "c13aa3292fe6c3273dba42f673f3c514096f241b5ddf93a6faa8114dbf32b73c",
+    "rust/crates/lingxi-service/src/approval_service.rs": "3203c4ead7b8ab7264cc9588f26a4971b662b681cd20e05f4876776af82afe21",
+    "rust/crates/lingxi-protocol/src/mcp_settings.rs": "bcca71939377a4973b7ca577fe9f0fb40704eac1985c5931af958af9746bf500",
+    "rust/crates/lingxi-service/Cargo.toml": "deb0df8168adf25b3f3c1184cb884d48c22217f45bc2695446d450f4ed54da8a",
+    "rust/crates/lingxi-adapters/src/models/oauth.rs": "df4a8db93d629c20826c9316114e03eaa615d1c9286b61a1cadf34fb15fa047a",
+    "rust/crates/lingxi-service/src/credentials/login.rs": "397b40157707c9bbee786ae86dff15b6989aca7c3a3942583caf71bae8276bf8",
+    "desktop/src/react/settings/tabs/mcp/mcp-api.ts": "2ef756206da8deadcaed7e9904dee0fc0389710aa4fb1441b4cfba81463a9f8a",
+    "desktop/src/react/components/input/mcp-approval-actions.ts": "2504e8449eb24eb646ea4246a274f836596cd66a9da157f6f5fd41cb971ec69c",
+    "desktop/src/react/components/input/SessionConfirmationPrompt.tsx": "608542157b262cd420cf83f3b3f38e7eb523e5495da874435766d1e757324549",
+    "desktop/src/react/services/rust-settings.ts": "ab2a6179b3bd7e1998d72e17e0538f43245133fff52afe550ea73d81331ef679",
+    "desktop/src/react/hooks/use-hana-fetch.ts": "d6bb1ff044f316c1d44c9b5a3b0b801154f1bfafb51d15c4a75ab56fc8a60a1c",
+    "server/routes/mcp.ts": "6bc19e8639d17d8986ddbde7ef182d7e2530c3b950a23b1ecd8bfada02c9b707",
+    "core/mcp/manager.ts": "cf95adb316f2f28c130260b325a25ba774b839983abf86408f96f8f7e7173895",
+    "rust/crates/lingxi-service/tests/r04_t07_mcp_and_workers.rs": "911f0c08e736c089f94abc2235158aecd9fd8387f86f98b9def35c9555490ba5",
+    "rust/crates/lingxi-service/tests/r04_t03_approval_service.rs": "6cb1af879d799ccbf95e8c85cfcebea656619f37fa1cbaf449b5bbd06a516ead",
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_settings.rs": "79fe6ef07c2b22e3b5f5c82305722a1ad79a0dc000c7dac7e60d383a41873fdb",
+    "tests/mcp-runtime.test.ts": "697a4d66fe91af6b251b9fefc9a85bbf70b2b657885e2a6f91966ae9a5119fe9",
+    "tests/mcp-routes.test.ts": "cf1a9071c8b053a9a431f9c6b9226ad400fd115ec42964406abb3d5ead757fe8",
+    "rust/crates/lingxi-adapters/src/models/network.rs": "38eb8d28653957bb2eddfe1bfeb2df45bffd663514399b078cec2652c6d9ace5"
+  },
+  "minimumDueJudgment": {
+    "T08": "原35中该19叶MCP设置与OAuth仍是R07到期责任；本地可模拟的上述7叶应在T08清账前补实现与正例，不按仅九枚举范围排除，不因unsupported自动推T11。",
+    "T11": "可继续复核插件禁用更新卸载生命周期，不自动替代当前到期正常入口。",
+    "R10Accounts": "真实供应商账号/授权浏览器和真实远程供应商互通不因loopback通过而领PASS。",
+    "T09": "未启动；本报告未开展CLI/手机工作。"
+  },
+  "notRun": [
+    "本轮无Cargo/npm/窗口/供应商请求；仅只读源码与既有原始日志哈希核对。",
+    "没有修改产品、原账、原失败、R07叶状态；源码并行变化，不能代替固定候选。"
+  ],
+  "officialSdkReuse": {
+    "scope": "已只读核本机安装的官方rmcp3.4.1；只建议开启正常feature及更新依赖锁后验证，不自写MCP协议、不复活旧Node核心。",
+    "currentFeatures": "lingxi-service Cargo.toml仅client/server，尚未开auth/transport-streamable-http-client-reqwest。D-06注释本身并非不能实施的阻塞。",
+    "transport": "官方StreamableHttpClientTransport::with_client支持现有配置HTTP客户端及StreamableHttpClientTransportConfig中的auth_header/custom_headers/请求与恢复预算；整合到同一McpEndpoint/McpServer生命周期，不另开绕过manager的连接池。",
+    "oauth": "官方AuthorizationManager::new_with_oauth_http_client为所有OAuth外呼提供自定义OAuthHttpClient；set_credential_store(CredentialStore load/save/clear/acquire_refresh_guard)及set_state_store可接现有私密原子存储/有界事务；AuthorizationManager含authorization URL/回调/refresh。应优先复用这些MCP官方机制而不是将连接器挤入模型provider的CredentialService。",
+    "network": "现有lingxi-adapters models/network.rs NetworkPlane::client_handle与NetworkClientHandle::client按policy generation重建；SDK OAuthHttpClient与StreamableHttpClient窄适配从现有NetworkPlane取当前客户端，延续代理、重定向、地址及响应体上限，不使用SDK默认裸Client绕过产品网络策略。",
+    "resources": "同一RunningService现有read_resource(ReadResourceRequestParams)已在官方client.rs，当前Rust产品没有调用；沿相同有界取消及代次核验接起来。",
+    "localAcceptance": "真实streamable-http外部fixture配自有loopback OAuth metadata/authorize/token可完成connector正常登录、真实消费、取消/登出，不需真实账号。需正常验证新features及oauth2等依赖锁；此报告未变更依赖或运行Cargo。",
+    "sourceHashes": {
+      "/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rmcp-3.4.1/Cargo.toml": "f8aca7e67941c69917e546ae581763cc1ee2b671501fa9b155777483d4d5c572",
+      "/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rmcp-3.4.1/src/transport/streamable_http_client.rs": "72a36d33f4906ba9c50f99ce2cd8252fad193e7efb65d24b411c873fdfa6df39",
+      "/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rmcp-3.4.1/src/transport/auth.rs": "112700f8f9b04b544374f7de3284fb7bac1e23e888494c5f4050905c1206110f",
+      "/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rmcp-3.4.1/src/service/client.rs": "03b78adb0bf923ce64202b82593e485bf6317970b47c6c91212d448ab3aefa85"
+    }
+  }
+}

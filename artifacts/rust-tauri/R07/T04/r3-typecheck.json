@@ -1,0 +1,24 @@
+{
+  "candidate": "r3",
+  "name": "typecheck",
+  "command": [
+    "npm",
+    "run",
+    "typecheck"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-15T22:46:03.343653+00:00",
+  "sourceFingerprint": "db2891f6e2c8fb03a513af30806ce459c35a1946abe101ac9cd85c07107f312f",
+  "log": "r3-typecheck.log",
+  "endedAt": "2026-10-15T22:46:28.282457+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "db2891f6e2c8fb03a513af30806ce459c35a1946abe101ac9cd85c07107f312f",
+  "logSha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+  "sourceUnchanged": true
+}

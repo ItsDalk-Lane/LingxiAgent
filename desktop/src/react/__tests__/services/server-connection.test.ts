@@ -15,6 +15,8 @@ import {
   readPersistedServerConnectionState,
   refreshLocalServerConnection,
   refreshLocalServerConnectionState,
+  requestConnectionWsTicket,
+  validateRestartTransport,
   resolveServerConnection,
   upsertServerConnection,
   warnIfServerProtocolMismatch,
@@ -50,6 +52,82 @@ describe('server connection helpers', () => {
       serverPort: null,
       serverToken: 'test-token-123',
     })).toBeNull();
+  });
+
+  it('keeps Rust local HTTP(S), WS, and route identity together', () => {
+    const rust = createLocalServerConnection({
+      serverPort: 34001,
+      serverToken: 'test-token',
+      serverNodeKind: 'lingxi-service',
+      serverNodeTransport: 'https',
+    })!;
+    expect(rust).toMatchObject({
+      serverNodeKind: 'lingxi-service', serverNodeTransport: 'https',
+      baseUrl: 'https://127.0.0.1:34001', wsUrl: 'wss://127.0.0.1:34001',
+    });
+    expect(buildConnectionUrl(rust, '/lingxi/v1/server/identity'))
+      .toBe('https://127.0.0.1:34001/lingxi/v1/server/identity');
+    expect(buildConnectionWsUrl(rust, '/lingxi/v1/ws'))
+      .toContain('wss://127.0.0.1:34001/lingxi/v1/ws');
+    expect(() => buildConnectionUrl(rust, '/api/sessions')).toThrow(/no migrated endpoint/);
+    expect(() => buildConnectionWsUrl(rust, '/ws')).toThrow(/no migrated WebSocket endpoint/);
+    expect(() => createLocalServerConnection({
+      serverPort: 34001, serverToken: 'test-token', serverNodeKind: 'lingxi-service', serverNodeTransport: 'ftp',
+    })).toThrow(/invalid local server transport/);
+  });
+
+  it('R08-T03: remote rust preview keeps the real remote host in baseUrl/wsUrl (Lead 验收断言)', () => {
+    const remote = createLocalServerConnection({
+      serverPort: 34001,
+      serverToken: 'remote-token',
+      serverNodeKind: 'lingxi-service',
+      serverNodeTransport: 'https',
+      serverHost: '192.168.1.20',
+    })!;
+    // Lead-mandated：远端 host 必须出现在最终 baseUrl/wsUrl。
+    expect(remote.baseUrl).toBe('https://192.168.1.20:34001');
+    expect(remote.wsUrl).toBe('wss://192.168.1.20:34001');
+    expect(buildConnectionUrl(remote, '/lingxi/v1/server/identity'))
+      .toBe('https://192.168.1.20:34001/lingxi/v1/server/identity');
+    expect(buildConnectionWsUrl(remote, '/lingxi/v1/ws'))
+      .toContain('wss://192.168.1.20:34001/lingxi/v1/ws');
+    // 远端形态走手动连接归一化：绝不落在 local/loopback_token。
+    expect(remote.kind).toBe('lan');
+    expect(remote.kind).not.toBe('local');
+    expect(remote.credentialKind).toBe('device_credential');
+    expect(remote.credentialKind).not.toBe('loopback_token');
+    expect(remote.trustState).toBe('lan');
+    expect(remote.token).toBe('remote-token');
+    expect(remote.authState).toBe('paired');
+    expect(remote.serverId).toBe('remote:192.168.1.20');
+    expect(remote.serverNodeKind).toBe('lingxi-service');
+  });
+
+  it('R08-T03: remote host requires the rust preview runtime and a clean host shape', () => {
+    // 非 rust 运行时不接受远端 host（防 node 模式被指到远端）。
+    expect(() => createLocalServerConnection({
+      serverPort: 34001, serverToken: 't', serverNodeKind: null, serverHost: '192.168.1.20',
+    })).toThrow(/only valid for the lingxi-service preview/);
+    expect(() => createLocalServerConnection({
+      serverPort: 34001, serverToken: 't', serverNodeKind: 'lingxi-service', serverHost: '192.168.1.20:34001',
+    })).toThrow(/invalid remote server host/);
+    expect(() => createLocalServerConnection({
+      serverPort: 34001, serverToken: 't', serverNodeKind: 'lingxi-service', serverHost: 'user@192.168.1.20',
+    })).toThrow(/invalid remote server host/);
+    expect(() => createLocalServerConnection({
+      serverPort: 34001, serverToken: 't', serverNodeKind: 'lingxi-service', serverHost: '192.168.1.20/api',
+    })).toThrow(/invalid remote server host/);
+    // 括号 IPv6 合法；回环 host 仍回落本地形态。
+    const v6 = createLocalServerConnection({
+      serverPort: 34001, serverToken: 't', serverNodeKind: 'lingxi-service', serverHost: '[fd00::1]',
+    })!;
+    expect(v6.baseUrl).toBe('http://[fd00::1]:34001');
+    expect(v6.kind).toBe('lan');
+    const loopback = createLocalServerConnection({
+      serverPort: 34001, serverToken: 't', serverNodeKind: 'lingxi-service', serverHost: '127.0.0.1',
+    })!;
+    expect(loopback.kind).toBe('local');
+    expect(loopback.credentialKind).toBe('loopback_token');
   });
 
   it('reports readiness from active connection while preserving legacy compatibility', () => {
@@ -415,6 +493,103 @@ describe('server connection helpers', () => {
       credentials: 'include',
     }));
     expect(connection.connectionId).toBe('lan:node_lan:studio_lan');
+  });
+
+  it('discovers a Rust server behind its closed unknown route and verifies its identity', async () => {
+    const base = 'https://192.168.31.75:14500';
+    const fetchImpl = vi.fn(async (url: string) => {
+      if (url === `${base}/api/web-auth/login`) {
+        return { ok: false, status: 403, statusText: 'Forbidden' } as Response;
+      }
+      if (url === `${base}/lingxi/v1/health`) {
+        return { ok: true, json: async () => ({ status: 'ok', serverKind: 'lingxi-service' }) } as Response;
+      }
+      if (url === `${base}/lingxi/v1/web-auth/login`) {
+        return { ok: true, json: async () => ({ ok: true }) } as Response;
+      }
+      if (url === `${base}/lingxi/v1/server/identity`) {
+        return { ok: true, json: async () => ({
+          serverId: 'rust-server', serverNodeId: 'rust-server', serverNodeKind: 'lingxi-service',
+          serverNodeTransport: 'https', studioId: 'studio-rust', label: 'Rust Server',
+          connectionKind: 'lan', credentialKind: 'device_credential', trustState: 'lan',
+          authState: 'paired', capabilities: ['access'],
+        }) } as Response;
+      }
+      throw new Error(`unexpected URL ${url}`);
+    });
+
+    const connection = await connectDeviceServerConnection({
+      baseUrl: base, credential: 'fixture-key', fetchImpl: fetchImpl as unknown as typeof fetch,
+    });
+
+    expect(fetchImpl).toHaveBeenNthCalledWith(2, `${base}/lingxi/v1/health`, { credentials: 'include' });
+    expect(fetchImpl).toHaveBeenNthCalledWith(3, `${base}/lingxi/v1/web-auth/login`, expect.objectContaining({
+      method: 'POST', credentials: 'include', body: JSON.stringify({ credential: 'fixture-key' }),
+    }));
+    expect(fetchImpl).toHaveBeenNthCalledWith(4, `${base}/lingxi/v1/server/identity`, expect.objectContaining({
+      headers: { Authorization: 'Bearer fixture-key' }, credentials: 'include',
+    }));
+    expect(connection).toMatchObject({ serverNodeKind: 'lingxi-service', serverNodeTransport: 'https',
+      connectionId: 'lan:rust-server:studio-rust', wsUrl: 'wss://192.168.31.75:14500' });
+  });
+
+  it('refuses an unrelated server when the old login route is absent', async () => {
+    const fetchImpl = vi.fn(async (url: string) => url.endsWith('/api/web-auth/login')
+      ? { ok: false, status: 404, statusText: 'Not Found' } as Response
+      : { ok: true, json: async () => ({ serverKind: 'other' }) } as Response);
+    await expect(connectDeviceServerConnection({
+      baseUrl: 'https://192.168.31.75:14500', credential: 'fixture-key',
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+    })).rejects.toThrow('unknown server protocol');
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+  });
+
+  it('preserves a rejected legacy credential when no Rust health identity exists', async () => {
+    const fetchImpl = vi.fn(async (url: string) => url.endsWith('/api/web-auth/login')
+      ? { ok: false, status: 401, statusText: 'Unauthorized' } as Response
+      : { ok: false, status: 404, statusText: 'Not Found' } as Response);
+    await expect(connectDeviceServerConnection({
+      baseUrl: 'https://192.168.31.75:14500', credential: 'fixture-key',
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+    })).rejects.toThrow('401 Unauthorized');
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+  });
+
+  it('requests a Rust WebSocket ticket from the Rust route with its device credential', async () => {
+    const connection = createDeviceServerConnection({
+      baseUrl: 'https://192.168.31.75:14500', credential: 'fixture-key',
+      identity: { serverId: 'rust-server', serverNodeId: 'rust-server', serverNodeKind: 'lingxi-service',
+        studioId: 'studio-rust', label: 'Rust Server', connectionKind: 'lan',
+        credentialKind: 'device_credential', capabilities: ['chat'] },
+    });
+    const fetchImpl = vi.fn(async () => ({ ok: true, json: async () => ({ ticket: 'hana_ws_fixture' }) } as Response));
+    expect(await requestConnectionWsTicket(connection, fetchImpl as unknown as typeof fetch)).toBe('hana_ws_fixture');
+    expect(fetchImpl).toHaveBeenCalledWith('https://192.168.31.75:14500/lingxi/v1/ws-ticket', expect.objectContaining({
+      method: 'POST', credentials: 'include', headers: expect.objectContaining({ Authorization: 'Bearer fixture-key' }),
+    }));
+  });
+
+  it('rejects a successful ticket response with no usable ticket', async () => {
+    const connection = createDeviceServerConnection({
+      baseUrl: 'https://192.168.31.75:14500', credential: 'fixture-key',
+      identity: { serverId: 'rust-server', serverNodeId: 'rust-server', serverNodeKind: 'lingxi-service',
+        studioId: 'studio-rust', label: 'Rust Server', connectionKind: 'lan',
+        credentialKind: 'device_credential', capabilities: ['chat'] },
+    });
+    for (const body of [{}, { ticket: '' }, { ticket: '   ' }, { ticket: ' hana_ws_fixture ' }, { ticket: 42 }]) {
+      const fetchImpl = vi.fn(async () => ({ ok: true, json: async () => body } as Response));
+      await expect(requestConnectionWsTicket(connection, fetchImpl as unknown as typeof fetch))
+        .rejects.toThrow('websocket ticket response missing ticket');
+    }
+  });
+
+  it('accepts only a fresh, complete restart port and token', () => {
+    expect(validateRestartTransport(63000, 'new-token')).toEqual({ port: '63000', token: 'new-token' });
+    expect(validateRestartTransport('63000', 'new-token')).toEqual({ port: '63000', token: 'new-token' });
+    for (const [port, token] of [[0, 'new-token'], [65536, 'new-token'], ['bad', 'new-token'],
+      [63000, null], [63000, ''], [63000, '  '], [63000, ' token ']]) {
+      expect(validateRestartTransport(port, token)).toBeNull();
+    }
   });
 
   it('persists only non-local ServerConnections and the active remote selection', () => {

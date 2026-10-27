@@ -21,6 +21,12 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source-sha.txt");
 
+// F44（R05 RR2）：RR1 大提交使 VERIFIED_SOURCE_SHA..HEAD 的 name-only 清单
+// （当前 ≈ 2.6MB）超过 node execSync 默认 1MB maxBuffer，guard 自身以 ENOBUFS
+// 崩溃而非产出下方违规清单文本（r02_t08 分类器因此 fail-closed 于不可识别
+// 崩溃形态）。仅抬高缓冲上限，不改变白名单与判定语义。
+const GIT_LISTING_MAX_BUFFER = 64 * 1024 * 1024;
+
 // 审计文件 allowlist：新增/改名审计脚本时须同步维护。
 // 与 tests/post-verification-audit-seal.test.ts 的 AUDIT_ALLOWLIST 为同一门禁的
 // 两份副本，必须保持一致（2026-08-23 曾发散：本文件缺 V3 验收文档等条目，
@@ -78,9 +84,21 @@ if (!/^[0-9a-f]{40}$/.test(sha)) {
   fail(`VERIFIED_SOURCE_SHA 非 40 位十六进制: ${sha}`);
 }
 
+// 坐标必须精确指向 commit 对象：tree/tag 同样被 git diff/ls-tree 接受，
+// 40 位格式检查不足以证明坐标是真实源码提交（C3 独立复核 F1）。
+let objectType;
+try {
+  objectType = execSync(`git cat-file -t ${sha}`, { cwd: ROOT, encoding: "utf-8" }).trim();
+} catch {
+  fail(`VERIFIED_SOURCE_SHA 必须指向真实 commit 对象（对象不存在或不可读）: ${sha}`);
+}
+if (objectType !== "commit") {
+  fail(`VERIFIED_SOURCE_SHA 必须指向真实 commit 对象（git cat-file -t 实际返回 ${objectType}）: ${sha}`);
+}
+
 let changed;
 try {
-  const out = execSync(`git diff --name-only ${sha}..HEAD`, { cwd: ROOT, encoding: "utf-8" });
+  const out = execSync(`git diff --name-only ${sha}..HEAD`, { cwd: ROOT, encoding: "utf-8", maxBuffer: GIT_LISTING_MAX_BUFFER });
   changed = out.split("\n").map((s) => s.trim()).filter(Boolean);
 } catch (err) {
   fail(`git diff ${sha}..HEAD 失败: ${err.message}`);

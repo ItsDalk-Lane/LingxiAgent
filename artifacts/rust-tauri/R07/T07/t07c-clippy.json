@@ -1,0 +1,32 @@
+{
+  "candidate": "t07c",
+  "name": "clippy",
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "clippy",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "--workspace",
+    "--all-targets",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-18T03:19:10.405646+00:00",
+  "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+  "log": "t07c-clippy.log",
+  "endedAt": "2026-10-18T03:19:10.845219+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+  "logSha256": "9a30d54c8b16d7e49510b182028079bca120aeebb7d662e88f8566e6196a49f6",
+  "baseCommitAfter": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceUnchanged": true
+}

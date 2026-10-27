@@ -1,0 +1,23 @@
+{
+  "identifier": "resource-viewer",
+  "description": "R09-T06 收口：派生只读文件预览。只读自身文件 + 自身 ResourceIO WS（token 类命令受保护）+ 关闭自己。",
+  "windows": [
+    "viewer-*"
+  ],
+  "permissions": [
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    "allow-file-info",
+    "allow-get-server-connection-info",
+    "allow-get-server-port",
+    "allow-get-server-token",
+    "allow-read-file",
+    "allow-read-file-base64",
+    "allow-read-file-snapshot",
+    "allow-resource-events",
+    "allow-resource-subscribe",
+    "allow-resource-unsubscribe",
+    "allow-viewer-close",
+    "allow-viewer-request-load"
+  ]
+}

@@ -1,0 +1,157 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t02_supervisor_ready",
+ "cases": [
+  {
+   "case": "t02::ready-handshake-real",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "events": [
+     "host-start",
+     "resolve",
+     "binary",
+     "spawn",
+     "ready",
+     "instance",
+     "identity",
+     "service-ready",
+     "host-service-ready",
+     "window-created",
+     "page-load",
+     "page-load",
+     "app-ready-window-suppressed",
+     "app-ready"
+    ],
+    "readyMsSinceSpawn": 135,
+    "ordered": true,
+    "readyAddr": "127.0.0.1:54465"
+   }
+  },
+  {
+   "case": "t02::no-fixed-sleep-handshake",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "readyMsSinceSpawn": 135,
+    "mode": "local-owned"
+   }
+  },
+  {
+   "case": "t02::debug-exit-graceful",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "exit": 0,
+    "timedOut": false,
+    "service_residual": []
+   }
+  },
+  {
+   "case": "t02::automation-no-modal-positive",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "dialogSink": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-91826-1793024944532/raw/dialog-tauri-home-debug-owned.json",
+    "automation": true
+   }
+  },
+  {
+   "case": "t02::manifest-protocol-match",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "manifest": {
+     "appVersion": "0.1.43",
+     "binary": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-service",
+     "contentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+     "event": "manifest",
+     "protocol": "lingxi-service wire 1..=1 data-epoch 2",
+     "rendererSha256": "d5a24adf33b380a1cc5eff153b3954ccfa79a4a1812481658cea37d2e55b59a0",
+     "schema": "lingxi.r09.tauri-launch.v1",
+     "sha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+     "signedMutation": true,
+     "target": "aarch64-apple-darwin",
+     "toolchain": "1.98.1",
+     "unixMs": 1793024979574
+    },
+    "serviceReady": {
+     "event": "service-ready",
+     "instanceId": "af79e1644883a2c54968a2f68a109f29",
+     "mode": "local-owned",
+     "pid": 92410,
+     "port": 54473,
+     "protocol": "lingxi-service wire 1..=1 data-epoch 2",
+     "schema": "lingxi.r09.tauri-launch.v1",
+     "unixMs": 1793024979676
+    }
+   }
+  },
+  {
+   "case": "t02::packaged-exit-graceful",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "exit": 0,
+    "timedOut": false,
+    "serviceResidual": []
+   }
+  },
+  {
+   "case": "t02::automation-no-modal-packaged",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "dialogSink": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-91826-1793024944532/raw/dialog-release-owned.json",
+    "automation": true
+   }
+  },
+  {
+   "case": "t02::manifest-protocol-mismatch-rejected",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "exit": {
+     "exit": 2,
+     "timedOut": false
+    },
+    "record": {
+     "actual": "lingxi-service wire 1..=2 data-epoch 2",
+     "appVersion": "0.1.43",
+     "atUnixMs": 1793024982636,
+     "debugBuild": false,
+     "detail": null,
+     "expected": "lingxi-service wire 1..=1 data-epoch 2",
+     "fallbackAttempts": 0,
+     "home": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-91826-1793024944532/home-protocol-mismatch",
+     "message": "bundled Rust service protocol/data epoch is incompatible with this host",
+     "nodeFallback": "none",
+     "packaged": true,
+     "reason": "RUST_SERVICE_PROTOCOL_INCOMPATIBLE",
+     "schema": "lingxi.r09.service-launch-failure.v1"
+    },
+    "recordPath": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-91826-1793024944532/tmp/lingxi-tauri-launch/41a9ae1602cdcea5/failure.json",
+    "codesignExit": 1
+   }
+  },
+  {
+   "case": "r09_t02_supervisor_ready::producer",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "error": "NameError: name 'suppressed_dialog' is not defined",
+    "traceback": "Traceback (most recent call last):\n  File \"/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r09_t02.py\", line 806, in run_suite\n    return implementation(producer)\n  File \"/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r09_t02.py\", line 399, in suite_supervisor_ready\n    protocol_dialog = suppressed_dialog(launched_bad, \"RUST_SERVICE_PROTOCOL_INCOMPATIBLE\")\n                      ^^^^^^^^^^^^^^^^^\nNameError: name 'suppressed_dialog' is not defined\n"
+   }
+  },
+  {
+   "case": "isolation::no-residual-processes",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "killed": [],
+    "residual": [],
+    "marker": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-91826-1793024944532"
+   }
+  }
+ ]
+}

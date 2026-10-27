@@ -1,0 +1,1005 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_capability_audit",
+ "cases": [
+  {
+   "case": "caps::registered-commands-nonzero",
+   "ok": true,
+   "actual": 1,
+   "detail": [
+    "app_ready",
+    "close_browser_viewer",
+    "copy_file",
+    "file_info",
+    "get_app_version",
+    "get_browser_viewer_context",
+    "get_platform",
+    "get_server_connection_info",
+    "get_server_port",
+    "get_server_token",
+    "get_service_status",
+    "list_skill_files",
+    "open_browser_viewer",
+    "open_external",
+    "open_file",
+    "open_skill_viewer",
+    "read_file",
+    "read_file_base64",
+    "read_file_snapshot",
+    "read_skill_file",
+    "resource_events",
+    "resource_subscribe",
+    "resource_unsubscribe",
+    "run_edit_command",
+    "rust_browser_request",
+    "select_files",
+    "select_folder",
+    "set_browser_connection",
+    "skill_viewer_close",
+    "skill_viewer_load",
+    "spawn_viewer",
+    "trash_item",
+    "unwatch_file",
+    "viewer_close",
+    "viewer_request_load",
+    "watch_file",
+    "window_close",
+    "window_is_maximized",
+    "window_maximize",
+    "window_minimize",
+    "window_theme_changed",
+    "write_file",
+    "write_file_binary",
+    "write_file_if_unchanged"
+   ]
+  },
+  {
+   "case": "caps::invoke-handler-equals-build-manifest",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "onlyInvokeHandler": [],
+    "onlyBuildManifest": []
+   }
+  },
+  {
+   "case": "caps::each-command-has-permission",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "missingPermission": []
+   }
+  },
+  {
+   "case": "caps::each-permission-command-registered",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "orphanPermissionCommands": []
+   }
+  },
+  {
+   "case": "caps::acl-manifest-covers-registered",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "missingFromAcl": []
+   }
+  },
+  {
+   "case": "caps::capability-windows-nonempty",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "r09-browser-viewer": [
+     "browser-viewer"
+    ],
+    "resource-main": [
+     "main"
+    ],
+    "r09-host": [
+     "main"
+    ],
+    "skill-viewer": [
+     "skill-viewer-*"
+    ],
+    "resource-viewer": [
+     "viewer-*"
+    ]
+   }
+  },
+  {
+   "case": "caps::capability-windows-no-remote-content-label",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "caps::policy-schema-valid",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "caps::policy-window-labels-match-native",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "onlyNative": [],
+    "onlyPolicy": []
+   }
+  },
+  {
+   "case": "caps::dev-only-capability-grants-only-dev-commands",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "presentDevCapabilities": [],
+    "devGranted": [],
+    "undeclared": []
+   }
+  },
+  {
+   "case": "caps::window-union-equals-policy::browser-viewer",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "commandWindows": [
+     "r09-browser-viewer"
+    ],
+    "extraPrivilege": [],
+    "missingUndeclared": [],
+    "declaredPending": [
+     "get_platform",
+     "settings_changed",
+     "window_theme_changed"
+    ]
+   }
+  },
+  {
+   "case": "caps::window-plugin-permissions::browser-viewer",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "actual": [
+     "core:default",
+     "core:event:default"
+    ],
+    "allowed": [
+     "core:event:default"
+    ],
+    "extraPluginPermissions": [
+     "core:default"
+    ]
+   }
+  },
+  {
+   "case": "caps::window-denied-commands::browser-viewer",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "caps::window-union-equals-policy::main",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "commandWindows": [
+     "r09-host",
+     "resource-main"
+    ],
+    "extraPrivilege": [],
+    "missingUndeclared": [],
+    "declaredPending": [
+     "get_auto_launch_status",
+     "get_keep_awake_status",
+     "keybindings_reload_global",
+     "keybindings_test_register",
+     "observability_export_abort",
+     "observability_export_begin",
+     "observability_export_end",
+     "observability_export_write",
+     "open_folder",
+     "open_settings",
+     "quick_chat_hide",
+     "quick_chat_open_session_ack",
+     "quick_chat_reload_shortcut",
+     "quick_chat_resize",
+     "quick_chat_shortcut_status",
+     "quick_chat_show",
+     "read_docx_html",
+     "read_xlsx_html",
+     "reload_main_window",
+     "restart_app",
+     "select_skill",
+     "set_auto_launch_enabled",
+     "set_keep_awake_enabled",
+     "settings_changed",
+     "show_in_finder",
+     "show_notification",
+     "speech_permission_request",
+     "speech_permission_status",
+     "start_drag",
+     "unwatch_workspace",
+     "watch_workspace"
+    ]
+   }
+  },
+  {
+   "case": "caps::window-plugin-permissions::main",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "actual": [
+     "core:default",
+     "core:event:default"
+    ],
+    "allowed": [
+     "core:event:default"
+    ],
+    "extraPluginPermissions": [
+     "core:default"
+    ]
+   }
+  },
+  {
+   "case": "caps::window-denied-commands::main",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "caps::window-union-equals-policy::onboarding",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "commandWindows": [],
+    "extraPrivilege": [],
+    "missingUndeclared": [],
+    "declaredPending": [
+     "get_avatar_path",
+     "get_platform",
+     "get_server_connection_info",
+     "get_server_port",
+     "get_server_token",
+     "get_splash_info",
+     "onboarding_complete"
+    ]
+   }
+  },
+  {
+   "case": "caps::window-plugin-permissions::onboarding",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "actual": [],
+    "allowed": [
+     "core:event:default"
+    ],
+    "extraPluginPermissions": []
+   }
+  },
+  {
+   "case": "caps::window-denied-commands::onboarding",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "caps::window-union-equals-policy::quick-chat",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "commandWindows": [],
+    "extraPrivilege": [],
+    "missingUndeclared": [],
+    "declaredPending": [
+     "get_platform",
+     "get_server_connection_info",
+     "get_server_port",
+     "get_server_token",
+     "open_external",
+     "quick_chat_hide",
+     "quick_chat_open_session",
+     "quick_chat_resize",
+     "quick_chat_show",
+     "window_theme_changed"
+    ]
+   }
+  },
+  {
+   "case": "caps::window-plugin-permissions::quick-chat",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "actual": [],
+    "allowed": [
+     "core:event:default"
+    ],
+    "extraPluginPermissions": []
+   }
+  },
+  {
+   "case": "caps::window-denied-commands::quick-chat",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "caps::window-union-equals-policy::settings",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "commandWindows": [],
+    "extraPrivilege": [],
+    "missingUndeclared": [],
+    "declaredPending": [
+     "get_app_version",
+     "get_auto_launch_status",
+     "get_keep_awake_status",
+     "get_platform",
+     "get_server_connection_info",
+     "get_server_port",
+     "get_server_token",
+     "keybindings_reload_global",
+     "keybindings_test_register",
+     "observability_export_abort",
+     "observability_export_begin",
+     "observability_export_end",
+     "observability_export_write",
+     "open_external",
+     "open_file",
+     "open_folder",
+     "open_settings",
+     "quick_chat_reload_shortcut",
+     "quick_chat_shortcut_status",
+     "restart_app",
+     "run_edit_command",
+     "select_files",
+     "select_folder",
+     "select_skill",
+     "set_auto_launch_enabled",
+     "set_keep_awake_enabled",
+     "settings_changed",
+     "show_in_finder",
+     "window_close",
+     "window_is_maximized",
+     "window_maximize",
+     "window_minimize",
+     "window_theme_changed"
+    ]
+   }
+  },
+  {
+   "case": "caps::window-plugin-permissions::settings",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "actual": [],
+    "allowed": [
+     "core:event:default"
+    ],
+    "extraPluginPermissions": []
+   }
+  },
+  {
+   "case": "caps::window-denied-commands::settings",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "caps::window-union-equals-policy::skill-viewer-*",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "commandWindows": [
+     "skill-viewer"
+    ],
+    "extraPrivilege": [],
+    "missingUndeclared": [],
+    "declaredPending": []
+   }
+  },
+  {
+   "case": "caps::window-plugin-permissions::skill-viewer-*",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "actual": [
+     "core:default"
+    ],
+    "allowed": [
+     "core:event:default"
+    ],
+    "extraPluginPermissions": [
+     "core:default"
+    ]
+   }
+  },
+  {
+   "case": "caps::window-denied-commands::skill-viewer-*",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "caps::window-union-equals-policy::splash",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "commandWindows": [],
+    "extraPrivilege": [],
+    "missingUndeclared": [],
+    "declaredPending": [
+     "get_avatar_path",
+     "get_platform",
+     "get_splash_info"
+    ]
+   }
+  },
+  {
+   "case": "caps::window-plugin-permissions::splash",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "actual": [],
+    "allowed": [
+     "core:event:default"
+    ],
+    "extraPluginPermissions": []
+   }
+  },
+  {
+   "case": "caps::window-denied-commands::splash",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "caps::window-union-equals-policy::viewer-*",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "commandWindows": [
+     "resource-viewer"
+    ],
+    "extraPrivilege": [],
+    "missingUndeclared": [],
+    "declaredPending": [
+     "get_server_connection_info",
+     "get_server_port",
+     "get_server_token"
+    ]
+   }
+  },
+  {
+   "case": "caps::window-plugin-permissions::viewer-*",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "actual": [
+     "core:default"
+    ],
+    "allowed": [
+     "core:event:default"
+    ],
+    "extraPluginPermissions": [
+     "core:default"
+    ]
+   }
+  },
+  {
+   "case": "caps::window-denied-commands::viewer-*",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "caps::no-dangerous-plugin-permissions",
+   "ok": false,
+   "actual": 0,
+   "detail": [
+    {
+     "window": "browser-viewer",
+     "leaves": [
+      "core:menu:allow-append",
+      "core:menu:allow-create-default",
+      "core:menu:allow-get",
+      "core:menu:allow-insert",
+      "core:menu:allow-is-checked",
+      "core:menu:allow-is-enabled",
+      "core:menu:allow-items",
+      "core:menu:allow-new",
+      "core:menu:allow-popup",
+      "core:menu:allow-prepend",
+      "core:menu:allow-remove",
+      "core:menu:allow-remove-at",
+      "core:menu:allow-set-accelerator",
+      "core:menu:allow-set-as-app-menu",
+      "core:menu:allow-set-as-help-menu-for-nsapp",
+      "core:menu:allow-set-as-window-menu",
+      "core:menu:allow-set-as-windows-menu-for-nsapp",
+      "core:menu:allow-set-checked",
+      "core:menu:allow-set-enabled",
+      "core:menu:allow-set-icon",
+      "core:menu:allow-set-text",
+      "core:menu:allow-text",
+      "core:tray:allow-get-by-id",
+      "core:tray:allow-new",
+      "core:tray:allow-remove-by-id",
+      "core:tray:allow-set-icon",
+      "core:tray:allow-set-icon-as-template",
+      "core:tray:allow-set-icon-with-as-template",
+      "core:tray:allow-set-menu",
+      "core:tray:allow-set-show-menu-on-left-click",
+      "core:tray:allow-set-temp-dir-path",
+      "core:tray:allow-set-title",
+      "core:tray:allow-set-tooltip",
+      "core:tray:allow-set-visible",
+      "core:webview:allow-internal-toggle-devtools"
+     ]
+    },
+    {
+     "window": "main",
+     "leaves": [
+      "core:menu:allow-append",
+      "core:menu:allow-create-default",
+      "core:menu:allow-get",
+      "core:menu:allow-insert",
+      "core:menu:allow-is-checked",
+      "core:menu:allow-is-enabled",
+      "core:menu:allow-items",
+      "core:menu:allow-new",
+      "core:menu:allow-popup",
+      "core:menu:allow-prepend",
+      "core:menu:allow-remove",
+      "core:menu:allow-remove-at",
+      "core:menu:allow-set-accelerator",
+      "core:menu:allow-set-as-app-menu",
+      "core:menu:allow-set-as-help-menu-for-nsapp",
+      "core:menu:allow-set-as-window-menu",
+      "core:menu:allow-set-as-windows-menu-for-nsapp",
+      "core:menu:allow-set-checked",
+      "core:menu:allow-set-enabled",
+      "core:menu:allow-set-icon",
+      "core:menu:allow-set-text",
+      "core:menu:allow-text",
+      "core:tray:allow-get-by-id",
+      "core:tray:allow-new",
+      "core:tray:allow-remove-by-id",
+      "core:tray:allow-set-icon",
+      "core:tray:allow-set-icon-as-template",
+      "core:tray:allow-set-icon-with-as-template",
+      "core:tray:allow-set-menu",
+      "core:tray:allow-set-show-menu-on-left-click",
+      "core:tray:allow-set-temp-dir-path",
+      "core:tray:allow-set-title",
+      "core:tray:allow-set-tooltip",
+      "core:tray:allow-set-visible",
+      "core:webview:allow-internal-toggle-devtools"
+     ]
+    },
+    {
+     "window": "skill-viewer-*",
+     "leaves": [
+      "core:menu:allow-append",
+      "core:menu:allow-create-default",
+      "core:menu:allow-get",
+      "core:menu:allow-insert",
+      "core:menu:allow-is-checked",
+      "core:menu:allow-is-enabled",
+      "core:menu:allow-items",
+      "core:menu:allow-new",
+      "core:menu:allow-popup",
+      "core:menu:allow-prepend",
+      "core:menu:allow-remove",
+      "core:menu:allow-remove-at",
+      "core:menu:allow-set-accelerator",
+      "core:menu:allow-set-as-app-menu",
+      "core:menu:allow-set-as-help-menu-for-nsapp",
+      "core:menu:allow-set-as-window-menu",
+      "core:menu:allow-set-as-windows-menu-for-nsapp",
+      "core:menu:allow-set-checked",
+      "core:menu:allow-set-enabled",
+      "core:menu:allow-set-icon",
+      "core:menu:allow-set-text",
+      "core:menu:allow-text",
+      "core:tray:allow-get-by-id",
+      "core:tray:allow-new",
+      "core:tray:allow-remove-by-id",
+      "core:tray:allow-set-icon",
+      "core:tray:allow-set-icon-as-template",
+      "core:tray:allow-set-icon-with-as-template",
+      "core:tray:allow-set-menu",
+      "core:tray:allow-set-show-menu-on-left-click",
+      "core:tray:allow-set-temp-dir-path",
+      "core:tray:allow-set-title",
+      "core:tray:allow-set-tooltip",
+      "core:tray:allow-set-visible",
+      "core:webview:allow-internal-toggle-devtools"
+     ]
+    },
+    {
+     "window": "viewer-*",
+     "leaves": [
+      "core:menu:allow-append",
+      "core:menu:allow-create-default",
+      "core:menu:allow-get",
+      "core:menu:allow-insert",
+      "core:menu:allow-is-checked",
+      "core:menu:allow-is-enabled",
+      "core:menu:allow-items",
+      "core:menu:allow-new",
+      "core:menu:allow-popup",
+      "core:menu:allow-prepend",
+      "core:menu:allow-remove",
+      "core:menu:allow-remove-at",
+      "core:menu:allow-set-accelerator",
+      "core:menu:allow-set-as-app-menu",
+      "core:menu:allow-set-as-help-menu-for-nsapp",
+      "core:menu:allow-set-as-window-menu",
+      "core:menu:allow-set-as-windows-menu-for-nsapp",
+      "core:menu:allow-set-checked",
+      "core:menu:allow-set-enabled",
+      "core:menu:allow-set-icon",
+      "core:menu:allow-set-text",
+      "core:menu:allow-text",
+      "core:tray:allow-get-by-id",
+      "core:tray:allow-new",
+      "core:tray:allow-remove-by-id",
+      "core:tray:allow-set-icon",
+      "core:tray:allow-set-icon-as-template",
+      "core:tray:allow-set-icon-with-as-template",
+      "core:tray:allow-set-menu",
+      "core:tray:allow-set-show-menu-on-left-click",
+      "core:tray:allow-set-temp-dir-path",
+      "core:tray:allow-set-title",
+      "core:tray:allow-set-tooltip",
+      "core:tray:allow-set-visible",
+      "core:webview:allow-internal-toggle-devtools"
+     ]
+    }
+   ]
+  },
+  {
+   "case": "caps::capabilities-reference-known-permissions",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "caps::window-stacking::main",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "capabilities": [
+     "resource-main",
+     "r09-host"
+    ],
+    "minCapabilities": 2
+   }
+  },
+  {
+   "case": "caps::gap-ledger-pending-implementation",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "declared": [
+     "get_auto_launch_status",
+     "get_avatar_path",
+     "get_keep_awake_status",
+     "get_splash_info",
+     "keybindings_reload_global",
+     "keybindings_test_register",
+     "observability_export_abort",
+     "observability_export_begin",
+     "observability_export_end",
+     "observability_export_write",
+     "onboarding_complete",
+     "open_folder",
+     "open_settings",
+     "quick_chat_hide",
+     "quick_chat_open_session",
+     "quick_chat_open_session_ack",
+     "quick_chat_reload_shortcut",
+     "quick_chat_resize",
+     "quick_chat_shortcut_status",
+     "quick_chat_show",
+     "read_docx_html",
+     "read_xlsx_html",
+     "reload_main_window",
+     "restart_app",
+     "select_skill",
+     "set_auto_launch_enabled",
+     "set_keep_awake_enabled",
+     "settings_changed",
+     "show_in_finder",
+     "show_notification",
+     "speech_permission_request",
+     "speech_permission_status",
+     "start_drag",
+     "unwatch_workspace",
+     "watch_workspace"
+    ],
+    "actual": [
+     "get_auto_launch_status",
+     "get_avatar_path",
+     "get_keep_awake_status",
+     "get_splash_info",
+     "keybindings_reload_global",
+     "keybindings_test_register",
+     "observability_export_abort",
+     "observability_export_begin",
+     "observability_export_end",
+     "observability_export_write",
+     "onboarding_complete",
+     "open_folder",
+     "open_settings",
+     "quick_chat_hide",
+     "quick_chat_open_session",
+     "quick_chat_open_session_ack",
+     "quick_chat_reload_shortcut",
+     "quick_chat_resize",
+     "quick_chat_shortcut_status",
+     "quick_chat_show",
+     "read_docx_html",
+     "read_xlsx_html",
+     "reload_main_window",
+     "restart_app",
+     "select_skill",
+     "set_auto_launch_enabled",
+     "set_keep_awake_enabled",
+     "settings_changed",
+     "show_in_finder",
+     "show_notification",
+     "speech_permission_request",
+     "speech_permission_status",
+     "start_drag",
+     "unwatch_workspace",
+     "watch_workspace"
+    ],
+    "onlyDeclared": [],
+    "onlyActual": []
+   }
+  },
+  {
+   "case": "caps::gap-ledger-pending-window-grants",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "declared": {
+     "settings": [
+      "get_app_version",
+      "get_platform",
+      "get_server_connection_info",
+      "get_server_port",
+      "get_server_token",
+      "open_external",
+      "open_file",
+      "run_edit_command",
+      "select_files",
+      "select_folder",
+      "window_close",
+      "window_is_maximized",
+      "window_maximize",
+      "window_minimize",
+      "window_theme_changed"
+     ],
+     "quick-chat": [
+      "get_platform",
+      "get_server_connection_info",
+      "get_server_port",
+      "get_server_token",
+      "open_external",
+      "window_theme_changed"
+     ],
+     "splash": [
+      "get_platform"
+     ],
+     "onboarding": [
+      "get_platform",
+      "get_server_connection_info",
+      "get_server_port",
+      "get_server_token"
+     ],
+     "browser-viewer": [
+      "get_platform",
+      "window_theme_changed"
+     ],
+     "viewer-*": [
+      "get_server_connection_info",
+      "get_server_port",
+      "get_server_token"
+     ]
+    },
+    "actual": {
+     "browser-viewer": [
+      "get_platform",
+      "window_theme_changed"
+     ],
+     "onboarding": [
+      "get_platform",
+      "get_server_connection_info",
+      "get_server_port",
+      "get_server_token"
+     ],
+     "quick-chat": [
+      "get_platform",
+      "get_server_connection_info",
+      "get_server_port",
+      "get_server_token",
+      "open_external",
+      "window_theme_changed"
+     ],
+     "settings": [
+      "get_app_version",
+      "get_platform",
+      "get_server_connection_info",
+      "get_server_port",
+      "get_server_token",
+      "open_external",
+      "open_file",
+      "run_edit_command",
+      "select_files",
+      "select_folder",
+      "window_close",
+      "window_is_maximized",
+      "window_maximize",
+      "window_minimize",
+      "window_theme_changed"
+     ],
+     "splash": [
+      "get_platform"
+     ],
+     "viewer-*": [
+      "get_server_connection_info",
+      "get_server_port",
+      "get_server_token"
+     ]
+    }
+   }
+  },
+  {
+   "case": "caps::protected-commands-window-scoped",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "caps::release-denied-commands-not-granted",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "hits": [],
+    "devOnly": [
+     "debug_open_onboarding",
+     "debug_open_onboarding_preview"
+    ],
+    "note": "debug 命令只允许出现在 devOnlyCapabilities 排除的 capability 中"
+   }
+  },
+  {
+   "case": "caps::debug-commands-declared-dev-only",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "debugInvokeCommands": [
+     "debug_open_onboarding",
+     "debug_open_onboarding_preview"
+    ],
+    "declaredDevOnly": [
+     "debug_open_onboarding",
+     "debug_open_onboarding_preview"
+    ]
+   }
+  },
+  {
+   "case": "caps::deferred-commands-not-granted",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "deferred": [
+     "ack_announcement",
+     "auto_update_check",
+     "auto_update_install",
+     "auto_update_set_channel",
+     "auto_update_state",
+     "get_pending_announcement",
+     "get_update_digest_history",
+     "release_check_latest",
+     "screenshot_render",
+     "train_update_apply",
+     "train_update_check",
+     "train_update_status"
+    ],
+    "granted": []
+   }
+  },
+  {
+   "case": "caps::dropped-commands-not-registered",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "caps::forbidden-commands-absent",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "caps::wdio-feature-gated",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "optional": true,
+    "featureGate": true
+   }
+  },
+  {
+   "case": "caps::tauri-crate-no-devtools-feature",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "tauriFeatures": [
+     "image-png",
+     "tray-icon"
+    ],
+    "forbiddenEnabled": []
+   }
+  },
+  {
+   "case": "caps::no-devtools-control-in-source",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "caps::release-config-has-no-dev-url",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "releaseConfigPresent": true
+   }
+  },
+  {
+   "case": "caps::with-global-tauri-matches-policy",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "actual": true,
+    "policy": true,
+    "note": "withGlobalTauri 只暴露 ACL 允许的命令，不是 ACL 绕过；T06 R09 保留 true 以复用同一 React 产物"
+   }
+  },
+  {
+   "case": "caps::no-dev-port-in-production-config",
+   "ok": true,
+   "actual": 1,
+   "detail": []
+  },
+  {
+   "case": "caps::test-control-env-not-in-release-paths",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "hits": [
+     {
+      "env": "LINGXI_R09_AUTOMATION",
+      "file": "desktop/src-tauri/src/commands.rs"
+     },
+     {
+      "env": "LINGXI_R09_AUTOMATION",
+      "file": "desktop/src-tauri/src/host.rs"
+     },
+     {
+      "env": "LINGXI_R09_HOST_DIALOG_SINK",
+      "file": "desktop/src-tauri/src/host.rs"
+     }
+    ],
+    "note": "非 cfg(test) 源码引用 = release 二进制仍可被该 env 改变行为（A12 需 patch 到 debug/test feature）"
+   }
+  }
+ ]
+}

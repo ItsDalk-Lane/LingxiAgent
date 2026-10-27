@@ -7,6 +7,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSettingsStore } from '../../settings/store';
+import { resetDesktopHostForTests } from '../../host/desktop-host';
 
 type MockResponse = { json: () => Promise<unknown> };
 
@@ -154,7 +155,7 @@ describe('AgentTab settings agent selection', () => {
   afterEach(() => {
     cleanup();
     vi.clearAllMocks();
-    delete (window as unknown as { platform?: unknown }).platform;
+    resetDesktopHostForTests();
   });
 
   it('rerenders when browsing a different settings agent', async () => {

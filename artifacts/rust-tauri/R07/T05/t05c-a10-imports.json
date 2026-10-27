@@ -1,0 +1,26 @@
+{
+  "stage": "R07-T05",
+  "candidate": "t05c",
+  "name": "a10-imports",
+  "purpose": "final_acceptance",
+  "command": [
+    "/bin/zsh",
+    "-c",
+    "/Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r06_agent_settings_live native_character_card_real_zip_refuses_escape_links_and_expansion_without_agents -- --nocapture && /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r06_original_memory_skill_proofs original_install_tool_risk_token_complete_package_agent_enable_and_failures -- --nocapture"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-16T04:53:29.856107+00:00",
+  "sourceFingerprint": "316fb6da889c6e3605aeb778ba52958094d6f08989fae73628b20cd19a7b7676",
+  "log": "t05c-a10-imports.log",
+  "endedAt": "2026-10-16T04:53:35.522707+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "316fb6da889c6e3605aeb778ba52958094d6f08989fae73628b20cd19a7b7676",
+  "logSha256": "2c60357780d57a757132a55d7cf8a4d9ba360e1bebdbe8436bef2e27caee4117",
+  "sourceUnchanged": true
+}

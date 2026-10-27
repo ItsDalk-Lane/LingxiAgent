@@ -1,0 +1,279 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t02_supervisor_ready",
+ "cases": [
+  {
+   "case": "t02::ready-handshake-real",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "events": [
+     "host-start",
+     "resolve",
+     "binary",
+     "spawn",
+     "ready",
+     "instance",
+     "identity",
+     "service-ready",
+     "host-service-ready",
+     "shutdown",
+     "shutdown-complete"
+    ],
+    "readyMsSinceSpawn": 118,
+    "ordered": true,
+    "readyAddr": "127.0.0.1:53168"
+   }
+  },
+  {
+   "case": "t02::no-fixed-sleep-handshake",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "readyMsSinceSpawn": 118,
+    "mode": "local-owned"
+   }
+  },
+  {
+   "case": "t02::debug-exit-graceful",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "exit": 0,
+    "timedOut": false,
+    "service_residual": []
+   }
+  },
+  {
+   "case": "t02::manifest-protocol-match",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "manifest": {
+     "appVersion": "0.1.43",
+     "binary": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-service",
+     "contentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+     "event": "manifest",
+     "protocol": "lingxi-service wire 1..=1 data-epoch 2",
+     "rendererSha256": "d5a24adf33b380a1cc5eff153b3954ccfa79a4a1812481658cea37d2e55b59a0",
+     "schema": "lingxi.r09.tauri-launch.v1",
+     "sha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+     "signedMutation": true,
+     "target": "aarch64-apple-darwin",
+     "toolchain": "1.98.1",
+     "unixMs": 1793024526359
+    },
+    "serviceReady": {
+     "event": "service-ready",
+     "instanceId": "aeed3fb73c4624c2541e43a77d3ea690",
+     "mode": "local-owned",
+     "pid": 86934,
+     "port": 53531,
+     "protocol": "lingxi-service wire 1..=1 data-epoch 2",
+     "schema": "lingxi.r09.tauri-launch.v1",
+     "unixMs": 1793024526510
+    }
+   }
+  },
+  {
+   "case": "t02::packaged-exit-graceful",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "exit": 0,
+    "timedOut": false,
+    "serviceResidual": []
+   }
+  },
+  {
+   "case": "t02::manifest-protocol-mismatch-rejected",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "exit": {
+     "exit": 2,
+     "timedOut": false
+    },
+    "record": {
+     "actual": "lingxi-service wire 1..=2 data-epoch 2",
+     "appVersion": "0.1.43",
+     "atUnixMs": 1793024529471,
+     "debugBuild": false,
+     "detail": null,
+     "expected": "lingxi-service wire 1..=1 data-epoch 2",
+     "fallbackAttempts": 0,
+     "home": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-86060-1793024336624/home-protocol-mismatch",
+     "message": "bundled Rust service protocol/data epoch is incompatible with this host",
+     "nodeFallback": "none",
+     "packaged": true,
+     "reason": "RUST_SERVICE_PROTOCOL_INCOMPATIBLE",
+     "schema": "lingxi.r09.service-launch-failure.v1"
+    },
+    "recordPath": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-86060-1793024336624/tmp/lingxi-tauri-launch/eb436646422f82fe/failure.json",
+    "codesignExit": 1
+   }
+  },
+  {
+   "case": "t02::injected-protocol-no-service-spawn",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "residual": []
+   }
+  },
+  {
+   "case": "t02::injected-protocol-no-node-fallback",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "record": {
+     "actual": "lingxi-service wire 1..=2 data-epoch 2",
+     "appVersion": "0.1.43",
+     "atUnixMs": 1793024529471,
+     "debugBuild": false,
+     "detail": null,
+     "expected": "lingxi-service wire 1..=1 data-epoch 2",
+     "fallbackAttempts": 0,
+     "home": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-86060-1793024336624/home-protocol-mismatch",
+     "message": "bundled Rust service protocol/data epoch is incompatible with this host",
+     "nodeFallback": "none",
+     "packaged": true,
+     "reason": "RUST_SERVICE_PROTOCOL_INCOMPATIBLE",
+     "schema": "lingxi.r09.service-launch-failure.v1"
+    }
+   }
+  },
+  {
+   "case": "t02::manifest-digest-mismatch-rejected",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "exit": {
+     "exit": 2,
+     "timedOut": false
+    },
+    "record": {
+     "actual": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+     "appVersion": "0.1.43",
+     "atUnixMs": 1793024533870,
+     "debugBuild": false,
+     "detail": {
+      "binarySha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+      "codesign": "codesign --verify --deep --strict failed: /private/tmp/lingxi-r09-injected-86060/DigestMismatch.app: a sealed resource is missing or invalid",
+      "contentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+      "manifestContentSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "manifestSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     },
+     "expected": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "fallbackAttempts": 0,
+     "home": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-86060-1793024336624/home-digest-mismatch",
+     "message": "bundled Rust service bytes do not match the build manifest",
+     "nodeFallback": "none",
+     "packaged": true,
+     "reason": "RUST_SERVICE_DIGEST_MISMATCH",
+     "schema": "lingxi.r09.service-launch-failure.v1"
+    },
+    "recordPath": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-86060-1793024336624/tmp/lingxi-tauri-launch/b5b4e07347258c4a/failure.json"
+   }
+  },
+  {
+   "case": "t02::injected-digest-no-service-spawn",
+   "ok": true,
+   "actual": 1,
+   "detail": null
+  },
+  {
+   "case": "t02::runtime-identity-mismatch-rejected",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "exit": {
+     "exit": 2,
+     "timedOut": false
+    },
+    "record": {
+     "actual": "wire 1..=3 epoch 2",
+     "appVersion": "0.0.0",
+     "atUnixMs": 1793024538476,
+     "debugBuild": true,
+     "detail": {
+      "instanceId": "0123456789abcdef0123456789abcdef"
+     },
+     "expected": "wire 1..=1 epoch 2",
+     "fallbackAttempts": 0,
+     "home": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-86060-1793024336624/home-runtime-mismatch",
+     "message": "runtime instance record announces an incompatible protocol/data epoch",
+     "nodeFallback": "none",
+     "packaged": false,
+     "reason": "RUNTIME_IDENTITY_MISMATCH",
+     "schema": "lingxi.r09.service-launch-failure.v1"
+    },
+    "recordPath": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-86060-1793024336624/tmp/lingxi-tauri-launch/556039507884b508/failure.json",
+    "fakeResidual": []
+   }
+  },
+  {
+   "case": "t02::error-surfaced-records",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "failureRecords": [
+     "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-86060-1793024336624/tmp/lingxi-tauri-launch/eb436646422f82fe/failure.json",
+     "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-86060-1793024336624/tmp/lingxi-tauri-launch/b5b4e07347258c4a/failure.json",
+     "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-86060-1793024336624/tmp/lingxi-tauri-launch/556039507884b508/failure.json"
+    ],
+    "crashLogs": [
+     "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-86060-1793024336624/tmp/lingxi-tauri-launch/eb436646422f82fe/tauri-crash.log",
+     "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-86060-1793024336624/tmp/lingxi-tauri-launch/b5b4e07347258c4a/tauri-crash.log",
+     "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-86060-1793024336624/tmp/lingxi-tauri-launch/556039507884b508/tauri-crash.log"
+    ]
+   }
+  },
+  {
+   "case": "t02::dialog-observation-boundary",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "observed": "native dialog is raised after the failure record is written; visual observation requires Accessibility/Screen Recording TCC (BLOCKED-SYSTEM-PERMISSIONS) — evidence relies on the pre-dialog failure record + crash log, as designed (R-06)"
+   }
+  },
+  {
+   "case": "t02::ready-timeout-bounded",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "evidence": "cargo test service_supervisor::ready_timeout_kills_spawned_child_and_records_failure (injected 600ms duration; asserts child reaped + failure record)"
+   }
+  },
+  {
+   "case": "t02::no-node-fallback-in-release-binary",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "matches": {
+     "hana-server": 0,
+     "server/bootstrap": 0,
+     "bundle/index.js": 0,
+     "bridge-sdk-worker": 0
+    }
+   }
+  },
+  {
+   "case": "isolation::real-home-untouched",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "before": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    },
+    "after": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,8 @@
+PASS fixture gen
+PASS A: old stack ready
+PASS A: real-format session LISTED by old stack :: [[null,"ents/a1/sessions/real-format-probe.jsonl"]]
+PASS A: real-format session content readable :: {"summaryStatus":200,"messageCount":null,"keys":["hasSummary","summary","createdAt","updatedAt"]}
+PASS B: legacy-import exit 0
+FAIL B: real-format entries imported as user/assistant messages (EXPECTED RED if F-T07-1 holds) :: {"sessions":2,"messages":5,"probeRows":4,"conversational":0,"unknownBlocks":4,"issues":12}
+REAL_FORMAT_PROBE_RESULT listedByOldStack=1 oldStackContent={"summaryStatus":200,"messageCount":null,"keys":["hasSummary","summary","createdAt","updatedAt"]} importedConversational=0 importedUnknownBlocks=4 failures=1
+REAL FORMAT PROBE: DIVERGENCE CONFIRMED (F-T07-1)

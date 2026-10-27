@@ -1,0 +1,36 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/desktop-open-external.test.ts (6 tests | 1 failed) 49ms
+     × 系统拒绝时返回明确失败而不假报已打开 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/desktop-open-external.test.ts > 现役打开外部浏览器的系统回执 > 系统拒绝时返回明确失败而不假报已打开
+AssertionError: expected Object{ ok: false, …(1) } to deeply equal { ok: false, error: '自有系统打开失败' }
+
+- Expected
++ Received
+
+  {
+-   "error": "自有系统打开失败",
++   "error": "Error: 自有系统打开失败",
+    "ok": false,
+  }
+
+ ❯ tests/desktop-open-external.test.ts:34:57
+     32|     void rejected.catch(() => {});
+     33|     const handler = actualHandler(() => rejected);
+     34|     expect(await handler({}, 'http://127.0.0.1/owned')).toEqual({ ok: …
+       |                                                         ^
+     35|   });
+     36|   it.each(['', 'broken url', 'javascript:alert(1)', 'file:///private/o…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 37 passed (38)
+   Start at  19:24:21
+   Duration  2.11s (transform 538ms, setup 41ms, import 799ms, tests 1.26s, environment 608ms)
+

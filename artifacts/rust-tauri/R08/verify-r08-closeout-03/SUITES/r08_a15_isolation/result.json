@@ -1,0 +1,14 @@
+{
+ "schema": "lingxi.r08.suite-receipt.v1",
+ "suite": "r08_a15_isolation",
+ "exitCode": 0,
+ "guardFailures": [],
+ "argv": [
+  "node",
+  "scripts/rust-tauri/r08_t08_isolation_check.mjs",
+  "--out",
+  "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/verify-r08-closeout-03/SUITES/r08_a15_isolation"
+ ],
+ "durationSecs": 0.031,
+ "logSha256": "70d83cb9e868529bf924ebd7fafa51fadc0d36b66c49da14ad8e0499694fc8e9"
+}

@@ -1,0 +1,102 @@
+{
+  "ownedFixtureHome": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-media-source-49e07387292d4d15",
+  "receipt": "artifacts/rust-tauri/R07/T08/media-source-and-search1.json",
+  "scope": "仅本次失败自有合成Source/兼容文件/数据库/产物，命令退出后复制；不含用户真实数据",
+  "files": [
+    {
+      "path": "agents/a/config.yaml",
+      "bytes": 42,
+      "sha256": "d9c13312a3b336f6ad4f1e54ccea77f3de5cf53db13f8a0771b34736c54a5577"
+    },
+    {
+      "path": "knowledge/ingestion-worker.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "knowledge/knowledge.db",
+      "bytes": 139264,
+      "sha256": "c4c32fa33cb7ba12e05390e55e90efc5e9049e2ed686b46655e10eba544600a8"
+    },
+    {
+      "path": "knowledge/knowledge_index.db",
+      "bytes": 57344,
+      "sha256": "cbf283b8ac6a10675d6985e55057b87247265393b262559db2782cb2aabcd251"
+    },
+    {
+      "path": "knowledge/knowledge_index.db.guard",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "knowledge/knowledge_index.db.owner",
+      "bytes": 54,
+      "sha256": "98178de1829ba7641c6965edcb022dafea49faf1e0d5300cc0b92f8cd854cfc7"
+    },
+    {
+      "path": "knowledge/knowledge_vector.db",
+      "bytes": 45056,
+      "sha256": "42c6bba4f70db9040fa93603f42f013b3ade419adbc38b7f8577bf14fc6e2fe5"
+    },
+    {
+      "path": "knowledge/knowledge_vector.db.guard",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "knowledge/knowledge_vector.db.owner",
+      "bytes": 55,
+      "sha256": "c0bd996d54e3edbf45c9490909ca1140707f7a0e7bb49d896a5b09e20ce8f7b2"
+    },
+    {
+      "path": "lingxi-service/data/runs.db",
+      "bytes": 499712,
+      "sha256": "9470c20cbc8d2e822b35290ae2d2fd42b56618e0e4d2776f3b31ac7f647892c6"
+    },
+    {
+      "path": "lingxi-service/data/runs.db-shm",
+      "bytes": 32768,
+      "sha256": "0bef6cf4a3f17e351ffcab5e3d2ecaca0c1fb7ee425946ed01a4a1ee9f4b099a"
+    },
+    {
+      "path": "lingxi-service/data/runs.db-wal",
+      "bytes": 1273112,
+      "sha256": "738cdad248ce5e770cc0c78248753c21bb840af296ae74b7995864be899ed4d6"
+    },
+    {
+      "path": "lingxi-service/device-credentials.json",
+      "bytes": 1028,
+      "sha256": "29637017ce216e75b57e23dbe1bbbc825a3eedc457a0eaa6f844845638f9b619"
+    },
+    {
+      "path": "lingxi-service/devices.json",
+      "bytes": 433,
+      "sha256": "3bd9b08c6c51841fc48087d51a9d2e23199f715626398a29ce052a9a93275576"
+    },
+    {
+      "path": "lingxi-service/local-token.json",
+      "bytes": 184,
+      "sha256": "ed1da3666bd3d4e69ef0123c7befaca38756954b7bea62b6a6d1c0f9714b61f1"
+    },
+    {
+      "path": "lingxi-service/management.json",
+      "bytes": 531,
+      "sha256": "b26ffac6e8f93db3e0b3e599c0c9c1f0bee0739f83176c3d06d172a61026e3a3"
+    },
+    {
+      "path": "logs/security-audit.jsonl",
+      "bytes": 829,
+      "sha256": "57debefe01fa74d155338edffa793f66f04db2d3df53acea57e9834ab4d58b52"
+    },
+    {
+      "path": "model-plane.json",
+      "bytes": 835,
+      "sha256": "2881db5a04833d36b01cf4e8f0d89723932c32c66eaab184a7075a85dda03f95"
+    },
+    {
+      "path": "user/preferences.json",
+      "bytes": 24,
+      "sha256": "4b985eb3c0e10ce8a6de2b7e51a01f3200345928085e326371de91ddbeab32c5"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "status": "DEVELOPMENT_ONLY",
+  "exitCode": 0,
+  "log": "artifacts/rust-tauri/R07/T08/card-navigation-guard-unit1.log",
+  "logSha256": "ecfd6f54ffd1179219d0b9d918118c430dbea4a9b900f22fc2a64183ec3509f4",
+  "command": "npx vitest run desktop/src/react/__tests__/components/card-frame-navigation.test.ts --maxWorkers=1",
+  "bindingNote": "运行时未保存源码快照；所列仅后续核对时源码，禁止用来声称本次运行绑定最终候选。",
+  "laterInspectionSourceHashes": [
+    {
+      "path": "desktop/src/shared/card-frame-navigation.cjs",
+      "sha256": "8dbff1a6b7459f3f1f488eab0c05cdb5c8cf676a6b10c88a643d0c124e4a05cd"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/card-frame-navigation.test.ts",
+      "sha256": "31130621547850e64b1661bff6ad77984bd84dbd536d68aa47898f6c2d16551b"
+    }
+  ]
+}

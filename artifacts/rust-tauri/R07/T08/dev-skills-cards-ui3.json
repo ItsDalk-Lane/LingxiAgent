@@ -1,0 +1,47 @@
+{
+  "stage": "R07-T08",
+  "purpose": "development_not_final_acceptance",
+  "command": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "desktop/src/react/__tests__/components/InteractiveCard.test.tsx",
+    "--maxWorkers=1"
+  ],
+  "startedAt": "2026-10-18T03:56:39.841817+00:00",
+  "endedAt": "2026-10-18T03:56:41.236899+00:00",
+  "exitCode": 0,
+  "log": "dev-skills-cards-ui3.log",
+  "logSha256": "2b013751d04b105df8ca1077d69107082d9a4e02f84fe9e144e70f8527437dd6",
+  "sourceFilesBefore": [
+    {
+      "path": "contracts/generated/ts/lingxi-protocol.ts",
+      "sha256": "bda82398dfccc62cd6d445fc1eedbe655877cb487f89fb47b8983295357cf215"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/InteractiveCard.test.tsx",
+      "sha256": "433b34baf928a253cbce50983e7c1e8681e50a7bac8778f3120362ed9c814c3e"
+    },
+    {
+      "path": "desktop/src/react/components/chat/InteractiveCard.tsx",
+      "sha256": "6c6715fbcaf30b14863b71a747741f5a9ac5f8849c5bb5c575b2f6254e1e1ff7"
+    }
+  ],
+  "sourceFilesAfter": [
+    {
+      "path": "contracts/generated/ts/lingxi-protocol.ts",
+      "sha256": "bda82398dfccc62cd6d445fc1eedbe655877cb487f89fb47b8983295357cf215"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/InteractiveCard.test.tsx",
+      "sha256": "433b34baf928a253cbce50983e7c1e8681e50a7bac8778f3120362ed9c814c3e"
+    },
+    {
+      "path": "desktop/src/react/components/chat/InteractiveCard.tsx",
+      "sha256": "6c6715fbcaf30b14863b71a747741f5a9ac5f8849c5bb5c575b2f6254e1e1ff7"
+    }
+  ],
+  "sourceFingerprintBefore": "ff27eb215d9cb7c3688653f68bee81e5a0214dc9c4cffc06afc401501838544c",
+  "sourceFingerprintAfter": "ff27eb215d9cb7c3688653f68bee81e5a0214dc9c4cffc06afc401501838544c",
+  "sourceUnchanged": true
+}

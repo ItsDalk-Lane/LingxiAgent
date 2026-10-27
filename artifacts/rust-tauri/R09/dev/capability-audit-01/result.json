@@ -1,0 +1,15 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_capability_audit",
+ "status": "FAIL",
+ "exitCode": 2,
+ "caseCount": 22,
+ "failedCases": [
+  "caps::invoke-handler-equals-build-manifest",
+  "caps::each-command-has-permission",
+  "caps::each-permission-command-registered",
+  "caps::acl-manifest-covers-registered",
+  "caps::policy-present"
+ ],
+ "audit": "capability-audit.json"
+}

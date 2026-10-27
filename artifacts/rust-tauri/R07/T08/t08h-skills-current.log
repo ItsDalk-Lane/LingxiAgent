@@ -1,0 +1,18 @@
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r06_skills_completion") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.18s
+     Running tests/r06_skills_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_skills_completion-9769348e9cef4aaf)
+
+running 5 tests
+test original_translation_uses_real_title_model_protocol_accounts_and_refuses_cross_catalog ... ok
+test original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval ... ok
+test original_skill_packages_workspace_source_global_and_agent_install_rejections ... ok
+test original_skills_settings_and_panel_current_real_service_projection ... ok
+test current_skills_pages_real_read_failures_and_partial_bundle_writes ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 28.22s
+

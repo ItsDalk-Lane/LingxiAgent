@@ -1,0 +1,158 @@
+{
+  "reviewedAt": "2026-10-18T04:27:35.136108+00:00",
+  "status": "READONLY_FOLLOWUP_FINDINGS_OPEN_NOT_ACCEPTANCE",
+  "sourceNotFrozen": true,
+  "scope": "仅root拥有的设置/鉴权/会话默认选择/前端消费及其真实服务测试。审阅者自己实现的publisher、gateway、network发布和provider路由不作为独立正确性结论。 agents_admin.rs仅追溯agent_dir_checked现役共用边界，不审其其他功能。",
+  "sourceBindings": [
+    {
+      "path": "rust/crates/lingxi-service/src/settings_configuration.rs",
+      "sha256": "ebb162945720943bad24520965089ed0114d5c6c8cdefac0626567ffdafb99a8"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/agent_config_readback.rs",
+      "sha256": "be21f0ec25bcf7b99af8615cb0d49e992c5bf657d15f2d701194c2fd6cf94cc2"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/chat_settings.rs",
+      "sha256": "9e5fad5552239b03bbd43cfcaf0fe237bfbfb8755b2449f400d4eafba6260166"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_focus.rs",
+      "sha256": "8d08997954ba578dcf1e538137f9fa5eea9c4ea49ab7f0bb4ff22993015de803"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/auth.rs",
+      "sha256": "5ee0bdf32d7efd58170dddb51682f59c39789c1093ef017ddd3bd8e0a34c98f3"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/settings_ui.rs",
+      "sha256": "afebdb233bb0f2fb9c83306efb7b3dd229f7b5820cc7edad07902dd9fa0aeb72"
+    },
+    {
+      "path": "desktop/src/react/settings/api.ts",
+      "sha256": "cbe677469233876756f680e0b7632b60e8e25fd6a71936e3df0713cb477d0965"
+    },
+    {
+      "path": "desktop/src/react/settings/components/SettingsTransferSection.tsx",
+      "sha256": "cd05f32a09383663e1b351821d5229b2fd7f8c74c6e9e35840ddc3359ad86b54"
+    },
+    {
+      "path": "desktop/src/react/services/rust-settings.ts",
+      "sha256": "46c85b04e52db1a92c14c8d89c80a20ff0f557028c70dea436ae25863ecae6a3"
+    },
+    {
+      "path": "desktop/src/react/__tests__/services/r07-settings-real-service.test.tsx",
+      "sha256": "c65556e7d349fe954eb02d765b2519e8383cdefb95e06bab508bf29479c58f45"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/agents_admin.rs",
+      "sha256": "fb8ad96defe8d152b5fbe10cb6fe00365ee39214968c9a4148fa08c484594c7d"
+    }
+  ],
+  "priorFindings": [
+    {
+      "id": "T08-ROOT-R1",
+      "status": "STATIC_FIX_PRESENT_TEST_EVIDENCE_PRESENT",
+      "evidence": [
+        "agent_config_readback.rs mask_object_secrets对四种代理URL字符串掩码username/password；apply_global_setter借effective_network_policy拒新userinfo",
+        "settings_configuration config_get/export、settings_ui snapshot共同调用递归掩码",
+        "r07_t08_settings::saved_proxy_credentials_never_leave_read_or_export_and_new_unsupported_credentials_are_refused 覆盖旧prefs读面与新写拒绝"
+      ],
+      "limit": "本次不独立重跑；core-flow3已有10 settings通过，但属于非冻结开发二进制，不作新源码最终验收。"
+    },
+    {
+      "id": "T08-ROOT-R2",
+      "status": "STATIC_FIX_PRESENT_TEST_EVIDENCE_PRESENT",
+      "evidence": [
+        "settings_configuration.rs:786 固定home DirFd逐组件打开user目录；Snapshot拒绝任何符号链接组件",
+        "settings_configuration.rs:827 read_user_profile 同样使用DirFd且有1MiB有界快照",
+        "r07_t08_settings::user_profile_parent_directory_link_cannot_redirect_reads_or_writes 实际父目录链接读写均拒绝并核outside字节"
+      ],
+      "limit": "当前新增父链接测试只有outside/user.md存在场景；缺失场景未独立运行，代码同样在父组件拒绝。"
+    },
+    {
+      "id": "T08-ROOT-R3",
+      "status": "PARTIALLY_FIXED_EVENT_GAP_REMAINS",
+      "evidence": [
+        "agent_config_put extraction、yuan校验、YAML渲染预演先于global写入",
+        "助手YAML实际保存失败回执包含preferencesSaved/agentConfigurationSaved/modelConfiguration并按已完成部分发事件",
+        "模型保存错误回执已有preferencesSaved及模型实际report，前端withSavedSettingsFacts会呈现部分成功"
+      ],
+      "remaining": "下方T08-ROOT-R2A：晚到模型/偏好错误仍有分支绕过已完成部分事件。"
+    },
+    {
+      "id": "T08-ROOT-R4",
+      "status": "ROOT_ROUTING_FIX_PRESENT_CORE_EXCLUDED_FROM_INDEPENDENT_REVIEW",
+      "evidence": [
+        "settings_configuration configPUT/import及agent config网络改动调用唯一publisher save/refresh_network_preferences",
+        "core-flow3网络目标1通过；这项核心实现由本审阅者完成，不据此声称独立审阅通过"
+      ],
+      "limit": "共享NetworkPlane实际实现/首次激活/后续model.save保持代理策略需其他独立审阅者核验。"
+    }
+  ],
+  "findings": [
+    {
+      "id": "T08-ROOT-R2A",
+      "priority": "P2",
+      "title": "已保存全局设置或模型后错误路径跳过真实变更事件",
+      "source": "rust/crates/lingxi-service/src/settings_configuration.rs:454",
+      "related": [
+        "rust/crates/lingxi-service/src/agent_config_readback.rs:2449",
+        "rust/crates/lingxi-service/src/settings_configuration.rs:370",
+        "rust/crates/lingxi-service/src/settings_configuration.rs:628"
+      ],
+      "reproduction": "PUT settings/config {locale:ja,providers:{invalid:{api:not-a-supported-protocol,base_url:http://127.0.0.1:1,models:[x]}}}。apply_globals先落盘locale，publisher拒绝模型，然后直接model_error返回，未调用emit_globals。现有真实UI测试已证明locale实际变ja并收到部分保存错误，但没有核对locale-changed事件。另模型已真实applied而后续preferences写失败时也直接错误返回，不发models-changed。",
+      "basis": "成功事件集中在整个handler末尾；上述return已保留HTTP部分成功事实，却让其他正在打开的界面和桌面监听错过实际变化。",
+      "minimalFix": "失败回执前根据实际完成的阶段发布对应事件：已保存global发global事件，report.applied=true发models-changed；未完成的阶段不伪报，避免重复发完整成功事件。",
+      "proofSuggested": "真实HTTP+AppEventLog订阅：globals保存后模型拒绝仍有locale-changed，prefs字节ja且错误preferencesSaved=true；模型已applied、后续偏好写故障时有models-changed且错误附实际report。",
+      "execution": "静态控制流确认，未运行新复现。"
+    },
+    {
+      "id": "T08-ROOT-R2B",
+      "priority": "P2",
+      "title": "明确目标助手配置缺失仍静默回落并修改焦点助手",
+      "source": "rust/crates/lingxi-service/src/agent_config_readback.rs:2237",
+      "related": [
+        "rust/crates/lingxi-service/src/settings_configuration.rs:714",
+        "rust/crates/lingxi-service/src/settings_tools.rs update_config_for_agent调用"
+      ],
+      "reproduction": "焦点为a，操作明确目标b；b/config.yaml在前面的目标检查之后被移走或替换为非普通文件。update_config_for_agent(Some(b),patch)因is_file=false走_分支，取focus_agent_id a并将b的修改写进a。",
+      "basis": "match agent_id只有Some(id)且config.is_file才保留明确目标，所有其余情形（含Some）都会读焦点。新recent链和设置工具均传Some明确身份。",
+      "minimalFix": "Some(id)必须检查并只修改该id，缺失或无效明确错误；仅None保留兼容焦点行为。",
+      "proofSuggested": "真实工具或HTTP故障检查：b缺失、非法目标及检查后移除都拒绝，a原字节与b不存在状态不变；合法Some(b)仍只改b，None旧兼容行为独立保留。",
+      "execution": "静态分支确认；尚无确定性实际窗口检查。"
+    },
+    {
+      "id": "T08-ROOT-R2C",
+      "priority": "P2",
+      "title": "助手目录父链接仍能将设置写到原home外",
+      "source": "rust/crates/lingxi-service/src/agent_config_readback.rs:2170",
+      "related": [
+        "rust/crates/lingxi-service/src/agents_admin.rs:216",
+        "rust/crates/lingxi-service/src/agent_config_readback.rs:41",
+        "rust/crates/lingxi-service/src/settings_configuration.rs:714",
+        "rust/crates/lingxi-service/src/chat_settings.rs:188"
+      ],
+      "reproduction": "在自有fixture将home/agents/b设为指向另一个自有outside目录的symlink，outside/config.yaml为有效助手配置。PUT /agents/b/config {agent:{name:changed}}会通过agent_dir_checked的config.is_file，save_agent_config_merge读取该配置，write_secret_file的create_dir_all、tmp和rename均跟随父目录链接，实际修改outside/config.yaml。无需同一请求内竞态。",
+      "basis": "agent_dir_checked仅验证助手ID、最终is_file和删除标记；写盘路径没有固定根目录句柄或Snapshot路径检查。profile的R1整改已采用相应防护，但助手配置面仍使用另一套跟随路径写法。",
+      "minimalFix": "现役助手读写面在明确home/agents/agent目录下逐组件不跟随链接；保存使用同一实际目录的Snapshot/FileSafety并执行前复核。不要只加末端config.yaml lstat。",
+      "proofSuggested": "真实HTTP分别助手目录/agents根目录/最终config.yaml链接（自有outside目标存在与不存在），明确拒绝、outside字节及不存在状态不变；合法b修改保留a原字节。",
+      "execution": "静态路径链确认，尚未执行新服务复现。"
+    }
+  ],
+  "contractQuestions": [
+    {
+      "id": "T08-ROOT-C1",
+      "detail": "chat_settings.choice先sessions或defaults[owner]，owner级新聊天选择会压过agent/models/chat。若它被定义为用户已存显式选择，则合理；若合同仅给已存session优先，则仍违背目标agent默认。已发root核定，不列为已确认缺陷。"
+    }
+  ],
+  "uiEvidenceLimits": [
+    "r07-settings-real-service.test.tsx实际启动Rust二进制并真HTTP导出/导入、核磁盘秘密保留/locale改变；URL.createObjectURL与anchor.click为jsdom替身，因此不是实际浏览器下载文件或OS保存完成证明。",
+    "无binary时该UI用例明确skip；必须把最终版本的环境和命令绑定后才可计通过。",
+    "SettingsTransferSection连接身份在读文件前后与响应后核对，未发现将旧连接响应回灌新连接的新增路径；临时URL定时及卸载释放均存在。"
+  ],
+  "cargoExecuted": false,
+  "productSourceEdited": false,
+  "testsExecutedByReviewer": false,
+  "preservedFailures": "保留core-flow1/2/3/4及T07 Chrome C/D原失败，不以静态整改关闭。"
+}

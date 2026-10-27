@@ -1,0 +1,19 @@
+{
+  "stage": "R07-T06",
+  "purpose": "development_not_final_acceptance",
+  "label": "dev-t06lint1",
+  "command": "cargo fmt --manifest-path rust/Cargo.toml --all -- --check && cargo clippy --manifest-path rust/Cargo.toml --locked --workspace --all-targets -- -D warnings",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "a1d0b3e49fe3302d64a31ed5680fb54f5b7689b1c4b98d3651921e88876ca029",
+  "sourceFingerprintAfter": "a1d0b3e49fe3302d64a31ed5680fb54f5b7689b1c4b98d3651921e88876ca029",
+  "sourceUnchanged": true,
+  "exitCode": 1,
+  "durationSec": 3.4,
+  "logSha256": "160391d32a226dbe673b9aeb42c5e06c670c59d657ec7e5b17bc11b862555b3f"
+}

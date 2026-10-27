@@ -1,0 +1,24 @@
+{
+  "candidate": "t07a",
+  "name": "protocol",
+  "command": [
+    "bash",
+    "scripts/rust-tauri/r01-t02-check-generated.sh"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-18T02:06:37.553288+00:00",
+  "sourceFingerprint": "e0f559efca12888cb68f168c1162b480458e2aca959775475ca8bb1340081e6a",
+  "log": "t07a-protocol.log",
+  "endedAt": "2026-10-18T02:06:39.963527+00:00",
+  "exitCode": 1,
+  "sourceFingerprintAfter": "e0f559efca12888cb68f168c1162b480458e2aca959775475ca8bb1340081e6a",
+  "logSha256": "faf855a5ad7c85fd7da0d9f42e5434ea4f2e814feab7e8bd72ab00e4bbe9cb3a",
+  "baseCommitAfter": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceUnchanged": true
+}

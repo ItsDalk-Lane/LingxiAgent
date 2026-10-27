@@ -1,0 +1,210 @@
+{
+  "reviewer": "independent-subagent-r07_t08_final_review",
+  "reviewedAt": "2026-10-18T08:45:58.480609+00:00",
+  "stage": "R07-T08",
+  "candidate": "t08d",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprint": "ce4642863c79eaa2d15dedff7c579b56649a9bc2c4cf133e6647faa70879664b",
+  "sourceManifestSha256": "2511984469c59230856a7a938f1209e5f4d570c1d18fc86840c56c5a6c3c9e9c",
+  "gatePlanSha256": "664d776e5491c40762d84ed3f6c38a613820d3406f01b44272120588a56497a8",
+  "finalAcceptance": "pending",
+  "sourceVerification": {
+    "fileCount": 647,
+    "allCurrentManifestRowsMatch": true,
+    "recomputedFingerprintMatches": true,
+    "archiveSha256Matches": true,
+    "allArchiveMemberBytesAndModesMatch": true,
+    "currentAndSnapshotPlanMatch": true,
+    "mainRunnerMatches": true,
+    "allFourVerificationHelpersMatch": true
+  },
+  "planReview": {
+    "gateCount": 20,
+    "postBuildGates": [
+      "ui",
+      "card-navigation-desktop",
+      "card-navigation-mobile",
+      "metadata-redaction-binary"
+    ],
+    "postBuildExcludedFromCargoGroup": true,
+    "postBuildWrapperRequiresActualSameCandidateBuildBinaryShaBeforeAfter": true,
+    "metadataProbeLogicFrozenInVerificationToolHashes": true,
+    "nativePickerBindingAfterNativeSkills": true,
+    "nativePickerClaim": "Verifies exact same native artifact and35-source closure against prior actual CUA/IPC proof; does not claim d repeated manual steps",
+    "existingManagementLANTargetStillSelected": true,
+    "existingServiceLibAndNativeLiveTargetsStillSelected": true
+  },
+  "implementationReview": "All previously reported Source, authorization, malformed settings, card, media and metadata fixes independently source-reviewed; no new blocking source finding. Metadata masks preserve ordinary fields, same-model-ID secret refill, secret-write permission, authHeader exact identity and downstream schema validation.",
+  "metadataEvidenceScope": {
+    "priorEnvelopeMistakeCorrectedBy": "independent-metadata-evidence-scope-correction1.json",
+    "originalReproduce4": "Actual existing Source read leakage only; HTTP200 values wrapper did not prove model Source save",
+    "fixedBinary1": "Read masking only; no actual model save inference",
+    "fixedBinary2": "Actual bare providers HTTP saved/applied true, Source name changed and ordinary extension retained, all3 read surfaces no secret values, binary hash unchanged and shutdown0",
+    "corrected3CaseTarget": "metadata-source-permissions-fixed2 exit0/sourceUnchanged=true/logSHAverified; actual test source uses bare providers, strict saved/applied and all original preservation/denial assertions retained",
+    "prior2Of3FailureRetained": true
+  },
+  "completedOrPendingGateReceipts": [
+    {
+      "gate": "fmt",
+      "status": "PASS",
+      "receipt": "t08d-fmt.json",
+      "receiptSha256": "ae5c7869377d60667a46c19ad71d15f68b2e713f176d0985b3f64902014a5635",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "sourceFingerprintMatches": true,
+      "commandMatchesFrozenPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "gate": "diff",
+      "status": "PASS",
+      "receipt": "t08d-diff.json",
+      "receiptSha256": "e52b956d8f69d15cfefb36792869575569363faa837e52619cbebc886bb15300",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "sourceFingerprintMatches": true,
+      "commandMatchesFrozenPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "gate": "clippy",
+      "status": "PASS",
+      "receipt": "t08d-clippy.json",
+      "receiptSha256": "9402c11c0cb503422d45fee6e99950cbc2dda07bb78e22fcbcadf03e258d17a8",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "sourceFingerprintMatches": true,
+      "commandMatchesFrozenPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "gate": "protocol",
+      "status": "PASS",
+      "receipt": "t08d-protocol.json",
+      "receiptSha256": "74a4d08bc105944103c411eb8e8b7a6c82b5306ee99112a917e8e304266a1a3f",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "sourceFingerprintMatches": true,
+      "commandMatchesFrozenPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "gate": "protocol-roundtrip",
+      "status": "PASS",
+      "receipt": "t08d-protocol-roundtrip.json",
+      "receiptSha256": "abf27f45194d2d1f57af4149f3690dc62f19177c232512863a8f08abb683de54",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "sourceFingerprintMatches": true,
+      "commandMatchesFrozenPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "gate": "protocol-tests",
+      "status": "PASS",
+      "receipt": "t08d-protocol-tests.json",
+      "receiptSha256": "4c1cf4c877d4827381883fd28eb8390b661d07dd338ddadace370e7efc7e33f7",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "sourceFingerprintMatches": true,
+      "commandMatchesFrozenPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "gate": "kernel",
+      "status": "PASS",
+      "receipt": "t08d-kernel.json",
+      "receiptSha256": "8ffe3b72fb7abd22d45aa247e30d4b110d1747ef869c7d7f748acde491645cd0",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "sourceFingerprintMatches": true,
+      "commandMatchesFrozenPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "gate": "boundaries",
+      "status": "PASS",
+      "receipt": "t08d-boundaries.json",
+      "receiptSha256": "1d7bd75506dba119d5189077a440b18425cd3d4a01e65741b8157d7172865279",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "sourceFingerprintMatches": true,
+      "commandMatchesFrozenPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "gate": "adapter",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "service",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "model-regression",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "native-skills",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "native-picker-binding",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "skills-current",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "build",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "ui",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "types",
+      "status": "PASS",
+      "receipt": "t08d-types.json",
+      "receiptSha256": "48b86cb351cb8830afe3e1fe6f16f0ebcca48f6444ac59583edb9b71fa90cc52",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "sourceFingerprintMatches": true,
+      "commandMatchesFrozenPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "gate": "card-navigation-desktop",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "card-navigation-mobile",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "metadata-redaction-binary",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    }
+  ],
+  "requiredFinalDisposition": [
+    "Only all20 actual matching gate passes permit frozen-scope pass; any remaining failed gate keeps whole frozen round FAILED",
+    "If LAN self-address exchange stalls and cause remains uncertain at application ingress, classify observed failure precisely; do not claim firewall/TUN as proven cause or skip/retire original target",
+    "Independent local implementation portions may be recorded completed and remaining failures explicitly transferred to T12 while T09 proceeds in order, consistent with T07 handling; never label that whole T08 PASS",
+    "Do not combine c old partial passes and d current passes into same-candidate full pass",
+    "Original c service has3 distinct observed failures: MCP full-queue fixture ParseIntEmpty, management LAN write/read stall, native Electron boundary test failure; not all LAN or all proven product bugs",
+    "Final109-leaf/343-assertion mapping must use named actual case outcomes and explicit unproven clauses, not suite totals"
+  ],
+  "boundary": "Local T08 review only; true accounts/paid vendors/otherOS/release packaging/T11 MCP remote+full lifecycle/T12 pending browser checks remain separately limited",
+  "reviewerMutations": "Only this new evidence file; no Cargo/GUI/product/test/plan/tool changes"
+}

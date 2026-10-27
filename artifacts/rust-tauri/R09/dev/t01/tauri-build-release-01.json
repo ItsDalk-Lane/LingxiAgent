@@ -1,0 +1,60 @@
+{
+  "schema": "lingxi.r09.tauri-build.v1",
+  "mode": "release",
+  "builtAtUnixMs": 1793022799354,
+  "cacheHit": false,
+  "command": [
+    "tauri",
+    "build",
+    "--config",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/tauri.release.generated.conf.json",
+    "--features",
+    "r09-host",
+    "--bundles",
+    "app"
+  ],
+  "inputs": {
+    "mode": "release",
+    "crateSourceDigest": "5edbcb58927982572b5b534b744d4d9522c3bbd26f52eb721f7ec85f17af3d9e",
+    "crateSourceFileCount": 125,
+    "rendererDigest": "d3e8ffe2650a098fd75b6a7b709a422e3ab3f9e5928862400faa88719f50be61",
+    "rendererFileCount": 642,
+    "configTemplateSha256": "46ebf32f7f49055ea9374819ba59fe891fa4715980224a1e877b66c573f30a5d",
+    "packageVersion": "0.1.43",
+    "tauriCli": "tauri-cli 2.12.4",
+    "toolchain": "1.98.1",
+    "target": "aarch64-apple-darwin",
+    "serviceManifestSha256": "cd4c057f21fe161df5805ca2be9cda95aebf8cac4691c8f5562a265932aa91a1",
+    "serviceBuildJsonSha256": "1b0bb316d9f22efa626ef32983bb9d9daa9b2ad00ad4ffe85e6eadac9140ae21",
+    "features": []
+  },
+  "config": {
+    "file": "desktop/src-tauri/tauri.release.generated.conf.json",
+    "generatedSha256": "340c2ad9e4655196671bc11863dec96e37026c67a87ad47bb9f7869796961ea5"
+  },
+  "artifacts": {
+    "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+    "executableSha256": "0f10bc6b9dfb1a905be12d343723ab33b9d42f1a50c4e687233c9d24104b4fb9",
+    "appBundle": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+    "appBundleExists": true
+  },
+  "service": {
+    "stage": "/Users/study_superior/Desktop/Code/LingxiAgent/dist-rust-service/mac-arm64",
+    "sidecar": "desktop/src-tauri/binaries/lingxi-service-aarch64-apple-darwin",
+    "sidecarSha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+    "resourcesManifest": "desktop/src-tauri/resources/rust-service/build.json",
+    "manifestSha256": "cd4c057f21fe161df5805ca2be9cda95aebf8cac4691c8f5562a265932aa91a1",
+    "protocol": {
+      "serverKind": "lingxi-service",
+      "wireProtocolMin": 1,
+      "wireProtocolMax": 1,
+      "dataEpoch": 2
+    },
+    "binarySha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+    "contentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0"
+  },
+  "codesign": {
+    "details": "",
+    "verify": ""
+  }
+}

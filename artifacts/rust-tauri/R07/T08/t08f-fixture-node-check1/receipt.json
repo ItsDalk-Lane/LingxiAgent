@@ -1,0 +1,43 @@
+{
+  "stage": "R07-T08",
+  "kind": "DEVELOPMENT_HELPER_MECHANISM_ONLY",
+  "recordedAt": "2026-10-18T09:29:35.933445+00:00",
+  "sourceStopped": true,
+  "noProductChanges": true,
+  "cargoNotExecuted": true,
+  "nodeResult": {
+    "exitCode": 0,
+    "testsPassed": 3,
+    "testsFailed": 0,
+    "transcript": "artifacts/rust-tauri/R07/T08/t08f-fixture-node-check1/node-tool-transcript.json",
+    "transcriptSha256": "508fc504d81061ea9d62a85781b6c2653365cce141b2d308582bb5fe21106169"
+  },
+  "scope": "三个负例仅证明测试就绪屏障拒绝错误/超时兜底/身份错，不替代真实Rust服务、鉴权、原删除或聊天流程。真实两Rust完整目标由root另行运行。",
+  "historicalFailures": "RESULTS_t08e及三个原失败现场未覆盖；本结果不升级e验收。",
+  "sourceHashes": [
+    {
+      "path": "desktop/src/react/settings/__tests__/agent-delete-initialization.ts",
+      "sha256": "4c38bcd79272e48a775aa8160bb1dbeca0a8281f964805ab766eaa1cc4c4e8f2"
+    },
+    {
+      "path": "desktop/src/react/settings/__tests__/AgentDeleteInitialization.test.ts",
+      "sha256": "c0f1978a83ab5e9975820fd1e60aec5e741637816db06a2f35562d82fc3d8148"
+    },
+    {
+      "path": "desktop/src/react/settings/__tests__/R06AgentDeleteRustLive.test.tsx",
+      "sha256": "091325efb32aa8eb5c9eef43061fe3844887e9645eb7ab2139c1e5ae51e801e3"
+    },
+    {
+      "path": "desktop/src/react/settings/__tests__/R06AgentDeleteConnectionReview.test.tsx",
+      "sha256": "e5a9af673d581bd01fa83a4354dd66abdbeb6bb71b26b081d25681255c3537ba"
+    },
+    {
+      "path": "desktop/src/react/settings/__tests__/R06AgentDeleteRegistryReview.test.tsx",
+      "sha256": "7ff2553a4596d285b14c78a98f0e54ea14ad9578ecd71133d8c6d5b8533b8102"
+    },
+    {
+      "path": "desktop/src/react/__tests__/chat-live/main.cjs",
+      "sha256": "6d8043d7332bb11727a8e5085231065d2aed18fb12906057ea8b41ae075ee63a"
+    }
+  ]
+}

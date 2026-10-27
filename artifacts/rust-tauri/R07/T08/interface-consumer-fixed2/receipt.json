@@ -1,0 +1,30 @@
+{
+  "developmentOnly": true,
+  "results": [
+    {
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "desktop/src/react/settings/tabs/__tests__/SecurityTab.test.tsx",
+        "desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx",
+        "desktop/src/react/settings/tabs/__tests__/KeybindingsTab.test.tsx"
+      ],
+      "exitCode": 0,
+      "stdoutSha256": "15265be257b38703ac02c9705fb19b9452cb1ace01aed8d7b1f83ef8882edfc7",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "--pretty",
+        "false"
+      ],
+      "exitCode": 2,
+      "stdoutSha256": "eefe8452ce3a6f9ff74e25495bb7fec915d1ed3f3bd806122d350ca6fc7e630b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

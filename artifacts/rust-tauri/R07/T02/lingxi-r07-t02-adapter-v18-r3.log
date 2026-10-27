@@ -1,0 +1,21 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.43s
+     Running tests/session_file_store.rs (/private/tmp/lingxi-r07-build/debug/deps/session_file_store-bff2eccd9b14bcc7)
+
+running 13 tests
+test supported_tip_matches_the_current_migration_registry ... ok
+test v7_to_tip_chain_preserves_prior_data_and_creates_new_tables ... ok
+test v14_delegation_accepts_only_boolean_values_and_rejects_null ... ok
+test upsert_session_activity_marks_coldness_for_cleanup_probe ... ok
+test file_history_store_lists_files_versions_and_reads_content ... ok
+test list_for_owner_orders_by_registration_then_id ... ok
+test source_key_dedup_is_scoped_to_owner ... ok
+test alias_resolution_maps_legacy_ids_to_canonical ... ok
+test insert_and_get_roundtrip_preserves_all_fields ... ok
+test refs_roundtrip_and_session_scoped_delete ... ok
+test status_transitions_record_expiry_timestamp ... ok
+test file_history_prune_enforces_age_and_total_bytes ... ok
+test delete_session_file_removes_row_and_aliases ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+

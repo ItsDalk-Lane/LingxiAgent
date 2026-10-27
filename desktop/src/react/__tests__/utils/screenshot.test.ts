@@ -14,6 +14,7 @@ vi.mock('../../stores', () => ({
 }));
 
 import { takeArticleScreenshot, takeScreenshot } from '../../utils/screenshot';
+import { getDesktopHost } from '../../host/desktop-host';
 
 type TakeMarkdownFileScreenshot = (
   filePath: string,
@@ -70,7 +71,7 @@ describe('screenshot utils', () => {
 
     await expect(takeArticleScreenshot('# hello')).resolves.toBeUndefined();
 
-    expect((window as any).hana.screenshotRender).toHaveBeenCalledOnce();
+    expect((getDesktopHost().api as any).screenshotRender).toHaveBeenCalledOnce();
     expect(notices).toEqual([
       expect.objectContaining({
         type: 'error',
@@ -89,7 +90,7 @@ describe('screenshot utils', () => {
       articleType: 'markdown',
     })).resolves.toBeUndefined();
 
-    expect((window as any).hana.screenshotRender).toHaveBeenCalledWith(expect.objectContaining({
+    expect((getDesktopHost().api as any).screenshotRender).toHaveBeenCalledWith(expect.objectContaining({
       mode: 'article',
       markdown: '![](<文本附件/a.png>)',
       filePath: '/vault/note.md',
@@ -108,7 +109,7 @@ describe('screenshot utils', () => {
       language: 'ts',
     })).resolves.toBeUndefined();
 
-    expect((window as any).hana.screenshotRender).toHaveBeenCalledWith(expect.objectContaining({
+    expect((getDesktopHost().api as any).screenshotRender).toHaveBeenCalledWith(expect.objectContaining({
       mode: 'article',
       markdown: 'const x = 1;',
       filePath: '/vault/app.ts',
@@ -144,11 +145,14 @@ describe('screenshot utils', () => {
   it('Markdown file screenshots read the file and save under the provided workspace', async () => {
     const hana = {
       screenshotRender: vi.fn().mockResolvedValue({ success: true, dir: '/workspace/OH-Works/截图' }),
+      readFileSnapshot: vi.fn(async () => ({ content: '# Report', version: 'v1' })),
     };
     Object.assign(window, { hana });
-    window.platform = {
-      readFileSnapshot: vi.fn(async () => ({ content: '# Report', version: 'v1' })),
-    } as unknown as typeof window.platform;
+    // R08-T02 批次 D：生产契约 window.platform === window.hana（platform.js
+    // 抢先别名），文件读取与 screenshotRender 同在 preload 桥上；旧桩把
+    // readFileSnapshot 挂在分离的 platform 上绕过宿主边界，现按契约取别名，
+    // 断言 window.platform.readFileSnapshot 指向同一读取桩，逐字保留。
+    window.platform = getDesktopHost().api;
 
     const { takeMarkdownFileScreenshot } = await import('../../utils/screenshot') as {
       takeMarkdownFileScreenshot: TakeMarkdownFileScreenshot;
@@ -156,7 +160,7 @@ describe('screenshot utils', () => {
 
     await expect(takeMarkdownFileScreenshot('/workspace/report.md', { saveDir: '/workspace' })).resolves.toBeUndefined();
 
-    expect(window.platform.readFileSnapshot).toHaveBeenCalledWith('/workspace/report.md');
+    expect(getDesktopHost().api.readFileSnapshot).toHaveBeenCalledWith('/workspace/report.md');
     expect(hana.screenshotRender).toHaveBeenCalledWith(expect.objectContaining({
       mode: 'article',
       markdown: '# Report',
@@ -169,11 +173,14 @@ describe('screenshot utils', () => {
   it('Markdown file screenshots keep the default screenshot directory when saveDir is omitted', async () => {
     const hana = {
       screenshotRender: vi.fn().mockResolvedValue({ success: true, dir: '/tmp/hana-home/截图' }),
+      readFileSnapshot: vi.fn(async () => ({ content: '# Default dir', version: 'v1' })),
     };
     Object.assign(window, { hana });
-    window.platform = {
-      readFileSnapshot: vi.fn(async () => ({ content: '# Default dir', version: 'v1' })),
-    } as unknown as typeof window.platform;
+    // R08-T02 批次 D：生产契约 window.platform === window.hana（platform.js
+    // 抢先别名），文件读取与 screenshotRender 同在 preload 桥上；旧桩把
+    // readFileSnapshot 挂在分离的 platform 上绕过宿主边界，现按契约取别名，
+    // 断言 window.platform.readFileSnapshot 指向同一读取桩，逐字保留。
+    window.platform = getDesktopHost().api;
 
     const { takeMarkdownFileScreenshot } = await import('../../utils/screenshot') as {
       takeMarkdownFileScreenshot: TakeMarkdownFileScreenshot;
@@ -193,11 +200,14 @@ describe('screenshot utils', () => {
   it('Markdown file screenshots can use the display name when a staged path has no extension', async () => {
     const hana = {
       screenshotRender: vi.fn().mockResolvedValue({ success: true, dir: '/workspace/OH-Works/截图' }),
+      readFileSnapshot: vi.fn(async () => ({ content: '# Session report', version: 'v1' })),
     };
     Object.assign(window, { hana });
-    window.platform = {
-      readFileSnapshot: vi.fn(async () => ({ content: '# Session report', version: 'v1' })),
-    } as unknown as typeof window.platform;
+    // R08-T02 批次 D：生产契约 window.platform === window.hana（platform.js
+    // 抢先别名），文件读取与 screenshotRender 同在 preload 桥上；旧桩把
+    // readFileSnapshot 挂在分离的 platform 上绕过宿主边界，现按契约取别名，
+    // 断言 window.platform.readFileSnapshot 指向同一读取桩，逐字保留。
+    window.platform = getDesktopHost().api;
 
     const { takeMarkdownFileScreenshot } = await import('../../utils/screenshot') as {
       takeMarkdownFileScreenshot: TakeMarkdownFileScreenshot;
@@ -208,7 +218,7 @@ describe('screenshot utils', () => {
       fileName: 'report.md',
     })).resolves.toBeUndefined();
 
-    expect(window.platform.readFileSnapshot).toHaveBeenCalledWith('/tmp/session-files/a1b2c3');
+    expect(getDesktopHost().api.readFileSnapshot).toHaveBeenCalledWith('/tmp/session-files/a1b2c3');
     expect(hana.screenshotRender).toHaveBeenCalledWith(expect.objectContaining({
       mode: 'article',
       markdown: '# Session report',
@@ -226,7 +236,7 @@ describe('screenshot utils', () => {
 
     await expect(takeArticleScreenshot('# hello')).resolves.toBeUndefined();
 
-    expect((window as any).hana.screenshotRender).toHaveBeenCalledWith(expect.objectContaining({
+    expect((getDesktopHost().api as any).screenshotRender).toHaveBeenCalledWith(expect.objectContaining({
       fontFamily: expect.stringContaining('Inter'),
     }));
   });
@@ -240,7 +250,7 @@ describe('screenshot utils', () => {
 
     await expect(takeArticleScreenshot('# hello')).resolves.toBeUndefined();
 
-    expect((window as any).hana.screenshotRender).toHaveBeenCalledWith(expect.objectContaining({
+    expect((getDesktopHost().api as any).screenshotRender).toHaveBeenCalledWith(expect.objectContaining({
       fontFamily: expect.stringContaining('Noto Serif SC'),
     }));
   });
@@ -284,13 +294,13 @@ describe('screenshot utils', () => {
     expect(storeMock.state.updateScreenshotProgress).toHaveBeenCalledWith({ currentPage: 2 });
     expect(storeMock.state.updateScreenshotProgress).toHaveBeenCalledWith({ completedBlocks: 4 });
     expect(storeMock.state.endScreenshotTask).toHaveBeenCalledOnce();
-    expect((window as any).hana.screenshotRender).toHaveBeenCalledTimes(2);
-    expect((window as any).hana.screenshotRender).toHaveBeenNthCalledWith(1, expect.objectContaining({
+    expect((getDesktopHost().api as any).screenshotRender).toHaveBeenCalledTimes(2);
+    expect((getDesktopHost().api as any).screenshotRender).toHaveBeenNthCalledWith(1, expect.objectContaining({
       locale: 'zh',
       segmentIndex: 1,
       segmentTotal: 2,
     }));
-    expect((window as any).hana.screenshotRender).toHaveBeenNthCalledWith(2, expect.objectContaining({
+    expect((getDesktopHost().api as any).screenshotRender).toHaveBeenNthCalledWith(2, expect.objectContaining({
       segmentIndex: 2,
       segmentTotal: 2,
     }));
@@ -336,7 +346,7 @@ describe('screenshot utils', () => {
 
     await expect(takeScreenshot('u1', sessionPath)).resolves.toBeUndefined();
 
-    const payload = (window as any).hana.screenshotRender.mock.calls[0][0];
+    const payload = (getDesktopHost().api as any).screenshotRender.mock.calls[0][0];
     expect(payload.messages[0].avatarDataUrl).toMatch(/^data:image\/svg\+xml/);
     expect(decodeURIComponent(payload.messages[0].avatarDataUrl)).toContain('唐');
     expect(payload.messages[1].avatarDataUrl).toMatch(/^data:image\/png;base64,/);
@@ -396,7 +406,7 @@ describe('screenshot utils', () => {
 
     await expect(takeScreenshot('u1', sessionPath)).resolves.toBeUndefined();
 
-    const payload = (window as any).hana.screenshotRender.mock.calls[0][0];
+    const payload = (getDesktopHost().api as any).screenshotRender.mock.calls[0][0];
     expect(payload.messages[0].blocks).toEqual([
       { type: 'markdown', content: '附件在这里' },
       {

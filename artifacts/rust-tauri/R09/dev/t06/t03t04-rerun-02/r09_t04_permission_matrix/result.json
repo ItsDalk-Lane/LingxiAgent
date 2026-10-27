@@ -1,0 +1,96 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t04_permission_matrix",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 3.985,
+ "caseCount": 41,
+ "casesSha256": "791d73b01f840d9d65c7cf304c3cc12dfc7090e8ec77c23b813131ea325fa93f",
+ "commands": [
+  {
+   "id": "build::native-harness",
+   "argv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "rustc",
+    "--test",
+    "--edition",
+    "2021",
+    "--cfg",
+    "r09_standalone_test",
+    "--crate-name",
+    "native_host_harness",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-02/r09_t04_permission_matrix/harness/lib.rs",
+    "-o",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-02/r09_t04_permission_matrix/harness/native_host_harness"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.666,
+   "logSha256": "74c3715361c478f87554a2b307e1b5bb035d3b035fdc113401aec53e3a465c6b"
+  },
+  {
+   "id": "test::native::permissions::tests",
+   "argv": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-02/r09_t04_permission_matrix/harness/native_host_harness",
+    "--test-threads",
+    "1",
+    "native::permissions::tests"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.1,
+   "logSha256": "09495dc9f0d665918544a22bdf66db655f692c44acc4e7d97781ec118a9e0a42"
+  },
+  {
+   "id": "test::native::speech::tests",
+   "argv": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-02/r09_t04_permission_matrix/harness/native_host_harness",
+    "--test-threads",
+    "1",
+    "native::speech::tests"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.006,
+   "logSha256": "458e9026660b5bfc8cd7f002c716149a1dfdd8cc6fbf1f2e865ff1a9cc80ca98"
+  },
+  {
+   "id": "test::native::remote_boundary::tests",
+   "argv": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-02/r09_t04_permission_matrix/harness/native_host_harness",
+    "--test-threads",
+    "1",
+    "native::remote_boundary::tests"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.005,
+   "logSha256": "840130a834574b5cdf53299240e1616da8c3069baca20d46f46d53460c91805b"
+  },
+  {
+   "id": "test::native::screenshot::tests",
+   "argv": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-02/r09_t04_permission_matrix/harness/native_host_harness",
+    "--test-threads",
+    "1",
+    "native::screenshot::tests"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.005,
+   "logSha256": "ade0ac2fd94675913c0dd20b29974f406c3ffd93e226c69c6bd3eb5027f2ca5a"
+  }
+ ],
+ "logSha256": "99dda95516f1947d7451a8df4470b5f3234e324f7792cf9ca7dc185c05d71521",
+ "finishedAtUnixMs": 1793026571984,
+ "blockedPendingRegistration": [
+  "真实 TCC 授权弹窗与撤销-恢复演练需人工在系统设置操作（BLOCKED-SYSTEM-PERMISSIONS）",
+  "服务报告 computer_control_engine_unavailable 且无输入注入 helper：点击/输入/按键/滚动真实生效在 helper 实现前不可验",
+  "Tauri/Wry 无稳定页面捕获 API（OQ-04），捕获执行 BLOCKED；仅策略层可验",
+  "真实语音识别结果需 ASR 供应商/本地识别链（BLOCKED-REAL-PROVIDER；服务 system-speech-recognition 显式 refusal）",
+  "打包壳真实 Speech TCC 弹窗需正式签名身份 + 人工操作（BLOCKED-SIGNING-IDENTITY / BLOCKED-SYSTEM-PERMISSIONS）",
+  "Linux Preview 负向真机不可用（BLOCKED-PLATFORM-LINUX-X64）；本机只验证 Rust 状态机返回 unsupported",
+  "T04 命令已注册（T06 收口）；端到端 invoke + TCC 桥需真实 GUI 会话 + 人工 TCC（Lead GUI 禁令 / BLOCKED_SYSTEM_PERMISSIONS）"
+ ],
+ "blockedKind": "BLOCKED_SYSTEM_PERMISSIONS|BLOCKED_GUI_SMOKE|BLOCKED_REAL_PROVIDER",
+ "serviceBinary": "rust/target/debug/lingxi-service",
+ "serviceSha256": "fbb3d7780478af87f09aa326201d1ab3c412937904bc7899d4c4d1a487961621",
+ "note": "真实服务 HTTP（approve/revoke/prefs/负向/app-events）与 Rust 状态机单测已真实执行；TCC/helper/截图/ASR/注册后 E2E 如实阻塞"
+}

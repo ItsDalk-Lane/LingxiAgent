@@ -1,0 +1,15 @@
+$ git status --porcelain -- desktop/src/react desktop/src/modules
+--- exit=0 duration=0.03s ---
+ M desktop/src/modules/connection-csp.js
+ M desktop/src/modules/platform.js
+ M desktop/src/react/App.tsx
+ M desktop/src/react/components/InputArea.tsx
+ M desktop/src/react/host/desktop-host.ts
+ M desktop/src/react/stores/session-actions.ts
+?? desktop/src/react/__tests__/host/r09-t01-tauri-desktop-host.test.tsx
+?? desktop/src/react/components/SystemPermissionsCard.tsx
+?? desktop/src/react/host/tauri-desktop-host.ts
+?? desktop/src/react/host/tauri-host-capabilities.ts
+
+$ grep -rl resource-desktop desktop/dist-renderer
+--- exit=1 duration=0.78s ---

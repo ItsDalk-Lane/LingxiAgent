@@ -1,0 +1,122 @@
+{
+  "$defs": {
+    "BrowserAction": {
+      "enum": [
+        "start",
+        "stop",
+        "navigate",
+        "snapshot",
+        "screenshot",
+        "click",
+        "type",
+        "scroll",
+        "select",
+        "key",
+        "wait",
+        "evaluate",
+        "show",
+        "back",
+        "forward",
+        "reload",
+        "new_tab",
+        "switch_tab",
+        "close_tab",
+        "suspend",
+        "resume",
+        "destroy",
+        "takeover",
+        "release"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "action": {
+      "$ref": "#/$defs/BrowserAction"
+    },
+    "amount": {
+      "format": "double",
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "direction": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "expression": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "key": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "pressEnter": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "ref": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "state": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tabId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "text": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "timeout": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "url": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "value": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "action"
+  ],
+  "title": "BrowserCommand",
+  "type": "object"
+}

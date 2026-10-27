@@ -1,0 +1,4 @@
+[r08-t03-a05] verdict=fail failures=3 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a05-7lbtmb out=/private/tmp/lingxi-r08-verify/r08_t03_a05_drill-37414-1792807829999
+  FAIL[history-tools] 工具序 === [read]（实测 <none>）
+  FAIL[history-tools-status] read 工具调用 success
+  FAIL[history-readback] 终结回答回显种子内容 LINGXI-A05-READ-7351（端到端真实往返证据）

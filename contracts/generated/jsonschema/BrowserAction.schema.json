@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "enum": [
+    "start",
+    "stop",
+    "navigate",
+    "snapshot",
+    "screenshot",
+    "click",
+    "type",
+    "scroll",
+    "select",
+    "key",
+    "wait",
+    "evaluate",
+    "show",
+    "back",
+    "forward",
+    "reload",
+    "new_tab",
+    "switch_tab",
+    "close_tab",
+    "suspend",
+    "resume",
+    "destroy",
+    "takeover",
+    "release"
+  ],
+  "title": "BrowserAction",
+  "type": "string"
+}

@@ -1,0 +1,27 @@
+{
+  "capabilities": {
+    "search": {
+      "providers": []
+    }
+  },
+  "catalogVersion": 2,
+  "meta": {
+    "migratedAt": "2026-10-18T07:09:22.095Z",
+    "migrationSource": "added-models.yaml"
+  },
+  "providers": {
+    "fixture": {
+      "api_key": "saved-fixture-key",
+      "custom": {
+        "preserve": 17
+      },
+      "headers": {
+        "x-fixture": "saved-header"
+      }
+    },
+    "fixture-anthropic": {
+      "api_key": "saved-anthropic-key",
+      "headers": {}
+    }
+  }
+}

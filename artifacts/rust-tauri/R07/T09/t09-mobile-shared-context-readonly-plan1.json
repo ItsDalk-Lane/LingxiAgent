@@ -1,0 +1,251 @@
+{
+  "label": "t09-mobile-shared-context-readonly-plan1",
+  "createdAt": "2026-10-18T12:56:02.103885+00:00",
+  "scope": "READ_ONLY_PREPARATION_DURING_T08H_FREEZE",
+  "implementationStarted": false,
+  "finalAcceptance": false,
+  "predecessor": "artifacts/rust-tauri/R07/T09/t09-cli-readonly-implementation-plan1.json",
+  "criticalActualGaps": [
+    {
+      "finding": "initializeMobileRuntime识别Rust后在建立connection/加载bootstrap前明确throw；不能只删throw就宣称手机接通。",
+      "file": "desktop/src/react/mobile/mobile-init.ts",
+      "lines": "110-151"
+    },
+    {
+      "finding": "MobileApp原required scopes只有chat/resources.read/files.read/files.write；GET /models、/agents、session-permission-default均settings.read。mobile原loadModels/chatFetch与raw permission GET会403，不能为手机扩settings.read。",
+      "files": [
+        "desktop/src/react/mobile/MobileApp.tsx:25",
+        "desktop/src/react/services/chat-client.ts:46",
+        "rust/crates/lingxi-service/src/auth.rs:1376,1519-1553"
+      ]
+    },
+    {
+      "finding": "既有loadSessions Rust用studio-list；路由策略为chat但handler额外要求sessions.read和sameStudio。因此不能直接替换loadMobileSessions为loadSessions给原4scope手机使用。",
+      "files": [
+        "desktop/src/react/stores/session-actions.ts:985-1000",
+        "rust/crates/lingxi-service/src/sessions.rs:2373-2390"
+      ]
+    },
+    {
+      "finding": "GET /models默认choice(None)不含明确Agent；下一Run当前助手的chat配置必须由effective_choice_for_agent解析，不能把global isCurrent当真实Agent模型。",
+      "files": [
+        "rust/crates/lingxi-service/src/chat_wire.rs:1779-1814",
+        "rust/crates/lingxi-service/src/chat_settings.rs:237-264"
+      ]
+    },
+    {
+      "finding": "effective_choice_for_agent缺thinking时会selected_thinking→dispatch_choice，未配置模型会返回错误，不能把这类错误直接统一映射500或伪造默认模型成功。需明确区分未配置/选中模型已无效与真实配置损坏。",
+      "file": "rust/crates/lingxi-service/src/chat_settings.rs:237-264,344-360"
+    }
+  ],
+  "minimalSharedReadSurface": {
+    "proposedNotExisting": true,
+    "coreFunction": "client_context::read(state:&ServiceState, principal:&Principal, target:ContextTarget) -> Result<ClientContext,EndpointError>",
+    "target": "ContextTarget {agent_id:Option<String>,session_id:Option<String>}，可先只为bootstrap提供agent_id；CLI续聊/手机模型刷新如有session则统一真实归属解析。",
+    "routes": [
+      {
+        "path": "GET /lingxi/v1/mobile/bootstrap",
+        "policy": "Scope(chat)，真实validate_live_principal与sameStudio必要复核；保留原移动bootstrap语义，CLI可复用该helper的context子集，不需要读整个设置。",
+        "handler": "新client_context/mobile_bootstrap模块内实际调用共享read，不调用旧Node engine或复制settings/config响应。"
+      },
+      {
+        "path": "GET /lingxi/v1/chat/models?agentId={id}&sessionId={id}",
+        "policy": "Scope(chat)，session给定先gate_session_owned，明确agent不匹配拒绝。",
+        "purpose": "同一安全目录/实际选择的窄投影，供手机模型刷新及CLI状态；避免扩大现有settings-only /models、/agents策略。实际是否独立端点可在实施时与主控选最小接法，但不能留下loadModels继续403。"
+      }
+    ],
+    "selectionRules": [
+      "principal从Extension/AuthService实际认证得到；不能由query/body传principalId/userId/studioId。",
+      "显式session先真实owned读SessionFacts，其owner_user_id/agent_id作为后续choice事实；显式agent与该事实冲突400。",
+      "无session但有明确agent先validate_agent_id、gate_agent_not_deleted、memory.agent_dir_checked；缺失/符号链接/损坏拒绝，不回焦点。",
+      "两者均无时仅首次bootstrap按current_agent_preference（current_agent_id→primary_agent_id）选择；没有任何助手为合法empty currentAgentId:null，不拿agents[0]伪装当前。",
+      "复用chat_settings当前owner选项/会话选项/明确Agent YAML/global Chat独立槽的真实优先序；配置错或模型被删不能猜其他model。",
+      "不复用settings-only HTTP回路；直接调用现役安全读取函数和共享模型网关的明确派发解析。",
+      "只投影chat需要的模型身份/显示名/能力，任何provider secret/endpoint/headers/OAuth/logged状态/自由metadata均不进入bootstrap。"
+    ],
+    "authorizationBoundaries": [
+      "bootstrap只读chat上下文不授files/resources；原MobileApp4scope入口要求保持，缺resources.read的设备A18仍应HTTP拒绝已知resourceId。",
+      "homeFolder/cwdHistory如需保持原移动语义，只在principal具有files.read且对应工作区已授权时披露；不得当浏览器本地file授权。缺files.read的CLI上下文返回null/[]和明确不可见状态，不能额外要求settings.read。",
+      "完整agents配置/全局偏好/用户档案正文不透传；Agent公开摘要只白名单id/name/yuan/isPrimary/isCurrent/hasAvatar及实际memory开关。",
+      "初次可见agent列表沿真实chat选Agent准入语义，currentAgent仅首次焦点例外；后续每次操作显式绑定agent/session/connection。",
+      "已登录WebSession/设备撤权在每次HTTP/WS复查；cookie不因bootstrap成功就变永久有效。"
+    ]
+  },
+  "dtoFieldSourceTable": [
+    {
+      "field": "locale",
+      "status": "existing MobileBootstrap",
+      "source": "MemoryService.read_preferences_root()的global_field_value(locale)，按现役默认zh-CN；AgentConfigScan.locale与global覆盖先后沿现有配置读面，不复制全Agent config。"
+    },
+    {
+      "field": "agentName/currentAgentId/agentYuan",
+      "status": "existing MobileBootstrap",
+      "source": "MemoryService.current_agent_preference()+agent_dir_checked，AgentConfigDocument.scan()的agent_name/yuan。明确session时取SessionFacts.agent_id，不用当前焦点。"
+    },
+    {
+      "field": "userName",
+      "status": "existing MobileBootstrap",
+      "source": "global_field_value(prefs,\"user.name\")，只显示名不透user-profile正文；auth帐号displayName与应用userName不得自行混同。"
+    },
+    {
+      "field": "agents",
+      "status": "existing MobileBootstrap",
+      "source": "MemoryService.list_agent_summaries()返回Value，但再次白名单投影；目前摘要含homeFolder/effectiveHomeFolder，不能原样用于chat-only主体。坏Agent配置读取失败必须显式错误，不能unwrap_or_default当空成功。"
+    },
+    {
+      "field": "memoryMasterEnabled/memoryEnabled",
+      "status": "existing MobileBootstrap",
+      "source": "实际选中AgentConfigDocument.scan().memory_enabled与现役Agent memory主开关语义。旧bootstrap的engine.agent.memoryMasterEnabled与engine.config.memory.enabled并非两个独立新配置，不新造global总开关。"
+    },
+    {
+      "field": "homeFolder/cwdHistory",
+      "status": "existing MobileBootstrap",
+      "source": "scan().desk_home_folder、明确目标config.cwd_history；沿已有prune_missing_workspace_config及实际授权工作台根；不从服务当前进程cwd或全局任意路径推导。"
+    },
+    {
+      "field": "thinkingLevel",
+      "status": "existing MobileBootstrap",
+      "source": "chat_settings::effective_choice_for_agent / selected_thinking / dispatch_choice。显式session choice最高优先。无reasoning声明实际off；未配置模型需要独立未配置事实，不能冒充可派发medium。"
+    },
+    {
+      "field": "permissionMode",
+      "status": "proposed bootstrap extension needed to avoid settings.read HTTP",
+      "source": "userprefs::session_permission_default_get_route读取prefs.session_permission_mode_default的现役auto/operate/ask/read_only归一，复用纯读取助手；不把值视为授权。"
+    },
+    {
+      "field": "avatars:{agent,user}",
+      "status": "existing MobileBootstrap",
+      "source": "当前Agent摘要hasAvatar与settings_ui::avatars_health_route现役用户头像路径；只能文件可用性bool，真实图片继续已存在chat读取/avatar/agent?agentId和/avatar/user。坏IO应真实报错，不掩为空。"
+    },
+    {
+      "field": "editor",
+      "status": "existing MobileBootstrap",
+      "source": "global_field_value(prefs,\"editor\")已调用规范化normalize_editor_typography，仅markdown已知排版字段；不复制自由prefs。"
+    },
+    {
+      "field": "chat",
+      "status": "existing MobileBootstrap optional; oldNode实际bootstrap未返回",
+      "source": "desktop/src/react/chat/layout.ts唯一已知contentWidth640/720/800/unlimited、bodyFontSizeOffset-2..2。如Rust没有已保存来源则现役默认；不伪称旧bootstrap保证同步了chat。"
+    },
+    {
+      "field": "appearance",
+      "status": "existing MobileBootstrap",
+      "source": "prefs.appearance已知theme/serif/paperTexture/leavesOverlay四字段，沿appearance-sync规范和已存在主题标识，不传unknown子键。"
+    },
+    {
+      "field": "currentModel/modelState/modelGeneration",
+      "status": "proposed shared context extension, not currently generated contract",
+      "source": "当前真实selected chat provider+id，gateway.resolve_dispatch同快照/代次，model_configuration.is_active()可区分生产空配置；generation沿u64_wire_string。modelState需至少区别unconfigured/ready/unavailable，配置损坏另错误，不硬填可用。"
+    },
+    {
+      "field": "models/activeModel",
+      "status": "proposed safe chat-model fragment, current ui-helpers already reads {models,activeModel}",
+      "source": "gateway.catalog_models()仅Chat可派发model，白名单id/provider/name/input/contextWindow并当前真实Agent/session model标记；模型自由metadata不透传。dispatch_choice要求声明tools，ready必须与真实新建/派发一致，不只family可解析。"
+    }
+  ],
+  "workspaceCleanup": {
+    "existing": "agent_config_readback::gc_workspace_persistence(memory,agent_dir)和prune_missing_workspace_config，目前private；会真实清理已失效cwd_history和prefs.workspace_ui_state.workspaces条目，无变化不写。",
+    "minimalReuse": "抽出或pub(crate)同一个既有helper供bootstrap调用，继续现有FileSafety/save_agent_config_merge+preferences_locked统一写面，不复制另一个writer；出错诚实返回，不能虚报已gc。",
+    "scopeNote": "这是原bootstrap继承的受控维护副作用，不能读取设备传入任意host路径，也不能借设备身份发任意设置写请求。只当前明确目标Agent及既有workspace持久化。"
+  },
+  "mobileReuseAndChanges": [
+    {
+      "file": "mobile/mobile-init.ts",
+      "reuse": "createBrowserServerConnection/upsertServerConnection、configureAppEventActions/ws-message-handler、connectWebSocket、loadMessages已经能走Rust真实链。",
+      "change": "Rust分支先验证serverNodeKind/正式协议/epoch，建立browser cookie连接后读真实bootstrap；取消throw以实际数据校验替代；所有await捕获connection+principal+revision，logout/换主体后的晚回包不得改新store。"
+    },
+    {
+      "file": "mobile/mobile-init.ts loadMobileSessions/switchMobileSession/createMobileSession",
+      "reuse": "switch已有loadMessages/locator/currentSessionId；loadMessages原Rusthistory可复用。",
+      "change": "列表需chat范围内真实owned会话投影：若复用studio-list必须处理内部sessions.read缺口，不能加scope凑通；可用/sessions并共享session projector/新安全chat list补revision/workspace字段，不能伪造revision。新建明确/lingxi/v1/sessions/new、agentId和native locator，保持pending草稿去重/请求归属。"
+    },
+    {
+      "file": "stores/session-actions.ts",
+      "reuse": "Rust loadMessages、history reconciliation、sessionOwnerFetch、session-connection-owner、postPendingSessionCreate均已接实际Rust；pending创建会补currentAgentId并校owns。",
+      "change": "抽取最小纯投影供mobile，避免另造提交队列；不要直接复用需要sessions.read的完整studio-list加载而要求用户扩权限。"
+    },
+    {
+      "file": "mobile/MobileApp.tsx",
+      "reuse": "现有Rust web-auth login/logout分支、四scope检查、MobileDesktopShell/ChatPage/InputArea/现役message coordinator。",
+      "change": "cold/login/logout/resume生命周期用真实连接guard，Rust模型目录更新走安全context，不打开旧Node fallback。初始化失败显示真实原因，不把失败bootstrap清成空且ready。"
+    },
+    {
+      "file": "services/chat-client.ts + utils/ui-helpers.ts",
+      "reuse": "原Rust请求switch/模型设置/思考级别已经按明确session适配。",
+      "change": "models读取改用chat可读安全模型投影并绑定明确Agent/session；保持真实拒绝与owner/revision，不能复用整设置目录要求settings.read。"
+    },
+    {
+      "file": "services/rust-workbench.ts + stores/desk-actions.ts",
+      "reuse": "/api/mobile/workbench/files/search/content/actions/upload已精确映射正式Rust/workbench，资源watch由同owner控制。",
+      "change": "当前mobile welcome desk主动activateWorkspaceDesk可能自动列表请求；无合法授权root先显示空工作台及原因，不把裸host path当浏览器可读。复用T07mount/lease/cancel而不是新手机文件引擎。"
+    },
+    {
+      "file": "mobile/mobile-platform.ts + services/resource-url.ts",
+      "reuse": "FileRef.resource.links.content已生成正式同连接URL、Rust明确不走本地file回退。",
+      "change": "browserSafeUrl当前仅相对/api可用；可允许精确/lingxi资源路径或确保传正式绝对URL，不能粗放接受任意相对路径/file:。图片/下载cookie/资源ticket不豁免resources.read。"
+    }
+  ],
+  "ownershipSplit": {
+    "cli": [
+      "cli/rust-service.ts",
+      "新cli/rust-chat.ts",
+      "cli/entry.ts",
+      "cli/args.ts",
+      "cli相关unit和真实子进程测试；复用runner/data/bundle"
+    ],
+    "backendProtocol": [
+      "新service client_context/mobile_bootstrap窄模块",
+      "protocol新独立client_context.rs及官方gen/verify注册（由单人统一生成）",
+      "lib/auth仅新增精确bootstrap/chat-models路由与chat策略",
+      "必要pub(crate)复用Memory/Gc/ChatChoice/目录投影；不改ModelConfiguration保存/凭证出口",
+      "真实cookie/4scope设备/sharedcontext配置损坏与无secret/target缺失/撤权测试"
+    ],
+    "mobile": [
+      "mobile/mobile-init.ts",
+      "mobile/MobileApp.tsx",
+      "mobile/mobile-platform.ts",
+      "chat-client/models窄读取消费与session-actions纯projector协调",
+      "真实Mobile页面/刷新/重连/文件/授权B拒绝；不碰CLI或后端写配置"
+    ],
+    "sharedCoordination": "backend先发布实际DTO与精确响应，再CLI/mobile各消费；生成器/契约注册只一人拥有。mobile若动session-actions须与CLI仅独立客户端保持无文件重叠；根统一Cargo/build/真实跨入口证据。"
+  },
+  "requiredActualProof": [
+    "真实隔离Source由T08 publisher设置模型；sharedcontext显示当前明确Agent实际下一Run模型，Owner/session选择优先级与切焦点不串。",
+    "四scope手机cookie可初始化/聊天/创建/读同history/下载CLI真实产物；不额外加settings.read/sessions.read。",
+    "无Agent/无模型显示未配置；坏preferences/YAML/非法模型/已删除Agent不返回假空成功，不回焦点。",
+    "扩展metadata里known secrets与未知普通字段不能进入bootstrap；当前context只返回白名单而非masked整Provider。",
+    "真实设备B缺resources.read已知resourceId GET/HEAD/ticket拒绝；已撤销WebSession/Device后续HTTP/WS/文件拒绝。",
+    "实际构建/mobile及资源、窄视口真实浏览器刷新/后台恢复/断网补流，复用同sessionId/runId/messageId/resourceId且prompt不重发。",
+    "GC真实只删过期workspace引用，保其他字段；文件损坏/写权限失败有诚实错误，不借只读bootstrap悄悄吞失败。"
+  ],
+  "notExecuted": [
+    "没有Cargo/构建/GUI/Node/新服务/测试运行。",
+    "没有源码、测试、工具、协议或生成物修改。",
+    "T09只是实施准备；h20门仍运行，不借h结果或旧阶段结果领T09通过。"
+  ],
+  "sourceSha256": {
+    "docs/rust-tauri/R07/T09_IMPLEMENTATION_READINESS.md": "b585106cbadd7e982e3d39b9fe9086f477875366232a637fbb695855513ff8df",
+    "desktop/src/react/mobile/mobile-init.ts": "b2460c727363f94a32c6a4ff9599226b5dbe1eb5825e9f0c3cf93dd091adb7a0",
+    "desktop/src/react/mobile/MobileApp.tsx": "8cb101a13c8c05e632a86b412f3de2a53dce6209f3b38b93a0a428c52ee3a436",
+    "desktop/src/react/mobile/mobile-platform.ts": "336e86b0cfcaab79d74964edbc01c8a5d67e20395514f1cac9bd86ec9ec872d4",
+    "desktop/src/react/services/chat-client.ts": "c25fa59d2fb7582a07b50c94ee2a580983300abc21c9fe0ad82c91a2ab9de293",
+    "desktop/src/react/services/server-connection.ts": "e945156fb2f8803db1fbcf7c3bb729c13bbb8442b39b030aa19c4cd805757563",
+    "desktop/src/react/services/websocket.ts": "5c34a3f17fc58235e0b3ef3f352fd7ed39e45cf5eb41541115931440fea45911",
+    "desktop/src/react/services/rust-settings.ts": "ab2a6179b3bd7e1998d72e17e0538f43245133fff52afe550ea73d81331ef679",
+    "desktop/src/react/services/rust-workbench.ts": "b19fefd057a24838f15ea156ebbbc2b38cb5d42982b93d68c3905249ca166f8f",
+    "desktop/src/react/stores/session-actions.ts": "64e688ed13dc186dad8836215d516afa34357aaf47966cac0117555febfaddad",
+    "desktop/src/react/utils/ui-helpers.ts": "9288205c89a1ec79c8eda39340f2a33e7bfd44e39a56e93f26e452960680dbd2",
+    "rust/crates/lingxi-service/src/memory.rs": "09ab2294f85019c235b21f5cb885fafc06e12dfa1de252fedb0b3dc9bf303ca4",
+    "rust/crates/lingxi-service/src/agents_admin.rs": "a33980e1605c56134cf351446e270245e4e88ead02741b51fe7016755a5610ec",
+    "rust/crates/lingxi-service/src/chat_settings.rs": "2ac01f59c6391dcd1d45bc71e2334d6326f7d296160e8371d7300e7aa1ad3c92",
+    "rust/crates/lingxi-service/src/model_configuration.rs": "8762fdd86907ca5be273b9b1ef403111f359eae8dfc96f44e6f0455e49ee9b49",
+    "rust/crates/lingxi-service/src/settings_ui.rs": "d46e208dad3ea4cba13ce504e179f209b6c72988a5bc42d6cb6116dde33d61af",
+    "rust/crates/lingxi-service/src/agent_config_readback.rs": "3a0044ca2d12748d3499dac5e8a8b518ffc7f277d0160aad6a40dfe56f6e7ac9",
+    "rust/crates/lingxi-service/src/session_focus.rs": "8d08997954ba578dcf1e538137f9fa5eea9c4ea49ab7f0bb4ff22993015de803",
+    "rust/crates/lingxi-service/src/sessions.rs": "70626adf48a6fddf4f1bcbffaa12e2c19a0ae0ebf48dc54653d503988a9e1cc5",
+    "rust/crates/lingxi-service/src/userprefs.rs": "4f3df18434a5c31aaeb2a2988874b59afe407b18546d4f7e636dcfe345c03b1e",
+    "rust/crates/lingxi-service/src/auth.rs": "75c155dab6067b47e88cd3d9afcfdb3f1bcbf08b63c15a176f609b15f65ab9e4",
+    "rust/crates/lingxi-adapters/src/storage/agent_config.rs": "968bfbafedcb694dba66ab28005c23e076a84559736f3c8bc80df75009854d0c",
+    "server/routes/mobile-workbench.ts": "bd9f4befc8a4b4576b559a89280f54ca974b1c941dc18ddcbdc6356252a2dea2"
+  }
+}

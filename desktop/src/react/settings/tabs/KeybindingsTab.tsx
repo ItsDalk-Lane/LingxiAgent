@@ -16,6 +16,7 @@ import { useSettingsStore } from '../store';
 import { lingxiFetch } from '../api';
 import { t } from '../helpers';
 import { updateSettingsSnapshot } from '../actions';
+import { captureSettingsConnection, ownsSettingsConnection, settingsConnectionRevision } from '../connection-owner';
 import { SettingsSection } from '../components/SettingsSection';
 import {
   KEYBINDING_COMMAND_VIEWS,
@@ -26,6 +27,7 @@ import {
 } from '../../keybindings/commands';
 import { normalizeKeybindings } from '../../../../../shared/keybindings-preferences.ts';
 import styles from '../Settings.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 type StoredKeybindings = Record<string, string[]>;
 
@@ -86,7 +88,8 @@ function UndoIcon() {
 }
 
 export function KeybindingsTab() {
-  const hana = window.hana;
+  const hana = usePlatform();
+  const connectionRevision = useSettingsStore(() => settingsConnectionRevision());
   const showToast = useSettingsStore(s => s.showToast);
   const snapshotKeybindings = useSettingsStore(s => s.settingsSnapshot.data?.preferences?.keybindings);
   const [stored, setStored] = useState<StoredKeybindings>(() =>
@@ -99,6 +102,11 @@ export function KeybindingsTab() {
   const [query, setQuery] = useState('');
   // 全局键位占用状态（combo 字符串 → 状态），加载与保存后探测刷新。
   const [availability, setAvailability] = useState<Record<string, GlobalAvailability>>({});
+  useEffect(() => {
+    // 换源时释放旧操作的界面等待，旧回复只能核对其原归属。
+    setSaving(false); setLoading(false); setRecording(null); setRecordingHint(null); setAvailability({});
+    setStored(normalizeKeybindings(useSettingsStore.getState().settingsSnapshot.data?.preferences?.keybindings ?? {}));
+  }, [connectionRevision]);
 
   const probeGlobalCombo = useCallback(async (combo: string): Promise<GlobalAvailability> => {
     const test = hana?.keybindingsTestRegister;
@@ -112,6 +120,7 @@ export function KeybindingsTab() {
   }, [hana]);
 
   const refreshGlobalAvailability = useCallback((bindingsMap: Record<string, string[]>) => {
+    const owner = captureSettingsConnection();
     const combos: string[] = [];
     for (const command of KEYBINDING_COMMAND_VIEWS) {
       if (command.scope !== 'global') continue;
@@ -126,6 +135,7 @@ export function KeybindingsTab() {
       return next;
     });
     void Promise.all(combos.map(probeGlobalCombo)).then((results) => {
+      if (!ownsSettingsConnection(owner)) return;
       setAvailability((prev) => {
         const next = { ...prev };
         combos.forEach((combo, index) => { next[combo] = results[index]; });
@@ -137,28 +147,30 @@ export function KeybindingsTab() {
   useEffect(() => {
     if (snapshotKeybindings) {
       setStored(normalizeKeybindings(snapshotKeybindings));
+      setLoading(false);
       return;
     }
     let alive = true;
+    const owner = captureSettingsConnection();
     setLoading(true);
     lingxiFetch('/api/preferences/keybindings')
       .then(res => res.json())
       .then((data) => {
-        if (alive) setStored(normalizeKeybindings(data?.keybindings ?? {}));
+        if (alive && ownsSettingsConnection(owner)) setStored(normalizeKeybindings(data?.keybindings ?? {}));
       })
       .catch((err) => {
-        if (!alive) return;
+        if (!alive || !ownsSettingsConnection(owner)) return;
         // 读取失败（比如服务端尚未支持该路由的旧构建）时保持默认键位可用，
         // 用「读取失败」提示而不是误报「保存失败」。
         showToast(t('settings.keybindings.loadFailed') + ': ' + (err?.message || String(err)), 'error');
       })
       .finally(() => {
-        if (alive) setLoading(false);
+        if (alive && ownsSettingsConnection(owner)) setLoading(false);
       });
     return () => {
       alive = false;
     };
-  }, [showToast, snapshotKeybindings]);
+  }, [showToast, snapshotKeybindings, connectionRevision]);
 
   // 初次加载（以及 snapshot 同步）后，对全局命令的当前键位做占用探测。
   useEffect(() => {
@@ -168,6 +180,7 @@ export function KeybindingsTab() {
 
   const saveCommandBindings = useCallback(async (commandId: string, nextKeys: string[]) => {
     if (!stored) return;
+    const owner = captureSettingsConnection();
     const deduped: string[] = [];
     for (const key of nextKeys) {
       if (key && !deduped.includes(key)) deduped.push(key);
@@ -197,6 +210,7 @@ export function KeybindingsTab() {
         } catch {
           probe = undefined; // 探测失败不阻塞保存，保存后的重注册仍会拦一道
         }
+        if (!ownsSettingsConnection(owner)) return;
         if (probe && probe.ok === false) {
           showToast(t('settings.keybindings.systemTaken').replace('{combo}', combo), 'error');
           return;
@@ -215,34 +229,47 @@ export function KeybindingsTab() {
 
     setStored(nextStored);
     setSaving(true);
+    let savedOnServer = false;
     try {
       const res = await lingxiFetch('/api/preferences/keybindings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ keybindings: nextStored }),
       });
+      if (!ownsSettingsConnection(owner)) return;
       const data = await res.json();
+      if (!ownsSettingsConnection(owner)) return;
       if (data?.error) throw new Error(data.error);
       const saved = normalizeKeybindings(data?.keybindings ?? nextStored);
+      savedOnServer = true;
       setStored(saved);
       updateSettingsSnapshot(snapshot => ({
         ...snapshot,
         preferences: { ...snapshot.preferences, keybindings: saved },
       }));
+      if (!ownsSettingsConnection(owner)) return;
+      hana?.settingsChanged?.('keybindings-changed', { keybindings: saved });
       if (command.scope === 'global') {
-        const registration = await hana?.keybindingsReloadGlobal?.() ?? await hana?.quickChatReloadShortcut?.();
+        if (!ownsSettingsConnection(owner)) return;
+        let registration = await hana?.keybindingsReloadGlobal?.();
+        if (!ownsSettingsConnection(owner)) return;
+        if (registration == null) {
+          registration = await hana?.quickChatReloadShortcut?.();
+          if (!ownsSettingsConnection(owner)) return;
+        }
         if (registration && registration.ok === false) {
           throw new Error(t('settings.keybindings.registrationFailed'));
         }
       }
-      hana?.settingsChanged?.('keybindings-changed', { keybindings: saved });
+      if (!ownsSettingsConnection(owner)) return;
       if (command.scope === 'global') refreshGlobalAvailability(saved);
       showToast(t('settings.keybindings.saved'), 'success');
     } catch (err: any) {
-      setStored(previous);
-      showToast(t('settings.saveFailed') + ': ' + (err?.message || String(err)), 'error');
+      if (!ownsSettingsConnection(owner)) return;
+      if (!savedOnServer) setStored(previous);
+      showToast(t(savedOnServer ? 'settings.keybindings.savedReloadFailed' : 'settings.saveFailed') + ': ' + (err?.message || String(err)), 'error');
     } finally {
-      setSaving(false);
+      if (ownsSettingsConnection(owner)) setSaving(false);
     }
   }, [hana, showToast, stored, refreshGlobalAvailability]);
 
@@ -309,32 +336,46 @@ export function KeybindingsTab() {
 
   const resetAll = useCallback(async () => {
     if (!stored) return;
+    const owner = captureSettingsConnection();
     const previous = stored;
     setStored({});
     setSaving(true);
+    let savedOnServer = false;
     try {
       const res = await lingxiFetch('/api/preferences/keybindings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ keybindings: {} }),
       });
+      if (!ownsSettingsConnection(owner)) return;
       const data = await res.json();
+      if (!ownsSettingsConnection(owner)) return;
       if (data?.error) throw new Error(data.error);
       const saved = normalizeKeybindings(data?.keybindings ?? {});
+      savedOnServer = true;
       setStored(saved);
       updateSettingsSnapshot(snapshot => ({
         ...snapshot,
         preferences: { ...snapshot.preferences, keybindings: saved },
       }));
-      await hana?.keybindingsReloadGlobal?.();
+      if (!ownsSettingsConnection(owner)) return;
       hana?.settingsChanged?.('keybindings-changed', { keybindings: saved });
+      if (!ownsSettingsConnection(owner)) return;
+      let registration = await hana?.keybindingsReloadGlobal?.();
+      if (!ownsSettingsConnection(owner)) return;
+      if (registration == null) {
+        registration = await hana?.quickChatReloadShortcut?.();
+        if (!ownsSettingsConnection(owner)) return;
+      }
+      if (registration && registration.ok === false) throw new Error(t('settings.keybindings.registrationFailed'));
       refreshGlobalAvailability(saved);
       showToast(t('settings.keybindings.resetDone'), 'success');
     } catch (err: any) {
-      setStored(previous);
-      showToast(t('settings.saveFailed') + ': ' + (err?.message || String(err)), 'error');
+      if (!ownsSettingsConnection(owner)) return;
+      if (!savedOnServer) setStored(previous);
+      showToast(t(savedOnServer ? 'settings.keybindings.savedReloadFailed' : 'settings.saveFailed') + ': ' + (err?.message || String(err)), 'error');
     } finally {
-      setSaving(false);
+      if (ownsSettingsConnection(owner)) setSaving(false);
     }
   }, [hana, showToast, stored, refreshGlobalAvailability]);
 

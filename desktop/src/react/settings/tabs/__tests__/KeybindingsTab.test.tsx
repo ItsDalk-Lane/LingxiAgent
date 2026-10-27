@@ -306,3 +306,33 @@ describe('KeybindingsTab user flows', () => {
     expect(resetAllButton.disabled).toBe(true); // 覆盖清零后回到禁用
   });
 });
+
+
+describe('KeybindingsTab saved facts when desktop reload fails', () => {
+  it.each(['rejected-result', 'thrown-error'] as const)('keeps saved shortcut after %s from the system reload', async kind => {
+    installHana();
+    lingxiFetch.mockResolvedValueOnce(jsonResponse({ keybindings: { 'quick-chat.toggle': ['F8'] } }))
+      .mockResolvedValueOnce(jsonResponse({ ok: true, keybindings: { 'quick-chat.toggle': ['F9'] } }));
+    if (kind === 'thrown-error') keybindingsReloadGlobal.mockRejectedValueOnce(new Error('owned OS reload failed'));
+    else keybindingsReloadGlobal.mockResolvedValueOnce({ ok: false });
+    await renderTab();
+    fireEvent.click(rowQuery(rowEl('quick-chat.toggle')).allByLabelText('settings.keybindings.editBinding')[0]);
+    fireEvent.keyDown(window, { key: 'F9' });
+    await waitFor(() => expect(useSettingsStore.getState().toastType).toBe('error'));
+    expect(rowEl('quick-chat.toggle').textContent).toContain('F9');
+    expect(rowEl('quick-chat.toggle').textContent).not.toContain('F8');
+    expect(useSettingsStore.getState().toastMessage).toContain('settings.keybindings.savedReloadFailed');
+    expect(settingsChanged).toHaveBeenCalledWith('keybindings-changed', { keybindings: { 'quick-chat.toggle': ['F9'] } });
+  });
+  it('keeps persisted defaults and reports reset reload ok:false as an error', async () => {
+    installHana();
+    lingxiFetch.mockResolvedValueOnce(jsonResponse({ keybindings: { 'quick-chat.toggle': ['F8'] } }))
+      .mockResolvedValueOnce(jsonResponse({ ok: true, keybindings: {} }));
+    keybindingsReloadGlobal.mockResolvedValueOnce({ ok: false });
+    await renderTab(); fireEvent.click(screen.getByText('settings.keybindings.resetAll'));
+    await waitFor(() => expect(useSettingsStore.getState().toastType).toBe('error'));
+    expect(rowEl('quick-chat.toggle').textContent).not.toContain('F8');
+    expect((screen.getByText('settings.keybindings.resetAll') as HTMLButtonElement).disabled).toBe(true);
+    expect(useSettingsStore.getState().toastMessage).toContain('settings.keybindings.savedReloadFailed');
+  });
+});

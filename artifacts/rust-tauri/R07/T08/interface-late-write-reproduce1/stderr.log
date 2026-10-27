@@ -1,0 +1,77 @@
+stderr | desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx > actual A save, delayed response and actual B connection isolate snapshot, events and OS reload (key-save)
+R07_INTERFACE_LATE_WRITE_FAILURE_HOME /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r07-interface-late-write-uUhBsx
+
+stderr | desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx > actual A save, delayed response and actual B connection isolate snapshot, events and OS reload (key-reset)
+R07_INTERFACE_LATE_WRITE_FAILURE_HOME /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r07-interface-late-write-RpSr9r
+
+stderr | desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx > actual A save, delayed response and actual B connection isolate snapshot, events and OS reload (sidebar-save)
+R07_INTERFACE_LATE_WRITE_FAILURE_HOME /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r07-interface-late-write-3Ke3sZ
+
+stderr | desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx > actual A save, delayed response and actual B connection isolate snapshot, events and OS reload (archive-import-aba)
+R07_INTERFACE_LATE_WRITE_FAILURE_HOME /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r07-interface-late-write-KO5WRo
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx > actual A save, delayed response and actual B connection isolate snapshot, events and OS reload (key-save)
+ FAIL  desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx > actual A save, delayed response and actual B connection isolate snapshot, events and OS reload (key-reset)
+AssertionError: A已真实保存；迟到回复不得写B快照/提示或触发当前桌面及窗口事件: expected [ 'snapshot', 'toast', 'events', …(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "snapshot",
++   "toast",
++   "events",
++   "reloads",
++ ]
+
+ ❯ desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx:152:60
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx > actual A save, delayed response and actual B connection isolate snapshot, events and OS reload (sidebar-save)
+AssertionError: A已真实保存；迟到回复不得写B快照/提示或触发当前桌面及窗口事件: expected [ 'events', 'windowEvents' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "events",
++   "windowEvents",
++ ]
+
+ ❯ desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx:152:60
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx > actual A save, delayed response and actual B connection isolate snapshot, events and OS reload (archive-import-aba)
+AssertionError: 旧File.text跨越连接revision后不得发起导入: expected [ { server: 'A', …(2) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "method": "POST",
++     "path": "/lingxi/v1/settings/import",
++     "server": "A",
++   },
++ ]
+
+ ❯ desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx:123:129
+    121|       await act(async () => { release.resolve(); await bodyConsumed.pr…
+    122|       await waitFor(() => expect(pendingRequests).toBe(0), waitOptions…
+    123|       expect(startedRequests.filter(request => request.path === '/ling…
+       |                                                                                                                                 ^
+    124|       expect(JSON.stringify(useSettingsStore.getState().settingsSnapsh…
+    125|       expect(useSettingsStore.getState().toastMessage).toBe(before.toa…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+

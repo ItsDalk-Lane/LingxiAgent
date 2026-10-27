@@ -1,0 +1,23 @@
+{
+  "candidate": "r6",
+  "name": "ownership",
+  "command": [
+    "python3",
+    "docs/rust-tauri/R01/r01_t01_check_ownership.py"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-15T23:03:00.988982+00:00",
+  "sourceFingerprint": "ee770ff89c7262c07dab96c51388b1420385e322d2f6a98bde7e4c7165ba2efe",
+  "log": "r6-ownership.log",
+  "endedAt": "2026-10-15T23:03:01.616442+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "ee770ff89c7262c07dab96c51388b1420385e322d2f6a98bde7e4c7165ba2efe",
+  "logSha256": "a675ab1a4eec5518ad50e39dc52c36dde7cea457da160811e3a68e8f341553a9",
+  "sourceUnchanged": true
+}

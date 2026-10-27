@@ -22,6 +22,7 @@ import { createRoot } from 'react-dom/client';
 import { useEffect, useState } from 'react';
 import { PreviewEditor } from './react/components/PreviewEditor';
 import { retainViewerLocalFileResourceWatch } from './viewer-resource-events';
+import { usePlatform } from './react/hooks/use-platform';
 
 type ViewerMode = 'markdown' | 'code' | 'csv';
 
@@ -39,7 +40,7 @@ function typeToMode(type: string): ViewerMode {
   return 'code';
 }
 
-// Subset of the renderer-side `window.platform` we use in the viewer.
+// R08-T02：viewer 侧平台能力改经宿主边界（DesktopHost api），不再直读 window.platform。
 interface ViewerPlatform {
   getServerPort?(): Promise<string | number | null | undefined>;
   getServerToken?(): Promise<string | null | undefined>;
@@ -49,8 +50,7 @@ interface ViewerPlatform {
 }
 
 function getPlatform(): ViewerPlatform | null {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- window.platform is injected by preload
-  return (window as any).platform ?? null;
+  return usePlatform() as ViewerPlatform | null;
 }
 
 function fileUnavailableError(payload: ViewerLoadPayload): Error {

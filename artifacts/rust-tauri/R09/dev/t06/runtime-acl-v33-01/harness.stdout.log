@@ -1,0 +1,3 @@
+runtime: launching evidence candidate hidden+automation: /private/tmp/lingxi-r09-t06-acl-70464-1793031733/LingxiRuntimeAcl.app/Contents/MacOS/lingxi-resource-desktop-v33-27bf075a
+r09_t06_runtime_acl: status=PASS_WITH_BLOCKED_WINDOWS exit=0 cases=105 failed=['blocked::allow-side-effect::main::copy_file', 'blocked::allow-side-effect::main::debug_open_onboarding', 'blocked::allow-side-effect::main::debug_open_onboarding_preview', 'blocked::allow-side-effect::main::open_browser_viewer', 'blocked::allow-side-effect::main::open_file', 'blocked::allow-side-effect::main::open_folder', 'blocked::allow-side-effect::main::open_skill_viewer', 'blocked::allow-side-effect::main::quick_chat_show']…
+runtime: app shutdown {'exitCode': 0, 'residual': 0}

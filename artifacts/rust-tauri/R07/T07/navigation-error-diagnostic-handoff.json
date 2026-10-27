@@ -1,0 +1,36 @@
+{
+  "recordedAt": "2026-10-18T03:43:47.870772+00:00",
+  "status": "DIAGNOSTIC_ONLY_STATIC_CHECKS_PASSED_RUNTIME_NOT_EXECUTED",
+  "scope": [
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/ops.rs",
+      "dSha256": "7f81f8eea5831cb7e4d85f316bda33c3b1198f2b4f8393f1c123fc8b3b09bffa",
+      "currentSha256": "6c451dd640c91f6c09da74e5707c1eb8a3920f0dd92c34c733759c0ef640b376"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r07_browser_chromium.rs",
+      "dSha256": "93dcc2f3c09f1eb935f8e9f40e61606186496c259cd6560437ee8508dee478b7",
+      "currentSha256": "41122b1a26b73bfcf875c330a41112a2b1dc55d2b3690a0476d744f80d1e6500"
+    }
+  ],
+  "patch": "navigation-error-diagnostic-working.patch",
+  "changes": [
+    "Page.navigate errorText只保留格式符合net::ERR_[A-Z0-9_]+且有界的网络错误编号，任意URL/凭据/正文隐藏，原browser_navigation代码及false效果标记不变。",
+    "当前cookie恢复测试4个Resume与6个Navigate采用现有owned helper，失败包含固定阶段、唯一自有root、本Site请求与实际workspaces；无全局注册/策略变化。",
+    "新增导航脱敏单测，覆盖标准code、带URL密码尾部、任意正文、非标准假code及空值。"
+  ],
+  "checks": [
+    {
+      "command": "rustfmt 1.98.1逐文件格式化与--check",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  ],
+  "cargoExecuted": false,
+  "newTestTarget": "browser::ops::navigation_diagnostics_tests::navigation_diagnostic_keeps_network_code_without_urls_credentials_or_arbitrary_text",
+  "oldFailureDisposition": "D原恢复失败仍未定位，作为T12待查缺口保留；本次只改善诊断，不宣称修好浏览器恢复。",
+  "sourceEditingStopped": true
+}

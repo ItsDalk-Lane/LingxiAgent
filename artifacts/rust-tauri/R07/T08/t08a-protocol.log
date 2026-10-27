@@ -1,0 +1,11 @@
+== toolchain: rustup run 1.98.1 (rustc 1.98.1 (48a229cea 2026-09-01))
+== [1/2] contracts/generated (lingxi-protocol-gen --check)
+GENERATED DRIFT DETECTED (7 problems):
+  - drift: MANIFEST.json (disk 23801 bytes sha256=7645ccba5c3b7a4166be20a1af5e03dcae6386c0e2a0a85361ecfde19ccbe9f0, regenerated 24337 bytes sha256=fc38ff34c16763bc434064457b36a6ce5bb17091a814457e7625dba33c892d06)
+  - drift: golden/index.json (disk 20074 bytes sha256=273cafcf9b6ebeea31f8c9652d8fec0d2aac23ad837cd3f35f3af8af249b3e05, regenerated 21041 bytes sha256=f778a24e6239982a5fd4dcf2c430aafb6a0f871f1294ad630d8f08aad5c8ac53)
+  - missing: golden/mcp-settings-action.json
+  - missing: golden/mcp-settings-change.json
+  - missing: golden/mcp-settings-failure.json
+  - missing: golden/mcp-settings-status.json
+  - missing: golden/mcp-settings-update.json
+regenerate with: cargo run -p lingxi-protocol --bin lingxi-protocol-gen

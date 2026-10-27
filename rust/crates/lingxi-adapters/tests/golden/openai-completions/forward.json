@@ -1,0 +1,131 @@
+{
+  "family": "openai-completions",
+  "case": "forward",
+  "route": {"provider": "openai-golden", "model": "gpt-golden-4o"},
+  "input": {
+    "submission": "总结一下 release 笔记并给出风险点",
+    "system_prompt": "You are the golden harness persona.",
+    "tools": [
+      {
+        "target": "tool:first-party:read",
+        "wire_name": "read",
+        "description": "Read a file 读取文件",
+        "schema": {
+          "type": "object",
+          "properties": {"path": {"type": "string", "description": "absolute path 绝对路径"}},
+          "required": ["path"],
+          "additionalProperties": false
+        }
+      },
+      {
+        "target": "tool:plugin:deep-research",
+        "wire_name": "deep_research_tool__cross_language_long_name____exactly_64_chars",
+        "description": "Deep research 深度研究 with a deliberately long wire name",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "object",
+              "description": "嵌套查询 deeply nested",
+              "properties": {
+                "filters": {
+                  "type": "object",
+                  "properties": {
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {"type": "string", "enum": ["alpha", "βeta", "文件", "ガンマ"]},
+                          "weight": {"type": "number"}
+                        },
+                        "required": ["name"]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": ["query"]
+        }
+      }
+    ],
+    "prior": []
+  },
+  "expected_request": {
+    "model": "gpt-golden-4o",
+    "messages": [
+      {"role": "system", "content": "You are the golden harness persona."},
+      {"role": "user", "content": "总结一下 release 笔记并给出风险点"}
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "read",
+          "description": "Read a file 读取文件",
+          "parameters": {
+            "type": "object",
+            "properties": {"path": {"type": "string", "description": "absolute path 绝对路径"}},
+            "required": ["path"],
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "deep_research_tool__cross_language_long_name____exactly_64_chars",
+          "description": "Deep research 深度研究 with a deliberately long wire name",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "object",
+                "description": "嵌套查询 deeply nested",
+                "properties": {
+                  "filters": {
+                    "type": "object",
+                    "properties": {
+                      "tags": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {"type": "string", "enum": ["alpha", "βeta", "文件", "ガンマ"]},
+                            "weight": {"type": "number"}
+                          },
+                          "required": ["name"]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": ["query"]
+          }
+        }
+      }
+    ],
+    "stream": false
+  },
+  "response_wire": {
+    "id": "chatcmpl-golden",
+    "model": "the-provider-lies",
+    "choices": [
+      {
+        "index": 0,
+        "finish_reason": "stop",
+        "message": {"role": "assistant", "content": "已总结：发布 v0.1.35 包含协议收口，风险点是回归窗口。"}
+      }
+    ],
+    "usage": {"prompt_tokens": 128, "completion_tokens": 32}
+  },
+  "expected_turn": {
+    "kind": "final",
+    "content": [{"text": "已总结：发布 v0.1.35 包含协议收口，风险点是回归窗口。"}],
+    "usage": {"input_tokens": 128, "output_tokens": 32}
+  }
+}

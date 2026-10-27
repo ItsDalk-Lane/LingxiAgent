@@ -1,0 +1,220 @@
+$ node tests/migration/r01-t05/run_old_chain.mjs --job /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t05_browser_pdf/old-chain/job-s1.json --log /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t05_browser_pdf/old-chain/run.log
+--- exit=0 duration=0.94s ---
+{"job":"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t05_browser_pdf/old-chain/job-s1.json","exit_code":0,"signal":null,"spawn_error":null,"wall_ms":909,"timed_out":false,"output_exists":true,"output_size":994832}
+
+$ /usr/bin/swiftc -O -o /private/tmp/lingxi-r09-runtime/r09_t05_browser_pdf-84938-1793032695312/bin/pdf_probe /Users/study_superior/Desktop/Code/LingxiAgent/tests/migration/r01-t05/pdf_probe.swift
+--- exit=0 duration=0.91s ---
+
+$ /private/tmp/lingxi-r09-runtime/r09_t05_browser_pdf-84938-1793032695312/bin/pdf_probe /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t05_browser_pdf/old-chain/s1-long-zh.pdf /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t05_browser_pdf/old-chain/probe 2
+--- exit=0 duration=4.77s ---
+{"pageCount":74,"allTextSha256":"3071523347e0bf9fd55e2c42806a3f1a555ce7d4e539b9a80840acda35328151"}
+
+$ /Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml -p lingxi-adapters --test r07_pdf_chromium -- --include-ignored --test-threads=1
+--- exit=0 duration=23.24s ---
+
+running 7 tests
+test actual_r01_documents_preserve_fonts_images_pagination_and_js_contract ... ok
+test broken_background_font_and_unfrozen_stylesheet_are_explicit_failures ... ok
+test html_network_frames_and_workers_never_reach_loopback_canary ... ok
+test printing_never_switches_or_clears_the_regular_logged_in_workspace ... ok
+test static_utf8_pdf_is_returned_only_after_confirmed_private_cleanup ... ok
+test total_deadline_and_explicit_cancel_reap_before_returning_failure ... ok
+test two_auxiliary_leases_are_scoped_and_dropped_future_is_cancelled ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 23.10s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/r07_pdf_chromium.rs (rust/target/debug/deps/r07_pdf_chromium-499d11c618388529)
+
+$ python3 tests/migration/r01-t05/compare_outputs.py --old-probe /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t05_browser_pdf/old-chain/probe --new-probe /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t05_browser_pdf/rust-pdf-attempt1/r01-quality-811594d58f63898256fa86b3af0b8e9f/s1-long-zh-probe --old-pdf /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t05_browser_pdf/old-chain/s1-long-zh.pdf --new-pdf /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t05_browser_pdf/rust-pdf-attempt1/r01-quality-811594d58f63898256fa86b3af0b8e9f/s1-long-zh.pdf --expect /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t05_browser_pdf/a09-expect.json --out /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-03/SUITES/r09_t05_browser_pdf/a09-compare.json
+--- exit=0 duration=8.28s ---
+{"all_pass": true, "failed": []}
+
+$ /Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml -p lingxi-adapters --test r07_browser_chromium -- --test-threads=1
+--- exit=0 duration=17.80s ---
+
+running 10 tests
+test downloads_are_actual_owned_bytes_and_ack_removes_only_confirmed_guid ... ok
+test fixture_idle_connection_never_invents_a_form_response ... ok
+test independent_persistent_profiles_auxiliary_locale_and_site_data_cleanup ... ok
+test page_cannot_move_or_forge_a_snapshot_reference_to_another_element ... ok
+test password_values_never_enter_normal_or_compact_snapshots_and_stay_in_the_page ... ok
+test permanent_forget_removes_owned_profile_and_rejects_late_scopes ... ok
+test pool_lru_is_bounded_and_idle_reap_keeps_cold_metadata ... ok
+test same_real_target_input_snapshot_generations_and_empty_workspace ... ok
+test scope_revoke_interrupts_real_pending_page_and_stale_node_never_launches ... ok
+test trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 17.61s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/r07_browser_chromium.rs (rust/target/debug/deps/r07_browser_chromium-0681c2f9e0455bec)
+
+$ /Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml -p lingxi-adapters --test r09_t05_assertions -- --test-threads=1
+--- exit=0 duration=7.74s ---
+
+running 8 tests
+test browser_navigation_a1_back_forward_reload_update_url_title_and_flags ... ok
+test browser_navigation_a2_no_active_view_and_illegal_urls_fail_explicitly ... ok
+test browser_tabs_a1_tab_set_and_active_follow_real_target_changes ... ok
+test browser_tabs_a2_invalid_tab_id_and_close_failure_are_explicit_and_state_unchanged ... ok
+test browser_tool_a1_title_and_snapshot_match_real_navigation ... ok
+test browser_tool_a2_stale_snapshot_reference_fails_explicitly ... ok
+test browser_tool_a3_session_state_and_cookies_never_leak_between_sessions ... ok
+test browser_tool_a4_browser_errors_are_explicit_and_never_touch_another_session ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.53s
+
+warning: variable does not need to be mutable
+   --> crates/lingxi-adapters/tests/r09_t05_assertions.rs:462:9
+    |
+462 |     for mut command in [
+    |         ----^^^^^^^
+    |         |
+    |         help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-adapters` (test "r09_t05_assertions") generated 1 warning (run `cargo fix --test "r09_t05_assertions" -p lingxi-adapters` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/r09_t05_assertions.rs (rust/target/debug/deps/r09_t05_assertions-64abb7cca9a68f97)
+
+$ /Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r07_browser_routes
+--- exit=0 duration=21.80s ---
+
+running 11 tests
+test concurrent_and_repeated_shutdown_waiters_preserve_failure_and_panic_results ... ok
+test partial_external_configuration_is_rolled_back_and_unconfirmed_rollback_is_explicit_unknown ... ok
+test unknown_external_revoke_receipt_never_repeats_the_stop_or_reopens_content ... ok
+test partial_preferences_preserve_unknown_fields_and_external_cookie_failure_is_not_success ... ok
+test preferences_and_session_projection_are_read_only_and_close_without_revoke_is_real ... ok
+test actual_http_command_replay_changed_input_and_emergency_receipt_never_repeat_external_actions ... ok
+test repeated_download_after_unknown_ack_reuses_actual_delivered_file_and_receipt ... ok
+test screenshot_registers_a_real_png_session_file_and_http_content_preserves_its_type_and_bytes ... ok
+test archive_and_permanent_delete_reclaim_only_the_actual_session_browser_before_success ... ok
+test restart_restores_cold_metadata_and_confirmed_receipt_without_automatically_opening_a_page ... ok
+test chat_device_reads_state_but_only_explicit_remote_admin_controls_the_actual_service_node ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 14.31s
+
+   Compiling ring v0.17.14
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+   Compiling rcgen v0.14.10
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: `lingxi-service` (test "r07_browser_routes") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.84s
+     Running tests/r07_browser_routes.rs (rust/target/debug/deps/r07_browser_routes-fdc6fad3b09d4813)
+
+$ /Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r07_browser_tools
+--- exit=0 duration=7.84s ---
+
+running 13 tests
+test external_unknown_effect_is_persisted_and_never_reported_as_success ... ok
+test undeclared_materialize_is_refused_without_dispatch_and_actual_run_finishes ... ok
+test actual_run_cancellation_reaches_external_cleanup_and_settles_both_records ... ok
+test actual_navigation_waits_for_approval_and_dispatches_exact_reviewed_url ... ok
+test actual_readonly_snapshot_persists_receipt_but_write_never_dispatches ... ok
+test page_change_and_foreign_tab_invalidate_approval_before_external_dispatch ... ok
+test new_actual_user_submission_releases_emergency_stop_with_a_new_epoch ... ok
+test actual_model_and_tool_echo_foreign_file_marker_without_pinning_or_blocking_fork ... ok
+test screenshot_owned_file_materializes_into_exact_read_pixels_without_granting_other_sessions ... ok
+test unconfirmed_http_emergency_keeps_last_page_and_live_process_explicitly_unknown ... ok
+test actual_service_interleaving_keeps_new_http_emergency_over_earlier_accepted_steer ... ok
+test confirmed_http_emergency_persists_empty_cold_state_across_restart_and_new_user_start ... ok
+test accepted_real_websocket_steer_reauthorizes_only_current_run_and_old_request_never_lifts_later_stop ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.39s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r07_browser_tools") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.77s
+     Running tests/r07_browser_tools.rs (rust/target/debug/deps/r07_browser_tools-c5f1e98ead9e2f3e)
+
+$ /Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r07_web_tools
+--- exit=0 duration=10.28s ---
+
+running 9 tests
+test auto_records_each_real_http_attempt_then_all_three_browser_page_diagnostics ... ok
+test public_fetch_proxy_pin_limitation_is_explicit_without_sending_any_request ... ok
+test actual_search_cancel_waits_for_auxiliary_cleanup_and_stops_fallback_chain ... ok
+test provider_auth_redirect_and_rate_limit_keep_real_error_diagnostics ... ok
+test auto_all_failed_is_explicit_and_fixed_provider_never_silently_falls_back ... ok
+test all_five_http_providers_use_real_gateway_and_distinct_authentication ... ok
+test web_fetch_blocked_page_invalid_urls_and_redirect_failures_are_explicit_without_writes ... ok
+test public_fetch_keeps_five_hop_guard_and_registers_readable_full_session_file ... ok
+test verification_real_http_masks_same_provider_and_only_persists_after_success ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.93s
+
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r07_web_tools") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.70s
+     Running tests/r07_web_tools.rs (rust/target/debug/deps/r07_web_tools-7cd2cd1fc86ce0ac)
+
+$ /Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r07_office_tools
+--- exit=0 duration=11.46s ---
+
+running 15 tests
+test office::cancelled_pdf_waits_for_actual_external_cleanup_and_never_registers_a_file ... ok
+test office::pdf_private_asset_is_refused_before_any_external_renderer_call ... ok
+test office::cover_requires_confirmation_and_preserves_markdown_and_actual_image ... ok
+test office::apply_cover_candidate_target_applies_existing_image_through_real_approval ... ok
+test office::capabilities_and_cover_style_guide_deliver_real_catalog_content ... ok
+test office::guide_state_is_owned_by_the_actual_session_and_plugin_toggle_is_effective ... ok
+test office::read_only_and_live_toggle_revocation_prevent_cover_writes ... ok
+test office::real_document_worker_reads_docx_xlsx_and_paged_pdf_without_changing_inputs ... ok
+test office::pdf_collects_authorized_assets_and_three_bundled_fonts_then_registers_real_file ... ok
+test office::actual_http_apply_preserves_old_shape_and_refuses_self_reported_identity ... ok
+test office::bundled_preset_apply_uses_real_gallery_bytes_and_rejects_unknown_presets ... ok
+test office::background_cover_job_refuses_to_apply_after_document_changed ... ok
+test office::background_cover_job_completes_with_real_media_and_applies_frozen_write ... ok
+test office::background_cover_fixed_actions_honor_live_revocation_and_cancel_before_apply ... ok
+test office::remote_cover_clients_cannot_turn_absolute_paths_into_local_owner_authority ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.10s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r07_office_tools") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.67s
+     Running tests/r07_office_tools.rs (rust/target/debug/deps/r07_office_tools-ecd52eda1d0aa579)
+
+$ /Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r06_t05_preview
+--- exit=0 duration=4.52s ---
+
+running 5 tests
+test create_preview_identity_ttl_and_errors ... ok
+test serve_preview_token_gate_expiry_and_csp ... ok
+test asset_over_50mb_refused ... ok
+test asset_scope_rewrite_base_inject_and_serve_gates ... ok
+test preview_route_faces_and_public_token_gate ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r06_t05_preview") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.67s
+     Running tests/r06_t05_preview.rs (rust/target/debug/deps/r06_t05_preview-0729975817d963c6)

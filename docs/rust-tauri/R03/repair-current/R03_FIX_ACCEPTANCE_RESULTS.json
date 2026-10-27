@@ -1,0 +1,678 @@
+{
+ "schema_version": "1.0",
+ "artifact_kind": "R03_ADVERSARIAL_REPAIR_ROUND_ACCEPTANCE_RESULTS",
+ "generated_by": "ZCode:EXECUTOR-REPAIR-R03-G07-E01 (2026-09-30; executor-scope report; stage verdict belongs to a fresh stage reviewer)",
+ "fix_base_sha": "cd3fb19e651f763afc6c75cb3163064fb54ca3fe",
+ "candidate": {
+  "head": "8a6303bcd477cda891d64fddd6e96fa35017f7ef",
+  "worktree": "G07 修复轮未提交工作树（verify-stage testedSha=8a6303bcd4、worktreeDirty=true 属预期；总控提交后由回执登记）",
+  "branch": "codex/rust-tauri-migration",
+  "toolchain": "~/.cargo/bin/cargo (rustup 1.98.1), --locked, CARGO_NET_OFFLINE",
+  "cargoLockSha1": "3b659f41eb262eaf42efc2f91ec93f9989d42934 (与 HEAD 相同，零依赖变化)"
+ },
+ "gateCommands": {
+  "standalone": [
+   {
+    "id": "rust_fmt",
+    "exitCode": 0
+   },
+   {
+    "id": "rust_clippy",
+    "exitCode": 0
+   },
+   {
+    "id": "rust_test_workspace",
+    "exitCode": 0,
+    "suitesOk": 72,
+    "passed": 709,
+    "failed": 0
+   },
+   {
+    "id": "check_contracts",
+    "exitCode": 0
+   },
+   {
+    "id": "check_boundaries",
+    "exitCode": 0
+   }
+  ],
+  "verifyStageR03": {
+   "command": "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R03 --evidence artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r03",
+   "exitCode": 0,
+   "overall": "PASS",
+   "testedSha": "8a6303bcd477cda891d64fddd6e96fa35017f7ef",
+   "commandCount": 15,
+   "commandsAllPassed": true,
+   "scenarioCount": 17,
+   "scenariosAllPassed": true,
+   "supplementalLeaves": 48,
+   "leavesPass": 17,
+   "leavesDeferred": 31,
+   "leavesFail": 0,
+   "leavesBlocked": 0,
+   "candidateSourceBindingStable": true,
+   "perCommandCheckpoints": 15,
+   "runnerSourceBinding": "PASS",
+   "evidence": "artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r03/verify-stage-result.json"
+  },
+  "verifyStageR02Regression": {
+   "command": "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R02 --evidence artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r02-regression",
+   "exitCode": 1,
+   "overall": "FAIL",
+   "testedSha": "8a6303bcd477cda891d64fddd6e96fa35017f7ef",
+   "commandCount": 20,
+   "commandsPassed": 19,
+   "reds": [
+    {
+     "command": "a16_legacy_regression",
+     "exitCode": 1,
+     "attribution": [
+      "3 个注册 SEAL_FAMILY 文件（post-verification-audit-seal/round2/round3-delivery-evidence）：VERIFIED_SOURCE_SHA 坐标滞后=R03-GOV-01 既有治理递延（seal 工作流）；round3 replay 'patch too large'=R03-GOV-02 既有治理递延（git MAX_APPLY_SIZE 1023MiB 硬限 vs ~1.9GB 增量补丁，本轮复现 'patch replay failed: error: patch too large'）",
+      "1 条非族红 tests/artifact-core-ustar.test.ts：afterEach fs.rmSync ENOTEMPTY 临时目录清理竞态（测试断言本体未失败）；该文件与 shared/artifact-core 在修复轮 cd3fb19e6..8a6303bcd 零触碰（git log 空）；隔离重跑 npx vitest run tests/artifact-core-ustar.test.ts =10/10 绿；分类器按设计 fail-closed 不消红——如实登记为测试基建环境闪红，不套用旧 seal 类别，不掩盖"
+     ]
+    }
+   ],
+   "greensOfNote": [
+    "a07_live_fault_02_check 绿（旧 FINDING-2 资产面已收口）",
+    "a14_slow_subscriber 绿（旧 FINDING-3 同上）",
+    "R03 图 7 条定向 R02 回归命令在 verify-stage R03 内全绿"
+   ],
+   "candidateSourceBindingStable": true,
+   "evidence": "artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r02-regression/verify-stage-result.json"
+  }
+ },
+ "repairSuiteProducer": {
+  "script": "scripts/rust-tauri/r03_g07_repair_suites.sh",
+  "mapRegistration": "rust/crates/xtask/src/stage_maps/R03.json: commands.repair_suites + scenarios[R03-RP01]（生成器 scripts/rust-tauri/r03_t08_generate_stage_map.py 同步；16 原场景/48 叶/7 条 R02 定向链注册零改动）",
+  "pinTableMirroredBy": "rust/crates/xtask/src/stage_map.rs 钉图测试（5 个 r03_production/pin_table 测试，跑在门禁 rust_test_workspace 命令内）",
+  "casesSchema": "lingxi.r03-repair-suite-results.v1",
+  "gateRun": {
+   "schema": "lingxi.r03-repair-suite-results.v1",
+   "producedBy": "scripts/rust-tauri/r03_g07_repair_suites.sh (cargo test -p lingxi-service --test <suite>, real chain)",
+   "suites": [
+    {
+     "suite": "cancel_link_inheritance",
+     "issue": "F01",
+     "expect": 7,
+     "actual": 7,
+     "ok": true
+    },
+    {
+     "suite": "subagent_closeout",
+     "issue": "F02",
+     "expect": 8,
+     "actual": 8,
+     "ok": true
+    },
+    {
+     "suite": "cancel_terminal_race",
+     "issue": "F03",
+     "expect": 13,
+     "actual": 13,
+     "ok": true
+    },
+    {
+     "suite": "tool_receipt_unknown",
+     "issue": "F04",
+     "expect": 6,
+     "actual": 6,
+     "ok": true
+    },
+    {
+     "suite": "admission_dedup_consistency",
+     "issue": "F05",
+     "expect": 5,
+     "actual": 5,
+     "ok": true
+    },
+    {
+     "suite": "admission_dedup_adversarial",
+     "issue": "F05",
+     "expect": 5,
+     "actual": 5,
+     "ok": true
+    },
+    {
+     "suite": "input_payload_fidelity",
+     "issue": "F06",
+     "expect": 5,
+     "actual": 5,
+     "ok": true
+    },
+    {
+     "suite": "input_budget_refusal",
+     "issue": "F06",
+     "expect": 2,
+     "actual": 2,
+     "ok": true
+    },
+    {
+     "suite": "background_steering",
+     "issue": "F07",
+     "expect": 8,
+     "actual": 8,
+     "ok": true
+    }
+   ],
+   "allSuitesOk": true
+  }
+ },
+ "gateNegativeTests": {
+  "script": "scripts/rust-tauri/r03_g07_gate_negative_tests.sh (可重跑)",
+  "method": "git worktree 隔离副本（HEAD+未提交门禁文件）内篡改后运行真实 cargo run -p xtask -- verify-stage R03 / 钉图测试，记录原始退出码与点名文本",
+  "cases": [
+   {
+    "case": "n1a-delete-leaf-mapping",
+    "exitCode": 1,
+    "gapNamed": "OK",
+    "verdict": "OK"
+   },
+   {
+    "case": "n1b-delete-command-mapping",
+    "exitCode": 2,
+    "gapNamed": "OK",
+    "verdict": "OK"
+   },
+   {
+    "case": "n4-delete-repair-scenario",
+    "exitCode": 101,
+    "gapNamed": "OK",
+    "verdict": "OK"
+   },
+   {
+    "case": "c03a-stale-evidence-root",
+    "exitCode": 1,
+    "gapNamed": "OK",
+    "verdict": "OK"
+   },
+   {
+    "case": "n2-zero-match-filter",
+    "exitCode": 1,
+    "gapNamed": "OK",
+    "verdict": "OK"
+   },
+   {
+    "case": "n3-missing-evidence-file",
+    "exitCode": 1,
+    "gapNamed": "OK",
+    "verdict": "OK"
+   },
+   {
+    "case": "c03b-midrun-input-change",
+    "exitCode": 1,
+    "gapNamed": "OK",
+    "verdict": "OK"
+   }
+  ],
+  "allRefused": true,
+  "evidence": "artifacts/rust-tauri/R03/repair-current/G07-E01/negative-tests/case-results.json",
+  "caseNotes": {
+   "n1a-delete-leaf-mapping": "删除一条 R00 补充叶映射→跨账本相等性检查中止并点名缺失叶 id（非零退出）",
+   "n1b-delete-command-mapping": "删除 repair_suites 命令映射（场景仍引用）→解析拒载 references unknown command（非零退出）",
+   "n4-delete-repair-scenario": "删除 R03-RP01 修复场景→xtask 钉图测试红并点名 R03-RP01（该测试跑在门禁 rust_test_workspace 命令内，exit 101）",
+   "n2-zero-match-filter": "生产者被改为匹配 0 的测试过滤器→生产者非零退出点名 suite+计数，完整 verify-stage R03 overall FAIL（不给总 PASS）",
+   "n3-missing-evidence-file": "图声明一条生产者永不写出的证据文件→命令本身 exit 0 但 missingEvidence 点名路径，overall FAIL",
+   "c03a-stale-evidence-root": "证据根预置陈旧文件→verify-stage 拒绝运行（is not empty，非零退出），旧结果不能遮盖新运行",
+   "c03b-midrun-input-change": "运行中更改受追踪执行输入→candidateSourceBinding.stable=false + reason 点名，overall 强制 FAIL（原 PASS 不可复用=STALE/拒用）"
+  }
+ },
+ "fIdMatrix": [
+  {
+   "fId": "F01",
+   "workorder": "G01",
+   "repairCommit": "520bb75b9",
+   "suites": [
+    {
+     "suite": "cancel_link_inheritance",
+     "testFile": "rust/crates/lingxi-service/tests/cancel_link_inheritance.rs",
+     "pinnedCount": 7,
+     "tests": [
+      "linked_run_roots_receive_parent_cancellation_across_mixed_entries",
+      "nodes_created_after_parent_cancellation_inherit_it",
+      "registration_racing_cancellation_misses_no_node",
+      "subagent_timeout_settles_a_parked_provider_wait",
+      "subagent_timeout_settles_a_parked_approval_wait",
+      "subagent_timeout_settles_a_parked_quota_wait",
+      "isolation_and_first_reason_survive_repeated_and_concurrent_cancels"
+     ]
+    }
+   ],
+   "redBaseline": [
+    {
+     "path": "artifacts/rust-tauri/R03/repair-current/G01-E01/adversarial-selfcheck/red-baseline-cancel_link_inheritance.log",
+     "observed": "FAILED. 1 passed; 6 failed"
+    }
+   ],
+   "greenEvidence": {
+    "gateCommand": "repair_suites (verify-stage R03, exit 0)",
+    "gateCases": [
+     {
+      "suite": "cancel_link_inheritance",
+      "issue": "F01",
+      "expect": 7,
+      "actual": 7,
+      "ok": true
+     }
+    ],
+    "workspaceSuitesLog": "artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r03/rust_test_workspace/stdout.log"
+   },
+   "threeLayer": {
+    "normalSelfcheck": {
+     "status": "PASS_EXECUTOR",
+     "report": "docs/rust-tauri/R03/repair-current/G01-E01_NORMAL_SELFCHECK.md"
+    },
+    "adversarialSelfcheck": {
+     "status": "PASS_EXECUTOR",
+     "report": "docs/rust-tauri/R03/repair-current/G01-E01_ADVERSARIAL_SELFCHECK.md"
+    },
+    "independentReview": {
+     "status": "PASS_R1",
+     "reviewer": "REVIEWER-REPAIR-R03-G01-R1",
+     "verdict": "PASS",
+     "report": "docs/rust-tauri/R03/repair-current/G01-R1_REVIEW.md"
+    }
+   }
+  },
+  {
+   "fId": "F02",
+   "workorder": "G01",
+   "repairCommit": "520bb75b9",
+   "suites": [
+    {
+     "suite": "subagent_closeout",
+     "testFile": "rust/crates/lingxi-service/tests/subagent_closeout.rs",
+     "pinnedCount": 8,
+     "tests": [
+      "parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap",
+      "thread_registry_refusal_leaves_no_permanent_reservations",
+      "parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls",
+      "child_provider_panic_closes_out_and_the_thread_continues",
+      "drain_expired_child_is_finally_reaped_after_its_actual_exit",
+      "late_and_duplicate_completions_cannot_corrupt_the_closeout",
+      "panicking_background_exits_are_recorded_and_reaped_without_a_waiter",
+      "finished_background_drives_reap_both_registries"
+     ]
+    }
+   ],
+   "redBaseline": [
+    {
+     "path": "artifacts/rust-tauri/R03/repair-current/G01-E01/adversarial-selfcheck/red-baseline-subagent_closeout.log",
+     "observed": "FAILED. 2 passed; 5 failed"
+    }
+   ],
+   "greenEvidence": {
+    "gateCommand": "repair_suites (verify-stage R03, exit 0)",
+    "gateCases": [
+     {
+      "suite": "subagent_closeout",
+      "issue": "F02",
+      "expect": 8,
+      "actual": 8,
+      "ok": true
+     }
+    ],
+    "workspaceSuitesLog": "artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r03/rust_test_workspace/stdout.log"
+   },
+   "threeLayer": {
+    "normalSelfcheck": {
+     "status": "PASS_EXECUTOR",
+     "report": "docs/rust-tauri/R03/repair-current/G01-E01_NORMAL_SELFCHECK.md"
+    },
+    "adversarialSelfcheck": {
+     "status": "PASS_EXECUTOR",
+     "report": "docs/rust-tauri/R03/repair-current/G01-E01_ADVERSARIAL_SELFCHECK.md"
+    },
+    "independentReview": {
+     "status": "PASS_R1",
+     "reviewer": "REVIEWER-REPAIR-R03-G01-R1",
+     "verdict": "PASS",
+     "report": "docs/rust-tauri/R03/repair-current/G01-R1_REVIEW.md"
+    }
+   }
+  },
+  {
+   "fId": "F03",
+   "workorder": "G02",
+   "repairCommit": "ccb09fde6",
+   "suites": [
+    {
+     "suite": "cancel_terminal_race",
+     "testFile": "rust/crates/lingxi-service/tests/cancel_terminal_race.rs",
+     "pinnedCount": 13,
+     "tests": [
+      "cancel_accepted_while_final_events_persist_beats_the_completed_terminal",
+      "cancel_accepted_before_the_terminal_claim_beats_the_failed_terminal_too",
+      "cancel_accepted_before_the_terminal_claim_beats_every_terminal_shape",
+      "cancel_after_the_committed_terminal_reports_already_terminal",
+      "cancel_racing_the_finalize_transaction_is_too_late_not_accepted",
+      "concurrent_duplicate_fires_keep_the_first_reason_and_a_single_fired",
+      "a_fire_after_the_driver_reached_cleaning_never_regresses_the_phase",
+      "cancel_at_the_intent_boundary_dispatches_no_new_external_call",
+      "cancel_at_the_started_boundary_dispatches_no_new_external_call",
+      "cancel_at_the_no_provider_early_close_settles_cancelled",
+      "cancel_between_tool_iterations_stops_the_second_dispatch",
+      "cancel_at_the_authorization_boundary_never_opens_the_approval_ask",
+      "started_without_receipt_journals_unknown_receipt_facts"
+     ]
+    }
+   ],
+   "redBaseline": [
+    {
+     "path": "artifacts/rust-tauri/R03/repair-current/G02-E01/adversarial-selfcheck/red-baseline-cancel_terminal_race-final.log",
+     "observed": "FAILED. 7 passed; 6 failed"
+    }
+   ],
+   "greenEvidence": {
+    "gateCommand": "repair_suites (verify-stage R03, exit 0)",
+    "gateCases": [
+     {
+      "suite": "cancel_terminal_race",
+      "issue": "F03",
+      "expect": 13,
+      "actual": 13,
+      "ok": true
+     }
+    ],
+    "workspaceSuitesLog": "artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r03/rust_test_workspace/stdout.log"
+   },
+   "threeLayer": {
+    "normalSelfcheck": {
+     "status": "PASS_EXECUTOR",
+     "report": "docs/rust-tauri/R03/repair-current/G02-E01_NORMAL_SELFCHECK.md"
+    },
+    "adversarialSelfcheck": {
+     "status": "PASS_EXECUTOR",
+     "report": "docs/rust-tauri/R03/repair-current/G02-E01_ADVERSARIAL_SELFCHECK.md"
+    },
+    "independentReview": {
+     "status": "PASS_R1",
+     "reviewer": "REVIEWER-REPAIR-R03-G02-R1",
+     "verdict": "PASS",
+     "report": "docs/rust-tauri/R03/repair-current/G02-R1_REVIEW.md"
+    }
+   }
+  },
+  {
+   "fId": "F04",
+   "workorder": "G03",
+   "repairCommit": "198e0da1e",
+   "suites": [
+    {
+     "suite": "tool_receipt_unknown",
+     "testFile": "rust/crates/lingxi-service/tests/tool_receipt_unknown.rs",
+     "pinnedCount": 6,
+     "tests": [
+      "f04_c01_panic_after_side_effect_journals_unknown_not_confirmed_failure",
+      "f04_c01_adv_panic_before_side_effect_is_still_unknown",
+      "f04_c02_dispatched_no_result_variants_classify_consistently_unknown",
+      "f04_c03_trusted_negatives_survive_alongside_the_unknown",
+      "f04_c04_recovery_and_repeat_recovery_do_not_redo_unknown",
+      "f04_c04_adv_control_verified_idempotent_recovery_uses_only_the_original_key"
+     ]
+    }
+   ],
+   "redBaseline": [
+    {
+     "path": "artifacts/rust-tauri/R03/repair-current/G03-E01/adversarial-selfcheck/red-baseline-tool_receipt_unknown-final.log",
+     "observed": "FAILED. 0 passed; 6 failed"
+    }
+   ],
+   "greenEvidence": {
+    "gateCommand": "repair_suites (verify-stage R03, exit 0)",
+    "gateCases": [
+     {
+      "suite": "tool_receipt_unknown",
+      "issue": "F04",
+      "expect": 6,
+      "actual": 6,
+      "ok": true
+     }
+    ],
+    "workspaceSuitesLog": "artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r03/rust_test_workspace/stdout.log"
+   },
+   "threeLayer": {
+    "normalSelfcheck": {
+     "status": "PASS_EXECUTOR",
+     "report": "docs/rust-tauri/R03/repair-current/G03-E01_NORMAL_SELFCHECK.md"
+    },
+    "adversarialSelfcheck": {
+     "status": "PASS_EXECUTOR",
+     "report": "docs/rust-tauri/R03/repair-current/G03-E01_ADVERSARIAL_SELFCHECK.md"
+    },
+    "independentReview": {
+     "status": "PASS_R1",
+     "reviewer": "REVIEWER-REPAIR-R03-G03-R1",
+     "verdict": "PASS",
+     "report": "docs/rust-tauri/R03/repair-current/G03-R1_REVIEW.md"
+    }
+   }
+  },
+  {
+   "fId": "F05",
+   "workorder": "G04",
+   "repairCommit": "d56e6883d",
+   "suites": [
+    {
+     "suite": "admission_dedup_adversarial",
+     "testFile": "rust/crates/lingxi-service/tests/admission_dedup_adversarial.rs",
+     "pinnedCount": 5,
+     "tests": [
+      "adv_c01_spawn_window_failure_and_retraction_leave_no_sticky_state",
+      "adv_c02_response_lost_inside_start_window_resolves_lazily",
+      "adv_c03_isolation_controls_hold_while_a_key_is_mid_admission",
+      "adv_c04_response_lost_before_any_external_effect_replays_real_run",
+      "adv_c05_restart_with_unknown_side_effects_refuses_explicitly"
+     ]
+    },
+    {
+     "suite": "admission_dedup_consistency",
+     "testFile": "rust/crates/lingxi-service/tests/admission_dedup_consistency.rs",
+     "pinnedCount": 5,
+     "tests": [
+      "r03_f05_c01_background_spawn_rejection_leaves_no_ghost_replay",
+      "r03_f05_c02_start_transaction_failure_is_compensated",
+      "r03_f05_c03_concurrent_same_key_between_reservation_and_commit",
+      "r03_f05_c04_post_side_effect_response_loss_never_reexecutes",
+      "r03_f05_c05_restart_same_key_is_an_explicit_contract_not_a_blind_redo"
+     ]
+    }
+   ],
+   "redBaseline": [
+    {
+     "path": "artifacts/rust-tauri/R03/repair-current/G04-E01/adversarial-selfcheck/red-baseline-admission_dedup_consistency.log",
+     "observed": "FAILED. 1 passed; 4 failed"
+    }
+   ],
+   "greenEvidence": {
+    "gateCommand": "repair_suites (verify-stage R03, exit 0)",
+    "gateCases": [
+     {
+      "suite": "admission_dedup_consistency",
+      "issue": "F05",
+      "expect": 5,
+      "actual": 5,
+      "ok": true
+     },
+     {
+      "suite": "admission_dedup_adversarial",
+      "issue": "F05",
+      "expect": 5,
+      "actual": 5,
+      "ok": true
+     }
+    ],
+    "workspaceSuitesLog": "artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r03/rust_test_workspace/stdout.log"
+   },
+   "threeLayer": {
+    "normalSelfcheck": {
+     "status": "PASS_EXECUTOR",
+     "report": "docs/rust-tauri/R03/repair-current/G04-E01_NORMAL_SELFCHECK.md"
+    },
+    "adversarialSelfcheck": {
+     "status": "PASS_EXECUTOR",
+     "report": "docs/rust-tauri/R03/repair-current/G04-E01_ADVERSARIAL_SELFCHECK.md"
+    },
+    "independentReview": {
+     "status": "PASS_R1",
+     "reviewer": "REVIEWER-REPAIR-R03-G04-R1",
+     "verdict": "PASS",
+     "report": "docs/rust-tauri/R03/repair-current/G04-R1_REVIEW.md"
+    }
+   }
+  },
+  {
+   "fId": "F06",
+   "workorder": "G05",
+   "repairCommit": "8883923a5",
+   "suites": [
+    {
+     "suite": "input_budget_refusal",
+     "testFile": "rust/crates/lingxi-service/tests/input_budget_refusal.rs",
+     "pinnedCount": 2,
+     "tests": [
+      "c03_over_budget_refused_loudly_with_zero_side_effects",
+      "c03_log_summary_oversized_legal_input_is_not_misrefused"
+     ]
+    },
+    {
+     "suite": "input_payload_fidelity",
+     "testFile": "rust/crates/lingxi-service/tests/input_payload_fidelity.rs",
+     "pinnedCount": 5,
+     "tests": [
+      "c01_foreground_boundary_lengths_deliver_the_full_input",
+      "c01_background_boundary_lengths_deliver_the_full_input",
+      "c02_unicode_payloads_byte_honest_on_both_entries",
+      "c02_dedup_digest_corresponds_to_the_content_actually_executed",
+      "c02_adversarial_combining_pair_straddling_the_historical_cut"
+     ]
+    }
+   ],
+   "redBaseline": [
+    {
+     "path": "artifacts/rust-tauri/R03/repair-current/G05-E01/adversarial-selfcheck/red-baseline-input_payload_fidelity-full.log",
+     "observed": "FAILED. 0 passed; 5 failed"
+    },
+    {
+     "path": "artifacts/rust-tauri/R03/repair-current/G05-E01/adversarial-selfcheck/red-baseline-input_budget_refusal-compile.log",
+     "observed": "compile error E0425（修复前不存在显式拒绝错误面）"
+    }
+   ],
+   "greenEvidence": {
+    "gateCommand": "repair_suites (verify-stage R03, exit 0)",
+    "gateCases": [
+     {
+      "suite": "input_payload_fidelity",
+      "issue": "F06",
+      "expect": 5,
+      "actual": 5,
+      "ok": true
+     },
+     {
+      "suite": "input_budget_refusal",
+      "issue": "F06",
+      "expect": 2,
+      "actual": 2,
+      "ok": true
+     }
+    ],
+    "workspaceSuitesLog": "artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r03/rust_test_workspace/stdout.log"
+   },
+   "threeLayer": {
+    "normalSelfcheck": {
+     "status": "PASS_EXECUTOR",
+     "report": "docs/rust-tauri/R03/repair-current/G05-E01_NORMAL_SELFCHECK.md"
+    },
+    "adversarialSelfcheck": {
+     "status": "PASS_EXECUTOR",
+     "report": "docs/rust-tauri/R03/repair-current/G05-E01_ADVERSARIAL_SELFCHECK.md"
+    },
+    "independentReview": {
+     "status": "PASS_R1",
+     "reviewer": "REVIEWER-REPAIR-R03-G05-R1",
+     "verdict": "PASS",
+     "report": "docs/rust-tauri/R03/repair-current/G05-R1_REVIEW.md"
+    }
+   }
+  },
+  {
+   "fId": "F07",
+   "workorder": "G06",
+   "repairCommit": "8a6303bcd",
+   "suites": [
+    {
+     "suite": "background_steering",
+     "testFile": "rust/crates/lingxi-service/tests/background_steering.rs",
+     "pinnedCount": 8,
+     "tests": [
+      "c01_background_accepted_steering_reaches_next_turn_exactly_once",
+      "c01_adversarial_multi_steer_orders_and_rounds_no_redrain",
+      "c02_steering_stays_in_the_authorized_session_across_parallel_runs",
+      "c02_adversarial_cancel_then_quick_new_run_no_misattribution",
+      "c03_midflight_steering_is_consumed_not_leaked_into_next_run",
+      "c03_too_late_steering_retained_not_claimed_no_auto_trigger",
+      "c04_bounded_inbox_same_contract_foreground_and_background",
+      "c04_adversarial_concurrent_steers_respect_the_bound"
+     ]
+    }
+   ],
+   "redBaseline": [
+    {
+     "path": "artifacts/rust-tauri/R03/repair-current/G06-E01/adversarial-selfcheck/red-baseline-background_steering.log",
+     "observed": "FAILED"
+    },
+    {
+     "path": "artifacts/rust-tauri/R03/repair-current/G06-E01/adversarial-selfcheck/red-baseline-final-file.log",
+     "observed": "FAILED. 1 passed; 7 failed"
+    }
+   ],
+   "greenEvidence": {
+    "gateCommand": "repair_suites (verify-stage R03, exit 0)",
+    "gateCases": [
+     {
+      "suite": "background_steering",
+      "issue": "F07",
+      "expect": 8,
+      "actual": 8,
+      "ok": true
+     }
+    ],
+    "workspaceSuitesLog": "artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r03/rust_test_workspace/stdout.log"
+   },
+   "threeLayer": {
+    "normalSelfcheck": {
+     "status": "PASS_EXECUTOR",
+     "report": "docs/rust-tauri/R03/repair-current/G06-E01_NORMAL_SELFCHECK.md"
+    },
+    "adversarialSelfcheck": {
+     "status": "PASS_EXECUTOR",
+     "report": "docs/rust-tauri/R03/repair-current/G06-E01_ADVERSARIAL_SELFCHECK.md"
+    },
+    "independentReview": {
+     "status": "PASS_R1",
+     "reviewer": "REVIEWER-REPAIR-R03-G06-R1",
+     "verdict": "PASS",
+     "report": "docs/rust-tauri/R03/repair-current/G06-R1_REVIEW.md"
+    }
+   }
+  }
+ ],
+ "f08Register": {
+  "fId": "F08",
+  "workorder": "G07",
+  "counterexamples": "旧接受（裁决2）容许未完成取消收口",
+  "repairs": [
+   "R03.json+生成器：repair_suites 命令+R03-RP01 场景（反例进入正式验收）",
+   "scripts/rust-tauri/r03_g07_repair_suites.sh：逐套件固定计数生产者（匹配 0/子集/改名=点名缺口）",
+   "xtask stage_map.rs 钉图测试：16 场景 commandRefs 冻结表+修复注册+7 链+48 叶+钉表镜像",
+   "scripts/rust-tauri/r03_g07_gate_negative_tests.sh：门禁负向测试（删映射/0 过滤器/缺证据/陈旧证据根/中途改输入→非零点名）",
+   "现行报告更正：R03_REPORT.md REOPENED 节追加修复结果+替代裁决2 依据（历史原文保留）；R03_HANDOFF.json FINDING-1 关闭标注+interfaces 更新（TooLate/AdmissionInFlight/RequestIdBoundToEarlierRun/InputTooLarge/后台 steering/输入保真）；R03_ACCEPTANCE_LEDGER.json 追加 repair 登记（原 16 场景条目未动）"
+  ],
+  "verdict2SupersededBecause": "裁决2 的前提『计数清理只可能在被跳过的 note_child_finished 中发生』被 G01 产线修复证伪：父取消现于当前进程内完成收尾/终态/线程与配额回收（subagent_closeout 8 用例），普通取消不再依赖重启；旧 PASS 原文保留。",
+  "remainingStageStep": "全新阶段 Reviewer 终审（F08-C04）：七条主反例独立实测+原验收/递延/R02 回归复核；此前保持 REOPENED_PENDING_REPAIR。"
+ },
+ "notes": [
+  "全部命令以 ~/.cargo/bin/cargo（rustup 1.98.1）--locked 离线执行；退出码为原始值。",
+  "G07 未 commit/push；总控账本（R03_FIX_ISSUES.json/R03_FIX_COMMIT_RECEIPTS.json）的 G01–G06 登记未改动。",
+  "本文件不写自身 SHA；提交后回执由总控登记。"
+ ]
+}

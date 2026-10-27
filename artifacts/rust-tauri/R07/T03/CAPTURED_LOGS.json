@@ -1,0 +1,421 @@
+{
+  "stage": "R07-T03",
+  "capturedAt": "2026-10-15T21:07:49.306862+00:00",
+  "logs": [
+    {
+      "file": "lingxi-r07-t03-adapters-r2.log",
+      "sha256": "05070d6a3791102c0ead1d7bb8dccd97a40313b44202f542fb89a86a32e35fe8",
+      "bytes": 4073,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-check-r1.log",
+      "sha256": "b220266f94eebe19d9f15fc32deeb4eae43988a9d97548768ffed8a04d46b8c5",
+      "bytes": 111,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-check-r2.log",
+      "sha256": "53d056ac2ec273cf3c603558152f1c52a2441e9bbc0ddef0f662d77caea5d8ca",
+      "bytes": 7735,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-check-r3.log",
+      "sha256": "24883d4d76c8ca1039eceb26a605519c7a5afa1352e338ebf83b11220e2d5a74",
+      "bytes": 14997,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-check-r4.log",
+      "sha256": "92dfc12c4b209926154b2008c13ff3109735eb9db05bc87f4272300880321524",
+      "bytes": 865,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-check-r5.log",
+      "sha256": "c9c067340fb3cd05d0866e16f7d25efcab986fbea5de4d77b2bceed1ddcf4e83",
+      "bytes": 297,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-clippy-r2.log",
+      "sha256": "590f51782566219a2ce19e155d6072a6dc9a0d88901b9b7f8a9f9950323c9ad6",
+      "bytes": 3420,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-clippy-r3.log",
+      "sha256": "5e297fda94af2407f408a3feea5c8e5e00d2f01eed7663849da1da8ea8acbbce",
+      "bytes": 184,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-collab-r06-r1.log",
+      "sha256": "7193966241b860cc5c4030cb0a1054ae34a3bee63f9d8b29cb0f27b9e4ed5c6c",
+      "bytes": 504,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-collab-service-create-r3.log",
+      "sha256": "03e5dc827ce07289a4fb83c3b77e6fa02c5b7b2e8c35ed438efe487ba3170655",
+      "bytes": 633,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-collab-service-r1.log",
+      "sha256": "95fd203b313fa02556cd87a532d07ec67f97c1c76281c2668f653a965f8113d0",
+      "bytes": 3465,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-collab-service-r2.log",
+      "sha256": "00aa0c037cb900fe1baeffab6eb1b6452d7826e7a5f3d67b3b028793169ac490",
+      "bytes": 1802,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-collab-service-r4.log",
+      "sha256": "05c2e48e541fdc0256c1f32180951a8d814d623e1745c48fe273ba2137374f76",
+      "bytes": 11236,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-collab-service-r5.log",
+      "sha256": "bb5fd6806a304d89a12c7f03720dcec7874f8613825361fe306907bece77f4e7",
+      "bytes": 10932,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-collab-service-r6.log",
+      "sha256": "960da518e8924d8ef3318be8d1be522ba178a9600957b4b2a307679c260f1d23",
+      "bytes": 11216,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-collab-store-r1.log",
+      "sha256": "eac87255972961b06a6d5794511ab4850ef10fc8f412a18818cd675da228d117",
+      "bytes": 823,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-collab-store-r2.log",
+      "sha256": "a3573ea027fb480dff3f29e8d95a408018ac06264d2a25e3b32ef5a47de52176",
+      "bytes": 1077,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-collab-store-r3.log",
+      "sha256": "b8c6f8b8a53bcdeb511daef15dc2b2d9994f91b1f914ea74dbf76db2c0b7b762",
+      "bytes": 1077,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-events-r1.log",
+      "sha256": "c9f643ddde9e31415ebb92270f83a53c39c352464be75396439a6b2c158fedcc",
+      "bytes": 235,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-files-phone-store-r1.log",
+      "sha256": "605c046baa83c92728a107d202a93eb284fd5f6e46334b73915762f87cd638d1",
+      "bytes": 2766,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-final-ownership.log",
+      "sha256": "037058d859e004dbadaaef02bceb95a2776455bf0369ff009cfe22270a966779",
+      "bytes": 1552,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-final-protocol-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-final-rust-roundtrip.log",
+      "sha256": "fc416f2cc1a70d50e4c5c2f0f31d91a2e86364eee3ec5466d4bb4a7b98ca4661",
+      "bytes": 295,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-final-ts-roundtrip.log",
+      "sha256": "4eb7a6824aaa9bc2cbcdb3924d462baa32744738032326e5ce690393d39332a5",
+      "bytes": 767,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-final-typecheck.log",
+      "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "bytes": 119,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-final-ui.log",
+      "sha256": "bcb7ccff80c1c267335e34293d4779fd0d4da2c37b84a01f15ca38775afce5f8",
+      "bytes": 241,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-frozen-r1-adapter.log",
+      "sha256": "b7076dd959ff3a29b82853c1b2eee434e92fc645eee734b469707dee292f9028",
+      "bytes": 5331,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-frozen-r1-clippy.log",
+      "sha256": "45e5191025fe3761168e4793dd566d6bd4102986f616afa9c58813a9b4048133",
+      "bytes": 1759,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-frozen-r1-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-frozen-r1-generated.log",
+      "sha256": "a24599394bc1e7c0146ebbaa81f1a60fecc4547278071234bfbd0be70501afc1",
+      "bytes": 277,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-frozen-r1-protocol.log",
+      "sha256": "1c67b6881c5c74effbf710bbb749d47c0c2a0b85f36bd72f4e2e730db763f245",
+      "bytes": 3896,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-frozen-r1-service.log",
+      "sha256": "c7d0ebb41eedbaee288fcf8468d07108e02d44e86e0efae4045357fdc2198159",
+      "bytes": 56554,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-frozen-r2-adapter.log",
+      "sha256": "e1f606f38beace23b5b9ff201578ae65e886369cf46077dfeb93497a13fd5dc4",
+      "bytes": 10768,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-frozen-r2-clippy.log",
+      "sha256": "b3d5dc1e4be14b0f442fcd722c952b78bb0e2be399628040002287e899d51ca7",
+      "bytes": 183,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-frozen-r2-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-frozen-r2-generated.log",
+      "sha256": "a24599394bc1e7c0146ebbaa81f1a60fecc4547278071234bfbd0be70501afc1",
+      "bytes": 277,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-frozen-r2-protocol.log",
+      "sha256": "153ccd2ce4b95369ac4302c9a4a83a824c70b16c2085e8b4d35e15619e319e12",
+      "bytes": 3896,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-frozen-r2-service.log",
+      "sha256": "5970b69558d0831d5e6d90010019756eb78289db70a84bd0d9d99fbfb18bcaa4",
+      "bytes": 56737,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-frozen-r2-ui.log",
+      "sha256": "0fff8844a184020c00bf15d92a65b48ac7431d48ee098b513106922ea326d866",
+      "bytes": 63,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-http-surfaces-r1.log",
+      "sha256": "1957e008a2dbcc9529dbaa875fd0f7e53eb52afb246a06ed331d2097001887af",
+      "bytes": 613,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-phone-collab-r4.log",
+      "sha256": "51d7cf05028a39d93b6b30a2f0d29f7d3cc5e446f400815715b5f3a13064a6fa",
+      "bytes": 2435,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-phone-collab-r5.log",
+      "sha256": "7a85a76b9681195753b6a70fde07c4c7dad6b3fe35f98cc339aafd94fccb0e56",
+      "bytes": 1459,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-phone-collab-r6.log",
+      "sha256": "aedbdf25f8a6cf85e3aaaa3e054aee44b78eb79652ddad3547575f04e999cfd9",
+      "bytes": 5572,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-phone-collab-r7.log",
+      "sha256": "530b5e6d4f6fd37fe00c6bcefd1f3de0de67642dbcce1b0d4f933917226dd944",
+      "bytes": 3372,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-phone-runtime-r2.log",
+      "sha256": "41ce1ff182bc178d6ca8ced1c28b2447f1b03294143ba55d561da910fe2037da",
+      "bytes": 947,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-phone-runtime-r3.log",
+      "sha256": "cd8a79eaced1d96819503de8e20d8b3b2d5de77f4f4dc2415dfe9b3d6f2bb43f",
+      "bytes": 2249,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-root-eslint-r1.log",
+      "sha256": "76b4da721cfb67b0f04db5ac92f266e54d49b63a638dbe341a736b226161e02c",
+      "bytes": 225,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-root-ui-r1.log",
+      "sha256": "1759ebc99a11c277f6da5dfc88c1d18c48b73dcf20e7443af67926348a82ef5b",
+      "bytes": 1335,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-root-ui-r2.log",
+      "sha256": "cabdb20d1b178416e4c24c433d3833d5f628c2af2d62819eb9354f9eaad89ca1",
+      "bytes": 236,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-storage-static.log",
+      "sha256": "c5f9713f283bf4523a36857bb3cef3ee231ac6f9ba50db9a476c97c5a599394f",
+      "bytes": 1877,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-tools-runtime-r1.log",
+      "sha256": "1f014259ae27d4614da63fa1cc4abf2902532083e4480dcaea9e42f5e271929e",
+      "bytes": 2820,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-typecheck-r7.log",
+      "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "bytes": 119,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-ui-lint-r6.log",
+      "sha256": "149e4720c3f15c3d05140657cb105b9f2cd101d14fbf4a6d19b1a3a42cd2c025",
+      "bytes": 634,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-ui-lint.log",
+      "sha256": "64e8a61b4e5a384592d8a06a7028529d5dc47fefe363813457d56af438476755",
+      "bytes": 1184,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-ui-r1.log",
+      "sha256": "c0d23e8785d1a629556d25213a66026c6b7a4add4953552d506bd1a7a8bd1129",
+      "bytes": 10944,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-ui-r2.log",
+      "sha256": "8d13b047b7a430e6b204bda72c9297cb3e64321197458110a81d195f37991500",
+      "bytes": 2506,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-ui-r3.log",
+      "sha256": "48f87fb5e48212f3eb434aa46ad9bad51ff078b59ebba4ef102b82c8d67aceff",
+      "bytes": 239,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-ui-r4.log",
+      "sha256": "2428438a3bf67694baa704bb197e2298425c8230828282b22e96b325264b82f5",
+      "bytes": 239,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-ui-r5.log",
+      "sha256": "64a0904c6d3c5127df85a4782ff0acd03655be65ce50ba752d27f9b07059bd9f",
+      "bytes": 239,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-ui-r6.log",
+      "sha256": "b3f80a3629fc19fc7ce1dcafb8a7a53dc4f89ad7c35432e23bc6de6c23b17403",
+      "bytes": 239,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-ui-r7.log",
+      "sha256": "e4f572362c769310e8c237a321094fc30471bad606e45fde5198a88d7452c196",
+      "bytes": 239,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-ui-types-final.log",
+      "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "bytes": 119,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-ui-types-r1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-ui-types-r2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-ui-types-r4.log",
+      "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "bytes": 119,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-ui-types-r6.log",
+      "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "bytes": 119,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-ui-types-r7.log",
+      "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "bytes": 119,
+      "classification": "historical_raw_see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-frozen-r2-ownership.log",
+      "sha256": "037058d859e004dbadaaef02bceb95a2776455bf0369ff009cfe22270a966779",
+      "bytes": 1552,
+      "classification": "see_validation_runs_for_verified_exit_codes"
+    },
+    {
+      "file": "lingxi-r07-t03-frozen-r2-typecheck.log",
+      "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "bytes": 119,
+      "classification": "see_validation_runs_for_verified_exit_codes"
+    }
+  ],
+  "copyPolicy": "仅本任务原始日志和精确命令回执；不复制测试主目录、SQLite、凭据、环境或缓存。"
+}

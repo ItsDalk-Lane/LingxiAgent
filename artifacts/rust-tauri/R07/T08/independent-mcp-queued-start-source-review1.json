@@ -1,0 +1,40 @@
+{
+  "reviewer": "r07_t08_final_review",
+  "reviewedAt": "2026-10-18T10:14:07.280245+00:00",
+  "scope": "新后台MCP启动及管理队列只读静态审阅；未运行反例，不改源码/Cargo。",
+  "sourcePath": "rust/crates/lingxi-service/src/mcp_settings.rs",
+  "sourceSha256AtRecord": "624cd905a6aa6c1fbfbd5a5cd34d800df2cacd1ebacf4d3d37babf7ba7cb982c",
+  "finalAcceptance": "pending",
+  "validatedDesign": [
+    "TaskSupervisor弱绑定无强引用环，pending guard按序号清理并通知；退出closing先置位再cancel，阻止新增排队。",
+    "add/bulk连接握手在runtime锁外，开始及提交时核原Auth/序号/完整connector配置；握手中每50ms检查原授权，取消后disconnect_checked真实清理。",
+    "初始state可显示connecting，初始保存事实与后续真实连接收据分开；注册期间ScopedExecutor.allowed还要求live集合，未commit的连接工具不会直接执行。",
+    "HTTP state成功读出后重验原principal，私密连接编辑材料不由排队前旧身份无限读回。"
+  ],
+  "findings": [
+    {
+      "id": "MCP-PRECHECK-BEFORE-CANCEL",
+      "kind": "确定静态控制流问题，待真实复现",
+      "path": "handle prelock cancel_pending before self.agent/expected_review and apply input validation",
+      "impact": "陈旧审批/已失效目标或id合法但坏patch请求可先取消另一个真实hold-init，再返回拒绝且saved/runtimeApplied=false，隐藏已造成的取消副作用。",
+      "minimumCheck": "真实pending hold-init后发坏update或失效冻结review，要求拒绝且原初始化未cancel/无清理副作用；不要先改测试为接受取消。",
+      "minimumRepair": "适用权限/目标/冻结review/输入预检须先于cancel，短runtime锁完成后释放再wait，提交锁内再复验。"
+    },
+    {
+      "id": "MCP-DISABLE-NEW-PENDING-RACE",
+      "kind": "静态可行交错，未实跑",
+      "path": "handle global disabled cancel snapshot then wait_pending(None) before config disabled persisted",
+      "impact": "另一合法add/bulk可在wait期间按旧enabled=true排入新未cancel任务，disable反被新握手拖到超时；begin_stop有closing栅栏不受同一问题。",
+      "minimumCheck": "实际hold-init取消收尾期间并发新add，核disable意图能覆盖新pending且进程回收，不仅等待旧快照。"
+    },
+    {
+      "id": "MCP-EXPLICIT-START-AUTHORITY-SCOPE",
+      "kind": "确定静态缺少原授权循环的路径，待真实效果复现",
+      "path": "apply start/refresh/global enabled and restore → start_connector → connect_connector(...authority=None)",
+      "impact": "只有add/bulk新后台链满足无runtime锁握手/50ms原授权；显式HTTP start持runtime锁且握手期间未复验原Auth，完成后handle也无原Auth复验，不能宣称所有启动都已支持。",
+      "minimumCheck": "显式start真实hold-init中轮换原owner，释放握手后应不注册/不回普通applied并回收进程；显式stop不能被同握手锁无限挡住。",
+      "boundary": "restore为内部恢复授权与用户原主体不同，不能机械给内部调用伪造用户；明确每条实际授权/取消语义。"
+    }
+  ],
+  "runtimeEvidence": "尚无本次新反例实际失败/修复通过记录，保持静态/待验证，不将疑点写成已跑失败。"
+}

@@ -1,0 +1,32 @@
+{
+  "reviewer": "independent-subagent-r07_t08_final_review",
+  "reviewedAt": "2026-10-18T08:35:00.878515+00:00",
+  "stage": "R07-T08",
+  "candidate": "t08c",
+  "finalAcceptance": "pending",
+  "status": "STATIC_REVIEW_NO_RUNTIME_TEST",
+  "proposedReadFix": "Apply shared recursive exact-key mask to full snapshot.providers after gateway catalog and live credential status; add snake-case access_token/refresh_token to Rust and TS exact vocabularies; keep ordinary extension metadata intact.",
+  "readFixAssessment": "Correct for identified snapshot/summary bypass and snake-case default export gap; no broad unknown-text guessing or metadata removal needed.",
+  "associatedWriteRisks": [
+    {
+      "kind": "MASK_ROUNDTRIP_DATA_LOSS",
+      "evidence": "normalize_provider iterates supplied models and calls normalize_model with old={}; normalize_model copies arbitrary extension value directly. After read fix a masked known-secret marker can overwrite the original Source value.",
+      "minimalFix": "Resolve masked known-secret fields against same provider/model ID and same field path before normalization; never borrow another provider/model or index-based model entry; ordinary unknown fields retain existing merge/replace contract."
+    },
+    {
+      "kind": "SECRET_WRITE_PERMISSION_VOCABULARY_DRIFT",
+      "evidence": "has_secret_edit only recognizes api_key/apiKey/value and headers, while shared known-secret mask vocabulary includes additional token keys; access_token/accessToken literals and clears can miss secrets.write at unique publisher save boundary.",
+      "minimalFix": "Use same exact known-secret field collection at save authorization, retain existing authHeader.value handling; unchanged mask is preservation, actual non-mask edits/clears require secrets.write."
+    }
+  ],
+  "necessaryRegressionCases": [
+    "Actual binary HTTP Source save and reads of summary/config/export; known sentinel absent, ordinary extension preserved",
+    "Read-only settings device receives no nested known-secret value",
+    "Read-modify-write returned masked model list retains actual Source secret bytes when another setting/model display changes",
+    "Reordered models resolve masked preservation by model ID, and a new model mask cannot borrow a different model secret",
+    "Principal without secrets.write cannot edit or clear nested known token; Source/generation unchanged",
+    "Authorized explicit clear remains distinct from mask preservation"
+  ],
+  "runtimeFailureReceipts": [],
+  "mutationScope": "Only this evidence file, no source/test/protocol/frozen runner edits; no Cargo/GUI/external requests"
+}

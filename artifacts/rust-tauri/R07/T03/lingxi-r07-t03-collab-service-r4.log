@@ -1,0 +1,74 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 30.09s
+     Running tests/r07_session_collab.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_session_collab-e9ed2f26742c668c)
+
+running 4 tests
+2026-10-15T20:27:26.682409Z  INFO lingxi_service: request handled request_id="req-344c72d033ee9a3e18737e3eab112f28" method=POST path=/lingxi/v1/sessions status=201
+2026-10-15T20:27:26.682404Z  INFO lingxi_service: request handled request_id="req-2f712e58d809d5e461a3067c35f9c06c" method=POST path=/lingxi/v1/sessions status=201
+2026-10-15T20:27:26.682410Z  INFO lingxi_service: request handled request_id="req-91440b3eda6cec62659581681fa440f9" method=POST path=/lingxi/v1/sessions status=201
+2026-10-15T20:27:26.682407Z  INFO lingxi_service: request handled request_id="req-1078298b404455b55f159043a7c84fbe" method=POST path=/lingxi/v1/sessions status=201
+2026-10-15T20:27:26.683793Z  INFO lingxi_service: request handled request_id="req-4e76794efe5434fdc48d8a686a26dfb0" method=POST path=/lingxi/v1/sessions status=201
+2026-10-15T20:27:26.683883Z  INFO lingxi_service: request handled request_id="req-288b7f55cf68a1b5803c55958c677e6a" method=POST path=/lingxi/v1/sessions status=201
+2026-10-15T20:27:26.693262Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:session entry="direct" permission_context="user_session" capability=session.execute permission_kind="read" target_generation=1 catalog_generation=17 prepared_at_unix_ms=1800000000000 binding_reason=session collaboration canonical tool
+2026-10-15T20:27:26.693262Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:session entry="direct" permission_context="user_session" capability=session.execute permission_kind="read" target_generation=1 catalog_generation=17 prepared_at_unix_ms=1800000000000 binding_reason=session collaboration canonical tool
+2026-10-15T20:27:26.693262Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:session entry="direct" permission_context="user_session" capability=session.execute permission_kind="read" target_generation=1 catalog_generation=17 prepared_at_unix_ms=1800000000000 binding_reason=session collaboration canonical tool
+2026-10-15T20:27:26.701639Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:session entry="direct" permission_context="user_session" capability=session.execute permission_kind="read" target_generation=1 catalog_generation=17 prepared_at_unix_ms=1800000000000 binding_reason=session collaboration canonical tool
+2026-10-15T20:27:26.708145Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a3185c5000_000001 session_id="source" outcome=completed.with_final input_chars=64 input_bytes=74
+2026-10-15T20:27:26.708174Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a3185c5000_000001 session_id="source" outcome=completed.with_final input_chars=65 input_bytes=71
+2026-10-15T20:27:26.708279Z  INFO lingxi_service: request handled request_id="req-78f9c9b79283f2a2a5e3e4c88be666fa" method=POST path=/lingxi/v1/sessions/source/execute status=200
+2026-10-15T20:27:26.708279Z  INFO lingxi_service: request handled request_id="req-836922b886823f6612c558df57c4a293" method=POST path=/lingxi/v1/sessions/source/execute status=200
+2026-10-15T20:27:26.708359Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a3185c5000_000002 session_id="source" outcome=completed.with_final input_chars=66 input_bytes=74
+2026-10-15T20:27:26.708387Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a3185c5000_000001 session_id="source" outcome=completed.with_final input_chars=78 input_bytes=94
+2026-10-15T20:27:26.708429Z  INFO lingxi_service: request handled request_id="req-b32a829777053cac71f7f8f62aa624f7" method=POST path=/lingxi/v1/sessions/source/execute status=200
+2026-10-15T20:27:26.708487Z  INFO lingxi_service: request handled request_id="req-97f875dd314634c4915f4e2d7f1ed862" method=POST path=/lingxi/v1/sessions/source/execute status=200
+2026-10-15T20:27:26.710235Z  INFO lingxi_service: request handled request_id="req-1f33b0ec7651f4ac792ba9b39e898525" method=POST path=/lingxi/v1/session-collab/reject status=403
+2026-10-15T20:27:26.710985Z  INFO lingxi_service: request handled request_id="req-c78eb0985a225f51294f59b075cbdeb6" method=POST path=/lingxi/v1/session-collab/apply status=400
+2026-10-15T20:27:26.711055Z  INFO lingxi_service: request handled request_id="req-9f96fb38bd129e3a581dd9ee521b72a3" method=POST path=/lingxi/v1/session-collab/apply status=200
+2026-10-15T20:27:26.711463Z  INFO lingxi_service: request handled request_id="req-8662f1171c7151de7f522f01a7d6f409" method=POST path=/lingxi/v1/session-collab/apply status=200
+2026-10-15T20:27:26.711480Z  INFO lingxi_service: request handled request_id="req-504bb67d76b7e9b54c2b38918241f14b" method=POST path=/lingxi/v1/session-collab/apply status=200
+2026-10-15T20:27:26.711657Z  INFO lingxi_service: request handled request_id="req-086e593471903e01dd2e68ab633a8cbf" method=POST path=/lingxi/v1/session-collab/apply status=200
+2026-10-15T20:27:26.711711Z  INFO lingxi_service: request handled request_id="req-c1de4ef9371570bc54ea83e6d1afebf9" method=POST path=/lingxi/v1/session-collab/apply status=200
+2026-10-15T20:27:26.712600Z  INFO lingxi_service: request handled request_id="req-b2e2203122def043241539b1b0b99838" method=POST path=/lingxi/v1/session-collab/reject status=200
+2026-10-15T20:27:26.713065Z  INFO lingxi_service::sessions: normal submission to a busy session rejected (session_busy; retryable) session_id="target"
+2026-10-15T20:27:26.713527Z  INFO lingxi_service: request handled request_id="req-ae4b7b9df4b1bad2f65f358c735c0054" method=POST path=/lingxi/v1/session-collab/apply status=404
+2026-10-15T20:27:26.713995Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000002 session_id="session-collab-ab8e6bcb76dacff7"
+2026-10-15T20:27:26.715797Z ERROR lingxi_service::background: background drive FAILED before its finalize (loud; the durable row stays honest) run_id=run_000001a3185c5000_000002 error=Storage(Corrupted { detail: "model_history: automation input Run/principal/lineage mismatch" })
+2026-10-15T20:27:26.716221Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a3185c5000_000001 session_id="target" outcome=completed.with_final input_chars=11 input_bytes=11
+2026-10-15T20:27:26.716294Z  INFO lingxi_service: request handled request_id="req-7e42005a3eb4ea1cc04799c7f1dffffd" method=POST path=/lingxi/v1/sessions/target/execute status=200
+2026-10-15T20:27:26.722325Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:session entry="direct" permission_context="user_session" capability=session.execute permission_kind="read" target_generation=1 catalog_generation=17 prepared_at_unix_ms=1800000000000 binding_reason=session collaboration canonical tool
+
+thread 'create_apply_is_single_target_and_survives_restart_without_replay' (613674) panicked at crates/lingxi-service/tests/r07_session_collab.rs:256:25:
+assertion `left == right` failed
+  left: "failed"
+ right: "completed"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+2026-10-15T20:27:26.732956Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000003 session_id="target"
+2026-10-15T20:27:26.740763Z ERROR lingxi_service::background: background drive FAILED before its finalize (loud; the durable row stays honest) run_id=run_000001a3185c5000_000003 error=Storage(Corrupted { detail: "model_history: automation input Run/principal/lineage mismatch" })
+test create_apply_is_single_target_and_survives_restart_without_replay ... FAILED
+2026-10-15T20:27:26.746556Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a3185c5000_000002 session_id="source" outcome=completed.with_final input_chars=65 input_bytes=71
+2026-10-15T20:27:26.746650Z  INFO lingxi_service: request handled request_id="req-ff4b9b6b0a76cf3ea882fcaeba2b3802" method=POST path=/lingxi/v1/sessions/source/execute status=200
+2026-10-15T20:27:26.748112Z  INFO lingxi_service: request handled request_id="req-d620eb677a092d3127f1034350acd2d7" method=POST path=/lingxi/v1/session-collab/apply status=404
+2026-10-15T20:27:26.748931Z  INFO lingxi_service: request handled request_id="req-ede3a1fd969dcc25b13e1632d1b63d64" method=POST path=/lingxi/v1/sessions status=201
+
+thread 'registered_tool_only_cards_then_busy_queue_accepts_one_causal_run_and_records_edits' (613675) panicked at crates/lingxi-service/tests/r07_session_collab.rs:256:25:
+assertion `left == right` failed
+  left: "failed"
+ right: "completed"
+2026-10-15T20:27:26.760974Z  WARN lingxi_service::runs: whole-batch admission refused this model tool turn (zero dispatch); the journal closes a never-dispatched failure run_id=run_000001a3418f3000_000003 tool_call=run_000001a3418f3000_000003-tc0001 target="tool:first-party:session"
+test registered_tool_only_cards_then_busy_queue_accepts_one_causal_run_and_records_edits ... FAILED
+2026-10-15T20:27:26.771258Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a3418f3000_000003 session_id="readonly" outcome=completed.with_final input_chars=68 input_bytes=80
+2026-10-15T20:27:26.771343Z  INFO lingxi_service: request handled request_id="req-055081f9de20a71bd98245285c8430b3" method=POST path=/lingxi/v1/sessions/readonly/execute status=200
+test reject_expiry_readonly_and_spoofed_source_are_checked_by_real_records ... ok
+2026-10-15T20:27:26.782744Z  INFO lingxi_service: request handled request_id="req-790541bb0dc74690746135e038f8a1dc" method=POST path=/lingxi/v1/session-collab/apply status=409
+test unconfirmed_started_create_recovers_existing_target_but_never_resends ... ok
+
+failures:
+
+failures:
+    create_apply_is_single_target_and_survives_restart_without_replay
+    registered_tool_only_cards_then_busy_queue_accepts_one_causal_run_and_records_edits
+
+test result: FAILED. 2 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.60s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_session_collab`

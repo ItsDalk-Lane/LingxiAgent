@@ -1,0 +1,94 @@
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0277]: `SessionExecuteError` doesn't implement `std::fmt::Display`
+   --> crates/lingxi-service/src/automation_patrol.rs:479:145
+    |
+479 | ...ipal,&run).await {tracing::error!(%error,"撤回心跳后取消运行失败");}
+    |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |                      |
+    |                      unsatisfied trait bound
+    |                      required by a bound introduced by this call
+    |
+help: the trait `std::fmt::Display` is not implemented for `SessionExecuteError`
+   --> crates/lingxi-service/src/sessions.rs:210:1
+    |
+210 | pub enum SessionExecuteError {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = note: required for `&SessionExecuteError` to implement `std::fmt::Display`
+note: required by a bound in `display`
+   --> /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tracing-core-0.1.36/src/field.rs:370:8
+    |
+368 | pub fn display<T>(t: T) -> DisplayValue<T>
+    |        ------- required by a bound in this function
+369 | where
+370 |     T: fmt::Display,
+    |        ^^^^^^^^^^^^ required by this bound in `display`
+    = note: this error originates in the macro `$crate::valueset_all` which comes from the expansion of the macro `tracing::error` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: `SessionExecuteError` doesn't implement `std::fmt::Display`
+   --> crates/lingxi-service/src/automation_patrol.rs:479:145
+    |
+479 | ...s(),&principal,&run).await {tracing::error!(%error,"撤回心跳后取消运行失败");}
+    |                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unsatisfied trait bound
+    |
+help: the trait `std::fmt::Display` is not implemented for `SessionExecuteError`
+   --> crates/lingxi-service/src/sessions.rs:210:1
+    |
+210 | pub enum SessionExecuteError {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = note: required for `&SessionExecuteError` to implement `std::fmt::Display`
+note: required by a bound in `DisplayValue`
+   --> /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tracing-core-0.1.36/src/field.rs:360:28
+    |
+360 | pub struct DisplayValue<T: fmt::Display>(T);
+    |                            ^^^^^^^^^^^^ required by this bound in `DisplayValue`
+    = note: this error originates in the macro `$crate::valueset_all` which comes from the expansion of the macro `tracing::error` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: `SessionExecuteError` doesn't implement `std::fmt::Display`
+   --> crates/lingxi-service/src/automation_patrol.rs:479:145
+    |
+479 | ...s(),&principal,&run).await {tracing::error!(%error,"撤回心跳后取消运行失败");}
+    |                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unsatisfied trait bound
+    |
+help: the trait `std::fmt::Display` is not implemented for `SessionExecuteError`
+   --> crates/lingxi-service/src/sessions.rs:210:1
+    |
+210 | pub enum SessionExecuteError {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: the trait `tracing::Value` is conditionally implemented for `DisplayValue<T>`
+   --> /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tracing-core-0.1.36/src/field.rs:719:1
+    |
+719 | / impl<T> Value for DisplayValue<T>
+720 | | where
+721 | |     T: fmt::Display,
+    | |________------------^
+    |          |
+    |          unsatisfied requirement introduced here: `&SessionExecuteError: std::fmt::Display`
+    = note: required for `&SessionExecuteError` to implement `std::fmt::Display`
+    = note: required for `DisplayValue<&SessionExecuteError>` to implement `tracing::Value`
+    = note: required for the cast from `&DisplayValue<&SessionExecuteError>` to `&dyn tracing::Value`
+    = note: this error originates in the macro `$crate::valueset_all` which comes from the expansion of the macro `tracing::error` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0599]: `SessionAdminError` doesn't implement `std::fmt::Display`
+   --> crates/lingxi-service/src/automation_patrol.rs:614:32
+    |
+614 |                 .map_err(|e| e.to_string())?,
+    |                                ^^^^^^^^^ method cannot be called on `SessionAdminError` due to unsatisfied trait bounds
+    |
+   ::: crates/lingxi-service/src/session_admin.rs:25:1
+    |
+ 25 | pub enum SessionAdminError {
+    | -------------------------- method `to_string` not found for this enum because it doesn't satisfy `SessionAdminError: ToString` or `SessionAdminError: std::fmt::Display`
+    |
+    = note: the following trait bounds were not satisfied:
+            `SessionAdminError: std::fmt::Display`
+            which is required by `SessionAdminError: ToString`
+note: the trait `std::fmt::Display` must be implemented
+   --> /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/fmt/mod.rs:1187:0
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `to_string`, perhaps you need to implement it:
+            candidate #1: `ToString`
+
+Some errors have detailed explanations: E0277, E0599.
+For more information about an error, try `rustc --explain E0277`.
+error: could not compile `lingxi-service` (lib) due to 6 previous errors

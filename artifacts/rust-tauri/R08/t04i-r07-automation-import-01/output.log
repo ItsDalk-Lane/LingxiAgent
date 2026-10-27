@@ -1,0 +1,9 @@
+test atomic_import_competition_has_one_insert_and_preserves_legacy_revision ... ok
+test symlinked_history_is_rejected_without_reading_or_modifying_the_target ... ok
+test duplicate_or_colliding_ids_cannot_choose_or_overwrite_an_existing_job ... ok
+test read_only_tmp_recovery_and_old_plugin_notifications_become_agent_prompts ... ok
+test import_replay_does_not_overwrite_user_edits_or_resurrect_soft_deleted_jobs ... ok
+test legacy_agent_jobs_use_verified_directory_identity_and_studio_legacy_refs_deduplicate ... ok
+test unresolved_paths_revoked_sessions_and_unknown_history_are_explicitly_blocked ... ok
+test imports_unknown_fields_cursor_revision_and_raw_history_without_rewriting_sources ... ok
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.47s

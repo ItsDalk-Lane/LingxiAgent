@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { getYuanVisual } from '../../../../shared/yuan-visuals.ts';
+import { usePlatform } from '../hooks/use-platform';
 
 const DEFAULT_NAME = 'Lingxi';
 const DEFAULT_VISUAL = getYuanVisual('lingxi');
@@ -29,6 +30,7 @@ export function resolvePreparingText(data: SplashLocaleData, locale: string, age
 
 export function SplashApp() {
   const [avatarSrc, setAvatarSrc] = useState('assets/Lingxi.png');
+  const defaultAvatarRef = useRef('assets/Lingxi.png');
   const [text, setText] = useState('');
   const [switching, setSwitching] = useState(false);
   const [symbol, setSymbol] = useState(DEFAULT_VISUAL.symbol);
@@ -52,21 +54,28 @@ export function SplashApp() {
       let yuan = 'lingxi';
 
       try {
-        const hana = window.hana;
-        const [avatarPath, splashInfo] = await Promise.all([
+        const hana = usePlatform();
+        const [avatarResult, infoResult] = await Promise.allSettled([
           hana?.getAvatarPath?.('agent'),
           hana?.getSplashInfo?.(),
         ]);
+        const avatarPath = avatarResult.status === 'fulfilled' ? avatarResult.value : null;
+        const splashInfo = infoResult.status === 'fulfilled' ? infoResult.value : null;
+        if (avatarResult.status === 'rejected' || infoResult.status === 'rejected') {
+          console.warn('启动头像或基本信息读取失败，使用可用信息和默认头像');
+        }
 
-        if (avatarPath && window.platform?.getFileUrl) {
-          const base = window.platform.getFileUrl(avatarPath);
+        defaultAvatarRef.current = `assets/${getYuanVisual(splashInfo?.yuan).avatar}`;
+        const platform = usePlatform();
+        if (avatarPath && platform?.getFileUrl) {
+          const base = platform.getFileUrl(avatarPath);
           if (base) {
             setAvatarSrc(`${base}?t=${Date.now()}`);
-          } else if (splashInfo?.yuan) {
-            setAvatarSrc(`assets/${getYuanVisual(splashInfo.yuan).avatar}`);
+          } else {
+            setAvatarSrc(defaultAvatarRef.current);
           }
-        } else if (splashInfo?.yuan) {
-          setAvatarSrc(`assets/${getYuanVisual(splashInfo.yuan).avatar}`);
+        } else {
+          setAvatarSrc(defaultAvatarRef.current);
         }
 
         if (splashInfo?.agentName) {
@@ -79,7 +88,10 @@ export function SplashApp() {
         const visual = getYuanVisual(yuan);
         setSymbol(visual.symbol);
         setAccentColor(visual.accent);
-      } catch {}
+      } catch (error) {
+        console.warn('启动头像读取失败，使用默认头像', error);
+        setAvatarSrc(defaultAvatarRef.current);
+      }
 
       // 安装模式：固定文案，不进轮播（壳更新场景，走 electron-updater 安装）
       if (mode === 'installing') {
@@ -148,6 +160,10 @@ export function SplashApp() {
         src={avatarSrc}
         alt=""
         draggable={false}
+        onError={() => {
+          // 路径返回后仍可能被移除或变坏；实际加载失败时回到当前角色默认头像。
+          setAvatarSrc(defaultAvatarRef.current);
+        }}
       />
       <div className="splash-text-row">
         <p className={`splash-text${switching ? ' switching' : ''}`}>{text}</p>

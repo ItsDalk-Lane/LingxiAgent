@@ -1,0 +1,19 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: {"type":"done","result":{"ok":false,"kind":"worker-exit","message":"sandbox worker crashed: EPERM: process.cwd failed with error operation not permitted, uv_cwd","logs":[]}}
+
+false !== true
+
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/ptc-implementation-01/node-contained-adapter-check.mjs:8:94
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.16.0

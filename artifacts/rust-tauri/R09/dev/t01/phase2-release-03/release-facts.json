@@ -1,0 +1,54 @@
+{
+ "schema": "lingxi.r09.phase2-release-facts.v1",
+ "currentRendererTreeDigest": "afcdc176c45f6ade4a0d811a4a3bae10347aa2bce0435f5b7f8259adee891ba7",
+ "releaseBuildReceiptRendererDigest": "afcdc176c45f6ade4a0d811a4a3bae10347aa2bce0435f5b7f8259adee891ba7",
+ "manifestRendererSha256": "afcdc176c45f6ade4a0d811a4a3bae10347aa2bce0435f5b7f8259adee891ba7",
+ "rendererDigestAligned": true,
+ "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+ "rendererBuild": [
+  "npm run build:renderer",
+  "npm run build:theme"
+ ],
+ "cacheHit": false,
+ "sha256": {
+  "mainExecutable": "587d1fb4a8480a2aea239f91b46ed2cafbd784e4f995250e78fa1a4f67bee9e2",
+  "sidecarActual": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+  "sidecarManifestSha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+  "sidecarContentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0"
+ },
+ "manifest": {
+  "schemaVersion": 1,
+  "platform": "mac",
+  "arch": "arm64",
+  "target": "aarch64-apple-darwin",
+  "toolchain": "1.98.1",
+  "appVersion": "0.1.43",
+  "binary": "lingxi-service",
+  "sha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+  "contentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+  "sourceSha256": "8e4d2a171a36c197f0093d4f780942aac0ea31655d3e55b69f669f2195edb882",
+  "protocol": {
+   "serverKind": "lingxi-service",
+   "wireProtocolMin": 1,
+   "wireProtocolMax": 1,
+   "dataEpoch": 2
+  },
+  "rendererSha256": "afcdc176c45f6ade4a0d811a4a3bae10347aa2bce0435f5b7f8259adee891ba7",
+  "tauri": {
+   "cli": "tauri-cli 2.12.4",
+   "layout": "externalBin+resources"
+  }
+ },
+ "signing": {
+  "identity": "adhoc (-)",
+  "teamIdentifier": null,
+  "codesignVerifyDeepStrict": "exit 0",
+  "notarization": "BLOCKED-SIGNING-IDENTITY"
+ },
+ "layout": {
+  "mainExecutable": "Contents/MacOS/lingxi-resource-desktop",
+  "sidecar": "Contents/MacOS/lingxi-service",
+  "buildJson": "Contents/Resources/rust-service/build.json"
+ },
+ "sizeMiB": 148.23
+}

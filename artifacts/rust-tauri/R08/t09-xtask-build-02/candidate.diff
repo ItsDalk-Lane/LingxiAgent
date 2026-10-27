@@ -1,0 +1,40 @@
+diff --git a/rust/crates/xtask/src/stage_maps/R08.json b/rust/crates/xtask/src/stage_maps/R08.json
+index 4276596e6..dc72ab661 100644
+--- a/rust/crates/xtask/src/stage_maps/R08.json
++++ b/rust/crates/xtask/src/stage_maps/R08.json
+@@ -383,8 +383,7 @@
+       "id": "R08-A05",
+       "requirement": "REQUIRED",
+       "commandRefs": [
+-        "r08_t03_a05_drill",
+-        "r08_t03_a06_drill"
++        "r08_t03_a05_drill"
+       ],
+       "specMirror": {
+         "name": "旧界面真正使用Rust内核",
+@@ -405,7 +404,6 @@
+       "id": "R08-A06",
+       "requirement": "REQUIRED",
+       "commandRefs": [
+-        "r08_t03_a05_drill",
+         "r08_t03_a06_drill"
+       ],
+       "specMirror": {
+diff --git a/scripts/rust-tauri/r08_stage_inputs.py b/scripts/rust-tauri/r08_stage_inputs.py
+index af9c40c72..84e16f5b8 100644
+--- a/scripts/rust-tauri/r08_stage_inputs.py
++++ b/scripts/rust-tauri/r08_stage_inputs.py
+@@ -365,6 +365,13 @@ def main() -> int:
+             for suite in TASK_SUITES.get(task, []):
+                 commands.setdefault(suite, command_for_suite(suite))
+                 refs.append(suite)
++        # 场景→套件精确化：A05 的验收证据就是 a05 演习（读/写腿 + PPG-1 呈现），
++        # A06 的证据就是 a06 演习（双客户端 remote 零接触）。按任务粗绑定会把
++        # a06 的环境红拖垮 A05——本阶段各自专属（gate-05 实证）。
++        if aid == 'R08-A05':
++            refs = ['r08_t03_a05_drill']
++        if aid == 'R08-A06':
++            refs = ['r08_t03_a06_drill']
+         scenarios.append({
+             "id": aid,
+             "requirement": "REQUIRED",

@@ -1,0 +1,18 @@
+
+running 8 tests
+test actual_http_preferences_match_shared_pure_normalizers_for_every_command_and_partial_sidebar ... ok
+test actual_http_workspace_ui_state_gc_prunes_missing_and_trims_over_fifty ... ok
+test actual_http_global_archive_delete_is_idempotent_and_loud_on_io_failure ... ok
+test actual_http_global_archives_return_only_existing_metadata_and_reject_corrupt_or_unsafe_files ... ok
+test actual_http_corrupt_preferences_are_explicit_and_authorized_writer_refuses_revocation_at_commit ... ok
+test actual_http_appearance_preferences_normalize_merge_publish_and_scope ... ok
+test actual_http_workspace_ui_state_round_trip_normalize_surface_scope_and_same_home_restart ... ok
+test actual_http_keybindings_full_replace_sidebar_partial_merge_scopes_and_same_home_restart ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 23.95s
+
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 14s
+     Running tests/r07_t08_interface_preferences.rs (rust/target/debug/deps/r07_t08_interface_preferences-7e99f08fdc2fc85a)

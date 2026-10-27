@@ -3,6 +3,9 @@ const { notarize } = require('@electron/notarize');
 // 因此 notarize.cjs 作为唯一 afterSign 入口，在公证之前先调用 resignAdhoc 统一签名身份，
 // 再按需公证。由 resignAdhoc 内部判断「有 CSC_LINK 则跳过」（让 Developer ID 真签名生效）。
 const { resignAdhoc } = require('./resign-adhoc.cjs');
+const { execFileSync } = require('child_process');
+const path = require('path');
+const { verifyRustServiceDirectory } = require('../desktop/src/shared/rust-local-service.cjs');
 
 exports.default = async function notarizing(context) {
   const { electronPlatformName, appOutDir } = context;
@@ -11,13 +14,21 @@ exports.default = async function notarizing(context) {
   // 先重签：无 Apple 证书时把包内所有 Mach-O 统一为 ad-hoc（消除 Team ID 不一致，
   // 修复 v0.1.0 macOS 启动即崩溃）；有证书时 resignAdhoc 内部会自动跳过。
   await resignAdhoc(context);
+  const appName = context.packager.appInfo.productFilename;
+  const appBundle = path.join(appOutDir, `${appName}.app`);
+  const rustService = path.join(appBundle, 'Contents', 'Resources', 'rust-service', 'lingxi-service');
+  execFileSync('codesign', ['--verify', '--strict', rustService], { stdio: 'inherit' });
+  execFileSync('codesign', ['--verify', '--deep', '--strict', appBundle], { stdio: 'inherit' });
+  verifyRustServiceDirectory({
+    directory: path.join(appBundle, 'Contents', 'Resources', 'rust-service'),
+    allowSignedMacMutation: true,
+  });
 
   if (process.env.SKIP_NOTARIZE === 'true') {
     console.log('Skipping notarization (SKIP_NOTARIZE=true)');
     return;
   }
 
-  const appName = context.packager.appInfo.productFilename;
   console.log(`Notarizing ${appName}...`);
 
   const password = process.env.APPLE_APP_SPECIFIC_PASSWORD || process.env.APPLE_ID_PASSWORD;
@@ -34,4 +45,3 @@ exports.default = async function notarizing(context) {
 
   console.log('Notarization complete.');
 };
-

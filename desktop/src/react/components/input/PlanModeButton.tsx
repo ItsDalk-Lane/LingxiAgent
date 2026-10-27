@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../services/service-client';
 import { useI18n } from '../../hooks/use-i18n';
 import { useStore } from '../../stores';
 import styles from './InputArea.module.css';

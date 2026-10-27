@@ -1,0 +1,99 @@
+{
+  "schema": "r07-t08-independent-prefreeze-review-v1",
+  "candidate": "t08g_DRAFT",
+  "reviewedAt": "2026-10-18T12:13:25.451552+00:00",
+  "reviewMode": "static read-only source/plan review; new independent artifact only",
+  "finalAcceptance": "pending",
+  "newBlockingFindings": [],
+  "runtimePassClaimed": false,
+  "reviewerRuntimeExecutions": [],
+  "observedCurrentSource": {
+    "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+    "files": 754,
+    "fingerprint": "6d00d82b598ad23f9cbbc05f61e9514cf8e7f771a8434f9f5884672b3782cf2f",
+    "fingerprintMethod": "same canonical sorted path/hash/bytes/mode/deletion/symlink definition as reviewed candidate runner; recalculated twice unchanged during this observation",
+    "isFrozenCandidate": false
+  },
+  "gatePlan": {
+    "path": "artifacts/rust-tauri/R07/T08/GATE_PLAN_t08g_DRAFT.json",
+    "sha256": "cfb1a1299d93820a5ffa8eba292fd0fd57658584c314c9618f9c96ac0232a314",
+    "gateCount": 20,
+    "status": "DRAFT_NOT_FROZEN_NOT_EXECUTED",
+    "runnerSha256": "27313b3d06c1996160e2dd6f8d74becb5dca23ddf9fc7bc442d70aa5eb8be813",
+    "verificationToolHashes": {
+      "run_gate_group.py": "3c56ff235f5b28edef5609888eb976f7c82e0e6d9e777b0c5f597bf70cfe049b",
+      "run_ui_bound.py": "77a507461d37c22e82fcc9941e4860b462e28d67288421c1ee276fddf3490134",
+      "verify_native_picker_binding.py": "199575b6bb86cb776d2ec61bfc09968664b2601f061103cbf6176071fc191eef",
+      "model_metadata_probe.mjs": "2a9a207f9087c6e5525fb15898005aabd5fa2132f13e65bca6f56d0ad6b74ffd"
+    },
+    "review": [
+      "All twenty prior gate kinds remain; service includes new interface preferences/provider capabilities/user preference/checkpoint/MCP remote/session targets.",
+      "UI standalone selection retains named JSON reporter for raw test-name results; child-only environment-dependent service consumers are intentionally executed by the selected real Rust parents.",
+      "Four build-bound UI/navigation/redaction gates remain excluded from Rust group and must be run with run_ui_bound after successful same-candidate build; no old binary acceptance is implied.",
+      "Native picker proof remains dependent on native-skills fresh native output plus exact prior receipt/binary/source-closure binding; this does not rerun manual UI takeover."
+    ]
+  },
+  "reviewedPathSha256": {
+    "rust/crates/lingxi-service/src/userprefs.rs": "4f3df18434a5c31aaeb2a2988874b59afe407b18546d4f7e636dcfe345c03b1e",
+    "rust/crates/lingxi-service/src/mcp_settings.rs": "54d58546530a0480800c856504fdbf0173bec2a39c93bee18c22f83de6078f69",
+    "rust/crates/lingxi-service/src/mcp_oauth.rs": "4be0b1fe5ee1a1b327a95e41beff3a8af7c15b816055332ddf405431986a0709",
+    "rust/crates/lingxi-service/src/mcp_apps.rs": "7c2dd97194e4598586f9c830fbf42666b1e3c611ae223f994eb78fd28631e57b",
+    "rust/crates/lingxi-service/src/mcp_http.rs": "84e571e194ea1636c93419b919d17dddd66e1835398167e73b59df3ccdce5c42",
+    "rust/crates/lingxi-service/src/mcpbridge.rs": "121bef4c2f67d7b16197cd073a1811081d51883a25fb5c4f89b08677e14bfe90",
+    "rust/crates/lingxi-service/src/mcpbridge_request_tests.rs": "967bdb483bbd0c211b8f45618e6003eff91ab9de77efaf429e4cc49513c76273",
+    "rust/crates/lingxi-service/src/mcp_session_permissions.rs": "43ea644a1b740859aec0d95dc152ecd24576ac69068de4d651b2ea8e2acfb44f",
+    "rust/crates/lingxi-service/src/toolgateway.rs": "7dc823667755bf2d28446f681a557989181670fe8a31eea3afed19609dc0bcbf",
+    "rust/crates/lingxi-service/src/sessions.rs": "70626adf48a6fddf4f1bcbffaa12e2c19a0ae0ebf48dc54653d503988a9e1cc5",
+    "rust/crates/lingxi-service/src/chat_wire.rs": "7ce06fcff97a7a21228c38cf541c936d347454bc8acfcd78e332d46826ad824c",
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_remote.rs": "f2cbda5904bdced7a7940129ee4fe4ab7d9829a811097a6dd9882243b6d593c8",
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_session_permissions.rs": "09c138dedc7e5fb723e2a42fe5f9df8e7663402e932f1b9a95c1bb6de7c0ffa7",
+    "rust/crates/lingxi-service/tests/r06_skills_completion.rs": "1c7cda6338c8d0399b871c59c42dd8b4d3162e7568e6f00f102cffa279d594ef",
+    "desktop/src/react/__tests__/services/r07-mcp-oauth-real-service.test.tsx": "960943399562ca407d31734b8d61913a9f31f0f60ca96b9517fa94f77d73c1ff",
+    "desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx": "bf9e33d8d0a9951c9f60050fe4105ef41768577e38ade9e39d595d83c161126c",
+    "desktop/src/react/settings/SettingsContent.tsx": "cd7db8b154cf2b8ef3732739c4501d63c59d2647c13473de7740c38e4b3ffaf8",
+    "desktop/src/react/settings/tabs/McpTab.tsx": "edca0934d710c04758469fc6beb7d89b49d96d2731a3c5a033fdb7a117d2538f",
+    "desktop/src/react/settings/tabs/mcp/mcp-api.ts": "95015aa1a32781f34c88aee21fa5455ecca1422ebf5c5dc14d38f7702fe157f1",
+    "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx": "e784c6bffeebed2b0c41143a055827e036fa30d12457076b46f7076547ee0d99",
+    "desktop/src/react/mobile/mobile-platform.ts": "336e86b0cfcaab79d74964edbc01c8a5d67e20395514f1cac9bd86ec9ec872d4",
+    "desktop/main.cjs": "bc8afa8a2f0894863b264e6a950f0430afca4dc6cb44184646b98741f2feafcf",
+    "desktop/src/react/types.ts": "e54a11d32eff39b6acf581fcb2237872b46556586fe4db5543da98be290eeeda"
+  },
+  "narrowChanges": [
+    {
+      "path": "rust/crates/lingxi-service/src/userprefs.rs",
+      "finding": "interface_put spawn_blocking result now boxes the same Response with map_err(Box::new), then unwraps the Box on error. Scope selection, original principal revalidation, source merge/lock and atomic write callbacks are unchanged; no HTTP status/body or authorization semantic change found."
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_t08_mcp_session_permissions.rs",
+      "finding": "First WS terminal barrier uses if let Some(run) instead of is_some plus unwrap. Original assistant_run_end and status false requirements, five-second first barrier, subsequent frame handling and dispatch assertions remain. No test budget or business-condition relaxation from this lint fix."
+    }
+  ],
+  "latestMcpReview": [
+    "OAuth credential stores now advance credential epoch under the same Source writer lock upon browser commit/unknown write and retain the owning flow epoch; old SDK refresh cannot retain current write authority merely because connector fields match. New login intent advances flow epoch before prior callbacks can commit.",
+    "OAuth pending count is separated from bounded final history, so cancelled flows release waiting capacity while saved/unknown poll facts remain truthful.",
+    "Session grant epoch ticket is captured before asynchronous reads and checked atomically with insertion; original principal, exact target/capability/review and execution checks remain.",
+    "Connection-specific request lifetime keeps active request cancellation before SDK close; historical cancellation-unknown facts are retained independently of current local cleanup result. Current active timeout, child and SDK cleanup failures remain failures.",
+    "Mobile platform now discards Window return under its existing void contract; consumers interpret only explicit ok===false as a negative receipt. Old fire-and-forget callers remain compatible."
+  ],
+  "parentChildCoverageCorrection": {
+    "earlierCommentary": "Reviewer initially called missing standalone r07-mcp-oauth-real-service UI selection a plan omission after inspecting only the UI array.",
+    "correction": "Withdrawn after tracing actual selected Rust parent; it is not a blocker and should not be added as standalone skipped coverage.",
+    "mcpParent": "r07_t08_mcp_remote::settings_content_mcp_oauth_page_consumes_the_same_owned_sdk_and_private_source",
+    "mcpChecks": [
+      "Parent injects nonempty real service BASE/TOKEN/EXTERNAL into child; captures stdout/stderr and actual child exit under sixty-second outer budget.",
+      "Child navigates actual SettingsContent -> MCP manage -> OAuth connect -> owned actual authorize/callback/poll -> SDK connector start -> logout -> second start/cancel; only OS browser opening is replaced with actual owned HTTP GET.",
+      "Parent requires successful child exit plus same private Source credentials cleared, unknown fields retained, exactly one token exchange, refresh>=1, toolcalls==0, then actual service/owned external cleanup. These facts prevent all-skipped child execution from being accepted."
+    ],
+    "skillsParent": "r06_skills_completion::current_skills_pages_real_read_failures_and_partial_bundle_writes",
+    "skillsChecks": [
+      "skills-current selects full target excluding only separately-run native case.",
+      "Parent injects actual URL/owner/chat-only credential and receipt paths, requires child successful exit, six raw receipts and actual disk bundle partial-write facts."
+    ]
+  },
+  "limitations": [
+    "This report observes current prefreeze source and draft only; g archive/source manifest and full real twenty-gate run are still root-owned pending steps.",
+    "No old development pass is substituted for the new frozen candidate. Prior failed/not-run/mixed-source records remain unchanged.",
+    "Actual external accounts, native browser end-to-end startup, other operating systems and full T11 lifecycle retain their separately stated evidence limits.",
+    "No source/tests/contracts/plans/runner/prior evidence modified by reviewer; no Cargo, test, commit or push executed."
+  ]
+}

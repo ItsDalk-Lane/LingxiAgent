@@ -110,6 +110,19 @@ describe('resource-events', () => {
     }));
   });
 
+  it('服务资源日志重启归零时重建订阅并重置游标，不能一直请求旧序号', async () => {
+    const fetchImpl = vi.fn(async () => ({ json: async () => ({ stale: false, latestSequence: 0, events: [] }) }));
+    const resubscribeWatches = vi.fn(async () => {});
+    const { createResourceEventClient } = await import('../../services/resource-events');
+    const client = createResourceEventClient({ fetchImpl, resubscribeWatches });
+    client.handleEvent({ type: 'resource.changed', sequence: 100 });
+    await client.catchUpAfterReconnect();
+    expect(resubscribeWatches).toHaveBeenCalledOnce();
+    expect(client.lastSeenSequence()).toBe(0);
+    await client.catchUpAfterReconnect();
+    expect(fetchImpl).toHaveBeenLastCalledWith('/api/resource-io/events?since=0', expect.any(Object));
+  });
+
   it('applies caught-up resource events through the same event handler', async () => {
     const event = {
       type: 'resource.changed',

@@ -1,0 +1,100 @@
+{
+  "status": "READ_ONLY_DIAGNOSIS_NO_FIX_OR_TEST_EXECUTION",
+  "originalLog": {
+    "path": "artifacts/rust-tauri/R07/T08/model-regression1.log",
+    "sha256": "5f810067a8be04225303c44a0389b85aa94df200725baed17c1b0f658d62bb3a"
+  },
+  "runReceipt": {
+    "path": "artifacts/rust-tauri/R07/T08/model-regression1.json",
+    "exitCode": 101,
+    "sourceUnchanged": false,
+    "scope": "开发检查，不是固定候选验收"
+  },
+  "observed": {
+    "failedTargets": [
+      "r05_t01_binary_wiring c02 stub hits0",
+      "r05_t08_closed_loop 11/11失败"
+    ],
+    "c09": "原日志实际断言events GET得到429而非200；DB在首模型前已failed.provider_error，后续15ms轮询无delta只是继续请求。",
+    "scenes": [
+      {
+        "home": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r05t08-c09-home-30972-1792304925628006000",
+        "runs": [
+          {
+            "runId": "run_000001a14db2ce2f_000001",
+            "sessionId": "sess_local_alpha",
+            "status": "failed",
+            "terminalReason": "failed.provider_error"
+          }
+        ],
+        "eventTypes": [
+          "run_state_changed",
+          "run_state_changed"
+        ],
+        "modelUsageCount": 0,
+        "toolJournalCount": 0,
+        "assistantMessageCount": 0,
+        "agentsExists": false,
+        "productExists": false,
+        "serviceLogBytes": 0
+      },
+      {
+        "home": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r05t01-bin-c02-home-30109-1792304877520155000",
+        "runs": [
+          {
+            "runId": "run_000001a14db21b3c_000001",
+            "sessionId": "sess_local_alpha",
+            "status": "failed",
+            "terminalReason": "failed.provider_error"
+          }
+        ],
+        "eventTypes": [
+          "run_state_changed",
+          "run_state_changed"
+        ],
+        "modelUsageCount": 0,
+        "toolJournalCount": 0,
+        "assistantMessageCount": 0,
+        "agentsExists": false,
+        "productExists": false,
+        "serviceLogBytes": 0
+      }
+    ],
+    "binary": {
+      "path": "/private/tmp/lingxi-r07-build/debug/lingxi-service",
+      "sha256": "f2e8ea457eb8eb0e5476c637ac23bab323ce65683d639aa0a009a793148004a2",
+      "ancestorLibYuanFound": false
+    },
+    "currentEnvironmentHasProductOverride": false
+  },
+  "sourceChain": [
+    {
+      "path": "rust/crates/lingxi-service/src/context_compiler.rs:242",
+      "fact": "product解析只使用env显式路径/可执行文件祖先lib/最后home.product；不把cwd当资源根。外置target二进制祖先无产品lib，失败home.product也缺失。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/main.rs:537",
+      "fact": "真实生产组合根绑定FileContextMaterialSource，不因这些旧测试而禁用；本轮diff没有修改该资源定位规则。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/context_compiler.rs:784",
+      "fact": "gather读取yuan_md；缺失材料为空，正常编译必须拒绝空yuan。"
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/context.rs:410",
+      "fact": "空yuan的明确失败为persona source incomplete: yuan template is empty (agent id lingxi)，已有r06_t01_context_compiler.rs:541真实错误契约测试。"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/runs.rs:2532",
+      "fact": "context_compile失败在首次模型请求之前终结为ProviderFailed，DB持久终态原因只留failed.provider_error，与现场一致。"
+    }
+  ],
+  "diagnosis": "共同的外置Cargo目标目录使旧binary夹具不再通过可执行文件祖先找到仓库lib产品材料。C09并非已观察到实时/历史结果不一致；根问题在模型请求前已无必需人格模板而失败，429为后续不停止轮询的次生错误。",
+  "evidenceLimits": "现场DB与服务日志没有保留完整FailureCause.code；空yuan完整字符串系当前真实源码、实际资源路径与既有编译器契约的确定性推导，并非冒称原stderr已捕获该字符串。未运行新服务或替换原现场来伪造证明。",
+  "minimalRecommendation": [
+    "只更新r05_t01_binary_wiring与r05_t08_closed_loop的真实child.spawn资源装配：显式LINGXI_PRODUCT_DIR=当前repo/lib，或复制当前真实产品模板到各自home.product。每个子进程独立设置，不全局set_var影响并行检查。",
+    "保留真实binary/argv/Source/网络/凭证/上下文/文件工具、全部实时delta/屏障/历史/崩溃重启/隔离/资源回收断言；不关闭compiler、不伪造yuan、不放宽429/timeout/assertion、不以重跑未复现关闭原失败。",
+    "适用新模板材料后重编目标并由root按原功能完整运行；可补更早检查failed终态以失败时尽快给出原因，但不能把失败当通过。"
+  ],
+  "validation": "本回合仅只读源码、日志、保留DB及文件存在性检查；未Cargo、未改产品/测试、原日志和home未删除。"
+}

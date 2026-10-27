@@ -1,0 +1,4672 @@
+{
+ "schema": "lingxi.r09.shell-parity-matrix.v1",
+ "stage": "R09",
+ "acceptance": "R09-A15",
+ "suite": "r09_t08_shell_parity",
+ "fixedFactors": {
+  "verifiedAtUnixMs": 1793032163389,
+  "candidate": {
+   "candidateVersion": "v3.3",
+   "source": "artifacts/rust-tauri/R09/dev/t06/candidate-handoff-v3.3/candidate-handoff.json",
+   "handoff": "artifacts/rust-tauri/R09/dev/t06/candidate-handoff-v3.3/candidate-handoff.json",
+   "gitHead": "aac8cb9fe6bb7bfa7a41d75528221136bfe55e50",
+   "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+   "serviceContentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+   "frozenAt": "2026-10-27T00:22:09+0800",
+   "deliveryAppTreeSha256": "97f226bffba064c7b408656c6be941b58f5e6e01b191d5ae6a30f89a1fbd4ccc",
+   "evidenceBuildSha256": "27bf075a70e57ccca607365276d261eed79764e02b663bfd881df472e51a31b6"
+  },
+  "renderer": {
+   "path": "desktop/dist-renderer",
+   "digest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+   "fileCount": 644,
+   "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73"
+  },
+  "delivery": {
+   "appBundle": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+   "appTreeSha256": "97f226bffba064c7b408656c6be941b58f5e6e01b191d5ae6a30f89a1fbd4ccc",
+   "hostExeSha256": "ddbd1fad42a8b172c85204cbba0e621fabd3bf52a0ced95dd0d2a1b06af40543",
+   "sidecarSha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+   "buildJsonSha256": "372c2b88748dcd96e9a74956c13554fb8d0e764638c28bc52b524c3a506473f9",
+   "infoPlistSha256": "da9ebff0b848d9ff1e3e6e5ac545c7270904ceb2a65677095cbb3e400e01919a",
+   "features": [
+    "r09-host"
+   ],
+   "protocol": {
+    "serverKind": "lingxi-service",
+    "wireProtocolMin": 1,
+    "wireProtocolMax": 1,
+    "dataEpoch": 2
+   },
+   "releaseReceipt": "desktop/src-tauri/.tauri-build/build-receipt-release.json",
+   "releaseReceiptSha256": "d12ff32f9d849ad9a45593402ee06c4c551d363af2e384f31edbff60bf298dff",
+   "buildJson": {
+    "schemaVersion": 1,
+    "platform": "mac",
+    "arch": "arm64",
+    "target": "aarch64-apple-darwin",
+    "toolchain": "1.98.1",
+    "appVersion": "0.1.43",
+    "binary": "lingxi-service",
+    "sha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+    "contentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+    "sourceSha256": "8e4d2a171a36c197f0093d4f780942aac0ea31655d3e55b69f669f2195edb882",
+    "protocol": {
+     "serverKind": "lingxi-service",
+     "wireProtocolMin": 1,
+     "wireProtocolMax": 1,
+     "dataEpoch": 2
+    },
+    "rendererSha256": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+    "tauri": {
+     "cli": "tauri-cli 2.12.4",
+     "layout": "externalBin+resources"
+    }
+   }
+  },
+  "evidence": {
+   "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/debug/lingxi-resource-desktop",
+   "executableSha256": "27bf075a70e57ccca607365276d261eed79764e02b663bfd881df472e51a31b6",
+   "receipt": "desktop/src-tauri/.tauri-build/build-receipt-debug.json",
+   "receiptSha256": "1ac08dafaad97bf50ce400bf22d3afe7319f27c6fef2f037927b38f7145365ee",
+   "features": [
+    "e2e-test",
+    "r09-host",
+    "r09-test-hooks"
+   ],
+   "wrapperMainExeSha256": null,
+   "executableSha256Actual": "27bf075a70e57ccca607365276d261eed79764e02b663bfd881df472e51a31b6"
+  },
+  "fixtures": {
+   "v3Base": "80a8d2c2640e2b2974b299a10f36679bc19daf0911e51f82f0c43399cb32feaa",
+   "v2Bulk": "40f42dc1fdb7dc026ee1ce6444914a02a085c12c53b7598e70fc453fdb388c9e"
+  },
+  "r08Baseline": {
+   "rendererDist": "3e5339cc92f9f29a30846a101b3e4636d3b4e2d7f896980c57b8f31b129a89ef",
+   "rustBinary": "b855e5d638aea6605c1b2d634377f230e1b6118e71522eb98a8be841ed10faa0",
+   "contractVersions": "6d86934755a23e4f35a6dbd68957ff3d302a3ce5f6d61d40066efd68f33a6f96",
+   "gitHead": "aa99d2ec1dae7f0aef5971bab049734f22fcf7d8",
+   "node": "v24.16.0",
+   "packageVersion": "0.1.43",
+   "gateOverall": "PASS",
+   "testedSha": "aa99d2ec1dae7f0aef5971bab049734f22fcf7d8",
+   "candidateSourceDigest": "0f07f2f7a0cf9e8d5660237be6a26666ba314dc04e840a02b9b573d990050dc6",
+   "ab": {
+    "tasks": 71,
+    "parity": 68,
+    "recorded": 3,
+    "differs": 0
+   },
+   "abRecordedApprovals": [
+    "leaf.prompt-snapshot",
+    "leaf.slash.new",
+    "leaf.slash",
+    "leaf.ws.terminal"
+   ]
+  },
+  "protocol": {
+   "serverKind": "lingxi-service",
+   "wireProtocolMin": 1,
+   "wireProtocolMax": 1,
+   "dataEpoch": 2
+  },
+  "sourceDrift": {
+   "crateSource": {
+    "sourceFileCount": 88,
+    "sourceFingerprint": "95e2c5fb39e7db4360e4a979948922fecbe868a7d3358af6c82a73a11db39f5a",
+    "generatedFileCount": 80,
+    "release": {
+     "sourceFingerprint": "95e2c5fb39e7db4360e4a979948922fecbe868a7d3358af6c82a73a11db39f5a",
+     "receipt": "desktop/src-tauri/.tauri-build/build-receipt-release.json",
+     "mtimeOnlyTouches": [
+      "Cargo.lock"
+     ],
+     "builtAtUnixMs": 1793031631428,
+     "receiptCrateDigest": "03b55518c9a0a5144ebfb29d15ac0caf47bd9bb4713971024c7100fa69921283",
+     "receiptCrateFileCount": 168,
+     "filesNewerThanReceipt": []
+    },
+    "evidence": {
+     "sourceFingerprint": "95e2c5fb39e7db4360e4a979948922fecbe868a7d3358af6c82a73a11db39f5a",
+     "receipt": "desktop/src-tauri/.tauri-build/build-receipt-debug.json",
+     "mtimeOnlyTouches": [
+      "Cargo.lock"
+     ],
+     "builtAtUnixMs": 1793031665042,
+     "receiptCrateDigest": "0214a25281735c65f4e707f754f753f4321479a652d6bb40d438dfc4bb94a934",
+     "receiptCrateFileCount": 165,
+     "filesNewerThanReceipt": []
+    }
+   },
+   "renderer": {
+    "distNewestMtime": 1793029972.1337142,
+    "sourcesNewerThanDist": []
+   },
+   "freezeEpochMs": 1793031729000,
+   "artifactsTouchedAfterFreeze": []
+  }
+ },
+ "recordedApprovals": [
+  {
+   "id": "R09-ADJ-HOST-01",
+   "diff": "主页面来源：Electron=file://<repo>/desktop/dist-renderer/index.html ｜ Tauri=tauri://localhost（嵌入式自定义协议）",
+   "affected": [
+    "host:main-window",
+    "host:app-ready",
+    "host:server-connection-info"
+   ],
+   "basisPath": "docs/rust-tauri/R09/IMPLEMENTATION_PLAN.md",
+   "basisQuote": "Tauri webview 无法获得 loopback http 来源",
+   "note": "D2（同一 React 产物 dist-renderer）+ D6（精确 origin 接缝）；T01 证据两侧标题/DOM/服务身份一致，差异仅为页面来源。"
+  },
+  {
+   "id": "R09-ADJ-HOST-02",
+   "diff": "托盘菜单：Electron 第 4 项「修复组件…」在 Tauri 无等价实现，按 Lead 裁决移除（4 项菜单：show/settings/—/quit），不保留 no-op",
+   "affected": [
+    "host:tray"
+   ],
+   "basisPath": "docs/rust-tauri/R09/BLOCKED.md",
+   "basisQuote": "托盘「修复组件…」原能力在 Tauri 无等价实现",
+   "note": "T03-REPAIR-02 登记；菜单项移除而非隐藏死按钮。"
+  },
+  {
+   "id": "R09-ADJ-HOST-03",
+   "diff": "更新链（GitHub release 检查 / 自动更新 / OTA 列车）R09 未实现：Tauri 命令面 deferred，UI 显式无更新状态",
+   "affected": [
+    "host:update-github-check",
+    "host:update-auto",
+    "host:update-train-ota"
+   ],
+   "basisPath": "docs/rust-tauri/R09/T06_PROGRESS.md",
+   "basisQuote": "更新链（GitHub check/自动更新/OTA）属 R10 验收范围",
+   "note": "T06 policy deferredCommands=R10-update-chain；11 条命令不注册/不授予（gapLedger=0）。"
+  },
+  {
+   "id": "R09-ADJ-HOST-04",
+   "diff": "页截图捕获（screenshot_render）R09 未实现：Tauri/Wry 无稳定捕获 API，命令 deferred",
+   "affected": [
+    "host:screenshot-render"
+   ],
+   "basisPath": "docs/rust-tauri/R09/T06_PROGRESS.md",
+   "basisQuote": "Tauri/Wry 无稳定页面捕获 API（T04 OQ-04 BLOCKED）",
+   "note": "T04-SHOT-01；策略层保留但无命令、不授予。"
+  },
+  {
+   "id": "R09-ADJ-HOST-05",
+   "diff": "卡片帧导航 guard：Tauri/Wry 无 will-frame-navigate 等价，flag 保持 false，HTTP 卡片降级为仅同源（显式降级，不假安全）",
+   "affected": [
+    "host:card-frame-navigation-guard"
+   ],
+   "basisPath": "docs/rust-tauri/R09/IMPLEMENTATION_PLAN.md",
+   "basisQuote": "导航 guard 保持 flag=false 并在卡片层显式降级",
+   "note": "OQ-07；T03_T04_PROGRESS §3 与 tauri-host-capabilities 理由同源。"
+  },
+  {
+   "id": "R09-ADJ-HOST-06",
+   "diff": "拖入文件路径：Electron preload getFilePath(webUtils.getPathForFile)；Tauri 无等价，File 对象不暴露路径，改走原生 drop 适配层（file_drop 校验绝对路径）",
+   "affected": [
+    "host:file-drop-paths"
+   ],
+   "basisPath": "docs/rust-tauri/R09/T03_HOST_CAPABILITY_INVENTORY.md",
+   "basisQuote": "Tauri 无 webUtils 等价",
+   "note": "R-06 同类平台限制；仅宿主适配，不改业务语义。"
+  },
+  {
+   "id": "R09-ADJ-HOST-07",
+   "diff": "onboarding_complete：Electron(Rust 服务模式) 与 Tauri 均显式 NOT_IMPLEMENTED（服务无 setup-complete 等价路由）——两侧行为一致，非换壳引入的差异",
+   "affected": [
+    "host:onboarding"
+   ],
+   "basisPath": "docs/rust-tauri/R09/T03_T04_PROGRESS.md",
+   "basisQuote": "Rust 服务模式 onboarding completion 现役 Electron 即显式 throw",
+   "note": "T03-ONBOARD-01；登记性质为「与现役一致的显式失败」，不冒充能力。"
+  },
+  {
+   "id": "R09-ADJ-HOST-08",
+   "diff": "文件能力（DOCX/XLSX 预览、workspace watch、可观测导出）R09 未实现：命令面 deferred（T03-FILE-01），UI 调用显式受限",
+   "affected": [
+    "host:docx-xlsx-preview",
+    "host:observability-export",
+    "host:file-watch"
+   ],
+   "basisPath": "docs/rust-tauri/R09/T06_PROGRESS.md",
+   "basisQuote": "T03 下一轮文件能力（docx/xlsx 预览、workspace watch、可观测导出）尚未实现",
+   "note": "T06 policy deferredCommands=T03-FILE-01（8 条命令）；不提前授予/不登记虚假能力。"
+  }
+ ],
+ "measuredRows": [
+  {
+   "id": "measured::t01::renderer-identity",
+   "surface": "same-window A/B (Electron vs Tauri, 同一次构建)",
+   "aSide": {
+    "kind": "t01-same-window-electron",
+    "refs": [
+     "artifacts/rust-tauri/R09/dev/t01/run-08"
+    ]
+   },
+   "bSide": {
+    "kind": "t01-same-window-tauri",
+    "suite": "r09_t01_react_parity",
+    "cases": [
+     "a01::renderer-dist-digest-recorded",
+     "a01::tauri-build-uses-same-renderer",
+     "a01::no-second-react-entry"
+    ]
+   },
+   "status": "parity",
+   "basis": null
+  },
+  {
+   "id": "measured::t01::boot-dom-projection",
+   "surface": "same-window A/B (Electron vs Tauri, 同一次构建)",
+   "aSide": {
+    "kind": "t01-same-window-electron",
+    "refs": [
+     "artifacts/rust-tauri/R09/dev/t01/run-08"
+    ]
+   },
+   "bSide": {
+    "kind": "t01-same-window-tauri",
+    "suite": "r09_t01_react_parity",
+    "cases": [
+     "a01::dom-snapshot-parity",
+     "a01::electron-boots",
+     "a01::tauri-boots"
+    ]
+   },
+   "status": "parity",
+   "basis": null
+  },
+  {
+   "id": "measured::t01::page-embedding",
+   "surface": "same-window A/B (Electron vs Tauri, 同一次构建)",
+   "aSide": {
+    "kind": "t01-same-window-electron",
+    "refs": [
+     "artifacts/rust-tauri/R09/dev/t01/run-08"
+    ]
+   },
+   "bSide": {
+    "kind": "t01-same-window-tauri",
+    "suite": "r09_t01_react_parity",
+    "cases": [
+     "a01::tauri-loads-embedded-page",
+     "a01::renderer-has-no-resource-ui"
+    ]
+   },
+   "status": "parity",
+   "basis": null
+  },
+  {
+   "id": "measured::t01::service-identity",
+   "surface": "same-window A/B (Electron vs Tauri, 同一次构建)",
+   "aSide": {
+    "kind": "t01-same-window-electron",
+    "refs": [
+     "artifacts/rust-tauri/R09/dev/t01/run-08"
+    ]
+   },
+   "bSide": {
+    "kind": "t01-same-window-tauri",
+    "suite": "r09_t01_react_parity",
+    "cases": [
+     "a01::service-identity-parity",
+     "a01::electron-service-identity"
+    ]
+   },
+   "status": "parity",
+   "basis": null
+  },
+  {
+   "id": "measured::t01::exit-and-isolation",
+   "surface": "same-window A/B (Electron vs Tauri, 同一次构建)",
+   "aSide": {
+    "kind": "t01-same-window-electron",
+    "refs": [
+     "artifacts/rust-tauri/R09/dev/t01/run-08"
+    ]
+   },
+   "bSide": {
+    "kind": "t01-same-window-tauri",
+    "suite": "r09_t01_react_parity",
+    "cases": [
+     "a01::electron-exit",
+     "a01::tauri-graceful-exit",
+     "a01::isolated-homes"
+    ]
+   },
+   "status": "parity",
+   "basis": null
+  },
+  {
+   "id": "measured::t02::ready-handshake",
+   "surface": "Rust service 监督/握手/退出语义（Tauri 宿主实测；Electron 基线=R08 已验证链）",
+   "aSide": {
+    "kind": "r08-electron-baseline-receipt",
+    "refs": [
+     "artifacts/rust-tauri/R08/verify-r08-closeout-08/verify-stage-result.json",
+     "docs/rust-tauri/R08/R08_HANDOFF.json"
+    ]
+   },
+   "bSide": {
+    "kind": "r09-tauri-supervisor",
+    "suites": [
+     "r09_t02_supervisor_ready",
+     "r09_t02_process_ownership"
+    ],
+    "cases": [
+     "t02::ready-handshake-real",
+     "t02::no-fixed-sleep-handshake"
+    ]
+   },
+   "status": "parity",
+   "basis": null
+  },
+  {
+   "id": "measured::t02::identity-health",
+   "surface": "Rust service 监督/握手/退出语义（Tauri 宿主实测；Electron 基线=R08 已验证链）",
+   "aSide": {
+    "kind": "r08-electron-baseline-receipt",
+    "refs": [
+     "artifacts/rust-tauri/R08/verify-r08-closeout-08/verify-stage-result.json",
+     "docs/rust-tauri/R08/R08_HANDOFF.json"
+    ]
+   },
+   "bSide": {
+    "kind": "r09-tauri-supervisor",
+    "suites": [
+     "r09_t02_supervisor_ready",
+     "r09_t02_process_ownership"
+    ],
+    "cases": [
+     "t02::manifest-protocol-match",
+     "t02::debug-exit-graceful",
+     "t02::packaged-exit-graceful"
+    ]
+   },
+   "status": "parity",
+   "basis": null
+  },
+  {
+   "id": "measured::t02::protocol-digest-identity-gate",
+   "surface": "Rust service 监督/握手/退出语义（Tauri 宿主实测；Electron 基线=R08 已验证链）",
+   "aSide": {
+    "kind": "r08-electron-baseline-receipt",
+    "refs": [
+     "artifacts/rust-tauri/R08/verify-r08-closeout-08/verify-stage-result.json",
+     "docs/rust-tauri/R08/R08_HANDOFF.json"
+    ]
+   },
+   "bSide": {
+    "kind": "r09-tauri-supervisor",
+    "suites": [
+     "r09_t02_supervisor_ready",
+     "r09_t02_process_ownership"
+    ],
+    "cases": [
+     "t02::manifest-protocol-mismatch-rejected",
+     "t02::manifest-digest-mismatch-rejected",
+     "t02::runtime-identity-mismatch-rejected",
+     "t02::injected-protocol-no-service-spawn",
+     "t02::injected-digest-no-service-spawn"
+    ]
+   },
+   "status": "parity",
+   "basis": null
+  },
+  {
+   "id": "measured::t02::exit-ownership",
+   "surface": "Rust service 监督/握手/退出语义（Tauri 宿主实测；Electron 基线=R08 已验证链）",
+   "aSide": {
+    "kind": "r08-electron-baseline-receipt",
+    "refs": [
+     "artifacts/rust-tauri/R08/verify-r08-closeout-08/verify-stage-result.json",
+     "docs/rust-tauri/R08/R08_HANDOFF.json"
+    ]
+   },
+   "bSide": {
+    "kind": "r09-tauri-supervisor",
+    "suites": [
+     "r09_t02_supervisor_ready",
+     "r09_t02_process_ownership"
+    ],
+    "cases": [
+     "t02::no-orphan-owned-services",
+     "t02::exit-owned-tree-only",
+     "t02::reused-is-detached",
+     "t02::remote-mode-zero-touch",
+     "t02::packaged-refuses-remote",
+     "t02::pid-reuse-safe"
+    ]
+   },
+   "status": "parity",
+   "basis": null
+  },
+  {
+   "id": "measured::t02::error-surface",
+   "surface": "Rust service 监督/握手/退出语义（Tauri 宿主实测；Electron 基线=R08 已验证链）",
+   "aSide": {
+    "kind": "r08-electron-baseline-receipt",
+    "refs": [
+     "artifacts/rust-tauri/R08/verify-r08-closeout-08/verify-stage-result.json",
+     "docs/rust-tauri/R08/R08_HANDOFF.json"
+    ]
+   },
+   "bSide": {
+    "kind": "r09-tauri-supervisor",
+    "suites": [
+     "r09_t02_supervisor_ready",
+     "r09_t02_process_ownership"
+    ],
+    "cases": [
+     "t02::error-surfaced-records",
+     "t02::no-node-fallback-in-release-binary"
+    ]
+   },
+   "status": "parity",
+   "basis": null
+  },
+  {
+   "id": "measured::t05::old-chain-vs-rust-chain",
+   "surface": "旧链（Electron 时代冻结基线）vs 服务侧 Rust 链：PDF 页数/文本/表格/视觉网格逐项",
+   "aSide": {
+    "kind": "r01-t05-frozen-old-chain",
+    "refs": [
+     "artifacts/rust-tauri/R09/verify-r09-final-02/SUITES/r09_t05_browser_pdf/a09-compare.json"
+    ]
+   },
+   "bSide": {
+    "kind": "r09-rust-service-chain",
+    "suite": "r09_t05_browser_pdf",
+    "cases": [],
+    "note": "证据=同目录 a09-compare.json（35 项逐项 pass、PDF 74 页/文本 sha/表格/视觉网格）"
+   },
+   "status": "differs",
+   "basis": null
+  },
+  {
+   "id": "measured::t05::untrusted-preview-zero-host-access",
+   "surface": "恶意预览内容无宿主权限（真实服务+真实 Chrome；Tauri 真机 IPC 矩阵属 T06 runtime blocked）",
+   "aSide": {
+    "kind": "r08-electron-baseline-receipt",
+    "refs": [
+     "artifacts/rust-tauri/R08/verify-r08-closeout-08/verify-stage-result.json"
+    ]
+   },
+   "bSide": {
+    "kind": "r09-untrusted-preview",
+    "suite": "r09_t05_untrusted_preview",
+    "cases": []
+   },
+   "status": "parity",
+   "basis": null
+  },
+  {
+   "id": "measured::t07::g1-hidden-shell",
+   "surface": "Tauri evidence 候选真实启动（hidden+sink）：tauri://localhost 加载、优雅退出、零残留、夹具锚点",
+   "aSide": {
+    "kind": "t01-same-window-electron",
+    "refs": [
+     "artifacts/rust-tauri/R09/dev/t01/run-08"
+    ]
+   },
+   "bSide": {
+    "kind": "r09-tauri-hidden-shell",
+    "suite": "r09_t07_native_e2e",
+    "cases": [
+     "t07::native-e2e.shell",
+     "t07::native-e2e.graceful-exit",
+     "t07::native-e2e.no-process-residual",
+     "t07::fixtures.deterministic-v3-anchor"
+    ]
+   },
+   "status": "parity",
+   "basis": null
+  }
+ ],
+ "capabilityRows": [
+  {
+   "id": "capability::host:app-info-platform",
+   "kind": "capability",
+   "capability": "host:app-info-platform",
+   "group": "connection-app-info",
+   "electronReference": "desktop/main.cjs:5670 get-app-version→app.getVersion()；:6604 get-platform→process.platform；desktop/preload.cjs:40,208；desktop/src/modules/platform.js:21 getPlatform 用于 data-platform；桌面壳版本 vs 内容版本语义见 main.cjs:5665-5670 注释",
+   "tauriImplementation": {
+    "modules": [
+     "native/app_info.rs"
+    ],
+    "commands": [
+     "get_app_version",
+     "get_platform"
+    ],
+    "kind": "native-module",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/components/WindowControls.tsx:20",
+     "desktop/src/modules/platform.js:21"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix",
+     "r09_t01_react_parity"
+    ],
+    "prefixes": [
+     "leaf::app-info."
+    ],
+    "cases": [
+     "a01::dom-snapshot-parity"
+    ],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "parity",
+   "note": "measured=measured::t01::boot-dom-projection"
+  },
+  {
+   "id": "capability::host:app-lifecycle-quit",
+   "kind": "capability",
+   "capability": "host:app-lifecycle-quit",
+   "group": "window-lifecycle",
+   "electronReference": "desktop/main.cjs:6824 app.on('window-all-closed')；:6833 activate；:6843 will-quit（keepAwake dispose/globalShortcut.unregisterAll/tray.destroy）；:6854 shutdownServer()；:6942 before-quit（隐藏窗口→按策略关自有 server→app.quit）",
+   "tauriImplementation": {
+    "modules": [
+     "native/window_lifecycle.rs"
+    ],
+    "commands": [],
+    "kind": "native-module",
+    "hostInternal": true
+   },
+   "consumer": {
+    "inventory": [
+     "no-consumer-found（host-internal）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix",
+     "r09_t02_process_ownership",
+     "r09_t07_native_e2e"
+    ],
+    "prefixes": [
+     "leaf::window-lifecycle."
+    ],
+    "cases": [
+     "t02::no-orphan-owned-services",
+     "t02::exit-owned-tree-only",
+     "t07::native-e2e.graceful-exit"
+    ],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "parity",
+   "note": "measured=measured::t02::exit-ownership"
+  },
+  {
+   "id": "capability::host:app-ready",
+   "kind": "capability",
+   "capability": "host:app-ready",
+   "group": "window-lifecycle",
+   "electronReference": "desktop/main.cjs:6620-6653 app-ready handler（写诊断、show 主窗、首启 mac 通知授权探测、200ms 后关 splash/onboarding）；desktop/preload.cjs:109",
+   "tauriImplementation": {
+    "modules": [
+     "native/app_ready.rs",
+     "host.rs"
+    ],
+    "commands": [
+     "app_ready"
+    ],
+    "kind": "native-module",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/app-init.ts:211",
+     "desktop/src/react/app-init.ts:234",
+     "desktop/src/react/app-init.ts:246",
+     "desktop/src/react/app-init.ts:421"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix",
+     "r09_t01_react_parity"
+    ],
+    "prefixes": [
+     "leaf::app-ready."
+    ],
+    "cases": [
+     "a01::tauri-boots",
+     "a01::tauri-graceful-exit"
+    ],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "parity",
+   "note": "measured=measured::t01::boot-dom-projection"
+  },
+  {
+   "id": "capability::host:auto-launch",
+   "kind": "capability",
+   "capability": "host:auto-launch",
+   "group": "shell-integration",
+   "electronReference": "desktop/login-item-settings.cjs:42 getAutoLaunchStatus()/:55 setAutoLaunchEnabled()/:63 wasLaunchedAtLogin()（mac wasOpenedAtLogin、win --hana-start-at-login）；desktop/main.cjs:5691-5692、:6676 启动读 openedAtLogin（后台启动不显 splash）",
+   "tauriImplementation": {
+    "modules": [
+     "native/auto_launch.rs"
+    ],
+    "commands": [
+     "get_auto_launch_status",
+     "set_auto_launch_enabled"
+    ],
+    "kind": "blocked",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/settings/tabs/GeneralTab.tsx:101（get）",
+     "desktop/src/react/settings/tabs/GeneralTab.tsx:211（set）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::auto-launch."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": {
+     "blockerId": "BLOCKED-SIGNING-IDENTITY",
+     "kind": "signing",
+     "basis": [
+      [
+       "docs/rust-tauri/R09/BLOCKED.md",
+       "无 Apple Developer 正式签名/公证身份"
+      ]
+     ]
+    },
+    "approvalId": null
+   },
+   "status": "blocked",
+   "note": "BLOCKED=BLOCKED-SIGNING-IDENTITY"
+  },
+  {
+   "id": "capability::host:browser-viewer",
+   "kind": "capability",
+   "capability": "host:browser-viewer",
+   "group": "viewers-browser-media",
+   "electronReference": "desktop/main.cjs:5753-5798 open-browser-viewer；:5737-5740 set-browser-connection（仅主窗）；:5741-5744 get-browser-viewer-context；:5745-5752 rust-browser-request（rust-browser-control）；:5800-5857 back/forward/reload/new-tab/switch-tab/close-tab/close-viewer/emergency-stop；:3435 createBrowserViewerWindow；:4030-4060 WebContentsView（sandbox:true, partition）；:4234 setWindowOpenHandler deny；:4151/3830 browser-update 广播；desktop/src/shared/rust-browser-control.cjs:15",
+   "tauriImplementation": {
+    "modules": [
+     "browser_viewer.rs"
+    ],
+    "commands": [
+     "close_browser_viewer",
+     "get_browser_viewer_context",
+     "open_browser_viewer",
+     "rust_browser_request",
+     "set_browser_connection"
+    ],
+    "kind": "native-module",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/utils/link-open.ts:174",
+     "desktop/src/react/components/BrowserCard.tsx:70",
+     "desktop/src/react/services/rust-browser.ts:30/66/87",
+     "desktop/src/react/browser-viewer/BrowserViewerApp.tsx:54/82/139/150/163/174/185/213/214/238",
+     "desktop/src/react/browser-viewer/RustBrowserViewer.tsx:76",
+     "no-consumer-found：closeBrowser（PlatformApi 声明但 preload.cjs 未暴露，Electron 无实现；仅 web/mobile 宿主定义）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t05_browser_pdf"
+    ],
+    "prefixes": [
+     "leaf:R00-T02-LA-"
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:card-frame-navigation-guard",
+   "kind": "capability",
+   "capability": "host:card-frame-navigation-guard",
+   "group": "security-t06",
+   "electronReference": "desktop/preload.cjs:35 cardFrameNavigationGuard:true；desktop/main.cjs:490-497 app.on('web-contents-created')→installCardFrameNavigationGuard；desktop/src/shared/card-frame-navigation.cjs:12（will-frame-navigate 拦截非同文档导航）",
+   "tauriImplementation": {
+    "modules": [],
+    "commands": [],
+    "kind": "design-boundary",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/components/chat/InteractiveCard.tsx:56（if (usePlatform()?.cardFrameNavigationGuard === true) return true）"
+    ]
+   },
+   "evidence": {
+    "suites": [],
+    "prefixes": [],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": "R09-ADJ-HOST-05"
+   },
+   "status": "recorded",
+   "note": "RECORDED_APPROVALS=R09-ADJ-HOST-05"
+  },
+  {
+   "id": "capability::host:clipboard-edit-command",
+   "kind": "capability",
+   "capability": "host:clipboard-edit-command",
+   "group": "dialogs-clipboard-drag-links",
+   "electronReference": "desktop/main.cjs:5656-5664 run-edit-command handler（白名单 cut/copy/paste/selectAll→event.sender[command]()）；desktop/preload.cjs:39；main 进程无 clipboard 模块使用（grep: main.cjs 仅 import 无 clipboard）",
+   "tauriImplementation": {
+    "modules": [
+     "native/clipboard_edit.rs"
+    ],
+    "commands": [
+     "run_edit_command"
+    ],
+    "kind": "native-module",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/components/InputContextMenu.tsx:205（copy）",
+     "desktop/src/react/components/InputContextMenu.tsx:230（通用）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::clipboard-edit."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:context-menu-policy",
+   "kind": "capability",
+   "capability": "host:context-menu-policy",
+   "group": "shell-integration",
+   "electronReference": "desktop/main.cjs:490-507 app.on('web-contents-created') 全局安装：非 editable 区域 context-menu preventDefault（styles.css body user-select:none）；无 setApplicationMenu 调用",
+   "tauriImplementation": {
+    "modules": [],
+    "commands": [],
+    "kind": "missing",
+    "hostInternal": true
+   },
+   "consumer": {
+    "inventory": [
+     "no-consumer-found（host 行为）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t07_native_e2e"
+    ],
+    "prefixes": [],
+    "cases": [
+     "t07::native-e2e.context-menu-policy"
+    ],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "R09 未实现（见 A16 缺口）"
+  },
+  {
+   "id": "capability::host:detached-viewer",
+   "kind": "capability",
+   "capability": "host:detached-viewer",
+   "group": "viewers-browser-media",
+   "electronReference": "desktop/main.cjs:5879-5922 spawn-viewer（新 BrowserWindow+_viewerPayloads）；:5924-5930 viewer-request-load（按 sender 反推 windowId）；:5932-5936 viewer-close；:5914 viewer-closed 广播；viewport 入口 desktop/src/viewer-window-entry.tsx:74/111/139",
+   "tauriImplementation": {
+    "modules": [
+     "files.rs",
+     "resource_bridge.rs"
+    ],
+    "commands": [
+     "resource_events",
+     "resource_subscribe",
+     "resource_unsubscribe",
+     "spawn_viewer",
+     "viewer_close",
+     "viewer_request_load"
+    ],
+    "kind": "r06-command",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/stores/preview-actions.ts:41（spawn）",
+     "desktop/src/react/stores/preview-actions.ts:63（onViewerClosed）",
+     "desktop/src/viewer-window-entry.tsx:74/139"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "audit_capability"
+    ],
+    "prefixes": [],
+    "cases": [
+     "caps::invoke-handler-equals-build-manifest",
+     "caps::each-command-has-permission"
+    ],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:docx-xlsx-preview",
+   "kind": "capability",
+   "capability": "host:docx-xlsx-preview",
+   "group": "files",
+   "electronReference": "desktop/main.cjs:6490-6502 read-docx-html、:6504-6527 read-xlsx-html；:6474-6489 readRustOfficePreview()（Rust 服务 /lingxi/v1/fs/{docx,xlsx}-html，10s 超时+连接切换检测）；Node 链用 mammoth/exceljs（20MB 上限）",
+   "tauriImplementation": {
+    "modules": [],
+    "commands": [],
+    "kind": "deferred",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/utils/preview-file-content.ts:127（readDocxHtml）",
+     "desktop/src/react/utils/preview-file-content.ts:131（readXlsxHtml）"
+    ]
+   },
+   "evidence": {
+    "suites": [],
+    "prefixes": [],
+    "cases": [],
+    "deferred": {
+     "group": "T03-FILE-01",
+     "basisPath": "docs/rust-tauri/R09/T06_PROGRESS.md",
+     "basisQuote": "T03 下一轮文件能力（docx/xlsx 预览、workspace watch、可观测导出）尚未实现"
+    },
+    "blocked": null,
+    "approvalId": "R09-ADJ-HOST-08"
+   },
+   "status": "recorded",
+   "note": "RECORDED_APPROVALS=R09-ADJ-HOST-08"
+  },
+  {
+   "id": "capability::host:drag-out",
+   "kind": "capability",
+   "capability": "host:drag-out",
+   "group": "dialogs-clipboard-drag-links",
+   "electronReference": "desktop/main.cjs:6238-6255 start-drag wrapIpcOn（app.getFileIcon 图标；单文件 event.sender.startDrag({file})/多文件 {files}）；desktop/preload.cjs:204",
+   "tauriImplementation": {
+    "modules": [
+     "native/drag_out.rs"
+    ],
+    "commands": [
+     "start_drag"
+    ],
+    "kind": "native-module",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/components/desk/DeskTree.tsx:562",
+     "desktop/src/react/components/chat/AssistantMessage.tsx:608",
+     "desktop/src/react/components/chat/AssistantMessage.tsx:694"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::drag-out."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:external-open",
+   "kind": "capability",
+   "capability": "host:external-open",
+   "group": "dialogs-clipboard-drag-links",
+   "electronReference": "desktop/main.cjs:6282-6296 open-external（URL 解析，仅 http/https，shell.openExternal，返回 {ok,error}）；:6229-6236 open-folder（绝对路径且 isDirectory）；:6274-6281 open-file（绝对路径且 isFile）；:6256-6260 show-in-finder；:3237-3246/:3358-3367 will-navigate 外链拦截；:694 isAllowedBrowserUrl",
+   "tauriImplementation": {
+    "modules": [
+     "native/external_open.rs"
+    ],
+    "commands": [
+     "open_external",
+     "open_file",
+     "open_folder",
+     "show_in_finder"
+    ],
+    "kind": "native-module",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/settings/tabs/McpTab.tsx:260",
+     "desktop/src/react/settings/tabs/AboutTab.tsx:372",
+     "desktop/src/react/settings/tabs/AboutTab.tsx:460",
+     "desktop/src/react/utils/link-open.ts:203",
+     "desktop/src/react/settings/tabs/AgentTab.tsx:221",
+     "desktop/src/react/components/InputArea.tsx:2378"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::external-open."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:file-dialogs",
+   "kind": "capability",
+   "capability": "host:file-dialogs",
+   "group": "dialogs-clipboard-drag-links",
+   "electronReference": "desktop/main.cjs:6011-6022 select-folder；:6024-6035 select-files（multiple 语义）；:6037-6073 select-skill（zip/skill 过滤）；均 dialog.showOpenDialog(BrowserWindow.fromWebContents)；desktop/preload.cjs:111-113",
+   "tauriImplementation": {
+    "modules": [
+     "native/file_dialogs.rs"
+    ],
+    "commands": [
+     "select_files",
+     "select_folder",
+     "select_skill"
+    ],
+    "kind": "native-module",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/settings/tabs/SkillsTab.tsx:502",
+     "desktop/src/react/components/InputArea.tsx:1177",
+     "desktop/src/react/settings/tabs/SkillsTab.tsx:218",
+     "desktop/src/react/components/knowledge/KnowledgePage.tsx:546"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::file-dialogs."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:file-drop-paths",
+   "kind": "capability",
+   "capability": "host:file-drop-paths",
+   "group": "dialogs-clipboard-drag-links",
+   "electronReference": "desktop/preload.cjs:143 getFilePath: (file)=>webUtils.getPathForFile(file)；desktop/preload.cjs:7 引入 webUtils",
+   "tauriImplementation": {
+    "modules": [
+     "native/file_drop.rs"
+    ],
+    "commands": [],
+    "kind": "native-module",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/MainContent.tsx:265",
+     "desktop/src/react/settings/tabs/SkillsTab.tsx:190",
+     "desktop/src/react/utils/markdown-cover-drop.ts:33"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::file-drop."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:file-text-io",
+   "kind": "capability",
+   "capability": "host:file-text-io",
+   "group": "files",
+   "electronReference": "desktop/main.cjs:6297-6310 read-file；:6304-6310 read-file-snapshot；:6312-6318 write-file；:6320-6328 write-file-if-unchanged（file-text-io.cjs:31 CAS 语义）；:6330-6355 write-file-binary（~ 展开；无大小上限）；:6343-6355 copy-file（拒绝 symlink）；:6463-6475 read-file-base64（20MB 上限）；desktop/file-text-io.cjs:12 readTextFileSnapshot（5MB+二进制探测+sha256）",
+   "tauriImplementation": {
+    "modules": [
+     "files.rs"
+    ],
+    "commands": [
+     "copy_file",
+     "file_info",
+     "read_file",
+     "read_file_base64",
+     "read_file_snapshot",
+     "write_file",
+     "write_file_binary",
+     "write_file_if_unchanged"
+    ],
+    "kind": "r06-command",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/components/PreviewEditor.tsx:650（writeFile）",
+     "desktop/src/react/components/PreviewEditor.tsx:639（writeFileIfUnchanged）",
+     "desktop/src/react/components/PreviewEditor.tsx:344（writeFileBinary）",
+     "desktop/src/react/utils/markdown-cover-actions.ts:30（copyFile）",
+     "desktop/src/react/utils/screenshot.ts:304（readFileSnapshot）",
+     "desktop/src/react/MainContent.tsx:88（readFileBase64）",
+     "desktop/src/viewer-window-entry.tsx:111（readFile）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "audit_capability"
+    ],
+    "prefixes": [],
+    "cases": [
+     "caps::invoke-handler-equals-build-manifest",
+     "caps::each-command-has-permission"
+    ],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:file-url-asset",
+   "kind": "capability",
+   "capability": "host:file-url-asset",
+   "group": "files",
+   "electronReference": "desktop/preload.cjs:140 getFileUrl: (filePath)=>pathToFileUrl(filePath)（同步纯字符串转换，无 IPC）；desktop/src/shared/path-to-file-url.cjs:1",
+   "tauriImplementation": {
+    "modules": [],
+    "commands": [],
+    "kind": "renderer+config",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/splash/SplashApp.tsx:71",
+     "desktop/src/react/utils/screenshot.ts:340",
+     "desktop/src/react/utils/markdown.ts:254"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t07_native_e2e"
+    ],
+    "prefixes": [],
+    "cases": [
+     "t07::native-e2e.file-url-asset"
+    ],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "plugin/asset protocol 运行期接线缺失（见 A16 缺口）"
+  },
+  {
+   "id": "capability::host:file-watch",
+   "kind": "capability",
+   "capability": "host:file-watch",
+   "group": "files",
+   "electronReference": "desktop/main.cjs:6408-6420 watch-file（file-watch-registry 共享订阅+50ms 防抖+subscriber destroyed 清理）；:6421-6425 unwatch-file；:6444-6456 watch-workspace（workspace-watch-registry + chokidar，6402-6443）；:6457-6462 unwatch-workspace；事件 file-changed/workspace-changed 6405/6437",
+   "tauriImplementation": {
+    "modules": [
+     "files.rs"
+    ],
+    "commands": [
+     "unwatch_file",
+     "unwatch_workspace",
+     "watch_file",
+     "watch_workspace"
+    ],
+    "kind": "r06-command+deferred",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "no-consumer-found（React 生产代码无调用；测试：desktop/src/react/__tests__/components/PreviewEditor.file-sync.test.tsx:33、DeskSection.test.tsx:93-102；viewer 改用服务端 ResourceIO：desktop/src/viewer-resource-events.ts:91）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "audit_capability"
+    ],
+    "prefixes": [],
+    "cases": [
+     "caps::invoke-handler-equals-build-manifest",
+     "caps::deferred-commands-not-granted"
+    ],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:global-shortcut",
+   "kind": "capability",
+   "capability": "host:global-shortcut",
+   "group": "shell-integration",
+   "electronReference": "desktop/main.cjs:231 registerQuickChatShortcut()（多组键位 1-3）、:266 testGlobalShortcutAvailability()、:3037 reloadQuickChatShortcut()、:3041 registerQuickChatShortcutBestEffort()；:5695-5699 IPC；:6845 unregisterAll；快捷键定义来自 user/preferences.json（只读，:208-258）",
+   "tauriImplementation": {
+    "modules": [
+     "native/global_shortcut.rs"
+    ],
+    "commands": [
+     "keybindings_reload_global",
+     "keybindings_test_register",
+     "quick_chat_reload_shortcut",
+     "quick_chat_shortcut_status"
+    ],
+    "kind": "native-module",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/settings/tabs/KeybindingsTab.tsx:112（test probe）、:209（test-register）、:254/:257（reload）、desktop/src/react/settings/tabs/GeneralTab.tsx:179,:191（reload）",
+     "no-consumer-found：quickChatShortcutStatus 无渲染调用（R00 叶子登记但当前 React 未调用）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::global-shortcut."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:i18n-main",
+   "kind": "capability",
+   "capability": "host:i18n-main",
+   "group": "window-lifecycle",
+   "electronReference": "desktop/main.cjs:743 _getMainI18n()；:768 mt()；:781 resetMainI18n()；:5980-5995 settings-changed 'locale-changed' → 重置 i18n 并重建托盘菜单",
+   "tauriImplementation": {
+    "modules": [
+     "native/i18n.rs"
+    ],
+    "commands": [],
+    "kind": "native-module",
+    "hostInternal": true
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/services/app-event-actions.ts:309（locale-changed 源头）→ settingsChanged"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::i18n."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:keep-awake",
+   "kind": "capability",
+   "capability": "host:keep-awake",
+   "group": "shell-integration",
+   "electronReference": "desktop/keep-awake.cjs:5 createKeepAwakeManager()（powerSaveBlocker type=prevent-app-suspension）；desktop/main.cjs:179 创建、:5693-5694 IPC、:6685 启动读偏好、:6844 will-quit dispose",
+   "tauriImplementation": {
+    "modules": [
+     "native/keep_awake.rs"
+    ],
+    "commands": [
+     "get_keep_awake_status",
+     "set_keep_awake_enabled"
+    ],
+    "kind": "native-module",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/settings/tabs/GeneralTab.tsx:227（setKeepAwakeEnabled）",
+     "no-consumer-found：getKeepAwakeStatus 无渲染调用（R00 叶子登记但当前 React 未调用）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::keep-awake."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:main-window",
+   "kind": "capability",
+   "capability": "host:main-window",
+   "group": "window-lifecycle",
+   "electronReference": "desktop/main.cjs:3129 createMainWindow()；:809 titleBarOpts()/:795 windowIconOpts()；:3242-3258 close→hide；:3260-3297 closed 清理；:6833 app.on('activate')",
+   "tauriImplementation": {
+    "modules": [
+     "native/window_lifecycle.rs",
+     "native/window_labels.rs",
+     "host.rs"
+    ],
+    "commands": [],
+    "kind": "native-module",
+    "hostInternal": true
+   },
+   "consumer": {
+    "inventory": [
+     "no-consumer-found（host-internal；renderer 经 app-ready/window-controls 间接）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix",
+     "r09_t01_react_parity"
+    ],
+    "prefixes": [
+     "leaf::window-lifecycle."
+    ],
+    "cases": [
+     "a01::dom-snapshot-parity",
+     "a01::tauri-loads-embedded-page"
+    ],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "parity",
+   "note": "measured=measured::t01::boot-dom-projection"
+  },
+  {
+   "id": "capability::host:notification",
+   "kind": "capability",
+   "capability": "host:notification",
+   "group": "shell-integration",
+   "electronReference": "desktop/main.cjs:6543-6570 show-notification handler（focus 抑制策略 normalizeDesktopNotificationOptions/shouldSuppressDesktopNotification；Notification.isSupported；agent 头像 icon；click→恢复+聚焦主窗；showNotificationWithReceipt 等待真实 show 事件）；desktop/src/shared/desktop-notification-policy.cjs:1；desktop/src/shared/desktop-notification-delivery.cjs:2；:6640 首启 mac 权限探测",
+   "tauriImplementation": {
+    "modules": [
+     "native/notification.rs",
+     "native/notification_center_macos.rs"
+    ],
+    "commands": [
+     "show_notification"
+    ],
+    "kind": "blocked",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/services/ws-message-handler.ts:988",
+     "desktop/src/react/services/rust-automation.ts:298"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::notification."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": {
+     "blockerId": "T03-NOTIFY-02",
+     "kind": "system-gui",
+     "basis": [
+      [
+       "docs/rust-tauri/R09/BLOCKED.md",
+       "通知点击聚焦"
+      ]
+     ]
+    },
+    "approvalId": null
+   },
+   "status": "blocked",
+   "note": "BLOCKED=T03-NOTIFY-02"
+  },
+  {
+   "id": "capability::host:observability-export",
+   "kind": "capability",
+   "capability": "host:observability-export",
+   "group": "files",
+   "electronReference": "desktop/main.cjs:6074-6140 observability-export:begin/write/end/abort（showSaveDialog→exportId capability token 绑定 senderId；≤4MB chunk；abort/窗口销毁删部分文件）；desktop/preload.cjs:135-138",
+   "tauriImplementation": {
+    "modules": [],
+    "commands": [],
+    "kind": "deferred",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/settings/tabs/observability/observability-export-save.ts:39-41（能力探测）",
+     "desktop/src/react/settings/tabs/observability/observability-export-save.ts:70（begin）",
+     "desktop/src/react/settings/tabs/observability/observability-export-save.ts:84（write）",
+     "desktop/src/react/settings/tabs/observability/observability-export-save.ts:92（end）",
+     "desktop/src/react/settings/tabs/observability/observability-export-save.ts:95（abort）"
+    ]
+   },
+   "evidence": {
+    "suites": [],
+    "prefixes": [],
+    "cases": [],
+    "deferred": {
+     "group": "T03-FILE-01",
+     "basisPath": "docs/rust-tauri/R09/T06_PROGRESS.md",
+     "basisQuote": "T03 下一轮文件能力（docx/xlsx 预览、workspace watch、可观测导出）尚未实现"
+    },
+    "blocked": null,
+    "approvalId": "R09-ADJ-HOST-08"
+   },
+   "status": "recorded",
+   "note": "RECORDED_APPROVALS=R09-ADJ-HOST-08"
+  },
+  {
+   "id": "capability::host:onboarding",
+   "kind": "capability",
+   "capability": "host:onboarding",
+   "group": "viewers-browser-media",
+   "electronReference": "desktop/main.cjs:4850-4884 createOnboardingWindow()；:6573-6581 debug-open-onboarding；:6582-6590 debug-open-onboarding-preview；:6591-6603 onboarding-complete（server PreferencesManager 持久化后 createMainWindow+注册快捷键；Rust 服务模式显式拒绝）；desktop/src/shared/onboarding-completion.cjs；desktop/preload.cjs:148-150",
+   "tauriImplementation": {
+    "modules": [
+     "native/onboarding.rs"
+    ],
+    "commands": [
+     "onboarding_complete"
+    ],
+    "kind": "blocked",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/onboarding/OnboardingApp.tsx:94",
+     "desktop/src/react/onboarding/steps/TutorialStep.tsx:87",
+     "no-consumer-found：debugOpenOnboarding/debugOpenOnboardingPreview（preload-only 调试命令，当前 React 未调用）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::onboarding."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": {
+     "blockerId": "T06-ONBOARD-01",
+     "kind": "service-gap",
+     "basis": [
+      [
+       "docs/rust-tauri/R09/BLOCKED.md",
+       "onboarding_complete` 返回 NOT_IMPLEMENTED"
+      ]
+     ]
+    },
+    "approvalId": "R09-ADJ-HOST-07"
+   },
+   "status": "recorded",
+   "note": "RECORDED_APPROVALS=R09-ADJ-HOST-07（两侧一致显式 NOT_IMPLEMENTED；非换壳差异）"
+  },
+  {
+   "id": "capability::host:quick-chat-session-handoff",
+   "kind": "capability",
+   "capability": "host:quick-chat-session-handoff",
+   "group": "quick-chat",
+   "electronReference": "desktop/main.cjs:5728-5732 quickChatSessionHandoff.open/acknowledge；desktop/quick-chat-session-handoff.cjs:3（仅 quick-chat 窗口可信；主窗存活；sessionPath/ownerKey/sessionId 校验；15s 超时；主窗确认后 focus 再 hide；失败保留快聊窗）；desktop/preload.cjs:88-98",
+   "tauriImplementation": {
+    "modules": [
+     "native/quick_chat_handoff.rs"
+    ],
+    "commands": [
+     "quick_chat_open_session",
+     "quick_chat_open_session_ack"
+    ],
+    "kind": "native-module",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/quick-chat/QuickChatApp.tsx:719（发起）",
+     "desktop/src/react/app-init.ts:412（主窗确认）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::quick-chat-handoff."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:quick-chat-window",
+   "kind": "capability",
+   "capability": "host:quick-chat-window",
+   "group": "quick-chat",
+   "electronReference": "desktop/main.cjs:2937-2984 createQuickChatWindow（frameless/alwaysOnTop/transparent/skipTaskbar/acceptFirstMouse）；:3001 hideQuickChatWindow（保存+焦点保护）；:3008-3027 showQuickChatWindow（setAlwaysOnTop floating、mac visibleOnAllWorkspaces、app.focus steal、quick-chat-shown）；:3029 toggle；:2909-2935 applyQuickChatMode；:2808/2828/2863 状态/边界；:5705-5706 quick-chat-show/hide；:5724 resize；desktop/preload.cjs:84-103",
+   "tauriImplementation": {
+    "modules": [
+     "native/quick_chat.rs"
+    ],
+    "commands": [
+     "quick_chat_hide",
+     "quick_chat_resize",
+     "quick_chat_show"
+    ],
+    "kind": "native-module",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/quick-chat/QuickChatApp.tsx:475/650/660（resize）",
+     "desktop/src/react/quick-chat/QuickChatApp.tsx:752（hide）",
+     "desktop/src/react/quick-chat/QuickChatApp.tsx:479（onQuickChatShown）",
+     "no-consumer-found：quickChatShow 无渲染调用（由全局快捷键/内部 toggle 驱动，main.cjs:3029）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::quick-chat."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:reload-restart",
+   "kind": "capability",
+   "capability": "host:reload-restart",
+   "group": "window-lifecycle",
+   "electronReference": "desktop/main.cjs:6531 reload-main-window handler（mainWindow.webContents.reload）；:3055 restartApp()（isExitingServer/isQuitting→app.relaunch→quit，走 before-quit 清理）；desktop/preload.cjs:83,146",
+   "tauriImplementation": {
+    "modules": [
+     "native/reload_restart.rs"
+    ],
+    "commands": [
+     "reload_main_window",
+     "restart_app"
+    ],
+    "kind": "native-module",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/settings/tabs/AccessTab.tsx:366",
+     "desktop/src/react/settings/tabs/AccessTab.tsx:390",
+     "desktop/src/react/app-init.ts:379（restartApp）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::reload-restart."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:screenshot-render",
+   "kind": "capability",
+   "capability": "host:screenshot-render",
+   "group": "viewers-browser-media",
+   "electronReference": "desktop/preload.cjs:125 screenshotRender（PlatformApi 未声明，靠 any 访问）；desktop/main.cjs:6357-6400 screenshot-render handler；:5377 screenshotCapture()（offscreen hidden BrowserWindow capturePage，deviceScaleFactor:2）；:4948 getScreenshotWindow；:4893 SCREENSHOT_THEMES",
+   "tauriImplementation": {
+    "modules": [
+     "native/screenshot.rs"
+    ],
+    "commands": [],
+    "kind": "deferred",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/utils/screenshot.ts:204/228/271（usePlatform() as any）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "audit_capability"
+    ],
+    "prefixes": [],
+    "cases": [
+     "caps::deferred-commands-not-granted"
+    ],
+    "deferred": {
+     "group": "T04-screenshot",
+     "basisPath": "docs/rust-tauri/R09/T06_PROGRESS.md",
+     "basisQuote": "Tauri/Wry 无稳定页面捕获 API（T04 OQ-04 BLOCKED）"
+    },
+    "blocked": null,
+    "approvalId": "R09-ADJ-HOST-04"
+   },
+   "status": "recorded",
+   "note": "RECORDED_APPROVALS=R09-ADJ-HOST-04"
+  },
+  {
+   "id": "capability::host:server-connection-info",
+   "kind": "capability",
+   "capability": "host:server-connection-info",
+   "group": "connection-app-info",
+   "electronReference": "desktop/main.cjs:5646-5655 get-server-port/get-server-token/get-server-connection-info；:2302 monitorServer()→:2324/:2328 广播 server-restarted；desktop/preload.cjs:36-38,171-175（事件）",
+   "tauriImplementation": {
+    "modules": [
+     "commands.rs",
+     "service/supervisor.rs"
+    ],
+    "commands": [
+     "get_server_connection_info",
+     "get_server_port",
+     "get_server_token",
+     "get_service_status"
+    ],
+    "kind": "native-module",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/app-init.ts:178（connectionInfo）",
+     "desktop/src/viewer-resource-events.ts:53/55（port/token）",
+     "desktop/src/react/app-init.ts:110（onServerRestarted）",
+     "desktop/src/react/settings/SettingsContent.tsx:237（onServerRestarted）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t02_supervisor_ready",
+     "r09_t02_process_ownership",
+     "r09_t01_react_parity"
+    ],
+    "prefixes": [],
+    "cases": [
+     "t02::ready-handshake-real",
+     "t02::manifest-protocol-match",
+     "a01::service-identity-parity",
+     "t02::no-orphan-owned-services"
+    ],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "parity",
+   "note": "measured=measured::t01::service-identity"
+  },
+  {
+   "id": "capability::host:settings-broadcast",
+   "kind": "capability",
+   "capability": "host:settings-broadcast",
+   "group": "settings",
+   "electronReference": "desktop/main.cjs:5948-6010 settings-changed wrapIpcOn（向主窗/设置窗/browser-viewer 转发；side effects: theme-changed 更新 _browserViewerTheme+转发、network-proxy-changed applyDesktopNetworkProxy、keep-awake-changed keepAwakeManager、quick-chat-shortcut-changed 重新注册、locale-changed 重置 i18n+重建托盘）；desktop/preload.cjs:155-160",
+   "tauriImplementation": {
+    "modules": [
+     "native/settings_broadcast.rs"
+    ],
+    "commands": [
+     "settings_changed"
+    ],
+    "kind": "native-module",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/settings/tabs/KeybindingsTab.tsx:251/362",
+     "desktop/src/react/settings/tabs/ExperimentsTab.tsx:416",
+     "desktop/src/react/settings/tabs/SecurityTab.tsx:119",
+     "desktop/src/react/settings/tabs/InterfaceTab.tsx:363",
+     "desktop/src/react/services/app-event-actions.ts:309/406/426/431/436",
+     "desktop/src/react/app-init.ts:383",
+     "desktop/src/react/settings/SettingsContent.tsx:201",
+     "desktop/src/react/browser-viewer/BrowserViewerApp.tsx:77"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::settings-broadcast."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:settings-window",
+   "kind": "capability",
+   "capability": "host:settings-window",
+   "group": "settings",
+   "electronReference": "desktop/main.cjs:5734 open-settings handler→createSettingsWindow(tab,theme)；:3299-3399 createSettingsWindow（主窗可用时 send open-settings-modal 并前置主窗；否则独立 720x700 BrowserWindow，主窗 resize 同步 90%）；:3305 open-settings-modal；:3316/:3353 settings-switch-tab；desktop/preload.cjs:154,161-170",
+   "tauriImplementation": {
+    "modules": [
+     "native/settings_window.rs"
+    ],
+    "commands": [
+     "open_settings"
+    ],
+    "kind": "native-module",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/app-init.ts:407（onOpenSettingsModal）",
+     "desktop/src/react/settings/SettingsContent.tsx:191（onSwitchTab）",
+     "no-consumer-found：openSettings 无 React 调用点（主进程托盘 open-settings 路径是唯一入口）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::settings-window."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:single-instance",
+   "kind": "capability",
+   "capability": "host:single-instance",
+   "group": "shell-integration",
+   "electronReference": "desktop/main.cjs:371 configureClientSingleInstance({lingxiHome,...}) → showPrimaryWindow；desktop/src/shared/single-instance-lock.cjs:71 app.requestSingleInstanceLock({lingxiHome})；:77 app.on('second-instance')；desktop/main.cjs:2354 showPrimaryWindow()",
+   "tauriImplementation": {
+    "modules": [
+     "native/single_instance.rs"
+    ],
+    "commands": [],
+    "kind": "native-module",
+    "hostInternal": true
+   },
+   "consumer": {
+    "inventory": [
+     "no-consumer-found（host-internal；R00 ENTRYPOINTS.json EP-DESK-05 登记）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::single-instance."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:skill-viewer",
+   "kind": "capability",
+   "capability": "host:skill-viewer",
+   "group": "viewers-browser-media",
+   "electronReference": "desktop/main.cjs:6141-6204 open-skill-viewer（.skill/.zip 解压：:6162-6186 execFileSync unzip/powershell Expand-Archive；已安装目录优先）；:6205-6214 skill-viewer-list-files；:6215-6228 skill-viewer-read-file（2MB 文本上限）；:3401 _showSkillViewer（Electron 走主窗 overlay 事件，不开独立窗）；:3412 scanSkillDir；desktop/preload.cjs:152,200-202",
+   "tauriImplementation": {
+    "modules": [
+     "skills.rs"
+    ],
+    "commands": [
+     "list_skill_files",
+     "open_skill_viewer",
+     "read_skill_file",
+     "skill_viewer_close",
+     "skill_viewer_load"
+    ],
+    "kind": "r06-command",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/settings/tabs/skills/SkillRow.tsx:64",
+     "desktop/src/react/utils/file-preview.ts:98",
+     "desktop/src/react/components/SkillViewerOverlay.tsx:64",
+     "desktop/src/react/components/SkillViewerOverlay.tsx:75",
+     "desktop/src/react/app-init.ts:415"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "audit_capability"
+    ],
+    "prefixes": [],
+    "cases": [
+     "caps::invoke-handler-equals-build-manifest",
+     "caps::each-command-has-permission"
+    ],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:speech-permission",
+   "kind": "capability",
+   "capability": "host:speech-permission",
+   "group": "permissions-t04",
+   "electronReference": "desktop/main.cjs:5716-5723 speech-permission-status/request（先 BrowserWindow.fromWebContents 校验 sender）；desktop/speech-permissions.cjs:44 createSpeechPermissionController()/SPEECH_PERMISSION_STATES:19/原生桥:172；hostCanPrompt 仅打包壳 true；desktop/preload.cjs:42-43",
+   "tauriImplementation": {
+    "modules": [
+     "native/speech.rs",
+     "native/permissions.rs"
+    ],
+    "commands": [
+     "speech_permission_request",
+     "speech_permission_status"
+    ],
+    "kind": "blocked",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "no-consumer-found（生产无 renderer 调用；R00 同结论；T04 范围）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t04_permission_matrix"
+    ],
+    "prefixes": [
+     "leaf::speech."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": {
+     "blockerId": "BLOCKED-SYSTEM-PERMISSIONS",
+     "kind": "tcc",
+     "basis": [
+      [
+       "docs/rust-tauri/R09/BLOCKED.md",
+       "macOS 系统级权限"
+      ]
+     ]
+    },
+    "approvalId": null
+   },
+   "status": "blocked",
+   "note": "BLOCKED=BLOCKED-SYSTEM-PERMISSIONS"
+  },
+  {
+   "id": "capability::host:splash",
+   "kind": "capability",
+   "capability": "host:splash",
+   "group": "viewers-browser-media",
+   "electronReference": "desktop/main.cjs:2668 createSplashWindow()；:5999-6007 registerSplashDataIpc({home, senderAllowed})；desktop/src/shared/splash-avatar-path.cjs:121 registerSplashDataIpc/:126 get-avatar-path（仅 splash/onboarding 窗口+页面 URL 白名单，头像文件类型/大小/符号链接校验）/:147 get-splash-info/:112 readSplashInfo；desktop/preload.cjs:144-145",
+   "tauriImplementation": {
+    "modules": [
+     "native/splash.rs",
+     "host.rs"
+    ],
+    "commands": [
+     "get_avatar_path",
+     "get_splash_info"
+    ],
+    "kind": "native-module",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/splash/SplashApp.tsx:59/60",
+     "desktop/src/react/onboarding/OnboardingApp.tsx:117/126"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::splash."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:theme-sync",
+   "kind": "capability",
+   "capability": "host:theme-sync",
+   "group": "window-lifecycle",
+   "electronReference": "desktop/main.cjs:5938 window-theme-changed wrapIpcOn → applyWindowThemeColors(win, theme)；:830 applyWindowThemeColors()；:817 resolveConcreteTheme()；:903 applyTransparentWindowBackground()（quick-chat 特例）；desktop/preload.cjs:110",
+   "tauriImplementation": {
+    "modules": [
+     "native/theme_sync.rs"
+    ],
+    "commands": [
+     "window_theme_changed"
+    ],
+    "kind": "native-module",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/shared/theme.ts:28（hana?.syncWindowTheme?.）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::theme-sync."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:trash",
+   "kind": "capability",
+   "capability": "host:trash",
+   "group": "dialogs-clipboard-drag-links",
+   "electronReference": "desktop/main.cjs:6261-6272 trash-item handler（resolveTrashItemPath 校验→lstat→shell.trashItem）；desktop/src/shared/trash-item-path.cjs:1",
+   "tauriImplementation": {
+    "modules": [
+     "native/trash.rs"
+    ],
+    "commands": [
+     "trash_item"
+    ],
+    "kind": "native-module",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/stores/desk-actions.ts:1223",
+     "desktop/src/react/stores/desk-actions.ts:1242"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::trash."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:tray",
+   "kind": "capability",
+   "capability": "host:tray",
+   "group": "shell-integration",
+   "electronReference": "desktop/main.cjs:2389 createTray()；:2402 new Tray；:2405 Menu.buildFromTemplate（显示/设置/修复组件/退出）；:2417 setContextMenu；:2418 right-click 重建；:2419 double-click 显示；:2365/:2374 图标候选；:5983 locale 重建；:6709-6710 启动装配",
+   "tauriImplementation": {
+    "modules": [
+     "native/tray.rs"
+    ],
+    "commands": [],
+    "kind": "native-module",
+    "hostInternal": true
+   },
+   "consumer": {
+    "inventory": [
+     "no-consumer-found（host-internal；R00 ENTRYPOINTS EP-DESK-05）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::tray."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:update-auto",
+   "kind": "capability",
+   "capability": "host:update-auto",
+   "group": "updates",
+   "electronReference": "desktop/auto-updater.cjs:754-783 registerIpcHandlers（auto-update-check/install/state/set-channel）；:795 initAutoUpdater；:228 checkForUpdatesOnce；:521 installDownloadedUpdate；:651 setupAutoUpdater；state 广播 :323 auto-update-state；desktop/main.cjs:3168-3174 初始化；desktop/preload.cjs:49-52,104-108",
+   "tauriImplementation": {
+    "modules": [],
+    "commands": [],
+    "kind": "deferred",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/settings/tabs/AboutTab.tsx:365/376/393",
+     "desktop/src/react/hooks/use-auto-update-state.ts:63/71",
+     "desktop/src/react/components/notices/SidebarNoticeSlot.tsx:356"
+    ]
+   },
+   "evidence": {
+    "suites": [],
+    "prefixes": [],
+    "cases": [],
+    "deferred": {
+     "group": "R10-update-chain",
+     "basisPath": "docs/rust-tauri/R09/T06_PROGRESS.md",
+     "basisQuote": "更新链（GitHub check/自动更新/OTA）属 R10 验收范围"
+    },
+    "blocked": null,
+    "approvalId": "R09-ADJ-HOST-03"
+   },
+   "status": "recorded",
+   "note": "RECORDED_APPROVALS=R09-ADJ-HOST-03"
+  },
+  {
+   "id": "capability::host:update-github-check",
+   "kind": "capability",
+   "capability": "host:update-github-check",
+   "group": "updates",
+   "electronReference": "desktop/main.cjs:5677-5686 release-check-latest（60s 缓存→githubReleaseCheck.checkLatestRelease）；:5687-5690 get-pending-announcement/ack-announcement（computePendingAnnouncement/writeLastSeenVersion:2724）；:5643 get-update-digest-history（update-digest-history.cjs）；desktop/src/shared/github-release-check.cjs:24；desktop/src/shared/update-digest-history.cjs",
+   "tauriImplementation": {
+    "modules": [],
+    "commands": [],
+    "kind": "deferred",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/hooks/use-release-check.ts:41",
+     "desktop/src/react/components/PostUpdateAnnouncement.tsx:54/68",
+     "desktop/src/react/settings/update-history-actions.ts:11"
+    ]
+   },
+   "evidence": {
+    "suites": [],
+    "prefixes": [],
+    "cases": [],
+    "deferred": {
+     "group": "R10-update-chain",
+     "basisPath": "docs/rust-tauri/R09/T06_PROGRESS.md",
+     "basisQuote": "更新链（GitHub check/自动更新/OTA）属 R10 验收范围"
+    },
+    "blocked": null,
+    "approvalId": "R09-ADJ-HOST-03"
+   },
+   "status": "recorded",
+   "note": "RECORDED_APPROVALS=R09-ADJ-HOST-03"
+  },
+  {
+   "id": "capability::host:update-train-ota",
+   "kind": "capability",
+   "capability": "host:update-train-ota",
+   "group": "updates",
+   "electronReference": "desktop/main.cjs:5571-5642 train-update-status/check/apply（applyTrainUpdateNow:5606；进度 sender 定向:5514；一次性 fallback notice:5584/1855）；:3096-3127 后台 OTA 调度（只 check 不下载/不写指针）；desktop/preload.cjs:54-75；desktop/src/shared/train-update-apply.cjs；shared/artifact-core/ota-core.cjs",
+   "tauriImplementation": {
+    "modules": [],
+    "commands": [],
+    "kind": "deferred",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/hooks/use-train-update-state.ts:110/134/147/169/178/200/223"
+    ]
+   },
+   "evidence": {
+    "suites": [],
+    "prefixes": [],
+    "cases": [],
+    "deferred": {
+     "group": "R10-update-chain",
+     "basisPath": "docs/rust-tauri/R09/T06_PROGRESS.md",
+     "basisQuote": "更新链（GitHub check/自动更新/OTA）属 R10 验收范围"
+    },
+    "blocked": null,
+    "approvalId": "R09-ADJ-HOST-03"
+   },
+   "status": "recorded",
+   "note": "RECORDED_APPROVALS=R09-ADJ-HOST-03"
+  },
+  {
+   "id": "capability::host:window-controls",
+   "kind": "capability",
+   "capability": "host:window-controls",
+   "group": "window-lifecycle",
+   "electronReference": "desktop/main.cjs:6605-6618 window-minimize/maximize/close/is-maximized handlers（BrowserWindow.fromWebContents(event.sender)）；:3248-3249 maximize/unmaximize 广播；desktop/preload.cjs:208-216",
+   "tauriImplementation": {
+    "modules": [
+     "native/window_controls.rs"
+    ],
+    "commands": [
+     "window_close",
+     "window_is_maximized",
+     "window_maximize",
+     "window_minimize"
+    ],
+    "kind": "native-module",
+    "hostInternal": false
+   },
+   "consumer": {
+    "inventory": [
+     "desktop/src/react/components/WindowControls.tsx:24（onMaximizeChange）",
+     "desktop/src/react/components/WindowControls.tsx:26/29/30/31（isMaximized/minimize/maximize/close）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::window-controls."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::host:window-state",
+   "kind": "capability",
+   "capability": "host:window-state",
+   "group": "window-lifecycle",
+   "electronReference": "desktop/main.cjs:2712 windowStatePath=lingxiHome/user/window-state.json；:2769 loadWindowState()；:2779 saveWindowState()（500ms 防抖+串行链）；:3129 sanitizeWindowState(...)；desktop/src/shared/window-state.cjs",
+   "tauriImplementation": {
+    "modules": [
+     "native/window_state.rs"
+    ],
+    "commands": [],
+    "kind": "native-module",
+    "hostInternal": true
+   },
+   "consumer": {
+    "inventory": [
+     "no-consumer-found（host-internal）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "r09_t03_native_matrix"
+    ],
+    "prefixes": [
+     "leaf::window-state."
+    ],
+    "cases": [],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::security:capability-sets",
+   "kind": "capability",
+   "capability": "security:capability-sets",
+   "group": "security-t06",
+   "electronReference": "Electron 无 capability 概念：所有窗口共用同一 preload.cjs:34-217 全量桥；隔离靠 webPreferences contextIsolation:true/nodeIntegration:false（main.cjs:3149-3153,2687-2689,2960-2962,3335-3337,3465-3467,4862-4864,5896-5898）与 browser view sandbox:true（:4035-4037,4227-4229）；无多 capability 叠加面",
+   "tauriImplementation": {
+    "modules": [],
+    "commands": [],
+    "kind": "security-policy",
+    "hostInternal": true
+   },
+   "consumer": {
+    "inventory": [
+     "no-consumer-found（无对应 API；T06 新增安全面）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "audit_capability"
+    ],
+    "prefixes": [],
+    "cases": [
+     "caps::window-union-equals-policy::main",
+     "caps::no-dangerous-plugin-permissions",
+     "caps::window-stacking::main"
+    ],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::security:command-acl",
+   "kind": "capability",
+   "capability": "security:command-acl",
+   "group": "security-t06",
+   "electronReference": "Electron IPC 无 ACL 层：desktop/ipc-wrapper.cjs:18 wrapIpcHandler/:34 wrapIpcBestEffortHandler/:48 wrapIpcOn + preload.cjs:34-217 单一桥；channel 白名单靠代码评审，无运行时拒绝矩阵",
+   "tauriImplementation": {
+    "modules": [],
+    "commands": [],
+    "kind": "security-policy",
+    "hostInternal": true
+   },
+   "consumer": {
+    "inventory": [
+     "no-consumer-found（配置面）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "audit_capability"
+    ],
+    "prefixes": [],
+    "cases": [
+     "caps::invoke-handler-equals-build-manifest",
+     "caps::each-command-has-permission",
+     "caps::each-permission-command-registered",
+     "caps::acl-manifest-covers-registered"
+    ],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::security:csp",
+   "kind": "capability",
+   "capability": "security:csp",
+   "group": "security-t06",
+   "electronReference": "Electron 各入口 HTML 内联 CSP meta：browser-viewer.html:6、quick-chat.html:6、splash.html:6、onboarding.html:6、viewer-window.html:6、mobile.html:5；index.html/settings.html 无 CSP（仅 will-navigate 拦截 main.cjs:3237-3246/3358-3367）；外链仅 http(s) 694 isAllowedBrowserUrl",
+   "tauriImplementation": {
+    "modules": [],
+    "commands": [],
+    "kind": "security-policy",
+    "hostInternal": true
+   },
+   "consumer": {
+    "inventory": [
+     "no-consumer-found（配置面）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "release_scan"
+    ],
+    "prefixes": [],
+    "cases": [
+     "release::csp-directives-hardened",
+     "release::csp-no-forbidden-tokens"
+    ],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::security:no-arbitrary-shell",
+   "kind": "capability",
+   "capability": "security:no-arbitrary-shell",
+   "group": "security-t06",
+   "electronReference": "Electron 无通用 shell IPC；openExternal 仅 http(s)（main.cjs:6282-6296）；openFile/openFolder 绝对路径+类型校验（6229-6281）；但 open-skill-viewer 现役用 child_process execFileSync('unzip')/powershell Expand-Archive（main.cjs:6165-6175）——潜在命令执行面；R01 sidecar 要求固定二进制+受限参数",
+   "tauriImplementation": {
+    "modules": [],
+    "commands": [],
+    "kind": "security-policy",
+    "hostInternal": true
+   },
+   "consumer": {
+    "inventory": [
+     "no-consumer-found（安全边界面）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "release_scan"
+    ],
+    "prefixes": [],
+    "cases": [
+     "release::no-shell-plugin-dependency",
+     "release::process-spawn-sites-match-ledger",
+     "release::no-renderer-controllable-shell-binary"
+    ],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::security:release-no-test-control",
+   "kind": "capability",
+   "capability": "security:release-no-test-control",
+   "group": "security-t06",
+   "electronReference": "Electron 生产仍注册调试 IPC（main.cjs:6573-6590 debug-open-onboarding/debug-open-onboarding-preview 无环境门控）；--dev 可开 DevTools（main.cjs:3207-3209，release 亦接受该 flag）；无 WebDriver 内嵌",
+   "tauriImplementation": {
+    "modules": [],
+    "commands": [],
+    "kind": "security-policy",
+    "hostInternal": true
+   },
+   "consumer": {
+    "inventory": [
+     "no-consumer-found（preload-only 调试命令也无人调用）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "audit_capability",
+     "release_scan"
+    ],
+    "prefixes": [],
+    "cases": [
+     "caps::test-hooks-feature-declared",
+     "caps::delivery-release-excludes-test-hooks",
+     "caps::delivery-release-binary-no-test-env",
+     "release::no-test-control-env-in-artifacts"
+    ],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "parity",
+   "note": "measured=measured::t01::renderer-identity"
+  },
+  {
+   "id": "capability::security:remote-content-isolation",
+   "kind": "capability",
+   "capability": "security:remote-content-isolation",
+   "group": "security-t06",
+   "electronReference": "desktop/main.cjs:4040-4052 WebContentsView(sandbox:true,contextIsolation,nodeIntegration:false)、:4234 setWindowOpenHandler deny、:3968-4000 浏览器 session 分区与 cookie 策略；:3237-3246/:3358-3367 will-navigate 外链；预览 iframe 无脚本（A10 场景）；desktop/src/shared/card-frame-navigation.cjs:12 卡片导航 guard（main.cjs:495-496 全局安装）",
+   "tauriImplementation": {
+    "modules": [],
+    "commands": [],
+    "kind": "security-policy",
+    "hostInternal": true
+   },
+   "consumer": {
+    "inventory": [
+     "no-consumer-found（安全边界面）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "release_scan"
+    ],
+    "prefixes": [],
+    "cases": [
+     "release::no-remote-domain-ipc-access",
+     "release::capabilities-no-generic-shell-http-fs"
+    ],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  },
+  {
+   "id": "capability::security:token-exposure",
+   "kind": "capability",
+   "capability": "security:token-exposure",
+   "group": "security-t06",
+   "electronReference": "server token 由 get-server-token IPC 返回给任意窗口（main.cjs:5646-5647 无 sender 校验）；web fallback 从 URL query/localStorage 取 token（desktop/src/react/host/web-desktop-host.ts:79-81）；浏览器 WebSocket/HTTP 使用 Bearer（viewer-resource-events.ts:53-58）",
+   "tauriImplementation": {
+    "modules": [],
+    "commands": [],
+    "kind": "security-policy",
+    "hostInternal": true
+   },
+   "consumer": {
+    "inventory": [
+     "no-consumer-found（安全边界面）"
+    ]
+   },
+   "evidence": {
+    "suites": [
+     "audit_capability"
+    ],
+    "prefixes": [],
+    "cases": [
+     "caps::protected-commands-window-scoped"
+    ],
+    "deferred": null,
+    "blocked": null,
+    "approvalId": null
+   },
+   "status": "pending",
+   "note": "Tauri 行为证据未覆盖（静态/单测支持不算 A15 实测）"
+  }
+ ],
+ "commandRows": [
+  {
+   "id": "command::app_ready",
+   "kind": "command",
+   "command": "app_ready",
+   "ownerCapability": "host:app-ready",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "parity",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::close_browser_viewer",
+   "kind": "command",
+   "command": "close_browser_viewer",
+   "ownerCapability": "host:browser-viewer",
+   "windows": [
+    "browser-viewer",
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/browser_viewer.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::copy_file",
+   "kind": "command",
+   "command": "copy_file",
+   "ownerCapability": "host:file-text-io",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::file_info",
+   "kind": "command",
+   "command": "file_info",
+   "ownerCapability": "host:file-text-io",
+   "windows": [
+    "main",
+    "viewer-*"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::get_app_version",
+   "kind": "command",
+   "command": "get_app_version",
+   "ownerCapability": "host:app-info-platform",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "parity",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::get_auto_launch_status",
+   "kind": "command",
+   "command": "get_auto_launch_status",
+   "ownerCapability": "host:auto-launch",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "blocked",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::get_avatar_path",
+   "kind": "command",
+   "command": "get_avatar_path",
+   "ownerCapability": "host:splash",
+   "windows": [
+    "onboarding",
+    "splash"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::get_browser_viewer_context",
+   "kind": "command",
+   "command": "get_browser_viewer_context",
+   "ownerCapability": "host:browser-viewer",
+   "windows": [
+    "browser-viewer"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/browser_viewer.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::get_keep_awake_status",
+   "kind": "command",
+   "command": "get_keep_awake_status",
+   "ownerCapability": "host:keep-awake",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::get_platform",
+   "kind": "command",
+   "command": "get_platform",
+   "ownerCapability": "host:app-info-platform",
+   "windows": [
+    "browser-viewer",
+    "main",
+    "onboarding",
+    "quick-chat",
+    "settings",
+    "splash"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "parity",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::get_server_connection_info",
+   "kind": "command",
+   "command": "get_server_connection_info",
+   "ownerCapability": "host:server-connection-info",
+   "windows": [
+    "main",
+    "onboarding",
+    "quick-chat",
+    "settings",
+    "viewer-*"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "parity",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::get_server_port",
+   "kind": "command",
+   "command": "get_server_port",
+   "ownerCapability": "host:server-connection-info",
+   "windows": [
+    "main",
+    "onboarding",
+    "quick-chat",
+    "settings",
+    "viewer-*"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "parity",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::get_server_token",
+   "kind": "command",
+   "command": "get_server_token",
+   "ownerCapability": "host:server-connection-info",
+   "windows": [
+    "main",
+    "onboarding",
+    "quick-chat",
+    "settings",
+    "viewer-*"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "parity",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::get_service_status",
+   "kind": "command",
+   "command": "get_service_status",
+   "ownerCapability": "host:server-connection-info",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "parity",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::get_splash_info",
+   "kind": "command",
+   "command": "get_splash_info",
+   "ownerCapability": "host:splash",
+   "windows": [
+    "onboarding",
+    "splash"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::keybindings_reload_global",
+   "kind": "command",
+   "command": "keybindings_reload_global",
+   "ownerCapability": "host:global-shortcut",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::keybindings_test_register",
+   "kind": "command",
+   "command": "keybindings_test_register",
+   "ownerCapability": "host:global-shortcut",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::list_skill_files",
+   "kind": "command",
+   "command": "list_skill_files",
+   "ownerCapability": "host:skill-viewer",
+   "windows": [
+    "main",
+    "skill-viewer-*"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::onboarding_complete",
+   "kind": "command",
+   "command": "onboarding_complete",
+   "ownerCapability": "host:onboarding",
+   "windows": [
+    "onboarding"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "recorded",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::open_browser_viewer",
+   "kind": "command",
+   "command": "open_browser_viewer",
+   "ownerCapability": "host:browser-viewer",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/browser_viewer.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::open_external",
+   "kind": "command",
+   "command": "open_external",
+   "ownerCapability": "host:external-open",
+   "windows": [
+    "main",
+    "quick-chat",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::open_file",
+   "kind": "command",
+   "command": "open_file",
+   "ownerCapability": "host:external-open",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/files.rs",
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::open_folder",
+   "kind": "command",
+   "command": "open_folder",
+   "ownerCapability": "host:external-open",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::open_settings",
+   "kind": "command",
+   "command": "open_settings",
+   "ownerCapability": "host:settings-window",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::open_skill_viewer",
+   "kind": "command",
+   "command": "open_skill_viewer",
+   "ownerCapability": "host:skill-viewer",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::quick_chat_hide",
+   "kind": "command",
+   "command": "quick_chat_hide",
+   "ownerCapability": "host:quick-chat-window",
+   "windows": [
+    "main",
+    "quick-chat"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::quick_chat_open_session",
+   "kind": "command",
+   "command": "quick_chat_open_session",
+   "ownerCapability": "host:quick-chat-session-handoff",
+   "windows": [
+    "main",
+    "quick-chat"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::quick_chat_open_session_ack",
+   "kind": "command",
+   "command": "quick_chat_open_session_ack",
+   "ownerCapability": "host:quick-chat-session-handoff",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::quick_chat_reload_shortcut",
+   "kind": "command",
+   "command": "quick_chat_reload_shortcut",
+   "ownerCapability": "host:global-shortcut",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::quick_chat_resize",
+   "kind": "command",
+   "command": "quick_chat_resize",
+   "ownerCapability": "host:quick-chat-window",
+   "windows": [
+    "quick-chat"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::quick_chat_shortcut_status",
+   "kind": "command",
+   "command": "quick_chat_shortcut_status",
+   "ownerCapability": "host:global-shortcut",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::quick_chat_show",
+   "kind": "command",
+   "command": "quick_chat_show",
+   "ownerCapability": "host:quick-chat-window",
+   "windows": [
+    "main",
+    "quick-chat"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::read_file",
+   "kind": "command",
+   "command": "read_file",
+   "ownerCapability": "host:file-text-io",
+   "windows": [
+    "main",
+    "viewer-*"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::read_file_base64",
+   "kind": "command",
+   "command": "read_file_base64",
+   "ownerCapability": "host:file-text-io",
+   "windows": [
+    "main",
+    "viewer-*"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::read_file_snapshot",
+   "kind": "command",
+   "command": "read_file_snapshot",
+   "ownerCapability": "host:file-text-io",
+   "windows": [
+    "main",
+    "viewer-*"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::read_skill_file",
+   "kind": "command",
+   "command": "read_skill_file",
+   "ownerCapability": "host:skill-viewer",
+   "windows": [
+    "main",
+    "skill-viewer-*"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::reload_main_window",
+   "kind": "command",
+   "command": "reload_main_window",
+   "ownerCapability": "host:reload-restart",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::resource_events",
+   "kind": "command",
+   "command": "resource_events",
+   "ownerCapability": "host:detached-viewer",
+   "windows": [
+    "main",
+    "viewer-*"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::resource_subscribe",
+   "kind": "command",
+   "command": "resource_subscribe",
+   "ownerCapability": "host:detached-viewer",
+   "windows": [
+    "main",
+    "viewer-*"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::resource_unsubscribe",
+   "kind": "command",
+   "command": "resource_unsubscribe",
+   "ownerCapability": "host:detached-viewer",
+   "windows": [
+    "main",
+    "viewer-*"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::restart_app",
+   "kind": "command",
+   "command": "restart_app",
+   "ownerCapability": "host:reload-restart",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::run_edit_command",
+   "kind": "command",
+   "command": "run_edit_command",
+   "ownerCapability": "host:clipboard-edit-command",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::rust_browser_request",
+   "kind": "command",
+   "command": "rust_browser_request",
+   "ownerCapability": "host:browser-viewer",
+   "windows": [
+    "browser-viewer",
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/browser_viewer.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::select_files",
+   "kind": "command",
+   "command": "select_files",
+   "ownerCapability": "host:file-dialogs",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::select_folder",
+   "kind": "command",
+   "command": "select_folder",
+   "ownerCapability": "host:file-dialogs",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::select_skill",
+   "kind": "command",
+   "command": "select_skill",
+   "ownerCapability": "host:file-dialogs",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::set_auto_launch_enabled",
+   "kind": "command",
+   "command": "set_auto_launch_enabled",
+   "ownerCapability": "host:auto-launch",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "blocked",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::set_browser_connection",
+   "kind": "command",
+   "command": "set_browser_connection",
+   "ownerCapability": "host:browser-viewer",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/browser_viewer.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::set_keep_awake_enabled",
+   "kind": "command",
+   "command": "set_keep_awake_enabled",
+   "ownerCapability": "host:keep-awake",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::settings_changed",
+   "kind": "command",
+   "command": "settings_changed",
+   "ownerCapability": "host:settings-broadcast",
+   "windows": [
+    "browser-viewer",
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::show_in_finder",
+   "kind": "command",
+   "command": "show_in_finder",
+   "ownerCapability": "host:external-open",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::show_notification",
+   "kind": "command",
+   "command": "show_notification",
+   "ownerCapability": "host:notification",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native/install.rs",
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "blocked",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::skill_viewer_close",
+   "kind": "command",
+   "command": "skill_viewer_close",
+   "ownerCapability": "host:skill-viewer",
+   "windows": [
+    "skill-viewer-*"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::skill_viewer_load",
+   "kind": "command",
+   "command": "skill_viewer_load",
+   "ownerCapability": "host:skill-viewer",
+   "windows": [
+    "skill-viewer-*"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::spawn_viewer",
+   "kind": "command",
+   "command": "spawn_viewer",
+   "ownerCapability": "host:detached-viewer",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::speech_permission_request",
+   "kind": "command",
+   "command": "speech_permission_request",
+   "ownerCapability": "host:speech-permission",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "blocked",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::speech_permission_status",
+   "kind": "command",
+   "command": "speech_permission_status",
+   "ownerCapability": "host:speech-permission",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "blocked",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::start_drag",
+   "kind": "command",
+   "command": "start_drag",
+   "ownerCapability": "host:drag-out",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/native_commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::trash_item",
+   "kind": "command",
+   "command": "trash_item",
+   "ownerCapability": "host:trash",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/files.rs",
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::unwatch_file",
+   "kind": "command",
+   "command": "unwatch_file",
+   "ownerCapability": "host:file-watch",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::unwatch_workspace",
+   "kind": "command",
+   "command": "unwatch_workspace",
+   "ownerCapability": "host:file-watch",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::viewer_close",
+   "kind": "command",
+   "command": "viewer_close",
+   "ownerCapability": "host:detached-viewer",
+   "windows": [
+    "viewer-*"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::viewer_request_load",
+   "kind": "command",
+   "command": "viewer_request_load",
+   "ownerCapability": "host:detached-viewer",
+   "windows": [
+    "viewer-*"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::watch_file",
+   "kind": "command",
+   "command": "watch_file",
+   "ownerCapability": "host:file-watch",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::watch_workspace",
+   "kind": "command",
+   "command": "watch_workspace",
+   "ownerCapability": "host:file-watch",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::window_close",
+   "kind": "command",
+   "command": "window_close",
+   "ownerCapability": "host:window-controls",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::window_is_maximized",
+   "kind": "command",
+   "command": "window_is_maximized",
+   "ownerCapability": "host:window-controls",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::window_maximize",
+   "kind": "command",
+   "command": "window_maximize",
+   "ownerCapability": "host:window-controls",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::window_minimize",
+   "kind": "command",
+   "command": "window_minimize",
+   "ownerCapability": "host:window-controls",
+   "windows": [
+    "main",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::window_theme_changed",
+   "kind": "command",
+   "command": "window_theme_changed",
+   "ownerCapability": "host:theme-sync",
+   "windows": [
+    "browser-viewer",
+    "main",
+    "quick-chat",
+    "settings"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/commands.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::write_file",
+   "kind": "command",
+   "command": "write_file",
+   "ownerCapability": "host:file-text-io",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::write_file_binary",
+   "kind": "command",
+   "command": "write_file_binary",
+   "ownerCapability": "host:file-text-io",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  },
+  {
+   "id": "command::write_file_if_unchanged",
+   "kind": "command",
+   "command": "write_file_if_unchanged",
+   "ownerCapability": "host:file-text-io",
+   "windows": [
+    "main"
+   ],
+   "implementationFiles": [
+    "desktop/src-tauri/src/lib.rs"
+   ],
+   "surfaceVerified": true,
+   "status": "pending",
+   "note": "行为状态继承所属能力；该行只声明注册面/实现符号核对"
+  }
+ ],
+ "leafRows": [
+  {
+   "id": "leaf::R00-T02-LA-0DEEE4813B0A",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-0DEEE4813B0A",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-0DEEE4813B0A::a1-spawn-viewer-window",
+    "leaf:R00-T02-LA-0DEEE4813B0A::a2-viewer-missing-payload"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "`host:detached-viewer` 消费者: desktop/src/react/stores/preview-actions.ts:41（spawn）；desktop/src/react/stores/preview-actions.ts:63（onViewerClosed）；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-1120B2AA320D",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-1120B2AA320D",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-1120B2AA320D::a1-onboarding-complete-open-main",
+    "leaf:R00-T02-LA-1120B2AA320D::a2-onboarding-complete-save-failure"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [
+    "leaf:R00-T02-LA-1120B2AA320D::a1-onboarding-complete-open-main",
+    "leaf:R00-T02-LA-1120B2AA320D::a2-onboarding-complete-save-failure"
+   ],
+   "manualAssertions": [],
+   "electronReference": "`host:onboarding` 消费者: desktop/src/react/onboarding/OnboardingApp.tsx:94；desktop/src/react/onboarding/steps/TutorialStep.tsx:87；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "blocked",
+   "note": "T03 计划中该叶存在 blocked 断言（onboarding 服务路由/DOCX/XLSX 命令缺口，已登记 T03_T04_PROGRESS）；真实动作证据 pending"
+  },
+  {
+   "id": "leaf::R00-T02-LA-1329EA46F72C",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-1329EA46F72C",
+   "hostClass": "SERVER_REACT",
+   "classification": "NON_HOST_SERVER_REACT",
+   "assertionCount": 7,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [],
+   "plannedCasesObserved": 0,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "React `desktop/src/react/settings/SettingsContent.tsx` + `settings/tabs/InterfaceTab.tsx`（R00 source `SettingsNav.tsx:17`）；服务端 preferences/appearance 路由 `lib.rs:8905` 仅消费方",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 0
+   },
+   "status": "excluded_non_host",
+   "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-15DFB1AED8F2",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-15DFB1AED8F2",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-15DFB1AED8F2::a1-drag-out-single-multi",
+    "leaf:R00-T02-LA-15DFB1AED8F2::a2-drag-out-missing-target"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [
+    "leaf:R00-T02-LA-15DFB1AED8F2::a1-drag-out-single-multi"
+   ],
+   "electronReference": "`host:drag-out` 消费者: desktop/src/react/components/desk/DeskTree.tsx:562；desktop/src/react/components/chat/AssistantMessage.tsx:608；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-15E163FBFBE8",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-15E163FBFBE8",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-15E163FBFBE8::a1-settings-broadcast-fanout",
+    "leaf:R00-T02-LA-15E163FBFBE8::a2-settings-broadcast-missing-window"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "`host:settings-broadcast` 消费者: desktop/src/react/settings/tabs/KeybindingsTab.tsx:251/362；desktop/src/react/settings/tabs/ExperimentsTab.tsx:416；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-1629CDD9EA4F",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-1629CDD9EA4F",
+   "hostClass": "SERVER_REACT",
+   "classification": "NON_HOST_SERVER_REACT",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [],
+   "plannedCasesObserved": 0,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "Rust `lingxi-service/settings_configuration.rs:799 user_profile_put_route`（`/lingxi/v1/user-profile` PUT，`lib.rs:9055`）；React `settings/tabs/MeTab.tsx:53`；R00 owner `server/routes/config.ts:386`",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 0
+   },
+   "status": "excluded_non_host",
+   "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-173C6332527D",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-173C6332527D",
+   "hostClass": "SERVER_REACT",
+   "classification": "NON_HOST_SERVER_REACT",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [],
+   "plannedCasesObserved": 0,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "Rust `lib.rs:8916 /lingxi/v1/system/env-deps/refresh` + `env_deps.rs`；React `settings/tabs/EnvDepsTab.tsx:76`；R00 owner `server/routes/env-deps.ts:47`",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 0
+   },
+   "status": "excluded_non_host",
+   "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-18FE3FDFF9A5",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-18FE3FDFF9A5",
+   "hostClass": "HOST_BRIDGE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-18FE3FDFF9A5::a1-appearance-read-no-write",
+    "leaf:R00-T02-LA-18FE3FDFF9A5::a2-appearance-invalid-write"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "权威面=R00 owner `server/routes/preferences.ts`（server/routes/preferences.ts:256）；host 侧参与: `host:theme-sync` 消费者: desktop/src/shared/theme.ts:28（hana?.syncWindowTheme?.）",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-1C41525D379C",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-1C41525D379C",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-1C41525D379C::a1-onboarding-open-focus",
+    "leaf:R00-T02-LA-1C41525D379C::a2-onboarding-open-no-complete"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "`host:onboarding` 消费者: desktop/src/react/onboarding/OnboardingApp.tsx:94；desktop/src/react/onboarding/steps/TutorialStep.tsx:87；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-1D4C7E9C713C",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-1D4C7E9C713C",
+   "hostClass": "SERVER_REACT",
+   "classification": "NON_HOST_SERVER_REACT",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [],
+   "plannedCasesObserved": 0,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "React `hooks/use-slash-items.ts:100`（`/api/commands`）；R00 owner `server/routes/commands.ts:18`；**Rust 服务未检出 `/api/commands` 等价迁移路由（R07 缺口，非宿主面）**",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 0
+   },
+   "status": "excluded_non_host",
+   "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-1E6EDB731186",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-1E6EDB731186",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-1E6EDB731186::a1-onboarding-preview-shows-steps",
+    "leaf:R00-T02-LA-1E6EDB731186::a2-onboarding-preview-no-side-effects"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "`host:onboarding` 消费者: desktop/src/react/onboarding/OnboardingApp.tsx:94；desktop/src/react/onboarding/steps/TutorialStep.tsx:87；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-322E02C7F2F9",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-322E02C7F2F9",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-322E02C7F2F9::a1-reload-main-window",
+    "leaf:R00-T02-LA-322E02C7F2F9::a2-reload-not-update-success"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "`host:reload-restart` 消费者: desktop/src/react/settings/tabs/AccessTab.tsx:366；desktop/src/react/settings/tabs/AccessTab.tsx:390；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-37E6C3B9A7B8",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-37E6C3B9A7B8",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-37E6C3B9A7B8::a1-docx-preview-render",
+    "leaf:R00-T02-LA-37E6C3B9A7B8::a2-docx-preview-invalid-input"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [
+    "leaf:R00-T02-LA-37E6C3B9A7B8::a1-docx-preview-render",
+    "leaf:R00-T02-LA-37E6C3B9A7B8::a2-docx-preview-invalid-input"
+   ],
+   "manualAssertions": [],
+   "electronReference": "`host:docx-xlsx-preview` 消费者: desktop/src/react/utils/preview-file-content.ts:127（readDocxHtml）；desktop/src/react/utils/preview-file-content.ts:131（readXlsxHtml）；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "blocked",
+   "note": "T03 计划中该叶存在 blocked 断言（onboarding 服务路由/DOCX/XLSX 命令缺口，已登记 T03_T04_PROGRESS）；真实动作证据 pending"
+  },
+  {
+   "id": "leaf::R00-T02-LA-394DD07D2968",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-394DD07D2968",
+   "hostClass": "HOST_BRIDGE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-394DD07D2968::a1-keybindings-update-registered",
+    "leaf:R00-T02-LA-394DD07D2968::a2-keybindings-invalid-body"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "权威面=R00 owner `server/routes/preferences.ts`（server/routes/preferences.ts:368）；host 侧参与: `host:global-shortcut` 消费者: desktop/src/react/settings/tabs/KeybindingsTab.tsx:112（test probe）、:209（test-register）、:254/:257（reload）、desktop/src/react/settings/tabs/GeneralTab.tsx:179,:191（reload）；no-consumer-found：quickChatShortcutStatus 无渲染调用（R00 叶子登记但当前 React 未调用）",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-429D86C4F952",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-429D86C4F952",
+   "hostClass": "SERVER_REACT",
+   "classification": "NON_HOST_SERVER_REACT",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [],
+   "plannedCasesObserved": 0,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "Rust `settings_ui.rs user_profile_route`（`/lingxi/v1/user-profile` GET，`lib.rs:9054`）；React `settings/actions.ts:180`；R00 owner `server/routes/config.ts:376`",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 0
+   },
+   "status": "excluded_non_host",
+   "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-57728C0A6D0A",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-57728C0A6D0A",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-57728C0A6D0A::a1-open-settings-window-focus",
+    "leaf:R00-T02-LA-57728C0A6D0A::a2-open-settings-not-saved"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "`host:settings-window` 消费者: desktop/src/react/app-init.ts:407（onOpenSettingsModal）；desktop/src/react/settings/SettingsContent.tsx:191（onSwitchTab）；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-58822B6B138B",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-58822B6B138B",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-58822B6B138B::a1-window-readiness-main-after-splash",
+    "leaf:R00-T02-LA-58822B6B138B::a2-window-readiness-not-early"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "`host:main-window` 消费者: no-consumer-found（host-internal；renderer 经 app-ready/window-controls 间接）；`host:app-ready` 消费者: desktop/src/react/app-init.ts:211；desktop/src/react/app-init.ts:234；`host:window-state` 消费者: no-consumer-found（host-internal）；`host:app-lifecycle-quit` 消费者: no-consumer-found（host-internal）；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-59987671E5AD",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-59987671E5AD",
+   "hostClass": "SERVER_REACT",
+   "classification": "NON_HOST_SERVER_REACT",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [],
+   "plannedCasesObserved": 0,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "Rust `lib.rs:8923 /lingxi/v1/preferences/workspace-ui-state` GET（`workspace_ui_state.rs`）；React `stores/workspace-ui-state-actions.ts:104`；R00 owner `server/routes/preferences.ts:490`",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 0
+   },
+   "status": "excluded_non_host",
+   "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-5D5938D61A00",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-5D5938D61A00",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-5D5938D61A00::a1-shortcut-register-and-trigger",
+    "leaf:R00-T02-LA-5D5938D61A00::a2-shortcut-conflict-unavailable"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "`host:global-shortcut` 消费者: desktop/src/react/settings/tabs/KeybindingsTab.tsx:112（test probe）、:209（test-register）、:254/:257（reload）、desktop/src/react/settings/tabs/GeneralTab.tsx:179,:191（reload）；no-consumer-found：quickChatShortcutStatus 无渲染调用（R00 叶子登记但当前 React 未调用）；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-6006FD0BF07D",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-6006FD0BF07D",
+   "hostClass": "SERVER_REACT",
+   "classification": "NON_HOST_SERVER_REACT",
+   "assertionCount": 3,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [],
+   "plannedCasesObserved": 0,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "React `desktop/src/react/settings/SettingsContent.tsx` + `settings/tabs/MeTab.tsx`（R00 source `SettingsNav.tsx:16`）",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 0
+   },
+   "status": "excluded_non_host",
+   "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-6774E79F6714",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-6774E79F6714",
+   "hostClass": "HOST_BRIDGE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-6774E79F6714::a1-setup-complete-followup-launch",
+    "leaf:R00-T02-LA-6774E79F6714::a2-setup-complete-manager-unavailable"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [
+    "leaf:R00-T02-LA-6774E79F6714::a1-setup-complete-followup-launch",
+    "leaf:R00-T02-LA-6774E79F6714::a2-setup-complete-manager-unavailable"
+   ],
+   "manualAssertions": [],
+   "electronReference": "权威面=R00 owner `server/routes/preferences.ts`（server/routes/preferences.ts:476）；host 侧参与: `host:onboarding` 消费者: desktop/src/react/onboarding/OnboardingApp.tsx:94；desktop/src/react/onboarding/steps/TutorialStep.tsx:87",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "blocked",
+   "note": "T03 计划中该叶存在 blocked 断言（onboarding 服务路由/DOCX/XLSX 命令缺口，已登记 T03_T04_PROGRESS）；真实动作证据 pending"
+  },
+  {
+   "id": "leaf::R00-T02-LA-70B07E378F42",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-70B07E378F42",
+   "hostClass": "SERVER_REACT",
+   "classification": "NON_HOST_SERVER_REACT",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [],
+   "plannedCasesObserved": 0,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "R00 owner `server/routes/preferences.ts:154`（Electron 启动闸门调用 `desktop/main.cjs:2265`）；**Rust 服务无等价路由，Rust 模式显式拒绝**；R09 不迁移真实数据 → 非宿主、Tauri 不实现",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 0
+   },
+   "status": "excluded_non_host",
+   "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-713E908B7B2F",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-713E908B7B2F",
+   "hostClass": "SERVER_REACT",
+   "classification": "NON_HOST_SERVER_REACT",
+   "assertionCount": 3,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [],
+   "plannedCasesObserved": 0,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "React `desktop/src/react/settings/SettingsContent.tsx` + `settings/tabs/EnvDepsTab.tsx`（R00 source `SettingsNav.tsx:32`）",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 0
+   },
+   "status": "excluded_non_host",
+   "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-8FE26C132D8B",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-8FE26C132D8B",
+   "hostClass": "SERVER_REACT",
+   "classification": "NON_HOST_SERVER_REACT",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [],
+   "plannedCasesObserved": 0,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "Rust `lib.rs:8899 /lingxi/v1/preferences/sidebar-ui` GET（`userprefs.rs`）；React `settings/tabs/InterfaceTab.tsx:182`；R00 owner `server/routes/preferences.ts:525`",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 0
+   },
+   "status": "excluded_non_host",
+   "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-9350C3E12165",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-9350C3E12165",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-9350C3E12165::a1-restart-process-identity",
+    "leaf:R00-T02-LA-9350C3E12165::a2-restart-blocked-explicit"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "`host:reload-restart` 消费者: desktop/src/react/settings/tabs/AccessTab.tsx:366；desktop/src/react/settings/tabs/AccessTab.tsx:390；`host:app-lifecycle-quit` 消费者: no-consumer-found（host-internal）；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-98B458390B7E",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-98B458390B7E",
+   "hostClass": "HOST_BRIDGE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-98B458390B7E::a1-keybindings-read-effective",
+    "leaf:R00-T02-LA-98B458390B7E::a2-keybindings-read-invalid"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "权威面=R00 owner `server/routes/preferences.ts`（server/routes/preferences.ts:360）；host 侧参与: `host:global-shortcut` 消费者: desktop/src/react/settings/tabs/KeybindingsTab.tsx:112（test probe）、:209（test-register）、:254/:257（reload）、desktop/src/react/settings/tabs/GeneralTab.tsx:179,:191（reload）；no-consumer-found：quickChatShortcutStatus 无渲染调用（R00 叶子登记但当前 React 未调用）",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-9C679D21A188",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-9C679D21A188",
+   "hostClass": "SERVER_REACT",
+   "classification": "NON_HOST_SERVER_REACT",
+   "assertionCount": 4,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [],
+   "plannedCasesObserved": 0,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "React `desktop/src/react/settings/SettingsContent.tsx` + `settings/tabs/KeybindingsTab.tsx`（R00 source `SettingsNav.tsx:18`）；快捷键持久化走 `lib.rs:8895 /lingxi/v1/preferences/keybindings`",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 0
+   },
+   "status": "excluded_non_host",
+   "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-A14D3027C881",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-A14D3027C881",
+   "hostClass": "SERVER_REACT",
+   "classification": "NON_HOST_SERVER_REACT",
+   "assertionCount": 5,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [],
+   "plannedCasesObserved": 0,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "React `desktop/src/react/settings/SettingsContent.tsx` + `settings/tabs/GeneralTab.tsx`（R00 source `SettingsNav.tsx:19`）",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 0
+   },
+   "status": "excluded_non_host",
+   "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-A2E507EBDEF2",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-A2E507EBDEF2",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-A2E507EBDEF2::a1-autolaunch-read-toggle",
+    "leaf:R00-T02-LA-A2E507EBDEF2::a2-autolaunch-write-failure"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "`host:auto-launch` 消费者: desktop/src/react/settings/tabs/GeneralTab.tsx:101（get）；desktop/src/react/settings/tabs/GeneralTab.tsx:211（set）；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-AC5B6EDA3FBD",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-AC5B6EDA3FBD",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-AC5B6EDA3FBD::a1-splash-info-avatar",
+    "leaf:R00-T02-LA-AC5B6EDA3FBD::a2-splash-info-fallback"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "`host:splash` 消费者: desktop/src/react/splash/SplashApp.tsx:59/60；desktop/src/react/onboarding/OnboardingApp.tsx:117/126；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-ACA2C4C1158D",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-ACA2C4C1158D",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-ACA2C4C1158D::a1-open-external-http",
+    "leaf:R00-T02-LA-ACA2C4C1158D::a2-open-external-invalid"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "`host:external-open` 消费者: desktop/src/react/settings/tabs/McpTab.tsx:260；desktop/src/react/settings/tabs/AboutTab.tsx:372；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-B6A97A19F2CB",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-B6A97A19F2CB",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-B6A97A19F2CB::a1-settings-modal-open-tab",
+    "leaf:R00-T02-LA-B6A97A19F2CB::a2-settings-modal-unknown-tab"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "`host:settings-window` 消费者: desktop/src/react/app-init.ts:407（onOpenSettingsModal）；desktop/src/react/settings/SettingsContent.tsx:191（onSwitchTab）；`host:settings-broadcast` 消费者: desktop/src/react/settings/tabs/KeybindingsTab.tsx:251/362；desktop/src/react/settings/tabs/ExperimentsTab.tsx:416；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-B72A6D3886B7",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-B72A6D3886B7",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-B72A6D3886B7::a1-keepawake-on-off-assertion",
+    "leaf:R00-T02-LA-B72A6D3886B7::a2-keepawake-unsupported"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "`host:keep-awake` 消费者: desktop/src/react/settings/tabs/GeneralTab.tsx:227（setKeepAwakeEnabled）；no-consumer-found：getKeepAwakeStatus 无渲染调用（R00 叶子登记但当前 React 未调用）；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-BEC2074CC33C",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-BEC2074CC33C",
+   "hostClass": "HOST_BRIDGE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-BEC2074CC33C::a1-locale-switch-tray-labels",
+    "leaf:R00-T02-LA-BEC2074CC33C::a2-locale-fallback-no-new-language"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [
+    "leaf:R00-T02-LA-BEC2074CC33C::a1-locale-switch-tray-labels"
+   ],
+   "electronReference": "权威面=R00 owner `desktop/src/react/settings/tabs/InterfaceTab.tsx`（desktop/src/react/settings/tabs/InterfaceTab.tsx:592, desktop/src/react/settings/tabs/InterfaceTab.tsx:600, desktop/src/react/settings/tabs/InterfaceTab.tsx:601）；host 侧参与: `host:i18n-main` 消费者: desktop/src/react/services/app-event-actions.ts:309（locale-changed 源头）→ settingsChanged",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-C5AAF360D10F",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-C5AAF360D10F",
+   "hostClass": "SERVER_REACT",
+   "classification": "NON_HOST_SERVER_REACT",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [],
+   "plannedCasesObserved": 0,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "Rust `lib.rs:8923 /lingxi/v1/preferences/workspace-ui-state` PUT（`workspace_ui_state.rs`）；React `stores/workspace-ui-state-actions.ts`；R00 owner `server/routes/preferences.ts:505`",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 0
+   },
+   "status": "excluded_non_host",
+   "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-CD873C715D96",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-CD873C715D96",
+   "hostClass": "SERVER_REACT",
+   "classification": "NON_HOST_SERVER_REACT",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [],
+   "plannedCasesObserved": 0,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "Rust `lib.rs:8912 /lingxi/v1/system/env-deps` GET（`env_deps.rs`）；React `settings/tabs/EnvDepsTab.tsx:77`；R00 owner `server/routes/env-deps.ts:36`",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 0
+   },
+   "status": "excluded_non_host",
+   "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-D15E0ADC0608",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-D15E0ADC0608",
+   "hostClass": "HOST_BRIDGE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-D15E0ADC0608::a1-notification-prefs-update-bridge",
+    "leaf:R00-T02-LA-D15E0ADC0608::a2-notification-prefs-invalid"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "权威面=R00 owner `server/routes/preferences.ts`（server/routes/preferences.ts:318）；host 侧参与: `host:notification` 消费者: desktop/src/react/services/ws-message-handler.ts:988；desktop/src/react/services/rust-automation.ts:298",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-D29DE479076C",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-D29DE479076C",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-D29DE479076C::a1-theme-broadcast-redraw",
+    "leaf:R00-T02-LA-D29DE479076C::a2-theme-no-persistence-claim"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "`host:theme-sync` 消费者: desktop/src/shared/theme.ts:28（hana?.syncWindowTheme?.）；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-DF4B5168ABB5",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-DF4B5168ABB5",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-DF4B5168ABB5::a1-notification-delivered-and-click-focus",
+    "leaf:R00-T02-LA-DF4B5168ABB5::a2-notification-suppressed-or-unsupported"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [
+    "leaf:R00-T02-LA-DF4B5168ABB5::a1-notification-delivered-and-click-focus"
+   ],
+   "electronReference": "`host:notification` 消费者: desktop/src/react/services/ws-message-handler.ts:988；desktop/src/react/services/rust-automation.ts:298；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-E6FB08FBBFAA",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-E6FB08FBBFAA",
+   "hostClass": "HOST_BRIDGE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-E6FB08FBBFAA::a1-notification-prefs-read",
+    "leaf:R00-T02-LA-E6FB08FBBFAA::a2-notification-prefs-read-invalid"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "权威面=R00 owner `server/routes/preferences.ts`（server/routes/preferences.ts:310）；host 侧参与: `host:notification` 消费者: desktop/src/react/services/ws-message-handler.ts:988；desktop/src/react/services/rust-automation.ts:298",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-E84F01456B6C",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-E84F01456B6C",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-E84F01456B6C::a1-xlsx-preview-render",
+    "leaf:R00-T02-LA-E84F01456B6C::a2-xlsx-preview-invalid"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [
+    "leaf:R00-T02-LA-E84F01456B6C::a1-xlsx-preview-render",
+    "leaf:R00-T02-LA-E84F01456B6C::a2-xlsx-preview-invalid"
+   ],
+   "manualAssertions": [],
+   "electronReference": "`host:docx-xlsx-preview` 消费者: desktop/src/react/utils/preview-file-content.ts:127（readDocxHtml）；desktop/src/react/utils/preview-file-content.ts:131（readXlsxHtml）；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "blocked",
+   "note": "T03 计划中该叶存在 blocked 断言（onboarding 服务路由/DOCX/XLSX 命令缺口，已登记 T03_T04_PROGRESS）；真实动作证据 pending"
+  },
+  {
+   "id": "leaf::R00-T02-LA-F5DBF2A80E28",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-F5DBF2A80E28",
+   "hostClass": "HOST_BRIDGE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-F5DBF2A80E28::a1-appearance-update-window-theme",
+    "leaf:R00-T02-LA-F5DBF2A80E28::a2-appearance-update-invalid"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "权威面=R00 owner `server/routes/preferences.ts`（server/routes/preferences.ts:264）；host 侧参与: `host:theme-sync` 消费者: desktop/src/shared/theme.ts:28（hana?.syncWindowTheme?.）",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-F6235778F816",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-F6235778F816",
+   "hostClass": "SERVER_REACT",
+   "classification": "NON_HOST_SERVER_REACT",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [],
+   "plannedCasesObserved": 0,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "Rust `lib.rs:9006 /lingxi/v1/settings/snapshot` GET（`settings_ui.rs:234`）；React settings store（`settings/__tests__/...` 真实调用）；R00 owner `server/routes/settings-snapshot.ts:185`",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 0
+   },
+   "status": "excluded_non_host",
+   "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-F9786414DD11",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-F9786414DD11",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-F9786414DD11::a1-window-controls-caller-only",
+    "leaf:R00-T02-LA-F9786414DD11::a2-window-controls-no-window"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "`host:window-controls` 消费者: desktop/src/react/components/WindowControls.tsx:24（onMaximizeChange）；desktop/src/react/components/WindowControls.tsx:26/29/30/31（isMaximized/minimize/maximize/close）；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-FB5C78308878",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-FB5C78308878",
+   "hostClass": "SERVER_REACT",
+   "classification": "NON_HOST_SERVER_REACT",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [],
+   "plannedCasesObserved": 0,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "Rust `lib.rs:8899 /lingxi/v1/preferences/sidebar-ui` PUT；React `settings/tabs/InterfaceTab.tsx:302`；R00 owner `server/routes/preferences.ts:533`",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 0
+   },
+   "status": "excluded_non_host",
+   "note": "SERVER_REACT：实现/证据归 server/React，不属宿主面（T03_T04_PROGRESS §9.1）"
+  },
+  {
+   "id": "leaf::R00-T02-LA-FF1B331F1019",
+   "kind": "shared-leaf",
+   "leafId": "R00-T02-LA-FF1B331F1019",
+   "hostClass": "HOST_NATIVE",
+   "classification": "HOST_UI",
+   "assertionCount": 2,
+   "plannedSuite": "r09_t03_native_matrix",
+   "plannedActionCases": [
+    "leaf:R00-T02-LA-FF1B331F1019::a1-settings-tab-activation",
+    "leaf:R00-T02-LA-FF1B331F1019::a2-settings-unknown-tab-no-action"
+   ],
+   "plannedCasesObserved": 2,
+   "blockedAssertions": [],
+   "manualAssertions": [],
+   "electronReference": "`host:settings-window` 消费者: desktop/src/react/app-init.ts:407（onOpenSettingsModal）；desktop/src/react/settings/SettingsContent.tsx:191（onSwitchTab）；R00 execution_owner: Tauri DesktopHost＋原React",
+   "tauriEvidence": {
+    "suite": "r09_t03_native_matrix",
+    "observedActionCases": 2
+   },
+   "status": "pending",
+   "note": "T03 GUI 真实动作证据 pending（plannedActionCase 未执行；不得用逻辑单测冒充）"
+  }
+ ],
+ "summary": {
+  "measured": {
+   "parity": 12,
+   "differs": 1
+  },
+  "capabilities": {
+   "parity": 6,
+   "blocked": 3,
+   "pending": 33,
+   "recorded": 8
+  },
+  "leaves": {
+   "pending": 26,
+   "blocked": 4,
+   "excluded_non_host": 16
+  },
+  "recorded": 8,
+  "blocked": 7,
+  "pending": 59,
+  "unapprovedDifferences": [
+   {
+    "id": "measured::t05::old-chain-vs-rust-chain",
+    "reason": "measured evidence failed/unavailable"
+   }
+  ]
+ }
+}

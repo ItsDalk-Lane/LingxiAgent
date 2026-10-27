@@ -1,0 +1,45 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.02s
+     Running tests/r07_conversation_files.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_conversation_files-e95a00e082c56d57)
+
+running 9 tests
+test dm_partial_success_preserves_first_copy_and_never_overwrites_changed_second ... ok
+test malformed_authority_and_symlink_paths_fail_closed ... ok
+test same_request_is_frozen_and_concurrent_retries_never_append_twice ... ok
+test forged_sender_headers_and_separators_round_trip_as_one_body ... ok
+test legacy_metadata_history_and_bookmarks_survive_real_patch ... ok
+test phone_reset_keeps_history_unknown_metadata_and_dm_bytes ... ok
+test user_bookmarks_use_the_legacy_user_directory_without_aliasing_an_agent ... ok
+test restart_recognizes_written_postimage_without_blind_reappend ... ok
+test revoked_member_cannot_resume_old_prepared_append ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.59s
+
+     Running tests/r07_phone_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_phone_store-7a62e66228c1729c)
+
+running 9 tests
+test delivery_binding_is_atomic_across_first_claim_reset_and_actual_unbound_run ... FAILED
+test concurrent_claims_spend_one_frozen_budget_across_restart ... ok
+test message_source_precedes_file_receipt_and_is_an_immutable_real_started_call ... ok
+test only_actual_causal_run_can_bind_or_decide_and_each_run_decides_once ... ok
+test binding_uses_actual_owned_session_cas_expiry_and_persistent_epoch_after_reset ... ok
+test descendants_share_root_budget_and_cancellation_scope_includes_child_runs ... ok
+test dm_three_rounds_directional_cooldown_and_five_minute_lock_are_persistent ... ok
+test accepted_unbound_run_recovers_from_lineage_and_never_creates_another ... ok
+test completed_real_reply_remains_publishable_until_same_file_operation_is_applied ... ok
+
+failures:
+
+---- delivery_binding_is_atomic_across_first_claim_reset_and_actual_unbound_run stdout ----
+
+thread 'delivery_binding_is_atomic_across_first_claim_reset_and_actual_unbound_run' (621440) panicked at crates/lingxi-adapters/tests/r07_phone_store.rs:105:6:
+called `Result::unwrap()` on an `Err` value: InvalidRequest { detail: "run run-first: finalize rejected (running -> cancelled): transition not permitted by the run lifecycle contract" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    delivery_binding_is_atomic_across_first_claim_reset_and_actual_unbound_run
+
+test result: FAILED. 8 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s
+
+error: test failed, to rerun pass `-p lingxi-adapters --test r07_phone_store`

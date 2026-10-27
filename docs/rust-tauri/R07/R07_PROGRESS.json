@@ -1,0 +1,196 @@
+{
+ "schemaVersion": 1,
+ "stage": "R07",
+ "status": "IN_PROGRESS",
+ "sourceBase": "0c86675d4",
+ "startBasis": "R06由用户明确接受；保留最后实际整轮失败，不重开R06。",
+ "scope": {
+  "baseScenarios": 24,
+  "requiredSupplementalScenarios": 408,
+  "extensionBoundaries": 2
+ },
+ "tasks": [
+  {
+   "id": "R07-T01",
+   "title": "定时任务、心跳与统一调度",
+   "status": "LOCAL_VERIFIED",
+   "note": "T01本地验证已完成，T02补齐bridge_owner真实通知回执/成功后上下文及重启不重发。Windows等未验范围继续保留，不重开R06。",
+   "historicalFailuresRetained": [
+    "调度首轮600秒超时中止，已定位后台输入历史锚点并修复；后续7项通过。",
+    "原R06界面检查缺本地构建缓存，未改写为通过。"
+   ],
+   "codeFingerprint": "f33ab49b1e8b638eb19d9c3d89c2fcf3f85dee22b7326b8f2ded665e65f78479",
+   "report": "T01_REPORT.md"
+  },
+  {
+   "id": "R07-T02",
+   "title": "五平台Bridge接入",
+   "status": "LOCAL_VERIFIED",
+   "note": "五平台正式SDK与Rust真实执行/存储链、重投/重启、安全矩阵、原生效果/回执与取消、管理页面已本地验证；独立审阅问题已关闭。真实账号、非Unix能力及正式包按延期范围保留。",
+   "codeFingerprint": "de949dedc106172aab3365fb50fcc7155bd53122afb428f3cb9d32b7a9a418b9",
+   "report": "T02_REPORT.md",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T02"
+  },
+  {
+   "id": "R07-T03",
+   "title": "频道、DM与多Agent协作",
+   "status": "LOCAL_VERIFIED",
+   "note": "频道/DM/phone与确认式跨会话协作沿真实服务链接通；最终服务627、适配器95、UI155及适用门禁通过，独立问题已关闭。22叶本地份额及A05/A06有证据；其他OS与明确未验组合继续保留。",
+   "codeFingerprint": "c450888b209b37ec02e9c19a6a1c71722551477866c3e056546b572bf3688fb4",
+   "report": "T03_REPORT.md",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T03"
+  },
+  {
+   "id": "R07-T04",
+   "title": "生产级浏览器宿主",
+   "status": "LOCAL_VERIFIED_FINAL_R07_PENDING",
+   "note": "r7同一候选19自动门禁与原生可见性通过；r7人工接管锁屏超时保留。用户解锁后A07在后续116依赖快照实际原生输入/交还补验通过，44帧及清理已归档；完整R07最终候选仍需统一回归。",
+   "codeFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+   "report": "T04_REPORT.md",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T04",
+   "supplementalA07Fingerprint": "898c5e0ba785aa0d2b09fcffb2f0e37ad9ba972b5ce2323d13194e040af8ea8d"
+  },
+  {
+   "id": "R07-T05",
+   "title": "Office、PDF、美化和内置插件",
+   "status": "LOCAL_VERIFIED",
+   "note": "候选t05c十项门禁全通过且源码未变：office集成14、unit群16、lib492、service32组743、adapter15组244、PDF真实Chromium7、A10导入2、UI 29+177、lint(fmt+clippy+typecheck)。14叶+A09/A10本机验证；7个媒体/即梦叶运行时归T06不提前领。r07_t05_media九项失败为T06未实现面，原始证据保留；phone_runtime一项时序敏感失败已保留原始回执并三次同源码通过。真实供应商/非Unix/正式包未验。",
+   "historicalFailuresRetained": [
+    "t05a-service：actual_proactive_31_minutes 时序敏感失败一次，同源码三次通过，回执保留未改写",
+    "r07_t05_media 9/9：T06 运行时未实现的预期失败，非回归",
+    "symlink 用例首轮构造无效（unix_permissions 掩掉文件类型位）被测试如实暴露后修正为 external_attributes"
+   ],
+   "codeFingerprint": "316fb6da889c6e3605aeb778ba52958094d6f08989fae73628b20cd19a7b7676",
+   "report": "T05_REPORT.md",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T05"
+  },
+  {
+   "id": "R07-T06",
+   "title": "媒体生成、语音与视觉桥",
+   "status": "LOCAL_VERIFIED",
+   "note": "候选t06b八项门禁全通过且清单指纹逐门禁核验不变：media-runtime 11/11、media-admin 9/9（新增视频HTTP全链+speech/video/ASR管理面扩展）、media lib unit 6/6、service 35组777/777、adapter 16组249/249、PDF真实Chromium 7/7、UI 7套件143/143、lint(fmt+clippy workspace+typecheck×3)。38叶+T05顺延7叶+A11/A12 全部 PASS_LOCAL_T06；6条语义偏差逐条冻结于 T06_MEDIA_STATUS.md。真实付费供应商/真实jimeng CLI/非macOS/正式安装包未验（未授权）。",
+   "historicalFailuresRetained": [
+    "t06a 作废候选：四门跑绿后发现视频/语音/ASR管理面缺直接HTTP覆盖，按T05 t05b先例重冻；t06a四份绿回执保留",
+    "dev-t06t13 揭露真实缺陷：静态GET路由 /lingxi/v1/media/speech/config 遮蔽参数化PUT致405；新增 put_speech_config 合并路由后 9/9（dev-t06t15）",
+    "dev-t06ui1：rust-conversation-events-http 既存fixture缺 /sessions/source/media/jobs 替身路由致1/143失败（T06较早接线暴露的预存缺口），补真实路由形状后143/143",
+    "t06b-adapter 首跑为编排错误（误列不存在目标 r07_media_store），t06b-adapter-r2 修正清单后 249/249；首跑回执保留",
+    "t06b-service 首跑 r07_phone_runtime::actual_proactive_31_minutes 复现T05已登记时序敏感失败（禁用/启用交错窗口）；phone路径30文件与t05c逐字节一致（非T06回归），孤立重跑15/15与t06b-service-r2全量777/777同源码通过；首跑回执保留",
+    "dev 轮次指纹方法学漂移（t06t11 vs t06ui1 起）已记录；候选门禁一律以 SOURCE_MANIFEST_t06b 清单重算为准"
+   ],
+   "codeFingerprint": "190b0c25f184eaacc23c53a02bafb54845f25dc05d8b7fa5c86550a7705b49bb",
+   "report": "T06_REPORT.md",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T06"
+  },
+  {
+   "id": "R07-T07",
+   "title": "工作台、文件历史与工作流能力",
+   "status": "LOCAL_FUNCTIONS_VERIFIED_GATE_FAILURES_PENDING_T12",
+   "note": "T07冻结候选C的服务50组1080项与界面21组495项通过；完整检查因真实Chromium弹窗流程失败，候选D局部复查又出现cookie设置后Resume导航失败。原始失败和现场均保留，不宣称整轮通过。独立工作台功能已验证；浏览器问题交T12继续排查，A14导入入口在T08实接实测。",
+   "report": "T07_STATUS.md",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T07",
+   "developmentNotes": "T07_RESUME_NOTES.md",
+   "interfaceContract": "T07_INTERFACE_CONTRACT.md"
+  },
+  {
+   "id": "R07-T08",
+   "title": "配置、管理与导入导出接口",
+   "status": "LOCAL_VERIFIED_FINAL_R07_PENDING",
+   "note": "h同一755源完整20门全部0，服务948/948、UI718/718，独立核验通过，接受T08本地实现与适用门禁份额。adapter13原生/Chromium项本h未执行；17个UI具体分支/4类窄负例/minimax原矛盾仍需T12最终逐项清账，绝不领原343全部通过。g/e/f及全部开发失败保留，LAN旧超时原因未证。按序T09，无提交推送。",
+   "report": "T08_REPORT.md",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T08",
+   "latestFailedCandidate": {
+    "candidate": "t08g",
+    "results": "artifacts/rust-tauri/R07/T08/RESULTS_t08g.json",
+    "resultsSha256": "7f3c7ee52f356a1b3a87314b4370366e254100ae4d94c823920287c13146974e",
+    "gateCount": 20,
+    "passedGates": 18,
+    "failedGates": 2,
+    "notRun": [],
+    "serviceExitCode": 101,
+    "history": "T08_FAILURE_HISTORY.json",
+    "fullStagePassClaimed": false
+   },
+   "currentCandidate": {
+    "candidate": "t08h",
+    "manifest": "artifacts/rust-tauri/R07/T08/SOURCE_MANIFEST_t08h.json",
+    "manifestSha256": "dfed102c2fd8eff025c8c64df378fbf18ebb8b113ab10b338b171719f789c8aa",
+    "sourceFingerprint": "f0dd4aa5092b31eb121c3977da8e65cbe2035ab3f4581b6c5898cf73f8da354e",
+    "status": "LOCAL_VERIFIED_FINAL_R07_PENDING",
+    "gateCount": 20,
+    "fullStagePassClaimed": false,
+    "results": "artifacts/rust-tauri/R07/T08/RESULTS_t08h.json",
+    "resultsSha256": "ca6866e8c7f8a4fcb39ed9da093e7117b463e5f33778665872bec03a63645b33",
+    "acceptance": "artifacts/rust-tauri/R07/T08/ACCEPTANCE_t08h.json",
+    "acceptanceSha256": "256c95bdb3951dbddf919a3455ce1915e1ca025da79a2a1cc923d8fb3be9a0e8"
+   },
+   "unresolvedCurrentTaskBlockers": [],
+   "finalR07Followup": "artifacts/rust-tauri/R07/T08/t08h-t12-clause-followup-actual1.json",
+   "handoff": "T08_HANDOFF.md"
+  },
+  {
+   "id": "R07-T09",
+   "title": "CLI、移动端与LAN服务",
+   "status": "LOCAL_VERIFIED",
+   "note": "CLI/mobile 共享 context 与真实执行接线随服务侧全量候选验证收官：回归34 全绿（219 个测试二进制、2363 项、0 失败，exitCode 0，sourceUnchanged=true，回执 artifacts/rust-tauri/R07/T09/t10-service-regression34.json）。本轮回归链 62 条全部登记于 docs/rust-tauri/R07/T10_LEAF_EVIDENCE_DRAFT.json（契约更新 6、环境受阻 5、persona 专属环境 2 另证、用户裁决设计退役 1，历史失败全部原样保留）。",
+   "readiness": "T09_IMPLEMENTATION_READINESS.md",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T09"
+  },
+  {
+   "id": "R07-T10",
+   "title": "观测查询、筛选与导出",
+   "status": "LOCAL_VERIFIED",
+   "note": "可观测性套件 r07_t10_observability 随回归34 全绿通过；叶级证据草案 docs/rust-tauri/R07/T10_LEAF_EVIDENCE_DRAFT.json 登记 408 叶核算口径、退役与受阻条目。手机权限保持原四项未扩权。",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T09"
+  },
+  {
+   "id": "R07-T11",
+   "title": "开发入口与扩展生命周期收口",
+   "status": "LOCAL_VERIFIED",
+   "note": "开发入口授权矩阵（三身份全响亮拒绝）、热卸载旧句柄失效、两项扩展边界闭合；旧用户插件目录退役为启动告知（不加载不删除）。t11-dev-unload3 3/3 绿，verify-r07-2 扩展边界 PASS。夹具修正史（ToolTargetId 签名、403 分层、助手登记）全留回执。",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T09"
+  },
+  {
+   "id": "R07-T12",
+   "title": "逐功能真实闭环与残留清账",
+   "status": "LOCAL_VERIFIED",
+   "note": "A23 双向路由矩阵（静态生产者+运行时全表探针）与 A24 无旧内核纯 Rust 闭环绿（t12-closure2 2/2）；verify-stage R07 正式门禁接通：24/24 基础场景 PASS、2/2 扩展 PASS、408 叶设计态 BLOCKED、35+43 移交透镜输出、overall 诚实 FAIL（逐断言证据待立为既定缺口）。地图/输入由 scripts/rust-tauri/r07_stage_inputs.py 生成，runner 三段解析+基础集合核对+合同机制落地。",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T12"
+  }
+ ],
+ "currentTask": "R07-DELIVERABLES",
+ "remoteWriteAuthorized": false,
+ "liveExternalAuthorized": false,
+ "productionDataAuthorized": false,
+ "releaseAuthorized": false,
+ "updatedAt": "2026-10-19T11:28:14.041846+00:00",
+ "closeout": {
+  "phase": "R07-CLOSEOUT",
+  "reviewBaseline": "bfe32d107fb60852712b897a25403d7f092671b3",
+  "headVerified": "bfe32d107fb60852712b897a25403d7f092671b3（与审查基线一致；收口修改在工作区未提交）",
+  "plan": "R07_CLOSEOUT_PLAN.md",
+  "ledger": "R07_CLOSEOUT_LEDGER.json（408叶：CONVERT_REGISTRY 181 / BIND_EVIDENCE 180 / SHARE_DOC_AND_BIND 47，1050 断言）",
+  "baselineGate": "verify-r07-closeout-baseline 完成：前半程源码未变时 24 基础场景/2 扩展 PASS；后半程因收口改码触发 stale-runner 保护中止（candidateSourceBinding stale），overall FAIL 属预期证据绑定行为",
+  "fixedDefects": {
+   "A_observability": "已实现并验证：settings GET/PUT（retention 持久化 home/model-observability-settings.json，恒真面 409，重启保留）、storage 概况（真实按日统计+库文件大小）、maintenance/delete（窗口/全量删除+VACUUM+孤儿行）、payloads/blobs 显式 404/400、query/traces 重写为统一轨迹面（session: 会话聚合+legacy 导入+singleton，minCallCount/origin/includeSingleton/limit/cursor keyset 分页）、query/aggregate dateBucket（utcOffsetMinutes 分桶；timeZone 显式 400）、export 契约对齐（query.filter/includePayloads/bundle trace+usage）、call 详情补 payloadRecords/attempts/parentCall/childCalls（因果链经 emitted/parent_tool_call_id 真实查询）、trace 详情补契约字段与 session: 支持；前端 rustObservabilityRoute 全段映射。r07_t10_observability 套件 2/2（新增 closeout 综合测试）、UI 135+5 绿",
+   "B_bridge_loop": "已实现并验证：bridge_command_kind 认 /loop /stop /abort /halt；LoopTarget::bridge；循环轮经 execute_scheduled_for 真实执行；回执/通知落 V25 bridge_loop_deliveries 台账（重启不丢）；V26 重建 outbox 增加 loop_delivery_id 来源列（来源互斥 CHECK，notice 三源皆空被拒的真实缺陷已修）；连接会话 tick 推进台账→outbox→真实外发；model_history 桥会话 owner 匹配经 bridge_conversations_v1 持久锚。r07_bridge_flow 14/14（含 guest 边界、全生命周期、伪造来源拒绝、重启回执）、相邻 store/effect/notice/projection 套件绿",
+   "C_loop_media_auth": "已实现并验证：media_source_authority 增加 RunOrigin::Loop 分支——循环根 run+本机用户+cause 逐字匹配目标会话+会话活跃+落盘循环记录活跃（Running/Paused）即授权；stop/complete 后下一拍即拒（撤权立即生效）；子任务继承链（parent_run 沿袭）保持拒绝。r07_t05_media 13/13（含 loop 来源授权与撤权场景）",
+   "D_gate_proof": "已实现并验证：双扫描器（python+rust 测试内）多行 .route 修复（141→409 条路由）；behavior_matrix unmapped≠0 或清单<300 退出 1（首轮 82 unmapped 红证据留存）；lib.rs 主干 23 组前缀按 handler 模块归因补齐（0 unmapped）；24 基础场景逐场景登记 39 条 suiteTestAnchors（stage_map 强制 command∈commandRefs；锚点零匹配/未通过/producer 失败均场景 FAIL，xtask 127 单元测试含 3 项正反向锚点测试）；A24 扩为六能力域闭环（会话执行/观测聚合+轨迹+设置/自动化状态/媒体目录/桥配置）+进程树 node 检测（含故意 spawn node 的检测器自证红测试）+出站 HTTP 白名单断言；A23 运行时探针照常全表"
+  },
+  "negativeVerification": "artifacts/rust-tauri/R07/T12/negative-verification-closeout-1（matrix 82-unmapped 红→0 绿；锚点 absent/not_ok 红→hit 绿；检测器抓 node 红→无 node 绿）+ gate-01 实战红：7 场景锚点名与日志模块前缀不一致被机器真实拦下（A09–A15 FAIL），修正后 gate-02 转 PASS",
+  "gateCloseout": {
+   "gate01": "verify-r07-closeout-01：53 命令全 PASS、candidate/runner 稳定，但 7 场景因锚点名缺模块前缀 FAIL（锚点机制实战反向验证）；回执原样保留",
+   "gate02": "verify-r07-closeout-02：52/53 命令 PASS（r07_t08_mcp_settings 套件内限流 429 时序敏感失败；同源码孤立重跑 3 次 22/22 全绿，回执 verify-r07-closeout-02-mcp-settings-flaky-retry/）、22/24 场景 PASS（A15/A16 因该 flaky 挂）、2/2 扩展 PASS、408 叶 BLOCKED（既定缺口）、overall FAIL（如实：逐断言证据待立为主因）、candidateSourceBinding stable=true",
+   "gate03": "verify-r07-closeout-03（绑定后候选）：53/53 命令 PASS（含新生产者 r07_leaf_cases）、24/24 场景 PASS（锚点全部命中）、2/2 扩展 PASS、叶 181 PASS / 227 BLOCKED / 0 FAIL、candidateSourceBinding stable=true、runner PASS；overall FAIL 仅因 227 叶仍 required_behavior_pending——R07 未达放行条件",
+   "gate04": "verify-r07-closeout-04：54/54 命令 PASS、24/24 场景 PASS、2/2 扩展 PASS、叶 241 PASS / 167 BLOCKED / 0 FAIL、stable=true、runner PASS；overall FAIL 仅因 167 叶未绑定",
+   "gate11": "verify-r07-closeout-11（决定性候选）：57/57 命令 PASS、24/24 场景 PASS、408/408 叶 PASS、2/2 扩展 PASS、35/35 移交 + 43/43 递延透镜全 PASS、candidate stable=true、runner PASS、47.1 分钟 —— overall PASS"
+  },
+  "knownRemaining": "无未绑定叶；R07 门禁 overall PASS。按完成条件：24 场景/408 叶/2 扩展/35+43 视图结算准确，正式门禁有效通过；独立审查为建议放行 R08 前的最后人工步骤",
+  "updatedAt": "2026-10-21T12:00:00.000000+00:00",
+  "leafBinding": {
+   "infrastructure": "scripts/rust-tauri/r07_leaf_cases.py（套件日志→lingxi.leaf-case-results.v1 案例，套件退出非0即全部 actual=0）+ docs/rust-tauri/R07/R07_LEAF_BINDINGS.json（逐叶逐断言绑定与 rationale）+ scripts/rust-tauri/r07_apply_leaf_bindings.py（注入 R07.json：full_original_behavior 逐断言 case 不复用；stage_share_satisfied 仅限含后续阶段叶并写 stageShare/laterShare）+ xtask r07_registered_map 解析护栏测试",
+   "bound": "408/408 叶（1050/1050 断言）全部经正式合同机制绑定：供应商 39、MCP 19（stage_share R08）、技能服务面 27（r07_probe_skills 19 测试）、接入/设备/思考/桥/频道 33（r07_probe_access 21 测试）、观测面 16、设置/模型/卡片/频道导出/git 39、办公/美化/语音工具 19、面板/设置页大叶（UI 逐断言）12、浏览器 R09 份额 8、对话工具（run_tools/ptc/ast_grep/lsp/run_code/security_scan/learn_lesson，lib 共享层真实 vitest）6、CLI 11、即梦 2、跨阶段 R08/R09 份额叶 10 等；生产者 r07_ui_vitest（595 UI/CLI/工具测试）+ r07_leaf_cases（57 套件→1050 案例）",
+   "unbound": "0",
+   "notBound_rationale": "不绑定条件：叶内无法为每条断言找到语义对应的独立真实测试（如回执/富流式切换的『字段缺省不改原值』边界、桥状态只读面）；n≥3 断言且域内测试不足；客户端渲染行为（Rust 套件结构性不覆盖）"
+  }
+ }
+}

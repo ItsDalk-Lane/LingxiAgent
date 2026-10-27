@@ -1,0 +1,53 @@
+[
+  {
+    "name": "ts-roundtrip",
+    "command": [
+      "node",
+      "tests/migration/r01-t02/roundtrip.mjs",
+      "--generated",
+      "contracts/generated",
+      "--out",
+      "/private/tmp/lingxi-r07-t03-ts-roundtrip"
+    ],
+    "startedAt": "2026-10-15T21:07:01.210090+00:00",
+    "endedAt": "2026-10-15T21:07:01.248983+00:00",
+    "exitCode": 0,
+    "log": "/private/tmp/lingxi-r07-t03-final-ts-roundtrip.log",
+    "sourceFingerprint": "c450888b209b37ec02e9c19a6a1c71722551477866c3e056546b572bf3688fb4"
+  },
+  {
+    "name": "rust-roundtrip",
+    "command": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "run",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-protocol",
+      "--bin",
+      "lingxi-protocol-verify",
+      "--",
+      "--ts",
+      "/private/tmp/lingxi-r07-t03-ts-roundtrip"
+    ],
+    "startedAt": "2026-10-15T21:07:01.249030+00:00",
+    "endedAt": "2026-10-15T21:07:01.792824+00:00",
+    "exitCode": 0,
+    "log": "/private/tmp/lingxi-r07-t03-final-rust-roundtrip.log",
+    "sourceFingerprint": "c450888b209b37ec02e9c19a6a1c71722551477866c3e056546b572bf3688fb4"
+  },
+  {
+    "name": "protocol-types",
+    "command": [
+      "./node_modules/.bin/tsc",
+      "-p",
+      "tests/migration/r01-t02/tsconfig.json"
+    ],
+    "startedAt": "2026-10-15T21:07:01.792902+00:00",
+    "endedAt": "2026-10-15T21:07:02.033084+00:00",
+    "exitCode": 0,
+    "log": "/private/tmp/lingxi-r07-t03-final-protocol-types.log",
+    "sourceFingerprint": "c450888b209b37ec02e9c19a6a1c71722551477866c3e056546b572bf3688fb4"
+  }
+]

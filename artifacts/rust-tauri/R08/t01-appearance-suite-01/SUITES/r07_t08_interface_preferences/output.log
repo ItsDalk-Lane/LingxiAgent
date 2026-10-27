@@ -1,0 +1,20 @@
+
+running 6 tests
+test actual_http_preferences_match_shared_pure_normalizers_for_every_command_and_partial_sidebar ... ok
+test actual_http_global_archive_delete_is_idempotent_and_loud_on_io_failure ... ok
+test actual_http_global_archives_return_only_existing_metadata_and_reject_corrupt_or_unsafe_files ... ok
+test actual_http_corrupt_preferences_are_explicit_and_authorized_writer_refuses_revocation_at_commit ... ok
+test actual_http_appearance_preferences_normalize_merge_publish_and_scope ... ok
+test actual_http_keybindings_full_replace_sidebar_partial_merge_scopes_and_same_home_restart ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 23.24s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (test "r07_t08_interface_preferences") generated 1 warning
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 06s
+     Running tests/r07_t08_interface_preferences.rs (rust/target/debug/deps/r07_t08_interface_preferences-3fe64cfd0b741f89)

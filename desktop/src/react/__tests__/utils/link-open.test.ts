@@ -3,10 +3,20 @@
  */
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { openInternalLink, resolveLinkTarget } from '../../utils/link-open';
+import { currentRustBrowserConnection, openRustBrowserViewer } from '../../services/rust-browser';
+import { showError } from '../../utils/ui-helpers';
+import { useStore } from '../../stores';
+import { resetDesktopHostForTests } from '../../host/desktop-host';
+
+vi.mock('../../services/rust-browser', () => ({ currentRustBrowserConnection: vi.fn(() => null), openRustBrowserViewer: vi.fn() }));
+vi.mock('../../utils/ui-helpers', () => ({ showError: vi.fn() }));
 
 afterEach(() => {
   document.documentElement.removeAttribute('data-platform');
-  delete (window as Partial<Window>).platform;
+  resetDesktopHostForTests();
+  vi.mocked(currentRustBrowserConnection).mockReset().mockReturnValue(null);
+  vi.mocked(openRustBrowserViewer).mockReset();
+  vi.mocked(showError).mockReset();
 });
 
 describe('resolveLinkTarget', () => {
@@ -75,5 +85,35 @@ describe('resolveLinkTarget', () => {
       sessionPath: '/tmp/hana-session.jsonl',
     });
     expect(openExternal).not.toHaveBeenCalled();
+  });
+  it('routes Rust URL previews through the trusted service-session entry', async () => {
+    vi.mocked(currentRustBrowserConnection).mockReturnValue({ serverNodeKind: 'lingxi-service' } as ReturnType<typeof currentRustBrowserConnection>);
+    const legacyOpen = vi.fn(); const external = vi.fn();
+    window.platform = { openBrowserViewer: legacyOpen, openExternal: external } as unknown as typeof window.platform;
+    await openInternalLink('https://example.com/new', { sessionPath: 'native:message-session' });
+    expect(openRustBrowserViewer).toHaveBeenCalledWith('native:message-session', false, 'https://example.com/new');
+    expect(legacyOpen).not.toHaveBeenCalled(); expect(external).not.toHaveBeenCalled();
+  });
+  it('preserves an explicit Rust open error without a local fallback', async () => {
+    vi.mocked(currentRustBrowserConnection).mockReturnValue({ serverNodeKind: 'lingxi-service' } as ReturnType<typeof currentRustBrowserConnection>);
+    vi.mocked(openRustBrowserViewer).mockRejectedValueOnce(new Error('browser_native_session_required'));
+    const legacyOpen = vi.fn(); const external = vi.fn();
+    window.platform = { openBrowserViewer: legacyOpen, openExternal: external } as unknown as typeof window.platform;
+    expect(await openInternalLink('https://example.com/new')).toBe(false);
+    expect(showError).toHaveBeenCalledWith('browser_native_session_required');
+    expect(openRustBrowserViewer).toHaveBeenCalledWith('', false, 'https://example.com/new');
+    expect(legacyOpen).not.toHaveBeenCalled(); expect(external).not.toHaveBeenCalled();
+  });
+  it('does not report a delayed open failure into a newly selected assistant', async () => {
+    vi.mocked(currentRustBrowserConnection).mockReturnValue({ serverNodeKind: 'lingxi-service' } as ReturnType<typeof currentRustBrowserConnection>);
+    window.platform = { openBrowserViewer: vi.fn() } as unknown as typeof window.platform;
+    useStore.setState({ currentAgentId: 'before' });
+    let reject!: (error: Error) => void;
+    vi.mocked(openRustBrowserViewer).mockImplementationOnce(() => new Promise<void>((_, fail) => { reject = fail; }));
+    const pending = openInternalLink('https://example.com/new', { sessionPath: 'native:s' });
+    useStore.setState({ currentAgentId: 'after' });
+    reject(new Error('old connection failed'));
+    expect(await pending).toBe(false);
+    expect(showError).not.toHaveBeenCalled();
   });
 });

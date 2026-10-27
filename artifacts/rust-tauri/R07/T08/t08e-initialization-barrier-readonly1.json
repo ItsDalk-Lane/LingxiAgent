@@ -1,0 +1,90 @@
+{
+  "candidate": "t08e",
+  "scope": "只读补充方案，未实施未执行，不改变冻结候选",
+  "createdAt": "2026-10-18T09:19:08.237068+00:00",
+  "facts": [
+    {
+      "file": "desktop/src/react/settings/SettingsContent.tsx",
+      "lines": [
+        425,
+        428
+      ],
+      "fact": "15秒watchdog只把ready设true；不证明任何初始化数据成功。"
+    },
+    {
+      "file": "desktop/src/react/settings/SettingsContent.tsx",
+      "lines": [
+        469,
+        526,
+        529
+      ],
+      "fact": "正常Rust分支先设rustSettingsUnavailable=true，错误catch同样true并ready=true；不能要求该旧标记false作为正常Rust成功前提。"
+    },
+    {
+      "file": "desktop/src/react/settings/actions.ts",
+      "lines": [
+        30,
+        49,
+        56,
+        104,
+        124,
+        128,
+        245,
+        252,
+        275,
+        335
+      ],
+      "fact": "真实agents/models/snapshot各自保存数据及error/owner字段；loadAgents/models/snapshot内部捕获错误，不保证init Promise resolve就是业务成功。"
+    },
+    {
+      "file": "vitest.config.js",
+      "lines": [
+        26
+      ],
+      "fact": "三个it均未单独给timeout，沿全局60_000ms；默认waitFor asyncUtilTimeout约1000ms独立于it总预算。"
+    },
+    {
+      "file": "desktop/src/react/settings/SettingsContent.tsx",
+      "lines": [
+        163,
+        413
+      ],
+      "fact": "initSettings是私有函数，由effect调用；在不改产品的前提下不能直接取得其真实Promise。"
+    }
+  ],
+  "recommendedMinimalTestOnlyDesign": {
+    "deadline": "每个it开始时只计算一次原60秒总deadline；初始化屏障受原产品15秒兜底边界与剩余原总预算共同限制，不重置总deadline、不在ready兜底后放行；不添加新总超时/任意sleep。",
+    "observation": "用现有global fetch包装只观察真实请求开始/HTTP状态/耗时/错误；记录method+pathname（不含查询秘密、headers、token、原始配置body），identity只保存服务标识及权限事实。每次finally无论成功失败写安全收据。用store订阅或现有waitFor谓词等真实字段；不可手动ready、不可替换fetch结果。",
+    "hardFailure": [
+      "收到初始化相关非2xx/throw，或store.agentsError/settingsConfigError/runtimeModelsError非空即失败。",
+      "捕获原15秒init timeout警告即失败，不借watchdog ready放行。",
+      "目标服务连接被换、已完成请求所属owner无效即失败。"
+    ],
+    "successPredicate": [
+      "ready===true只是必要条件之一。",
+      "真实GET server/identity 200：serverNodeKind=lingxi-service，原服务serverId/serverNodeId/studioId匹配隔离home权威标识，userId=user_local，connectionKind/credentialKind/trustState为当前LocalOwner原定义，capabilities包含studio.owner。",
+      "agents列表包含本场已建fixture明确ID（victim/survivor），agentsError===null，settingsAgentsOwner经ownsSettingsConnection验证仍属同连接。",
+      "settingsSnapshot.status===ready、settingsConfigStatus===ready、二者error均null，snapshot.data.agentId与settingsDataAgentId/当前设置目标相同，settingsConfig非null。",
+      "settingsDataOwner经ownsSettingsConnection验证仍属同连接，data key属于同一有效settingsConnectionKey（内部比较，不写token串进报告）。",
+      "真实模型目录请求200、runtimeModelsError===null；头像等额外请求也有明确完成收据。"
+    ],
+    "whyNotNoRustSettingsUnavailable": "当前产品成功Rust分支也会设true；本轮不得为测试改其语义。以上具体真实资源就绪/error/owner验证排除初始化失败与watchdog假成功。",
+    "filesWhenAuthorized": [
+      "desktop/src/react/settings/__tests__/R06AgentDeleteRustLive.test.tsx",
+      "desktop/src/react/settings/__tests__/R06AgentDeleteConnectionReview.test.tsx",
+      "desktop/src/react/settings/__tests__/R06AgentDeleteRegistryReview.test.tsx"
+    ],
+    "preservedAssertions": "不删任何删除/孤立技能/连接变化/双服务守卫断言，不把未执行子场景计通过。"
+  },
+  "capsuleAudit": {
+    "missedOne": "desktop/src/react/__tests__/chat-live/main.cjs:16/18",
+    "alreadyGuardedOne": "desktop/src/react/__tests__/chat-app-live/main.cjs:18",
+    "scope": "全desktop/src/react原生helper中data-runtime-capsule/runtime-capsule-mounted搜索只见上述两处；直接组件单测不经过lazy。",
+    "repairWhenAuthorized": "只把胶囊DOM存在加到chat-live原20秒real model final visible同一until；保留后面的即时check和所有原动作，不另起20秒。"
+  },
+  "notClaimed": [
+    "现有agent-delete现场没有HTTP收发时间，具体慢阶段/根因仍未定。",
+    "没有证明lazy胶囊在原失败后最终必然挂载；增加真实就绪屏障后必须实际运行确认。",
+    "未修改源码、未运行Cargo、未将e任何失败改判通过。"
+  ]
+}

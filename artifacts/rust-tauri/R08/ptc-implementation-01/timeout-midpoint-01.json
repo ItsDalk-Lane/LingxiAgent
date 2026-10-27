@@ -1,0 +1,18 @@
+{
+  "status": "MIDPOINT_NOT_PASS",
+  "observedAtUtc": "2026-10-21T16:56:33.632857+00:00",
+  "runs": [
+    {
+      "syntheticRoot": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-ptc-6a37ea827ddeb803",
+      "marker": "ONE_CONFIRMED_ACTION",
+      "activeRuns": [
+        [
+          "run_000001a3185c5000_000001",
+          "ptc-operate",
+          "running",
+          null
+        ]
+      ]
+    }
+  ]
+}

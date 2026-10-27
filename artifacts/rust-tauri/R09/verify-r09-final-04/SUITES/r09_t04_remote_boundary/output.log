@@ -1,0 +1,50 @@
+$ /Users/study_superior/.cargo/bin/rustup run 1.98.1 rustc --test --edition 2021 --cfg r09_standalone_test --crate-name native_host_harness /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-04/SUITES/r09_t04_remote_boundary/harness/lib.rs -o /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-04/SUITES/r09_t04_remote_boundary/harness/native_host_harness
+--- exit=0 duration=0.60s ---
+
+$ /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-04/SUITES/r09_t04_remote_boundary/harness/native_host_harness --test-threads 1 native::remote_boundary::tests
+--- exit=0 duration=0.10s ---
+
+running 6 tests
+test native::remote_boundary::tests::expired_grant_does_not_allow_and_local_tcc_is_conjunctive ... ok
+test native::remote_boundary::tests::grant_scopes_device_subject_and_ttl ... ok
+test native::remote_boundary::tests::local_principals_follow_host_permission_only ... ok
+test native::remote_boundary::tests::remote_cannot_grant_itself ... ok
+test native::remote_boundary::tests::remote_request_without_grant_requires_local_authorization ... ok
+test native::remote_boundary::tests::revoke_removes_grant_and_device_tcc_mapping_is_complete ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 173 filtered out; finished in 0.00s
+
+
+$ /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-04/SUITES/r09_t04_remote_boundary/harness/native_host_harness --test-threads 1 native::permissions::tests
+--- exit=0 duration=0.01s ---
+
+running 9 tests
+test native::permissions::tests::actions_are_gated_by_lease_expiry_permissions_and_controls ... ok
+test native::permissions::tests::approvals_are_validated_and_deduped ... ok
+test native::permissions::tests::lease_requires_real_approval_and_permissions ... ok
+test native::permissions::tests::platform_and_caller_gates ... ok
+test native::permissions::tests::query_is_read_only_and_window_gated ... ok
+test native::permissions::tests::remote_sessions_can_never_start_leases ... ok
+test native::permissions::tests::request_only_prompts_in_not_determined_and_user_gesture_window ... ok
+test native::permissions::tests::state_and_rejection_codes_are_stable ... ok
+test native::permissions::tests::stop_revoke_and_app_exit_invalidate_leases ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 170 filtered out; finished in 0.00s
+
+
+$ /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-04/SUITES/r09_t04_remote_boundary/harness/native_host_harness --test-threads 1 native::speech::tests
+--- exit=0 duration=0.01s ---
+
+running 9 tests
+test native::speech::tests::caller_and_platform_errors ... ok
+test native::speech::tests::cancel_and_timeout_never_count_as_success ... ok
+test native::speech::tests::capture_requires_authorized_permission_and_device ... ok
+test native::speech::tests::dispose_settles_as_bridge_unavailable_and_late_callbacks_are_dropped ... ok
+test native::speech::tests::raw_status_mapping_matches_electron ... ok
+test native::speech::tests::request_policy_first_terminal_devshell_and_single_flight ... ok
+test native::speech::tests::revocation_during_recording_stops_and_reports ... ok
+test native::speech::tests::status_is_read_only_and_platform_gated ... ok
+test native::speech::tests::ui_states_cover_first_denied_restricted_missing_cancel ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 170 filtered out; finished in 0.00s
+

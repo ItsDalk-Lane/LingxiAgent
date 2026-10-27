@@ -1,0 +1,75 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0308]: mismatched types
+    --> crates/lingxi-service/tests/r07_t08_mcp_settings.rs:2594:9
+     |
+2592 |     let disabling = manager.request(
+     |                             ------- arguments to this method are incorrect
+2593 |         lingxi_service::mcp_settings::SETTINGS_TOPIC,
+2594 |         &auth,
+     |         ^^^^^ expected `&Arc<AuthService>`, found `&&AuthService`
+     |
+     = note: expected reference `&Arc<AuthService>`
+                found reference `&&AuthService`
+note: method defined here
+    --> crates/lingxi-service/src/mcp_settings.rs:1671:18
+     |
+1671 |     pub async fn request(
+     |                  ^^^^^^^
+
+error[E0308]: mismatched types
+    --> crates/lingxi-service/tests/r07_t08_mcp_settings.rs:2607:13
+     |
+2605 |         .request(
+     |          ------- arguments to this method are incorrect
+2606 |             lingxi_service::mcp_settings::SETTINGS_TOPIC,
+2607 |             &auth,
+     |             ^^^^^ expected `&Arc<AuthService>`, found `&&AuthService`
+     |
+     = note: expected reference `&Arc<AuthService>`
+                found reference `&&AuthService`
+note: method defined here
+    --> crates/lingxi-service/src/mcp_settings.rs:1671:18
+     |
+1671 |     pub async fn request(
+     |                  ^^^^^^^
+
+error[E0716]: temporary value dropped while borrowed
+    --> crates/lingxi-service/tests/r07_t08_mcp_settings.rs:2503:32
+     |
+2503 |     tokio::select! { _=marker(&root.join("initialize.json"))=>{},result=&mut start=>panic!("真实初始化尚未回复前不可返回：{result:?}") }
+     |     ---------------------------^^^^^^^^^^^^^^^^^^^^^^^^^^^^-----------------------------------------------------------------------------
+     |     |                          |
+     |     |                          creates a temporary value which is freed while still in use
+     |     temporary value is freed at the end of this statement
+     |     borrow later used here
+     |
+     = note: consider using a `let` binding to create a longer lived value
+
+error[E0505]: cannot move out of `h` because it is borrowed
+    --> crates/lingxi-service/tests/r07_t08_mcp_settings.rs:2521:5
+     |
+2493 |     let h = Harness::boot().await;
+     |         - binding `h` declared here
+...
+2497 |     let start = h.request(
+     |                 - borrow of `h` occurs here
+...
+2521 |     h.close_runtime(false).await;
+     |     ^ move out of `h` occurs here
+...
+2536 | }
+     | - borrow might be used here, when `start` is dropped and runs the destructor for type `impl std::future::Future<Output = (u16, Value)>`
+     |
+note: if `Harness` implemented `Clone`, you could clone the value
+    --> crates/lingxi-service/tests/r07_t08_mcp_settings.rs:129:1
+     |
+ 129 | struct Harness {
+     | ^^^^^^^^^^^^^^ consider implementing `Clone` for this type
+...
+2497 |     let start = h.request(
+     |                 - you could clone this value
+
+Some errors have detailed explanations: E0308, E0505, E0716.
+For more information about an error, try `rustc --explain E0308`.
+error: could not compile `lingxi-service` (test "r07_t08_mcp_settings") due to 4 previous errors
+warning: build failed, waiting for other jobs to finish...

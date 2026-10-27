@@ -1,0 +1,27 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_bridge_sdk_platforms.rs:448:
+     .await;
+     assert_eq!(h.provider.calls.load(Ordering::SeqCst), 1);
+     assert_eq!(h.scalar("SELECT CAST(COUNT(*) AS TEXT) FROM bridge_effects_v1 WHERE operation='receipt_start' AND status='unknown'").await, "1");
+-    assert_eq!(h.scalar("SELECT CAST(COUNT(*) AS TEXT) FROM bridge_effects_v1 WHERE operation='stream_finish'").await, "0");
++    assert_eq!(
++        h.scalar(
++            "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_effects_v1 WHERE operation='stream_finish'"
++        )
++        .await,
++        "0"
++    );
+     let operations = h.operations();
+     assert_eq!(
+         operations
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_bridge_sdk_platforms.rs:461:
+         .iter()
+         .filter(|item| item["kind"] == "send")
+         .collect();
+-    assert!(published.is_empty(), "合并草稿可能已外发，未知后禁止另发新正文");
++    assert!(
++        published.is_empty(),
++        "合并草稿可能已外发，未知后禁止另发新正文"
++    );
+     let home = h.close().await;
+     std::fs::remove_dir_all(home).unwrap();
+ }

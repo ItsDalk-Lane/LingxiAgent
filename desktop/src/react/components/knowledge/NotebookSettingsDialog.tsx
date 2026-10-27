@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ConfirmDialog } from '../../ui';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../services/service-client';
 import {
   updateKnowledgeNotebookSettings,
   type KnowledgeModelRefDto,

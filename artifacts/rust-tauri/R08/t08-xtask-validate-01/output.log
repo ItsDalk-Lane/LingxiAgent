@@ -1,0 +1,3 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.05s
+     Running `rust/target/debug/xtask verify-stage R08 --evidence artifacts/rust-tauri/R08/t08-xtask-validate-01`
+error: invalid stage map for R08: stage map invalid: supplemental leaf "R00-T02-LA-0D4F0EFC9DAE" declares originalAssertionCases without full_original_behavior evidence

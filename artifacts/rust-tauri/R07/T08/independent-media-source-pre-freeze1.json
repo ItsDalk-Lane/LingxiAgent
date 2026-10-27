@@ -1,0 +1,78 @@
+{
+  "reviewer": "independent-subagent-r07_t08_final_review",
+  "reviewedAt": "2026-10-18T08:06:49.343570+00:00",
+  "stage": "R07-T08",
+  "candidate": null,
+  "finalAcceptance": "pending",
+  "sourceDisposition": "DRAFT_STATIC_REVIEW_NOT_FROZEN_ACCEPTANCE",
+  "files": [
+    {
+      "path": "rust/crates/lingxi-service/src/media_admin.rs",
+      "sha256": "3338413f9f79a24cdc4bb61827ba8267bddc41c8190e54cd83781ac4bd3fc8c0"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/media_operations.rs",
+      "sha256": "5772222e7ecbb9ec68f088fd7e2a83244f033d01b8f344392d00d61fee7ee2b0"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/model_configuration.rs",
+      "sha256": "67c48e0e63e589c488854856159a001f68758e715cbdcd7913d8d41e20420de3"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_t08_media_source.rs",
+      "sha256": "0bb2718ab57421c2914157b1060a75cd8e85f00f2f0cf6e498799d00ba43366e"
+    },
+    {
+      "path": "artifacts/rust-tauri/R07/T08/evidence-tools/verify_native_picker_binding.py",
+      "sha256": "199575b6bb86cb776d2ec61bfc09968664b2601f061103cbf6176071fc191eef"
+    }
+  ],
+  "confirmedOriginalGap": "T08b media_admin catalog management kept old overlay/Pi projection as authority and omitted unique publisher; candidate cancelled to fix actual connection, not a kernel business failure.",
+  "draftFixReview": [
+    "All four media catalog lists use publisher snapshot; declared catalog only supplies candidates, cannot resurrect deleted actual Source model",
+    "Add/edit/remove use unique ModelSettingsChange publisher and save_at_generation within actual mutation lock, preserving original principal checks and rejecting concurrent stale revival",
+    "Same-ID protocol/category conflict explicitly409; edit/remove do not delete models of another class",
+    "Applied partial facts still notify actual changed state if compatibility projection fails",
+    "Operation media_route accepts only real published Source model or static alias mapped to real same-provider Source key; static metadata does not grant extra models"
+  ],
+  "testSourceReview": {
+    "target": "r07_t08_media_source",
+    "cases": 2,
+    "covers": [
+      "four classes HTTP CRUD and idempotence",
+      "preserve chat model, unknown metadata and independent bindings",
+      "cross-category denial",
+      "same Operation Arc immediate image/speech actual dispatch, generated file bytes and actual model-call usage",
+      "restart survival and compatibility projection corruption partial facts",
+      "actual mutex queue device revocation and generation-conflict stale edit after real deletion"
+    ],
+    "explicitLimits": [
+      "Source review only; not run by independent reviewer",
+      "New target video/ASR cases verify catalog CRUD and deletion, not actual generation/transcription; do not promote CRUD into proof of those external operations"
+    ]
+  },
+  "nativeBindingV2Review": {
+    "status": "SUITABLE_EXACT_ARTIFACT_REUSE_CONTRACT_PENDING_FORMAL_GATE",
+    "proof": "native-picker-ipc2/binding-proof-v2.json",
+    "sourceClosureFileCount": 35,
+    "scope": "Post-actual-run closure explicitly labeled, includes original source/UI/permission/build/lock definitions; same-native-binary SHA remains required after actual later native-skills build",
+    "machineGuards": [
+      "frozen proof SHA",
+      "actual successful picker command receipt/log SHA",
+      "all linked evidence SHA including launch",
+      "original18 source SHA",
+      "source-set additions/deletions and all35 closure SHA",
+      "same native binary SHA",
+      "raw cancel null/retained path/readonly denial/cleanup facts"
+    ],
+    "smallFollowup": "At read time verifier did not explicitly hash originalBoundaryReceipt.path despite linking it; either add check or describe as trace link only. This does not change actual selected/cancel facts already independently checked.",
+    "notClaimed": [
+      "later-candidate repeated manual CUA steps",
+      "application raw exit0",
+      "whole-candidate success from changed-source development test",
+      "replacement for later frozen native-skills gate"
+    ]
+  },
+  "newBlockingFindings": [],
+  "nextStep": "Root finishes development checks, preserves failures, freezes next candidate and runs complete applicable gates, fresh-build UI and card-navigation proofs plus native exact-artifact binding. Independent final receipt audit follows."
+}

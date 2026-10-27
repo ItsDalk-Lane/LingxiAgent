@@ -1,0 +1,77 @@
+{
+  "status": "VERIFIED_DEVELOPMENT_NOT_FINAL_ACCEPTANCE",
+  "securityConclusion": "旧整机token外泄失败保留；新票据真实桌面宿主阻断与同源mobile父策略链均开发复测通过，完整固定候选与独立复核仍待。",
+  "baseline": {
+    "finding": "CONFIRMED_FAILURE",
+    "binarySha256": "d1a18915be860f5a96c6251a5cb00a2facaa84a4a2977b6856155a69061e31a2",
+    "receipts": [
+      {
+        "path": "artifacts/rust-tauri/R07/T08/card-navigation-baseline/receipt.json",
+        "sha256": "5974cbdc976f9f0e4b1e011005aebd6ea3db8762698d495452d970901b727b76"
+      },
+      {
+        "path": "artifacts/rust-tauri/R07/T08/card-navigation-baseline-replay/receipt.json",
+        "sha256": "61d79bb6ab3e114dda0f34bad6e2f19faed8fc0a4e9c79aaf7ebbb556fb29fbe"
+      }
+    ],
+    "result": "collector count=1；tokenReadableAndSent=true",
+    "interaction": "实际生产组件登记/真实Rust GET后，由实际DOM按钮click执行卡片脚本；两个原生sendInputEvent未命中不算人工操作通过。",
+    "preservedFailures": "card-navigation-baseline/attempt-history.json与attempt1/2原日志保留。"
+  },
+  "mobileParentCsp": {
+    "receipt": {
+      "path": "artifacts/rust-tauri/R07/T08/card-navigation-mobile-csp/receipt.json",
+      "sha256": "408f5f79517f40a8852f3bf7a48ea60e7ad85fbebbf50c5537629b5887c4bce4"
+    },
+    "result": "当前mobile.html原meta限制frame-src self/blob，实际Electron Chromium+实际组件+同源代理下自导航ERR_BLOCKED_BY_CSP，loopback collector=0。",
+    "limits": "验证父策略的浏览器行为；不是手机端全部功能或真实手机验证。首轮错误地要求拦截后原文档仍存在的测试断言失败保留attempt1-ui.log。"
+  },
+  "implemented": {
+    "frameCapability": "120秒，单卡8份、总2048份；按owner/card/现役code与vars绑定，替换/逐出/重启失效；精确GET再次检查本机连接和原身份当前有效性。",
+    "desktopGuard": "所有生产WebContents will-frame-navigate阻断卡片脚本离开当前文档；不是只断言CSP navigate-to。",
+    "frontend": "只接受受控frameUrl，绝不将整机token拼入iframe；网页同源且严格父meta或Electron宿主能力才能显示。"
+  },
+  "pending": [
+    "4项修正fixture后的Rust真实HTTP/存储重新运行",
+    "完整固定候选门禁及独立复核"
+  ],
+  "unsupported": [
+    "旧Node cards没有安全frameUrl，显示服务暂不支持，不回退unsafe token地址。",
+    "Tauri当前静态策略不能加载HTTP卡片，且尚无已验证宿主导航保护，明确暂不可用；不是PASS。"
+  ],
+  "scope": "只本机合成fixture，无真实账号、无外部接收端，不提交不推送。",
+  "fixedDevelopmentEvidence": {
+    "binarySha256": "55d160b62243aecbdd1be59cfd37e588b40440e3001a9f6d2e91629033f13c37",
+    "desktop": [
+      {
+        "path": "artifacts/rust-tauri/R07/T08/card-navigation-ticket-desktop/receipt.json",
+        "sha256": "60db0ce01018f5082c404583e7d6a737328eb9d1503d80f17ffbe1e898680d63"
+      },
+      {
+        "path": "artifacts/rust-tauri/R07/T08/card-navigation-ticket-desktop-r2/receipt.json",
+        "sha256": "49c86e12b03914300c326bc7c846d3c19b3af724649609a6fdc5a43d308793a9"
+      },
+      {
+        "path": "artifacts/rust-tauri/R07/T08/card-navigation-ticket-desktop-r2/cleanup.json",
+        "sha256": "306ded05980e18d63d1d7dc3fb975334940551ed1ce21305ed74d58ec233a8b4"
+      }
+    ],
+    "mobile": [
+      {
+        "path": "artifacts/rust-tauri/R07/T08/card-navigation-ticket-mobile/receipt.json",
+        "sha256": "ab8f7ff66178b1da64cf48f4e65f696eec5d4d7b246337e940e96c6ce8e01c00"
+      },
+      {
+        "path": "artifacts/rust-tauri/R07/T08/card-navigation-ticket-mobile-r2/receipt.json",
+        "sha256": "9ddfc4779a51c62e2229356f5cd8b0ecc8cba5bb93b32302f7e6a851f285f75e"
+      },
+      {
+        "path": "artifacts/rust-tauri/R07/T08/card-navigation-ticket-mobile-r2/cleanup.json",
+        "sha256": "306ded05980e18d63d1d7dc3fb975334940551ed1ce21305ed74d58ec233a8b4"
+      }
+    ],
+    "actualResult": "实际组件PUT200/专属票据GET200、frameURL无owner token；桌面生产will-frame-navigate真实阻断1，手机父CSP（无Electron guard）真实ERR_BLOCKED_BY_CSP；两收集器均0；r2两服务退出0、收集器已关闭。",
+    "binding": "新binary由service-build2开发构建；不是固定候选全门禁，不代表真实手机/Tauri支持。",
+    "realRun": "core-flow4真实Run→工具→实际Electron组件检查通过；其余4fixture失败另列未改通过。"
+  }
+}

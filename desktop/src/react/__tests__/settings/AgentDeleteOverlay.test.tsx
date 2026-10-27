@@ -15,6 +15,8 @@ vi.mock('../../settings/store', () => ({
     selector ? selector(mockState) : mockState
   ), {
     setState: vi.fn((patch: Record<string, unknown>) => Object.assign(mockState, patch)),
+    getState: () => mockState,
+    subscribe: () => () => {},
   }),
 }));
 

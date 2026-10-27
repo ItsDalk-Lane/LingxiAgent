@@ -1,0 +1,38 @@
+{
+  "stage": "R07",
+  "task": "T07",
+  "slice": "β4",
+  "label": "dev-t07d2",
+  "purpose": "日记面端口：POST /lingxi/v1/diary/write + GET /lingxi/v1/diary/list（现役 diary.ts + diary-writer.ts 全语义；memory 槽 AuxiliaryExecutor 模型链；材料 = summaries 落盘扫描 + run DB 会话分支；确定性 TCP 供应商替身）",
+  "candidate": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "commands": [
+    "cargo test -p lingxi-service --lib --test r07_diary --test r07_desk_files --test r07_workbench --test r06_workbench_write --test auth_matrix --test r07_media_admin --test r07_t05_media",
+    "cargo fmt -p lingxi-service -- --check",
+    "cargo clippy -p lingxi-service --all-targets"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp",
+    "platform": "darwin-arm64"
+  },
+  "sourceFingerprintBefore": "e7333698a1186eb34db28a462550cf35755a838f7275fcf2b0a38fd877237656",
+  "sourceFingerprintAfter": "e7333698a1186eb34db28a462550cf35755a838f7275fcf2b0a38fd877237656",
+  "sourceFilesHashed": 561,
+  "exitCode": [
+    0,
+    0,
+    0
+  ],
+  "durationSec": 183.3,
+  "durationsPerCommand": [
+    131.6,
+    2.4,
+    49.3
+  ],
+  "logSha256": "7b7cbf01bf8eedab9c28c2614de0cc2aaa4e92ce69f758f43633a782fc1a0fcd",
+  "logFile": "artifacts/rust-tauri/R07/T07/dev-t07d2.log",
+  "timestamp": "2026-10-17T21:11:52+0800"
+}

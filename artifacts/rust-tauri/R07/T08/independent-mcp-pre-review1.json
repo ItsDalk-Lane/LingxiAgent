@@ -1,0 +1,124 @@
+{
+  "recordedAt": "2026-10-18T06:44:21.875349+00:00",
+  "status": "INDEPENDENT_READONLY_PRE_REVIEW_MOVING_DEVELOPMENT_SOURCE_NOT_FINAL",
+  "scope": "T08 MCP设置真实主体/审批、文件完整性、同ID调用与子进程资源生命周期",
+  "ran": [],
+  "notRun": [
+    "Cargo",
+    "GUI",
+    "new subprocess fixture"
+  ],
+  "findings": [
+    {
+      "id": "WIN-MCP-EMPTY-BOOT",
+      "severity": "must_fix_platform_startup_regression",
+      "evidence": [
+        "lib.rs unconditional bootstrap restore() propagates Err",
+        "mcp_settings.rs restore→read→read_versioned→directory always child_directory(plugin-data,true)",
+        "filetools.rs cfg(not(unix)) DirFd::child_directory always returns Unsupported"
+      ],
+      "effect": "Windows即使全新资料/MCP未配置或关闭，也会因新管理器无条件创建状态目录而在bootstrap失败。",
+      "classification": "STATIC_DETERMINISTIC_PATH_NOT_RUNTIME_PROOF",
+      "suggestion": "无配置读取不创建目录，保留实际平台写边界；用已有Windows no-reparse只读目录能力识别缺失或读取合法禁用配置。不要放宽FileSafety以伪造等价写安全。",
+      "communicatedTo": [
+        "root",
+        "MCP author"
+      ]
+    },
+    {
+      "id": "MCP-PROTOCOL-VERIFY-REGISTRATION",
+      "severity": "must_complete_before_final_gate",
+      "evidence": [
+        "protocol gen新增七种McpSettings schema与Request/Result样本",
+        "当前verify::reencode_typed无McpSettings任何分支且unknown恒Err",
+        "当前generated尚未同步新types"
+      ],
+      "effect": "正式生成后仅gen/check不能构成Rust/TS回验；新样本verify将明确拒绝未登记类型。",
+      "suggestion": "登记新Request/Result（建议七种）并完整generate+roundtrip。",
+      "communicatedTo": [
+        "root"
+      ]
+    },
+    {
+      "id": "BIND-ERROR-CLEANUP-ORDER",
+      "severity": "conditional_cleanup_gap",
+      "evidence": [
+        "lib.rs run_with_tls bind/local_addr失败先mcp.shutdown().await.map_err(...)?，再knowledge.wait_worker_stopped()"
+      ],
+      "condition": "仅MCP shutdown返回Err时；不是已发生运行失败",
+      "effect": "早返回会跳过知识worker显式停止/等待；若调用者仍持ServiceState clone，最后owner Drop不会替此路径立刻收尾。",
+      "suggestion": "两项均尝试，再汇总原bind与清理错误；测试保留外部state clone防Drop掩盖。",
+      "communicatedTo": [
+        "root"
+      ]
+    }
+  ],
+  "closedDuringReviewAwaitingRealProof": [
+    {
+      "id": "QUEUED-APPROVAL-REVISION",
+      "originalEvidence": "gateway确认后tool仍await材料锁/runtime队列，旧版handle不再比对审批configRevision。",
+      "currentSource": "作者已加request_tool捕获toolgateway::review_scope并传入spawn，handle获runtime锁后重算review_tool并比较mcp_approval_changed。",
+      "claim": "静态补上该等待窗口；须真实排队交错测试，未领通过。"
+    },
+    {
+      "id": "AGENT-WHOLE-MCP-REPLAY",
+      "originalEvidence": "旧apply先读助手MCP全对象，之后update_config_for_agent可能重放并发他方改动。",
+      "currentSource": "作者已改只传 connectors[id].enabled/tools最小补丁，legacy alias归一在统一写方中补；待统一编译。",
+      "claim": "不再将旧全副本重放作为当前已知缺陷，实际并发检查仍需。"
+    },
+    {
+      "id": "PERSISTED-SHAPE",
+      "currentSource": "作者正补schemaVersion/agents/sessions/global开关、connector完整shape、restore配置验证；审核期来源正在变化。",
+      "claim": "不可把并行开发中的暂缺校验当成最终残留，也不可提前PASS。"
+    }
+  ],
+  "positiveStaticChains": [
+    {
+      "id": "authority",
+      "evidence": "ArgumentAwareSettings apply为Review；gateway冻结实际principal/session/run/attempt/call/agent及permission，trusted_settings_context逐一匹配；mint仅LocalUser+非只读UserSession且无owner/secret权限；管理HTTP另需is_local_owner；payload agentId不可改冻结目标。"
+    },
+    {
+      "id": "current-call-invalidation",
+      "evidence": "stop先撤live/live_servers，uninstall目标后断SDK；新epoch纳入review scope，同ID重装旧catalog/target/review需重新准备；ScopedExecutor再次按冻结agent查当前开关。",
+      "limit": "本轮只读，仍需真实旧prepared handle与在途SDK调用交错。"
+    },
+    {
+      "id": "files",
+      "evidence": "有界Snapshot严格JSON读取，缺失才建默认；home/plugin/mcp目录句柄、同目录验证、FileSafety replace_private/create保护，单项merge保留根未知字段；不返回env/header/token原值。"
+    },
+    {
+      "id": "processes",
+      "evidence": "stdio env白名单且env_clear；Unix独立进程组killpg，tokio kill_on_drop；SDK取消token同步begin_stop，call_raw不跨远端await持connection锁；disconnect_checked等待child及SDK取消；初始化取消McpChild Drop回收。",
+      "limit": "Windows只杀直接child，不将Unix进程组实证推广到Windows。"
+    },
+    {
+      "id": "shutdown",
+      "evidence": "signal同步mcp.begin_stop，后续预算内shutdown；storage before_close弱引用manager；McpSettingsManager与gateway弱回指避免新保活循环；rmcp3.4.1 RunningService DropGuard触发取消，显式cancel用于确认完成。"
+    }
+  ],
+  "additionalTargetedValidationSuggestions": [
+    "真实runtime排队期间配置/agent变更使旧批准锁内拒绝零写；包括stop/remove/readd同ID。",
+    "在FileSafety既有before_replace受控窗口更换plugin-data祖先但迁移同一个mcp目录，确认中间祖先身份也被拒；当前authorize只复核home和最终mcp父句柄，尚未实际复现。",
+    "真实MCP握手挂住、tools/call挂住时Run取消/统一shutdown/库close均子孙进程退出且SDK future结束；bind失败保留state clone验证资源回收。",
+    "损坏全schema、非string args/env/cwd、mask保留真实已存秘密、外部写冲突、父链接替换均零覆盖；输出回执及审批摘要无材料明文。",
+    "same-ID重装前已准备工具句柄不能调用新进程，助手单项开关撤权不能被后续旧副本覆盖。"
+  ],
+  "sourceHashes": {
+    "rust/crates/lingxi-service/src/mcp_settings.rs": "fb9d28fd885e0a04e85a1002c68a198ebe5ed74f52d11b98cdebe0d7418a2d64",
+    "rust/crates/lingxi-service/src/settings_tools.rs": "c70ed383618aa04f4b915038800dd501afe9839d3ee80c596d05e524c74f1b9d",
+    "rust/crates/lingxi-service/src/mcpbridge.rs": "abbde8187e47c449e430fad14883cb9b8f727f722385888a51b21ed1ce54d222",
+    "rust/crates/lingxi-service/src/lib.rs": "39cb8a74fb44c87648586d4a38380eaaf0b5a67d848f2901ed5d0827cd96f670",
+    "rust/crates/lingxi-service/src/auth.rs": "3a27f7a7b3d7cc79078687ae1cd016b179e753de944f68b0f75ff8079ccaa562",
+    "rust/crates/lingxi-service/src/toolgateway.rs": "06adc5358f23b122666f7c0fc01628f1fa51e8f9d5e77ec7dcd0728e47e28839",
+    "rust/crates/lingxi-service/src/filetools.rs": "65de7ec880afd431d0ea69d02f19f91ba1a0563ec115d27e4962e21dd820cc3e",
+    "rust/crates/lingxi-protocol/src/mcp_settings.rs": "54e4289b86d718171b1c4065496dae3fd2dcfef0e419711da8261c1a88cfd877",
+    "rust/crates/lingxi-protocol/src/bin/lingxi-protocol-gen.rs": "4da26eefbcce3a4393cb444922f925a6b42b5994bae678ea364e842a57d38acf",
+    "rust/crates/lingxi-protocol/src/bin/lingxi-protocol-verify.rs": "8c511ac8ca41c5f3a501a8f5ade92a1678b265aa1ae9ed20386f8c9c0744debf",
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_settings.rs": "cf7e174477322cc5088bd165500c7ad1ae9e278560bac21d7f00549e31761351",
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_process.rs": "30083b92f56f2dd8c66544561aad7c4684316123aad3a71b36a18bed6a65ac42"
+  },
+  "notes": [
+    "不改生产/旧失败/叶状态；该预审不是最终候选审阅或运行通过。",
+    "作者与root在并行修源码，以上摘要绑定各读取文件哈希，后续须再核候选。"
+  ]
+}

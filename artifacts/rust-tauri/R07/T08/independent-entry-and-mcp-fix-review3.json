@@ -1,0 +1,63 @@
+{
+  "reviewer": "r07_t08_final_review",
+  "reviewedAt": "2026-10-18T10:27:38.948272+00:00",
+  "finalAcceptance": "pending",
+  "scope": "只读核本次实际开发证据、追加旧401组合与三MCP原反例修复；不改源/不Cargo。",
+  "sourceHashesAtReview": {
+    "rust/crates/lingxi-service/src/mcp_settings.rs": "04c602567ad8653c4c682a3a8cf5b5c27586722a858bcb93566832a3f8a221bf",
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_settings.rs": "79fe6ef07c2b22e3b5f5c82305722a1ad79a0dc000c7dac7e60d383a41873fdb",
+    "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx": "ce7f8ef2c109218192536417ce053b8b58fea28de3b34ec1af6a6a2ad017d42f"
+  },
+  "runs": {
+    "settings-entry-compound3": {
+      "receiptSha256": "f1979df94a2ef451faf6d11d1c01f5bbd87222742ab9df7bd5ace575b030944f",
+      "logSha256": "57cd5fb826214b9625658177f8a31a1ba9ff24e3a7e32c56f8fa5df1fe65853b",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE"
+    },
+    "mcp-queue-review-reproduce2": {
+      "receiptSha256": "7caa4ca6c9d14e4c0f33048dad70fdc9c34fdd5fb72d02ee85304d8f449280f1",
+      "logSha256": "ff2de59389533691b052374fe078befedc6eba4b6c7358b97519231bfa0e5640",
+      "exitCode": 101,
+      "sourceUnchanged": false,
+      "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE"
+    },
+    "mcp-queue-review-fixed1": {
+      "receiptSha256": "314f154365277c1bf4f2b6d4e40aeee3bfb4bf956471d8c4bea4f1bd525e5a34",
+      "logSha256": "8166d1956d850ae516881776723c2927117db30d2fab99aff520da96945dd860",
+      "exitCode": 0,
+      "sourceUnchanged": false,
+      "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE"
+    }
+  },
+  "entryCompound3": {
+    "actualCases": 7,
+    "status": "实际7/7；执行期全局源码未变，但仍非后继冻结完整验收。",
+    "newOld401Proof": "restart场景旧服务真实models401，仅延迟响应交消费者；随后实际SIGTERM旧服务0、同home新token启动、新连接重新identity owner验证且General真实页体可见后释放旧401，确认unauthorized、新owner不变且General仍可达。",
+    "cleanup": "finally首先释放迟到门，cleanup后等待pendingLate401收尾；无论等待结果都嵌套finally恢复global/store/window/URL、终止子进程并清隔离目录。",
+    "limits": [
+      "单请求坏credential产生真实401，并非真实device撤权。",
+      "旧token重启事件被客户端拒绝，并非额外旧tokenHTTP鉴权全链测试。",
+      "其余归档/provider条款延续compound2具体范围，不扩成17页全验收或OS chooser验证。"
+    ]
+  },
+  "mcpOriginalThree": {
+    "actualReproduction": "reproduce2原22项19通过3失败，首轮reproduce1仅编译失败未执行；原日志和失败继续保留。",
+    "actualFix": "fixed1原22项全部通过，包含原十九与三反例；全局sourceUnchanged=false，开发实际日志不是统一最终源码候选。",
+    "assertionsRetained": [
+      "坏update保持400/savedfalse/runtimeAppliedfalse及原config字节不变，原任务仍connecting并最终running/实际工具可执行、退出回收。",
+      "显式start在实际SDK等待中更换原local owner，要求403/mcp_original_authority_revoked、savedtrue/runtimeAppliedfalse、runningfalse及进程组实际回收。",
+      "disable已确认清理意图期间新正式manager add不被接受为queued，disable必须完成、第二外端不得收到initialize，新旧进程清理；不以shutdown兜底替代disable成功。"
+    ],
+    "sourceFixReviewed": [
+      "短runtime锁先validate_guarded_request检查原authority/取消/目标agent/冻结review；更新使用同一个edited_connector完整预检，之后才cancel_pending；正式写锁再复验。",
+      "global disable短锁内递增start_pauses，RAII guard覆盖等待到收据返回，queue_start在pending锁内观察暂停拒绝新排队；并发disable计数不会由单个请求提前解除他者暂停。",
+      "显式start/refresh沿原authority传入connect_connector，等待期间原授权50ms检查；live发布前再次复验，失败将实际registered插入统一stop_connector清理后返回真实授权错误，保留saved事实。",
+      "restore内部调用仍authorityNone，保留内部恢复边界，不伪造原始用户。"
+    ],
+    "remainingScope": "add/bulk后台握手在runtime锁外；手动start/refresh等仍同步返回并可能持runtime锁，不能笼统宣称所有MCP握手已无设置锁。"
+  },
+  "newFindings": "对这三项最小修复未发现新增阻断；不把本轮22绿当MCP原35全部责任或T08验收。",
+  "next": "等待后继冻结归档、完整门禁、fresh build绑定及原35未接条款逐项核算。"
+}

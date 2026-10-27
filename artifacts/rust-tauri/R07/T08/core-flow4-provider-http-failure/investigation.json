@@ -1,0 +1,184 @@
+{
+  "sourceHome": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-http-b30b9aa892c571cf",
+  "database": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-http-b30b9aa892c571cf/lingxi-service/data/runs.db",
+  "preservedHome": "artifacts/rust-tauri/R07/T08/core-flow4-provider-http-failure/home-b30b9aa892c571cf",
+  "snapshot": "artifacts/rust-tauri/R07/T08/core-flow4-provider-http-failure/b30b9aa892c571cf.sqlite",
+  "sha256": "b76f677e03c7f0a7a273ee6b9783a3e21cc8f71bf4c146819f1492d2f88aa98b",
+  "sessions": [
+    {
+      "session_id": "sess_local_alpha",
+      "agent_id": "lingxi"
+    },
+    {
+      "session_id": "sess_local_beta",
+      "agent_id": "lingxi"
+    },
+    {
+      "session_id": "settings-search",
+      "agent_id": "b"
+    },
+    {
+      "session_id": "settings-name",
+      "agent_id": "b"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "run_000001a14d40a2a4_000001",
+      "session_id": "settings-search",
+      "owner_kind": "local_user",
+      "owner_subject": "user_local",
+      "principal_id": "principal_local",
+      "attempt_count": 1,
+      "status": "completed",
+      "terminal_reason": "completed.with_final",
+      "generation": 1,
+      "created_at_unix_ms": 1792297444004,
+      "updated_at_unix_ms": 1792297444047,
+      "last_event_seq": 14
+    },
+    {
+      "run_id": "run_000001a14d40a2d0_000002",
+      "session_id": "settings-name",
+      "owner_kind": "local_user",
+      "owner_subject": "user_local",
+      "principal_id": "principal_local",
+      "attempt_count": 1,
+      "status": "cancelling",
+      "terminal_reason": null,
+      "generation": 1,
+      "created_at_unix_ms": 1792297444048,
+      "updated_at_unix_ms": 1792297444048,
+      "last_event_seq": 6
+    }
+  ],
+  "journal": [
+    {
+      "journal_id": "run_000001a14d40a2a4_000001-tc0001",
+      "session_id": "settings-search",
+      "run_id": "run_000001a14d40a2a4_000001",
+      "attempt": "run_000001a14d40a2a4_000001#a1",
+      "generation": 1,
+      "owner_kind": "local_user",
+      "owner_subject": "user_local",
+      "target": "tool:first-party:update_settings",
+      "args_digest": "09a4a8403cbce237e5d869e1b9afbed0606fc755c9ee25cf199d05b77151fb31",
+      "args_summary": null,
+      "idempotency_key": "run_000001a14d40a2a4_000001-tc0001",
+      "phase": "succeeded",
+      "receipt_outcome": "succeeded",
+      "receipt_detail": "external content digest fd9516e43a1b4d3acb991027920d3f8989a23f9bd6b0f5af34a38241c4830435",
+      "dedup_id": "fd9516e43a1b4d3acb991027920d3f8989a23f9bd6b0f5af34a38241c4830435",
+      "dispatched": 1,
+      "prepared_at_unix_ms": 1792297444004,
+      "updated_at_unix_ms": 1792297444004
+    },
+    {
+      "journal_id": "run_000001a14d40a2d0_000002-tc0001",
+      "session_id": "settings-name",
+      "run_id": "run_000001a14d40a2d0_000002",
+      "attempt": "run_000001a14d40a2d0_000002#a1",
+      "generation": 1,
+      "owner_kind": "local_user",
+      "owner_subject": "user_local",
+      "target": "tool:first-party:update_settings",
+      "args_digest": "a8917091538e53b08f6492a12ce3fcd20e9c4bcdb469592f53619d552f560a42",
+      "args_summary": null,
+      "idempotency_key": "run_000001a14d40a2d0_000002-tc0001",
+      "phase": "prepared",
+      "receipt_outcome": null,
+      "receipt_detail": null,
+      "dedup_id": null,
+      "dispatched": null,
+      "prepared_at_unix_ms": 1792297444048,
+      "updated_at_unix_ms": 1792297444048
+    }
+  ],
+  "events": [
+    {
+      "event_type": "run_state_changed",
+      "payload_json": "{\"from\":\"queued\",\"to\":\"running\",\"type\":\"run_state_changed\"}",
+      "run_id": "run_000001a14d40a2a4_000001",
+      "seq": 1
+    },
+    {
+      "event_type": "model_call_started",
+      "payload_json": "{\"model\":\"fixture-chat\",\"modelCallId\":\"run_000001a14d40a2a4_000001-mc0001\",\"operation\":\"chat\",\"provider\":\"fixture\",\"type\":\"model_call_started\"}",
+      "run_id": "run_000001a14d40a2a4_000001",
+      "seq": 2
+    },
+    {
+      "event_type": "model_call_completed",
+      "payload_json": "{\"modelCallId\":\"run_000001a14d40a2a4_000001-mc0001\",\"type\":\"model_call_completed\",\"usage\":{\"inputTokens\":\"3\",\"outputTokens\":\"1\"}}",
+      "run_id": "run_000001a14d40a2a4_000001",
+      "seq": 3
+    },
+    {
+      "event_type": "tool_call_started",
+      "payload_json": "{\"toolCall\":{\"argsDigest\":{\"algorithm\":\"sha256\",\"canonicalization\":\"lingxi-canonical-json-v1\",\"hex\":\"09a4a8403cbce237e5d869e1b9afbed0606fc755c9ee25cf199d05b77151fb31\"},\"target\":\"tool:first-party:update_settings\",\"toolCallId\":\"run_000001a14d40a2a4_000001-tc0001\"},\"type\":\"tool_call_started\"}",
+      "run_id": "run_000001a14d40a2a4_000001",
+      "seq": 4
+    },
+    {
+      "event_type": "tool_call_completed",
+      "payload_json": "{\"result\":{\"content\":[{\"text\":\"{\\\"action\\\":\\\"search\\\",\\\"count\\\":1,\\\"settings\\\":[{\\\"currentValue\\\":\\\"zh-CN\\\",\\\"key\\\":\\\"locale\\\",\\\"label\\\":\\\"语言\\\",\\\"modelEditable\\\":true,\\\"options\\\":[\\\"zh-CN\\\",\\\"zh-TW\\\",\\\"ja\\\",\\\"ko\\\",\\\"en\\\"],\\\"scope\\\":\\\"global\\\",\\\"source\\\":\\\"lib/tools/update-settings-tool.ts; scope: shared/config-schema.ts\\\",\\\"type\\\":\\\"list\\\"}]}\",\"type\":\"text\"}],\"details\":{\"action\":\"search\",\"count\":1,\"settings\":[{\"currentValue\":\"zh-CN\",\"key\":\"locale\",\"label\":\"语言\",\"modelEditable\":true,\"options\":[\"zh-CN\",\"zh-TW\",\"ja\",\"ko\",\"en\"],\"scope\":\"global\",\"source\":\"lib/tools/update-settings-tool.ts; scope: shared/config-schema.ts\",\"type\":\"list\"}]},\"status\":\"success\",\"truncated\":false},\"toolCallId\":\"run_000001a14d40a2a4_000001-tc0001\",\"type\":\"tool_call_completed\"}",
+      "run_id": "run_000001a14d40a2a4_000001",
+      "seq": 5
+    },
+    {
+      "event_type": "model_call_started",
+      "payload_json": "{\"model\":\"fixture-chat\",\"modelCallId\":\"run_000001a14d40a2a4_000001-mc0002\",\"operation\":\"chat\",\"provider\":\"fixture\",\"type\":\"model_call_started\"}",
+      "run_id": "run_000001a14d40a2a4_000001",
+      "seq": 7
+    },
+    {
+      "event_type": "model_call_completed",
+      "payload_json": "{\"modelCallId\":\"run_000001a14d40a2a4_000001-mc0002\",\"type\":\"model_call_completed\",\"usage\":{\"inputTokens\":\"3\",\"outputTokens\":\"1\"}}",
+      "run_id": "run_000001a14d40a2a4_000001",
+      "seq": 12
+    },
+    {
+      "event_type": "run_state_changed",
+      "payload_json": "{\"from\":\"running\",\"reason\":\"completed.with_final\",\"to\":\"completed\",\"type\":\"run_state_changed\"}",
+      "run_id": "run_000001a14d40a2a4_000001",
+      "seq": 13
+    },
+    {
+      "event_type": "run_state_changed",
+      "payload_json": "{\"from\":\"queued\",\"to\":\"running\",\"type\":\"run_state_changed\"}",
+      "run_id": "run_000001a14d40a2d0_000002",
+      "seq": 1
+    },
+    {
+      "event_type": "model_call_started",
+      "payload_json": "{\"model\":\"fixture-chat\",\"modelCallId\":\"run_000001a14d40a2d0_000002-mc0001\",\"operation\":\"chat\",\"provider\":\"fixture\",\"type\":\"model_call_started\"}",
+      "run_id": "run_000001a14d40a2d0_000002",
+      "seq": 2
+    },
+    {
+      "event_type": "model_call_completed",
+      "payload_json": "{\"modelCallId\":\"run_000001a14d40a2d0_000002-mc0001\",\"type\":\"model_call_completed\",\"usage\":{\"inputTokens\":\"3\",\"outputTokens\":\"1\"}}",
+      "run_id": "run_000001a14d40a2d0_000002",
+      "seq": 3
+    },
+    {
+      "event_type": "tool_call_started",
+      "payload_json": "{\"toolCall\":{\"argsDigest\":{\"algorithm\":\"sha256\",\"canonicalization\":\"lingxi-canonical-json-v1\",\"hex\":\"a8917091538e53b08f6492a12ce3fcd20e9c4bcdb469592f53619d552f560a42\"},\"target\":\"tool:first-party:update_settings\",\"toolCallId\":\"run_000001a14d40a2d0_000002-tc0001\"},\"type\":\"tool_call_started\"}",
+      "run_id": "run_000001a14d40a2d0_000002",
+      "seq": 4
+    },
+    {
+      "event_type": "run_state_changed",
+      "payload_json": "{\"from\":\"running\",\"reason\":\"approval_required\",\"to\":\"waiting_approval\",\"type\":\"run_state_changed\"}",
+      "run_id": "run_000001a14d40a2d0_000002",
+      "seq": 5
+    },
+    {
+      "event_type": "run_state_changed",
+      "payload_json": "{\"from\":\"waiting_approval\",\"reason\":\"cancelled:foreground caller disconnected\",\"to\":\"cancelling\",\"type\":\"run_state_changed\"}",
+      "run_id": "run_000001a14d40a2d0_000002",
+      "seq": 6
+    }
+  ],
+  "finding": "第二次工具调用settings-name/agent.name等待真实审批；夹具先等待前台execute HTTP响应，之后才答审批，形成夹具时序死锁。30秒超时触发调用方断开取消。仅改夹具并发回答同session/LocalUser/精确update_settings的真实ApprovalService请求，不加预算或改产品执行含义。"
+}

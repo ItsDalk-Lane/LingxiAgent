@@ -1,0 +1,25 @@
+{
+  "home": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-b1c56533f0b13da2",
+  "db": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-b1c56533f0b13da2/lingxi-service/data/runs.db",
+  "columns": [
+    "journal_id",
+    "session_id",
+    "run_id",
+    "attempt",
+    "generation",
+    "owner_kind",
+    "owner_subject",
+    "target",
+    "args_digest",
+    "args_summary",
+    "idempotency_key",
+    "phase",
+    "receipt_outcome",
+    "receipt_detail",
+    "dedup_id",
+    "dispatched",
+    "prepared_at_unix_ms",
+    "updated_at_unix_ms"
+  ],
+  "rows": []
+}

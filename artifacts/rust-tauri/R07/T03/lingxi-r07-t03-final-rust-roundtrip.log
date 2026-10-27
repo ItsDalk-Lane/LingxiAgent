@@ -1,0 +1,3 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running `/private/tmp/lingxi-r07-build/debug/lingxi-protocol-verify --ts /private/tmp/lingxi-r07-t03-ts-roundtrip`
+OK: 59 golden samples verified (Rust decode→encode byte-stable; TS re-encoded copies byte-identical)

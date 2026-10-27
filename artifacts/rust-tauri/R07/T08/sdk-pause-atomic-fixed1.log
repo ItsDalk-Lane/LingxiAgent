@@ -1,0 +1,16 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 44.50s
+     Running unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_service-15cf71a69d3ae192)
+
+running 1 test
+MCP 真实背压现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-real-backpressure-d1ab865bca61b7fa
+MCP 真实背压：accepted=1024 pending=76 payloadBytes=65536 deadlineMs=80 elapsedMs=2086；取消请求在满队列同轮返回，外端仍未读取
+test mcpbridge::request_tests::real_sdk_full_queue_honors_request_deadline_and_scope_cancel_without_replay ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 647 filtered out; finished in 3.97s
+

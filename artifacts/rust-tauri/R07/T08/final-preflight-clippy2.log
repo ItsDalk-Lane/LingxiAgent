@@ -1,0 +1,36 @@
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error: unnecessary use of `get("vision").is_none()`
+    --> crates/lingxi-service/tests/r07_t08_provider_http.rs:1023:41
+     |
+1023 |     assert!(gateway.configured_routes().get("vision").is_none());
+     |             ----------------------------^^^^^^^^^^^^^^^^^^^^^^^
+     |             |
+     |             help: replace it with: `!gateway.configured_routes().contains_key("vision")`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#unnecessary_get_then_check
+     = note: `-D clippy::unnecessary-get-then-check` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::unnecessary_get_then_check)]`
+
+error: unnecessary use of `get("vision").is_none()`
+    --> crates/lingxi-service/tests/r07_t08_provider_http.rs:1064:41
+     |
+1064 |     assert!(gateway.configured_routes().get("vision").is_none());
+     |             ----------------------------^^^^^^^^^^^^^^^^^^^^^^^
+     |             |
+     |             help: replace it with: `!gateway.configured_routes().contains_key("vision")`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#unnecessary_get_then_check
+
+error: unnecessary use of `get("vision").is_none()`
+    --> crates/lingxi-service/tests/r07_t08_provider_http.rs:1084:37
+     |
+1084 |         gateway.configured_routes().get("vision").is_none(),
+     |         ----------------------------^^^^^^^^^^^^^^^^^^^^^^^
+     |         |
+     |         help: replace it with: `!gateway.configured_routes().contains_key("vision")`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#unnecessary_get_then_check
+
+error: could not compile `lingxi-service` (test "r07_t08_provider_http") due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...

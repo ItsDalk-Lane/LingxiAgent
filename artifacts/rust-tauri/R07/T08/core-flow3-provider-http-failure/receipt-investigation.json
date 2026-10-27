@@ -1,0 +1,54 @@
+{
+  "sourceHome": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-http-2d5b4cc9635a9a75",
+  "sourceDatabase": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-http-2d5b4cc9635a9a75/lingxi-service/data/runs.db",
+  "preservedHome": "artifacts/rust-tauri/R07/T08/core-flow3-provider-http-failure/home",
+  "sqliteBackup": "artifacts/rust-tauri/R07/T08/core-flow3-provider-http-failure/runtime-snapshot.sqlite",
+  "sqliteSha256": "1462939510c651f5a88f3bbb80559e9568c2972ba20b08a45b40d3e29d7ed9f8",
+  "toolReceipts": [
+    [
+      "run_000001a14d3a9c57_000001",
+      "tool:first-party:update_settings",
+      "external content digest fd9516e43a1b4d3acb991027920d3f8989a23f9bd6b0f5af34a38241c4830435"
+    ]
+  ],
+  "evidenceScope": "synthetic-loopback-test-home; original failure preserved; not acceptance",
+  "rawToolCompletedEvent": {
+    "result": {
+      "content": [
+        {
+          "text": "{\"action\":\"search\",\"count\":1,\"settings\":[{\"currentValue\":\"zh-CN\",\"key\":\"locale\",\"label\":\"语言\",\"modelEditable\":true,\"options\":[\"zh-CN\",\"zh-TW\",\"ja\",\"ko\",\"en\"],\"scope\":\"global\",\"source\":\"lib/tools/update-settings-tool.ts; scope: shared/config-schema.ts\",\"type\":\"list\"}]}",
+          "type": "text"
+        }
+      ],
+      "details": {
+        "action": "search",
+        "count": 1,
+        "settings": [
+          {
+            "currentValue": "zh-CN",
+            "key": "locale",
+            "label": "语言",
+            "modelEditable": true,
+            "options": [
+              "zh-CN",
+              "zh-TW",
+              "ja",
+              "ko",
+              "en"
+            ],
+            "scope": "global",
+            "source": "lib/tools/update-settings-tool.ts; scope: shared/config-schema.ts",
+            "type": "list"
+          }
+        ]
+      },
+      "status": "success",
+      "truncated": false
+    },
+    "toolCallId": "run_000001a14d3a9c57_000001-tc0001",
+    "type": "tool_call_completed"
+  },
+  "canonicalContentSha256": "fd9516e43a1b4d3acb991027920d3f8989a23f9bd6b0f5af34a38241c4830435",
+  "journalDigestMatchesRawContent": true,
+  "finding": "测试helper把journal审计摘要误当工具正文；真实持久化工具完成事件成功返回locale。修复测试读取及同调用/摘要绑定，不改产品实现或放宽locale断言。"
+}

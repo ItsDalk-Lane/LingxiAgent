@@ -1,0 +1,71 @@
+{
+  "schema": "lingxi.r07.handoff.v1",
+  "stage": "R07",
+  "generatedAt": "2026-10-21T12:00:00+00:00",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "candidate": "HEAD 0c86675d4 的工作区候选（含未提交实现）；不声称该提交本身含全部实现",
+  "overallLocal": "LOCAL_VERIFIED_WITH_DESIGNED_OPEN_GATE",
+  "gate": {
+    "command": "cargo run --manifest-path rust/Cargo.toml -p xtask -- verify-stage R07 --evidence artifacts/rust-tauri/R07/T12/verify-r07-1",
+    "resultRef": "artifacts/rust-tauri/R07/T12/verify-r07-2/verify-stage-result.json（overall FAIL 为设计态：24/24 基础 PASS、2/2 扩展 PASS、408 叶 BLOCKED、53 命令全绿、快照无漂移）",
+    "expectedShape": "24 基础场景 PASS + 2 扩展 PASS + 408 叶 BLOCKED（required_behavior_pending 设计态）→ overall FAIL；移交透镜 35+43 随叶状态",
+    "note": "整体 FAIL 是门禁已真实消费义务、尚缺逐断言证据的诚实状态，不是放行失败"
+  },
+  "tasks": {
+    "R07-T01": "LOCAL_VERIFIED",
+    "R07-T02": "LOCAL_VERIFIED",
+    "R07-T03": "LOCAL_VERIFIED",
+    "R07-T04": "LOCAL_VERIFIED_FINAL_R07_PENDING",
+    "R07-T05": "LOCAL_VERIFIED",
+    "R07-T06": "LOCAL_VERIFIED",
+    "R07-T07": "VERIFIED_WITH_RETAINED_FAILURES",
+    "R07-T08": "LOCAL_VERIFIED_FINAL_R07_PENDING",
+    "R07-T09": "LOCAL_VERIFIED",
+    "R07-T10": "LOCAL_VERIFIED",
+    "R07-T11": "LOCAL_VERIFIED",
+    "R07-T12": "LOCAL_VERIFIED"
+  },
+  "regression": {
+    "fullSweep": "t10-service-regression34（219 二进制/2363 项/0 失败）",
+    "postDelta": "t10-service-regression36 全绿（220 二进制/2368 项/0 失败，logSha256=1f5e2e35615b7fb1…）",
+    "chainLedger": "docs/rust-tauri/R07/T10_LEAF_EVIDENCE_DRAFT.json",
+    "flakes": [
+      "actual_proactive_31_minutes（时序敏感：T05 一次+回归35 一次失败，同源码 3+3 通过）"
+    ]
+  },
+  "retained": {
+    "blockedEnvironment": "5 项（LAN 管理、tenet 焦点、settings 焦点、原生目录对话框、废纸篓）——锁屏环境",
+    "personaSuites": "2 项专属环境，已单独取证绿（t10-persona-suite2）",
+    "retiredByDesign": "1 项（浏览器宿主，用户 2026-10-19 裁决，R08 重立覆盖义务）",
+    "t07BrowserFailures": "真实 Chromium 弹窗、cookie 后 Resume 导航（锁屏受阻未改写）",
+    "t08Clearance": "t08h-t12-clause-followup-actual1.json：17 界面分支/4 窄负例/minimax 条款矛盾",
+    "liveExternal": "真实账号/付费供应商/对外发消息未验（DEFERRED_R10）",
+    "platforms": "非 macOS 与正式安装包未验",
+    "knownBoundaries": [
+      "MCP legacy SSE 未实现",
+      "SDK 解析前分配上限未证明",
+      "缺人格模板误标 provider_error"
+    ]
+  },
+  "nextStageObligations": [
+    "R08：重立浏览器宿主退役用例的对应覆盖（retiredByDesign 登记义务）",
+    "52 个跨后阶段叶的后续份额按原阶段集合验收（不把早期阶段当延期接收者）",
+    "408 叶逐断言证据推进后 verify-stage R07 才能整体转绿",
+    "手机权限保持原四项（chat/resources.read/files.read/files.write），不得扩权"
+  ],
+  "deliverables": {
+    "report": "docs/rust-tauri/R07/R07_REPORT.md",
+    "parity": "docs/rust-tauri/R07/FEATURE_PARITY_RESULTS.json",
+    "legacyLedger": "docs/rust-tauri/R07/LEGACY_DEPENDENCY_LEDGER.json",
+    "handoff": "docs/rust-tauri/R07/R07_HANDOFF.json"
+  },
+  "closeoutRound": {
+    "date": "2026-10-20",
+    "reviewBaseline": "bfe32d107fb60852712b897a25403d7f092671b3",
+    "summary": "审查确诊的 A(观测面)/B(Bridge /loop)/C(Loop 媒体授权)/D(门禁证明力) 四组缺陷全部实现并验证；正式门禁机器修复（路由扫描 141→409 全归因、24 场景 suiteTestAnchors、A24 六域闭环+旧内核检测、behavior_matrix 非零退出）。gate-01 全命令 PASS 但 7 场景被锚点机制真实拦下（名字与日志前缀不一致，实战反向验证）；gate-02 22/24 场景 PASS（mcp_settings 限流 flaky，孤立 3 连绿回执在案）、2/2 扩展、408 叶 BLOCKED。",
+    "gate": "artifacts/rust-tauri/R07/T12/verify-r07-closeout-11/verify-stage-result.json —— overall PASS：57/57 命令、24/24 场景、408/408 叶、2/2 扩展、35/35+43/43 移交/递延、stable；gate-01~10 过程回执同目录留存",
+    "remaining": "门禁侧无剩余；R08 准入证据已取得（待独立审查确认后建议放行）。真实账户/付费供应商/跨平台/正式包按既有延期范围保留。",
+    "stateChangeNote": "本轮全部修改仍在工作区未提交（无提交/推送授权）；迁移登记表 docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json 补登 V24-V26。",
+    "leafBinding": "408/408 叶经正式合同机制 PASS（gate-11 overall PASS）"
+  }
+}

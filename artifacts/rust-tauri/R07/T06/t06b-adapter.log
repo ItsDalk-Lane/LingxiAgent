@@ -1,0 +1,56 @@
+
+--- STDERR ---
+error: no test target named `r07_media_store` in `lingxi-adapters` package
+help: available test targets:
+    active_run_listing
+    agent_memory_r06t06
+    backup_faults
+    backup_restore
+    canonical_message_store
+    context_material_commit_r06ex01
+    disk_full_fault
+    event_store_reads
+    ex08_independent_review
+    invocation_journal_store
+    knowledge_store_r06t07
+    late_result_fencing_property
+    migration_idempotency
+    r05_t02_oauth_flows
+    r05_t03_goldens
+    r05_t03_rr1_replay
+    r05_t04_rr1_batch_terminal
+    r05_t04_streaming
+    r05_t05_compat
+    r05_t05_timeouts
+    r05_t06_operations
+    r05_t07_rr1_usage_strict
+    r05_t07_usage_families
+    r06_ar_f06_config_preservation
+    r06_ar_f06_d2_replay_probe
+    r06_ar_f12_cache_preservation
+    r06_ar_f14_migration_receipts
+    r06_ar_w09_vector_integrity
+    r06_ex05_independent_review
+    r06_ex05_restore_atomicity
+    r06_ex09_search_cache
+    r06_t02_compaction_render
+    r07_activity_store
+    r07_automation_store
+    r07_automation_suggestions
+    r07_bridge_effect_store
+    r07_bridge_message_projection
+    r07_bridge_notice_render
+    r07_bridge_store
+    r07_browser_chromium
+    r07_browser_store
+    r07_conversation_files
+    r07_pdf_chromium
+    r07_phone_store
+    r07_session_collab_store
+    r07_t05_media_store
+    run_finalize_property
+    run_id_allocator
+    run_lineage_store
+    session_file_store
+    session_tree_r06t03
+    storage_transactions

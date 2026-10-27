@@ -1,0 +1,17 @@
+{
+  "schema": "lingxi.r08.independent-f02-scope-receipt.v1",
+  "generatedAt": "2026-10-21T14:43:48.365799+00:00",
+  "sourceSha": "86840d1700397d3dd620a41f2b884df4cddd5cc2",
+  "command": "python3 artifacts/rust-tauri/R08/r07-f02-scope-review-01/verify_scope.py /Users/study_superior/Desktop/Code/LingxiAgent",
+  "exitCode": 0,
+  "status": "PASS_SOURCE_RECONSTRUCTION_ONLY",
+  "admissionStatus": "F02_OPEN_FAIL",
+  "businessTests": "NOT_EXECUTED",
+  "files": {
+    "docs/rust-tauri/R08/ADMISSION_F02_SCOPE_REVIEW.md": "dc6268ac2b4865192d97045d27991915d55966e616a8f5a57a267681e4cd9f74",
+    "docs/rust-tauri/R08/ADMISSION_F02_SCOPE_REVIEW.json": "ca8c579d9d3d32c2e338598043d4380401d0e04005bb1d5bd8fae60a8fc914e5",
+    "artifacts/rust-tauri/R08/r07-f02-scope-review-01/verify_scope.py": "ae326ee0aa7678d9e462046d94c78483624ba6e82e9458d07d0b7a10323d2e71",
+    "artifacts/rust-tauri/R08/r07-f02-scope-review-01/verification.json": "74179b65f80df72e76e1318631c22a9a65f9303df44b8dd7fe6389eab9798133",
+    "artifacts/rust-tauri/R08/r07-f02-scope-review-01/source-excerpts.json": "93018d6f1a83c9a4ef0344dddfed14bc0fb38e833812e408634de610ac065653"
+  }
+}

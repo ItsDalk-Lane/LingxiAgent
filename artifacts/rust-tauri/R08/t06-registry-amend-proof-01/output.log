@@ -1,0 +1,16 @@
+{"seed":20261023,"out":"/private/tmp/t06-registry-amend-proof-01/src-a","fileCount":32,"rootHash":"80a8d2c2640e2b2974b299a10f36679bc19daf0911e51f82f0c43399cb32feaa"}
+{"seed":20261023,"out":"/private/tmp/t06-registry-amend-proof-01/src-b","fileCount":32,"rootHash":"80a8d2c2640e2b2974b299a10f36679bc19daf0911e51f82f0c43399cb32feaa"}
+PASS fixture file sets identical across runs :: 32 files
+PASS fixture v3 contains no models-store.json (new pattern zero-hit)
+FAIL run-a status completed :: complete
+FAIL run-a batches 435/435 done :: 35/35
+FAIL run-a issues 5206 :: 5
+FAIL run-b status completed :: complete
+FAIL run-b batches 435/435 done :: 35/35
+FAIL run-b issues 5206 :: 5
+FAIL source_root_sha256 anchor v3 preserved (run-a) :: c09ba009d9b69893bb415bd6bed664f5cdac4e59ff7da5f8ca645ab54756cf24
+FAIL source_root_sha256 anchor v3 preserved (run-b) :: c09ba009d9b69893bb415bd6bed664f5cdac4e59ff7da5f8ca645ab54756cf24
+PASS source_root_sha256 identical across runs
+PASS migration receipts normalized deep-equal (classification output byte-stable)
+REGISTRY_AMEND_RESULT anchor=c09ba009d9b69893… batches=35/35 issues=5 doubleRunIdentical=true fixtureHasModelsStore=false
+REGISTRY AMEND FAILURES: 8

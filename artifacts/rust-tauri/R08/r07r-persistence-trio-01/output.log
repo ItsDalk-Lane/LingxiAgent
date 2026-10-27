@@ -1,0 +1,248 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stdout | tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > uses real SQLite stores and matches the deterministic committed fingerprint
+[fact-store] schema migrated: v0 → v3
+
+ ❯ tests/persistence-schema-tripwire.test.ts (15 tests | 4 failed) 1485ms
+     × uses real SQLite stores and matches the deterministic committed fingerprint 1149ms
+     ✓ fails with both review paths when a runtime contract source drifts 50ms
+     × ignores comment-only drift in the sources it hashes 26ms
+     × ignores JSDoc drift, including the file headers this guard once taxed 27ms
+     ✓ catches a statement-boundary rewrite that keeps the flat token stream intact 23ms
+     ✓ keeps string and template literal content inside the hash 22ms
+     × records the digest method and the compiler in the payload it pins 13ms
+     ✓ names the toolchain change instead of a bare mismatch when digest provenance differs 23ms
+     ✓ holds digest invariants that no toolchain upgrade may break silently 1ms
+     ✓ pins parse-behavior snapshots so toolchain drift is separable from module drift 1ms
+     ✓ rejects a repinned payload until the committed review pins that exact payload 38ms
+     ✓ treats a runtime DATA_EPOCH change as payload drift that needs a new review 29ms
+     ✓ requires an epoch-changing write to carry the exact breaking transition review 51ms
+     ✓ keeps the unregistered-write mutation as the first tripwire 3ms
+     ✓ requires a complete breaking declaration and binds it to the landed DATA_EPOCH 29ms
+ ❯ tests/persistence-startup-receipt.test.ts (3 tests | 1 failed) 1571ms
+     ✓ uses the canonical phase order and records every registered store 39ms
+     ✓ derives pre-coordinator risk and required access moves from the declared phases 2ms
+     × matches the committed deterministic startup receipt 1529ms
+ ❯ tests/persistence-store-registry.test.ts (14 tests | 5 failed) 6045ms
+     × owns every production persistence site exactly once 1541ms
+     ✓ keeps required store contracts explicit and session identity path-independent 6ms
+     ✓ declares provider plugin paths the local plugin store actually writes 0ms
+     ✓ rejects duplicate IDs, overlapping paths, and Windows-only case collisions 1ms
+     ✓ allows only strict child carve-outs fully taken over by one tree descriptor 15ms
+     × rejects expired and dangling exemptions 1132ms
+     ✓ fails closed when a declared production root is missing 2ms
+     ✓ detects multiline, imported-alias, destructured-alias, stream, destructive, truncate, and SQLite writes 3ms
+     ✓ scans desktop host and CLI source while explicitly excluding generated, test, renderer, dist, and native products 5ms
+     ✓ rejects epoch-managed pre-coordinator access without a named additive read projection 0ms
+     ✓ requires exact registered paths before bootstrap state may prove an unstamped home is new 0ms
+     × generates deterministic, repository-relative receipts that match the committed inventory 1129ms
+     × anchors sites by ordinal so the receipt survives line shifts 1108ms
+     × still reports a genuinely new write site after the ordinal change 1103ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 10 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > uses real SQLite stores and matches the deterministic committed fingerprint
+Error: schema review pins sha256:2ed75f9bc701185aa8cb5463746c468b797aeed970550c6d05e3d79896f87f8b, but generated payload is sha256:29443d1375ca98b6fc6598390f68ee126ec5df2a99b8407437817919c521f91b
+
+compatible addition
+→ record compatibility reasoning
+→ update the store-local schema contract
+→ repin the persistence schema fingerprint
+
+breaking change
+→ declare source and target DATA_EPOCH values
+→ register the migration in the coordinated migration batch
+→ declare affected stores plus checkpoint and restore policy
+→ repin the persistence schema fingerprint
+ ❯ reviewedFingerprint scripts/generate-persistence-schema-fingerprint.mjs:609:11
+    607|   validateSchemaChangeDeclaration(review, { currentDataEpoch });
+    608|   if (review.payloadFingerprint && review.payloadFingerprint !== paylo…
+    609|     throw new Error(
+       |           ^
+    610|       `schema review pins ${review.payloadFingerprint}, but generated …
+    611|       + SCHEMA_CHANGE_GUIDANCE,
+ ❯ generatePersistenceSchemaFingerprint scripts/generate-persistence-schema-fingerprint.mjs:636:10
+ ❯ tests/persistence-schema-tripwire.test.ts:44:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/10]⎯
+
+ FAIL  tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > ignores comment-only drift in the sources it hashes
+AssertionError: promise rejected "Error: persistence schema fingerprint mis…" instead of resolving
+ ❯ tests/persistence-schema-tripwire.test.ts:196:9
+    194|         inventory,
+    195|         sourceOverrides: new Map([[module, commented]]),
+    196|       })).resolves.not.toThrow();
+       |         ^
+    197|     }
+    198|   });
+
+Caused by: Error: persistence schema fingerprint mismatch: committed sha256:2ed75f9bc701185aa8cb5463746c468b797aeed970550c6d05e3d79896f87f8b, generated sha256:29443d1375ca98b6fc6598390f68ee126ec5df2a99b8407437817919c521f91b
+
+compatible addition
+→ record compatibility reasoning
+→ update the store-local schema contract
+→ repin the persistence schema fingerprint
+
+breaking change
+→ declare source and target DATA_EPOCH values
+→ register the migration in the coordinated migration batch
+→ declare affected stores plus checkpoint and restore policy
+→ repin the persistence schema fingerprint
+ ❯ assertCommittedPersistenceSchemaFingerprint scripts/generate-persistence-schema-fingerprint.mjs:756:11
+ ❯ tests/persistence-schema-tripwire.test.ts:191:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/10]⎯
+
+ FAIL  tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > ignores JSDoc drift, including the file headers this guard once taxed
+AssertionError: promise rejected "Error: persistence schema fingerprint mis…" instead of resolving
+ ❯ tests/persistence-schema-tripwire.test.ts:222:9
+    220|         inventory,
+    221|         sourceOverrides: new Map([[module, mutated]]),
+    222|       })).resolves.not.toThrow();
+       |         ^
+    223|     }
+    224|   });
+
+Caused by: Error: persistence schema fingerprint mismatch: committed sha256:2ed75f9bc701185aa8cb5463746c468b797aeed970550c6d05e3d79896f87f8b, generated sha256:29443d1375ca98b6fc6598390f68ee126ec5df2a99b8407437817919c521f91b
+
+compatible addition
+→ record compatibility reasoning
+→ update the store-local schema contract
+→ repin the persistence schema fingerprint
+
+breaking change
+→ declare source and target DATA_EPOCH values
+→ register the migration in the coordinated migration batch
+→ declare affected stores plus checkpoint and restore policy
+→ repin the persistence schema fingerprint
+ ❯ assertCommittedPersistenceSchemaFingerprint scripts/generate-persistence-schema-fingerprint.mjs:756:11
+ ❯ tests/persistence-schema-tripwire.test.ts:217:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/10]⎯
+
+ FAIL  tests/persistence-schema-tripwire.test.ts > persistence schema tripwire > records the digest method and the compiler in the payload it pins
+Error: schema review pins sha256:2ed75f9bc701185aa8cb5463746c468b797aeed970550c6d05e3d79896f87f8b, but generated payload is sha256:29443d1375ca98b6fc6598390f68ee126ec5df2a99b8407437817919c521f91b
+
+compatible addition
+→ record compatibility reasoning
+→ update the store-local schema contract
+→ repin the persistence schema fingerprint
+
+breaking change
+→ declare source and target DATA_EPOCH values
+→ register the migration in the coordinated migration batch
+→ declare affected stores plus checkpoint and restore policy
+→ repin the persistence schema fingerprint
+ ❯ reviewedFingerprint scripts/generate-persistence-schema-fingerprint.mjs:609:11
+    607|   validateSchemaChangeDeclaration(review, { currentDataEpoch });
+    608|   if (review.payloadFingerprint && review.payloadFingerprint !== paylo…
+    609|     throw new Error(
+       |           ^
+    610|       `schema review pins ${review.payloadFingerprint}, but generated …
+    611|       + SCHEMA_CHANGE_GUIDANCE,
+ ❯ generatePersistenceSchemaFingerprint scripts/generate-persistence-schema-fingerprint.mjs:636:10
+ ❯ tests/persistence-schema-tripwire.test.ts:273:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/10]⎯
+
+ FAIL  tests/persistence-startup-receipt.test.ts > persistence startup receipt > matches the committed deterministic startup receipt
+Error: dangling persistence rule for store knowledge-indexes: lib/knowledge/vector-search-backend-factory.ts
+ ❯ validateRuleCoverage scripts/scan-persistent-stores.mjs:528:15
+    526|     for (const rule of store.siteRules) {
+    527|       if (!sites.some((site) => ruleMatches(site, rule))) {
+    528|         throw new Error(
+       |               ^
+    529|           `dangling persistence rule for store ${store.id}: ${rule.sou…
+    530|           + `${rule.linePattern ? ` /${rule.linePattern}/` : ""}`,
+ ❯ scanPersistentStores scripts/scan-persistent-stores.mjs:623:3
+ ❯ tests/persistence-startup-receipt.test.ts:83:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/10]⎯
+
+ FAIL  tests/persistence-store-registry.test.ts > persistent store registry > owns every production persistence site exactly once
+Error: dangling persistence rule for store knowledge-indexes: lib/knowledge/vector-search-backend-factory.ts
+ ❯ validateRuleCoverage scripts/scan-persistent-stores.mjs:528:15
+    526|     for (const rule of store.siteRules) {
+    527|       if (!sites.some((site) => ruleMatches(site, rule))) {
+    528|         throw new Error(
+       |               ^
+    529|           `dangling persistence rule for store ${store.id}: ${rule.sou…
+    530|           + `${rule.linePattern ? ` /${rule.linePattern}/` : ""}`,
+ ❯ scanPersistentStores scripts/scan-persistent-stores.mjs:623:3
+ ❯ tests/persistence-store-registry.test.ts:55:27
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/10]⎯
+
+ FAIL  tests/persistence-store-registry.test.ts > persistent store registry > rejects expired and dangling exemptions
+AssertionError: expected [Function] to throw error matching /dangling persistence exemption/ but got 'dangling persistence rule for store k…'
+
+- Expected:
+/dangling persistence exemption/
+
++ Received:
+"dangling persistence rule for store knowledge-indexes: lib/knowledge/vector-search-backend-factory.ts"
+
+ ❯ tests/persistence-store-registry.test.ts:243:9
+    241|       exemptions: [...PERSISTENCE_EXEMPTIONS, dangling],
+    242|       today: TODAY,
+    243|     })).toThrow(/dangling persistence exemption/);
+       |         ^
+    244|   }, 60_000);
+    245|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/10]⎯
+
+ FAIL  tests/persistence-store-registry.test.ts > persistent store registry > generates deterministic, repository-relative receipts that match the committed inventory
+Error: dangling persistence rule for store knowledge-indexes: lib/knowledge/vector-search-backend-factory.ts
+ ❯ validateRuleCoverage scripts/scan-persistent-stores.mjs:528:15
+    526|     for (const rule of store.siteRules) {
+    527|       if (!sites.some((site) => ruleMatches(site, rule))) {
+    528|         throw new Error(
+       |               ^
+    529|           `dangling persistence rule for store ${store.id}: ${rule.sou…
+    530|           + `${rule.linePattern ? ` /${rule.linePattern}/` : ""}`,
+ ❯ scanPersistentStores scripts/scan-persistent-stores.mjs:623:3
+ ❯ tests/persistence-store-registry.test.ts:358:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/10]⎯
+
+ FAIL  tests/persistence-store-registry.test.ts > persistent store registry > anchors sites by ordinal so the receipt survives line shifts
+Error: dangling persistence rule for store knowledge-indexes: lib/knowledge/vector-search-backend-factory.ts
+ ❯ validateRuleCoverage scripts/scan-persistent-stores.mjs:528:15
+    526|     for (const rule of store.siteRules) {
+    527|       if (!sites.some((site) => ruleMatches(site, rule))) {
+    528|         throw new Error(
+       |               ^
+    529|           `dangling persistence rule for store ${store.id}: ${rule.sou…
+    530|           + `${rule.linePattern ? ` /${rule.linePattern}/` : ""}`,
+ ❯ scanPersistentStores scripts/scan-persistent-stores.mjs:623:3
+ ❯ tests/persistence-store-registry.test.ts:380:27
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/10]⎯
+
+ FAIL  tests/persistence-store-registry.test.ts > persistent store registry > still reports a genuinely new write site after the ordinal change
+AssertionError: expected [Function] to throw error matching /unregistered persistence site/ but got 'dangling persistence rule for store k…'
+
+- Expected:
+/unregistered persistence site/
+
++ Received:
+"dangling persistence rule for store knowledge-indexes: lib/knowledge/vector-search-backend-factory.ts"
+
+ ❯ tests/persistence-store-registry.test.ts:408:9
+    406|       today: TODAY,
+    407|       sourceOverrides: new Map([[target, `${original}\nfs.writeFileSyn…
+    408|     })).toThrow(/unregistered persistence site/);
+       |         ^
+    409|   }, 60_000);
+    410| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/10]⎯
+
+
+ Test Files  3 failed (3)
+      Tests  10 failed | 22 passed (32)
+   Start at  00:57:13
+   Duration  6.38s (transform 432ms, setup 51ms, import 662ms, tests 9.10s, environment 0ms)
+

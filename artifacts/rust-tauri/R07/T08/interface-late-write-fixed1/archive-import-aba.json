@@ -1,0 +1,347 @@
+{
+  "scenario": "archive-import-aba",
+  "realAtoBtoAInitialization": true,
+  "noStaleImportPost": true,
+  "snapshotsAndToastUnchanged": true,
+  "bothPreferencesUnchanged": true,
+  "startedRequests": [
+    {
+      "server": "A",
+      "path": "/lingxi/v1/access/summary",
+      "method": "GET"
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/server/identity",
+      "method": "GET"
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/settings/config",
+      "method": "GET"
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/agents",
+      "method": "GET"
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/models",
+      "method": "GET"
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/settings/snapshot",
+      "method": "GET"
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/settings/avatar-health",
+      "method": "GET"
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/providers/summary",
+      "method": "GET"
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/preferences/quick-chat",
+      "method": "GET"
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/preferences/notifications",
+      "method": "GET"
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/server/identity",
+      "method": "GET"
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/settings/config",
+      "method": "GET"
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/agents",
+      "method": "GET"
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/models",
+      "method": "GET"
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/settings/snapshot",
+      "method": "GET"
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/settings/avatar-health",
+      "method": "GET"
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/providers/summary",
+      "method": "GET"
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/preferences/quick-chat",
+      "method": "GET"
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/preferences/notifications",
+      "method": "GET"
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/server/identity",
+      "method": "GET"
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/settings/config",
+      "method": "GET"
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/agents",
+      "method": "GET"
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/models",
+      "method": "GET"
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/settings/snapshot",
+      "method": "GET"
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/settings/avatar-health",
+      "method": "GET"
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/providers/summary",
+      "method": "GET"
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/preferences/quick-chat",
+      "method": "GET"
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/preferences/notifications",
+      "method": "GET"
+    }
+  ],
+  "requests": [
+    {
+      "server": "A",
+      "path": "/lingxi/v1/access/summary",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/server/identity",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/settings/config",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/agents",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/settings/snapshot",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/settings/avatar-health",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/models",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/providers/summary",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/preferences/quick-chat",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/preferences/notifications",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/server/identity",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/settings/config",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/agents",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/settings/snapshot",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/settings/avatar-health",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/models",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/providers/summary",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/preferences/quick-chat",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/preferences/notifications",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/server/identity",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/settings/config",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/agents",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/models",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/settings/snapshot",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/settings/avatar-health",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/providers/summary",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/preferences/notifications",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/preferences/quick-chat",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    }
+  ]
+}

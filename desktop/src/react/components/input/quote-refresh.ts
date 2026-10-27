@@ -1,5 +1,5 @@
 import type { QuotedSelection } from '../../stores/input-slice';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../services/service-client';
 
 /**
  * 引用新鲜度重读（阶段一·2）。

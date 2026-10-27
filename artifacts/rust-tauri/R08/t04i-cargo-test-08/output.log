@@ -1,0 +1,6 @@
+test storage::legacy_import::tests::fresh_run_plans_batches_and_writes_receipt ... FAILED
+test storage::legacy_import::tests::resume_continues_same_run_without_duplicate_batches ... FAILED
+thread 'storage::legacy_import::tests::fresh_run_plans_batches_and_writes_receipt' (14211268) panicked at crates/lingxi-adapters/src/storage/legacy_import/mod.rs:761:9:
+thread 'storage::legacy_import::tests::resume_continues_same_run_without_duplicate_batches' (14211271) panicked at crates/lingxi-adapters/src/storage/legacy_import/mod.rs:805:79:
+test result: FAILED. 17 passed; 2 failed; 0 ignored; 0 measured; 154 filtered out; finished in 2.09s
+error: test failed, to rerun pass `-p lingxi-adapters --lib`

@@ -1,0 +1,57 @@
+{
+  "$defs": {
+    "ContentDigest": {
+      "additionalProperties": false,
+      "description": "Hash of canonical content (protocol §6). `algorithm` is `sha256`;\n`canonicalization` names the canonical JSON profile.",
+      "properties": {
+        "algorithm": {
+          "type": "string"
+        },
+        "canonicalization": {
+          "type": "string"
+        },
+        "hex": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "algorithm",
+        "canonicalization",
+        "hex"
+      ],
+      "type": "object"
+    },
+    "ToolCallId": {
+      "description": "Identity of one tool call.\n\nOpaque string identifier. Equality and ordering carry no\nsemantics; the string form is preserved verbatim across\nmigrations (legacy IDs are never renumbered). On the wire this is\na plain JSON string (`#[serde(transparent)]`).",
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Wire descriptor of one tool call as announced at start.",
+  "properties": {
+    "argsDigest": {
+      "$ref": "#/$defs/ContentDigest"
+    },
+    "argsSummary": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "target": {
+      "description": "Registry target id at the pinned generation.",
+      "type": "string"
+    },
+    "toolCallId": {
+      "$ref": "#/$defs/ToolCallId"
+    }
+  },
+  "required": [
+    "toolCallId",
+    "target",
+    "argsDigest"
+  ],
+  "title": "ToolCallDescriptor",
+  "type": "object"
+}

@@ -1,0 +1,55 @@
+{
+  "recordedAt": "2026-10-18T07:21:50.093516+00:00",
+  "status": "READONLY_MACOS_CLEANUP_REVIEW_NOT_FINAL_ACCEPTANCE",
+  "scope": [
+    "macos_process_group_absent",
+    "McpChild.kill",
+    "McpChild.stop",
+    "McpConnection.stop"
+  ],
+  "conclusion": "本次限定改动未发现具体新增回归。仅EPERM且实际try_wait确认退出回收后才查询真实组内容；只接受成功且返回0字节为空。查询失败、缓冲不足或组仍非空均明确失败，回收后不再对可能复用的PID发信号。",
+  "findings": [],
+  "checkedInvariants": [
+    {
+      "lines": "303-327",
+      "evidence": "使用实际4096字节buffer调用sysctl，未使用size-only估算；result==0且bytes==0才返回true。"
+    },
+    {
+      "lines": "338-361",
+      "evidence": "仅EPERM走Mac例外；try_wait为Some且组空才能成功。try_wait None保持原错误；查询错误经?返回，非空保留原错误。getpgid仅诊断读取。"
+    },
+    {
+      "lines": "330-369",
+      "evidence": "killpg仅位于try_wait之前；已reap后没有再次signal逻辑。process.id为None时不发signal。"
+    },
+    {
+      "lines": "370-407",
+      "evidence": "stop仍有真实wait的2秒上限；McpConnection.stop消费连接且保存child_result，即使SDK结束也不覆盖子进程清理失败。"
+    },
+    {
+      "lines": "1568-1607",
+      "evidence": "现有真实测试分别断言活组非空、未reap退出记录非空、实际EPERM、stop后组空。"
+    }
+  ],
+  "conservativeBoundary": "4096字节不足或sysctl无权限会明确报告清理未确认。此时不能据查询失败声称已回收；这是保守失败边界，当前没有无证据的放宽。未实测其他Mac版本或非Mac平台。",
+  "verifiedExistingRun": {
+    "receipt": "artifacts/rust-tauri/R07/T08/mcp-cancellation-and-queue2.json",
+    "receiptSha256": "f7916e648bbc11d9d9076c2185877c8a28827ee817efb58513631e2bfb549ded",
+    "log": "artifacts/rust-tauri/R07/T08/mcp-cancellation-and-queue2.log",
+    "logSha256Verified": "ae1554de6d2de1aa0a80aeee3fe70292ab3a2708574945fd0ff8972774d62277",
+    "exitCode": 0,
+    "sourceUnchanged": true,
+    "reportedFingerprint": "68a5f7c78851273e31fe2e7bf2202eeebd98f4b05d4c92260f951eca142fe1bd",
+    "observedLogSummary": "7 passed; 0 failed; 641 filtered out",
+    "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+    "finalAcceptance": false
+  },
+  "sourceHashes": {
+    "rust/crates/lingxi-service/src/mcpbridge.rs": "c13aa3292fe6c3273dba42f673f3c514096f241b5ddf93a6faa8114dbf32b73c"
+  },
+  "runsByReviewer": [],
+  "limitations": [
+    "未运行Cargo、窗口或新进程实验。只核对现有原始日志哈希与源码。",
+    "开发检查通过不能代替最终冻结候选门禁；原失败与台账保持不变。"
+  ]
+}

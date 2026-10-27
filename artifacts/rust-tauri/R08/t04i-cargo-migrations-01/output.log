@@ -1,0 +1,8 @@
+test storage::migrations::tests::tampered_fingerprint_is_rejected ... ok
+test storage::migrations::tests::tampered_version_row_is_rejected ... ok
+test storage::migrations::tests::tampered_user_version_is_rejected ... ok
+test storage::migrations::tests::newer_database_is_rejected_not_downgraded ... ok
+test storage::migrations::tests::integrity_check_passes_a_healthy_db_and_flags_a_broken_one ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 155 filtered out; finished in 0.24s
+

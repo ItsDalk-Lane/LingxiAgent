@@ -1,0 +1,18 @@
+{
+  "scope": "OWNED_EMPTY_HOME_LAN_TCP_DIAGNOSIS_NOT_GATE_PASS",
+  "requests": [],
+  "networkSettingsChanged": false,
+  "manualClockInjected": false,
+  "isolatedHomeRoot": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r07-lan-readonly-9foz9ima",
+  "binarySha256Before": "e3c682aa7c5cbc6259fb5dfe01087394da3283a8db7021b9e94fb87abadf2cc4",
+  "actualInterface": "en0",
+  "actualLanIp": "192.168.3.96",
+  "probeErrorType": "Empty",
+  "serviceExitCode": 2,
+  "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderrSha256": "57d86167cd77c2ef0093a472119341ee7e679b384da4f0b4e29d79ea1a3b273c",
+  "binarySha256After": "e3c682aa7c5cbc6259fb5dfe01087394da3283a8db7021b9e94fb87abadf2cc4",
+  "binaryUnchanged": true,
+  "probeSourceSha256": "fcc5052aea5c7b8a1f12ca34321d63c2920f51e4189ff9fca7a3910dc4137a41",
+  "credentialFilesNotCopied": true
+}

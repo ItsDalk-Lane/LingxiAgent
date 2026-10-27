@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "approvalId": {
+      "type": "string"
+    },
+    "approved": {
+      "type": "boolean"
+    },
+    "decidedBy": {
+      "description": "Who decided (principal id); set by the service auth layer, never by\nthe model or the frontend.",
+      "type": "string"
+    },
+    "reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "approvalId",
+    "approved",
+    "decidedBy"
+  ],
+  "title": "ApprovalDecision",
+  "type": "object"
+}

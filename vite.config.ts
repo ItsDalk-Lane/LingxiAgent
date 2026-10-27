@@ -62,6 +62,75 @@ function restoreLegacyCss(): Plugin {
 }
 
 /**
+ * 构建产物确定性：Vite 的 build-html 插件会把入口 chunk 的 CSS 以
+ * <link rel="stylesheet" crossorigin href="./assets/xxx.css"> 注入 HTML，
+ * 注入顺序来自 Rollup 的 chunk 图遍历顺序，同一份源码重复构建可能不同
+ * （实测 settings.html 的 Vite CSS link 顺序会在两次构建间变化），
+ * 导致产物字节不稳定。
+ *
+ * 这里在 HTML 资产写入磁盘前，仅把 Vite 注入的 ./assets/*.css 链接按 href
+ * 升序重排；script / modulepreload 以及旧 styles.css、themes/*.css 链接的
+ * 位置与顺序都保持不变——渐进迁移依赖 legacy 链接在前、模块 CSS 在后的
+ * 层叠顺序。对所有构建产出的 HTML 页面生效。
+ */
+function sortInjectedCssLinks(): Plugin {
+  // 整行匹配 <link>，捕获缩进/行尾，重排时只交换标签本身，排版不变。
+  const linkTagLineRE = /^([ \t]*)(<link\b[^>]*>)([ \t]*(?:\r?\n|$))/gm;
+  // base 为相对路径（'./'）时注入 href 形如 ./assets/xxx.css；兼容绝对 base。
+  const injectedCssHrefRE = /^(?:\.\/|\/)?assets\/.*\.css$/;
+
+  function getAttr(tag: string, name: string): string | null {
+    const match = new RegExp(`(?:^|\\s)${name}="([^"]*)"`).exec(tag);
+    return match ? match[1] : null;
+  }
+
+  function sortAssetHtml(html: string): string {
+    const slots: Array<{ start: number; end: number; prefix: string; tag: string; suffix: string; href: string }> = [];
+    for (const match of html.matchAll(linkTagLineRE)) {
+      const [line, prefix, tag, suffix] = match;
+      const rel = getAttr(tag, 'rel');
+      if (!rel || !rel.split(/\s+/).some((value) => value.toLowerCase() === 'stylesheet')) continue;
+      const href = getAttr(tag, 'href');
+      if (!href || !injectedCssHrefRE.test(href)) continue;
+      const start = match.index ?? 0;
+      slots.push({ start, end: start + line.length, prefix, tag, suffix, href });
+    }
+    // 少于两个 Vite CSS link 时顺序唯一，原样返回。
+    if (slots.length < 2) return html;
+    // 按 href 码位升序，不用 localeCompare，避免受运行环境 locale 影响。
+    const sortedTags = slots
+      .map((slot) => slot.tag)
+      .sort((left, right) => {
+        const leftHref = getAttr(left, 'href') ?? '';
+        const rightHref = getAttr(right, 'href') ?? '';
+        return leftHref < rightHref ? -1 : leftHref > rightHref ? 1 : 0;
+      });
+    let result = '';
+    let cursor = 0;
+    slots.forEach((slot, index) => {
+      result += html.slice(cursor, slot.start) + slot.prefix + sortedTags[index] + slot.suffix;
+      cursor = slot.end;
+    });
+    return result + html.slice(cursor);
+  }
+
+  return {
+    name: 'hana-sort-injected-css-links',
+    apply: 'build',
+    // 必须晚于内置的 vite:build-html：它只在自身的 generateBundle 里注入 CSS link
+    //（已 emit 的资产会出现在后续 post 插件的 bundle 参数中）。
+    enforce: 'post',
+    generateBundle(_options, bundle) {
+      for (const asset of Object.values(bundle)) {
+        if (asset.type !== 'asset' || !asset.fileName.endsWith('.html')) continue;
+        if (typeof asset.source !== 'string') continue;
+        asset.source = sortAssetHtml(asset.source);
+      }
+    },
+  };
+}
+
+/**
  * Vite dev server 直接服务 source HTML 时，theme helper 不能再依赖 dist-renderer/lib/theme.js。
  * 开发模式把旧 script 标签重写到 source theme.ts，保持和 build:theme 同一份实现。
  */
@@ -312,6 +381,7 @@ export default defineConfig({
     serveMobilePwaStaticFiles(),
     useSourceThemeInDev(),
     restoreLegacyCss(),
+    sortInjectedCssLinks(),
     copyLegacyFiles(),
   ],
   resolve: {

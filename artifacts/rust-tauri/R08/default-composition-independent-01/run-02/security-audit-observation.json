@@ -1,0 +1,35 @@
+{
+  "scanEvents": [
+    {
+      "action": "security_scan",
+      "actor": {
+        "kind": "local_user",
+        "principalId": "user_local"
+      },
+      "decision": null,
+      "errorCode": null,
+      "eventId": "sec_f9adb320b6d2014947da38b4c8423d32c7ce45c46dda5c68d381e37303faf61c",
+      "leaseId": null,
+      "metadata": {
+        "counts": {
+          "critical": 1,
+          "info": 0,
+          "warning": 1
+        },
+        "engines": [
+          "baseline"
+        ],
+        "fileCapReached": false,
+        "filesScanned": 1,
+        "mode": "path"
+      },
+      "result": "success",
+      "schemaVersion": 1,
+      "secretFields": [],
+      "target": "independent-default",
+      "timestamp": "2026-10-21T19:36:00.804Z"
+    }
+  ],
+  "auditFileSha256": "8ae21c06cb59971baaefc4b7e6e8421dc6ddca5178065804c42b5af322a8829b",
+  "syntheticHitBodyPresent": false
+}

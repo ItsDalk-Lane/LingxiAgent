@@ -1,0 +1,38 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: method `apply_cover_frozen` is never used
+   --> crates/lingxi-service/src/office_tools.rs:408:25
+    |
+165 | impl OfficeApi {
+    | -------------- method in this implementation
+...
+408 |     pub(crate) async fn apply_cover_frozen(
+    |                         ^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 17.67s
+     Running tests/r07_office_tools.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_office_tools-ca0717eb6a989f9e)
+
+running 2 tests
+
+thread 'office::background_cover_job_refuses_to_apply_after_document_changed' (1468499) panicked at crates/lingxi-service/tests/r07_office/mod.rs:1128:5:
+assertion `left == right` failed
+  left: 0
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'office::background_cover_job_completes_with_real_media_and_applies_frozen_write' (1468498) panicked at crates/lingxi-service/tests/r07_office/mod.rs:1064:9:
+封面任务未完成：{"activity":{"agentId":"a","finishedAt":1800000000000,"id":"beautify-418198a8d43713d358ddb732f649da0267a383d8deb717e13eadd3ded7d9e5ec","label":"Markdown cover","result":null,"runId":"run_000001a3185c5000_000001","sessionId":"cover-session-418198a8d43713d358ddb732f649da0267a383d8deb717e13eadd3ded7d9e5ec","sessionPath":"native:cover-session-418198a8d43713d358ddb732f649da0267a383d8deb717e13eadd3ded7d9e5ec","startedAt":1800000000000,"status":"failed","summary":"封面图片未交付：failed","type":"beautify"},"effectUnknown":false,"jobId":"beautify-418198a8d43713d358ddb732f649da0267a383d8deb717e13eadd3ded7d9e5ec","ok":true,"phase":"failed","requestId":"cover-happy","runId":"run_000001a3185c5000_000001","sessionId":"cover-session-418198a8d43713d358ddb732f649da0267a383d8deb717e13eadd3ded7d9e5ec"}；媒体作业[200]：{"job":{"createdAtMs":"1800000000000","errorCode":"MEDIA_NOT_DISPATCHED","executionRunId":"run_000001a3185c5000_000002","files":[],"kind":"image","localDeliveryStopped":false,"message":"OpenAI image resolution \"2k\" is unsupported; supported resolutions: 1K","provider":"image_b","remoteCancel":null,"remoteOutcome":"not_submitted","revision":"3","sourceRunId":"run_000001a3185c5000_000001","status":"failed","taskId":"media-b16aed948be6c4f9c95bff591a53484ab657d5f78729308e533b14e75a0ff5da","updatedAtMs":"1800000000000"}}
+test office::background_cover_job_refuses_to_apply_after_document_changed ... FAILED
+test office::background_cover_job_completes_with_real_media_and_applies_frozen_write ... FAILED
+
+failures:
+
+failures:
+    office::background_cover_job_completes_with_real_media_and_applies_frozen_write
+    office::background_cover_job_refuses_to_apply_after_document_changed
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 9 filtered out; finished in 1.38s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_office_tools`

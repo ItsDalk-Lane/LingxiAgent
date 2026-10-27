@@ -1,0 +1,37 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ artifacts/rust-tauri/R07/T01/source-snapshot/tests/migration/r01-t02/automation-contract.test.mjs (0 test)
+ ❯ tests/migration/r01-t02/bridge-contract.test.mjs (3 tests | 1 failed) 43ms
+     × 保留五平台回发所需的实际上下文，同时限制代次与字段名 2ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  artifacts/rust-tauri/R07/T01/source-snapshot/tests/migration/r01-t02/automation-contract.test.mjs [ artifacts/rust-tauri/R07/T01/source-snapshot/tests/migration/r01-t02/automation-contract.test.mjs ]
+Error: Cannot find module './validator.mjs' imported from /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R07/T01/source-snapshot/tests/migration/r01-t02/automation-contract.test.mjs
+ ❯ artifacts/rust-tauri/R07/T01/source-snapshot/tests/migration/r01-t02/automation-contract.test.mjs:3:1
+      1| import { readFileSync } from 'node:fs';
+      2| import { describe, expect, it } from 'vitest';
+      3| import { validateAgainstSchema } from './validator.mjs';
+       | ^
+      4|
+      5| const generated = new URL('../../../contracts/generated/', import.meta…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/migration/r01-t02/bridge-contract.test.mjs > 桥接统一消息、附件与回执契约 > 保留五平台回发所需的实际上下文，同时限制代次与字段名
+AssertionError: expected [Function] to throw an error
+ ❯ tests/migration/r01-t02/bridge-contract.test.mjs:34:106
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 1 passed (3)
+      Tests  1 failed | 5 passed (6)
+   Start at  02:13:37
+   Duration  142ms (transform 67ms, setup 55ms, import 22ms, tests 83ms, environment 0ms)
+

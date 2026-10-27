@@ -1,0 +1,6 @@
+{"n": 20, "case": "blocked::allow-side-effect::main::copy_file", "ok": false, "at": 1793030881.520075}
+{"n": 40, "case": "acl::main::open_settings::allow", "ok": true, "at": 1793030881.6064398}
+{"n": 60, "case": "blocked::allow-side-effect::main::select_files", "ok": false, "at": 1793030881.655927}
+{"n": 80, "case": "blocked::allow-side-effect::main::window_maximize", "ok": false, "at": 1793030881.674777}
+{"n": 100, "case": "acl::runtime::dialog-sink-clean", "ok": true, "at": 1793030883.231648}
+{"n": 102, "final": true, "status": "FAIL", "at": 1793030883.2332742}

@@ -1,0 +1,35 @@
+CARD_CLICK_STATE:{"hasHandler":true,"text":"实际点击","tokenReadable":true}
+
+▲ [WARNING] The "assert" keyword is not supported in the configured target environment ("node24.16.0") [assert-to-with]
+
+    vite.config.ts:7:33:
+      7 │ import pkg from './package.json' assert { type: 'json' };
+        │                                  ~~~~~~
+        ╵                                  with
+
+  Did you mean to use "with" instead of "assert"?
+
+[5821:1018/121402.452849:INFO:CONSOLE:733] "[vite] connecting...", source: http://127.0.0.1:5173/@vite/client (733)
+[5821:1018/121402.457528:INFO:CONSOLE:827] "[vite] connected.", source: http://127.0.0.1:5173/@vite/client (827)
+[5821:1018/121402.917787:INFO:CONSOLE:20103] "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold", source: http://127.0.0.1:5173/@fs/private/tmp/lingxi-card-nav-ey4L8U/home/.card-vite-cache/deps/react-dom_client.js?v=f07800d7 (20103)
+[5821:1018/121402.935951:INFO:CONSOLE:2] "%cElectron Security Warning (Insecure Content-Security-Policy) font-weight: bold; This renderer process has either no Content Security
+  Policy set or a policy with "unsafe-eval" enabled. This exposes users of
+  this app to unnecessary security risks.
+
+For more information and help, consult
+https://electronjs.org/docs/tutorial/security.
+This warning will not show up
+once the app is packaged.", source: node:electron/js2c/sandbox_bundle (2)
+[5821:1018/121402.993246:INFO:CONSOLE:0] "Unrecognized Content-Security-Policy directive 'navigate-to'.", source: http://127.0.0.1:62953/lingxi/v1/cards/navigation-probe?token=[REDACTED_SYNTHETIC_OWNER_TOKEN]&v=1 (0)
+Error: 自导航未到达本机收集器
+    at until (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/r07-t08-card-electron-main.cjs:14:9)
+    at async /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/r07-t08-card-electron-main.cjs:31:21
+file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/r07-t08-card-electron-launch.mjs:27
+  if (result !== 0) throw new Error(`真实卡片窗口失败：${result}`);
+                          ^
+
+Error: 真实卡片窗口失败：1
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/r07-t08-card-electron-launch.mjs:27:27
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+Node.js v24.16.0

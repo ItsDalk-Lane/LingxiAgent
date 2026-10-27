@@ -17,7 +17,8 @@ import {
   createLocalServerConnection,
   persistServerConnectionSelection,
   type ServerConnection,
-} from '../services/server-connection';
+} from '../services/service-client';
+import { usePlatform } from '../hooks/use-platform';
 
 interface OnboardingAppProps { preview: boolean; skipToTutorial: boolean }
 export function OnboardingApp({ preview, skipToTutorial }: OnboardingAppProps) {
@@ -90,7 +91,7 @@ export function OnboardingApp({ preview, skipToTutorial }: OnboardingAppProps) {
     persistServerConnectionSelection(connection);
     setServerConnection(connection);
     if (!preview) {
-      await window.hana.onboardingComplete?.();
+      await usePlatform().onboardingComplete?.();
     }
   }, [preview]);
 
@@ -98,12 +99,22 @@ export function OnboardingApp({ preview, skipToTutorial }: OnboardingAppProps) {
     (async () => {
       let localeLoaded = false;
       try {
-        const port = await window.hana.getServerPort();
-        const token = await window.hana.getServerToken();
-        const connection = createLocalServerConnection({ serverPort: port, serverToken: token });
+        const platform = usePlatform();
+        const info = platform.getServerConnectionInfo
+          ? await platform.getServerConnectionInfo()
+          : await Promise.all([platform.getServerPort(), platform.getServerToken()])
+            .then(([port, token]) => ({ port, token, serverNodeKind: null, serverNodeTransport: 'http', host: null }));
+        const connection = createLocalServerConnection({
+          serverPort: info.port, serverToken: info.token,
+          serverNodeKind: info.serverNodeKind, serverNodeTransport: info.serverNodeTransport,
+          serverHost: info.host ?? null,
+        });
         if (!connection) throw new Error('Local server connection is unavailable');
+        if (connection.serverNodeKind === 'lingxi-service') {
+          throw new Error('Rust onboarding is not migrated; the legacy setup API cannot be used');
+        }
         setServerConnection(connection);
-        const splashInfo = await window.hana.getSplashInfo?.();
+        const splashInfo = await usePlatform().getSplashInfo?.();
         const loc = splashInfo?.locale || 'zh-CN';
         const name = splashInfo?.agentName || 'Lingxi';
         setLocale(loc);
@@ -112,8 +123,8 @@ export function OnboardingApp({ preview, skipToTutorial }: OnboardingAppProps) {
         localeLoaded = true;
         i18n.defaultName = name;
         try {
-          const localPath = await window.hana.getAvatarPath?.('agent');
-          if (localPath) setAvatarSrc(window.platform?.getFileUrl?.(localPath) ?? '');
+          const localPath = await usePlatform().getAvatarPath?.('agent');
+          if (localPath) setAvatarSrc(usePlatform()?.getFileUrl?.(localPath) ?? '');
         } catch { /* ignore */ }
         if (!preview) {
           const connectionFetch: LingxiFetch = (path, opts = {}) => {

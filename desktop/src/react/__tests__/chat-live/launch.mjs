@@ -1,0 +1,17 @@
+// 实际 Vite 和 Electron 仅从合成目录启动，不拷贝产物或业务资料。
+import { createServer } from 'vite';
+import { spawn } from 'node:child_process';
+import fs from 'node:fs';
+import net from 'node:net';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+const here=path.dirname(fileURLToPath(import.meta.url));const repo=path.resolve(here,'../../../../..');
+if(!process.env.R06_CHAT_HOME||!process.env.R06_CHAT_URL||!process.env.R06_CHAT_TOKEN)throw Error('synthetic service required');
+delete process.env.VITEST;
+// Vite把0回退为默认端口；先取得非零空闲端口，避免并行窗口争用5173。
+const listener=net.createServer();
+await new Promise((resolve,reject)=>{listener.once('error',reject);listener.listen(0,'127.0.0.1',resolve);});
+const port=listener.address().port;
+await new Promise((resolve,reject)=>listener.close(error=>error?reject(error):resolve()));
+const vite=await createServer({configFile:path.join(repo,'vite.config.ts'),root:path.join(repo,'desktop/src'),cacheDir:path.join(process.env.R06_CHAT_HOME,'.chat-vite-cache'),plugins:[{name:'actual-chat-surface',transformIndexHtml:html=>html.replace('src="./settings-main.tsx"','src="./react/__tests__/chat-live/surface.tsx"')}],resolve:{alias:{'@':path.join(repo,'desktop/src/react')}},esbuild:{jsx:'automatic'},server:{host:'127.0.0.1',port,strictPort:true,hmr:false,fs:{allow:[repo]}},optimizeDeps:{include:['react','react-dom/client','zustand']},logLevel:'error'});
+try{await vite.listen();const child=spawn(fs.realpathSync(path.join(repo,'node_modules/electron/dist/Electron.app/Contents/MacOS/Electron')),[path.join(here,'main.cjs')],{env:{...process.env,R06_CHAT_RENDERER:`http://127.0.0.1:${vite.httpServer.address().port}/settings.html`},stdio:['ignore','pipe','pipe']});child.stdout.pipe(process.stdout);child.stderr.pipe(process.stderr);const timeout=setTimeout(()=>child.kill(),60000);const code=await new Promise((resolve,reject)=>{child.on('exit',resolve);child.on('error',reject);});clearTimeout(timeout);if(code!==0)throw Error(`actual chat Electron failed ${code}`);}finally{await vite.close();}

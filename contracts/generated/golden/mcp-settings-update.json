@@ -1,0 +1,1 @@
+{"action":"mcp.connector.stop","agentId":"b","changes":[{"after":"已停用，重启后仍停用","before":"运行中","key":"mcp.connector.stop","label":"fixture"}],"connectorId":"fixture","error":null,"key":"mcp.connector.stop","runtimeApplied":true,"saved":true,"status":"applied","summary":"fixture 已停止，重启应用后仍保持停用。","title":"连接器已停用"}

@@ -4,7 +4,7 @@
  * 集中声明 window 上的全局属性，避免散落的 `(window as any)` 和重复的 declare global。
  */
 
-import type { DesktopNotificationOptions, PlatformApi } from './react/types';
+import type { DesktopNotificationOptions, DesktopNotificationReceipt, PlatformApi } from './react/types';
 
 declare global {
   interface Window {
@@ -37,7 +37,7 @@ declare global {
     loadSavedPaperTexture: () => void;
 
     // ── Notification bridge ──
-    showNotification?: (title: string, body: string, agentId?: string | null, options?: DesktopNotificationOptions) => void;
+    showNotification?: (title: string, body: string, agentId?: string | null, options?: DesktopNotificationOptions) => Promise<DesktopNotificationReceipt> | void;
 
     // ── Mobile PWA update latch ──
     __hanaMobileUpdateAvailable?: boolean;

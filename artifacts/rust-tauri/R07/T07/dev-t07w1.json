@@ -1,0 +1,30 @@
+{
+  "stage": "R07-T07",
+  "slice": "β1/β2 studio workspaces + workbench 全动作/上传/内容 + 写租约台账 + 安全审计投影透传",
+  "purpose": "dev 收口验证：r07_workbench 6 项 + r06 兼容 + auth_matrix 回归（含 a07 关停修复）+ media_admin/t05_media 回归 + security_audit 单测",
+  "candidate": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "label": "dev-t07w1",
+  "commands": [
+    "cargo test -p lingxi-service --test r07_workbench --test r06_workbench_write --test auth_matrix --test r07_media_admin --test r07_t05_media",
+    "cargo test -p lingxi-service --lib security_audit"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp",
+    "host": "darwin-arm64",
+    "isolatedHome": true
+  },
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "7462d9e4692d69d1d2e67d4de3768c7af679daeff479d03e44765d3a96bf449c",
+  "sourceFingerprintAfter": "7462d9e4692d69d1d2e67d4de3768c7af679daeff479d03e44765d3a96bf449c",
+  "sourceFilesHashed": 182,
+  "exitCode": [
+    0,
+    0
+  ],
+  "durationSec": 85.0,
+  "logSha256": "7532256a05e74b053d651b903d5d9a95ca6bf117d592cec49b25ac4199ba3e32",
+  "logFile": "artifacts/rust-tauri/R07/T07/dev-t07w1.log"
+}

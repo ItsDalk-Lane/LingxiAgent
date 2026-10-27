@@ -1,0 +1,524 @@
+{
+ "schema": "lingxi.r09.t06-gui-batch-needs.v1",
+ "generatedAt": "2026-10-26T23:02:04+0800",
+ "purpose": "T03/T04/T06 真实 GUI/系统动作 blocked 清单，供 Lead 编排唯一一次 visible clearance 批次；不启动 GUI，不改 frozen desktop/src-tauri。",
+ "sources": [
+  "artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-02/*/cases.json",
+  "scripts/rust-tauri/r09_t06_runtime_acl.py（运行期 ACL 矩阵 harness）",
+  "docs/rust-tauri/R09/R09_COMMAND_POLICY.json"
+ ],
+ "clearanceRule": "唯一 visible clearance 批次由 Lead 发放；hidden-ok 项可合并进 wdio 批次，visible-required/manual-system 项集中人工执行；本文件不授予任何 GUI 启动权限。",
+ "summary": {
+  "totalItems": 25,
+  "byAutomation": {
+   "wdio": 8,
+   "wdio-partial": 3,
+   "manual-system": 4,
+   "blocked-non-gui": 5,
+   "visible-required": 4
+  }
+ },
+ "items": [
+  {
+   "id": "native::tray-created-with-real-icon",
+   "case": "blocked::native::tray-created-with-real-icon",
+   "producer": "r09_t03_native_matrix",
+   "requiredRealAction": "创建托盘图标并观察菜单栏图标/双击/右键菜单（真实菜单渲染）",
+   "automation": "osascript+AX（菜单栏枚举）或人工",
+   "visibility": "visible-required",
+   "t07WdiDrive": false,
+   "needs": [
+    "gui",
+    "ax"
+   ],
+   "reasonFromProducer": "native::tray 注册已合并（T06 命令面收口）；托盘真实创建/双击/右键菜单需真实 GUI 会话（Lead GUI 禁令）"
+  },
+  {
+   "id": "native::global-shortcut-registered-by-os",
+   "case": "blocked::native::global-shortcut-registered-by-os",
+   "producer": "r09_t03_native_matrix",
+   "requiredRealAction": "真实注册全局快捷键、冲突检测、合成 Cmd/Ctrl 组合键触发 quick-chat",
+   "automation": "osascript(CGEvent)+AX 或人工；需辅助功能授权",
+   "visibility": "hidden-ok（需辅助功能授权）",
+   "t07WdiDrive": false,
+   "needs": [
+    "gui",
+    "ax",
+    "accessibility"
+   ],
+   "reasonFromProducer": "命令面已注册；OS 级快捷键注册/冲突/合成 CGEvent 触发需真实 GUI 会话 + 辅助功能授权"
+  },
+  {
+   "id": "native::notification-real-delivery",
+   "case": "blocked::native::notification-real-delivery",
+   "producer": "r09_t03_native_matrix",
+   "requiredRealAction": "投递真实系统通知并点击/点击聚焦主窗（mac UNUserNotificationCenter delegate）",
+   "automation": "人工点击（通知中心交互不可脚本化）",
+   "visibility": "visible-required",
+   "t07WdiDrive": false,
+   "needs": [
+    "gui",
+    "manual-click"
+   ],
+   "reasonFromProducer": "show_notification 已注册；系统通知真实投递与点击聚焦需真实 GUI 会话 + 通知权限（OQ-03）"
+  },
+  {
+   "id": "native::dialog-real-panel",
+   "case": "blocked::native::dialog-real-panel",
+   "producer": "r09_t03_native_matrix",
+   "requiredRealAction": "打开原生文件/目录选择面板并取消（Cmd+period）",
+   "automation": "wdio 触发命令 + 人工操作系统模态面板",
+   "visibility": "visible-required",
+   "t07WdiDrive": "partial（wdio 触发，人工完成面板）",
+   "needs": [
+    "gui",
+    "manual-os-panel"
+   ],
+   "reasonFromProducer": "select_skill/open_folder 已注册；原生面板与取消路径需真实 GUI 会话"
+  },
+  {
+   "id": "native::drag-drop-real-move",
+   "case": "blocked::native::drag-drop-real-move",
+   "producer": "r09_t03_native_matrix",
+   "requiredRealAction": "真实拖出文件到 Finder / Finder 拖入（需 Tauri 文件拖出后端，当前未实现）",
+   "automation": "人工（且 start_drag 后端缺失→T03/T07 实现前不可验）",
+   "visibility": "visible-required",
+   "t07WdiDrive": false,
+   "needs": [
+    "gui",
+    "host-backend-missing"
+   ],
+   "reasonFromProducer": "start_drag 命令已注册（Tauri 文件拖出后端待 T03/T07）；真实拖放需 GUI 会话"
+  },
+  {
+   "id": "native::auto-launch-real-toggle",
+   "case": "blocked::native::auto-launch-real-toggle",
+   "producer": "r09_t03_native_matrix",
+   "requiredRealAction": "真实 enable/disable SMAppService 登录项并重启系统会话观察",
+   "automation": "terminal+重启会话；受 ad-hoc 签名限制（BLOCKED-SIGNING-IDENTITY）",
+   "visibility": "manual-system",
+   "t07WdiDrive": false,
+   "needs": [
+    "gui",
+    "signing",
+    "reboot"
+   ],
+   "reasonFromProducer": "auto-launch 命令已注册；真实 enable/disable 受 BLOCKED-SIGNING-IDENTITY 限制"
+  },
+  {
+   "id": "native::keep-awake-real-assertion",
+   "case": "blocked::native::keep-awake-real-assertion",
+   "producer": "r09_t03_native_matrix",
+   "requiredRealAction": "启用 keep-awake 后用 pmset -g assertions 断言 PreventUserIdleSystemSleep",
+   "automation": "wdio/hidden app + terminal pmset 探针（可自动）",
+   "visibility": "hidden-ok",
+   "t07WdiDrive": true,
+   "needs": [
+    "gui",
+    "terminal-probe"
+   ],
+   "reasonFromProducer": "keep-awake 命令已注册；IOPMAssertion 真实生效需 pmset 探针 + 真实 GUI 会话"
+  },
+  {
+   "id": "native::window-controls-real-maximize",
+   "case": "blocked::native::window-controls-real-maximize",
+   "producer": "r09_t03_native_matrix",
+   "requiredRealAction": "真实最小化/最大化/恢复并观察宿主事件/原生窗口状态",
+   "automation": "wdio（窗口 API）+ AX 校验",
+   "visibility": "hidden-ok",
+   "t07WdiDrive": true,
+   "needs": [
+    "gui",
+    "ax"
+   ],
+   "reasonFromProducer": "窗口控制命令已注册；真实最小化/最大化/Restore 需真实 GUI 会话"
+  },
+  {
+   "id": "ipc::registered-host-negative-invoke",
+   "case": "blocked::ipc::registered-host-negative-invoke",
+   "producer": "r09_t03_ipc_negative",
+   "requiredRealAction": "真实宿主逐窗口 invoke 负向矩阵（ACL 拒绝 + 无副作用）",
+   "automation": "T07 wdio（本任务新增 r09_t06_runtime_acl.py 已就绪）",
+   "visibility": "hidden-ok",
+   "t07WdiDrive": true,
+   "needs": [
+    "gui",
+    "wdio"
+   ],
+   "reasonFromProducer": "命令面已注册；逐窗口 invoke 负向矩阵（ACL 拒绝 + 无副作用）需真实 GUI/wdio（Lead GUI 禁令；T06 运行期矩阵）"
+  },
+  {
+   "id": "ipc::acl-denied-window",
+   "case": "blocked::ipc::acl-denied-window",
+   "producer": "r09_t03_ipc_negative",
+   "requiredRealAction": "未授权窗口调用被 Tauri ACL 拒绝的真实矩阵",
+   "automation": "T07 wdio（r09_t06_runtime_acl.py）",
+   "visibility": "hidden-ok",
+   "t07WdiDrive": true,
+   "needs": [
+    "gui",
+    "wdio"
+   ],
+   "reasonFromProducer": "未授权窗口调用必须被 Tauri ACL 拒绝；capability 配置已就绪（T06），真实宿主拒绝矩阵需 GUI/wdio"
+  },
+  {
+   "id": "ipc::no-child-process-observed",
+   "case": "blocked::ipc::no-child-process-observed",
+   "producer": "r09_t03_ipc_negative",
+   "requiredRealAction": "真实 IPC 注入后进程表探针（无子进程/无 shell）",
+   "automation": "wdio + 终端 ps 采样（可自动）",
+   "visibility": "hidden-ok",
+   "t07WdiDrive": true,
+   "needs": [
+    "gui",
+    "terminal-probe"
+   ],
+   "reasonFromProducer": "真实 IPC 注入后进程表探针（无子进程/无 shell）需真实宿主会话（Lead GUI 禁令）"
+  },
+  {
+   "id": "tcc.real-prompt-and-revoke",
+   "case": "blocked::tcc.real-prompt-and-revoke",
+   "producer": "r09_t04_permission_matrix",
+   "requiredRealAction": "真实 TCC 授权弹窗 + 系统设置撤销-恢复演练",
+   "automation": "人工操作系统设置（不可脚本化；BLOCKED-SYSTEM-PERMISSIONS）",
+   "visibility": "manual-system",
+   "t07WdiDrive": false,
+   "needs": [
+    "gui",
+    "tcc",
+    "manual"
+   ],
+   "reasonFromProducer": "真实 TCC 授权弹窗与撤销-恢复演练需人工在系统设置操作（BLOCKED-SYSTEM-PERMISSIONS）"
+  },
+  {
+   "id": "computer-use.helper-real-input",
+   "case": "blocked::computer-use.helper-real-input",
+   "producer": "r09_t04_permission_matrix",
+   "requiredRealAction": "computer-use helper 真实点击/输入/按键/滚动",
+   "automation": "blocked：服务 computer_control_engine_unavailable 且无 helper",
+   "visibility": "blocked-non-gui",
+   "t07WdiDrive": false,
+   "needs": [
+    "helper-missing"
+   ],
+   "reasonFromProducer": "服务报告 computer_control_engine_unavailable 且无输入注入 helper：点击/输入/按键/滚动真实生效在 helper 实现前不可验"
+  },
+  {
+   "id": "screenshot.capture-execution",
+   "case": "blocked::screenshot.capture-execution",
+   "producer": "r09_t04_permission_matrix",
+   "requiredRealAction": "页面截图捕获执行",
+   "automation": "blocked：Tauri/Wry 无稳定捕获 API（OQ-04）",
+   "visibility": "blocked-non-gui",
+   "t07WdiDrive": false,
+   "needs": [
+    "api-missing"
+   ],
+   "reasonFromProducer": "Tauri/Wry 无稳定页面捕获 API（OQ-04），捕获执行 BLOCKED；仅策略层可验"
+  },
+  {
+   "id": "asr.real-recognition-result",
+   "case": "blocked::asr.real-recognition-result",
+   "producer": "r09_t04_permission_matrix",
+   "requiredRealAction": "真实语音识别结果",
+   "automation": "blocked：需真实 ASR 供应商/本地识别链（BLOCKED-REAL-PROVIDER）",
+   "visibility": "blocked-non-gui",
+   "t07WdiDrive": false,
+   "needs": [
+    "provider"
+   ],
+   "reasonFromProducer": "真实语音识别结果需 ASR 供应商/本地识别链（BLOCKED-REAL-PROVIDER；服务 system-speech-recognition 显式 refusal）"
+  },
+  {
+   "id": "speech.packaged-tcc-prompt",
+   "case": "blocked::speech.packaged-tcc-prompt",
+   "producer": "r09_t04_permission_matrix",
+   "requiredRealAction": "打包壳真实 Speech TCC 弹窗",
+   "automation": "人工 + 正式签名身份（BLOCKED-SIGNING-IDENTITY/SYSTEM-PERMISSIONS）",
+   "visibility": "manual-system",
+   "t07WdiDrive": false,
+   "needs": [
+    "gui",
+    "tcc",
+    "signing"
+   ],
+   "reasonFromProducer": "打包壳真实 Speech TCC 弹窗需正式签名身份 + 人工操作（BLOCKED-SIGNING-IDENTITY / BLOCKED-SYSTEM-PERMISSIONS）"
+  },
+  {
+   "id": "permission-matrix.linux-preview",
+   "case": "blocked::permission-matrix.linux-preview",
+   "producer": "r09_t04_permission_matrix",
+   "requiredRealAction": "Linux Preview 负向真机",
+   "automation": "BLOCKED-PLATFORM-LINUX-X64",
+   "visibility": "blocked-non-gui",
+   "t07WdiDrive": false,
+   "needs": [
+    "platform"
+   ],
+   "reasonFromProducer": "Linux Preview 负向真机不可用（BLOCKED-PLATFORM-LINUX-X64）；本机只验证 Rust 状态机返回 unsupported"
+  },
+  {
+   "id": "permission-matrix.registered-host-e2e",
+   "case": "blocked::permission-matrix.registered-host-e2e",
+   "producer": "r09_t04_permission_matrix",
+   "requiredRealAction": "T04 命令端到端（invoke + TCC 桥）",
+   "automation": "wdio 触发命令 + 人工 TCC 授权（部分可自动）",
+   "visibility": "visible-required（TCC 弹窗）",
+   "t07WdiDrive": "partial（非 TCC 分支 wdio；TCC 分支人工）",
+   "needs": [
+    "gui",
+    "wdio",
+    "tcc"
+   ],
+   "reasonFromProducer": "T04 命令已注册（T06 收口）；端到端 invoke + TCC 桥需真实 GUI 会话 + 人工 TCC（Lead GUI 禁令 / BLOCKED_SYSTEM_PERMISSIONS）"
+  },
+  {
+   "id": "remote-boundary.two-host-e2e",
+   "case": "blocked::remote-boundary.two-host-e2e",
+   "producer": "r09_t04_remote_boundary",
+   "requiredRealAction": "桌面连接远端服务 + 未授权采集拒绝的双宿主端到端",
+   "automation": "wdio + 双实例（dev remote mode）可自动",
+   "visibility": "hidden-ok",
+   "t07WdiDrive": true,
+   "needs": [
+    "gui",
+    "wdio",
+    "two-host"
+   ],
+   "reasonFromProducer": "宿主已注册 + T02 远端模式已实现；双宿主端到端拒绝需真实 GUI 会话（Lead GUI 禁令）"
+  },
+  {
+   "id": "remote-boundary.remote-device-read-chain",
+   "case": "blocked::remote-boundary.remote-device-read-chain",
+   "producer": "r09_t04_remote_boundary",
+   "requiredRealAction": "远端任务实际调用本机麦克风/屏幕完整链",
+   "automation": "blocked：helper + 宿主注册（当前仅策略层可验）",
+   "visibility": "blocked-non-gui",
+   "t07WdiDrive": false,
+   "needs": [
+    "helper-missing",
+    "gui"
+   ],
+   "reasonFromProducer": "远端任务实际调用本机麦克风/屏幕的完整链（服务→宿主命令→设备）需 helper 与宿主注册；当前仅策略/鉴权边可验"
+  },
+  {
+   "id": "remote-boundary.tcc-revoke-mid-task",
+   "case": "blocked::remote-boundary.tcc-revoke-mid-task",
+   "producer": "r09_t04_remote_boundary",
+   "requiredRealAction": "任务中真实撤销屏幕/麦克风权限并观察采集停止",
+   "automation": "人工系统设置（BLOCKED-SYSTEM-PERMISSIONS）",
+   "visibility": "manual-system",
+   "t07WdiDrive": false,
+   "needs": [
+    "gui",
+    "tcc",
+    "manual"
+   ],
+   "reasonFromProducer": "任务进行中真实撤销屏幕/麦克风权限并观察采集停止需人工 TCC 操作（BLOCKED-SYSTEM-PERMISSIONS）"
+  },
+  {
+   "id": "t06-runtime-acl-matrix",
+   "case": "runtime.<window>.negative-matrix / positive-matrix",
+   "producer": "r09_t06_runtime_acl",
+   "requiredRealAction": "启动 T07 evidence 候选（hidden+sink）+ wdio，逐窗口执行 71 命令正/负矩阵与 union-equals-policy",
+   "automation": "T07 wdio（scripts/rust-tauri/r09_t06_runtime_acl.py，已实现；无 clearance 时 exit 2 RUNTIME_ACL_NOT_CLEARED）",
+   "visibility": "hidden-ok",
+   "t07WdiDrive": true,
+   "needs": [
+    "gui",
+    "wdio",
+    "evidence-build"
+   ],
+   "reasonFromProducer": "RUNTIME_ACL_NOT_CLEARED"
+  },
+  {
+   "id": "t06-runtime-token",
+   "case": "acl::token-not-in-url-dom::<window>",
+   "producer": "r09_t06_runtime_acl",
+   "requiredRealAction": "逐窗口断言服务 token 不入 URL/DOM/localStorage",
+   "automation": "T07 wdio（harness 已实现，只记录布尔/不落 token）",
+   "visibility": "hidden-ok",
+   "t07WdiDrive": true,
+   "needs": [
+    "gui",
+    "wdio"
+   ],
+   "reasonFromProducer": "RUNTIME_ACL_NOT_CLEARED"
+  },
+  {
+   "id": "t06-runtime-remote-csp",
+   "case": "acl::remote-webview-zero-acl / csp-blocked-remote-script",
+   "producer": "r09_t06_runtime_acl",
+   "requiredRealAction": "远程/预览内容 webview 零 capability + CSP 阻止远程脚本",
+   "automation": "T07 wdio + 真实预览内容（A10 真机）；A10 已用真实 Chrome 等价验证",
+   "visibility": "hidden-ok",
+   "t07WdiDrive": "partial（Tauri 真机 webview 需 G1 批次）",
+   "needs": [
+    "gui",
+    "wdio",
+    "a10-content"
+   ],
+   "reasonFromProducer": "RUNTIME_ACL_NOT_CLEARED"
+  },
+  {
+   "id": "t06-runtime-release-canary",
+   "case": "acl::canary-debug-command-absent / debug-command-release-denied / A12 端口扫描",
+   "producer": "r09_t06_runtime_acl + r09_t07_release_smoke",
+   "requiredRealAction": "安装/启动交付 release，扫描监听端口，调用 test canary/debug 命令断言 not found",
+   "automation": "终端启动交付 release（非 wdio）+ lsof/connect 探针；需 Lead clearance",
+   "visibility": "hidden-ok",
+   "t07WdiDrive": false,
+   "needs": [
+    "gui",
+    "release-install",
+    "terminal-probe"
+   ],
+   "reasonFromProducer": "RUNTIME_ACL_NOT_CLEARED"
+  }
+ ],
+ "t06WindowAcquisition": [
+  {
+   "window": "main",
+   "openStrategy": "启动即存在",
+   "status": "wdio-drivable",
+   "note": ""
+  },
+  {
+   "window": "quick-chat",
+   "openStrategy": "main invoke quick_chat_show",
+   "status": "wdio-drivable",
+   "note": ""
+  },
+  {
+   "window": "onboarding",
+   "openStrategy": "main invoke debug_open_onboarding（仅 evidence/hooks 构建）",
+   "status": "wdio-drivable",
+   "note": "依赖 r09-test-hooks 证据构建"
+  },
+  {
+   "window": "viewer-*",
+   "openStrategy": "main invoke spawn_viewer + 隔离 fixture 文件",
+   "status": "wdio-drivable",
+   "note": ""
+  },
+  {
+   "window": "browser-viewer",
+   "openStrategy": "main set_browser_connection + open_browser_viewer（best-effort）",
+   "status": "wdio-drivable-partial",
+   "note": "需有效 connectionKey/服务连接；harness 先尝试 mock connection，失败则 blocked"
+  },
+  {
+   "window": "skill-viewer-*",
+   "openStrategy": "main invoke open_skill_viewer（best-effort payload）",
+   "status": "wdio-drivable-partial",
+   "note": "payload 校验失败时 blocked"
+  },
+  {
+   "window": "settings",
+   "openStrategy": "无：主窗存活时 open_settings 走 MainModal，不创建 settings 窗口",
+   "status": "needs-host-patch",
+   "note": "需 host 提供独立创建/显示 settings 窗口的路径（或崩溃态路由）；属 T06_GUI_BATCH_NEEDS 编排输入"
+  },
+  {
+   "window": "splash",
+   "openStrategy": "无：host 只有 windows() 规格，没有创建/显示 splash 的命令",
+   "status": "needs-host-patch",
+   "note": "需 host 在启动流程创建 splash 或提供测试入口（hooks）"
+  }
+ ],
+ "visibleBatchSuggestedOrder": [
+  "1) wdio/hidden 批次：r09_t06_runtime_acl.py（evidence 候选 + automation hidden + sink）→ 覆盖 T06 ACL/token 矩阵、T03 ipc 3 项、T03 keep-awake/window-controls、T04 remote two-host（非 TCC）",
+  "2) visible 系统设置批次（人工）：T04 TCC 弹窗/撤销、Speech TCC、任务中撤权；T03 auto-launch（签名前提）",
+  "3) visible UI 批次（人工+osascript/AX）：T03 托盘/通知点击/原生面板/拖放；T04 registered-host-e2e 非 TCC 分支由 wdio 覆盖",
+  "4) 交付 release 运行期探针：端口扫描 + debug/canary 命令 not found（终端启动，非 wdio）",
+  "5) host patch 后补：settings/splash 窗口创建路径（若 visible 批次需要这两个 label 的矩阵）"
+ ],
+ "runtimeAclBatch": {
+  "status": "V33_HIDDEN_ACL_PASS_WITH_BLOCKED_WINDOWS",
+  "attempts": [
+   {
+    "attempt": 1,
+    "evidence": "dev/t06/runtime-acl-01/attempt1-aborted",
+    "abortReason": "fixture 误入 LINGXI_HOME → 服务数据闸拒绝；裸 debug exe 缺 .app bundle 崩溃；harness 自清理误杀"
+   },
+   {
+    "attempt": 2,
+    "evidence": "dev/t06/runtime-acl-cleared-01/attempt2-wdio-parse-aborted",
+    "abortReason": "W3C /window/handles value 为数组，旧解析抛 AttributeError（app graceful exit/residual 0）"
+   },
+   {
+    "attempt": 3,
+    "evidence": "dev/t06/runtime-acl-cleared-01/attempt3-wdio-hang-aborted",
+    "abortReason": "--wdio-port 被忽略（回落 19465）；wdio session/handles 无超时挂起 10min；app/service 已 TERM，ps=0/端口释放"
+   },
+   {
+    "attempt": 4,
+    "scope": "v2 hidden cleared batch",
+    "evidence": "dev/t06/runtime-acl-v2-01/attempt-before-launch-aborted",
+    "abortReason": "harness CLI --wdio-port 被 int(Path) 解析 TypeError；错误在 app/service 启动前，未发生 hidden 启动/可见窗口/端口监听；按 Lead 规则停止不重试",
+    "appLaunched": false,
+    "harnessFix": "--wdio-port 解析改为 int(str(...))；无 GUI 自检 runtime-acl-selfcheck-04 exit 2 RUNTIME_ACL_NOT_CLEARED"
+   },
+   {
+    "attempt": 5,
+    "scope": "v2 hidden single launch (Lead cleared)",
+    "evidence": "dev/t06/runtime-acl-v2-02/（仅 runtime-acl-plan.json）",
+    "abortReason": "运行 8m25s 无 result/无进度落盘；app/service/renderer 正常且 hidden，hang 在 wdio 调用阶段；Lead interrupt+终止（ps=0/端口=0）",
+    "appLaunched": true,
+    "rootCauseJudgement": "旧 harness 每命令 probe 最长 60s + 无整体 deadline + 无进度落盘；72 命令在 wdio 无响应时最坏 ~1.5h，外部不可见",
+    "harnessFix": "wdio 调用10s/窗口45s/命令8s/整体300s deadline；每20 case progress.jsonl；session/ready/handles 快速失败；hidden-only 只跑 main；结束/异常 killpg+ps/端口断言；--wdio-port CLI 生效",
+    "next": "T08 v3 renderer patch 后统一重建候选并重跑隐藏批次（v2 批次暂停）"
+   },
+   {
+    "attempt": 6,
+    "scope": "v3.2 hidden single launch (Lead cleared)",
+    "evidence": "dev/t06/runtime-acl-v32-01",
+    "appLaunched": true,
+    "status": "FAIL exit 2",
+    "caseCount": 76,
+    "failure": "overall deadline exceeded at allow:main:watch_file；probe 路径在 wdio execute/sync 下不 resolve，每命令耗尽 8s 预算；37 条 allow OK 无效已撤回",
+    "cleanup": "app exit 0/residual 0；ps 0、端口 0、sink 无",
+    "harnessFix": "execute/async 单调用 + script timeout 8s + probe-no-result 记红；selfcheck-06 exit 2"
+   },
+   {
+    "attempt": 7,
+    "scope": "v3.2 hidden ACL retry (execute/async harness, Lead cleared)",
+    "evidence": "dev/t06/runtime-acl-v32-02",
+    "appLaunched": true,
+    "object": "/private/tmp/lingxi-r09-evidence/lingxi-resource-desktop-030607ee sha 030607ee…",
+    "status": "FAIL exit 2",
+    "caseCount": 102,
+    "validEvidence": "8 deny 命令实测 ACL 拒绝文案；allow 18 ok + 23 到达命令体（invalid args/domain）→ main allow/deny 语义成立",
+    "findings": [
+     "hidden automation 抑制非幂等：第二次 app_ready windowVisible=true（可见主窗）",
+     "quick_chat_resize：ACL allowed on main 但 host 返回 WINDOW_NOT_ALLOWED（policy/host gate 不一致）"
+    ],
+    "harnessFixes": "execute/async 结果 dict 分类修复；ACL 文案 marker 扩充；hidden evidence jsonl 容错；sidecar 残留宽限重试；traceback 记录；selfcheck-07 exit 2",
+    "cleanup": "app exit 0/residual 0；端口 19531 释放；sink clean；real home untouched"
+   },
+   {
+    "attempt": 8,
+    "scope": "v3.3 hidden ACL (Lead cleared; fixed harness)",
+    "evidence": "dev/t06/runtime-acl-v33-01",
+    "appLaunched": true,
+    "object": "/private/tmp/lingxi-r09-evidence/lingxi-resource-desktop-v33-27bf075a sha 27bf075a…",
+    "status": "PASS_WITH_BLOCKED_WINDOWS exit 0",
+    "caseCount": 105,
+    "matrix": "allow 40/40; deny 9/9; union==policy PASS; token PASS; hidden windowVisible=false（两次 app_ready，defensive hide 生效）",
+    "cleanup": "app exit 0/residual 0; ps 0; port 19533 released; sink clean; real home untouched",
+    "blocked": "35 = 27 allow-side-effect + 1 union-full-side-effect + 7 window-open（hidden-only 策略）"
+   }
+  ],
+  "visibleWindowsObserved": false,
+  "matrixResults": null,
+  "harnessFixes": [
+   "fixture 移出 home",
+   "裸 exe 最小 .app 包装",
+   "--wdio-port CLI 生效",
+   "30s wdio 调用超时 + handles 连续失败即红",
+   "清理排除自身 pid",
+   "进程/端口/sink/hidden 证据断言"
+  ],
+  "rerunNeeds": "无需 hidden 重跑；visible 批次待 Lead 安排（side-effect/window-open/跨窗矩阵）"
+ }
+}

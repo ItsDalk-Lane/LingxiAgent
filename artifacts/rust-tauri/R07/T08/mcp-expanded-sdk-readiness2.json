@@ -1,0 +1,33 @@
+{
+  "scope": "DEVELOPMENT_NOT_EXECUTED_REMOTE_CASES",
+  "createdAt": "2026-10-18T11:13:13.774923+00:00",
+  "sourceStopped": true,
+  "rustFiles": {
+    "rust/crates/lingxi-service/src/mcpbridge.rs": "8222bc77499c4e7615647f53b00d5b9ecf602e1effa56e425ad391886af0f237",
+    "rust/crates/lingxi-service/src/mcp_apps.rs": "7c2dd97194e4598586f9c830fbf42666b1e3c611ae223f994eb78fd28631e57b",
+    "rust/crates/lingxi-service/src/mcp_oauth.rs": "7ced2f904a7de25ef4542cadbb9c9c1539a4deb206134f75b0635f3d42fcfd9f",
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_remote.rs": "6a70703463752ad2aff92cb9ba4f2d27e33f8cc1ed1b2a85bd847d648083edae"
+  },
+  "patches": [
+    "Official SDK metadata cache now retains the first occurrence of duplicate tool names exactly as the actual registry does; remote test lists a later conflicting invisible descriptor.",
+    "OAuth confirmed credential persistence remains explicit if later lifecycle cleanup fails; unknown write still remains unknown.",
+    "All new public apps/launch/OAuth response paths consume the generated shared DTO; resource body remains raw MIME response as original contract."
+  ],
+  "newTarget": {
+    "command": "cargo test -p lingxi-service --locked --test r07_t08_mcp_remote",
+    "status": "NOT_RUN",
+    "cases": 4
+  },
+  "scopeBoundaries": [
+    "No protocol/auth/lib assembly or audit grant source edited in this increment.",
+    "No standalone legacy SSE implementation.",
+    "Launch descriptor is not a tool call.",
+    "SDK JSON preparse allocation limit remains an unverified upstream boundary."
+  ],
+  "nodeConsumer": {
+    "passed": 20,
+    "files": 2,
+    "exitCode": 0,
+    "log": "artifacts/rust-tauri/R07/T08/mcp-expanded-ui-owner2.log"
+  }
+}

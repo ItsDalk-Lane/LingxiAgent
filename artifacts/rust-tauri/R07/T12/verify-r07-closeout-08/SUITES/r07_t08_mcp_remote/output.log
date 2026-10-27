@@ -1,0 +1,14 @@
+
+running 7 tests
+test cancelled_browser_flows_release_pending_capacity_without_erasing_saved_facts ... ok
+test actual_http_apps_visibility_launch_input_resources_and_generation_cancellation ... ok
+test old_official_sdk_refresh_cannot_overwrite_a_new_browser_login_committed_to_source ... ok
+test actual_session_run_http_404_never_replays_the_posted_mcp_tool_call ... ok
+test oauth_cancel_changed_configuration_revoked_owner_and_shutdown_never_resurrect_credentials ... ok
+test actual_oauth_pkce_dcr_private_source_refresh_restart_resources_and_logout ... ok
+test settings_content_mcp_oauth_page_consumes_the_same_owned_sdk_and_private_source ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.37s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/r07_t08_mcp_remote.rs (rust/target/debug/deps/r07_t08_mcp_remote-c925b1af13c9611e)

@@ -115,8 +115,8 @@ function maybeTruncateFirstBlock(block, maxChars) {
   };
 }
 
-export async function readPdfDocument(filePath: string, input: PdfReadInput = {}) {
-  const buffer = await fs.readFile(filePath);
+export async function readPdfDocument(filePath: string | Buffer, input: PdfReadInput = {}) {
+  const buffer = Buffer.isBuffer(filePath) ? filePath : await fs.readFile(filePath);
   const data = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
   const { getDocumentProxy } = await import("unpdf");
   const pdf = await getDocumentProxy(data);

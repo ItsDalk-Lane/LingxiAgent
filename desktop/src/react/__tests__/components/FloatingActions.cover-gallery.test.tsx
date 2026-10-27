@@ -9,6 +9,7 @@ import { COVER_GALLERY_ITEMS } from '../../components/preview/cover-gallery-asse
 import { FloatingActions } from '../../components/preview/FloatingActions';
 import { useStore, type StoreState } from '../../stores';
 import type { PlatformApi } from '../../types';
+import { getDesktopHost } from '../../host/desktop-host';
 
 const mocks = vi.hoisted(() => ({
   lingxiFetch: vi.fn(),
@@ -307,7 +308,7 @@ describe('FloatingActions cover gallery', () => {
     fireEvent.click(screen.getByText('cover.gallery.upload'));
 
     await waitFor(() => {
-      expect(window.platform?.readFileBase64).toHaveBeenCalledWith('/client/cover.png');
+      expect(getDesktopHost().api?.readFileBase64).toHaveBeenCalledWith('/client/cover.png');
       expect(mocks.lingxiFetch).toHaveBeenCalledWith(
         '/api/desk/beautify/cover/apply',
         expect.objectContaining({

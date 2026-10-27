@@ -1,0 +1,38 @@
+[
+  {
+    "case": 0,
+    "outcome": "PDF_CAPACITY: 文档打印执行器已达上限",
+    "requestLines": [],
+    "tcpConnections": 0
+  },
+  {
+    "case": 1,
+    "outcome": "PDF_CAPACITY: 文档打印执行器已达上限",
+    "requestLines": [],
+    "tcpConnections": 0
+  },
+  {
+    "case": 2,
+    "outcome": "printed",
+    "requestLines": [],
+    "tcpConnections": 0
+  },
+  {
+    "case": 3,
+    "outcome": "printed",
+    "requestLines": [],
+    "tcpConnections": 0
+  },
+  {
+    "case": 4,
+    "outcome": "printed",
+    "requestLines": [],
+    "tcpConnections": 0
+  },
+  {
+    "case": 5,
+    "outcome": "PDF_RESOURCE_FORBIDDEN: 文档请求了未冻结的资源或额外页面",
+    "requestLines": [],
+    "tcpConnections": 0
+  }
+]

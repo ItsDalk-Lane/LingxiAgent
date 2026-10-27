@@ -1,0 +1,15 @@
+{
+ "schema": "lingxi.r08.suite-receipt.v1",
+ "suite": "r08_cli_data_vitest",
+ "exitCode": 0,
+ "guardFailures": [],
+ "argv": [
+  "npx",
+  "vitest",
+  "run",
+  "tests/cli-data.test.ts",
+  "--reporter=verbose"
+ ],
+ "durationSecs": 1.458,
+ "logSha256": "06758f07e2428a145e7fa6f4bbd0299feaf31010105c4ef1644badba0a8d08cf"
+}

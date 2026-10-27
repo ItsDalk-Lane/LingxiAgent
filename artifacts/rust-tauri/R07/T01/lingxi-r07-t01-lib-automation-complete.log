@@ -1,0 +1,25 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.84s
+     Running unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_service-0591b361ca6dec9e)
+
+running 17 tests
+test automation_schedule::tests::failure_backoff_is_bounded_and_never_shortens_the_normal_interval ... ok
+test automation_schedule::tests::one_time_jobs_disable_after_success_and_failure ... ok
+test automation_schedule::tests::every_is_completion_based_with_a_one_minute_minimum ... ok
+test automation_schedule::tests::completion_skips_missed_cron_slots_instead_of_replaying_them ... ok
+test automation_schedule::tests::cron_always_advances_beyond_the_current_minute ... ok
+test automation_schedule::tests::cron_uses_local_calendar_but_returns_absolute_milliseconds ... ok
+test automation_schedule::tests::clock_rollback_never_makes_the_calculated_cursor_past_due ... ok
+test automation_schedule::tests::fall_back_preserves_two_distinct_instants_without_returning_the_past ... ok
+test automation_schedule::tests::compatible_millisecond_prefixes_and_trailing_cron_fields_are_preserved ... ok
+test automation_schedule::tests::invalid_input_fails_explicitly_without_overflow_or_silent_fallback ... ok
+test automation_schedule::tests::restricted_day_and_weekday_use_or ... ok
+test automation_schedule::tests::spring_forward_skips_missing_local_time ... ok
+test automation_schedule::tests::cron_supports_steps_ranges_lists_and_sunday_alias ... ok
+test automation_patrol::tests::wait_stopped_waits_for_every_beat_after_coordinator_and_earlier_beat_panic ... ok
+test automation::shutdown_tests::shutdown_timeout_keeps_pending_task_and_prior_error_for_all_waiters ... ok
+test automation_patrol::tests::shutdown_timeout_and_concurrent_waiters_keep_coordinator_and_beat_registered ... ok
+test automation_schedule::tests::yearly_search_is_bounded_to_366_days ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 426 filtered out; finished in 0.67s
+

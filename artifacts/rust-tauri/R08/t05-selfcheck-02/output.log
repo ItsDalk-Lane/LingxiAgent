@@ -1,0 +1,9 @@
+test management::tests::password_scrypt_matches_node_and_upgrades_legacy_record ... ok
+
+test result: ok. 703 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.36s
+
+=== service_health ===
+test help_and_version_do_not_hide_invalid_arguments ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.49s
+

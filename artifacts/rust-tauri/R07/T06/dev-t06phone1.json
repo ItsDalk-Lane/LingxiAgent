@@ -1,0 +1,21 @@
+{
+ "stage": "R07-T06",
+ "purpose": "development_not_final_acceptance",
+ "candidate": "t06b",
+ "label": "dev-t06phone1",
+ "command": "/Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r07_phone_runtime -- --nocapture",
+ "environment": {
+  "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+  "CARGO_BUILD_JOBS": "4",
+  "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+  "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+ },
+ "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+ "manifestFingerprintBefore": "190b0c25f184eaacc23c53a02bafb54845f25dc05d8b7fa5c86550a7705b49bb",
+ "manifestFingerprintAfter": "190b0c25f184eaacc23c53a02bafb54845f25dc05d8b7fa5c86550a7705b49bb",
+ "manifestFingerprintMatchesCandidate": true,
+ "exitCode": 0,
+ "durationSec": 5.9,
+ "logSha256": "e6c53ded4a8204fb977a4f030edce1986ce6a437017b3310ae01b1465bdb3f49",
+ "note": "t06b-service 首跑中 r07_phone_runtime::actual_proactive_31_minutes 复现 T05 已登记的时序敏感失败；孤立重跑刻画。"
+}

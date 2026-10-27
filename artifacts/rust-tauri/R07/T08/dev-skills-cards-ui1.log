@@ -1,0 +1,9 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+No test files found, exiting with code 1
+
+filter: desktop/src/react/components/chat/InteractiveCard.tsx
+include: **/*.{test,spec}.?(c|m)[jt]s?(x)
+exclude:  **/node_modules/**, **/.git/**, .cache/**, .claude/worktrees/**, desktop/native/**/.build/**, dist-computer-use/**
+

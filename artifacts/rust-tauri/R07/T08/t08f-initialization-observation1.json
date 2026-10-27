@@ -1,0 +1,109 @@
+{
+  "schema": "r07-t08-initialization-observation-v1",
+  "recordedAt": "2026-10-18T09:31:21.778307+00:00",
+  "scope": "开发复验结果及取证限制；不是f正式候选验收",
+  "sourceUnchanged": true,
+  "noSourceChangesByThisTask": true,
+  "cargoNotExecutedByThisAgent": true,
+  "run": {
+    "label": "initialization-capsule-fixed1",
+    "command": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--no-fail-fast",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_agent_delete_skills_live",
+      "--test",
+      "r06_chat_wire"
+    ],
+    "exitCode": 0,
+    "sourceFingerprintBefore": "29f90f801ab9c52ae5b18272fc7e2b291e66879a8f6db18561b9fd79e1c02714",
+    "sourceFingerprintAfter": "29f90f801ab9c52ae5b18272fc7e2b291e66879a8f6db18561b9fd79e1c02714",
+    "receipt": "artifacts/rust-tauri/R07/T08/initialization-capsule-fixed1.json",
+    "receiptSha256": "fb41dd9f22285e1f381e6f5eb8a4df000c3fb93a7b598a858fc60c33df81637c",
+    "log": "artifacts/rust-tauri/R07/T08/initialization-capsule-fixed1.log",
+    "logSha256": "c8a6fb3cbcab97d276b8eecc750ce072d172b7952ce62dd5d9100a46b17e14d0"
+  },
+  "actualResults": {
+    "passed": 19,
+    "failed": 0,
+    "targets": [
+      {
+        "name": "r06_agent_delete_skills_live",
+        "passed": 2,
+        "failed": 0,
+        "suiteDurationSeconds": 61.53,
+        "includes": "原助手删除/技能保留及真实双服务连接守卫全部原循环子场景，未删断言。"
+      },
+      {
+        "name": "r06_chat_wire",
+        "passed": 17,
+        "failed": 0,
+        "suiteDurationSeconds": 7.26,
+        "includes": "原17项，含本轮chat-live胶囊就绪及此前resume/app主屏障。"
+      }
+    ]
+  },
+  "initializationEvidence": {
+    "successConditionsEnforcedByActualPassingCode": [
+      "每场受原15秒初始化界限及原it总60秒剩余预算约束；到界拒绝，不放宽父预算。",
+      "真实身份须匹配本场management中serverId/studioId及本机拥有者权限，连接及凭证与本场相同。",
+      "6类初始化GET均须完成且HTTP200；助手/模型/配置错误、watchdog触发均硬拒绝。",
+      "助手列表含victim/survivor；配置/snapshot双ready、明确survivor资料及当前连接owner/key均匹配。"
+    ],
+    "directlyPreservedPerSceneReceipts": 0,
+    "perSceneInitializationDurationMs": null,
+    "perPathTimingStatistics": null,
+    "directWatchdogLogStatistics": null,
+    "reason": "本轮Rust成功会回收各隔离home；未设置既有R06_AGENT_DELETE_EVIDENCE_DIR，Cargo默认不输出成功测试捕获的子进程输出。现有log未含AGENT_DELETE_INITIALIZATION_RECEIPTS，所有本轮临时home已回收。不得把suite总耗时当逐场初始化耗时。",
+    "distinction": "原实链通过表明严格屏障实际满足；不声称已直接留存每场6路径收据或其具体耗时。"
+  },
+  "historicalBoundary": [
+    "e原三失败及RESULTS_t08e保持原状。",
+    "不能据此倒推e原失败具体慢在哪个请求，或证明其唯一原因是1秒默认等待。",
+    "不为取耗时再次运行已成功目标；f正式唯一Cargo由root继续。"
+  ],
+  "sourceHashes": [
+    {
+      "path": "desktop/src/react/settings/__tests__/agent-delete-initialization.ts",
+      "sha256": "4c38bcd79272e48a775aa8160bb1dbeca0a8281f964805ab766eaa1cc4c4e8f2",
+      "currentSha256": "4c38bcd79272e48a775aa8160bb1dbeca0a8281f964805ab766eaa1cc4c4e8f2",
+      "matchesStoppedVersion": true
+    },
+    {
+      "path": "desktop/src/react/settings/__tests__/AgentDeleteInitialization.test.ts",
+      "sha256": "c0f1978a83ab5e9975820fd1e60aec5e741637816db06a2f35562d82fc3d8148",
+      "currentSha256": "c0f1978a83ab5e9975820fd1e60aec5e741637816db06a2f35562d82fc3d8148",
+      "matchesStoppedVersion": true
+    },
+    {
+      "path": "desktop/src/react/settings/__tests__/R06AgentDeleteRustLive.test.tsx",
+      "sha256": "091325efb32aa8eb5c9eef43061fe3844887e9645eb7ab2139c1e5ae51e801e3",
+      "currentSha256": "091325efb32aa8eb5c9eef43061fe3844887e9645eb7ab2139c1e5ae51e801e3",
+      "matchesStoppedVersion": true
+    },
+    {
+      "path": "desktop/src/react/settings/__tests__/R06AgentDeleteConnectionReview.test.tsx",
+      "sha256": "e5a9af673d581bd01fa83a4354dd66abdbeb6bb71b26b081d25681255c3537ba",
+      "currentSha256": "e5a9af673d581bd01fa83a4354dd66abdbeb6bb71b26b081d25681255c3537ba",
+      "matchesStoppedVersion": true
+    },
+    {
+      "path": "desktop/src/react/settings/__tests__/R06AgentDeleteRegistryReview.test.tsx",
+      "sha256": "7ff2553a4596d285b14c78a98f0e54ea14ad9578ecd71133d8c6d5b8533b8102",
+      "currentSha256": "7ff2553a4596d285b14c78a98f0e54ea14ad9578ecd71133d8c6d5b8533b8102",
+      "matchesStoppedVersion": true
+    },
+    {
+      "path": "desktop/src/react/__tests__/chat-live/main.cjs",
+      "sha256": "6d8043d7332bb11727a8e5085231065d2aed18fb12906057ea8b41ae075ee63a",
+      "currentSha256": "6d8043d7332bb11727a8e5085231065d2aed18fb12906057ea8b41ae075ee63a",
+      "matchesStoppedVersion": true
+    }
+  ]
+}

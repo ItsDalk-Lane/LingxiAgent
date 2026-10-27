@@ -19,70 +19,36 @@
     "telegram",
     "personal-assistant"
   ],
-  "main": "desktop/bootstrap.cjs",
-  "bin": {
-    "lingxi": "cli/entry.ts"
-  },
   "engines": {
     "node": ">=24.12.0 <25"
   },
   "scripts": {
-    "start": "node scripts/ensure-windows-sandbox-helper.mjs && npm run build:preload && npm run build:renderer && npm run build:splash && npm run build:theme && node scripts/launch.js electron",
-    "start:dev": "node scripts/ensure-windows-sandbox-helper.mjs && npm run build:preload && npm run build:renderer && npm run build:splash && npm run build:theme && node scripts/launch.js electron-dev",
-    "start:vite": "node scripts/ensure-windows-sandbox-helper.mjs && npm run build:preload && node scripts/launch.js electron-vite",
     "dev:web": "node scripts/dev-web.js",
     "dev:renderer": "vite --config vite.config.ts",
     "build:renderer": "vite build --config vite.config.ts",
     "build:splash": "vite build --config vite.config.splash.ts",
     "build:theme": "vite build --config vite.config.theme.js",
-    "build:preload": "vite build --config vite.config.preload.js",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json",
-    "typecheck:core-contracts": "node scripts/check-core-contracts-strict.mjs",
-    "check:tool-invocation-boundaries": "node scripts/check-tool-invocation-boundaries.mjs",
-    "check:dependency-boundaries": "node scripts/check-dependency-boundaries.mjs",
-    "cli": "node scripts/launch.js cli",
-    "server": "node scripts/launch.js server",
-    "build:main": "vite build --config vite.config.main.js",
-    "build:computer-use-helper": "node scripts/build-computer-use-helper.mjs",
-    "build:speech-helper": "node scripts/build-speech-helper.mjs",
-    "build:speech-permissions": "node scripts/build-speech-permissions.mjs",
-    "build:windows-sandbox-helper": "node scripts/build-windows-sandbox-helper.mjs",
-    "build:client": "npm run build:main && npm run build:preload && npm run build:renderer && npm run build:splash && npm run build:theme",
-    "build:shell": "node scripts/build-shell.mjs",
-    "generate:windows-icon": "node scripts/generate-windows-icon.cjs",
-    "generate:tray-icons": "node scripts/generate-tray-icons.cjs",
-    "pack": "npm run fetch:bundled-bins && npm run build:computer-use-helper && npm run build:speech-helper && npm run build:speech-permissions && npm run build:client && npm run build:server && npm run verify:seed-kit && electron-builder --dir",
-    "install:local": "npm run pack && rm -rf /Applications/Lingxi.app /Applications/Lingxi.app && cp -R dist/mac-arm64/Lingxi.app /Applications/ && node scripts/sign-local.cjs",
-    "dist": "npm run fetch:bundled-bins && npm run build:computer-use-helper && npm run build:speech-helper && npm run build:speech-permissions && npm run build:client && npm run build:server && npm run verify:seed-kit && electron-builder --mac dmg",
-    "dist:win": "npm run fetch:bundled-bins && npm run build:computer-use-helper && npm run build:windows-sandbox-helper && npm run generate:windows-icon && npm run generate:tray-icons && npm run build:client && npm run build:server && npm run verify:seed-kit && npm run pack:server:standalone && npm run verify:standalone:server && electron-builder --win nsis",
-    "dist:linux": "npm run fetch:bundled-bins && npm run build:client && npm run build:server && npm run verify:seed-kit && electron-builder --linux AppImage deb",
+    "build:rust-service": "node scripts/build-rust-desktop-service.mjs",
+    "verify:rust-service-package": "node scripts/build-rust-desktop-service.mjs --verify",
+    "build:tauri:renderer": "npm run build:renderer && npm run build:theme",
+    "build:tauri:service": "npm run build:rust-service",
+    "build:tauri": "npm run fetch:chromium && npm run fetch:node && npm run fetch:lsp && node scripts/tauri-build.mjs",
+    "build:tauri:debug": "node scripts/tauri-build.mjs --debug",
+    "dev:tauri": "node scripts/tauri-dev.mjs",
     "fetch:bundled-bins": "node scripts/fetch-bundled-binaries.cjs",
-    "verify:seed-kit": "node scripts/verify-seed-kit.mjs",
-    "pack:server:standalone": "node scripts/build-standalone-server-artifact.mjs x64",
-    "verify:standalone:server": "node scripts/verify-standalone-server-artifact.mjs x64 --smoke",
-    "release:preflight": "node scripts/release-preflight.mjs",
-    "test:artifact-release-smoke": "vitest run tests/release-preflight.test.ts tests/artifact-release-order.test.ts tests/artifact-core-manifest.test.ts tests/artifact-core-activation.test.ts tests/artifact-boot.test.ts tests/artifact-ota.test.ts tests/build-server-artifact.test.ts tests/publish-train.test.ts",
+    "fetch:chromium": "node scripts/fetch-chromium.cjs",
     "test": "vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**'",
-    "test:knowledge-platform-smoke": "vitest run tests/knowledge-store.test.ts tests/knowledge-manager-import.test.ts tests/knowledge-engine-persistence.test.ts tests/knowledge-vector-index.test.ts tests/auxiliary-slot-resolver.test.ts tests/fresh-credential-routing.test.ts tests/oauth-force-refresh.test.ts tests/model-manager-auth-storage.test.ts tests/knowledge-store-v18-migration.test.ts tests/knowledge-store-v19-migration.test.ts tests/knowledge-index-metadata-migration.test.ts tests/knowledge-multigrain-migration.test.ts tests/knowledge-vector-backend-parity.test.ts tests/knowledge-vector-backend-fallback.test.ts tests/knowledge-vector-shutdown.test.ts tests/knowledge-fast-zero-remote.test.ts tests/knowledge-detailed-engine-context.test.ts tests/knowledge-research-recovery.test.ts tests/knowledge-completeness-quality.test.ts --maxWorkers=1",
-    "build:server": "node scripts/build-server.mjs",
-    "build:server:open": "node scripts/build-server-open.mjs",
-    "smoke:server:open": "node scripts/smoke-open-server.mjs",
-    "smoke:skill-ws": "node scripts/smoke-skill-ws.mjs",
-    "benchmark:terminal-ui": "node scripts/benchmark-terminal-ui.mjs",
-    "export:open": "node scripts/export-open-tree.mjs",
-    "rehearse:open": "node scripts/rehearse-open-export.mjs",
     "lint": "eslint .",
-    "lint:boundary": "node scripts/lint-open-boundary.mjs",
     "test:watch": "vitest --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**'",
-    "postinstall": "node scripts/patch-pi-sdk.cjs && node scripts/prepare-usearch-native.mjs"
+    "fetch:node": "node scripts/fetch-node-runtime.cjs",
+    "stage:tauri:workers": "node scripts/stage-tauri-workers.mjs",
+    "fetch:lsp": "node scripts/fetch-lsp-servers.cjs"
   },
   "dependencies": {
     "@codemirror/lang-markdown": "^6.5.0",
     "@codemirror/language-data": "^6.5.2",
     "@codemirror/view": "6.43.0",
-    "@earendil-works/pi-agent-core": "0.86.0",
-    "@earendil-works/pi-ai": "0.86.0",
-    "@earendil-works/pi-coding-agent": "0.86.0",
     "@firecrawl/anydoc": "0.1.2",
     "@hono/node-server": "^1.19.17",
     "@hono/node-ws": "^1.3.0",
@@ -102,7 +68,6 @@
     "chokidar": "^5.0.0",
     "codemirror": "^6.0.2",
     "diff": "8.0.4",
-    "electron-updater": "^6.8.9",
     "exceljs": "^4.4.0",
     "hono": "^4.13.1",
     "js-yaml": "^4.3.1",
@@ -134,6 +99,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@tauri-apps/cli": "2.12.4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/markdown-it": "^14.1.2",
@@ -142,8 +108,6 @@
     "@types/yauzl": "3.4.0",
     "@vercel/nft": "^1.5.0",
     "@vitejs/plugin-react": "^5.1.4",
-    "electron": "42.8.1",
-    "electron-builder": "^26.15.3",
     "esbuild": "^0.27.4",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^5.2.0",
@@ -152,142 +116,9 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.57.2",
     "vite": "^7.3.6",
-    "vitest": "^4.1.10"
-  },
-  "build": {
-    "appId": "com.lingxi.app",
-    "productName": "Lingxi",
-    "asar": true,
-    "asarUnpack": [
-      "**/node_modules/usearch/**/*.node"
-    ],
-    "npmRebuild": false,
-    "afterPack": "./scripts/fix-modules.cjs",
-    "extraMetadata": {
-      "main": "desktop/bootstrap.cjs"
-    },
-    "files": [
-      "desktop/main.bundle.cjs",
-      "desktop/bootstrap.cjs",
-      "desktop/src/office-pdf-helper.cjs",
-      "desktop/src/office-pdf-fonts.cjs",
-      "desktop/src/shared/launch-integrity.cjs",
-      "desktop/src/shared/windows-system-ca.cjs",
-      "shared/hana-runtime-paths.cjs",
-      "desktop/preload.bundle.cjs",
-      "desktop/dist-splash/**",
-      "desktop/src/**/*.{html,icns,ico,png,svg,json}",
-      "desktop/src/assets/**",
-      "package.json",
-      "release-digest.v1.json",
-      "release-digest.v2.json",
-      "!packages/**",
-      "!**/node_modules/**",
-      "node_modules/ws/**"
-    ],
-    "extraResources": [
-      {
-        "from": "dist-server-artifact/${os}-${arch}/",
-        "to": "seed/"
-      },
-      {
-        "from": "bundled-bin/${os}-${arch}/",
-        "to": "bundled-bin/"
-      },
-      {
-        "from": "desktop/src/screenshot-themes/",
-        "to": "screenshot-themes/"
-      },
-      {
-        "from": "desktop/src/assets/",
-        "to": "assets/"
-      }
-    ],
-    "afterSign": "./scripts/notarize.cjs",
-    "mac": {
-      "target": [
-        "dmg",
-        "zip"
-      ],
-      "category": "public.app-category.productivity",
-      "icon": "desktop/src/icon.icns",
-      "artifactName": "${productName}-${version}-macOS-${arch}.${ext}",
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false,
-      "entitlements": "desktop/entitlements.mac.plist",
-      "entitlementsInherit": "desktop/entitlements.mac.plist",
-      "extraResources": [
-        {
-          "from": "dist-computer-use/mac-${arch}/",
-          "to": "computer-use/macos/"
-        },
-        {
-          "from": "dist-speech/mac-${arch}/",
-          "to": "speech/macos/"
-        }
-      ],
-      "extendInfo": {
-        "NSMicrophoneUsageDescription": "灵犀需要使用麦克风来录制你的语音输入（语音消息与听写）。语音只在你按下录音时录制。",
-        "NSSpeechRecognitionUsageDescription": "灵犀需要使用 macOS 自带的语音识别，把你的录音在本地转为文字（听写功能）。"
-      }
-    },
-    "dmg": {
-      "title": "Lingxi",
-      "contents": [
-        {
-          "x": 180,
-          "y": 220
-        },
-        {
-          "x": 420,
-          "y": 220,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ]
-    },
-    "publish": [
-      {
-        "provider": "github",
-        "owner": "ItsDalk-Lane",
-        "repo": "LingxiAgent"
-      }
-    ],
-    "win": {
-      "target": "nsis",
-      "icon": "desktop/src/icon.ico",
-      "executableName": "Lingxi",
-      "artifactName": "${productName}-${version}-Windows-${arch}.${ext}",
-      "requestedExecutionLevel": "asInvoker",
-      "extraResources": [
-        {
-          "from": "vendor/mingit",
-          "to": "git"
-        },
-        {
-          "from": "dist-sandbox/win-${arch}/",
-          "to": "sandbox/windows/"
-        }
-      ]
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": false,
-      "shortcutName": "Lingxi",
-      "include": "build/installer.nsh",
-      "installerIcon": "desktop/src/icon.ico",
-      "uninstallerIcon": "desktop/src/icon.ico"
-    },
-    "linux": {
-      "target": [
-        "AppImage",
-        "deb"
-      ],
-      "maintainer": "Lingxi Developers <manbuchao@qq.com>",
-      "category": "Utility",
-      "icon": "desktop/src/icon.png",
-      "artifactName": "${productName}-${version}-Linux-${arch}.${ext}"
-    }
+    "vitest": "^4.1.10",
+    "electron": "42.8.1",
+    "electron-updater": "^6.8.9"
   },
   "optionalDependencies": {
     "usearch": "2.26.0"

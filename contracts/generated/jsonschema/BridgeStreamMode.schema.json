@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "enum": [
+    "batch",
+    "draft",
+    "rich_draft",
+    "edit_message",
+    "cardkit_stream",
+    "block"
+  ],
+  "title": "BridgeStreamMode",
+  "type": "string"
+}

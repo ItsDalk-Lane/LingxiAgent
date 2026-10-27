@@ -324,7 +324,9 @@ export function tryAcquireSendLease(input: AcquireSendLeaseInput): AcquireSendLe
   // 防重复发送的底线保留在「不自动重发」。
   if (activeLeaseByKey.has(key)
     || unresolvedForKey(key).some(record => record.phase === 'awaiting_ack'
-      || (record.phase === 'accepted' && record.runStatus !== 'terminal' && record.runStatus !== 'reconciled_idle'))) {
+      || (record.phase === 'accepted' && record.runStatus !== 'terminal' && record.runStatus !== 'reconciled_idle'
+        && !(input.bundle.type === 'interject' && record.sourceEntryId && record.observedRunId
+          && [input.targetRun?.streamId, input.targetRun?.turnId].includes(record.observedRunId))))) {
     return { ok: false, reason: 'transport_busy' };
   }
   if ([...recordsByLease.values()].filter(isUnresolved).length >= MAX_UNRESOLVED_RECORDS) {
@@ -817,7 +819,7 @@ export function reconcileComposerSession(sessionPath: string): Promise<void> {
       if (!valid()) return;
       const snapshot = page.reconciliation;
       if (!snapshot || snapshot.sessionId !== scope.sessionId || snapshot.sessionPath !== sessionPath
-        || snapshot.complete !== true || !snapshot.snapshotId || !Number.isSafeInteger(snapshot.runRevision)) throw new Error('history_identity_or_evidence_unavailable');
+        || snapshot.complete !== true || !snapshot.snapshotId || !(Number.isSafeInteger(snapshot.runRevision) || typeof snapshot.runRevision === 'string' && /^(0|[1-9][0-9]{0,19})$/.test(snapshot.runRevision) && BigInt(snapshot.runRevision) <= 18446744073709551615n)) throw new Error('history_identity_or_evidence_unavailable');
       for (const record of records) {
         const matches = page.messages.filter(message => message.role === 'user' && message.clientMessageId === record.clientMessageId
           && message.snapshotVersion === record.snapshotVersion && typeof message.sourceEntryId === 'string');
@@ -1032,6 +1034,7 @@ export async function sendWithLease(
     return prep.result;
   }
 
+  if (record.bundle.type === 'interject' && record.targetRun?.streamId) prep.prepared.wsMsg.streamId = record.targetRun.streamId;
   const attemptId = createClientAttemptId();
   const result = await commitPreparedComposerSend(prep.prepared, {
     t: deps.t,

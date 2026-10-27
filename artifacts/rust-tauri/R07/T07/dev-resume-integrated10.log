@@ -1,0 +1,35 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0425]: cannot find type `ToolCallId` in this scope
+   --> crates/lingxi-service/src/runs.rs:836:15
+    |
+836 |     call: &'a ToolCallId,
+    |               ^^^^^^^^^^
+    |
+   ::: crates/lingxi-protocol/src/lib.rs:69:9
+    |
+ 69 |         pub struct $name(String);
+    |         ------------------------- similarly named struct `ModelCallId` defined here
+    |
+help: a struct with a similar name exists
+    |
+836 -     call: &'a ToolCallId,
+836 +     call: &'a ModelCallId,
+    |
+
+error[E0433]: cannot find type `ToolCallId` in this scope
+   --> crates/lingxi-service/src/runs.rs:893:20
+    |
+893 |         let call = ToolCallId::new(format!("{}-{label}", ctx.run_id));
+    |                    ^^^^^^^^^^ use of undeclared type `ToolCallId`
+    |
+help: a struct with a similar name exists
+    |
+893 -         let call = ToolCallId::new(format!("{}-{label}", ctx.run_id));
+893 +         let call = ModelCallId::new(format!("{}-{label}", ctx.run_id));
+    |
+
+Some errors have detailed explanations: E0425, E0433.
+For more information about an error, try `rustc --explain E0425`.
+error: could not compile `lingxi-service` (lib) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `lingxi-service` (lib test) due to 2 previous errors

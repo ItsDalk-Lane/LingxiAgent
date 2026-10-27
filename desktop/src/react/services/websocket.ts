@@ -14,6 +14,12 @@ import {
   recordResourceEventCursor,
 } from './resource-events';
 import { useStore } from '../stores';
+import { startRustAutomationNotifications } from './rust-automation';
+import { startRustMediaPolling } from './rust-media';
+import { startRustResourceEvents } from './rust-workbench';
+import { refreshRustAgentActivities } from './rust-agent-activities';
+import { captureSessionConnection } from './session-connection-owner';
+import { handleAppEvent } from './app-event-actions';
 import { setStatus } from '../utils/ui-helpers';
 import {
   buildConnectionWsUrl,
@@ -24,6 +30,7 @@ import {
 } from './server-connection';
 import { AppError } from '../../../../shared/errors.ts';
 import { errorBus } from '../../../../shared/error-bus.ts';
+import { version as desktopVersion } from '../../../../package.json';
 import {
   configureTerminalClientWebSocketGetter,
   requestTerminalSnapshot,
@@ -39,6 +46,17 @@ import {
 
 // ── 模块级 WS 实例 ──
 let _ws: WebSocket | null = null;
+let _wsConnectionIsRust = false;
+let _rustSlashConnection: ServerConnection | null = null;
+let _rustSlashReady = false;
+let _wsConnectAttempt = 0;
+let _wsHandshakeTimer: ReturnType<typeof setTimeout> | null = null;
+const RUST_WIRE_PROTOCOL = 1;
+// R08 数据纪元切换（T05：Rust 侧 R08_CUTOVER 把 data_epoch 升到 2）：切换窗内
+// 客户端同时接受升级前(1)与升级后(2)的服务公告。显式枚举，禁区间通配（>=）；
+// 窗外纪元一律拒绝，方向（过旧/过新）由 rustWireHelloDataEpochDirection 区分。
+const RUST_ACCEPTED_DATA_EPOCHS: readonly number[] = [1, 2];
+const RUST_HANDSHAKE_TIMEOUT_MS = 10_000;
 
 // ── WS 重连状态 ──
 let _wsRetryDelay = 1000;
@@ -49,10 +67,22 @@ const WS_FAST_RETRY_LIMIT = 20;
 const WS_SLOW_RETRY_DELAY = 60_000;
 let _wsRetryCount = 0;
 let _resourceForegroundCatchUpCleanup: (() => void) | null = null;
+let _stopRustAutomationNotifications: (() => void) | null = null;
+let _stopRustMediaPolling: (() => void) | null = null;
+let _stopRustResourceEvents: (() => void) | null = null;
+
+function stopRustAutomationNotifications(): void {
+  _stopRustResourceEvents?.();
+  _stopRustResourceEvents = null;
+  _stopRustMediaPolling?.();
+  _stopRustMediaPolling = null;
+  _stopRustAutomationNotifications?.();
+  _stopRustAutomationNotifications = null;
+}
 
 // 注入循环依赖的 handlers
 injectHandlers(handleServerMessage, applyStreamingStatus);
-injectWebSocketGetter(() => _ws);
+injectWebSocketGetter(getWebSocket);
 configureTerminalClientWebSocketGetter(() => _ws);
 configureBackgroundProcessWebSocketGetter(() => _ws);
 
@@ -88,64 +118,219 @@ export function requestTerminalSnapshotForCurrentSession(state: {
   });
 }
 
+export function isRustWireServerHello(value: unknown): boolean {
+  if (!value || typeof value !== 'object') return false;
+  const hello = value as Record<string, unknown>;
+  return hello.protocol === 'lingxi.wire'
+    && hello.selectedProtocol === RUST_WIRE_PROTOCOL
+    && Number.isInteger(hello.wireProtocolMin)
+    && Number.isInteger(hello.wireProtocolMax)
+    && (hello.wireProtocolMin as number) >= 1
+    && (hello.wireProtocolMin as number) <= RUST_WIRE_PROTOCOL
+    && (hello.wireProtocolMax as number) >= RUST_WIRE_PROTOCOL
+    && (hello.wireProtocolMax as number) >= (hello.wireProtocolMin as number)
+    && RUST_ACCEPTED_DATA_EPOCHS.includes(hello.dataEpoch as number)
+    && hello.serverKind === 'lingxi-service'
+    && typeof hello.serverVersion === 'string'
+    && hello.serverVersion.trim().length > 0
+    && (hello.rejectedCaps === undefined
+      || (Array.isArray(hello.rejectedCaps)
+        && hello.rejectedCaps.every((cap) => typeof cap === 'string')));
+}
+
+/**
+ * 判定 hello.dataEpoch 被拒的方向：
+ * - 在接受集 {1, 2} 内 → null（未拒）；
+ * - 整数但低于接受集 → 'too_old'（服务数据目录落后于本客户端可写纪元）；
+ * - 整数但高于接受集 → 'too_new'（数据目录已被更新版本升级，应提示升级客户端
+ *   而不是继续写入，对应任务书 A11）；
+ * - 非整数/缺失 → null（不属于纪元方向问题，走通用不兼容理由）。
+ */
+export function rustWireHelloDataEpochDirection(value: unknown): 'too_old' | 'too_new' | null {
+  if (!Number.isInteger(value)) return null;
+  const epoch = value as number;
+  if (RUST_ACCEPTED_DATA_EPOCHS.includes(epoch)) return null;
+  return epoch < RUST_ACCEPTED_DATA_EPOCHS[0] ? 'too_old' : 'too_new';
+}
+
+function clearRustHandshakeTimer(): void {
+  if (_wsHandshakeTimer) clearTimeout(_wsHandshakeTimer);
+  _wsHandshakeTimer = null;
+}
+
+function noteWsFailure(reasonKey: string): void {
+  setStatus('status.disconnected', false);
+  useStore.setState({ wsFailureReasonKey: reasonKey, wsRecoveryNotice: false });
+}
+
+/** 服务重启时先废弃旧连接；等待本轮有效端口和令牌后再重新连接。 */
+export function disconnectWebSocketForRestart(): void {
+  stopRustAutomationNotifications();
+  _wsConnectAttempt++;
+  _rustSlashConnection = null;
+  _rustSlashReady = false;
+  clearRustHandshakeTimer();
+  if (_wsRetryTimer) clearTimeout(_wsRetryTimer);
+  _wsRetryTimer = null;
+  if (_ws) {
+    const previous = _ws;
+    _ws = null;
+    previous.onclose = null;
+    try { previous.close(); } catch { /* 已关闭的旧连接 */ }
+    noteComposerConnectionClosed();
+  }
+  _wsRetryCount = 0;
+  _wsRetryDelay = 1000;
+  noteWsFailure('status.serverRestarting');
+  useStore.setState({ wsState: 'disconnected', wsReconnectAttempt: 0 });
+}
+
 /** 获取当前 WebSocket 实例 */
 export function getWebSocket(): WebSocket | null {
+  if (_wsConnectionIsRust) {
+    const current = resolveServerConnection(useStore.getState());
+    if (!_rustSlashReady || !_rustSlashConnection || !current || JSON.stringify(current) !== JSON.stringify(_rustSlashConnection)) return null;
+  }
   return _ws;
+}
+
+/** 命令只发给握手通过且仍属于当前完整连接的 Rust socket。 */
+export function sendRustSlash(sessionId: string, text: string, agentId: string | null): void {
+  const current = resolveServerConnection(useStore.getState());
+  if (!_rustSlashReady || !_rustSlashConnection || !current
+    || JSON.stringify(current) !== JSON.stringify(_rustSlashConnection)
+    || !_ws || _ws.readyState !== WebSocket.OPEN) {
+    throw new Error('命令连接尚未就绪或已切换，请等待当前连接后重试');
+  }
+  _ws.send(JSON.stringify({ type: 'slash', sessionId, text, ...(agentId ? { agentId } : {}) }));
 }
 
 /** 发起 WebSocket 连接 */
 export function connectWebSocket(port?: string, token?: string): void {
+  const attempt = ++_wsConnectAttempt;
   // 如果没有传参，从 Zustand store 获取
   const storeState = useStore.getState();
-  const connection = port !== undefined || token !== undefined
-    ? createLocalServerConnection({
-        serverPort: port || storeState.serverPort,
-        serverToken: token ?? storeState.serverToken,
-      })
-    : resolveServerConnection(storeState);
+  let connection: ServerConnection | null;
+  try {
+    connection = port !== undefined || token !== undefined
+      ? createLocalServerConnection({
+          serverPort: port !== undefined ? port : storeState.serverPort,
+          serverToken: token !== undefined ? token : storeState.serverToken,
+        })
+      : resolveServerConnection(storeState);
+  } catch {
+    disconnectWebSocketForRestart();
+    noteWsFailure('status.wsConnectionFailed');
+    return;
+  }
 
-  if (!connection) return;
+  if (!connection) {
+    disconnectWebSocketForRestart();
+    noteWsFailure('status.wsConnectionFailed');
+    useStore.setState({ wsState: 'disconnected' });
+    return;
+  }
+  if (connection.serverNodeKind === 'lingxi-service') {
+    setStatus('status.disconnected', false);
+    useStore.setState({ wsState: 'reconnecting', wsRecoveryNotice: false });
+  }
   ensureResourceForegroundCatchUp();
 
-  void openConnectionWebSocket(connection).catch((err) => {
+  void openConnectionWebSocket(connection, attempt).catch((err) => {
+    if (attempt !== _wsConnectAttempt) return;
     console.error('[ws] connection setup failed:', err);
     errorBus.report(new AppError('WS_DISCONNECTED'));
-    setStatus('status.disconnected', false);
+    if (!useStore.getState().wsFailureReasonKey) noteWsFailure('status.wsConnectionFailed');
     scheduleReconnect();
   });
 }
 
 function ensureResourceForegroundCatchUp(): void {
   if (_resourceForegroundCatchUpCleanup) return;
-  _resourceForegroundCatchUpCleanup = bindResourceEventForegroundCatchUp((event) => handleServerMessage(event));
+  _resourceForegroundCatchUpCleanup = bindResourceEventForegroundCatchUp((event) => handleServerMessage(event), {
+    catchUp: () => resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service'
+      ? undefined : catchUpResourceEventsAfterReconnect((event) => handleServerMessage(event)),
+  });
 }
 
-async function openConnectionWebSocket(connection: ServerConnection): Promise<void> {
-  const wsTicket = await requestConnectionWsTicket(connection);
+async function openConnectionWebSocket(connection: ServerConnection, attempt: number): Promise<void> {
+  stopRustAutomationNotifications();
+  const isRustService = connection.serverNodeKind === 'lingxi-service';
+  _rustSlashReady = false;
+  _rustSlashConnection = isRustService ? connection : null;
+  let rustHandshakeComplete = false;
 
   if (_wsRetryTimer) { clearTimeout(_wsRetryTimer); _wsRetryTimer = null; }
+  clearRustHandshakeTimer();
   if (_ws) {
-    try { _ws.onclose = null; _ws.close(); } catch { /* silent */ }
+    try { _ws.onclose = null; _ws.close(); } catch { /* 已失效的旧连接 */ }
+    noteComposerConnectionClosed();
+    _ws = null;
   }
+  if (connection.kind === 'local' && connection.credentialKind === 'loopback_token' && !connection.token) {
+    noteWsFailure('status.wsTicketFailed');
+    throw new Error('local server token missing');
+  }
+  let wsTicket: string | null;
+  try {
+    wsTicket = await requestConnectionWsTicket(connection);
+    if (isRustService && connection.kind !== 'local' && !wsTicket) {
+      throw new Error('Rust remote WebSocket ticket missing');
+    }
+  } catch (err) {
+    if (attempt === _wsConnectAttempt) noteWsFailure('status.wsTicketFailed');
+    throw err;
+  }
+  if (attempt !== _wsConnectAttempt) return;
 
-  const url = buildConnectionWsUrl(connection, '/ws', { wsTicket });
+  const url = buildConnectionWsUrl(connection, isRustService ? '/lingxi/v1/ws' : '/ws', { wsTicket });
   _ws = new WebSocket(url);
+  _wsConnectionIsRust = isRustService;
   const socket = _ws;
 
-  _ws.onopen = () => {
+  const failRustSocket = (reasonKey: string, code: number, reason: string) => {
     if (_ws !== socket) return;
+    stopRustAutomationNotifications();
+    clearRustHandshakeTimer();
+    noteWsFailure(reasonKey);
+    try { socket.close(code, reason); } catch { /* 浏览器会继续走重连 */ }
+    scheduleReconnect();
+  };
+
+  const markConnectionReady = () => {
+    if (_ws !== socket) return;
+    clearRustHandshakeTimer();
+    const recovered = _wsRetryCount > 0 || Boolean(useStore.getState().wsFailureReasonKey);
     _wsRetryDelay = 1000;
     _wsRetryCount = 0;
-    // 连接代次递增：旧代次上准备中的发送在提交复核时会被拒绝（F2）。
-    noteComposerConnectionOpened();
     setStatus('status.connected', true);
     useStore.setState({
       wsState: 'connected',
       wsReconnectAttempt: 0,
+      wsFailureReasonKey: null,
+      wsRecoveryNotice: recovered,
       compactingSessions: [],
       compactionModeBySession: {},
     });
 
+    noteComposerConnectionOpened();
+    if (isRustService) {
+      stopRustAutomationNotifications();
+      _stopRustMediaPolling = startRustMediaPolling(connection);
+      _stopRustResourceEvents = startRustResourceEvents(connection, {
+        applyEvent: event => handleServerMessage(event, composerOriginConnectionKey(connection)),
+      });
+      _stopRustAutomationNotifications = startRustAutomationNotifications(connection, {
+        deliverEvent: (type, payload, source, isCurrent) => handleAppEvent(type, payload, { source, isCurrent }),
+      });
+      const state = useStore.getState();
+      const owner = captureSessionConnection();
+      if (owner && state.currentSessionId) void refreshRustAgentActivities(owner, state.currentSessionId);
+      const paths = [...new Set([...resolveStreamingSessionResumeTargets(state), ...unresolvedComposerSessionPaths(composerOriginConnectionKey(connection))])];
+      reconcilePendingComposerSessions();
+      for (const path of paths) requestStreamResume(path);
+      return;
+    }
     const s = useStore.getState();
     requestTerminalSnapshotForCurrentSession(s);
     const streamingPaths = [...new Set([...resolveStreamingSessionResumeTargets(s), ...unresolvedComposerSessionPaths(composerOriginConnectionKey(connection))])];
@@ -178,20 +363,99 @@ async function openConnectionWebSocket(connection: ServerConnection): Promise<vo
     });
   };
 
+  _ws.onopen = () => {
+    if (_ws !== socket) return;
+    if (!isRustService) {
+      markConnectionReady();
+      return;
+    }
+    try {
+      socket.send(JSON.stringify({
+        protocol: 'lingxi.wire',
+        clientKind: 'desktop',
+        clientVersion: desktopVersion,
+        protocolMin: RUST_WIRE_PROTOCOL,
+        protocolMax: RUST_WIRE_PROTOCOL,
+        caps: [],
+      }));
+    } catch {
+      failRustSocket('status.wsConnectionFailed', 4400, 'Rust handshake send failed');
+      return;
+    }
+    _wsHandshakeTimer = setTimeout(() => {
+      if (!rustHandshakeComplete) {
+        failRustSocket('status.wsHandshakeTimedOut', 4408, 'Rust wire handshake timeout');
+      }
+    }, RUST_HANDSHAKE_TIMEOUT_MS);
+    (_wsHandshakeTimer as unknown as { unref?: () => void }).unref?.();
+  };
+
   _ws.onmessage = (event: MessageEvent) => {
     if (_ws !== socket) return;
     try {
       const msg = JSON.parse(event.data);
+      if (isRustService && !rustHandshakeComplete) {
+        if (!isRustWireServerHello(msg)) {
+          // 纪元不匹配仍是拒绝，但理由必须区分方向（任务书 A11 客户端侧）：
+          // 过新 = 数据目录已被更新版本升级，提示升级客户端而不是继续写入。
+          const epochDirection = rustWireHelloDataEpochDirection(
+            (msg as Record<string, unknown> | null)?.dataEpoch,
+          );
+          if (epochDirection === 'too_old') {
+            failRustSocket('status.wsHandshakeFailed', 4409,
+              'Rust data epoch too old for this client (accepted: 1,2)');
+          } else if (epochDirection === 'too_new') {
+            failRustSocket('status.wsHandshakeFailed', 4409,
+              'Rust data epoch too new for this client (accepted: 1,2); upgrade the client');
+          } else {
+            failRustSocket('status.wsHandshakeFailed', 4409, 'incompatible Rust wire handshake');
+          }
+          return;
+        }
+        rustHandshakeComplete = true;
+        _rustSlashReady = true;
+        markConnectionReady();
+        return;
+      }
+      if (isRustService) {
+        // 只桥接已实现的命令回执，其他 Rust 事件仍走各自正式订阅面。
+        const current = resolveServerConnection(useStore.getState());
+        if (current && JSON.stringify(current) === JSON.stringify(connection)
+          && typeof msg?.sessionId === 'string'
+          && ['session_created', 'subagent_stop_result', 'slash_result', 'session_user_message', 'loop_status', 'input_rejected', 'status', 'stage',
+            'assistant_run_start', 'assistant_run_end', 'assistant_segment_start', 'assistant_segment_delta', 'assistant_segment_end',
+            'tool_start', 'tool_end', 'error', 'abort_result', 'stream_resume', 'steered', 'compaction_accepted', 'compaction_result', 'context_usage'].includes(msg.type)) {
+          if (msg.historyCleared === true && msg.level === 'success' && msg.targetSessionId === msg.sessionId) {
+            const state = useStore.getState();
+            const path = state.currentSessionId === msg.sessionId ? state.currentSessionPath
+              : state.sessions.find(session => session.sessionId === msg.sessionId)?.path;
+            if (path) {
+              // 成功收据来自真实清除事务；阻止旧在途读回再覆盖已清除的页面。
+              state.bumpLoadMessagesVersion(path);
+              state.initSession(path, [], false, null, null);
+            }
+          }
+          handleServerMessage(msg, composerOriginConnectionKey(connection));
+        }
+        return;
+      }
       recordResourceEventCursor(msg);
       handleServerMessage(msg, composerOriginConnectionKey(connection));
     } catch (err) {
       console.error('[ws] message parse error:', err);
+      if (isRustService && !rustHandshakeComplete) {
+        failRustSocket('status.wsHandshakeFailed', 4409, 'invalid Rust wire handshake');
+      }
     }
   };
 
   _ws.onclose = () => {
     if (_ws !== socket) return;
-    setStatus('status.disconnected', false);
+    stopRustAutomationNotifications();
+    _rustSlashReady = false;
+    clearRustHandshakeTimer();
+    if (!useStore.getState().wsFailureReasonKey) noteWsFailure('status.wsConnectionClosed');
+    else setStatus('status.disconnected', false);
     // 断连后再不会有后续事件来清「等待助手」pending；streamingSessions 保留
     // （重连 resume 靠它圈目标），pending 必须就地全清，否则挂出永久指示器。
     useStore.getState().clearAllTurnPending?.();
@@ -203,6 +467,11 @@ async function openConnectionWebSocket(connection: ServerConnection): Promise<vo
 
   _ws.onerror = () => {
     errorBus.report(new AppError('WS_DISCONNECTED'));
+    if (isRustService) {
+      failRustSocket('status.wsConnectionFailed', 4400, 'Rust connection error');
+    } else {
+      noteWsFailure('status.wsConnectionFailed');
+    }
   };
 }
 

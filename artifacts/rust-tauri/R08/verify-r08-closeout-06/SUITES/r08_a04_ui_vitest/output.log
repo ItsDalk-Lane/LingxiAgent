@@ -1,0 +1,12 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/components/r08-a04-card-expansion.test.tsx > R08-A04 卡片展开不退化 > 夹具即服务捕获：无最终回复、失败工具与诚实终态逐字段可查 25ms
+ ✓ desktop/src/react/__tests__/components/r08-a04-card-expansion.test.tsx > R08-A04 卡片展开不退化 > 真实投影：过程块成卡、缺最终回复结果块上答案面 1ms
+ ✓ desktop/src/react/__tests__/components/r08-a04-card-expansion.test.tsx > R08-A04 卡片展开不退化 > 展开汇总区再逐卡点击：错误/思考/产物全部可查，收折不退化 110ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  15:34:41
+   Duration  1.42s (transform 732ms, setup 20ms, import 967ms, tests 136ms, environment 236ms)
+

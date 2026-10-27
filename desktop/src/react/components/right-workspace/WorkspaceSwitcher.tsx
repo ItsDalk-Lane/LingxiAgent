@@ -22,6 +22,7 @@ import { isSameWorkspacePath } from '../../utils/agent-workspace';
 import { buildWorkspacePickerItems, normalizeWorkspacePath, workspaceDisplayName } from '../../../../../shared/workspace-history.ts';
 import type { StudioWorkspace } from '../../types';
 import styles from './RightWorkspacePanel.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 function FolderIcon() {
   return (
@@ -132,7 +133,7 @@ export function WorkspaceSwitcher() {
     [cwdHistory],
   );
 
-  const canBrowse = typeof window.platform?.selectFolder === 'function';
+  const canBrowse = typeof usePlatform()?.selectFolder === 'function';
   const hasEntries = visibleStudioWorkspaces.length > 0 || primaryItems.length > 0 || canBrowse;
 
   return (

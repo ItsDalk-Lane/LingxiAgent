@@ -1,0 +1,11 @@
+ok   fixture-gen exit 0
+ok   variant=unmapped: mystery-unmapped.bin derived onto base fixture
+ok   unmapped variant: migrate exit 2 (refuse)
+ok   unmapped variant: refusal names backup + unclassified file
+ok   unmapped variant: journal exists
+ok   unmapped variant: journal phase == refused
+ok   unmapped variant: preflight/stop_write_probe/quiesce_snapshot ok before refuse
+ok   unmapped variant: target never created
+ok   unmapped variant: pointer never written
+ok   unmapped variant: legacy root byte-equal (zero-mutation red line)
+E2E_RESULT {"verdict":"PASS","variant":"unmapped"}

@@ -1,0 +1,538 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t02_supervisor_ready",
+ "cases": [
+  {
+   "case": "t02::candidate.debug-consume-only",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "source": "env",
+    "mode": "debug",
+    "executableSha256": "6fb2371cafddcfdc1a837ccb67648f37b04f422c13dceecc205f08a07e94f759"
+   }
+  },
+  {
+   "case": "t02::candidate.debug-features",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "features": [
+     "e2e-test",
+     "r09-host",
+     "r09-test-hooks"
+    ]
+   }
+  },
+  {
+   "case": "t02::candidate.release-consume-only",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "app": "/private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app",
+    "executableSha256": "d0072dbea750dffac45357c595a7ae59a5fbc49dd4f3fe433ce8bdbcabac708d",
+    "features": [
+     "r09-host"
+    ]
+   }
+  },
+  {
+   "case": "t02::ready-handshake-real",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "events": [
+     "host-start",
+     "resolve",
+     "binary",
+     "spawn",
+     "ready",
+     "instance",
+     "identity",
+     "service-ready",
+     "host-service-ready",
+     "window-created",
+     "page-load",
+     "page-load",
+     "app-ready-window-suppressed",
+     "app-ready"
+    ],
+    "readyMsSinceSpawn": 109,
+    "ordered": true,
+    "readyAddr": "127.0.0.1:59007"
+   }
+  },
+  {
+   "case": "t02::no-fixed-sleep-handshake",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "readyMsSinceSpawn": 109,
+    "mode": "local-owned"
+   }
+  },
+  {
+   "case": "t02::debug-exit-graceful",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "exit": 0,
+    "timedOut": false,
+    "service_residual": []
+   }
+  },
+  {
+   "case": "isolation::ps-clean-supervisor-debug-positive",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "label": "supervisor-debug-positive",
+    "aliveAppPids": [],
+    "residualServices": []
+   }
+  },
+  {
+   "case": "t02::automation-no-modal-positive",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "dialogSink": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/raw/dialog-tauri-home-debug-owned.json",
+    "automation": true
+   }
+  },
+  {
+   "case": "t02::manifest-protocol-match",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "manifest": {
+     "appVersion": "0.1.43",
+     "binary": "/private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-service",
+     "contentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+     "event": "manifest",
+     "protocol": "lingxi-service wire 1..=1 data-epoch 2",
+     "rendererSha256": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+     "schema": "lingxi.r09.tauri-launch.v1",
+     "sha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+     "signedMutation": true,
+     "target": "aarch64-apple-darwin",
+     "toolchain": "1.98.1",
+     "unixMs": 1793033149883
+    },
+    "serviceReady": {
+     "event": "service-ready",
+     "instanceId": "52979ee228b1e560f7d0d4119b674186",
+     "mode": "local-owned",
+     "pid": 90184,
+     "port": 59015,
+     "protocol": "lingxi-service wire 1..=1 data-epoch 2",
+     "schema": "lingxi.r09.tauri-launch.v1",
+     "unixMs": 1793033149986
+    }
+   }
+  },
+  {
+   "case": "t02::packaged-exit-graceful",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "exit": 0,
+    "timedOut": false,
+    "serviceResidual": []
+   }
+  },
+  {
+   "case": "isolation::ps-clean-supervisor-release-positive",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "label": "supervisor-release-positive",
+    "aliveAppPids": [],
+    "residualServices": []
+   }
+  },
+  {
+   "case": "t02::automation-no-modal-packaged",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "dialogSink": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/raw/dialog-release-owned.json",
+    "automation": true
+   }
+  },
+  {
+   "case": "t02::manifest-protocol-mismatch-rejected",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "exit": {
+     "exit": 2,
+     "timedOut": false
+    },
+    "record": {
+     "actual": "lingxi-service wire 1..=2 data-epoch 2",
+     "appVersion": "0.1.43",
+     "atUnixMs": 1793033153221,
+     "debugBuild": false,
+     "detail": null,
+     "expected": "lingxi-service wire 1..=1 data-epoch 2",
+     "fallbackAttempts": 0,
+     "home": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/home-protocol-mismatch",
+     "message": "bundled Rust service protocol/data epoch is incompatible with this host",
+     "nodeFallback": "none",
+     "packaged": true,
+     "reason": "RUST_SERVICE_PROTOCOL_INCOMPATIBLE",
+     "schema": "lingxi.r09.service-launch-failure.v1"
+    },
+    "recordPath": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/tmp/lingxi-tauri-launch/0bb1663f04705fcb/failure.json",
+    "codesignExit": 1
+   }
+  },
+  {
+   "case": "t02::injected-protocol-no-service-spawn",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "residual": []
+   }
+  },
+  {
+   "case": "t02::failure-dialog-suppressed-protocol",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sink": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/raw/dialog-protocol-mismatch.json",
+    "exists": true,
+    "payload": {
+     "actual": "lingxi-service wire 1..=2 data-epoch 2",
+     "atUnixMs": 1793033153222,
+     "code": "RUST_SERVICE_PROTOCOL_INCOMPATIBLE",
+     "detailPath": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/tmp/lingxi-tauri-launch/0bb1663f04705fcb/failure.json",
+     "expected": "lingxi-service wire 1..=1 data-epoch 2",
+     "home": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/home-protocol-mismatch",
+     "message": "bundled Rust service protocol/data epoch is incompatible with this host",
+     "modalShown": false,
+     "schema": "lingxi.r09.host-failure-dialog.v1"
+    },
+    "codeMatches": true,
+    "modalShown": false,
+    "automation": "1"
+   }
+  },
+  {
+   "case": "t02::injected-protocol-no-node-fallback",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "record": {
+     "actual": "lingxi-service wire 1..=2 data-epoch 2",
+     "appVersion": "0.1.43",
+     "atUnixMs": 1793033153221,
+     "debugBuild": false,
+     "detail": null,
+     "expected": "lingxi-service wire 1..=1 data-epoch 2",
+     "fallbackAttempts": 0,
+     "home": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/home-protocol-mismatch",
+     "message": "bundled Rust service protocol/data epoch is incompatible with this host",
+     "nodeFallback": "none",
+     "packaged": true,
+     "reason": "RUST_SERVICE_PROTOCOL_INCOMPATIBLE",
+     "schema": "lingxi.r09.service-launch-failure.v1"
+    }
+   }
+  },
+  {
+   "case": "isolation::ps-clean-supervisor-injected-protocol",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "label": "supervisor-injected-protocol",
+    "aliveAppPids": [],
+    "residualServices": []
+   }
+  },
+  {
+   "case": "t02::manifest-digest-mismatch-rejected",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "exit": {
+     "exit": 2,
+     "timedOut": false
+    },
+    "record": {
+     "actual": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+     "appVersion": "0.1.43",
+     "atUnixMs": 1793033155193,
+     "debugBuild": false,
+     "detail": {
+      "binarySha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+      "codesign": "codesign --verify --deep --strict failed: /private/tmp/lingxi-r09-injected-90164/DigestMismatch.app: a sealed resource is missing or invalid",
+      "contentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+      "manifestContentSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "manifestSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     },
+     "expected": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "fallbackAttempts": 0,
+     "home": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/home-digest-mismatch",
+     "message": "bundled Rust service bytes do not match the build manifest",
+     "nodeFallback": "none",
+     "packaged": true,
+     "reason": "RUST_SERVICE_DIGEST_MISMATCH",
+     "schema": "lingxi.r09.service-launch-failure.v1"
+    },
+    "recordPath": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/tmp/lingxi-tauri-launch/943349bd76f3bfbf/failure.json"
+   }
+  },
+  {
+   "case": "t02::injected-digest-no-service-spawn",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": null
+  },
+  {
+   "case": "isolation::ps-clean-supervisor-injected-digest",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "label": "supervisor-injected-digest",
+    "aliveAppPids": [],
+    "residualServices": []
+   }
+  },
+  {
+   "case": "t02::failure-dialog-suppressed-digest",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sink": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/raw/dialog-digest-mismatch.json",
+    "exists": true,
+    "payload": {
+     "actual": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+     "atUnixMs": 1793033155194,
+     "code": "RUST_SERVICE_DIGEST_MISMATCH",
+     "detailPath": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/tmp/lingxi-tauri-launch/943349bd76f3bfbf/failure.json",
+     "expected": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "home": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/home-digest-mismatch",
+     "message": "bundled Rust service bytes do not match the build manifest",
+     "modalShown": false,
+     "schema": "lingxi.r09.host-failure-dialog.v1"
+    },
+    "codeMatches": true,
+    "modalShown": false,
+    "automation": "1"
+   }
+  },
+  {
+   "case": "t02::runtime-identity-mismatch-rejected",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "exit": {
+     "exit": 2,
+     "timedOut": false
+    },
+    "record": {
+     "actual": "wire 1..=3 epoch 2",
+     "appVersion": "0.1.43",
+     "atUnixMs": 1793033156696,
+     "debugBuild": true,
+     "detail": {
+      "instanceId": "0123456789abcdef0123456789abcdef"
+     },
+     "expected": "wire 1..=1 epoch 2",
+     "fallbackAttempts": 0,
+     "home": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/home-runtime-mismatch",
+     "message": "runtime instance record announces an incompatible protocol/data epoch",
+     "nodeFallback": "none",
+     "packaged": false,
+     "reason": "RUNTIME_IDENTITY_MISMATCH",
+     "schema": "lingxi.r09.service-launch-failure.v1"
+    },
+    "recordPath": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/tmp/lingxi-tauri-launch/68ab00b5015240f3/failure.json",
+    "fakeResidual": []
+   }
+  },
+  {
+   "case": "isolation::ps-clean-supervisor-runtime-mismatch",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "label": "supervisor-runtime-mismatch",
+    "aliveAppPids": [],
+    "residualServices": []
+   }
+  },
+  {
+   "case": "t02::error-surfaced-records",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "failureRecords": [
+     "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/tmp/lingxi-tauri-launch/0bb1663f04705fcb/failure.json",
+     "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/tmp/lingxi-tauri-launch/943349bd76f3bfbf/failure.json",
+     "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/tmp/lingxi-tauri-launch/68ab00b5015240f3/failure.json"
+    ],
+    "crashLogs": [
+     "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/tmp/lingxi-tauri-launch/0bb1663f04705fcb/tauri-crash.log",
+     "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/tmp/lingxi-tauri-launch/943349bd76f3bfbf/tauri-crash.log",
+     "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/tmp/lingxi-tauri-launch/68ab00b5015240f3/tauri-crash.log"
+    ]
+   }
+  },
+  {
+   "case": "t02::failure-dialog-suppressed-all",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "dialogs": [
+     {
+      "sink": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/raw/dialog-protocol-mismatch.json",
+      "exists": true,
+      "payload": {
+       "actual": "lingxi-service wire 1..=2 data-epoch 2",
+       "atUnixMs": 1793033153222,
+       "code": "RUST_SERVICE_PROTOCOL_INCOMPATIBLE",
+       "detailPath": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/tmp/lingxi-tauri-launch/0bb1663f04705fcb/failure.json",
+       "expected": "lingxi-service wire 1..=1 data-epoch 2",
+       "home": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/home-protocol-mismatch",
+       "message": "bundled Rust service protocol/data epoch is incompatible with this host",
+       "modalShown": false,
+       "schema": "lingxi.r09.host-failure-dialog.v1"
+      },
+      "codeMatches": true,
+      "modalShown": false,
+      "automation": "1"
+     },
+     {
+      "sink": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/raw/dialog-digest-mismatch.json",
+      "exists": true,
+      "payload": {
+       "actual": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+       "atUnixMs": 1793033155194,
+       "code": "RUST_SERVICE_DIGEST_MISMATCH",
+       "detailPath": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/tmp/lingxi-tauri-launch/943349bd76f3bfbf/failure.json",
+       "expected": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+       "home": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/home-digest-mismatch",
+       "message": "bundled Rust service bytes do not match the build manifest",
+       "modalShown": false,
+       "schema": "lingxi.r09.host-failure-dialog.v1"
+      },
+      "codeMatches": true,
+      "modalShown": false,
+      "automation": "1"
+     },
+     {
+      "sink": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/raw/dialog-tauri-home-runtime-mismatch.json",
+      "exists": true,
+      "payload": {
+       "actual": "wire 1..=3 epoch 2",
+       "atUnixMs": 1793033156697,
+       "code": "RUNTIME_IDENTITY_MISMATCH",
+       "detailPath": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/tmp/lingxi-tauri-launch/68ab00b5015240f3/failure.json",
+       "expected": "wire 1..=1 epoch 2",
+       "home": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239/home-runtime-mismatch",
+       "message": "runtime instance record announces an incompatible protocol/data epoch",
+       "modalShown": false,
+       "schema": "lingxi.r09.host-failure-dialog.v1"
+      },
+      "codeMatches": true,
+      "modalShown": false,
+      "automation": "1"
+     }
+    ],
+    "note": "自动化模式（LINGXI_R09_AUTOMATION=1）不弹原生 modal，失败结构化写入 LINGXI_R09_HOST_DIALOG_SINK；生产默认仍弹 dialog（TCC 像素观察为 BLOCKED-SYSTEM-PERMISSIONS，不冒充）"
+   }
+  },
+  {
+   "case": "t02::ready-timeout-bounded",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "evidence": "cargo test service_supervisor::ready_timeout_kills_spawned_child_and_records_failure (injected 600ms duration; asserts child reaped + failure record)"
+   }
+  },
+  {
+   "case": "t02::candidate.release-consume-only",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "app": "/private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app",
+    "executableSha256": "d0072dbea750dffac45357c595a7ae59a5fbc49dd4f3fe433ce8bdbcabac708d",
+    "features": [
+     "r09-host"
+    ]
+   }
+  },
+  {
+   "case": "t02::no-node-fallback-in-release-binary",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "matches": {
+     "hana-server": 0,
+     "server/bootstrap": 0,
+     "bundle/index.js": 0,
+     "bridge-sdk-worker": 0
+    }
+   }
+  },
+  {
+   "case": "isolation::no-residual-processes",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "killed": [],
+    "residual": [],
+    "marker": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-90164-1793033146239"
+   }
+  },
+  {
+   "case": "isolation::real-home-untouched",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "before": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    },
+    "after": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    }
+   }
+  }
+ ]
+}

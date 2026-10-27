@@ -1,0 +1,19 @@
+{
+  "candidate": "t07a",
+  "additionalFailuresRetained": [
+    {
+      "gate": "boundaries",
+      "exitCode": 1,
+      "sourceUnchanged": true,
+      "reason": "B1 protected execute_prepared called by beautify_generation outside frozen run/gateway execution ownership. Fix implementation, never expand whitelist."
+    }
+  ],
+  "verificationInputsExpandedForNextCandidate": [
+    "API_COMPAT_MATRIX.json",
+    "PROTOCOL_SPEC.md",
+    "B1 checker and ownership/dependency inputs",
+    "package/lock/toolchain/typescript configs"
+  ],
+  "serviceAndBuild": "service rejected before execution; build and UI not run; see separate precheck record.",
+  "sourceManifestA": "original 525 rows and archive unchanged; next candidate must use expanded input set."
+}

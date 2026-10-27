@@ -1,0 +1,58 @@
+{
+  "scope": "NATIVE_OWNED_CHILD_SYSCALL_OBSERVATION_NOT_RUST_MCP_PROOF",
+  "method": "Own fork child setpgid before readiness pipe; killpg only before exact child wait/reap; all exact children waitpid reaped. No user processes or product source changed.",
+  "iterations": 3,
+  "elapsedSeconds": 0.004973709001205862,
+  "counts": {
+    "kill_errno=1;waited=False;pgid_errno=3;group_bytes=648;group_errno=0": 3
+  },
+  "observedAmbiguousExitWindow": [
+    {
+      "iteration": 0,
+      "ownedPid": 25540,
+      "killErrno": 1,
+      "tryWaitReturnedStatus": false,
+      "getpgid": -1,
+      "getpgidErrno": 3,
+      "group": {
+        "rc": 0,
+        "errno": 0,
+        "bytes": 648
+      }
+    },
+    {
+      "iteration": 1,
+      "ownedPid": 25541,
+      "killErrno": 1,
+      "tryWaitReturnedStatus": false,
+      "getpgid": -1,
+      "getpgidErrno": 3,
+      "group": {
+        "rc": 0,
+        "errno": 0,
+        "bytes": 648
+      }
+    },
+    {
+      "iteration": 2,
+      "ownedPid": 25542,
+      "killErrno": 1,
+      "tryWaitReturnedStatus": false,
+      "getpgid": -1,
+      "getpgidErrno": 3,
+      "group": {
+        "rc": 0,
+        "errno": 0,
+        "bytes": 648
+      }
+    }
+  ],
+  "rustSource": {
+    "file": "rust/crates/lingxi-service/src/mcpbridge.rs",
+    "sha256": "8222bc77499c4e7615647f53b00d5b9ecf602e1effa56e425ad391886af0f237"
+  },
+  "limitations": [
+    "This syscall observation does not establish the precise branch taken by owned_pid=24956 in the preserved failure.",
+    "No Cargo or Rust execution performed."
+  ]
+}

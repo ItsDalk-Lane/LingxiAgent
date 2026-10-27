@@ -1,0 +1,88 @@
+{
+  "sourceDatabase": "/private/tmp/lingxi-r07-tests/home/lingxi-r06-ex01-chat-resume-95726-1792313417388784000/lingxi-service/data/runs.db",
+  "sourceDatabaseSha256AtRead": "a92c4d760c1ec051b8e2b1a33de9e8e502e4c5ffcb655bb79ae1ce34a3200bfb",
+  "mode": "READ_ONLY_SQLITE_NARROW_EXPORT_NOT_DATABASE_COPY",
+  "runs": [
+    {
+      "runId": "run_000001a14e346352_000001",
+      "sessionId": "resume",
+      "status": "completed",
+      "terminalReason": "completed.with_final",
+      "lastEventSeq": 12
+    }
+  ],
+  "events": [
+    {
+      "seq": 1,
+      "type": "run_state_changed",
+      "from": "queued",
+      "to": "running"
+    },
+    {
+      "seq": 2,
+      "type": "model_context_snapshot"
+    },
+    {
+      "seq": 3,
+      "type": "model_call_started"
+    },
+    {
+      "seq": 4,
+      "type": "assistant_segment_start",
+      "semanticPhase": "unresolved",
+      "segmentId": "assistant:1:text:default"
+    },
+    {
+      "seq": 5,
+      "type": "model_call_delta",
+      "isExpectedSyntheticFinalDelta": false
+    },
+    {
+      "seq": 6,
+      "type": "assistant_segment_delta",
+      "semanticPhase": "unresolved",
+      "segmentId": "assistant:1:text:default",
+      "isExpectedSyntheticFinalDelta": false
+    },
+    {
+      "seq": 7,
+      "type": "model_call_delta",
+      "isExpectedSyntheticFinalDelta": true
+    },
+    {
+      "seq": 8,
+      "type": "assistant_segment_delta",
+      "semanticPhase": "unresolved",
+      "segmentId": "assistant:1:text:default",
+      "isExpectedSyntheticFinalDelta": true
+    },
+    {
+      "seq": 9,
+      "type": "assistant_segment_end",
+      "semanticPhase": "final_answer",
+      "segmentId": "assistant:1:text:default"
+    },
+    {
+      "seq": 10,
+      "type": "model_call_completed"
+    },
+    {
+      "seq": 11,
+      "type": "run_state_changed",
+      "from": "running",
+      "to": "completed",
+      "reason": "completed.with_final"
+    },
+    {
+      "seq": 12,
+      "type": "final_message_committed",
+      "hasActualMessage": true
+    }
+  ],
+  "excluded": [
+    "model_context_snapshot内容",
+    "任何用户正文或凭证",
+    "完整数据库/WAL/SHM"
+  ],
+  "limit": "没有原失败时内存replay响应逐字内容；不能从事后SQLite推断当时最后frame类型。"
+}

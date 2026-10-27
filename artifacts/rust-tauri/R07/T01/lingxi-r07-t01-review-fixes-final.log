@@ -1,0 +1,11 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0609]: no field `updated_at_unix_ms` on type `RunRecord`
+   --> crates/lingxi-service/src/automation.rs:474:26
+    |
+474 |                         .updated_at_unix_ms;
+    |                          ^^^^^^^^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `run_id`, `session_id`, `status`, `last_event_seq`
+
+For more information about this error, try `rustc --explain E0609`.
+error: could not compile `lingxi-service` (lib) due to 1 previous error

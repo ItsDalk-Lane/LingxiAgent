@@ -1,0 +1,316 @@
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: `lingxi-service` (test "r07_t08_search_clear") generated 1 warning (1 duplicate)
+warning: `lingxi-service` (test "r07_t08_provider_matrix") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.93s
+     Running tests/r07_t08_provider_matrix.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_provider_matrix-570a7d4c02a3eb95)
+
+running 36 tests
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-876c6563350b6fcf
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-81a02e42963311de
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-cb4f0d86cf0e1c02
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-2acedfc53c5aea6e
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-9b419cd555926817
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-2dabef673327c4ad
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-41f76e08e0014f96
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-62a0c158ed46aeb7
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-83b49d05fb80dbbe
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-90b360f4e088e92f
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-e52da37be255b766
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-8452d5ef3d28b932
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-8199e976f6b994eb
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-dd67649c97286db7
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-97e6704132edc351
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-f5d13efc4bf4a426
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-6b1e18ae99957572
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-29d710faae38a437
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-05b7d22a1394ec5b
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-244ba5b2bf69125f
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-d99ba9de9a466abd
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-ebb54617296e2d4f
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-cb7a0f0c9cc68676
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-183e99914f76c68c
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-6f67d90a9c9a9d3c
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-d6c3e713eb3552c3
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-a34ce6b4968d8e27
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-2433191d8bca7ead
+provider_matrix_boundary provider=agnes default_protocol=openai-completions keyless_external=401_rejected call_id=probe-d9724939b3208620de41f6b3ce1a1d04 physical=1 usage_rows=1
+provider_matrix_boundary provider=moonshot default_protocol=openai-completions keyless_external=401_rejected call_id=probe-a86f0a5916cbbc77632b3f97b08c11d6 physical=1 usage_rows=1
+provider_matrix_boundary provider=mistral default_protocol=openai-completions keyless_external=401_rejected call_id=probe-f846ba78550b9f35bfe4447b090b6216 physical=1 usage_rows=1
+provider_matrix_boundary provider=agnes case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=hunyuan default_protocol=openai-completions keyless_external=401_rejected call_id=probe-3aca560be6471ba8fec4e4e72b770666 physical=1 usage_rows=1
+provider_matrix_boundary provider=moonshot case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=mistral case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=agnes case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=deepseek-responses default_protocol=openai-responses keyless_external=401_rejected call_id=probe-5ca60f537cecab2fe026a425ae5d908c physical=1 usage_rows=1
+provider_matrix_boundary provider=hunyuan case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=moonshot case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=mistral case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=agnes case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=deepseek-responses case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=mimo-token-plan default_protocol=openai-completions keyless_external=401_rejected call_id=probe-7c2d1fd9980ce765479fc431c986503a physical=1 usage_rows=1
+provider_matrix_boundary provider=hunyuan case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=moonshot case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=groq default_protocol=openai-completions keyless_external=401_rejected call_id=probe-f22671ba463443e60c35308d3a98655c physical=1 usage_rows=1
+provider_matrix_boundary provider=mistral case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=deepseek-responses case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=ollama default_protocol=openai-completions keyless_external=200_allowed call_id=probe-41e126517d871534917e11c6430fdad3 physical=1 usage_rows=1
+provider_matrix_boundary provider=mimo-token-plan case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=hunyuan case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=dashscope default_protocol=openai-completions keyless_external=401_rejected call_id=probe-a139b882193bd1b7725729d8b9692b5e physical=1 usage_rows=1
+provider_matrix_boundary provider=siliconflow default_protocol=openai-completions keyless_external=401_rejected call_id=probe-bf24af394ec6fc31757f0ceb6a8eb010 physical=1 usage_rows=1
+provider_matrix_boundary provider=groq case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=deepseek-responses case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=opencode-go default_protocol=openai-completions keyless_external=401_rejected call_id=probe-131d41b0968a71ef22b7b40d37a1bc88 physical=1 usage_rows=1
+provider_matrix_boundary provider=ollama case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=mimo-token-plan case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=dashscope case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=gemini default_protocol=google-generative-ai keyless_external=401_rejected call_id=probe-18c380f8fa2ec118305ff941f1e95ba1 physical=1 usage_rows=1
+provider_matrix_boundary provider=siliconflow case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=groq case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=openrouter default_protocol=openai-completions keyless_external=401_rejected call_id=probe-009cf6596932c8956d05541465969e1a physical=1 usage_rows=1
+provider_matrix_boundary provider=dashscope-coding default_protocol=openai-completions keyless_external=401_rejected call_id=probe-7b26c15d9492c7f1fd6164b1caee78f0 physical=1 usage_rows=1
+provider_matrix_boundary provider=opencode-go case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=ollama case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=mimo-token-plan case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=dashscope case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=anthropic default_protocol=anthropic-messages keyless_external=401_rejected call_id=probe-e02648f04ed6d7a3b76d0e2c94c42518 physical=1 usage_rows=1
+provider_matrix_boundary provider=gemini case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=modelscope default_protocol=openai-completions keyless_external=401_rejected call_id=probe-2e2e3ef3d6e9aa417683e8dcb6c8fd79 physical=1 usage_rows=1
+provider_matrix_boundary provider=baichuan default_protocol=openai-completions keyless_external=401_rejected call_id=probe-dd956228614da366ea0f443a28741d25 physical=1 usage_rows=1
+provider_matrix_boundary provider=siliconflow case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=groq case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=baidu-cloud default_protocol=openai-completions keyless_external=401_rejected call_id=probe-dbcb7ceb84a9f776c64576d3b7d51991 physical=1 usage_rows=1
+provider_matrix_boundary provider=openrouter case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=opencode-go case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=dashscope-coding case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=anthropic case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=ollama case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=dashscope case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=gemini case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=perplexity default_protocol=openai-completions keyless_external=401_rejected call_id=probe-e81b8d0036a2ae54c9f5a2421ebe8281 physical=1 usage_rows=1
+provider_matrix_boundary provider=modelscope case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=deepseek default_protocol=openai-completions keyless_external=401_rejected call_id=probe-28f3d4fa33e39b3bad892b06cbdae1b0 physical=1 usage_rows=1
+provider_matrix_boundary provider=baichuan case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=baidu-cloud case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=siliconflow case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=openrouter case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=mimo default_protocol=openai-completions keyless_external=401_rejected call_id=probe-a8887bddde590de237d42b0afa5277e7 physical=1 usage_rows=1
+provider_matrix_boundary provider=opencode-go case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=dashscope-coding case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=fireworks default_protocol=openai-completions keyless_external=401_rejected call_id=probe-88c8931f3f8ad4e88d2819ff2e0dfd83 physical=1 usage_rows=1
+provider_matrix_boundary provider=anthropic case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=minimax-token-plan default_protocol=anthropic-messages keyless_external=401_rejected call_id=probe-345de606b4e9c38effe33a8b994b591b physical=1 usage_rows=1
+provider_matrix_boundary provider=minimax default_protocol=anthropic-messages keyless_external=401_rejected call_id=probe-a0da78e69228bbf5ab6aad0978dc26b8 physical=1 usage_rows=1
+provider_matrix_boundary provider=kimi-coding default_protocol=openai-completions keyless_external=401_rejected call_id=probe-f6980e6f460017b7497c74603f284355 physical=1 usage_rows=1
+provider_matrix_boundary provider=gemini case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=opencode default_protocol=anthropic-messages keyless_external=401_rejected call_id=probe-399c2df3729286b990311ee1ec82b6f0 physical=1 usage_rows=1
+provider_matrix_boundary provider=perplexity case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=modelscope case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=infini default_protocol=openai-completions keyless_external=401_rejected call_id=probe-87b82af86b84b622518dbd315c07551c physical=1 usage_rows=1
+provider_matrix_boundary provider=moonshot case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=deepseek case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=agnes case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=mistral case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=baichuan case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=baidu-cloud case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=hunyuan case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=openai default_protocol=openai-completions keyless_external=401_rejected call_id=probe-1068122eb8e9bfbac660a561a486326d physical=1 usage_rows=1
+provider_matrix_boundary provider=mimo case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=openrouter case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=deepseek-responses case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=dashscope-coding case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=fireworks case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=anthropic case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=minimax-token-plan case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=minimax case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=kimi-coding case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=opencode case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=perplexity case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=modelscope case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=mimo-token-plan case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=infini case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=deepseek case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=groq case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=baichuan case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=baidu-cloud case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=openai case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=mimo case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=ollama case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=dashscope case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=fireworks case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=minimax-token-plan case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=minimax case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=kimi-coding case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=opencode case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=perplexity case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=infini case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=deepseek case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=siliconflow case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=openai case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=mimo case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=opencode-go case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=fireworks case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=minimax-token-plan case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=minimax case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=gemini case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=kimi-coding case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=opencode case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=infini case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=openai case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=openrouter case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=dashscope-coding case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=anthropic case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=modelscope case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=baidu-cloud case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+test builtin_moonshot_rejects_invalid_requests ... okprovider_matrix_boundary provider=baichuan
+ case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+test builtin_mistral_rejects_invalid_requests ... ok
+test builtin_agnes_rejects_invalid_requests ... ok
+test builtin_deepseek_responses_rejects_invalid_requests ... ok
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-0106dac6044b95ab
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-a6dfce8571da829c
+test builtin_hunyuan_rejects_invalid_requests ... okprovider_matrix_boundary provider=deepseek
+ case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-fa6ac3980ea481b1
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-94f7bb27594693d0
+provider_matrix_boundary provider=fireworks case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=minimax-token-plan case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=mimo case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=perplexity case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=kimi-coding case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+test builtin_groq_rejects_invalid_requests ... okprovider_matrix_boundary provider=opencode case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+
+provider_matrix 现场：test builtin_mimo_token_plan_rejects_invalid_requests ... ok
+/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-919673ac9f393689
+provider_matrix_boundary provider=minimax case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=infini case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+test builtin_ollama_rejects_invalid_requests ... ok
+test builtin_dashscope_rejects_invalid_requests ... ok
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-cfecc62d56995191
+provider_matrix_boundary provider=openai case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-c9f5e074e13a0a69
+test builtin_opencode_go_rejects_invalid_requests ... ok
+test builtin_siliconflow_rejects_invalid_requests ... ok
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-efcc7fd1d53900de
+test builtin_gemini_rejects_invalid_requests ... ok
+test builtin_dashscope_coding_rejects_invalid_requests ... ok
+test builtin_openrouter_rejects_invalid_requests ... ok
+test builtin_anthropic_rejects_invalid_requests ... ok
+test builtin_modelscope_rejects_invalid_requests ... ok
+test builtin_baichuan_rejects_invalid_requests ... ok
+test builtin_baidu_cloud_rejects_invalid_requests ... ok
+test builtin_minimax_token_plan_rejects_invalid_requests ... ok
+test builtin_fireworks_rejects_invalid_requests ... ok
+test builtin_deepseek_rejects_invalid_requests ... ok
+test builtin_perplexity_rejects_invalid_requests ... ok
+test builtin_mimo_rejects_invalid_requests ... ok
+test builtin_minimax_rejects_invalid_requests ... ok
+test builtin_kimi_coding_rejects_invalid_requests ... ok
+test builtin_infini_rejects_invalid_requests ... ok
+test builtin_opencode_rejects_invalid_requests ... ok
+test builtin_openai_rejects_invalid_requests ... ok
+provider_matrix_boundary provider=zhipu-coding default_protocol=openai-completions keyless_external=401_rejected call_id=probe-9b713239bb951ed92386b169987ad11c physical=1 usage_rows=1
+provider_matrix_boundary provider=zhipu-coding case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=zhipu-coding case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=zhipu-coding case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=volcengine default_protocol=openai-completions keyless_external=401_rejected call_id=probe-bc70c3cb63f7e701308e46131e44aa9e physical=1 usage_rows=1
+provider_matrix_boundary provider=volcengine-coding default_protocol=openai-completions keyless_external=401_rejected call_id=probe-2e31ec913513eb9d780b7e033819a28e physical=1 usage_rows=1
+provider_matrix_boundary provider=volcengine case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=volcengine-coding case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=xai default_protocol=openai-completions keyless_external=401_rejected call_id=probe-6665e622ddf576b9c3c111f7812c0ba0 physical=1 usage_rows=1
+provider_matrix_boundary provider=volcengine case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=volcengine-coding case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=xai case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=together default_protocol=openai-completions keyless_external=401_rejected call_id=probe-d7e8bac45032851b775186ca329d2a6b physical=1 usage_rows=1
+provider_matrix_boundary provider=xai case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=volcengine case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=volcengine-coding case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=together case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=xai case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=together case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=zhipu default_protocol=openai-completions keyless_external=401_rejected call_id=probe-9b8e72a8f39403ca6f781086bdb75b20 physical=1 usage_rows=1
+provider_matrix_boundary provider=together case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=stepfun default_protocol=openai-completions keyless_external=401_rejected call_id=probe-86e426dadd72ccd9f7d3bc8909df0a39 physical=1 usage_rows=1
+provider_matrix_boundary provider=zhipu case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=stepfun case=empty_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=zhipu case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=stepfun case=unregistered_model http=400 extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=stepfun case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=zhipu case=invalid_protocol_save http=400 source_unchanged=true extra_physical=0 extra_usage=0
+provider_matrix_boundary provider=zhipu-coding case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=volcengine case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=volcengine-coding case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=xai case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=together case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=zhipu case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+provider_matrix_boundary provider=stepfun case=chat_on_saved_embedding_only_model http=400 extra_physical=0 extra_usage=0 default_protocol_preserved=true
+test builtin_zhipu_coding_rejects_invalid_requests ... ok
+test builtin_volcengine_rejects_invalid_requests ... ok
+test builtin_volcengine_coding_rejects_invalid_requests ... ok
+test builtin_together_rejects_invalid_requests ... ok
+test builtin_xai_rejects_invalid_requests ... ok
+test builtin_stepfun_rejects_invalid_requests ... ok
+test builtin_zhipu_rejects_invalid_requests ... ok
+provider_matrix 已核实 provider=agnes protocol=openai-completions model=matrix-model-agnes call_id=probe-36f5193fb3fcd7aac4ac90f13e865f9f usage=100/10
+provider_matrix 已核实 provider=dashscope protocol=openai-completions model=matrix-model-dashscope call_id=probe-23633584ec6b61748ff6a3771d44812d usage=101/11
+provider_matrix 已核实 provider=openai protocol=openai-completions model=matrix-model-openai call_id=probe-9eb4e7d046bb7bf2b0bea9eccc4e33cf usage=102/12
+provider_matrix 已核实 provider=anthropic protocol=anthropic-messages model=matrix-model-anthropic call_id=probe-a7a916777b00970a72992424517303d0 usage=103/13
+provider_matrix 已核实 provider=deepseek protocol=openai-completions model=matrix-model-deepseek call_id=probe-08fa3eda5effa9aaddfede45d3967fd9 usage=104/14
+provider_matrix 已核实 provider=deepseek-responses protocol=openai-responses model=matrix-model-deepseek-responses call_id=probe-c003a5f55091b586e57cdb06278e4c9e usage=105/15
+provider_matrix 已核实 provider=gemini protocol=google-generative-ai model=matrix-model-gemini call_id=probe-922f29d79360853c98e3bd4afbd933e1 usage=106/16
+provider_matrix 已核实 provider=openrouter protocol=openai-completions model=matrix-model-openrouter call_id=probe-26dc6f7c1b13201e19ef030f5ef8d11a usage=107/17
+provider_matrix 已核实 provider=opencode protocol=anthropic-messages model=matrix-model-opencode call_id=probe-2c8fde37f41330475578b0ecdcdc9c75 usage=108/18
+provider_matrix 已核实 provider=opencode-go protocol=openai-completions model=matrix-model-opencode-go call_id=probe-3903f383cd41e36ce96a2f7d04252cff usage=109/19
+provider_matrix 已核实 provider=ollama protocol=openai-completions model=matrix-model-ollama call_id=probe-ce431a21ae714ed0d581a472bc4a43cd usage=110/20
+provider_matrix 已核实 provider=minimax protocol=anthropic-messages model=matrix-model-minimax call_id=probe-d41b8fb233c20bff557a88bc559640f1 usage=111/21
+provider_matrix 已核实 provider=minimax-token-plan protocol=anthropic-messages model=matrix-model-minimax-token-plan call_id=probe-b3828611e623bcc0a373cbb9bac1ebf0 usage=112/22
+provider_matrix 已核实 provider=siliconflow protocol=openai-completions model=matrix-model-siliconflow call_id=probe-77aca4922027bf23c873246b17313f9d usage=113/23
+provider_matrix 已核实 provider=zhipu protocol=openai-completions model=matrix-model-zhipu call_id=probe-8a0f6860cd5cfbf82a4120719d582ba4 usage=114/24
+provider_matrix 已核实 provider=moonshot protocol=openai-completions model=matrix-model-moonshot call_id=probe-7228e358f807f315f4ef33f9c23f4485 usage=115/25
+provider_matrix 已核实 provider=baichuan protocol=openai-completions model=matrix-model-baichuan call_id=probe-1cbe5559618563fa84f74fff57fbdcea usage=116/26
+provider_matrix 已核实 provider=stepfun protocol=openai-completions model=matrix-model-stepfun call_id=probe-fb772c34dbb31ab5c29ef2bfd0e97288 usage=117/27
+provider_matrix 已核实 provider=volcengine protocol=openai-completions model=matrix-model-volcengine call_id=probe-adb3f95bee8d55be90c72e70a80b024a usage=118/28
+provider_matrix 已核实 provider=hunyuan protocol=openai-completions model=matrix-model-hunyuan call_id=probe-ec4d38fce682abb1b3228a97f1c2d928 usage=119/29
+provider_matrix 已核实 provider=baidu-cloud protocol=openai-completions model=matrix-model-baidu-cloud call_id=probe-079cdddd0c64500ff0bab8d72eebc0d9 usage=120/30
+provider_matrix 已核实 provider=modelscope protocol=openai-completions model=matrix-model-modelscope call_id=probe-957516fed16844b037d7c85b67e2117b usage=121/31
+provider_matrix 已核实 provider=infini protocol=openai-completions model=matrix-model-infini call_id=probe-631679bd7fb697c17aacf155469934d0 usage=122/32
+provider_matrix 已核实 provider=mimo protocol=openai-completions model=matrix-model-mimo call_id=probe-d17aa6441a3aad4fe09cd93e7f83d929 usage=123/33
+provider_matrix 已核实 provider=mimo-token-plan protocol=openai-completions model=matrix-model-mimo-token-plan call_id=probe-7e40e33130981905105434472458667a usage=124/34
+provider_matrix 已核实 provider=groq protocol=openai-completions model=matrix-model-groq call_id=probe-5b4546db59b90b6ffa046001b2824be6 usage=125/35
+provider_matrix 已核实 provider=together protocol=openai-completions model=matrix-model-together call_id=probe-5fc0c19cc8bcea47e08df634d0d4bed3 usage=126/36
+provider_matrix 已核实 provider=fireworks protocol=openai-completions model=matrix-model-fireworks call_id=probe-c943cf1662a382a01ff71550e2eeaf69 usage=127/37
+provider_matrix 已核实 provider=mistral protocol=openai-completions model=matrix-model-mistral call_id=probe-411509458a3c16fa3b07c76231c232cb usage=128/38
+provider_matrix 已核实 provider=perplexity protocol=openai-completions model=matrix-model-perplexity call_id=probe-312d4bff9702488e74474917f9fcd302 usage=129/39
+provider_matrix 已核实 provider=xai protocol=openai-completions model=matrix-model-xai call_id=probe-e25e771193dd1b8861384a73408bb671 usage=130/40
+provider_matrix 已核实 provider=dashscope-coding protocol=openai-completions model=matrix-model-dashscope-coding call_id=probe-a1513725c379fe43fd11864bb98a058d usage=131/41
+provider_matrix 已核实 provider=kimi-coding protocol=openai-completions model=matrix-model-kimi-coding call_id=probe-f7210a34023be83a4ef69d41f20d53ef usage=132/42
+provider_matrix 已核实 provider=volcengine-coding protocol=openai-completions model=matrix-model-volcengine-coding call_id=probe-784b83bd49ed49088c5b01adc50846da usage=133/43
+provider_matrix 已核实 provider=zhipu-coding protocol=openai-completions model=matrix-model-zhipu-coding call_id=probe-4e4cc7057084bfdc01049c602bbdf8ba usage=134/44
+test every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage ... ok
+
+test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.26s
+
+     Running tests/r07_t08_search_clear.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_search_clear-053e1a8b72085a0e)
+
+running 5 tests
+搜索凭据清除现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-search-clear-f4b5d0f53f00fded
+搜索凭据清除现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-search-clear-cf74be36500bd8f8
+搜索凭据清除现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-search-clear-df885be9bec70499
+搜索凭据清除现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-search-clear-d77fdae98cd3edc9
+搜索凭据清除现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-search-clear-7eba205f0b53ce63
+test mixed_models_search_validation_failure_reads_both_sections_and_unchanged_runtime ... ok
+搜索凭据清除现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-search-clear-28197b134ab32e00
+test mixed_models_search_projection_failure_keeps_applied_model_and_unapplied_search_after_restart ... ok
+搜索凭据清除现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-search-clear-47ec1ae3213cf42a
+搜索凭据清除现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-search-clear-a63101535f7d82e0
+test legacy_search_api_key_empty_and_null_clear_only_the_selected_provider_and_survive_restart ... ok
+test per_provider_search_clear_empty_and_null_remove_the_selected_key_without_legacy_resurrection ... ok
+test per_provider_search_clear_of_inactive_key_preserves_active_key_and_never_borrows_it_after_switch ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.44s
+

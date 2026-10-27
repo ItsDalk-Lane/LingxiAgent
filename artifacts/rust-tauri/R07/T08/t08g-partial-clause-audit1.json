@@ -1,0 +1,2676 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "R07_T08_G_82_PARTIAL_EXACT_SCOPE_AUDIT_01",
+  "createdAt": "2026-10-18T12:54:20.115991+00:00",
+  "status": "READ_ONLY_NOT_ACCEPTANCE",
+  "scope": "g封存源/实际结果逐组厘清；不改旧109/343/165refs、中央、源或测试，不Cargo。",
+  "inputs": {
+    "gActualTable": "artifacts/rust-tauri/R07/T08/t08g-per-leaf-results-actual1.json",
+    "gActualTableSha256": "44d3fde232cb1b2de3c05b6ede0d495b80a53d0e20261df6685d792dee8469b3",
+    "gArchiveSha256": "5de9acb993c52b0f7b36f735eae9978c3439c42f3f2129388de1ccd28eb4c0f3",
+    "gUiJsonSha256": "3f05acc8e12a98d815b7bd7f4d4828c718155f709175a49dd2e040acbd8b25f2"
+  },
+  "counts": {
+    "partialAssertionsReviewed": 82,
+    "classificationCounts": {
+      "SHARED_GUARD_NOT_IDENTITY_NEGATIVES": 34,
+      "IDENTITY_FAILURE_SHARED_REPRESENTATIVE": 1,
+      "CONFOUNDED_NEGATIVE_INPUT": 2,
+      "REAL_LOCAL_CHECK_WITH_PLATFORM_BOUNDARY": 4,
+      "PLATFORM_BOUNDARY": 1,
+      "SPECIFIC_NEGATIVE_NOT_DIRECTLY_INPUT": 1,
+      "SPECIFIC_CONSUMER_BRANCH_NOT_DIRECTLY_INPUT": 18,
+      "EXISTING_CHECKPOINTS_OR_CAUTION": 21
+    },
+    "upgradedPass": 0,
+    "newChecklistItems": 0
+  },
+  "criticalConclusion": "除root已补且实际41/41通过的provider35负例和mixed models/search两组，本审阅未确认新的关键产品断链足以直接判h不得冻结。82不是82功能缺陷。",
+  "providerMatrixExactFacts": {
+    "definitionArrayNotSorted": true,
+    "brands0": "agnes",
+    "brands1": "dashscope",
+    "positiveLoopLines": [
+      423,
+      490
+    ],
+    "negativeBlockLines": [
+      555,
+      638
+    ],
+    "gNegatives": [
+      "unknown品牌/model",
+      "dashscope未知model",
+      "agnes已删除允许model",
+      "OAuth未登录+模型未登记混合条件",
+      "两speech generic probe不可用"
+    ],
+    "notInGMatrix": [
+      "34需key身份缺自己key（Ollama免key）",
+      "35身份空选择",
+      "逐identity不支持能力"
+    ],
+    "noInventedZeroExternalRequirement": "原文要求明确失败，缺key若真实远端401并记Failed用量也合法，不强加必须本地零请求。"
+  },
+  "assertions": [
+    {
+      "originalID": "R00-T02-LA-C4EFBA7711E1",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "agnes",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:agnes",
+      "alreadyCoveredConcretePoints": [
+        "agnes35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-D86616980926",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "anthropic",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:anthropic",
+      "alreadyCoveredConcretePoints": [
+        "anthropic35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-BA4BDB7F7338",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "baichuan",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:baichuan",
+      "alreadyCoveredConcretePoints": [
+        "baichuan35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-71738E50BACA",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "baidu-cloud",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:baidu-cloud",
+      "alreadyCoveredConcretePoints": [
+        "baidu-cloud35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-39733312E5F4",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "dashscope",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:dashscope",
+      "alreadyCoveredConcretePoints": [
+        "dashscope35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-89707E479335",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "dashscope-coding",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:dashscope-coding",
+      "alreadyCoveredConcretePoints": [
+        "dashscope-coding35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-ED13EB6D0FA6",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "deepseek",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:deepseek",
+      "alreadyCoveredConcretePoints": [
+        "deepseek35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-419F19D7AA64",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。 V4-Pro虽预登记，当前供应商可能拒绝Responses请求，不可按列表出现宣称可用。",
+      "providerId": "deepseek-responses",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:deepseek-responses",
+      "alreadyCoveredConcretePoints": [
+        "deepseek-responses35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。 V4-Pro虽预登记，当前供应商可能拒绝Responses请求，不可按列表出现宣称可用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-184E03F012D5",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "fireworks",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:fireworks",
+      "alreadyCoveredConcretePoints": [
+        "fireworks35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-BFD9531DEA41",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "gemini",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:gemini",
+      "alreadyCoveredConcretePoints": [
+        "gemini35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-FBCFA99A89A2",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "groq",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:groq",
+      "alreadyCoveredConcretePoints": [
+        "groq35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-2097E172B42B",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "hunyuan",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:hunyuan",
+      "alreadyCoveredConcretePoints": [
+        "hunyuan35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-477D944DF19B",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "infini",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:infini",
+      "alreadyCoveredConcretePoints": [
+        "infini35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-B70FCDCAC1ED",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "kimi-coding",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:kimi-coding",
+      "alreadyCoveredConcretePoints": [
+        "kimi-coding35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-0DFFAB20A40B",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "mimo",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:mimo",
+      "alreadyCoveredConcretePoints": [
+        "mimo35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-D61616CAF15F",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "mimo-token-plan",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:mimo-token-plan",
+      "alreadyCoveredConcretePoints": [
+        "mimo-token-plan35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-FE9588171A23",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "minimax",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:minimax",
+      "alreadyCoveredConcretePoints": [
+        "minimax35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-9194C0F0D909",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "minimax-token-plan",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:minimax-token-plan",
+      "alreadyCoveredConcretePoints": [
+        "minimax-token-plan35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-77812804951F",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "mistral",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:mistral",
+      "alreadyCoveredConcretePoints": [
+        "mistral35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-DE0309EF3F56",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "modelscope",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:modelscope",
+      "alreadyCoveredConcretePoints": [
+        "modelscope35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-565BE3400DAC",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "moonshot",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:moonshot",
+      "alreadyCoveredConcretePoints": [
+        "moonshot35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-43DDCE21A45C",
+      "originalAssertionIndex": 4,
+      "originalText": "本地Ollama未启动、模型未拉取或端点不通时明确失败；不要求API Key。",
+      "providerId": "ollama",
+      "classification": "IDENTITY_FAILURE_SHARED_REPRESENTATIVE",
+      "coveredGroup": "provider:ollama",
+      "alreadyCoveredConcretePoints": [
+        "g此identity无key实际正例；通用错误/其它identity未知模型是代表。"
+      ],
+      "specificStillUnprovenConditions": [
+        "原句Ollama未启动/未拉取/端点不通没有此identity直接失败输入；不能换成要求无key拒绝。"
+      ],
+      "exactOriginalTextForThoseConditions": "本地Ollama未启动、模型未拉取或端点不通时明确失败；不要求API Key。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-03E1121574A1",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "openai",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:openai",
+      "alreadyCoveredConcretePoints": [
+        "openai35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-ABAC28922F7A",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。 auth.json键为openai-codex，缺登录时不可借其他OpenAI API Key。",
+      "providerId": "openai-codex-oauth",
+      "classification": "CONFOUNDED_NEGATIVE_INPUT",
+      "coveredGroup": "provider:openai-codex-oauth",
+      "alreadyCoveredConcretePoints": [
+        "g未登录标记+未登记not-logged-in-model拒绝；真实Codex alias/PKCE和UI的PKCE/xai device、summary/私密落盘/logout已有。",
+        "通用c07缺登录fixture只代表机制，不是该identity有效模型缺登录。"
+      ],
+      "specificStillUnprovenConditions": [
+        "该identity有效已登记模型只缺自己OAuth的隔离负例未输入；g未登录与未登记模型同时存在。",
+        "该identity空模型选择未直接输入。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。 auth.json键为openai-codex，缺登录时不可借其他OpenAI API Key。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_oauth_alias.rs::oauth_display_alias_reaches_pkce_device_registry_logout_revoke_and_actual_model_without_renaming_source",
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-80DB4026AF13",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "opencode",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:opencode",
+      "alreadyCoveredConcretePoints": [
+        "opencode35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-668EEC15C958",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "opencode-go",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:opencode-go",
+      "alreadyCoveredConcretePoints": [
+        "opencode-go35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-9871F51BE25B",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "openrouter",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:openrouter",
+      "alreadyCoveredConcretePoints": [
+        "openrouter35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-00A769DD0FA3",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "perplexity",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:perplexity",
+      "alreadyCoveredConcretePoints": [
+        "perplexity35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-2EDB69DA3AE2",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "siliconflow",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:siliconflow",
+      "alreadyCoveredConcretePoints": [
+        "siliconflow35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-7D969CDBF21C",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "stepfun",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:stepfun",
+      "alreadyCoveredConcretePoints": [
+        "stepfun35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-22A8DCD792BE",
+      "originalAssertionIndex": 1,
+      "originalText": "注册id精确为system-speech，目录与真实调用使用同一id",
+      "providerId": "system-speech",
+      "classification": "REAL_LOCAL_CHECK_WITH_PLATFORM_BOUNDARY",
+      "coveredGroup": "provider:system-speech",
+      "alreadyCoveredConcretePoints": [
+        "system-speech真实HTTP/auth none/say产品/ledger已核"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "现有本地核心已验，外部平台或其它OS未验不等于当前实现缺口。",
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/src/provider_probe.rs::all_39_definitions_keep_declared_identity_protocol_and_keyless_boundaries",
+        "rust/crates/lingxi-service/tests/r07_t08_speech_bindings.rs::http_publish_system_speech_reaches_same_operation_real_say_product_zero_transport_and_recognition_refusal"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-22A8DCD792BE",
+      "originalAssertionIndex": 2,
+      "originalText": "系统适配器无API Key，凭证不泄漏到列表或其他provider",
+      "providerId": "system-speech",
+      "classification": "REAL_LOCAL_CHECK_WITH_PLATFORM_BOUNDARY",
+      "coveredGroup": "provider:system-speech",
+      "alreadyCoveredConcretePoints": [
+        "system-speech真实HTTP/auth none/say产品/ledger已核"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "现有本地核心已验，外部平台或其它OS未验不等于当前实现缺口。",
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/src/provider_probe.rs::all_39_definitions_keep_declared_identity_protocol_and_keyless_boundaries",
+        "rust/crates/lingxi-service/tests/r07_t08_speech_bindings.rs::http_publish_system_speech_reaches_same_operation_real_say_product_zero_transport_and_recognition_refusal"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-22A8DCD792BE",
+      "originalAssertionIndex": 4,
+      "originalText": "系统适配器未注册或平台不支持时应标不可用，不得出现在聊天模型目录。",
+      "providerId": "system-speech",
+      "classification": "PLATFORM_BOUNDARY",
+      "coveredGroup": "provider:system-speech",
+      "alreadyCoveredConcretePoints": [
+        "真实say可解码M4A/进程退出/0transport ledger，非聊天目录；系统识别not implemented真实拒绝且无新增usage。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "其它OS/无系统adapter未运行是平台边界；系统识别不宣称正例。",
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/src/provider_probe.rs::all_39_definitions_keep_declared_identity_protocol_and_keyless_boundaries",
+        "rust/crates/lingxi-service/tests/r07_t08_speech_bindings.rs::http_publish_system_speech_reaches_same_operation_real_say_product_zero_transport_and_recognition_refusal"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-AC352BFA3D82",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "together",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:together",
+      "alreadyCoveredConcretePoints": [
+        "together35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-CCD6BA30F9ED",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "volcengine-coding",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:volcengine-coding",
+      "alreadyCoveredConcretePoints": [
+        "volcengine-coding35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-E06C7DDB93D2",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "volcengine",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:volcengine",
+      "alreadyCoveredConcretePoints": [
+        "volcengine35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-A9ACB7418FC4",
+      "originalAssertionIndex": 1,
+      "originalText": "注册id精确为volcengine-speech，目录与真实调用使用同一id",
+      "providerId": "volcengine-speech",
+      "classification": "REAL_LOCAL_CHECK_WITH_PLATFORM_BOUNDARY",
+      "coveredGroup": "provider:volcengine-speech",
+      "alreadyCoveredConcretePoints": [
+        "volcengine-speech真实HTTP/BigASR独立key/WAV/转写/ledger已核"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "现有本地核心已验，外部平台或其它OS未验不等于当前实现缺口。",
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/src/provider_probe.rs::all_39_definitions_keep_declared_identity_protocol_and_keyless_boundaries",
+        "rust/crates/lingxi-service/tests/r07_t08_speech_bindings.rs::http_publish_volcengine_speech_reaches_same_operation_actual_bigasr_credentials_and_usage"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-A9ACB7418FC4",
+      "originalAssertionIndex": 2,
+      "originalText": "API Key/请求头凭证按provider隔离，凭证不泄漏到列表或其他provider",
+      "providerId": "volcengine-speech",
+      "classification": "REAL_LOCAL_CHECK_WITH_PLATFORM_BOUNDARY",
+      "coveredGroup": "provider:volcengine-speech",
+      "alreadyCoveredConcretePoints": [
+        "volcengine-speech真实HTTP/BigASR独立key/WAV/转写/ledger已核"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "现有本地核心已验，外部平台或其它OS未验不等于当前实现缺口。",
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/src/provider_probe.rs::all_39_definitions_keep_declared_identity_protocol_and_keyless_boundaries",
+        "rust/crates/lingxi-service/tests/r07_t08_speech_bindings.rs::http_publish_volcengine_speech_reaches_same_operation_actual_bigasr_credentials_and_usage"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-A9ACB7418FC4",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。 BigASR为独立语音凭证与协议，不可拿Ark聊天凭证替代。",
+      "providerId": "volcengine-speech",
+      "classification": "SPECIFIC_NEGATIVE_NOT_DIRECTLY_INPUT",
+      "coveredGroup": "provider:volcengine-speech",
+      "alreadyCoveredConcretePoints": [
+        "真实HTTP→原Operation BigASR独立key/header/WAV、转写/ledger；generic probe unavailable。"
+      ],
+      "specificStillUnprovenConditions": [
+        "专用speech key缺失且不能借Ark key、空模型/不支持能力没有在此成功typed场景输入。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。 BigASR为独立语音凭证与协议，不可拿Ark聊天凭证替代。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/src/provider_probe.rs::all_39_definitions_keep_declared_identity_protocol_and_keyless_boundaries",
+        "rust/crates/lingxi-service/tests/r07_t08_speech_bindings.rs::http_publish_volcengine_speech_reaches_same_operation_actual_bigasr_credentials_and_usage"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-D79C2E204AFB",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "xai",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:xai",
+      "alreadyCoveredConcretePoints": [
+        "xai35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-3D8337A8088F",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。 OAuth资源URL仅允许指定HTTPS来源，不能改成任意主机。",
+      "providerId": "xai-oauth",
+      "classification": "CONFOUNDED_NEGATIVE_INPUT",
+      "coveredGroup": "provider:xai-oauth",
+      "alreadyCoveredConcretePoints": [
+        "g未登录标记+未登记not-logged-in-model拒绝；真实Codex alias/PKCE和UI的PKCE/xai device、summary/私密落盘/logout已有。",
+        "通用c07缺登录fixture只代表机制，不是该identity有效模型缺登录。"
+      ],
+      "specificStillUnprovenConditions": [
+        "该identity有效已登记模型只缺自己OAuth的隔离负例未输入；g未登录与未登记模型同时存在。",
+        "该identity空模型选择未直接输入。",
+        "xai资源URL非允许主机/非HTTPS专用g断言未定位；通用redirect不是精确allowlist。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。 OAuth资源URL仅允许指定HTTPS来源，不能改成任意主机。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_oauth_alias.rs::oauth_display_alias_reaches_pkce_device_registry_logout_revoke_and_actual_model_without_renaming_source",
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-FF3AD97F8429",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "zhipu",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:zhipu",
+      "alreadyCoveredConcretePoints": [
+        "zhipu35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-834034527694",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "providerId": "zhipu-coding",
+      "classification": "SHARED_GUARD_NOT_IDENTITY_NEGATIVES",
+      "coveredGroup": "provider:zhipu-coding",
+      "alreadyCoveredConcretePoints": [
+        "zhipu-coding35循环真实health正例/protocol/key/model/usage；g负例只unknown品牌、dashscope未知model、agnes已删model。",
+        "通用fixture有unsupported family/tools、撤权credential与operation拒绝，但不是此品牌负例。"
+      ],
+      "specificStillUnprovenConditions": [
+        "有效模型缺本identity凭据的实际失败未逐身份输入。",
+        "空模型选择与不支持能力未在35循环逐identity输入，unknown字符串不等于空选择。"
+      ],
+      "exactOriginalTextForThoseConditions": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。",
+      "boundaryNotImplementationGap": [
+        "真实账户/外网/付费与其它OS未验另列，不作为本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+        "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-4629FFC0E72A",
+      "originalAssertionIndex": 2,
+      "originalText": "混合 patch 失败时分别读回 models/search 和运行时状态，避免把 400/500 当作整体回滚",
+      "providerId": null,
+      "classification": "SPECIFIC_CONSUMER_BRANCH_NOT_DIRECTLY_INPUT",
+      "coveredGroup": "4629FFC0E72A",
+      "alreadyCoveredConcretePoints": [
+        "原三search-clear具体empty/null/active/inactive key及重启不复活真实通过。",
+        "partial_global_save仅locale+invalid provider，确有preferencesSaved和event，但不是models/search混合。"
+      ],
+      "specificStillUnprovenConditions": [
+        "g缺同一models+search失败patch后分别读models/search/runtime；原partial_global_save只是locale+invalid provider；三search-clear是成功清除。"
+      ],
+      "exactOriginalTextForThoseConditions": "混合 patch 失败时分别读回 models/search 和运行时状态，避免把 400/500 当作整体回滚",
+      "boundaryNotImplementationGap": [
+        "不是接口未实现，也不要求新配置导入功能。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_settings.rs::invalid_import_and_unknown_global_fields_never_write_any_preferences",
+        "rust/crates/lingxi-service/tests/r07_t08_settings.rs::partial_global_save_still_emits_only_the_changes_that_really_happened"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-0DDB5AA05072",
+      "originalAssertionIndex": 1,
+      "originalText": "打开面板自动加载技能及组合：成功核对 当前助手技能与组合卡；空态/未初始化核对 loading 与 noUser 分开；错误/无权限核对 技能读取失败显示错误 toast 并保留旧列表；首次加载的初始空数组仍可显示 noUser 空态，不能说失败不会伪装空态。",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "0DDB5AA05072",
+      "alreadyCoveredConcretePoints": [
+        "Panel完整包真实安装后当前Agent enabled/runtime GET、无Agent零写/error。",
+        "Panel真实删除确认取消/成功runtime读回、bundle双向启停。",
+        "Panel组合创建/成员移动/改名/两个组合排序正式读回、导出真实文件/零额外GET。",
+        "新两surface首次skills/bundles GET403 error非空成功、同owner保旧、换身份隐藏。",
+        "新两个PUT200/404+真实磁盘部分提交/error已直接覆盖Promise.all失败。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "不再要求新增GET失败和partial测试，原文未要求部分写必须403。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection",
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::current_skills_pages_real_read_failures_and_partial_bundle_writes",
+        "desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx::panel_same_owner_get_failures_keep_old_lists_and_two_bundle_writes_preserve_real_partial_result",
+        "desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx::panel_first_skills_get_real_scope_denial_is_visible_not_empty_success",
+        "desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx::panel_first_bundles_get_real_scope_denial_is_visible_not_empty_success"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-0DDB5AA05072",
+      "originalAssertionIndex": 2,
+      "originalText": "安装文件技能并对助手启用：成功核对 安装后重载并显示启用；相关成功路径重读当前助手的技能及组合列表以投影最新状态。；空态/未初始化核对 取消文件选择无变更；错误/无权限核对 安装失败 toast；写入失败不应把原有读取叶的成功结果当作本次写入完成。",
+      "providerId": null,
+      "classification": "SPECIFIC_CONSUMER_BRANCH_NOT_DIRECTLY_INPUT",
+      "coveredGroup": "0DDB5AA05072",
+      "alreadyCoveredConcretePoints": [
+        "Panel完整包真实安装后当前Agent enabled/runtime GET、无Agent零写/error。",
+        "Panel真实删除确认取消/成功runtime读回、bundle双向启停。",
+        "Panel组合创建/成员移动/改名/两个组合排序正式读回、导出真实文件/零额外GET。",
+        "新两surface首次skills/bundles GET403 error非空成功、同owner保旧、换身份隐藏。",
+        "新两个PUT200/404+真实磁盘部分提交/error已直接覆盖Promise.all失败。"
+      ],
+      "specificStillUnprovenConditions": [
+        "Panel真实安装服务拒绝→error未输入；无agent零写不是服务安装失败。"
+      ],
+      "exactOriginalTextForThoseConditions": "安装文件技能并对助手启用：成功核对 安装后重载并显示启用；相关成功路径重读当前助手的技能及组合列表以投影最新状态。；空态/未初始化核对 取消文件选择无变更；错误/无权限核对 安装失败 toast；写入失败不应把原有读取叶的成功结果当作本次写入完成。",
+      "boundaryNotImplementationGap": [
+        "不再要求新增GET失败和partial测试，原文未要求部分写必须403。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-0DDB5AA05072",
+      "originalAssertionIndex": 3,
+      "originalText": "删除技能/按助手启停技能与组合：成功核对 树状态与列表更新；相关成功路径重读当前助手的技能及组合列表以投影最新状态。；空态/未初始化核对 无助手不允许写；错误/无权限核对 失败 toast/回滚；写入失败不应把原有读取叶的成功结果当作本次写入完成。",
+      "providerId": null,
+      "classification": "SPECIFIC_CONSUMER_BRANCH_NOT_DIRECTLY_INPUT",
+      "coveredGroup": "0DDB5AA05072",
+      "alreadyCoveredConcretePoints": [
+        "Panel完整包真实安装后当前Agent enabled/runtime GET、无Agent零写/error。",
+        "Panel真实删除确认取消/成功runtime读回、bundle双向启停。",
+        "Panel组合创建/成员移动/改名/两个组合排序正式读回、导出真实文件/零额外GET。",
+        "新两surface首次skills/bundles GET403 error非空成功、同owner保旧、换身份隐藏。",
+        "新两个PUT200/404+真实磁盘部分提交/error已直接覆盖Promise.all失败。"
+      ],
+      "specificStillUnprovenConditions": [
+        "Panel toggle自身实际失败→乐观回滚未输入；Tab toggle403和Panel move404不是相同消费动作。"
+      ],
+      "exactOriginalTextForThoseConditions": "删除技能/按助手启停技能与组合：成功核对 树状态与列表更新；相关成功路径重读当前助手的技能及组合列表以投影最新状态。；空态/未初始化核对 无助手不允许写；错误/无权限核对 失败 toast/回滚；写入失败不应把原有读取叶的成功结果当作本次写入完成。",
+      "boundaryNotImplementationGap": [
+        "不再要求新增GET失败和partial测试，原文未要求部分写必须403。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-0DDB5AA05072",
+      "originalAssertionIndex": 4,
+      "originalText": "创建、改名、删除、导出、排序组合及移动技能：成功核对 组合树及导出文件更新；相关成功路径重读当前助手的技能及组合列表以投影最新状态。；导出返回 filePath 时打开文件管理器。；空态/未初始化核对 取消对话框无变更；导出无 filePath 不调用文件管理器，导出本身不重读双 GET。；错误/无权限核对 组合内多项移动用 Promise.all，可能部分成功；异常 toast 后不保证重载，不能承诺整体回滚或组合树完全一致。；写入失败不应把原有读取叶的成功结果当作本次写入完成。",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "0DDB5AA05072",
+      "alreadyCoveredConcretePoints": [
+        "Panel完整包真实安装后当前Agent enabled/runtime GET、无Agent零写/error。",
+        "Panel真实删除确认取消/成功runtime读回、bundle双向启停。",
+        "Panel组合创建/成员移动/改名/两个组合排序正式读回、导出真实文件/零额外GET。",
+        "新两surface首次skills/bundles GET403 error非空成功、同owner保旧、换身份隐藏。",
+        "新两个PUT200/404+真实磁盘部分提交/error已直接覆盖Promise.all失败。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "不再要求新增GET失败和partial测试，原文未要求部分写必须403。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection",
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::current_skills_pages_real_read_failures_and_partial_bundle_writes",
+        "desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx::panel_same_owner_get_failures_keep_old_lists_and_two_bundle_writes_preserve_real_partial_result"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-F92121640419",
+      "originalAssertionIndex": 2,
+      "originalText": "自动读取辅助模型与可用供应商：成功核对 各槽位显示当前引用和可选模型；模型页挂载后按现役子路径重取媒体供应商设置；窗口 focus 仅重取 image/video/speech。；空态/未初始化核对 全局模型配置尚未加载时，辅助槽 ModelWidget 仍可操作并调用 autoSaveGlobalModels；不能断言等待加载才允许保存，写入结果需按返回与后续刷新判断。；错误/无权限核对 加载错误保留旧状态或由设置外壳提示；四类读取分别处理失败，不能把某一类失败伪装为全部成功。",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "F92121640419",
+      "alreadyCoveredConcretePoints": [
+        "7槽widget数量、follow(null)、同名model区分provider/vision filter；真实Knowledge/Summarize后端操作另证。",
+        "aux busy→success→3秒复位；failed-result/request-error失败图标；换模型丢旧结果与卸载abort均g具名。",
+        "useMedia三路独立读，单路失败不拖全局、失败保last-known-good、序列化写防迟到；ModelsTab focus刷新目录合同已有。",
+        "image null/选择/adapter缺失禁用，video独立PUT，ASR enabled/default包均有组件。",
+        "TTS select/clear两拒绝保旧error、ASR零写独立/adapter缺失和后端真roundtrip已有。",
+        "四模态真实Source CRUD/生成/重启/queued revoke与BigASR真Operation另外已跑。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "UI mock合同与真实handler是分层证据，没拼成全部一次UI链不自动说明功能未实现。",
+        "不要求每种空态/失败全排列；无adapter或无模型的禁用不是账号阻塞。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::renders auxiliary models section and global media defaults"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-F92121640419",
+      "originalAssertionIndex": 3,
+      "originalText": "七个辅助槽分别选模型/跟随主模型：成功核对 title/summarize/memory/knowledge/vision/approval/guard 各自保存 provider+id；经 autoSaveGlobalModels 保存后重读模型偏好。；空态/未初始化核对 空引用依槽位回退主模型或关闭；错误/无权限核对 保存失败需显示；不能由 Anthropic 单项代替；后续重读失败需与 PUT 是否持久化分开裁决。",
+      "providerId": null,
+      "classification": "SPECIFIC_CONSUMER_BRANCH_NOT_DIRECTLY_INPUT",
+      "coveredGroup": "F92121640419",
+      "alreadyCoveredConcretePoints": [
+        "7槽widget数量、follow(null)、同名model区分provider/vision filter；真实Knowledge/Summarize后端操作另证。",
+        "aux busy→success→3秒复位；failed-result/request-error失败图标；换模型丢旧结果与卸载abort均g具名。",
+        "useMedia三路独立读，单路失败不拖全局、失败保last-known-good、序列化写防迟到；ModelsTab focus刷新目录合同已有。",
+        "image null/选择/adapter缺失禁用，video独立PUT，ASR enabled/default包均有组件。",
+        "TTS select/clear两拒绝保旧error、ASR零写独立/adapter缺失和后端真roundtrip已有。",
+        "四模态真实Source CRUD/生成/重启/queued revoke与BigASR真Operation另外已跑。"
+      ],
+      "specificStillUnprovenConditions": [
+        "七槽直接组件case只断言7个widget；未逐槽UI保存→同Rust读回provider/id，Knowledge真实操作不是7槽UI逐一输入。"
+      ],
+      "exactOriginalTextForThoseConditions": "七个辅助槽分别选模型/跟随主模型：成功核对 title/summarize/memory/knowledge/vision/approval/guard 各自保存 provider+id；经 autoSaveGlobalModels 保存后重读模型偏好。；空态/未初始化核对 空引用依槽位回退主模型或关闭；错误/无权限核对 保存失败需显示；不能由 Anthropic 单项代替；后续重读失败需与 PUT 是否持久化分开裁决。",
+      "boundaryNotImplementationGap": [
+        "UI mock合同与真实handler是分层证据，没拼成全部一次UI链不自动说明功能未实现。",
+        "不要求每种空态/失败全排列；无adapter或无模型的禁用不是账号阻塞。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/settings/tabs/providers/__tests__/AuxiliaryModelsSection.test.tsx::renders one model widget per auxiliary slot (7 slots; knowledgeDistill removed with the distill path) and no operation pickers",
+        "desktop/src/react/__tests__/settings/ModelWidget.test.tsx::renders the follow option and calls onSelect(null) when clicked",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::first_save_activates_shared_catalog_credentials_and_independent_knowledge_without_restart",
+        "rust/crates/lingxi-service/tests/r07_t08_network_preferences.rs::saved_network_proxy_reaches_actual_next_model_dispatch_without_restart_or_loopback_bypass"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-F92121640419",
+      "originalAssertionIndex": 4,
+      "originalText": "视觉辅助开关：成功核对 vision_enabled 保存；经 autoSaveGlobalModels 保存后重读模型偏好。；空态/未初始化核对 未配置模型时展示缺省提示；错误/无权限核对 保存失败提示；后续重读失败需与 PUT 是否持久化分开裁决。",
+      "providerId": null,
+      "classification": "SPECIFIC_CONSUMER_BRANCH_NOT_DIRECTLY_INPUT",
+      "coveredGroup": "F92121640419",
+      "alreadyCoveredConcretePoints": [
+        "7槽widget数量、follow(null)、同名model区分provider/vision filter；真实Knowledge/Summarize后端操作另证。",
+        "aux busy→success→3秒复位；failed-result/request-error失败图标；换模型丢旧结果与卸载abort均g具名。",
+        "useMedia三路独立读，单路失败不拖全局、失败保last-known-good、序列化写防迟到；ModelsTab focus刷新目录合同已有。",
+        "image null/选择/adapter缺失禁用，video独立PUT，ASR enabled/default包均有组件。",
+        "TTS select/clear两拒绝保旧error、ASR零写独立/adapter缺失和后端真roundtrip已有。",
+        "四模态真实Source CRUD/生成/重启/queued revoke与BigASR真Operation另外已跑。"
+      ],
+      "specificStillUnprovenConditions": [
+        "vision具体保存拒绝/重读失败显示未输入；helper spy与真HTTP分别证明。"
+      ],
+      "exactOriginalTextForThoseConditions": "视觉辅助开关：成功核对 vision_enabled 保存；经 autoSaveGlobalModels 保存后重读模型偏好。；空态/未初始化核对 未配置模型时展示缺省提示；错误/无权限核对 保存失败提示；后续重读失败需与 PUT 是否持久化分开裁决。",
+      "boundaryNotImplementationGap": [
+        "UI mock合同与真实handler是分层证据，没拼成全部一次UI链不自动说明功能未实现。",
+        "不要求每种空态/失败全排列；无adapter或无模型的禁用不是账号阻塞。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/settings/tabs/providers/__tests__/AuxiliaryModelsSection.test.tsx::renders the auxiliary vision toggle above the vision model picker and saves it as a global model preference"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-F92121640419",
+      "originalAssertionIndex": 5,
+      "originalText": "辅助槽模型健康测试：成功核对 测试中/成功/失败三态图标；空态/未初始化核对 未选模型不显示按钮；错误/无权限核对 网络异常为 fail 图标，三秒复位",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "F92121640419",
+      "alreadyCoveredConcretePoints": [
+        "7槽widget数量、follow(null)、同名model区分provider/vision filter；真实Knowledge/Summarize后端操作另证。",
+        "aux busy→success→3秒复位；failed-result/request-error失败图标；换模型丢旧结果与卸载abort均g具名。",
+        "useMedia三路独立读，单路失败不拖全局、失败保last-known-good、序列化写防迟到；ModelsTab focus刷新目录合同已有。",
+        "image null/选择/adapter缺失禁用，video独立PUT，ASR enabled/default包均有组件。",
+        "TTS select/clear两拒绝保旧error、ASR零写独立/adapter缺失和后端真roundtrip已有。",
+        "四模态真实Source CRUD/生成/重启/queued revoke与BigASR真Operation另外已跑。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "UI mock合同与真实handler是分层证据，没拼成全部一次UI链不自动说明功能未实现。",
+        "不要求每种空态/失败全排列；无adapter或无模型的禁用不是账号阻塞。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/settings/tabs/providers/__tests__/AuxiliaryModelsSection.test.tsx::shows a named busy state until the model test succeeds, then restores the action",
+        "desktop/src/react/settings/tabs/providers/__tests__/AuxiliaryModelsSection.test.tsx::ignores the previous model result after a model change and aborts requests on unmount"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-F92121640419",
+      "originalAssertionIndex": 6,
+      "originalText": "图片默认模型选择：成功核对 图片默认值PUT 返回的配置值或本地 patch 用于更新当前显示；不追加独立 GET；空态/未初始化核对 加载中占位；无凭据或 adapter 不可用选项禁用；错误/无权限核对 图片配置 GET 失败只留在 hook.error，页面初次加载呈禁用/占位且没有专门错误提示；HTTP 非 2xx 或网络异常由 lingxiFetch 抛错，hook 显示错误 toast；200 响应无 values/config 时本地 patch 更新并显示成功，未追加 GET 校验。",
+      "providerId": null,
+      "classification": "SPECIFIC_CONSUMER_BRANCH_NOT_DIRECTLY_INPUT",
+      "coveredGroup": "F92121640419",
+      "alreadyCoveredConcretePoints": [
+        "7槽widget数量、follow(null)、同名model区分provider/vision filter；真实Knowledge/Summarize后端操作另证。",
+        "aux busy→success→3秒复位；failed-result/request-error失败图标；换模型丢旧结果与卸载abort均g具名。",
+        "useMedia三路独立读，单路失败不拖全局、失败保last-known-good、序列化写防迟到；ModelsTab focus刷新目录合同已有。",
+        "image null/选择/adapter缺失禁用，video独立PUT，ASR enabled/default包均有组件。",
+        "TTS select/clear两拒绝保旧error、ASR零写独立/adapter缺失和后端真roundtrip已有。",
+        "四模态真实Source CRUD/生成/重启/queued revoke与BigASR真Operation另外已跑。"
+      ],
+      "specificStillUnprovenConditions": [
+        "image默认PUT拒绝保旧/error未直接输入；TTS同helper失败是共享代表。"
+      ],
+      "exactOriginalTextForThoseConditions": "图片默认模型选择：成功核对 图片默认值PUT 返回的配置值或本地 patch 用于更新当前显示；不追加独立 GET；空态/未初始化核对 加载中占位；无凭据或 adapter 不可用选项禁用；错误/无权限核对 图片配置 GET 失败只留在 hook.error，页面初次加载呈禁用/占位且没有专门错误提示；HTTP 非 2xx 或网络异常由 lingxiFetch 抛错，hook 显示错误 toast；200 响应无 values/config 时本地 patch 更新并显示成功，未追加 GET 校验。",
+      "boundaryNotImplementationGap": [
+        "UI mock合同与真实handler是分层证据，没拼成全部一次UI链不自动说明功能未实现。",
+        "不要求每种空态/失败全排列；无adapter或无模型的禁用不是账号阻塞。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::saves the default image model through the generic config envelope",
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::sends null to clear the default image model",
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::does not offer image models with missing runtime adapters as selectable defaults"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-F92121640419",
+      "originalAssertionIndex": 7,
+      "originalText": "视频默认模型选择：成功核对 视频默认值PUT 返回的配置值或本地 patch 用于更新当前显示；不追加独立 GET；空态/未初始化核对 加载中占位；无凭据或 adapter 不可用选项禁用；错误/无权限核对 视频配置 GET 失败只留在 hook.error，页面初次加载呈禁用/占位且没有专门错误提示；HTTP 非 2xx 或网络异常由 lingxiFetch 抛错，hook 显示错误 toast；200 响应无 values/config 时本地 patch 更新并显示成功，未追加 GET 校验。",
+      "providerId": null,
+      "classification": "SPECIFIC_CONSUMER_BRANCH_NOT_DIRECTLY_INPUT",
+      "coveredGroup": "F92121640419",
+      "alreadyCoveredConcretePoints": [
+        "7槽widget数量、follow(null)、同名model区分provider/vision filter；真实Knowledge/Summarize后端操作另证。",
+        "aux busy→success→3秒复位；failed-result/request-error失败图标；换模型丢旧结果与卸载abort均g具名。",
+        "useMedia三路独立读，单路失败不拖全局、失败保last-known-good、序列化写防迟到；ModelsTab focus刷新目录合同已有。",
+        "image null/选择/adapter缺失禁用，video独立PUT，ASR enabled/default包均有组件。",
+        "TTS select/clear两拒绝保旧error、ASR零写独立/adapter缺失和后端真roundtrip已有。",
+        "四模态真实Source CRUD/生成/重启/queued revoke与BigASR真Operation另外已跑。"
+      ],
+      "specificStillUnprovenConditions": [
+        "video独立默认PUT拒绝/首GET失败显示未直接输入。"
+      ],
+      "exactOriginalTextForThoseConditions": "视频默认模型选择：成功核对 视频默认值PUT 返回的配置值或本地 patch 用于更新当前显示；不追加独立 GET；空态/未初始化核对 加载中占位；无凭据或 adapter 不可用选项禁用；错误/无权限核对 视频配置 GET 失败只留在 hook.error，页面初次加载呈禁用/占位且没有专门错误提示；HTTP 非 2xx 或网络异常由 lingxiFetch 抛错，hook 显示错误 toast；200 响应无 values/config 时本地 patch 更新并显示成功，未追加 GET 校验。",
+      "boundaryNotImplementationGap": [
+        "UI mock合同与真实handler是分层证据，没拼成全部一次UI链不自动说明功能未实现。",
+        "不要求每种空态/失败全排列；无adapter或无模型的禁用不是账号阻塞。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::saves the default video model through the video config endpoint"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-F92121640419",
+      "originalAssertionIndex": 8,
+      "originalText": "语音合成默认模型选择：成功核对 语音合成默认值PUT 返回的配置值或本地 patch 用于更新当前显示；不追加独立 GET；空态/未初始化核对 加载中占位；无凭据或 adapter 不可用选项禁用；错误/无权限核对 语音合成配置 GET 失败只留在 hook.error，页面初次加载呈禁用/占位且没有专门错误提示；HTTP 非 2xx 或网络异常由 lingxiFetch 抛错，hook 显示错误 toast；200 响应无 values/config 时本地 patch 更新并显示成功，未追加 GET 校验。",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "F92121640419",
+      "alreadyCoveredConcretePoints": [
+        "7槽widget数量、follow(null)、同名model区分provider/vision filter；真实Knowledge/Summarize后端操作另证。",
+        "aux busy→success→3秒复位；failed-result/request-error失败图标；换模型丢旧结果与卸载abort均g具名。",
+        "useMedia三路独立读，单路失败不拖全局、失败保last-known-good、序列化写防迟到；ModelsTab focus刷新目录合同已有。",
+        "image null/选择/adapter缺失禁用，video独立PUT，ASR enabled/default包均有组件。",
+        "TTS select/clear两拒绝保旧error、ASR零写独立/adapter缺失和后端真roundtrip已有。",
+        "四模态真实Source CRUD/生成/重启/queued revoke与BigASR真Operation另外已跑。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "UI mock合同与真实handler是分层证据，没拼成全部一次UI链不自动说明功能未实现。",
+        "不要求每种空态/失败全排列；无adapter或无模型的禁用不是账号阻塞。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::does not offer speech models without runnable adapters as selectable defaults",
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::saves the speechGeneration default through the speech config envelope and keeps ASR independent",
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::clears defaultSpeechModel with explicit null and keeps the speech-recognition default",
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::keeps the saved speech default after a failed $name and exposes the error",
+        "rust/crates/lingxi-service/tests/r07_media_admin/mod.rs::admin_models_config_and_asr_preferences_roundtrip"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-F92121640419",
+      "originalAssertionIndex": 9,
+      "originalText": "语音转录默认模型选择：成功核对 语音转录默认值PUT 返回的配置值或本地 patch 用于更新当前显示；不追加独立 GET；空态/未初始化核对 加载中占位；无凭据或 adapter 不可用选项禁用；语音转录总开关关闭时默认模型下拉禁用。；错误/无权限核对 语音转录配置 GET 失败由 hook 显示错误 toast，页面初次加载仍呈禁用/占位；PUT 保存失败也由 hook 显示错误 toast。",
+      "providerId": null,
+      "classification": "SPECIFIC_CONSUMER_BRANCH_NOT_DIRECTLY_INPUT",
+      "coveredGroup": "F92121640419",
+      "alreadyCoveredConcretePoints": [
+        "7槽widget数量、follow(null)、同名model区分provider/vision filter；真实Knowledge/Summarize后端操作另证。",
+        "aux busy→success→3秒复位；failed-result/request-error失败图标；换模型丢旧结果与卸载abort均g具名。",
+        "useMedia三路独立读，单路失败不拖全局、失败保last-known-good、序列化写防迟到；ModelsTab focus刷新目录合同已有。",
+        "image null/选择/adapter缺失禁用，video独立PUT，ASR enabled/default包均有组件。",
+        "TTS select/clear两拒绝保旧error、ASR零写独立/adapter缺失和后端真roundtrip已有。",
+        "四模态真实Source CRUD/生成/重启/queued revoke与BigASR真Operation另外已跑。"
+      ],
+      "specificStillUnprovenConditions": [
+        "ASR默认PUT拒绝/首GET失败显示未在该成功case输入。"
+      ],
+      "exactOriginalTextForThoseConditions": "语音转录默认模型选择：成功核对 语音转录默认值PUT 返回的配置值或本地 patch 用于更新当前显示；不追加独立 GET；空态/未初始化核对 加载中占位；无凭据或 adapter 不可用选项禁用；语音转录总开关关闭时默认模型下拉禁用。；错误/无权限核对 语音转录配置 GET 失败由 hook 显示错误 toast，页面初次加载仍呈禁用/占位；PUT 保存失败也由 hook 显示错误 toast。",
+      "boundaryNotImplementationGap": [
+        "UI mock合同与真实handler是分层证据，没拼成全部一次UI链不自动说明功能未实现。",
+        "不要求每种空态/失败全排列；无adapter或无模型的禁用不是账号阻塞。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::saves speech-recognition enabled state and default model"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-F92121640419",
+      "originalAssertionIndex": 10,
+      "originalText": "语音转录开关：成功核对 PUT 返回 config/values 或本地 patch 更新语音转录开关显示，不追加独立 GET。；空态/未初始化核对 配置加载前禁用；错误/无权限核对 HTTP 非 2xx 或网络异常显示错误 toast；200 响应无 config/values 时本地 patch 更新并显示成功，未追加 GET 校验。",
+      "providerId": null,
+      "classification": "SPECIFIC_CONSUMER_BRANCH_NOT_DIRECTLY_INPUT",
+      "coveredGroup": "F92121640419",
+      "alreadyCoveredConcretePoints": [
+        "7槽widget数量、follow(null)、同名model区分provider/vision filter；真实Knowledge/Summarize后端操作另证。",
+        "aux busy→success→3秒复位；failed-result/request-error失败图标；换模型丢旧结果与卸载abort均g具名。",
+        "useMedia三路独立读，单路失败不拖全局、失败保last-known-good、序列化写防迟到；ModelsTab focus刷新目录合同已有。",
+        "image null/选择/adapter缺失禁用，video独立PUT，ASR enabled/default包均有组件。",
+        "TTS select/clear两拒绝保旧error、ASR零写独立/adapter缺失和后端真roundtrip已有。",
+        "四模态真实Source CRUD/生成/重启/queued revoke与BigASR真Operation另外已跑。"
+      ],
+      "specificStillUnprovenConditions": [
+        "ASR开关独立PUT拒绝/error未输入；不新增原文未承诺的回滚要求。"
+      ],
+      "exactOriginalTextForThoseConditions": "语音转录开关：成功核对 PUT 返回 config/values 或本地 patch 更新语音转录开关显示，不追加独立 GET。；空态/未初始化核对 配置加载前禁用；错误/无权限核对 HTTP 非 2xx 或网络异常显示错误 toast；200 响应无 config/values 时本地 patch 更新并显示成功，未追加 GET 校验。",
+      "boundaryNotImplementationGap": [
+        "UI mock合同与真实handler是分层证据，没拼成全部一次UI链不自动说明功能未实现。",
+        "不要求每种空态/失败全排列；无adapter或无模型的禁用不是账号阻塞。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::saves speech-recognition enabled state and default model"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-D50161CE274A",
+      "originalAssertionIndex": 1,
+      "originalText": "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "D50161CE274A",
+      "alreadyCoveredConcretePoints": [
+        "真实初始化/cache/摘要失败/15秒+rootentry all-pages/无model/无agent/重启通过。",
+        "持久provider重挂保留、草稿不丢持久项/重挂丢草稿、草稿零config写、持久删/JSONerror保条目合同。",
+        "key blur/清除/拒绝保draft、BaseURL/API Format合同；rootentry172–201真实BaseURL PUT200落Source→Agent config GET500→error且零summary/media续读。",
+        "模型发现只候选、enable才metadata/删media/JSONerror不refresh合同；后端真实四模态Source及消费者另证。",
+        "key保存后验证失败保已存、清空/shouldVerify，真health/Anthropic及ledger；search busy/success/failure/rejection合同。",
+        "mode参数provider/model/runtime/mode包与modal，g额外无schema/无models两空态也已执行。",
+        "g真实OAuth按钮→生产Rust→自有PKCE/device→state/summary/私密落盘/logout；slowDown/失败/迟到/已生效刷新失败组件分支另证。",
+        "masked key显式读取/隐藏清临时state/无普通state或clipboard秘密，后端双scope reveal真实验证。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "不能再说写成功读失败没有真实代表。",
+        "不能再说OAuth只有mock；URL平台代理不证明系统浏览器打开或真账号是明确边界，不是本地断链。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_agent_settings_live.rs::native_initialization_cache_summary_and_real_fifteen_second_timeout",
+        "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx::真实设置容器的导航、恢复及失败处理（%s）"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-D50161CE274A",
+      "originalAssertionIndex": 2,
+      "originalText": "自动加载供应商摘要和配置：成功核对 配置快照和供应商摘要分别加载；成功后按实际集合显示状态、凭据与模型。；选中供应商详情后按现役子路径重取媒体供应商设置；窗口 focus 仅重取 image/video/speech。；空态/未初始化核对 配置中无供应商显示添加入口；摘要尚未返回时状态徽标可暂缺，不能据此认定未配置。；错误/无权限核对 供应商摘要请求失败在初始化处静默吞掉，不显示专门错误状态，旧摘要或空徽标可保留；配置快照加载失败另按设置初始化状态判断。；四类读取分别处理失败，不能把某一类失败伪装为全部成功。",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "D50161CE274A",
+      "alreadyCoveredConcretePoints": [
+        "真实初始化/cache/摘要失败/15秒+rootentry all-pages/无model/无agent/重启通过。",
+        "持久provider重挂保留、草稿不丢持久项/重挂丢草稿、草稿零config写、持久删/JSONerror保条目合同。",
+        "key blur/清除/拒绝保draft、BaseURL/API Format合同；rootentry172–201真实BaseURL PUT200落Source→Agent config GET500→error且零summary/media续读。",
+        "模型发现只候选、enable才metadata/删media/JSONerror不refresh合同；后端真实四模态Source及消费者另证。",
+        "key保存后验证失败保已存、清空/shouldVerify，真health/Anthropic及ledger；search busy/success/failure/rejection合同。",
+        "mode参数provider/model/runtime/mode包与modal，g额外无schema/无models两空态也已执行。",
+        "g真实OAuth按钮→生产Rust→自有PKCE/device→state/summary/私密落盘/logout；slowDown/失败/迟到/已生效刷新失败组件分支另证。",
+        "masked key显式读取/隐藏清临时state/无普通state或clipboard秘密，后端双scope reveal真实验证。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "不能再说写成功读失败没有真实代表。",
+        "不能再说OAuth只有mock；URL平台代理不证明系统浏览器打开或真账号是明确边界，不是本地断链。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/__tests__/settings/ProvidersTab.test.tsx::restores every persisted provider after unmount while selection only controls styling",
+        "rust/crates/lingxi-service/tests/r07_t08_metadata_redaction.rs::metadata_reads_mask_known_nested_secrets_and_masked_model_lists_refill_only_same_id"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-D50161CE274A",
+      "originalAssertionIndex": 3,
+      "originalText": "选择已有供应商、挑选未配置项临时草稿、提交自定义供应商表单三个阶段：成功核对 选择已有项只切换所见详情，不发保存请求；挑选未配置项只在页面内形成临时草稿；提交自定义表单才 PUT /api/config，成功后刷新摘要并可重开读回。；自定义提交成功时只执行一次 loadSettingsConfig；状态 ready 才选中新供应商、调用 onDone 拉摘要并关闭弹窗，摘要读取失败在 onDone 内被吞掉而仍关闭弹窗。；空态/未初始化核对 未配置项草稿未保存，重开页面不当作已持久配置；提交表单名称或 URL 空时显示表单错误。；错误/无权限核对 本地选择无网络保存失败；真正提交保存失败显示 toast，不能把临时草稿视为持久配置。；写入已成功而设置重读失败时 loadSettingsConfig 标 error，后续摘要刷新不执行，可能显示操作失败但服务端已持久化。",
+      "providerId": null,
+      "classification": "SPECIFIC_CONSUMER_BRANCH_NOT_DIRECTLY_INPUT",
+      "coveredGroup": "D50161CE274A",
+      "alreadyCoveredConcretePoints": [
+        "真实初始化/cache/摘要失败/15秒+rootentry all-pages/无model/无agent/重启通过。",
+        "持久provider重挂保留、草稿不丢持久项/重挂丢草稿、草稿零config写、持久删/JSONerror保条目合同。",
+        "key blur/清除/拒绝保draft、BaseURL/API Format合同；rootentry172–201真实BaseURL PUT200落Source→Agent config GET500→error且零summary/media续读。",
+        "模型发现只候选、enable才metadata/删media/JSONerror不refresh合同；后端真实四模态Source及消费者另证。",
+        "key保存后验证失败保已存、清空/shouldVerify，真health/Anthropic及ledger；search busy/success/failure/rejection合同。",
+        "mode参数provider/model/runtime/mode包与modal，g额外无schema/无models两空态也已执行。",
+        "g真实OAuth按钮→生产Rust→自有PKCE/device→state/summary/私密落盘/logout；slowDown/失败/迟到/已生效刷新失败组件分支另证。",
+        "masked key显式读取/隐藏清临时state/无普通state或clipboard秘密，后端双scope reveal真实验证。"
+      ],
+      "specificStillUnprovenConditions": [
+        "自定义provider空name/URL表单错误未定位g具名；APIkey preset setup不是自定义空表单。"
+      ],
+      "exactOriginalTextForThoseConditions": "选择已有供应商、挑选未配置项临时草稿、提交自定义供应商表单三个阶段：成功核对 选择已有项只切换所见详情，不发保存请求；挑选未配置项只在页面内形成临时草稿；提交自定义表单才 PUT /api/config，成功后刷新摘要并可重开读回。；自定义提交成功时只执行一次 loadSettingsConfig；状态 ready 才选中新供应商、调用 onDone 拉摘要并关闭弹窗，摘要读取失败在 onDone 内被吞掉而仍关闭弹窗。；空态/未初始化核对 未配置项草稿未保存，重开页面不当作已持久配置；提交表单名称或 URL 空时显示表单错误。；错误/无权限核对 本地选择无网络保存失败；真正提交保存失败显示 toast，不能把临时草稿视为持久配置。；写入已成功而设置重读失败时 loadSettingsConfig 标 error，后续摘要刷新不执行，可能显示操作失败但服务端已持久化。",
+      "boundaryNotImplementationGap": [
+        "不能再说写成功读失败没有真实代表。",
+        "不能再说OAuth只有mock；URL平台代理不证明系统浏览器打开或真账号是明确边界，不是本地断链。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/__tests__/settings/ProvidersTab.test.tsx::keeps persisted providers when a draft is added, and drops only the draft after remount",
+        "desktop/src/react/__tests__/settings/ProvidersTab.test.tsx::saves registry-only non-preset providers through the initial setup payload",
+        "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx::真实设置容器的导航、恢复及失败处理（%s）"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-D50161CE274A",
+      "originalAssertionIndex": 4,
+      "originalText": "移除临时供应商草稿或删除持久自定义供应商：成功核对 临时草稿点击删除直接从本地列表移除并清所选项，不发请求；持久自定义且 can_delete 时先确认，再 PUT /api/config 删除，成功后 loadSettingsConfig 六项/条件经验及供应商摘要，读取 ready 后才清所选项并提示删除成功。；空态/未初始化核对 不可删除的持久条目不显示删除按钮；临时草稿可直接删除且不弹确认；持久自定义条目未确认不发 PUT。；错误/无权限核对 草稿本地移除无网络失败路径；持久条目 PUT 失败显示错误 toast 并保留条目。PUT 已成功但后续设置重读失败时 loadSettingsConfig 标 error，摘要刷新与清选中不执行，服务端删除可能已持久化。",
+      "providerId": null,
+      "classification": "SPECIFIC_CONSUMER_BRANCH_NOT_DIRECTLY_INPUT",
+      "coveredGroup": "D50161CE274A",
+      "alreadyCoveredConcretePoints": [
+        "真实初始化/cache/摘要失败/15秒+rootentry all-pages/无model/无agent/重启通过。",
+        "持久provider重挂保留、草稿不丢持久项/重挂丢草稿、草稿零config写、持久删/JSONerror保条目合同。",
+        "key blur/清除/拒绝保draft、BaseURL/API Format合同；rootentry172–201真实BaseURL PUT200落Source→Agent config GET500→error且零summary/media续读。",
+        "模型发现只候选、enable才metadata/删media/JSONerror不refresh合同；后端真实四模态Source及消费者另证。",
+        "key保存后验证失败保已存、清空/shouldVerify，真health/Anthropic及ledger；search busy/success/failure/rejection合同。",
+        "mode参数provider/model/runtime/mode包与modal，g额外无schema/无models两空态也已执行。",
+        "g真实OAuth按钮→生产Rust→自有PKCE/device→state/summary/私密落盘/logout；slowDown/失败/迟到/已生效刷新失败组件分支另证。",
+        "masked key显式读取/隐藏清临时state/无普通state或clipboard秘密，后端双scope reveal真实验证。"
+      ],
+      "specificStillUnprovenConditions": [
+        "删除已成功后重读失败未在真实页面直接输入；BaseURL更新不写成删除也实跑。"
+      ],
+      "exactOriginalTextForThoseConditions": "移除临时供应商草稿或删除持久自定义供应商：成功核对 临时草稿点击删除直接从本地列表移除并清所选项，不发请求；持久自定义且 can_delete 时先确认，再 PUT /api/config 删除，成功后 loadSettingsConfig 六项/条件经验及供应商摘要，读取 ready 后才清所选项并提示删除成功。；空态/未初始化核对 不可删除的持久条目不显示删除按钮；临时草稿可直接删除且不弹确认；持久自定义条目未确认不发 PUT。；错误/无权限核对 草稿本地移除无网络失败路径；持久条目 PUT 失败显示错误 toast 并保留条目。PUT 已成功但后续设置重读失败时 loadSettingsConfig 标 error，摘要刷新与清选中不执行，服务端删除可能已持久化。",
+      "boundaryNotImplementationGap": [
+        "不能再说写成功读失败没有真实代表。",
+        "不能再说OAuth只有mock；URL平台代理不证明系统浏览器打开或真账号是明确边界，不是本地断链。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/__tests__/settings/ProvidersTab.test.tsx::removes an unsaved draft without touching persisted providers",
+        "desktop/src/react/__tests__/settings/ProvidersTab.test.tsx::removes a deleted configured provider from the list and keeps a built-in provider in the picker",
+        "desktop/src/react/__tests__/settings/ProvidersTab.test.tsx::keeps a configured provider and skips authoritative reload when deletion returns an error",
+        "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx::真实设置容器的导航、恢复及失败处理（%s）"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-D50161CE274A",
+      "originalAssertionIndex": 5,
+      "originalText": "供应商页保存 API Key、Header、Base URL 或 API Format：成功核对 API Key/Header/Base URL/API Format 的独立输入控件经 saveProviderConfigPatch 写 /api/config；非首次预设配置的 API Format 变更立即保存，首次预设配置先保留草稿、随首次凭据保存带入。连接测试由 #06 单独验收。；有选中助手且设置重读 ready 时才继续刷新供应商摘要及媒体可用性。；空态/未初始化核对 无凭据显示 needs_setup；无助手时 loadSettingsConfig 不发设置读取；无媒体详情或未触发对应操作时不重读媒体集合。；Base URL 未编辑或修剪后与现值相同不写；API Format 未变不写；预设首次配置的 API Format 只更新本地草稿，等待首次保存。；错误/无权限核对 保存失败显示 toast，保留旧配置；连接测试失败由 #06 检查，不能混作保存失败。；四类读取分别处理失败，不能把某一类失败伪装为全部成功。；无选中助手或设置重读未 ready 时 ProviderTab.onRefresh 抛错，后续供应商摘要和媒体刷新不会执行；先前写入可能已成功。",
+      "providerId": null,
+      "classification": "SPECIFIC_CONSUMER_BRANCH_NOT_DIRECTLY_INPUT",
+      "coveredGroup": "D50161CE274A",
+      "alreadyCoveredConcretePoints": [
+        "真实初始化/cache/摘要失败/15秒+rootentry all-pages/无model/无agent/重启通过。",
+        "持久provider重挂保留、草稿不丢持久项/重挂丢草稿、草稿零config写、持久删/JSONerror保条目合同。",
+        "key blur/清除/拒绝保draft、BaseURL/API Format合同；rootentry172–201真实BaseURL PUT200落Source→Agent config GET500→error且零summary/media续读。",
+        "模型发现只候选、enable才metadata/删media/JSONerror不refresh合同；后端真实四模态Source及消费者另证。",
+        "key保存后验证失败保已存、清空/shouldVerify，真health/Anthropic及ledger；search busy/success/failure/rejection合同。",
+        "mode参数provider/model/runtime/mode包与modal，g额外无schema/无models两空态也已执行。",
+        "g真实OAuth按钮→生产Rust→自有PKCE/device→state/summary/私密落盘/logout；slowDown/失败/迟到/已生效刷新失败组件分支另证。",
+        "masked key显式读取/隐藏清临时state/无普通state或clipboard秘密，后端双scope reveal真实验证。"
+      ],
+      "specificStillUnprovenConditions": [
+        "Header输入控件实际修改保存未定位g UI动作；后端headers null/credential消费为独立真handler。"
+      ],
+      "exactOriginalTextForThoseConditions": "供应商页保存 API Key、Header、Base URL 或 API Format：成功核对 API Key/Header/Base URL/API Format 的独立输入控件经 saveProviderConfigPatch 写 /api/config；非首次预设配置的 API Format 变更立即保存，首次预设配置先保留草稿、随首次凭据保存带入。连接测试由 #06 单独验收。；有选中助手且设置重读 ready 时才继续刷新供应商摘要及媒体可用性。；空态/未初始化核对 无凭据显示 needs_setup；无助手时 loadSettingsConfig 不发设置读取；无媒体详情或未触发对应操作时不重读媒体集合。；Base URL 未编辑或修剪后与现值相同不写；API Format 未变不写；预设首次配置的 API Format 只更新本地草稿，等待首次保存。；错误/无权限核对 保存失败显示 toast，保留旧配置；连接测试失败由 #06 检查，不能混作保存失败。；四类读取分别处理失败，不能把某一类失败伪装为全部成功。；无选中助手或设置重读未 ready 时 ProviderTab.onRefresh 抛错，后续供应商摘要和媒体刷新不会执行；先前写入可能已成功。",
+      "boundaryNotImplementationGap": [
+        "不能再说写成功读失败没有真实代表。",
+        "不能再说OAuth只有mock；URL平台代理不证明系统浏览器打开或真账号是明确边界，不是本地断链。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/__tests__/settings/ApiKeyCredentials.test.tsx::lets preset setup edit and save the Base URL immediately (gateway/proxy override)",
+        "desktop/src/react/__tests__/settings/ApiKeyCredentials.test.tsx::shows an actionable refresh failure after the server accepts an API type change",
+        "desktop/src/react/__tests__/settings/ApiKeyCredentials.test.tsx::persists edited Kimi API keys on input blur without requiring connection verification",
+        "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx::真实设置容器的导航、恢复及失败处理（%s）"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-D50161CE274A",
+      "originalAssertionIndex": 6,
+      "originalText": "拉取远端候选、聊天模型持久增删/编辑、四类媒体或转录模型持久增删/编辑：成功核对 远端发现只填候选下拉；聊天模型增删写 /api/config，聊天元数据编辑写 providers 模型 PUT；图片、视频、语音合成、语音转录按各自模型路由增删或编辑，重读后列表与能力标签对应。；模型增删或拉取成功后按现役子路径重取媒体供应商设置；窗口 focus 仅重取 image/video/speech。；成功且有选中助手、loadSettingsConfig 状态为 ready 时才继续刷新供应商摘要；否则停在设置读取错误；经验启用再读经验，媒体/转录读取按操作类别分流。；进入供应商模型列表或切换 providerId 时先读取已缓存发现候选，不等同用户主动拉取远端 POST。；空态/未初始化核对 发现返回零项显示发现失败提示；未添加模型时列表为空，不能把发现候选算作已保存。；无助手时 loadSettingsConfig 不发设置读取；无媒体详情或未触发对应操作时不重读媒体集合。；缓存 GET 返回无 models 时下拉候选为空。；错误/无权限核对 发现失败显示内联提示；聊天及媒体持久写入失败显示 toast，原保存列表不可冒称已变更。；四类读取分别处理失败，不能把某一类失败伪装为全部成功。；无选中助手或设置重读未 ready 时 ProviderTab.onRefresh 抛错，后续供应商摘要和媒体刷新不会执行；先前写入可能已成功。；缓存 GET 失败由 catch 静默，保留原候选状态，不显示主动发现失败提示。",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "D50161CE274A",
+      "alreadyCoveredConcretePoints": [
+        "真实初始化/cache/摘要失败/15秒+rootentry all-pages/无model/无agent/重启通过。",
+        "持久provider重挂保留、草稿不丢持久项/重挂丢草稿、草稿零config写、持久删/JSONerror保条目合同。",
+        "key blur/清除/拒绝保draft、BaseURL/API Format合同；rootentry172–201真实BaseURL PUT200落Source→Agent config GET500→error且零summary/media续读。",
+        "模型发现只候选、enable才metadata/删media/JSONerror不refresh合同；后端真实四模态Source及消费者另证。",
+        "key保存后验证失败保已存、清空/shouldVerify，真health/Anthropic及ledger；search busy/success/failure/rejection合同。",
+        "mode参数provider/model/runtime/mode包与modal，g额外无schema/无models两空态也已执行。",
+        "g真实OAuth按钮→生产Rust→自有PKCE/device→state/summary/私密落盘/logout；slowDown/失败/迟到/已生效刷新失败组件分支另证。",
+        "masked key显式读取/隐藏清临时state/无普通state或clipboard秘密，后端双scope reveal真实验证。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "不能再说写成功读失败没有真实代表。",
+        "不能再说OAuth只有mock；URL平台代理不证明系统浏览器打开或真账号是明确边界，不是本地断链。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/settings/tabs/providers/__tests__/ProviderModelList.test.tsx::persists discovered model metadata when enabling a fetched model",
+        "desktop/src/react/settings/tabs/providers/__tests__/ProviderModelList.test.tsx::removes media models through the media endpoints",
+        "desktop/src/react/settings/tabs/providers/__tests__/ProviderModelList.test.tsx::keeps the model editor open and skips refresh when metadata mutation returns a JSON error",
+        "rust/crates/lingxi-service/tests/r07_t08_media_source.rs::media_http_source_crud_same_operations_actual_generation_restart_and_projection_corruption",
+        "rust/crates/lingxi-service/tests/r07_t08_media_source.rs::media_source_queued_revocation_and_stale_edit_cannot_resurrect_deleted_model",
+        "rust/crates/lingxi-service/tests/r07_media_admin/mod.rs::admin_models_config_and_asr_preferences_roundtrip",
+        "rust/crates/lingxi-service/tests/r07_t08_metadata_redaction.rs::metadata_reads_mask_known_nested_secrets_and_masked_model_lists_refill_only_same_id"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-D50161CE274A",
+      "originalAssertionIndex": 7,
+      "originalText": "测试供应商连接：成功核对 未编辑 key 时直接测试连接；已编辑时先保存到 /api/config 并刷新，plan.shouldVerify 才测试；清空非本地 preset key 时仅保存并显示保存结果。；已编辑 key 的保存路径经 onCredentialRefresh 重读助手设置六项/条件经验、供应商摘要及四类媒体，再根据 plan.shouldVerify 判断是否 POST 测试；未编辑 key 直接测试不执行这些写后重读。；空态/未初始化核对 输入框为空且 key 未编辑时 verifyOnly 仍可用已保存凭据；已编辑清空非本地 key 时不发送测试请求。；错误/无权限核对 保存或刷新失败不发送测试；实际测试失败显示错误 toast，不能把保存成功误称测试成功。；写入已成功而设置重读失败时 loadSettingsConfig 标 error，后续摘要/媒体刷新不执行，可能显示操作失败但服务端已持久化。",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "D50161CE274A",
+      "alreadyCoveredConcretePoints": [
+        "真实初始化/cache/摘要失败/15秒+rootentry all-pages/无model/无agent/重启通过。",
+        "持久provider重挂保留、草稿不丢持久项/重挂丢草稿、草稿零config写、持久删/JSONerror保条目合同。",
+        "key blur/清除/拒绝保draft、BaseURL/API Format合同；rootentry172–201真实BaseURL PUT200落Source→Agent config GET500→error且零summary/media续读。",
+        "模型发现只候选、enable才metadata/删media/JSONerror不refresh合同；后端真实四模态Source及消费者另证。",
+        "key保存后验证失败保已存、清空/shouldVerify，真health/Anthropic及ledger；search busy/success/failure/rejection合同。",
+        "mode参数provider/model/runtime/mode包与modal，g额外无schema/无models两空态也已执行。",
+        "g真实OAuth按钮→生产Rust→自有PKCE/device→state/summary/私密落盘/logout；slowDown/失败/迟到/已生效刷新失败组件分支另证。",
+        "masked key显式读取/隐藏清临时state/无普通state或clipboard秘密，后端双scope reveal真实验证。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "不能再说写成功读失败没有真实代表。",
+        "不能再说OAuth只有mock；URL平台代理不证明系统浏览器打开或真账号是明确边界，不是本地断链。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/__tests__/settings/ApiKeyCredentials.test.tsx::saves the key even when remote verification fails (preset setup must not deadlock)",
+        "desktop/src/react/__tests__/settings/ApiKeyCredentials.test.tsx::persists an intentionally cleared API key instead of leaving the old provider secret active"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-D50161CE274A",
+      "originalAssertionIndex": 8,
+      "originalText": "打开图片/视频默认参数弹窗并编辑指定模型的参数：成功核对 图片/视频 providerDefaults 中相应供应商和模型的比例、分辨率或模式参数写入并重开读回；模型下拉只选择正在编辑哪款模型。；空态/未初始化核对 没有已添加的对应媒体模型时默认参数按钮不出现。；错误/无权限核对 参数保存失败显示提示，不得称已改变全局默认图片/视频模型。",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "D50161CE274A",
+      "alreadyCoveredConcretePoints": [
+        "真实初始化/cache/摘要失败/15秒+rootentry all-pages/无model/无agent/重启通过。",
+        "持久provider重挂保留、草稿不丢持久项/重挂丢草稿、草稿零config写、持久删/JSONerror保条目合同。",
+        "key blur/清除/拒绝保draft、BaseURL/API Format合同；rootentry172–201真实BaseURL PUT200落Source→Agent config GET500→error且零summary/media续读。",
+        "模型发现只候选、enable才metadata/删media/JSONerror不refresh合同；后端真实四模态Source及消费者另证。",
+        "key保存后验证失败保已存、清空/shouldVerify，真health/Anthropic及ledger；search busy/success/failure/rejection合同。",
+        "mode参数provider/model/runtime/mode包与modal，g额外无schema/无models两空态也已执行。",
+        "g真实OAuth按钮→生产Rust→自有PKCE/device→state/summary/私密落盘/logout；slowDown/失败/迟到/已生效刷新失败组件分支另证。",
+        "masked key显式读取/隐藏清临时state/无普通state或clipboard秘密，后端双scope reveal真实验证。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "不能再说写成功读失败没有真实代表。",
+        "不能再说OAuth只有mock；URL平台代理不证明系统浏览器打开或真账号是明确边界，不是本地断链。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/settings/tabs/providers/__tests__/ProviderMediaDefaults.test.tsx::saves provider mode defaults under provider/model/mode keyed by runtimeProviderId",
+        "desktop/src/react/settings/tabs/providers/__tests__/ProviderModelList.test.tsx::opens a modal instead of an inline defaults form"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-D50161CE274A",
+      "originalAssertionIndex": 9,
+      "originalText": "搜索供应商和搜索 API key 验证：成功核对 选择搜索供应商经 autoSaveGlobalModels 写 /preferences/models；API key 验证另走 /search/verify，成功后显示验证状态。；搜索供应商偏好保存后按 helper 重读模型偏好。；搜索 API key 验证成功后调用 loadSettingsConfig 读取设置六项/条件经验，成功 toast 在读取之前显示。；空态/未初始化核对 尚未选择搜索供应商或缺有效 key 时按各控件状态处理；选择本身不代表 key 已通过验证。；错误/无权限核对 偏好保存失败与 API key 验证失败分别提示；验证成功后 loadSettingsConfig 读取失败仅在设置 store 标 error，仍保留此前成功 toast，不能承诺视图刷新。",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "D50161CE274A",
+      "alreadyCoveredConcretePoints": [
+        "真实初始化/cache/摘要失败/15秒+rootentry all-pages/无model/无agent/重启通过。",
+        "持久provider重挂保留、草稿不丢持久项/重挂丢草稿、草稿零config写、持久删/JSONerror保条目合同。",
+        "key blur/清除/拒绝保draft、BaseURL/API Format合同；rootentry172–201真实BaseURL PUT200落Source→Agent config GET500→error且零summary/media续读。",
+        "模型发现只候选、enable才metadata/删media/JSONerror不refresh合同；后端真实四模态Source及消费者另证。",
+        "key保存后验证失败保已存、清空/shouldVerify，真health/Anthropic及ledger；search busy/success/failure/rejection合同。",
+        "mode参数provider/model/runtime/mode包与modal，g额外无schema/无models两空态也已执行。",
+        "g真实OAuth按钮→生产Rust→自有PKCE/device→state/summary/私密落盘/logout；slowDown/失败/迟到/已生效刷新失败组件分支另证。",
+        "masked key显式读取/隐藏清临时state/无普通state或clipboard秘密，后端双scope reveal真实验证。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "不能再说写成功读失败没有真实代表。",
+        "不能再说OAuth只有mock；URL平台代理不证明系统浏览器打开或真账号是明确边界，不是本地断链。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/settings/tabs/providers/__tests__/SearchProviderSection.test.tsx::saves the selected search provider through autoSaveGlobalModels",
+        "desktop/src/react/settings/tabs/providers/__tests__/SearchApiKeyConfig.test.tsx::shows verification progress and recovers after %s"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-D50161CE274A",
+      "originalAssertionIndex": 10,
+      "originalText": "OAuth 登录启动并打开授权 URL：成功核对 返回 sessionId，并显示扫码/手输码或启动轮询；start 成功后 openExternal 打开授权 URL，再按 instructions/polling 分流。；空态/未初始化核对 未登录显示登录按钮；错误/无权限核对 OAuth 启动请求失败显示 toast；授权 URL 的 openExternal 未 await，外部打开拒绝不会进入此 catch，页面仍可能显示码并开始轮询。；start 失败不打开外链。",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "D50161CE274A",
+      "alreadyCoveredConcretePoints": [
+        "真实初始化/cache/摘要失败/15秒+rootentry all-pages/无model/无agent/重启通过。",
+        "持久provider重挂保留、草稿不丢持久项/重挂丢草稿、草稿零config写、持久删/JSONerror保条目合同。",
+        "key blur/清除/拒绝保draft、BaseURL/API Format合同；rootentry172–201真实BaseURL PUT200落Source→Agent config GET500→error且零summary/media续读。",
+        "模型发现只候选、enable才metadata/删media/JSONerror不refresh合同；后端真实四模态Source及消费者另证。",
+        "key保存后验证失败保已存、清空/shouldVerify，真health/Anthropic及ledger；search busy/success/failure/rejection合同。",
+        "mode参数provider/model/runtime/mode包与modal，g额外无schema/无models两空态也已执行。",
+        "g真实OAuth按钮→生产Rust→自有PKCE/device→state/summary/私密落盘/logout；slowDown/失败/迟到/已生效刷新失败组件分支另证。",
+        "masked key显式读取/隐藏清临时state/无普通state或clipboard秘密，后端双scope reveal真实验证。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "不能再说写成功读失败没有真实代表。",
+        "不能再说OAuth只有mock；URL平台代理不证明系统浏览器打开或真账号是明确边界，不是本地断链。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/settings/tabs/providers/__tests__/OAuthCredentials.test.tsx::PKCE 使用正式 provider 路径与原 state，回调不发送旧 sessionId",
+        "desktop/src/react/settings/tabs/providers/__tests__/OAuthCredentials.test.tsx::卸载和切换供应商后都不打开迟到授权地址",
+        "rust/crates/lingxi-service/tests/r07_t08_oauth_alias.rs::oauth_display_alias_reaches_pkce_device_registry_logout_revoke_and_actual_model_without_renaming_source"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-D50161CE274A",
+      "originalAssertionIndex": 11,
+      "originalText": "OAuth 手输授权码完成登录：成功核对 callback HTTP/业务成功时先显示登录成功 toast、关闭输入，再尝试刷新供应商；刷新成功才显示已登录状态；OAuth 回调完成后按现役子路径重取媒体供应商设置；窗口 focus 仅重取 image/video/speech。；成功且进入 onRefresh 时重读助手设置六类字段和供应商摘要；经验启用再读经验，媒体/转录读取按操作类别分流。；空态/未初始化核对 空码不提交；无助手时 loadSettingsConfig 不发设置读取；无媒体详情或未触发对应操作时不重读媒体集合。；错误/无权限核对 callback 请求失败显示失败 toast 且不进入成功刷新；callback 已成功但随后 onRefresh 失败时，先显示成功 toast 后又显示失败 toast，服务端可能已登录，不能据旧界面推断未登录。；四类媒体读取分别处理失败，不能把某一类失败伪装为全部成功。",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "D50161CE274A",
+      "alreadyCoveredConcretePoints": [
+        "真实初始化/cache/摘要失败/15秒+rootentry all-pages/无model/无agent/重启通过。",
+        "持久provider重挂保留、草稿不丢持久项/重挂丢草稿、草稿零config写、持久删/JSONerror保条目合同。",
+        "key blur/清除/拒绝保draft、BaseURL/API Format合同；rootentry172–201真实BaseURL PUT200落Source→Agent config GET500→error且零summary/media续读。",
+        "模型发现只候选、enable才metadata/删media/JSONerror不refresh合同；后端真实四模态Source及消费者另证。",
+        "key保存后验证失败保已存、清空/shouldVerify，真health/Anthropic及ledger；search busy/success/failure/rejection合同。",
+        "mode参数provider/model/runtime/mode包与modal，g额外无schema/无models两空态也已执行。",
+        "g真实OAuth按钮→生产Rust→自有PKCE/device→state/summary/私密落盘/logout；slowDown/失败/迟到/已生效刷新失败组件分支另证。",
+        "masked key显式读取/隐藏清临时state/无普通state或clipboard秘密，后端双scope reveal真实验证。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "不能再说写成功读失败没有真实代表。",
+        "不能再说OAuth只有mock；URL平台代理不证明系统浏览器打开或真账号是明确边界，不是本地断链。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/settings/tabs/providers/__tests__/OAuthCredentials.test.tsx::用户确认授权码后才回调，并刷新状态",
+        "desktop/src/react/settings/tabs/providers/__tests__/OAuthCredentials.test.tsx::登录已生效但刷新失败如实说明；未保存凭证不可显示普通成功",
+        "rust/crates/lingxi-service/tests/r07_t08_oauth_alias.rs::oauth_display_alias_reaches_pkce_device_registry_logout_revoke_and_actual_model_without_renaming_source"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-D50161CE274A",
+      "originalAssertionIndex": 12,
+      "originalText": "OAuth 设备码轮询直到完成或失败：成功核对 轮询 status=done 先显示登录成功 toast、停止轮询，再尝试刷新供应商；刷新成功才更新已登录状态；OAuth 轮询完成后按现役子路径重取媒体供应商设置；窗口 focus 仅重取 image/video/speech。；成功且进入 onRefresh 时重读助手设置六类字段和供应商摘要；经验启用再读经验，媒体/转录读取按操作类别分流。；空态/未初始化核对 300 秒内无结果结束轮询且未登录；无助手时 loadSettingsConfig 不发设置读取；无媒体详情或未触发对应操作时不重读媒体集合。；错误/无权限核对 轮询 HTTP 非 2xx 由 lingxiFetch 抛错，结束轮询并显示错误 toast；HTTP 2xx 若 status=error 同样报错。HTTP 2xx 缺少 status 时继续轮询直至超时；四类媒体读取分别处理失败，不能把某一类失败伪装为全部成功。；status=done 后 onRefresh 失败仍会先有成功 toast 再有失败 toast，服务端可能已登录。",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "D50161CE274A",
+      "alreadyCoveredConcretePoints": [
+        "真实初始化/cache/摘要失败/15秒+rootentry all-pages/无model/无agent/重启通过。",
+        "持久provider重挂保留、草稿不丢持久项/重挂丢草稿、草稿零config写、持久删/JSONerror保条目合同。",
+        "key blur/清除/拒绝保draft、BaseURL/API Format合同；rootentry172–201真实BaseURL PUT200落Source→Agent config GET500→error且零summary/media续读。",
+        "模型发现只候选、enable才metadata/删media/JSONerror不refresh合同；后端真实四模态Source及消费者另证。",
+        "key保存后验证失败保已存、清空/shouldVerify，真health/Anthropic及ledger；search busy/success/failure/rejection合同。",
+        "mode参数provider/model/runtime/mode包与modal，g额外无schema/无models两空态也已执行。",
+        "g真实OAuth按钮→生产Rust→自有PKCE/device→state/summary/私密落盘/logout；slowDown/失败/迟到/已生效刷新失败组件分支另证。",
+        "masked key显式读取/隐藏清临时state/无普通state或clipboard秘密，后端双scope reveal真实验证。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "不能再说写成功读失败没有真实代表。",
+        "不能再说OAuth只有mock；URL平台代理不证明系统浏览器打开或真账号是明确边界，不是本地断链。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/settings/tabs/providers/__tests__/OAuthCredentials.test.tsx::设备码按服务间隔轮询，slowDown 延长等待后才确认并刷新",
+        "desktop/src/react/settings/tabs/providers/__tests__/OAuthCredentials.test.tsx::启动和回调请求失败不伪造已登录，也不进入成功刷新",
+        "rust/crates/lingxi-service/tests/r07_t08_oauth_alias.rs::oauth_display_alias_reaches_pkce_device_registry_logout_revoke_and_actual_model_without_renaming_source"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-D50161CE274A",
+      "originalAssertionIndex": 13,
+      "originalText": "OAuth 退出登录：成功核对 logout HTTP 成功时先显示退出成功 toast，再尝试刷新供应商；刷新成功才呈未登录状态；OAuth 退出成功后按现役子路径重取媒体供应商设置；窗口 focus 仅重取 image/video/speech。；成功且进入 onRefresh 时重读助手设置六类字段和供应商摘要；经验启用再读经验，媒体/转录读取按操作类别分流。；空态/未初始化核对 原未登录无退出按钮；无助手时 loadSettingsConfig 不发设置读取；无媒体详情或未触发对应操作时不重读媒体集合。；错误/无权限核对 退出登录 HTTP 非 2xx 或网络异常由 lingxiFetch 抛错并显示错误 toast，不进入成功刷新；HTTP 2xx 的 body 未读取，若业务上仍返回失败字段，成功 toast 不足以证明已退出；四类媒体读取分别处理失败。；logout 已成功但 onRefresh 失败时先成功 toast 后失败 toast，服务端可能已退出而界面状态未刷新。",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "D50161CE274A",
+      "alreadyCoveredConcretePoints": [
+        "真实初始化/cache/摘要失败/15秒+rootentry all-pages/无model/无agent/重启通过。",
+        "持久provider重挂保留、草稿不丢持久项/重挂丢草稿、草稿零config写、持久删/JSONerror保条目合同。",
+        "key blur/清除/拒绝保draft、BaseURL/API Format合同；rootentry172–201真实BaseURL PUT200落Source→Agent config GET500→error且零summary/media续读。",
+        "模型发现只候选、enable才metadata/删media/JSONerror不refresh合同；后端真实四模态Source及消费者另证。",
+        "key保存后验证失败保已存、清空/shouldVerify，真health/Anthropic及ledger；search busy/success/failure/rejection合同。",
+        "mode参数provider/model/runtime/mode包与modal，g额外无schema/无models两空态也已执行。",
+        "g真实OAuth按钮→生产Rust→自有PKCE/device→state/summary/私密落盘/logout；slowDown/失败/迟到/已生效刷新失败组件分支另证。",
+        "masked key显式读取/隐藏清临时state/无普通state或clipboard秘密，后端双scope reveal真实验证。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "不能再说写成功读失败没有真实代表。",
+        "不能再说OAuth只有mock；URL平台代理不证明系统浏览器打开或真账号是明确边界，不是本地断链。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/settings/tabs/providers/__tests__/OAuthCredentials.test.tsx::正式登出契约完成后刷新；刷新失败保留已经登出的事实",
+        "rust/crates/lingxi-service/tests/r07_t08_oauth_alias.rs::oauth_display_alias_reaches_pkce_device_registry_logout_revoke_and_actual_model_without_renaming_source"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-D50161CE274A",
+      "originalAssertionIndex": 14,
+      "originalText": "点击 API Key 显示或隐藏按钮：成功核对 保存值为脱敏占位且由隐藏切换显示时，GET /api/providers/:name/api-key 取回并仅临时显示；再隐藏会清除临时明文。；空态/未初始化核对 已有明文或无 onReveal 时仅本地显隐，不发读取请求；隐藏时仅本地清除临时明文。；错误/无权限核对 读取失败通过 onRevealError 显示错误 toast，保持未显示；不将明文写入新保存请求。",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "D50161CE274A",
+      "alreadyCoveredConcretePoints": [
+        "真实初始化/cache/摘要失败/15秒+rootentry all-pages/无model/无agent/重启通过。",
+        "持久provider重挂保留、草稿不丢持久项/重挂丢草稿、草稿零config写、持久删/JSONerror保条目合同。",
+        "key blur/清除/拒绝保draft、BaseURL/API Format合同；rootentry172–201真实BaseURL PUT200落Source→Agent config GET500→error且零summary/media续读。",
+        "模型发现只候选、enable才metadata/删media/JSONerror不refresh合同；后端真实四模态Source及消费者另证。",
+        "key保存后验证失败保已存、清空/shouldVerify，真health/Anthropic及ledger；search busy/success/failure/rejection合同。",
+        "mode参数provider/model/runtime/mode包与modal，g额外无schema/无models两空态也已执行。",
+        "g真实OAuth按钮→生产Rust→自有PKCE/device→state/summary/私密落盘/logout；slowDown/失败/迟到/已生效刷新失败组件分支另证。",
+        "masked key显式读取/隐藏清临时state/无普通state或clipboard秘密，后端双scope reveal真实验证。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "不能再说写成功读失败没有真实代表。",
+        "不能再说OAuth只有mock；URL平台代理不证明系统浏览器打开或真账号是明确边界，不是本地断链。"
+      ],
+      "gExisting165CaseRefs": [
+        "desktop/src/react/__tests__/settings/ApiKeyCredentials.test.tsx::reveals a masked saved api key through the explicit provider endpoint",
+        "desktop/src/react/__tests__/settings/ApiKeyCredentials.test.tsx::keeps revealed saved api keys out of ordinary state and blocks copy"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-99F8CD228733",
+      "originalAssertionIndex": 1,
+      "originalText": "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "99F8CD228733",
+      "alreadyCoveredConcretePoints": [
+        "独立native初始化冷启动/缓存/摘要失败/15秒实预算通过，不受另两drag失败倒算。",
+        "真实空技能noUser、选文件取消零写、完整包全局安装不自动启用。",
+        "Tab真实单PATCH403回滚enabled/error；切选择丢旧响应g组件合同。",
+        "真实组合CRUD/导出文件、Panel两个组合排序、新真实200/404部分写；Tab drag/order合同。",
+        "真实目录选择取消/添加成功，外部路径重启另后端真case。",
+        "真实goal/autolearn独立GET+各自PUT200；learn.enabled实际PUT后config读回false。",
+        "真实技能行viewer installed:true与按钮不误开；独立native viewer文件树正文边界。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "新增GET/partial是真实已做，不再把旧historical missing复制为当前缺口。",
+        "原生目录选择/取消另有精确绑定证据，其他OS不额外当本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_agent_settings_live.rs::native_initialization_cache_summary_and_real_fifteen_second_timeout",
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection",
+        "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx::真实设置容器的导航、恢复及失败处理（%s）"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-99F8CD228733",
+      "originalAssertionIndex": 2,
+      "originalText": "自动读技能、组合、外部目录和后台译名：成功核对 技能/组合按助手显示，名称可翻译；空态/未初始化核对 无助手清空；无技能显 noUser；错误/无权限核对 技能加载异常仅 console.error，可能呈空态：需修正场景",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "99F8CD228733",
+      "alreadyCoveredConcretePoints": [
+        "独立native初始化冷启动/缓存/摘要失败/15秒实预算通过，不受另两drag失败倒算。",
+        "真实空技能noUser、选文件取消零写、完整包全局安装不自动启用。",
+        "Tab真实单PATCH403回滚enabled/error；切选择丢旧响应g组件合同。",
+        "真实组合CRUD/导出文件、Panel两个组合排序、新真实200/404部分写；Tab drag/order合同。",
+        "真实目录选择取消/添加成功，外部路径重启另后端真case。",
+        "真实goal/autolearn独立GET+各自PUT200；learn.enabled实际PUT后config读回false。",
+        "真实技能行viewer installed:true与按钮不误开；独立native viewer文件树正文边界。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "新增GET/partial是真实已做，不再把旧historical missing复制为当前缺口。",
+        "原生目录选择/取消另有精确绑定证据，其他OS不额外当本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection",
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::current_skills_pages_real_read_failures_and_partial_bundle_writes",
+        "desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx::settings_same_owner_get_failures_keep_old_lists_and_two_bundle_writes_preserve_real_partial_result",
+        "desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx::settings_first_skills_get_real_scope_denial_is_visible_not_empty_success",
+        "desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx::settings_first_bundles_get_real_scope_denial_is_visible_not_empty_success"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-99F8CD228733",
+      "originalAssertionIndex": 3,
+      "originalText": "拖入文件或选文件安装全局技能：成功核对 安装成功 toast 并重载当前 agentId、runtime=1 的技能视角；不会自动为当前助手启用。桌面选择器选路径安装；拖入文件若能取得路径也用 path，只有无路径才提交 base64 file。；空态/未初始化核对 取消文件选择无变更；系统文件选择取消不发安装请求。；错误/无权限核对 错误 toast",
+      "providerId": null,
+      "classification": "SPECIFIC_CONSUMER_BRANCH_NOT_DIRECTLY_INPUT",
+      "coveredGroup": "99F8CD228733",
+      "alreadyCoveredConcretePoints": [
+        "独立native初始化冷启动/缓存/摘要失败/15秒实预算通过，不受另两drag失败倒算。",
+        "真实空技能noUser、选文件取消零写、完整包全局安装不自动启用。",
+        "Tab真实单PATCH403回滚enabled/error；切选择丢旧响应g组件合同。",
+        "真实组合CRUD/导出文件、Panel两个组合排序、新真实200/404部分写；Tab drag/order合同。",
+        "真实目录选择取消/添加成功，外部路径重启另后端真case。",
+        "真实goal/autolearn独立GET+各自PUT200；learn.enabled实际PUT后config读回false。",
+        "真实技能行viewer installed:true与按钮不误开；独立native viewer文件树正文边界。"
+      ],
+      "specificStillUnprovenConditions": [
+        "无本机路径上传只有mock组件合同；真实上传→Rust落文件链不在该live。"
+      ],
+      "exactOriginalTextForThoseConditions": "拖入文件或选文件安装全局技能：成功核对 安装成功 toast 并重载当前 agentId、runtime=1 的技能视角；不会自动为当前助手启用。桌面选择器选路径安装；拖入文件若能取得路径也用 path，只有无路径才提交 base64 file。；空态/未初始化核对 取消文件选择无变更；系统文件选择取消不发安装请求。；错误/无权限核对 错误 toast",
+      "boundaryNotImplementationGap": [
+        "新增GET/partial是真实已做，不再把旧historical missing复制为当前缺口。",
+        "原生目录选择/取消另有精确绑定证据，其他OS不额外当本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-99F8CD228733",
+      "originalAssertionIndex": 4,
+      "originalText": "删除技能：成功核对 确认后删除并重载；空态/未初始化核对 无助手或取消确认无变更；错误/无权限核对 失败 toast",
+      "providerId": null,
+      "classification": "SPECIFIC_CONSUMER_BRANCH_NOT_DIRECTLY_INPUT",
+      "coveredGroup": "99F8CD228733",
+      "alreadyCoveredConcretePoints": [
+        "独立native初始化冷启动/缓存/摘要失败/15秒实预算通过，不受另两drag失败倒算。",
+        "真实空技能noUser、选文件取消零写、完整包全局安装不自动启用。",
+        "Tab真实单PATCH403回滚enabled/error；切选择丢旧响应g组件合同。",
+        "真实组合CRUD/导出文件、Panel两个组合排序、新真实200/404部分写；Tab drag/order合同。",
+        "真实目录选择取消/添加成功，外部路径重启另后端真case。",
+        "真实goal/autolearn独立GET+各自PUT200；learn.enabled实际PUT后config读回false。",
+        "真实技能行viewer installed:true与按钮不误开；独立native viewer文件树正文边界。"
+      ],
+      "specificStillUnprovenConditions": [
+        "Tab删除按钮自身服务拒绝后提示未在live输入，后端删除拒绝/Panel删除是不同事实。"
+      ],
+      "exactOriginalTextForThoseConditions": "删除技能：成功核对 确认后删除并重载；空态/未初始化核对 无助手或取消确认无变更；错误/无权限核对 失败 toast",
+      "boundaryNotImplementationGap": [
+        "新增GET/partial是真实已做，不再把旧historical missing复制为当前缺口。",
+        "原生目录选择/取消另有精确绑定证据，其他OS不额外当本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-99F8CD228733",
+      "originalAssertionIndex": 5,
+      "originalText": "创建/改名/删除/排序/导出组合及移动组合内技能：成功核对 组合树及文件导出更新；导出返回 filePath 时调用 showInFinder，其他组合写入不触发该 IPC。；空态/未初始化核对 空名称或取消弹窗无变更；错误/无权限核对 每项失败 toast",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "99F8CD228733",
+      "alreadyCoveredConcretePoints": [
+        "独立native初始化冷启动/缓存/摘要失败/15秒实预算通过，不受另两drag失败倒算。",
+        "真实空技能noUser、选文件取消零写、完整包全局安装不自动启用。",
+        "Tab真实单PATCH403回滚enabled/error；切选择丢旧响应g组件合同。",
+        "真实组合CRUD/导出文件、Panel两个组合排序、新真实200/404部分写；Tab drag/order合同。",
+        "真实目录选择取消/添加成功，外部路径重启另后端真case。",
+        "真实goal/autolearn独立GET+各自PUT200；learn.enabled实际PUT后config读回false。",
+        "真实技能行viewer installed:true与按钮不误开；独立native viewer文件树正文边界。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "新增GET/partial是真实已做，不再把旧historical missing复制为当前缺口。",
+        "原生目录选择/取消另有精确绑定证据，其他OS不额外当本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection",
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::current_skills_pages_real_read_failures_and_partial_bundle_writes",
+        "desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx::settings_same_owner_get_failures_keep_old_lists_and_two_bundle_writes_preserve_real_partial_result"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-99F8CD228733",
+      "originalAssertionIndex": 6,
+      "originalText": "按助手启停技能与组合：成功核对 相应助手技能状态更新；空态/未初始化核对 无助手禁用；错误/无权限核对 失败回滚/提示",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "99F8CD228733",
+      "alreadyCoveredConcretePoints": [
+        "独立native初始化冷启动/缓存/摘要失败/15秒实预算通过，不受另两drag失败倒算。",
+        "真实空技能noUser、选文件取消零写、完整包全局安装不自动启用。",
+        "Tab真实单PATCH403回滚enabled/error；切选择丢旧响应g组件合同。",
+        "真实组合CRUD/导出文件、Panel两个组合排序、新真实200/404部分写；Tab drag/order合同。",
+        "真实目录选择取消/添加成功，外部路径重启另后端真case。",
+        "真实goal/autolearn独立GET+各自PUT200；learn.enabled实际PUT后config读回false。",
+        "真实技能行viewer installed:true与按钮不误开；独立native viewer文件树正文边界。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "新增GET/partial是真实已做，不再把旧historical missing复制为当前缺口。",
+        "原生目录选择/取消另有精确绑定证据，其他OS不额外当本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-99F8CD228733",
+      "originalAssertionIndex": 7,
+      "originalText": "添加或移除外部兼容目录：成功核对 选择目录后发送外部路径 PUT，随后重载目录与技能并显示成功 toast；移除目录走同样路径。；空态/未初始化核对 取消选目录不变；目录选择取消不发 PUT。；错误/无权限核对 外部目录 PUT 的非 2xx 由 lingxiFetch 抛错；网络或后续重载异常也进入 catch，显示失败 toast。",
+      "providerId": null,
+      "classification": "SPECIFIC_CONSUMER_BRANCH_NOT_DIRECTLY_INPUT",
+      "coveredGroup": "99F8CD228733",
+      "alreadyCoveredConcretePoints": [
+        "独立native初始化冷启动/缓存/摘要失败/15秒实预算通过，不受另两drag失败倒算。",
+        "真实空技能noUser、选文件取消零写、完整包全局安装不自动启用。",
+        "Tab真实单PATCH403回滚enabled/error；切选择丢旧响应g组件合同。",
+        "真实组合CRUD/导出文件、Panel两个组合排序、新真实200/404部分写；Tab drag/order合同。",
+        "真实目录选择取消/添加成功，外部路径重启另后端真case。",
+        "真实goal/autolearn独立GET+各自PUT200；learn.enabled实际PUT后config读回false。",
+        "真实技能行viewer installed:true与按钮不误开；独立native viewer文件树正文边界。"
+      ],
+      "specificStillUnprovenConditions": [
+        "live目录操作是取消/添加成功；页面移除路径、PUT成功后重载失败提示未输入。"
+      ],
+      "exactOriginalTextForThoseConditions": "添加或移除外部兼容目录：成功核对 选择目录后发送外部路径 PUT，随后重载目录与技能并显示成功 toast；移除目录走同样路径。；空态/未初始化核对 取消选目录不变；目录选择取消不发 PUT。；错误/无权限核对 外部目录 PUT 的非 2xx 由 lingxiFetch 抛错；网络或后续重载异常也进入 catch，显示失败 toast。",
+      "boundaryNotImplementationGap": [
+        "新增GET/partial是真实已做，不再把旧historical missing复制为当前缺口。",
+        "原生目录选择/取消另有精确绑定证据，其他OS不额外当本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-99F8CD228733",
+      "originalAssertionIndex": 8,
+      "originalText": "技能创建/远端拉取/安全审查三种能力开关：成功核对 capabilities.learn_skills 的 enabled/allow_github_fetch/safety_review 通过每助手配置接口写入全局 preferences 并重载；高风险开启/关闭须确认；经 autoSaveConfig 的保存成功后立即重读助手 config 快照。；该组能力开关保存尝试后仍重读助手设置，经验启用时追加读取经验。；空态/未初始化核对 配置未就绪开关为未加载态；错误/无权限核对 autoSaveConfig 失败须按返回值/提示核对，不能自动认为已保存；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；helper PUT 已成功但后续快照 GET 失败可能提示保存失败，需读回判实际状态。；SkillCapabilities 未检查 autoSaveConfig 返回值，保存失败后仍尝试 loadSettingsConfig。",
+      "providerId": null,
+      "classification": "SPECIFIC_CONSUMER_BRANCH_NOT_DIRECTLY_INPUT",
+      "coveredGroup": "99F8CD228733",
+      "alreadyCoveredConcretePoints": [
+        "独立native初始化冷启动/缓存/摘要失败/15秒实预算通过，不受另两drag失败倒算。",
+        "真实空技能noUser、选文件取消零写、完整包全局安装不自动启用。",
+        "Tab真实单PATCH403回滚enabled/error；切选择丢旧响应g组件合同。",
+        "真实组合CRUD/导出文件、Panel两个组合排序、新真实200/404部分写；Tab drag/order合同。",
+        "真实目录选择取消/添加成功，外部路径重启另后端真case。",
+        "真实goal/autolearn独立GET+各自PUT200；learn.enabled实际PUT后config读回false。",
+        "真实技能行viewer installed:true与按钮不误开；独立native viewer文件树正文边界。"
+      ],
+      "specificStillUnprovenConditions": [
+        "live line50只点learnCreate/enabled总开关，allow_github_fetch/safety_review的风险确认取消/保存未点。",
+        "本能力组保存后重读失败未输入；BaseURL真实刷新失败是共享调用者代表。"
+      ],
+      "exactOriginalTextForThoseConditions": "技能创建/远端拉取/安全审查三种能力开关：成功核对 capabilities.learn_skills 的 enabled/allow_github_fetch/safety_review 通过每助手配置接口写入全局 preferences 并重载；高风险开启/关闭须确认；经 autoSaveConfig 的保存成功后立即重读助手 config 快照。；该组能力开关保存尝试后仍重读助手设置，经验启用时追加读取经验。；空态/未初始化核对 配置未就绪开关为未加载态；错误/无权限核对 autoSaveConfig 失败须按返回值/提示核对，不能自动认为已保存；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；helper PUT 已成功但后续快照 GET 失败可能提示保存失败，需读回判实际状态。；SkillCapabilities 未检查 autoSaveConfig 返回值，保存失败后仍尝试 loadSettingsConfig。",
+      "boundaryNotImplementationGap": [
+        "新增GET/partial是真实已做，不再把旧historical missing复制为当前缺口。",
+        "原生目录选择/取消另有精确绑定证据，其他OS不额外当本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-99F8CD228733",
+      "originalAssertionIndex": 9,
+      "originalText": "自动读取 goal/autolearn 全局偏好：成功核对 只从 GET 读取并展示 goal/autolearn 全局偏好；保存由后续 #09 控件执行。；空态/未初始化核对 读取失败保持 undefined 未加载态；错误/无权限核对 GET 失败静默保留未加载态；此自动读取动作没有 PUT 保存失败。",
+      "providerId": null,
+      "classification": "SPECIFIC_CONSUMER_BRANCH_NOT_DIRECTLY_INPUT",
+      "coveredGroup": "99F8CD228733",
+      "alreadyCoveredConcretePoints": [
+        "独立native初始化冷启动/缓存/摘要失败/15秒实预算通过，不受另两drag失败倒算。",
+        "真实空技能noUser、选文件取消零写、完整包全局安装不自动启用。",
+        "Tab真实单PATCH403回滚enabled/error；切选择丢旧响应g组件合同。",
+        "真实组合CRUD/导出文件、Panel两个组合排序、新真实200/404部分写；Tab drag/order合同。",
+        "真实目录选择取消/添加成功，外部路径重启另后端真case。",
+        "真实goal/autolearn独立GET+各自PUT200；learn.enabled实际PUT后config读回false。",
+        "真实技能行viewer installed:true与按钮不误开；独立native viewer文件树正文边界。"
+      ],
+      "specificStillUnprovenConditions": [
+        "goal/autolearn各自GET失败保持undefined未加载无此页面具名输入。"
+      ],
+      "exactOriginalTextForThoseConditions": "自动读取 goal/autolearn 全局偏好：成功核对 只从 GET 读取并展示 goal/autolearn 全局偏好；保存由后续 #09 控件执行。；空态/未初始化核对 读取失败保持 undefined 未加载态；错误/无权限核对 GET 失败静默保留未加载态；此自动读取动作没有 PUT 保存失败。",
+      "boundaryNotImplementationGap": [
+        "新增GET/partial是真实已做，不再把旧historical missing复制为当前缺口。",
+        "原生目录选择/取消另有精确绑定证据，其他OS不额外当本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-99F8CD228733",
+      "originalAssertionIndex": 10,
+      "originalText": "目标预算/踩坑自动沉淀开关：成功核对 两个全局偏好独立显示并保存；空态/未初始化核对 读取失败保持 undefined 未加载态；错误/无权限核对 PUT 失败回滚开关并 toast；GET 失败目前静默保留未加载态",
+      "providerId": null,
+      "classification": "SPECIFIC_CONSUMER_BRANCH_NOT_DIRECTLY_INPUT",
+      "coveredGroup": "99F8CD228733",
+      "alreadyCoveredConcretePoints": [
+        "独立native初始化冷启动/缓存/摘要失败/15秒实预算通过，不受另两drag失败倒算。",
+        "真实空技能noUser、选文件取消零写、完整包全局安装不自动启用。",
+        "Tab真实单PATCH403回滚enabled/error；切选择丢旧响应g组件合同。",
+        "真实组合CRUD/导出文件、Panel两个组合排序、新真实200/404部分写；Tab drag/order合同。",
+        "真实目录选择取消/添加成功，外部路径重启另后端真case。",
+        "真实goal/autolearn独立GET+各自PUT200；learn.enabled实际PUT后config读回false。",
+        "真实技能行viewer installed:true与按钮不误开；独立native viewer文件树正文边界。"
+      ],
+      "specificStillUnprovenConditions": [
+        "goal/autolearn各自PUT失败回滚/error未输入；live47–48仅两次成功PUT200。"
+      ],
+      "exactOriginalTextForThoseConditions": "目标预算/踩坑自动沉淀开关：成功核对 两个全局偏好独立显示并保存；空态/未初始化核对 读取失败保持 undefined 未加载态；错误/无权限核对 PUT 失败回滚开关并 toast；GET 失败目前静默保留未加载态",
+      "boundaryNotImplementationGap": [
+        "新增GET/partial是真实已做，不再把旧historical missing复制为当前缺口。",
+        "原生目录选择/取消另有精确绑定证据，其他OS不额外当本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    },
+    {
+      "originalID": "R00-T02-LA-99F8CD228733",
+      "originalAssertionIndex": 11,
+      "originalText": "点击已列出的技能行打开技能查看器：成功核对 有 baseDir 的技能行触发 openSkillViewer IPC；主窗口接收 show-skill-viewer 后显示查看器，查看器自动 listSkillFiles 并 readSkillFile 读取默认文件；此入口 installed:true，不显示“复制到技能”按钮。；空态/未初始化核对 技能缺 baseDir 时行点击无请求；文件列表返回空或正文返回 null 时查看器显示空文件树/空正文；删除和开关按钮阻止行点击。；错误/无权限核对 SkillRow 对 openSkillViewer fire-and-forget；查看器文件树/正文 IPC 异常未在该组件捕获，不能承诺错误 toast。",
+      "providerId": null,
+      "classification": "EXISTING_CHECKPOINTS_OR_CAUTION",
+      "coveredGroup": "99F8CD228733",
+      "alreadyCoveredConcretePoints": [
+        "独立native初始化冷启动/缓存/摘要失败/15秒实预算通过，不受另两drag失败倒算。",
+        "真实空技能noUser、选文件取消零写、完整包全局安装不自动启用。",
+        "Tab真实单PATCH403回滚enabled/error；切选择丢旧响应g组件合同。",
+        "真实组合CRUD/导出文件、Panel两个组合排序、新真实200/404部分写；Tab drag/order合同。",
+        "真实目录选择取消/添加成功，外部路径重启另后端真case。",
+        "真实goal/autolearn独立GET+各自PUT200；learn.enabled实际PUT后config读回false。",
+        "真实技能行viewer installed:true与按钮不误开；独立native viewer文件树正文边界。"
+      ],
+      "specificStillUnprovenConditions": [],
+      "exactOriginalTextForThoseConditions": null,
+      "boundaryNotImplementationGap": [
+        "新增GET/partial是真实已做，不再把旧historical missing复制为当前缺口。",
+        "原生目录选择/取消另有精确绑定证据，其他OS不额外当本地实现缺口。"
+      ],
+      "gExisting165CaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection",
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_native_skill_viewer_current_tauri_window_and_read_boundaries"
+      ],
+      "knownProductFailureClaimed": false,
+      "originalStatusUnchanged": "PARTIAL_NAMED_EVIDENCE"
+    }
+  ],
+  "concreteGroupAudits": {
+    "0DDB5AA05072": {
+      "alreadyCovered": [
+        "Panel完整包真实安装后当前Agent enabled/runtime GET、无Agent零写/error。",
+        "Panel真实删除确认取消/成功runtime读回、bundle双向启停。",
+        "Panel组合创建/成员移动/改名/两个组合排序正式读回、导出真实文件/零额外GET。",
+        "新两surface首次skills/bundles GET403 error非空成功、同owner保旧、换身份隐藏。",
+        "新两个PUT200/404+真实磁盘部分提交/error已直接覆盖Promise.all失败。"
+      ],
+      "notGap": [
+        "不再要求新增GET失败和partial测试，原文未要求部分写必须403。"
+      ]
+    },
+    "99F8CD228733": {
+      "alreadyCovered": [
+        "独立native初始化冷启动/缓存/摘要失败/15秒实预算通过，不受另两drag失败倒算。",
+        "真实空技能noUser、选文件取消零写、完整包全局安装不自动启用。",
+        "Tab真实单PATCH403回滚enabled/error；切选择丢旧响应g组件合同。",
+        "真实组合CRUD/导出文件、Panel两个组合排序、新真实200/404部分写；Tab drag/order合同。",
+        "真实目录选择取消/添加成功，外部路径重启另后端真case。",
+        "真实goal/autolearn独立GET+各自PUT200；learn.enabled实际PUT后config读回false。",
+        "真实技能行viewer installed:true与按钮不误开；独立native viewer文件树正文边界。"
+      ],
+      "notGap": [
+        "新增GET/partial是真实已做，不再把旧historical missing复制为当前缺口。",
+        "原生目录选择/取消另有精确绑定证据，其他OS不额外当本地实现缺口。"
+      ]
+    },
+    "F92121640419": {
+      "alreadyCovered": [
+        "7槽widget数量、follow(null)、同名model区分provider/vision filter；真实Knowledge/Summarize后端操作另证。",
+        "aux busy→success→3秒复位；failed-result/request-error失败图标；换模型丢旧结果与卸载abort均g具名。",
+        "useMedia三路独立读，单路失败不拖全局、失败保last-known-good、序列化写防迟到；ModelsTab focus刷新目录合同已有。",
+        "image null/选择/adapter缺失禁用，video独立PUT，ASR enabled/default包均有组件。",
+        "TTS select/clear两拒绝保旧error、ASR零写独立/adapter缺失和后端真roundtrip已有。",
+        "四模态真实Source CRUD/生成/重启/queued revoke与BigASR真Operation另外已跑。"
+      ],
+      "notGap": [
+        "UI mock合同与真实handler是分层证据，没拼成全部一次UI链不自动说明功能未实现。",
+        "不要求每种空态/失败全排列；无adapter或无模型的禁用不是账号阻塞。"
+      ]
+    },
+    "D50161CE274A": {
+      "alreadyCovered": [
+        "真实初始化/cache/摘要失败/15秒+rootentry all-pages/无model/无agent/重启通过。",
+        "持久provider重挂保留、草稿不丢持久项/重挂丢草稿、草稿零config写、持久删/JSONerror保条目合同。",
+        "key blur/清除/拒绝保draft、BaseURL/API Format合同；rootentry172–201真实BaseURL PUT200落Source→Agent config GET500→error且零summary/media续读。",
+        "模型发现只候选、enable才metadata/删media/JSONerror不refresh合同；后端真实四模态Source及消费者另证。",
+        "key保存后验证失败保已存、清空/shouldVerify，真health/Anthropic及ledger；search busy/success/failure/rejection合同。",
+        "mode参数provider/model/runtime/mode包与modal，g额外无schema/无models两空态也已执行。",
+        "g真实OAuth按钮→生产Rust→自有PKCE/device→state/summary/私密落盘/logout；slowDown/失败/迟到/已生效刷新失败组件分支另证。",
+        "masked key显式读取/隐藏清临时state/无普通state或clipboard秘密，后端双scope reveal真实验证。"
+      ],
+      "notGap": [
+        "不能再说写成功读失败没有真实代表。",
+        "不能再说OAuth只有mock；URL平台代理不证明系统浏览器打开或真账号是明确边界，不是本地断链。"
+      ]
+    },
+    "4629FFC0E72A": {
+      "alreadyCovered": [
+        "原三search-clear具体empty/null/active/inactive key及重启不复活真实通过。",
+        "partial_global_save仅locale+invalid provider，确有preferencesSaved和event，但不是models/search混合。"
+      ],
+      "notGap": [
+        "不是接口未实现，也不要求新配置导入功能。"
+      ]
+    }
+  },
+  "additionalAlreadyExecutedGNamedResultsNotNew165Refs": [
+    {
+      "source": "desktop/src/react/__tests__/services/r07-oauth-real-service.test.tsx",
+      "fullName": "T08 OAuth 页面连接真实 Rust 子进程与自有授权响应端 实际按钮完成 PKCE 手输码、device 轮询、摘要刷新、私密落盘和登出；无二进制明确跳过",
+      "status": "PASS_IN_G",
+      "jsonPointer": "/testResults/12/assertionResults/0"
+    },
+    {
+      "source": "desktop/src/react/settings/hooks/__tests__/useMediaSettingsData.test.tsx",
+      "fullName": "useMediaSettingsData loads image, video, and speech resources independently on mount",
+      "status": "PASS_IN_G",
+      "jsonPointer": "/testResults/64/assertionResults/0"
+    },
+    {
+      "source": "desktop/src/react/settings/hooks/__tests__/useMediaSettingsData.test.tsx",
+      "fullName": "useMediaSettingsData does not fail the whole resource layer when one endpoint rejects",
+      "status": "PASS_IN_G",
+      "jsonPointer": "/testResults/64/assertionResults/1"
+    },
+    {
+      "source": "desktop/src/react/settings/hooks/__tests__/useMediaSettingsData.test.tsx",
+      "fullName": "useMediaSettingsData keeps last-known-good providers when a refresh fails",
+      "status": "PASS_IN_G",
+      "jsonPointer": "/testResults/64/assertionResults/2"
+    },
+    {
+      "source": "desktop/src/react/settings/hooks/__tests__/useMediaSettingsData.test.tsx",
+      "fullName": "useMediaSettingsData serializes writes so a slower earlier response cannot overwrite a later save",
+      "status": "PASS_IN_G",
+      "jsonPointer": "/testResults/64/assertionResults/5"
+    },
+    {
+      "source": "desktop/src/react/settings/tabs/__tests__/SkillsTab.test.tsx",
+      "fullName": "SkillsTab — sticky skillsViewAgentId & toggleSkill race guard uploads a selected skill package when no local path picker is available",
+      "status": "PASS_IN_G",
+      "jsonPointer": "/testResults/73/assertionResults/1"
+    },
+    {
+      "source": "desktop/src/react/settings/tabs/__tests__/SkillsTab.test.tsx",
+      "fullName": "SkillsTab — sticky skillsViewAgentId & toggleSkill race guard requests backend skill-name translation with the current agentId and visible names",
+      "status": "PASS_IN_G",
+      "jsonPointer": "/testResults/73/assertionResults/4"
+    },
+    {
+      "source": "desktop/src/react/settings/tabs/__tests__/SkillsTab.test.tsx",
+      "fullName": "SkillsTab — sticky skillsViewAgentId & toggleSkill race guard toggleSkill race guard: switching selector mid-flight ignores the stale PATCH result",
+      "status": "PASS_IN_G",
+      "jsonPointer": "/testResults/73/assertionResults/6"
+    },
+    {
+      "source": "desktop/src/react/settings/tabs/__tests__/SkillsTab.test.tsx",
+      "fullName": "SkillsTab — sticky skillsViewAgentId & toggleSkill race guard persists bundle and bundled-skill order after drag and drop",
+      "status": "PASS_IN_G",
+      "jsonPointer": "/testResults/73/assertionResults/12"
+    },
+    {
+      "source": "desktop/src/react/settings/tabs/providers/__tests__/AuxiliaryModelsSection.test.tsx",
+      "fullName": "AuxiliaryModelsSection shows a readable failure for failed-result",
+      "status": "PASS_IN_G",
+      "jsonPointer": "/testResults/80/assertionResults/1"
+    },
+    {
+      "source": "desktop/src/react/settings/tabs/providers/__tests__/AuxiliaryModelsSection.test.tsx",
+      "fullName": "AuxiliaryModelsSection shows a readable failure for request-error",
+      "status": "PASS_IN_G",
+      "jsonPointer": "/testResults/80/assertionResults/2"
+    },
+    {
+      "source": "desktop/src/react/settings/tabs/providers/__tests__/ProviderMediaDefaults.test.tsx",
+      "fullName": "ProviderMediaDefaults renders an explicit empty state when the added model declares no parameter schema",
+      "status": "PASS_IN_G",
+      "jsonPointer": "/testResults/83/assertionResults/2"
+    },
+    {
+      "source": "desktop/src/react/settings/tabs/providers/__tests__/ProviderMediaDefaults.test.tsx",
+      "fullName": "ProviderMediaDefaults renders the same empty state when the runtime catalog has no added models at all",
+      "status": "PASS_IN_G",
+      "jsonPointer": "/testResults/83/assertionResults/3"
+    }
+  ],
+  "frozenSourceProofs": {
+    "rust/crates/lingxi-service/src/provider_probe.rs": {
+      "kind": "g-archive",
+      "sha256": "c73574d344d8d489451330ebd01f6a08b5118d94e021af811a008ab431c5ce83",
+      "bytes": 38912
+    },
+    "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs": {
+      "kind": "g-archive",
+      "sha256": "0c8dda8542b193417d8c9037fcc7fb53393ded762f51c1d4828054ef6373c0f1",
+      "bytes": 24779
+    },
+    "rust/crates/lingxi-service/tests/r07_t08_settings.rs": {
+      "kind": "g-archive",
+      "sha256": "249140e1690506fd0c7058d1891d7690573a10ff1f893ce79ae7a5b05be212db",
+      "bytes": 27555
+    },
+    "rust/crates/lingxi-service/tests/r07_t08_search_clear.rs": {
+      "kind": "g-archive",
+      "sha256": "809406bc49b65f87ef074a28fb84a92f282554676ce44309a95c1774c57f4920",
+      "bytes": 13065
+    },
+    "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs": {
+      "kind": "g-archive",
+      "sha256": "3ce34df1e565a4d6aec60d27335f269dbff9fc7542f718b35fa8686e3eb32f0f",
+      "bytes": 33681
+    },
+    "rust/crates/lingxi-service/tests/r07_t08_speech_bindings.rs": {
+      "kind": "g-archive",
+      "sha256": "537b3cde1c5911da80e901737e3076f59fa826735e369eccbc05b68358b725d5",
+      "bytes": 19895
+    },
+    "desktop/src/react/settings/__tests__/R06SkillsRustLive.test.tsx": {
+      "kind": "base-commit",
+      "sha256": "97f0abd2b6eeb6af855ed497edc4659db0410af5b5ed648d7104a089c237a14c",
+      "bytes": 15516
+    },
+    "desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx": {
+      "kind": "g-archive",
+      "sha256": "bf9e33d8d0a9951c9f60050fe4105ef41768577e38ade9e39d595d83c161126c",
+      "bytes": 11599
+    },
+    "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx": {
+      "kind": "g-archive",
+      "sha256": "4b3f42514447ea22d51fdc01c414d28cc18d73a956c89f4371ac8bb61d7c7292",
+      "bytes": 19680
+    },
+    "desktop/src/react/__tests__/services/r07-oauth-real-service.test.tsx": {
+      "kind": "g-archive",
+      "sha256": "23261911b64df1e66c35744fd9d74457562931afbecf60847eaf6c33c5bd935e",
+      "bytes": 14001
+    },
+    "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx": {
+      "kind": "g-archive",
+      "sha256": "ef2afb92f0b7f60c5d8b1dd7a54d8ef90803b7f4a1b4ed2e4fe49dd3c9ea8735",
+      "bytes": 17594
+    },
+    "desktop/src/react/settings/tabs/providers/__tests__/AuxiliaryModelsSection.test.tsx": {
+      "kind": "base-commit",
+      "sha256": "35a5b4c2fa751c2555e768dfe4339f074cd8e10603d8725179306d9e8037f63f",
+      "bytes": 7471
+    },
+    "rust/crates/lingxi-service/tests/r05_t01_model_plane.rs": {
+      "kind": "base-commit",
+      "sha256": "101c02bf149534abe150154b17ef7a5cc0588e9a7580aba17d1f6aaa5efae9e0",
+      "bytes": 117514
+    },
+    "rust/crates/lingxi-service/tests/r05_t02_credentials.rs": {
+      "kind": "base-commit",
+      "sha256": "8a7f7f23e30aa22b23a51138d4ac2817e9dca78fa63889d4fa82dd82a0e35541",
+      "bytes": 165447
+    }
+  },
+  "laterRootDevelopmentNotG": {
+    "reportedResult": "provider36(原positive+35逐IDnegative)+search5(原3+mixed400/500)真实41/41，sourceUnchanged=true，logSHA6e28241574bf78b562589ecbb73353c11269e5ce307e3fd82ec52d1e41e74344",
+    "thisReviewerDidNotRunOrReadSuccessorSource": true,
+    "effect": "不改g原未证/原失败，h仍绑定自己的候选结果。"
+  },
+  "hPracticalJudgment": [
+    "skills GET/partial、provider BaseURL写后GET500、aux失败/TTS错误、真实OAuth已做，不重复当缺口。",
+    "剩余learn两个具体开关确认、goal/autolearn失败及Panel自身失败可用同live fixture补，属于具体输入未做，不是已知产品bug。",
+    "Header/自定义空表单/删除成功读失败是消费分支未直接输入；不要求每字段所有故障全排列。",
+    "七槽render/选择合同和四媒体合同+真handler是分层已有证据；若要加强用户动作实际结果可做最小真实保存读盘，但不由缺一次全链自动认定功能未接。",
+    "空态/真实账号/其它OS边界不变成本地实现缺口，任何新修复需h自己验证，不倒填g。"
+  ],
+  "originalLedgerEdited": false,
+  "sourceEdited": false,
+  "cargoRun": false,
+  "finalAcceptanceClaimed": false,
+  "existingSharedGuardRepresentativeEvidence": [
+    {
+      "source": "rust/crates/lingxi-service/tests/r05_t01_model_plane.rs",
+      "case": "c06_unsupported_family_makes_zero_requests",
+      "gate": "model-regression",
+      "status": "PASS_IN_G",
+      "logLine": 38,
+      "logSha256": "701042a9ff51fbc907423cfc0c68fa7a74102e1291eb4eabce276f41a1cb24a2",
+      "scope": "真实通用模型/凭证fixture代表，不是35品牌逐identity负例。"
+    },
+    {
+      "source": "rust/crates/lingxi-service/tests/r05_t01_model_plane.rs",
+      "case": "f01_explicitly_unsupported_tools_capability_makes_zero_requests",
+      "gate": "model-regression",
+      "status": "PASS_IN_G",
+      "logLine": 26,
+      "logSha256": "701042a9ff51fbc907423cfc0c68fa7a74102e1291eb4eabce276f41a1cb24a2",
+      "scope": "真实通用模型/凭证fixture代表，不是35品牌逐identity负例。"
+    },
+    {
+      "source": "rust/crates/lingxi-service/tests/r05_t02_credentials.rs",
+      "case": "c07_oauth_without_a_login_fails_before_any_request",
+      "gate": "model-regression",
+      "status": "PASS_IN_G",
+      "logLine": 52,
+      "logSha256": "701042a9ff51fbc907423cfc0c68fa7a74102e1291eb4eabce276f41a1cb24a2",
+      "scope": "真实通用模型/凭证fixture代表，不是35品牌逐identity负例。"
+    },
+    {
+      "source": "rust/crates/lingxi-service/tests/r05_t02_credentials.rs",
+      "case": "c05_a_revoked_credential_never_resurrects_full_chain",
+      "gate": "model-regression",
+      "status": "PASS_IN_G",
+      "logLine": 79,
+      "logSha256": "701042a9ff51fbc907423cfc0c68fa7a74102e1291eb4eabce276f41a1cb24a2",
+      "scope": "真实通用模型/凭证fixture代表，不是35品牌逐identity负例。"
+    }
+  ],
+  "interpretationRules": [
+    "每条alreadyCoveredConcretePoints列同一功能组已检查的具体点，结合该条gExisting165CaseRefs核对；不是把组中所有点自动分配为本条全覆盖。",
+    "specificStillUnprovenConditions为该消费分支未直接输入，不等同产品缺陷或必须为每副句新建测试；仅原文相关条件，不要求全排列。",
+    "原343/109和165refs未修改；旧partial状态保留，此摘要只细化判断。",
+    "引用的13个g额外标题均已正式执行，不是新建清单，也不借后继源码填g。"
+  ]
+}

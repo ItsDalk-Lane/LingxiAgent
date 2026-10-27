@@ -5,6 +5,7 @@
  */
 
 import { useMemo } from 'react';
+import { ownsSessionConnection, type SessionConnectionOwner } from '../../services/session-connection-owner';
 import { useStore } from '../../stores';
 import { switchSession } from '../../stores/session-actions';
 import { MarkdownContent } from '../chat/MarkdownContent';
@@ -14,6 +15,7 @@ import type { MapCard } from './conversation-map-layout';
 import styles from './ConversationMap.module.css';
 
 interface Props {
+  owner?: SessionConnectionOwner | null;
   card: MapCard;
   threadTitle: string;
   /** 该卡片是否为其 thread 的最后一张可见卡片（决定能否继续追问）。 */
@@ -21,7 +23,7 @@ interface Props {
   onClose: () => void;
 }
 
-export function ConversationMapInspector({ card, threadTitle, isLastInThread, onClose }: Props) {
+export function ConversationMapInspector({ card, threadTitle, isLastInThread, onClose, owner = null }: Props) {
   const { t } = useI18n();
   const setMapDraft = useStore((s) => s.setMapDraft);
 
@@ -31,8 +33,11 @@ export function ConversationMapInspector({ card, threadTitle, isLastInThread, on
   );
 
   const openDraft = (kind: 'continue' | 'branch') => {
+    if (owner && !ownsSessionConnection(owner)) return;
     setMapDraft({
       kind,
+      draftId: crypto.randomUUID(),
+      ...(owner ? {nativeOwner:{key:owner.key,revision:owner.revision}} : {}),
       anchorCardId: card.id,
       sessionId: card.sessionId,
       sessionPath: card.sessionPath,
@@ -82,6 +87,7 @@ export function ConversationMapInspector({ card, threadTitle, isLastInThread, on
           type="button"
           className={styles.toolbarButton}
           onClick={() => {
+            if (owner && !ownsSessionConnection(owner)) return;
             void switchSession(card.sessionPath);
             useStore.getState().setCurrentTab('chat');
           }}

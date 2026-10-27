@@ -1,0 +1,260 @@
+{
+ "scannedAtUnixMs": 1793062993336,
+ "notImplementedOccurrences": [
+  {
+   "file": "desktop/src-tauri/src/native/errors.rs",
+   "line": 77,
+   "token": "NOT_IMPLEMENTED",
+   "text": "pub const E_NOT_IMPLEMENTED: &str = \"NOT_IMPLEMENTED\";",
+   "category": "constant-definition"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/errors.rs",
+   "line": 77,
+   "token": "NOT_IMPLEMENTED",
+   "text": "pub const E_NOT_IMPLEMENTED: &str = \"NOT_IMPLEMENTED\";",
+   "category": "constant-definition"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/ipc_negative_matrix.rs",
+   "line": 489,
+   "token": "NOT_IMPLEMENTED",
+   "text": "crate::native::errors::E_NOT_IMPLEMENTED,",
+   "category": "negative-test-matrix"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/ipc_negative_matrix.rs",
+   "line": 494,
+   "token": "NOT_IMPLEMENTED",
+   "text": "crate::native::errors::E_NOT_IMPLEMENTED,",
+   "category": "negative-test-matrix"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/onboarding.rs",
+   "line": 19,
+   "token": "NOT_IMPLEMENTED",
+   "text": "deny, HostResult, E_NOT_IMPLEMENTED, E_RELEASE_DISABLED, E_WINDOW_NOT_ALLOWED,",
+   "category": "registered-blocked (T06-ONBOARD-01，与 Electron Rust 模式一致)",
+   "registrationChecked": {
+    "BLOCKED.md": true,
+    "T06_PROGRESS.md": true
+   }
+  },
+  {
+   "file": "desktop/src-tauri/src/native/onboarding.rs",
+   "line": 63,
+   "token": "NOT_IMPLEMENTED",
+   "text": "E_NOT_IMPLEMENTED,",
+   "category": "registered-blocked (T06-ONBOARD-01，与 Electron Rust 模式一致)",
+   "registrationChecked": {
+    "BLOCKED.md": true,
+    "T06_PROGRESS.md": true
+   }
+  },
+  {
+   "file": "desktop/src-tauri/src/native/onboarding.rs",
+   "line": 73,
+   "token": "NOT_IMPLEMENTED",
+   "text": "E_NOT_IMPLEMENTED,",
+   "category": "registered-blocked (T06-ONBOARD-01，与 Electron Rust 模式一致)",
+   "registrationChecked": {
+    "BLOCKED.md": true,
+    "T06_PROGRESS.md": true
+   }
+  },
+  {
+   "file": "desktop/src-tauri/src/native/onboarding.rs",
+   "line": 79,
+   "token": "NOT_IMPLEMENTED",
+   "text": "E_NOT_IMPLEMENTED,",
+   "category": "registered-blocked (T06-ONBOARD-01，与 Electron Rust 模式一致)",
+   "registrationChecked": {
+    "BLOCKED.md": true,
+    "T06_PROGRESS.md": true
+   }
+  },
+  {
+   "file": "desktop/src-tauri/src/native/screenshot.rs",
+   "line": 20,
+   "token": "NOT_IMPLEMENTED",
+   "text": "deny, HostResult, E_INVALID_ARGUMENT, E_NOT_IMPLEMENTED, E_PATH_NOT_ABSOLUTE,",
+   "category": "deferred-command-policy (T04 OQ-04)"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/screenshot.rs",
+   "line": 241,
+   "token": "NOT_IMPLEMENTED",
+   "text": "E_NOT_IMPLEMENTED,",
+   "category": "deferred-command-policy (T04 OQ-04)"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/tray.rs",
+   "line": 16,
+   "token": "NOT_IMPLEMENTED",
+   "text": "//! R09 缺失」——移除是显式登记后的可见差异，不是静默隐藏，也不以 NOT_IMPLEMENTED",
+   "category": "fail-closed (icon missing → explicit deny, no silent continue)"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/tray.rs",
+   "line": 23,
+   "token": "NOT_IMPLEMENTED",
+   "text": "use super::errors::{deny, HostResult, E_ENUM_INVALID, E_NOT_IMPLEMENTED};",
+   "category": "fail-closed (icon missing → explicit deny, no silent continue)"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/tray.rs",
+   "line": 175,
+   "token": "NOT_IMPLEMENTED",
+   "text": "E_NOT_IMPLEMENTED,",
+   "category": "fail-closed (icon missing → explicit deny, no silent continue)"
+  }
+ ],
+ "notImplementedRegistered": [
+  {
+   "file": "desktop/src-tauri/src/native/errors.rs",
+   "line": 77,
+   "token": "NOT_IMPLEMENTED",
+   "text": "pub const E_NOT_IMPLEMENTED: &str = \"NOT_IMPLEMENTED\";",
+   "category": "constant-definition"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/errors.rs",
+   "line": 77,
+   "token": "NOT_IMPLEMENTED",
+   "text": "pub const E_NOT_IMPLEMENTED: &str = \"NOT_IMPLEMENTED\";",
+   "category": "constant-definition"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/ipc_negative_matrix.rs",
+   "line": 489,
+   "token": "NOT_IMPLEMENTED",
+   "text": "crate::native::errors::E_NOT_IMPLEMENTED,",
+   "category": "negative-test-matrix"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/ipc_negative_matrix.rs",
+   "line": 494,
+   "token": "NOT_IMPLEMENTED",
+   "text": "crate::native::errors::E_NOT_IMPLEMENTED,",
+   "category": "negative-test-matrix"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/onboarding.rs",
+   "line": 19,
+   "token": "NOT_IMPLEMENTED",
+   "text": "deny, HostResult, E_NOT_IMPLEMENTED, E_RELEASE_DISABLED, E_WINDOW_NOT_ALLOWED,",
+   "category": "registered-blocked (T06-ONBOARD-01，与 Electron Rust 模式一致)",
+   "registrationChecked": {
+    "BLOCKED.md": true,
+    "T06_PROGRESS.md": true
+   }
+  },
+  {
+   "file": "desktop/src-tauri/src/native/onboarding.rs",
+   "line": 63,
+   "token": "NOT_IMPLEMENTED",
+   "text": "E_NOT_IMPLEMENTED,",
+   "category": "registered-blocked (T06-ONBOARD-01，与 Electron Rust 模式一致)",
+   "registrationChecked": {
+    "BLOCKED.md": true,
+    "T06_PROGRESS.md": true
+   }
+  },
+  {
+   "file": "desktop/src-tauri/src/native/onboarding.rs",
+   "line": 73,
+   "token": "NOT_IMPLEMENTED",
+   "text": "E_NOT_IMPLEMENTED,",
+   "category": "registered-blocked (T06-ONBOARD-01，与 Electron Rust 模式一致)",
+   "registrationChecked": {
+    "BLOCKED.md": true,
+    "T06_PROGRESS.md": true
+   }
+  },
+  {
+   "file": "desktop/src-tauri/src/native/onboarding.rs",
+   "line": 79,
+   "token": "NOT_IMPLEMENTED",
+   "text": "E_NOT_IMPLEMENTED,",
+   "category": "registered-blocked (T06-ONBOARD-01，与 Electron Rust 模式一致)",
+   "registrationChecked": {
+    "BLOCKED.md": true,
+    "T06_PROGRESS.md": true
+   }
+  },
+  {
+   "file": "desktop/src-tauri/src/native/screenshot.rs",
+   "line": 20,
+   "token": "NOT_IMPLEMENTED",
+   "text": "deny, HostResult, E_INVALID_ARGUMENT, E_NOT_IMPLEMENTED, E_PATH_NOT_ABSOLUTE,",
+   "category": "deferred-command-policy (T04 OQ-04)"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/screenshot.rs",
+   "line": 241,
+   "token": "NOT_IMPLEMENTED",
+   "text": "E_NOT_IMPLEMENTED,",
+   "category": "deferred-command-policy (T04 OQ-04)"
+  }
+ ],
+ "notImplementedUnregistered": [],
+ "failClosed": [
+  {
+   "file": "desktop/src-tauri/src/native/tray.rs",
+   "line": 16,
+   "token": "NOT_IMPLEMENTED",
+   "text": "//! R09 缺失」——移除是显式登记后的可见差异，不是静默隐藏，也不以 NOT_IMPLEMENTED",
+   "category": "fail-closed (icon missing → explicit deny, no silent continue)"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/tray.rs",
+   "line": 23,
+   "token": "NOT_IMPLEMENTED",
+   "text": "use super::errors::{deny, HostResult, E_ENUM_INVALID, E_NOT_IMPLEMENTED};",
+   "category": "fail-closed (icon missing → explicit deny, no silent continue)"
+  },
+  {
+   "file": "desktop/src-tauri/src/native/tray.rs",
+   "line": 175,
+   "token": "NOT_IMPLEMENTED",
+   "text": "E_NOT_IMPLEMENTED,",
+   "category": "fail-closed (icon missing → explicit deny, no silent continue)"
+  }
+ ],
+ "trivialCommands": [],
+ "noopWithoutReason": [],
+ "absentWithoutReason": [],
+ "uiDeadEntrypoints": [],
+ "capabilityReasonConsumers": [
+  "desktop/src/react/mobile/mobile-platform.ts"
+ ],
+ "deferredCommands": [
+  "ack_announcement",
+  "auto_update_check",
+  "auto_update_install",
+  "auto_update_set_channel",
+  "auto_update_state",
+  "get_pending_announcement",
+  "get_update_digest_history",
+  "observability_export_abort",
+  "observability_export_begin",
+  "observability_export_end",
+  "observability_export_write",
+  "read_docx_html",
+  "read_xlsx_html",
+  "release_check_latest",
+  "screenshot_render",
+  "train_update_apply",
+  "train_update_check",
+  "train_update_status"
+ ],
+ "unregisteredGaps": [],
+ "summary": {
+  "notImplemented": 13,
+  "registered": 10,
+  "unregistered": 0,
+  "failClosed": 3,
+  "uiDeadEntrypoints": 0,
+  "unregisteredGaps": 0
+ }
+}

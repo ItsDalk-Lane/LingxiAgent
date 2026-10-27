@@ -1,0 +1,282 @@
+{
+  "docx": {
+    "plan": {
+      "processorId": "lingxi-office-docx",
+      "processorVersion": "1",
+      "processorConfigHash": "966ca2ecd8b76a1f7c4b4c06655e8044c984b625d7639ee2ef5a12ce5b59cf90"
+    },
+    "blocks": [
+      {
+        "ordinal": 0,
+        "text": "参考标题",
+        "locatorType": "text",
+        "locator": {
+          "lineStart": 1,
+          "lineEnd": 1,
+          "charStart": 0,
+          "charEnd": 4,
+          "source": {
+            "kind": "docx_paragraph",
+            "paragraphIndex": 0,
+            "tag": "h1",
+            "headingPath": [
+              "参考标题"
+            ]
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "text": "DOCX reference 𠀀 exact",
+        "locatorType": "text",
+        "locator": {
+          "lineStart": 2,
+          "lineEnd": 2,
+          "charStart": 5,
+          "charEnd": 28,
+          "source": {
+            "kind": "docx_paragraph",
+            "paragraphIndex": 1,
+            "tag": "p",
+            "headingPath": [
+              "参考标题"
+            ]
+          }
+        }
+      }
+    ],
+    "warnings": [],
+    "fidelity": "structural"
+  },
+  "xlsx": {
+    "plan": {
+      "processorId": "lingxi-office-xlsx",
+      "processorVersion": "1",
+      "processorConfigHash": "e626ae31c2f7741f33fa9e87b8ab8d9f43346d101829d7febdc835e0230004bb"
+    },
+    "blocks": [
+      {
+        "ordinal": 0,
+        "text": "Alpha target",
+        "locatorType": "text",
+        "locator": {
+          "lineStart": 1,
+          "lineEnd": 1,
+          "charStart": 0,
+          "charEnd": 12,
+          "source": {
+            "kind": "sheet_row",
+            "sheet": "Alpha",
+            "row": 3,
+            "cells": [
+              "B3"
+            ]
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "text": "Beta target | 12 | 3",
+        "locatorType": "text",
+        "locator": {
+          "lineStart": 2,
+          "lineEnd": 2,
+          "charStart": 13,
+          "charEnd": 33,
+          "source": {
+            "kind": "sheet_row",
+            "sheet": "Beta",
+            "row": 7,
+            "cells": [
+              "C7",
+              "D7",
+              "E7"
+            ]
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "text": "2024-02-29T12:00:00.000Z",
+        "locatorType": "text",
+        "locator": {
+          "lineStart": 3,
+          "lineEnd": 3,
+          "charStart": 34,
+          "charEnd": 58,
+          "source": {
+            "kind": "sheet_row",
+            "sheet": "Beta",
+            "row": 9,
+            "cells": [
+              "B9"
+            ]
+          }
+        }
+      }
+    ],
+    "warnings": [],
+    "fidelity": "structural"
+  },
+  "csv": {
+    "plan": {
+      "processorId": "lingxi-office-csv",
+      "processorVersion": "1",
+      "processorConfigHash": "80151c159021caee9b2c763602b95307ef4dc0617637877bbebfc254f6f79ecd"
+    },
+    "blocks": [
+      {
+        "ordinal": 0,
+        "text": "one | quoted, exact",
+        "locatorType": "text",
+        "locator": {
+          "lineStart": 1,
+          "lineEnd": 1,
+          "charStart": 0,
+          "charEnd": 19,
+          "source": {
+            "kind": "csv_row",
+            "sheet": "sheet1",
+            "row": 1,
+            "cells": [
+              "R1C1",
+              "R1C2"
+            ]
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "text": "𠀀 | CSV target",
+        "locatorType": "text",
+        "locator": {
+          "lineStart": 2,
+          "lineEnd": 2,
+          "charStart": 20,
+          "charEnd": 35,
+          "source": {
+            "kind": "csv_row",
+            "sheet": "sheet1",
+            "row": 2,
+            "cells": [
+              "R2C1",
+              "R2C2"
+            ]
+          }
+        }
+      }
+    ],
+    "warnings": [],
+    "fidelity": "structural"
+  },
+  "csvCases": [
+    {
+      "input": "0001,1.0,1e3,0x10,true,#N/A\n",
+      "blocks": [
+        {
+          "ordinal": 0,
+          "text": "1 | 1 | 1000 | 16 | true | [object Object]",
+          "locatorType": "text",
+          "locator": {
+            "lineStart": 1,
+            "lineEnd": 1,
+            "charStart": 0,
+            "charEnd": 42,
+            "source": {
+              "kind": "csv_row",
+              "sheet": "sheet1",
+              "row": 1,
+              "cells": [
+                "R1C1",
+                "R1C2",
+                "R1C3",
+                "R1C4",
+                "R1C5",
+                "R1C6"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "input": "2024-02-29,02-29-2024,2024-02-29T12:00:00Z\n",
+      "blocks": [
+        {
+          "ordinal": 0,
+          "text": "2024-02-28T16:00:00.000Z | 2024-02-28T16:00:00.000Z | 2024-02-29T12:00:00Z",
+          "locatorType": "text",
+          "locator": {
+            "lineStart": 1,
+            "lineEnd": 1,
+            "charStart": 0,
+            "charEnd": 74,
+            "source": {
+              "kind": "csv_row",
+              "sheet": "sheet1",
+              "row": 1,
+              "cells": [
+                "R1C1",
+                "R1C2",
+                "R1C3"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "input": "a,b\n\nc,d\n",
+      "blocks": [
+        {
+          "ordinal": 0,
+          "text": "a | b",
+          "locatorType": "text",
+          "locator": {
+            "lineStart": 1,
+            "lineEnd": 1,
+            "charStart": 0,
+            "charEnd": 5,
+            "source": {
+              "kind": "csv_row",
+              "sheet": "sheet1",
+              "row": 1,
+              "cells": [
+                "R1C1",
+                "R1C2"
+              ]
+            }
+          }
+        },
+        {
+          "ordinal": 1,
+          "text": "c | d",
+          "locatorType": "text",
+          "locator": {
+            "lineStart": 2,
+            "lineEnd": 2,
+            "charStart": 6,
+            "charEnd": 11,
+            "source": {
+              "kind": "csv_row",
+              "sheet": "sheet1",
+              "row": 3,
+              "cells": [
+                "R3C1",
+                "R3C2"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "input": "\"unclosed",
+      "error": "Parse Error: missing closing: '\"' in line: at '\"unclosed'"
+    },
+    {
+      "input": "a,\"b\"oops\n",
+      "error": "Parse Error: expected: ',' OR new line got: 'o'. at 'oops\\n'"
+    }
+  ]
+}

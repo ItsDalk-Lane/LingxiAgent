@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "collapsedFolderIds": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "collapsedProjectIds": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "showAllProjectIds": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "collapsedProjectIds",
+    "collapsedFolderIds",
+    "showAllProjectIds"
+  ],
+  "title": "SidebarProjectViewPreferences",
+  "type": "object"
+}

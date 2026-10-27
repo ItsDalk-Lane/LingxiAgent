@@ -1,0 +1,67 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "zhipu",
+  "case": "clear-replay-policy-round-trips",
+  "model": {
+    "provider": "zhipu",
+    "id": "glm-4.7",
+    "baseUrl": "https://open.bigmodel.cn/api/paas/v4",
+    "api": "openai-completions",
+    "reasoning": true
+  },
+  "payload": {
+    "model": "glm-4.7",
+    "messages": [
+      {
+        "role": "assistant",
+        "content": "a",
+        "reasoning_content": "trace",
+        "tool_calls": [
+          {
+            "id": "c1",
+            "type": "function",
+            "function": {
+              "name": "f",
+              "arguments": "{}"
+            }
+          }
+        ]
+      }
+    ],
+    "thinking": {
+      "type": "enabled",
+      "clear_thinking": true
+    }
+  },
+  "options": {
+    "mode": "chat"
+  },
+  "expected": {
+    "thinkingFormat": "zhipu",
+    "reasoningProfile": "zhipu-openai",
+    "matched": "zhipu",
+    "result": {
+      "model": "glm-4.7",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "a",
+          "tool_calls": [
+            {
+              "id": "c1",
+              "type": "function",
+              "function": {
+                "name": "f",
+                "arguments": "{}"
+              }
+            }
+          ]
+        }
+      ],
+      "thinking": {
+        "type": "enabled",
+        "clear_thinking": true
+      }
+    }
+  }
+}

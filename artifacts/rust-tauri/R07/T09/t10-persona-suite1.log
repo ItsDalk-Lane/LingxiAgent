@@ -1,0 +1,54 @@
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r06_original_persona_proofs") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.58s
+     Running tests/r06_original_persona_proofs.rs (rust/target-r07/debug/deps/r06_original_persona_proofs-63325c2d30afba1d)
+
+running 2 tests
+test original_avatar_read_prefers_all_formats_and_preserves_other_agent ... FAILED
+test original_persona_reads_template_custom_alias_and_refusal ... FAILED
+
+failures:
+
+---- original_avatar_read_prefers_all_formats_and_preserves_other_agent stdout ----
+
+thread 'original_avatar_read_prefers_all_formats_and_preserves_other_agent' (6227108) panicked at crates/lingxi-service/tests/r06_original_persona_proofs.rs:33:5:
+assertion `left == right` failed
+  left: "/Users/study_superior/Desktop/Code/LingxiAgent/lib"
+ right: "/private/tmp/lingxi-r07-tests/persona-product"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- original_persona_reads_template_custom_alias_and_refusal stdout ----
+
+thread 'original_persona_reads_template_custom_alias_and_refusal' (6227136) panicked at crates/lingxi-service/tests/r06_original_persona_proofs.rs:33:5:
+assertion `left == right` failed
+  left: "/Users/study_superior/Desktop/Code/LingxiAgent/lib"
+ right: "/private/tmp/lingxi-r07-tests/persona-product"
+
+
+failures:
+    original_avatar_read_prefers_all_formats_and_preserves_other_agent
+    original_persona_reads_template_custom_alias_and_refusal
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_original_persona_proofs`

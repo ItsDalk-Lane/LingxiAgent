@@ -188,7 +188,7 @@ async function main() {
   // ── 7. @vercel/nft 追踪 ──
   await pruneServerNodeModulesViaNft({
     outDir,
-    nftRoots: ["bundle/index.js"],
+    nftRoots: ["bundle/index.js", "bundle/bridge-sdk-worker.mjs", "bundle/bridge-sdk-diagnostic.mjs", "bundle/office-document-worker.mjs", "bundle/media-jimeng-worker.mjs"],
     externalPackageNames: Object.keys(externalPkg.dependencies),
     runWithTargetNode,
   });

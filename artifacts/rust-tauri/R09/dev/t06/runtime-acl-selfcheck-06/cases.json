@@ -1,0 +1,281 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t06_runtime_acl",
+ "cases": [
+  {
+   "case": "acl::preflight::policy-valid",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "schema": "lingxi.r09.command-policy.v1",
+    "path": "docs/rust-tauri/R09/R09_COMMAND_POLICY.json"
+   }
+  },
+  {
+   "case": "acl::preflight::window-labels-match-policy",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "policy": [
+     "browser-viewer",
+     "main",
+     "onboarding",
+     "quick-chat",
+     "settings",
+     "skill-viewer-*",
+     "splash",
+     "viewer-*"
+    ],
+    "native": [
+     "browser-viewer",
+     "main",
+     "onboarding",
+     "quick-chat",
+     "settings",
+     "skill-viewer-*",
+     "splash",
+     "viewer-*"
+    ]
+   }
+  },
+  {
+   "case": "acl::preflight::matrix-plan-generated",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "allowCases": 142,
+    "denyCases": 466,
+    "perWindow": {
+     "main": 8,
+     "settings": 47,
+     "quick-chat": 66,
+     "splash": 73,
+     "onboarding": 66,
+     "browser-viewer": 70,
+     "viewer-*": 64,
+     "skill-viewer-*": 72
+    }
+   }
+  },
+  {
+   "case": "acl::preflight::candidate-handoff-present",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "path": "artifacts/rust-tauri/R09/dev/t06/candidate-handoff-02/candidate-handoff.json"
+   }
+  },
+  {
+   "case": "acl::preflight::g1-evidence-features",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "features": [
+     "e2e-test",
+     "r09-host",
+     "r09-test-hooks"
+    ],
+    "evidenceBuild": true,
+    "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/debug/lingxi-resource-desktop"
+   }
+  },
+  {
+   "case": "acl::preflight::delivery-release-not-evidence",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "features": [
+     "r09-host"
+    ],
+    "evidenceBuild": false
+   }
+  },
+  {
+   "case": "acl::preflight::renderer-binding-equal",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "delivery": "d09359bd5bc87071c7e4cfc7fffb99553bc39b1345dd83946dcd14c51f244f31",
+    "g1": "d09359bd5bc87071c7e4cfc7fffb99553bc39b1345dd83946dcd14c51f244f31",
+    "note": "同一 renderer 候选（digest 相同），两个生成实例"
+   }
+  },
+  {
+   "case": "acl::preflight::delivery-scan-pass",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": "PASS",
+    "failedCases": []
+   }
+  },
+  {
+   "case": "acl::preflight::release-no-canary-debug-command",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "binary": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+    "hits": {},
+    "note": "A12：release 不得含 test canary/debug 命令名"
+   }
+  },
+  {
+   "case": "acl::preflight::gui-clearance",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "env": "LINGXI_R09_T06_RUNTIME_ACL_CLEARED",
+    "value": null,
+    "note": "运行期矩阵未 cleared：不会启动 app（无 GUI 自检模式）"
+   }
+  },
+  {
+   "case": "acl::preflight::hidden-only-clearance",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "env": "LINGXI_R09_T06_RUNTIME_ACL_HIDDEN_ONLY",
+    "value": null,
+    "visibleRiskWindows": {
+     "quick-chat": "quick_chat_show → install::show_quick_chat → window.show()/set_focus（可见）",
+     "onboarding": "debug_open_onboarding: builder visible(false) 后立即 window.show()（可见）",
+     "viewer-*": "spawn_viewer: WebviewWindowBuilder 默认 visible=true（创建即可见）",
+     "browser-viewer": "open_browser_viewer: 创建控制面板窗口后 show（可见）",
+     "skill-viewer-*": "open_skill_viewer: WebviewWindowBuilder 默认 visible=true（创建即可见）"
+    },
+    "note": "hidden-only 批次只启动 hidden 主窗；可见风险窗口记 blocked，避免任何可见窗口"
+   }
+  },
+  {
+   "case": "blocked::runtime::browser-viewer::matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "RUNTIME_ACL_NOT_CLEARED：需 Lead 明确 GUI cleared 批次",
+    "plan": {
+     "allow": 6,
+     "deny": 70
+    }
+   }
+  },
+  {
+   "case": "blocked::runtime::main::matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "RUNTIME_ACL_NOT_CLEARED：需 Lead 明确 GUI cleared 批次",
+    "plan": {
+     "allow": 68,
+     "deny": 8
+    }
+   }
+  },
+  {
+   "case": "blocked::runtime::onboarding::matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "RUNTIME_ACL_NOT_CLEARED：需 Lead 明确 GUI cleared 批次",
+    "plan": {
+     "allow": 10,
+     "deny": 66
+    }
+   }
+  },
+  {
+   "case": "blocked::runtime::quick-chat::matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "RUNTIME_ACL_NOT_CLEARED：需 Lead 明确 GUI cleared 批次",
+    "plan": {
+     "allow": 10,
+     "deny": 66
+    }
+   }
+  },
+  {
+   "case": "blocked::runtime::settings::matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "RUNTIME_ACL_NOT_CLEARED：需 Lead 明确 GUI cleared 批次",
+    "plan": {
+     "allow": 29,
+     "deny": 47
+    }
+   }
+  },
+  {
+   "case": "blocked::runtime::skill-viewer-*::matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "RUNTIME_ACL_NOT_CLEARED：需 Lead 明确 GUI cleared 批次",
+    "plan": {
+     "allow": 4,
+     "deny": 72
+    }
+   }
+  },
+  {
+   "case": "blocked::runtime::splash::matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "RUNTIME_ACL_NOT_CLEARED：需 Lead 明确 GUI cleared 批次",
+    "plan": {
+     "allow": 3,
+     "deny": 73
+    }
+   }
+  },
+  {
+   "case": "blocked::runtime::viewer-*::matrix",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "RUNTIME_ACL_NOT_CLEARED：需 Lead 明确 GUI cleared 批次",
+    "plan": {
+     "allow": 12,
+     "deny": 64
+    }
+   }
+  },
+  {
+   "case": "blocked::runtime::remote-webview-zero-acl",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "RUNTIME_ACL_NOT_CLEARED：需真实 GUI/wdio"
+   }
+  },
+  {
+   "case": "blocked::runtime::canary-debug-command-absent",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "RUNTIME_ACL_NOT_CLEARED：需真实 GUI/wdio"
+   }
+  },
+  {
+   "case": "blocked::runtime::debug-command-release-denied",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "RUNTIME_ACL_NOT_CLEARED：需真实 GUI/wdio"
+   }
+  }
+ ]
+}

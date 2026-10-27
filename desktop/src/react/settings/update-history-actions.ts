@@ -1,4 +1,5 @@
 import type { UpdateDigestHistoryResult } from '../types';
+import { usePlatform } from '../hooks/use-platform';
 
 const EMPTY_HISTORY: UpdateDigestHistoryResult = {
   entries: [],
@@ -7,7 +8,7 @@ const EMPTY_HISTORY: UpdateDigestHistoryResult = {
 };
 
 export async function loadUpdateDigestHistory(): Promise<UpdateDigestHistoryResult> {
-  const result = await window.hana?.getUpdateDigestHistory?.();
+  const result = await usePlatform()?.getUpdateDigestHistory?.();
   if (!result || !Array.isArray(result.entries)) return EMPTY_HISTORY;
   return {
     entries: result.entries.slice(0, 5),

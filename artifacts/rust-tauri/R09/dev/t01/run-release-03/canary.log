@@ -1,0 +1,6 @@
+{
+ "port": 5173,
+ "connections": 0,
+ "viteEnabled": false,
+ "injectedEnv": "VITE_DEV_URL=http://127.0.0.1:5173"
+}

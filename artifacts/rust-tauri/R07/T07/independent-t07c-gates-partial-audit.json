@@ -1,0 +1,185 @@
+{
+  "candidate": "t07c",
+  "checkedAt": "2026-10-18T03:21:37.597466+00:00",
+  "status": "PARTIAL_GATES_ONLY",
+  "receipts": {
+    "fmt": {
+      "checks": {
+        "commandMatchesPlan": true,
+        "exitZero": true,
+        "beforeMatchesCandidate": true,
+        "afterMatchesCandidate": true,
+        "sourceUnchanged": true,
+        "headMatches": true,
+        "logHashMatches": true
+      },
+      "receiptSha256": "b9f17e61743dfa7f8dfac8ab8d9ceb525f16a41426e03a2ce2e2ff328603c5f7",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "summaries": [],
+      "successRows": 0,
+      "ignoredRows": []
+    },
+    "clippy": {
+      "checks": {
+        "commandMatchesPlan": true,
+        "exitZero": true,
+        "beforeMatchesCandidate": true,
+        "afterMatchesCandidate": true,
+        "sourceUnchanged": true,
+        "headMatches": true,
+        "logHashMatches": true
+      },
+      "receiptSha256": "e73c1e7ad21db69c316cd8f4c4f097f3fc28b5644232f0604241bd3aaf9fcf57",
+      "logSha256": "9a30d54c8b16d7e49510b182028079bca120aeebb7d662e88f8566e6196a49f6",
+      "summaries": [],
+      "successRows": 0,
+      "ignoredRows": []
+    },
+    "adapter": {
+      "checks": {
+        "commandMatchesPlan": true,
+        "exitZero": false,
+        "beforeMatchesCandidate": true,
+        "afterMatchesCandidate": true,
+        "sourceUnchanged": true,
+        "headMatches": true,
+        "logHashMatches": true
+      },
+      "receiptSha256": "63e6b71bf726bb8fc94d2b7be3ce93c50e43206f06fefe41e8e618d1f982f450",
+      "logSha256": "bcfa954bcca461a075d13dba3a5b8e1d2e3171d7d9f9ebeaeda7a46400cb0a3d",
+      "summaries": [
+        "test result: ok. 138 passed; 0 failed; 13 ignored; 0 measured; 0 filtered out; finished in 0.38s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.58s",
+        "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s",
+        "test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s",
+        "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s",
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.44s",
+        "test result: FAILED. 9 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.86s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s",
+        "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.64s",
+        "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s",
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s",
+        "test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s"
+      ],
+      "successRows": 249,
+      "ignoredRows": [
+        "test browser::host::manual_capture::externally_restored_suspended_window_is_never_reaped_or_evicted ... ignored, 需要可见Chrome窗口，单独执行原生恢复与回收检查",
+        "test browser::host::manual_capture::same_page_native_human_takeover_records_only_owned_target ... ignored, 需要显式提供证据目录，并在原生Chrome测试表单中手动输入",
+        "test browser::host::pdf_lifecycle_tests::browser_revoke_cancels_matching_pdf_without_conflating_run_and_workspace_epochs ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "test browser::host::pdf_lifecycle_tests::invalid_pdf_or_wrong_node_never_spawns_or_reserves_a_lease ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "test browser::host::pdf_lifecycle_tests::pdf_cancel_startup_gap_unknown_keeps_late_owner_and_wrong_owner_cannot_clear_it ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "test browser::host::pdf_lifecycle_tests::pdf_initialization_unknown_retains_scope_process_and_profile_until_retry ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "test browser::host::startup_tests::auxiliary_initialization_unknown_preserves_profile_and_owner_until_retry ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "test browser::host::startup_tests::cdp_preparation_failure_happens_before_any_real_spawn ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "test browser::host::startup_tests::first_target_failure_keeps_actual_process_and_target_until_cleanup_retry ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "test browser::host::startup_tests::forget_rechecks_late_startup_unknown_before_purging_profile ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "test browser::host::startup_tests::live_initialization_failure_keeps_real_owner_until_cleanup_retry_confirms ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "test browser::host::startup_tests::revoke_startup_timeout_preserves_late_unknown_live_until_same_epoch_retry ... ignored, 需要真实Chromium；R07门禁显式运行",
+        "test browser::host::startup_tests::revoke_waits_for_real_spawn_owner_registration_and_confirmed_reap ... ignored, 需要真实Chromium；R07门禁显式运行"
+      ]
+    },
+    "kernel": {
+      "checks": {
+        "commandMatchesPlan": true,
+        "exitZero": true,
+        "beforeMatchesCandidate": true,
+        "afterMatchesCandidate": true,
+        "sourceUnchanged": true,
+        "headMatches": true,
+        "logHashMatches": true
+      },
+      "receiptSha256": "2dac29d1101b117a12eb7979e20ea9cb1c30081e76e19a4d860a3fb62a8e4194",
+      "logSha256": "f21afab48784c9f89c4e69be43c22b7e81f0861f7e088733e0fce49c04638967",
+      "summaries": [
+        "test result: ok. 129 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s",
+        "test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 44 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ],
+      "successRows": 193,
+      "ignoredRows": []
+    },
+    "protocol": {
+      "checks": {
+        "commandMatchesPlan": true,
+        "exitZero": true,
+        "beforeMatchesCandidate": true,
+        "afterMatchesCandidate": true,
+        "sourceUnchanged": true,
+        "headMatches": true,
+        "logHashMatches": true
+      },
+      "receiptSha256": "892203af61c311d1fae0e12a56606b7e27f90ce36394aa3120bd65b1036c8c6c",
+      "logSha256": "41aa43acf572a22b07245f608695a7f66dbb8f1312b1fa2e3bff87ffeab261f0",
+      "summaries": [],
+      "successRows": 0,
+      "ignoredRows": []
+    },
+    "boundaries": {
+      "checks": {
+        "commandMatchesPlan": true,
+        "exitZero": true,
+        "beforeMatchesCandidate": true,
+        "afterMatchesCandidate": true,
+        "sourceUnchanged": true,
+        "headMatches": true,
+        "logHashMatches": true
+      },
+      "receiptSha256": "5af29ec9f4091f0f5c5441611557c5e88b7e7ca1f690d061fd20ba566a53e951",
+      "logSha256": "639c14da4d4db5655ec2449ed7c401ab077a13e2a5255019489a41ea88a20dc6",
+      "summaries": [],
+      "successRows": 0,
+      "ignoredRows": []
+    },
+    "types": {
+      "checks": {
+        "commandMatchesPlan": true,
+        "exitZero": true,
+        "beforeMatchesCandidate": true,
+        "afterMatchesCandidate": true,
+        "sourceUnchanged": true,
+        "headMatches": true,
+        "logHashMatches": true
+      },
+      "receiptSha256": "11744c01325ef14440aa741d7b4f0e34137a5808dd0160142046aec6c9ba2a70",
+      "logSha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "summaries": [],
+      "successRows": 0,
+      "ignoredRows": []
+    },
+    "protocol-tests": {
+      "checks": {
+        "commandMatchesPlan": true,
+        "exitZero": true,
+        "beforeMatchesCandidate": true,
+        "afterMatchesCandidate": true,
+        "sourceUnchanged": true,
+        "headMatches": true,
+        "logHashMatches": true
+      },
+      "receiptSha256": "90a7740255d8a7687b6e1d136d3598b8769a95a89197737a77743e3fa0ef680c",
+      "logSha256": "02141e8dd206dc03d337d74f845b486c01a955a97ddcbae450a2fdcb62794582",
+      "summaries": [
+        "test result: ok. 40 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ],
+      "successRows": 41,
+      "ignoredRows": []
+    }
+  },
+  "missing": [
+    "service",
+    "build",
+    "ui"
+  ],
+  "problems": [
+    "adapter"
+  ]
+}

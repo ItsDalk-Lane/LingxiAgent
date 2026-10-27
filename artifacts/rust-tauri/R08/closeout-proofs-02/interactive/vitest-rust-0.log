@@ -1,0 +1,36 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [rust] > leaf.tool.ask-user: 卡片可见/确认映射/超时推荐/拒答与中止无答案/无效与缺省显式错误（5 断言） 42517ms
+ ✓ desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [rust] > leaf.chat.task-abort: 终止本会话拥有的后台子代理任务 + 404/403/运行态/不扩权（2 断言） 3053ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  19:22:11
+   Duration  46.38s (transform 523ms, setup 20ms, import 452ms, tests 45.58s, environment 245ms)
+
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [rust] > leaf.tool.ask-user: 卡片可见/确认映射/超时推荐/拒答与中止无答案/无效与缺省显式错误（5 断言）
+[has-dbg] called sessionPath= native:sess-39676-1a177f25575-0 sessionId= sess-39676-1a177f25575-0
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [rust] > leaf.tool.ask-user: 卡片可见/确认映射/超时推荐/拒答与中止无答案/无效与缺省显式错误（5 断言）
+[has-dbg] called sessionPath= native:sess-39676-1a177f25575-0 sessionId= sess-39676-1a177f25575-0
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [rust] > leaf.tool.ask-user: 卡片可见/确认映射/超时推荐/拒答与中止无答案/无效与缺省显式错误（5 断言）
+[has-dbg] called sessionPath= native:sess-39676-1a177f25575-0 sessionId= sess-39676-1a177f25575-0
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [rust] > leaf.tool.ask-user: 卡片可见/确认映射/超时推荐/拒答与中止无答案/无效与缺省显式错误（5 断言）
+[has-dbg] called sessionPath= native:sess-39676-1a177f25575-0 sessionId= sess-39676-1a177f25575-0
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [rust] > leaf.tool.ask-user: 卡片可见/确认映射/超时推荐/拒答与中止无答案/无效与缺省显式错误（5 断言）
+[has-dbg] called sessionPath= native:sess-39676-1a177f25575-0 sessionId= sess-39676-1a177f25575-0
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/r08/r08-t07-interactive-ab.test.ts > R08-T07 interactive A/B [rust] > leaf.tool.ask-user: 卡片可见/确认映射/超时推荐/拒答与中止无答案/无效与缺省显式错误（5 断言）
+[has-dbg] called sessionPath= native:sess-39676-1a177f25575-0 sessionId= sess-39676-1a177f25575-0
+[has-dbg] recordsSize= 0 limit= 50
+

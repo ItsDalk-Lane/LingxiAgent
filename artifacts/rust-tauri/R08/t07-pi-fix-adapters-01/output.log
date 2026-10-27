@@ -1,0 +1,214 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.44s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_adapters-826068e87821baa9)
+
+running 191 tests
+test browser::host::manual_capture::externally_restored_suspended_window_is_never_reaped_or_evicted ... ignored, 需要可见Chrome窗口，单独执行原生恢复与回收检查
+test browser::host::manual_capture::same_page_native_human_takeover_records_only_owned_target ... ignored, 需要显式提供证据目录，并在原生Chrome测试表单中手动输入
+test browser::host::pdf_lifecycle_tests::browser_revoke_cancels_matching_pdf_without_conflating_run_and_workspace_epochs ... ignored, 需要真实Chromium；R07门禁显式运行
+test browser::host::pdf_lifecycle_tests::invalid_pdf_or_wrong_node_never_spawns_or_reserves_a_lease ... ignored, 需要真实Chromium；R07门禁显式运行
+test browser::host::pdf_lifecycle_tests::pdf_cancel_startup_gap_unknown_keeps_late_owner_and_wrong_owner_cannot_clear_it ... ignored, 需要真实Chromium；R07门禁显式运行
+test browser::host::pdf_lifecycle_tests::pdf_initialization_unknown_retains_scope_process_and_profile_until_retry ... ignored, 需要真实Chromium；R07门禁显式运行
+test browser::host::startup_tests::auxiliary_initialization_unknown_preserves_profile_and_owner_until_retry ... ignored, 需要真实Chromium；R07门禁显式运行
+test browser::host::startup_tests::cdp_preparation_failure_happens_before_any_real_spawn ... ignored, 需要真实Chromium；R07门禁显式运行
+test browser::host::startup_tests::first_target_failure_keeps_actual_process_and_target_until_cleanup_retry ... ignored, 需要真实Chromium；R07门禁显式运行
+test browser::host::startup_tests::forget_rechecks_late_startup_unknown_before_purging_profile ... ignored, 需要真实Chromium；R07门禁显式运行
+test browser::host::startup_tests::live_initialization_failure_keeps_real_owner_until_cleanup_retry_confirms ... ignored, 需要真实Chromium；R07门禁显式运行
+test browser::host::startup_tests::revoke_startup_timeout_preserves_late_unknown_live_until_same_epoch_retry ... ignored, 需要真实Chromium；R07门禁显式运行
+test browser::host::startup_tests::revoke_waits_for_real_spawn_owner_registration_and_confirmed_reap ... ignored, 需要真实Chromium；R07门禁显式运行
+test browser::pdf::tests::frozen_csp_blocks_network_workers_frames_and_page_javascript_when_disabled ... ok
+test browser::ops::navigation_diagnostics_tests::navigation_diagnostic_keeps_network_code_without_urls_credentials_or_arbitrary_text ... ok
+test models::anthropic_messages::tests::request_shape_system_tools_and_max_tokens ... ok
+test models::anthropic_messages::tests::cross_family_opaque_state_is_never_echoed ... ok
+test models::anthropic_messages::tests::tool_roundtrip_renders_tool_use_and_merged_tool_results ... ok
+test models::anthropic_messages::tests::a_max_tokens_stop_maps_to_retryable_budget_failure ... ok
+test models::compat::tests::replay_contract_covers_the_served_families ... ok
+test models::compat::tests::openrouter_adaptive_disable_is_a_loud_refusal ... ok
+test models::compat::tests::ollama_bridges_response_format_and_num_ctx ... ok
+test models::compat::tests::volcengine_disable_guard_passes_through_without_controls ... ok
+test models::compat::tests::anthropic_marks_system_and_two_recent_user_messages ... ok
+test models::anthropic_messages::tests::unknown_tool_and_malformed_blocks_are_loud ... ok
+test models::compat::tests::replay_center_validates_clears_and_refuses ... ok
+test models::compat::tests::codex_strips_budget_and_temperature_fields ... ok
+test models::compat::tests::dispatch_is_first_match_in_incumbent_order ... ok
+test models::compat::tests::anthropic_max_effort_raises_the_implicit_one_third_cap ... ok
+test models::config::tests::unknown_keys_are_refused ... ok
+test browser::cdp::tests::malformed_messages_wake_both_event_and_command_waiters ... ok
+test models::credentials::tests::applicable_auth_lists_its_materials ... ok
+test models::credentials::tests::credential_error_text_never_names_material_shape_fields ... ok
+test models::config::tests::credential_is_explicit_and_never_defaulted ... ok
+test models::config::tests::endpoint_shape_is_validated ... ok
+test models::config::tests::valid_config_parses ... ok
+test models::credentials::tests::scrub_materials_removes_every_occurrence_and_ignores_empty ... ok
+test models::config::tests::oauth_flow_descriptors_are_validated ... ok
+test models::dispatch::tests::a_429_carries_its_retry_after_hint_in_the_error_details ... ok
+test models::dispatch::tests::error_status_classification_matches_the_incumbent ... ok
+test models::config::tests::t06_operation_bindings_parse_and_family_mismatch_is_loud ... ok
+test models::dispatch::tests::retry_after_parses_seconds_and_http_dates_and_refuses_garbage ... ok
+test models::anthropic_messages::tests::thinking_and_signature_roundtrip_as_state_never_text ... ok
+test models::dispatch::tests::the_incumbent_join_rule_is_verbatim ... ok
+test models::config::tests::unknown_protocol_and_route_provider_are_loud ... ok
+test models::config::tests::route_compat_block_parses_and_validates ... ok
+test models::config::tests::route_compat_block_is_loud_on_unknown_keys_and_values ... ok
+test models::config::tests::auth_header_shape_is_validated ... ok
+test models::compat::tests::session_thinking_options_use_wire_fields_and_longcat_off_without_changing_absent_options ... ok
+test browser::pdf::tests::pdf_output_requires_real_header_trailer_and_byte_budget ... ok
+test browser::pdf::tests::frozen_assets_require_exact_owned_url_and_finite_print_settings ... ok
+test models::egress::tests::https_public_passes_and_plain_http_is_same_origin_only ... ok
+test models::egress::tests::guarded_ipv4_literals_refuse_outside_the_endpoint_exception ... ok
+test models::egress::tests::ipv4_parsing_is_strict_and_default_ports_elide ... ok
+test models::egress::tests::scheme_userinfo_and_host_shapes_refuse ... ok
+test models::egress::tests::the_endpoint_origin_exception_lets_the_loopback_stub_through ... ok
+test models::egress::tests::non_decimal_ipv4_spellings_and_mapped_ipv6_refuse_like_their_normalized_form ... ok
+test models::egress::tests::the_same_origin_exception_matches_normalized_origins_across_spellings ... ok
+test models::gateway::tests::chat_and_auxiliary_routes_resolve_independently ... ok
+test models::gateway::tests::a_family_outside_the_operations_matrix_is_loud ... ok
+test models::gateway::tests::explicit_pair_inherits_only_current_exact_binding_and_never_a_retired_generation ... ok
+test models::gateway::tests::reload_swaps_atomically_and_bumps_the_generation ... ok
+test browser::runtime::tests::fixed_download_parent_rejects_symlinks_and_enforces_both_file_and_cache_limits ... ok
+test browser::managed_files::tests::purge_is_pinned_to_owned_parent_and_never_follows_replaced_links ... ok
+test models::gateway::tests::the_pin_pair_rule_never_guesses_a_provider_from_a_model ... ok
+test models::gateway::tests::the_five_chat_families_resolve_for_dispatch ... ok
+test models::gateway::tests::unconfigured_operations_are_loud_route_gaps ... ok
+test models::google_generative_ai::tests::model_ids_are_percent_encoded_into_the_path ... ok
+test models::google_generative_ai::tests::an_unpairable_tool_result_is_a_loud_render_failure ... ok
+test models::google_generative_ai::tests::request_shape_system_instruction_and_function_declarations ... ok
+test models::google_generative_ai::tests::thoughts_signatures_and_function_calls_parse_in_order ... ok
+test models::network::tests::bracketed_ipv6_no_proxy_entries_bypass_public_literals ... ok
+test models::google_generative_ai::tests::tool_roundtrip_pairs_function_responses_by_exchange_name ... ok
+test models::network::tests::forced_local_bypass_beats_every_list ... ok
+test models::network::tests::config_validation_is_loud_on_every_incumbent_rule ... ok
+test models::network::tests::loopback_bracket_entries_are_pinned_at_the_entry_level ... ok
+test models::network::tests::plane_generations_rebuild_the_client_lazily ... ok
+test models::network::tests::no_proxy_grammar_matches_the_incumbent_forms ... ok
+test models::network::tests::scheme_selection_prefers_the_scheme_proxy ... ok
+test models::network::tests::system_mode_resolves_the_environment_snapshot ... ok
+test models::openai_codex_responses::tests::account_id_extracts_from_the_jwt_claim_or_fails_honestly ... ok
+test models::openai_codex_responses::tests::codex_body_pins_store_stream_and_instructions ... ok
+test models::openai_codex_responses::tests::the_incumbent_url_rule_is_verbatim ... ok
+test models::openai_completions::tests::a_history_target_missing_from_the_snapshot_fails_loudly ... ok
+test models::openai_completions::tests::final_answer_identity_comes_from_the_driver_not_the_response ... ok
+test models::openai_completions::tests::first_turn_request_carries_the_route_model_and_declarations ... ok
+test models::openai_completions::tests::mixed_content_parts_keep_every_block_in_order ... ok
+test models::openai_completions::tests::parses_tool_calls_with_usage_and_identity_from_the_driver ... ok
+test models::openai_completions::tests::stream_aggregates_text_and_usage_and_requires_done ... ok
+test models::openai_completions::tests::stream_rejects_multi_choice_and_missing_ids_loudly ... ok
+test models::openai_completions::tests::stream_aggregates_tool_call_fragments_and_reasoning_in_order ... ok
+test models::openai_completions::tests::streaming_request_flips_the_wire_mode ... ok
+test models::openai_completions::tests::system_prompt_renders_as_the_first_system_message ... ok
+test models::openai_completions::tests::tool_call_exchange_renders_the_protocol_pairing ... ok
+test models::openai_completions::tests::tool_outcome_rendering_is_honest_for_all_four_states ... ok
+test models::openai_completions::tests::unknown_wire_names_are_protocol_violations_never_guesses ... ok
+test models::openai_completions::tests::zero_choices_and_empty_content_are_loud_or_explicit ... ok
+test models::openai_responses::tests::failed_status_is_an_honest_failure_never_an_empty_turn ... ok
+test models::openai_responses::tests::request_shape_instructions_tools_and_no_server_state ... ok
+test models::openai_responses::tests::reasoning_items_roundtrip_verbatim_with_summary_as_reasoning ... ok
+test models::openai_responses::tests::stream_terminal_event_carries_the_authoritative_aggregate ... ok
+test models::streaming::tests::a_leading_bom_is_stripped_once ... ok
+test models::openai_responses::tests::tool_roundtrip_uses_function_call_pairing ... ok
+test models::streaming::tests::an_unterminated_event_at_eof_is_discarded_and_reported ... ok
+test models::streaming::tests::comments_and_id_and_retry_fields_are_ignored ... ok
+test models::streaming::tests::invalid_utf8_is_a_loud_error ... ok
+test models::streaming::tests::multi_line_data_joins_and_chunks_may_split_anywhere ... ok
+test models::streaming::tests::simple_frames_dispatch_on_blank_lines ... ok
+test models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest ... ok
+test models::tool_render::tests::success_renders_resources_status_and_truncation_last ... ok
+test models::tool_render::tests::the_four_base_states_keep_the_t01_vocabulary ... ok
+test models::usage::tests::a_half_reported_usage_is_partial_naming_the_missing_half ... ok
+test models::usage::tests::absent_usage_is_absent_never_zero ... ok
+test models::usage::tests::anthropic_cache_categories_are_separate_from_input ... ok
+test models::usage::tests::every_mapping_names_all_five_chat_families ... ok
+test models::usage::tests::negative_float_and_string_counts_are_invalid_never_satruated ... ok
+test models::usage::tests::openai_totals_include_their_components_but_never_re_add ... ok
+test models::usage::tests::operation_totals_are_never_split_by_guessing ... ok
+test models::streaming::tests::the_buffer_bound_is_loud ... ok
+test storage::legacy_import::classes::tests::table_has_69_classes_and_unique_ids ... ok
+test storage::legacy_import::session_jsonl::tests::clean_file_parses_all_entries ... ok
+test storage::legacy_import::session_jsonl::tests::crlf_and_blank_lines_tolerated ... ok
+test storage::legacy_import::session_jsonl::tests::mid_file_corrupt_line_recorded_and_parsing_continues ... ok
+test storage::legacy_import::session_jsonl::tests::truncated_tail_is_quarantined_not_dropped ... ok
+test storage::legacy_import::session_jsonl::tests::unknown_fields_pass_through_in_raw ... ok
+test storage::legacy_import::session_jsonl::tests::pi_sdk_real_format_entries_recognized ... FAILED
+test storage::legacy_import::manifest::tests::symlinks_are_skipped_not_followed ... ok
+test storage::media_gallery::tests::gallery_status_mapping_never_claims_success_for_non_delivery ... ok
+test storage::media_gallery::tests::task_type_is_the_incumbent_media_kind ... ok
+test browser::cdp::tests::first_close_cause_reaches_written_and_unwritten_calls_with_their_own_effects ... ok
+test browser::cdp::tests::written_cooperative_cancellation_keeps_its_cause_for_later_unwritten_calls ... ok
+test storage::migrations::tests::fingerprints_are_stable_sha256_hex ... ok
+test models::streaming::tests::the_per_frame_bound_is_loud_across_lines_and_chunks ... ok
+test storage::migrations::tests::foreign_tables_without_receipts_are_rejected ... ok
+test browser::cdp::tests::buffered_events_have_monotonic_cursors_and_old_windows_fail_explicitly ... ok
+test storage::migrations::tests::migration_sql_avoids_if_not_exists ... ok
+test storage::migrations::tests::migrations_are_contiguous_from_one ... ok
+test storage::migrations::tests::not_a_database_maps_to_corrupted ... ok
+test storage::migrations::tests::sqlite_error_mapping_by_primary_code ... ok
+test storage::legacy_import::manifest::tests::manifest_is_deterministic_and_change_sensitive ... ok
+test storage::legacy_import::observability::tests::wrong_shape_is_loud_not_silent ... ok
+test browser::managed_files::tests::native_cookie_preferences_keep_unknown_data_and_restore_site_exceptions ... ok
+test storage::queue::tests::checkpoint_grace_above_the_clock_bound_is_rejected_loudly ... ok
+test storage::legacy_import::observability::tests::bad_timestamp_is_loud_not_silent ... ok
+test storage::legacy_import::observability::tests::v1_store_without_usage_table_still_maps ... ok
+test storage::legacy_import::observability::tests::v2_store_maps_rows_with_usage_and_traces ... ok
+test storage::queue::tests::out_of_range_pragma_knobs_are_rejected_before_any_db_open ... ok
+test storage::queue::tests::pragma_knobs_above_the_sqlite_i32_range_are_rejected_loudly ... ok
+test storage::queue::tests::queue_capacity_above_the_tokio_bound_is_rejected_loudly ... ok
+test storage::queue::tests::queue_wait_budget_above_the_documented_max_is_rejected_loudly ... ok
+test storage::queue::tests::accepted_pragma_knobs_round_trip_through_real_sqlite ... ok
+test storage::queue::tests::zero_queue_wait_budget_is_rejected_loudly ... ok
+test storage::rollback_delta::tests::apply_is_idempotent_and_conflicts_loudly ... ok
+test browser::cdp::tests::a_stalled_pipe_write_obeys_the_same_deadline_and_removes_its_pending_id ... ok
+test storage::rollback_delta::tests::export_filters_legacy_identities_and_bookkeeping ... ok
+test storage::rollback_delta::tests::fk_violation_rolls_back_loudly ... ok
+test storage::rollback_delta::tests::package_roundtrip_and_tamper_detection ... ok
+test storage::rollback_delta::tests::session_files_mutation_refused ... ok
+test browser::cdp::tests::eof_wakes_pending_commands_without_waiting_for_their_full_deadline ... ok
+test storage::run_store::run_id_sequence_tests::foreign_and_malformed_shapes_never_seed ... ok
+test storage::run_store::run_id_sequence_tests::recognizes_only_ids_this_allocator_mints ... ok
+test storage::statfs::tests::matches_df_avail_kbytes_within_one_percent ... ok
+test storage::statfs::tests::nonexistent_leaf_resolves_to_existing_ancestor ... ok
+test storage::statfs::tests::temp_dir_volume_reports_plausible_space ... ok
+test storage::queue::tests::checkpoint_grace_recovers_after_transient_reader_pin ... ok
+test storage::legacy_import::classes::tests::models_store_json_amendment_classifies_provider_state ... ok
+test storage::rollback_delta::tests::unmapped_jsonl_shape_skipped_not_guessed ... ok
+test storage::legacy_import::classes::tests::unmapped_returns_none ... ok
+test storage::legacy_import::classes::tests::session_files_directory_prefix_matches ... ok
+test storage::legacy_import::plan::tests::plan_is_sorted_and_keys_are_stable ... ok
+test storage::legacy_import::classes::tests::most_specific_pattern_wins_on_overlap ... ok
+test storage::legacy_import::tests::nonempty_target_without_db_is_refused ... ok
+test storage::rollback_delta::tests::identity_derivation_matches_converter_rules ... ok
+test storage::legacy_import::classes::tests::fixture_representative_paths_classify ... ok
+test storage::queue::tests::queue_wait_budget_turns_a_full_queue_into_loud_queue_full ... ok
+test browser::launcher::tests::exec_does_not_inherit_unprotected_service_fds_and_spawn_errors_remain_real ... ok
+test storage::migrations::tests::apply_then_verify_is_idempotent ... ok
+test storage::migrations::tests::integrity_check_passes_a_healthy_db_and_flags_a_broken_one ... ok
+test storage::queue::tests::checkpoint_grace_expires_loud_with_the_actual_budget ... ok
+test storage::migrations::tests::newer_database_is_rejected_not_downgraded ... ok
+test storage::migrations::tests::tampered_version_row_is_rejected ... ok
+test storage::queue::tests::checkpoint_grace_zero_keeps_the_strict_single_shot ... ok
+test storage::migrations::tests::tampered_fingerprint_is_rejected ... ok
+test storage::migrations::tests::tampered_user_version_is_rejected ... ok
+test storage::legacy_import::tests::resume_with_unknown_run_is_refused ... ok
+test storage::legacy_import::tests::fresh_run_plans_batches_and_writes_receipt ... ok
+test storage::legacy_import::tests::rerun_without_resume_is_refused_fail_closed ... ok
+test storage::legacy_import::tests::stop_after_batch_interrupts_cleanly_then_resume_finishes ... ok
+test storage::legacy_import::tests::kill_recovery_requires_instance_lock ... ok
+test storage::legacy_import::tests::b2_session_jsonl_convert_end_to_end ... ok
+test storage::legacy_import::tests::resume_continues_same_run_without_duplicate_batches ... ok
+
+failures:
+
+---- storage::legacy_import::session_jsonl::tests::pi_sdk_real_format_entries_recognized stdout ----
+
+thread 'storage::legacy_import::session_jsonl::tests::pi_sdk_real_format_entries_recognized' (17329339) panicked at crates/lingxi-adapters/src/storage/legacy_import/session_jsonl.rs:233:9:
+assertion `left == right` failed
+  left: Some(1790848800000)
+ right: Some(1725789600000)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    storage::legacy_import::session_jsonl::tests::pi_sdk_real_format_entries_recognized
+
+test result: FAILED. 177 passed; 1 failed; 13 ignored; 0 measured; 0 filtered out; finished in 0.58s
+
+error: test failed, to rerun pass `-p lingxi-adapters --lib`

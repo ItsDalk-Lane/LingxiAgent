@@ -1,0 +1,97 @@
+{
+  "status": "STATIC_ONLY_NOT_EXECUTED",
+  "scope": "只读预核受影响旧检查；未运行Cargo、Node、原生窗口，未改产品或测试源；原测试不得删除或自动退役。",
+  "requiredTargets": [
+    "r06_agent_config_readback",
+    "r06_b7b_config_scope_prefs",
+    "r06_agent_settings_live",
+    "r06_settings_owner_current_source",
+    "r06_skills_completion"
+  ],
+  "sharedFixtureRecipe": [
+    "已有模型场景：在runtime_dir写合法ModelsFile，ConfigModelGateway与CredentialService从同一ModelPlaneConfig创建，ServiceDeps同时传model_plane_source=ModelsFile(该真实路径)、network_plane=NetworkPlane::direct_isolated()、model_plane_activation=true、同clock。目录显式声明模型白名单/能力，仍只用自有响应stub。",
+    "首次无配置场景：空providers/models、共享gateway/credentials/network已装配、activation=false、source=None，之后真实HTTP save激活。纯无模型读面测试可保留Default注入，但不得宣称能执行模型。",
+    "Source=None且只注入非空gateway不是持久来源：snapshot能展示gateway目录；首次save会从空Source开始，不能假定旧内存slot/credential定义自动迁入。需保存完整初始Source以检查单项修改不丢其它绑定。",
+    "当前save preflight强制gateway+credentials；network None不会直接在该preflight报错，但无法证明下一真实请求可用；网络偏好刷新明确503。正常可执行夹具应完整装配，专用missing-network反例继续保留。"
+  ],
+  "targets": [
+    {
+      "target": "r06_agent_config_readback",
+      "refs": [
+        "boot:78-95",
+        "put_config_provider_save_readback:293-444",
+        "put_config_inline_credential_transfer_readback:634-719",
+        "get_config_provider_registry_failure_gives_empty_providers_not_an_error:1712-1743",
+        "get_config_without_catalog_reads_without_creating_it:1747-1758"
+      ],
+      "fixtureIssues": [
+        "boot有gateway/credentials但无Source/network；建议按sharedFixtureRecipe声明同一真实Source，保留原建助手/切焦点/鉴权链。",
+        "inline转存首次新建embed-explicit/keptprov等必须有可执行provider完整协议与endpoint，或提前经真实save建立其目录；不能只写key的旧overlay再假称运行链已应用。"
+      ],
+      "contractConflicts": [
+        "1712/1747的legacy目录损坏/不存在→providers={}，与已发布readback-fixture权威模型冲突。保留读取成功、掩码、路径指定助手、读不修旧文件要求；断言应核实际published providers仍完整且旧损坏文件原字节未改，不可从旧目录回灌runtime。",
+        "419-444同一坏metadata批次仍落前一provider、564/689/717将校验错固定为500，与publisher整批写前校验和400结构化错误冲突。必须保留拒绝秘密元数据、之前有效配置不丢、真实部分提交事实诚实；若核部分提交应使用已成功Source发布后的compat投影故障并核saved/applied，而非恢复不安全的逐项先写。"
+      ],
+      "productCompatibilityRisk": {
+        "refs": [
+          "agent_config_readback.rs:492-494",
+          "model_configuration.rs:1191-1198"
+        ],
+        "issue": "自定义provider旧请求省略api时原明确默认openai-completions；新normalize_provider对未知id无默认直接拒绝。293等旧真实合法请求将先400。应修唯一publisher的已有默认兼容，不可只给测试补api掩盖。"
+      },
+      "retainAssertions": "保留所有保存/删除/幂等投影0600、未知字段、内联清秘密、指定助手隔离、授权、状态、实验和观察断言；不得删测试。"
+    },
+    {
+      "target": "r06_b7b_config_scope_prefs",
+      "refs": [
+        "start_server_with_ticker:77-83",
+        "global_agent_leaf_split_cross_agent_readback_and_immediate_refilter:274-304",
+        "mixed_patch_partial_success_and_memory_toggle_timestamps:430-460"
+      ],
+      "fixtureIssues": "现有无模型ServiceDeps适合偏好/技能检查，无须为普通设置强装模型。缺失provider输入是写前纯校验反例。",
+      "contractConflicts": [
+        "430-460原断言缺provider的输入错误仍先写keep_awake=false且零事件，当前已在第一次写前解析检查，预期应无任何存储变化；保留该坏请求无助手变更断言，另用真实写后故障验证全局已存时有事实回执和事件。",
+        "editor事件原要求payload.editor严格等于输入partial；完整事件现携带已保存归一值以防桌面重置，需核事件完整等于磁盘且原serif/1.6保留，不能退回partial事件。"
+      ],
+      "retainAssertions": "保留跨助手同全局、纯全局不写助手、技能即时重筛、mixed成功两叶、记忆时间戳和真实ticker缺席检查。"
+    },
+    {
+      "target": "r06_agent_settings_live",
+      "refs": [
+        "Fixture::start:191-249",
+        "Fixture::restart:399-425",
+        "native_settings_reads_keep_real_failures_and_paid_dream_consumption:599-612"
+      ],
+      "fixtureIssues": "gateway/credentials/network已真实装配，missing-network专用分支需保持；若本轮涉及模型保存或重启持久设置，须同时给Source并重启从实际Source重建，不只克隆旧内存gateway。",
+      "contractConflicts": "599-612把损坏provider-catalog当summary/models/snapshot均500不再成立：它是派生兼容文件，三个读面应仍显示新权威模型且不外泄秘密。保留真实失败保真场景但将损坏对象放在真正被读取的权威数据，或用reload损坏Source明确409并核既有发布代次保留；不得让兼容损坏覆盖runtime。",
+      "retainAssertions": "其余Electron真实动作、付费用量、记忆消费、权限和文件读取错误等无本轮必然不兼容证据，仍完整运行，不据静态预核宣称通过。"
+    },
+    {
+      "target": "r06_settings_owner_current_source",
+      "refs": [
+        "tests/rust-native/settings-owner-orchestrator.mjs:7-8",
+        "r06_settings_owner_current_source.rs:42-113"
+      ],
+      "finding": "生产bin --config含provider/chat，main装配真实Source+统一链；没有仅legacy目录或缺creds问题。保持未配置memory、按钮禁用/零PUT、双服务身份隔离和二进制SHA原断言；无需为兼容新增memory槽。",
+      "execution": "macOS实际Electron腿，应由root串行安排；未执行。"
+    },
+    {
+      "target": "r06_skills_completion",
+      "refs": [
+        "Harness::boot:47-61",
+        "original_translation_uses_real_title_model_protocol_accounts_and_refuses_cross_catalog:453-473",
+        "original_native_skill_viewer_current_tauri_window_and_read_boundaries:543-645",
+        "original_skills_settings_and_panel_current_real_service_projection:649-710"
+      ],
+      "finding": "默认无模型注入用于技能/经验/只读限制合法；翻译测试另建真实title gateway+凭证+direct网络，明确注入AuxiliaryExecutor并走实际stub/用量，不依赖legacy目录，不必为过测试改成假发布或补全局模型。",
+      "execution": "原native测试内有两次子Cargo和vite build，需root单独串行并保留现有target/实际窗口/receipt断言；其它HTTP/UI子Node检查仍须完整运行。未发现需要因publisher切换删除的技能检查。"
+    }
+  ],
+  "sourceHashes": {
+    "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs": "d1e9bd62e542088562fa42268f051f20c723d372fd0db94bbaaa0e4213278642",
+    "rust/crates/lingxi-service/tests/r06_b7b_config_scope_prefs.rs": "c7c6e1c12451baf179a0ded8072d454fd470d325aa31ade0358827ac3bf466a4",
+    "rust/crates/lingxi-service/tests/r06_agent_settings_live.rs": "69271bffcc8f59fb24f83e3f4769137914e66e7669a5ed7fb203bc9eb41af044",
+    "rust/crates/lingxi-service/tests/r06_settings_owner_current_source.rs": "c3f5629669f60d95dfc414737b19bc849d9a34cd54403beb857f6e6d1620c847",
+    "rust/crates/lingxi-service/tests/r06_skills_completion.rs": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e"
+  }
+}

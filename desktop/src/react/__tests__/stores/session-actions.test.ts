@@ -1844,6 +1844,15 @@ function mockPermissionDefault(mode = 'ask') {
   });
 
   describe('loadSessions 冷启动循环状态注入', () => {
+    it('冷启动保留独立运行错误字段，不把磁盘running状态改成paused', async () => {
+      Object.assign(mockState, { currentSessionId: 'sess_error', currentSessionPath: '/session/error.jsonl',
+        pendingNewSession: false, pendingSessionSwitchPath: null, loopStatusBySession: {} });
+      mockFetch.mockResolvedValueOnce(jsonResponse([{ path: '/session/error.jsonl', sessionId: 'sess_error',
+        loopStatus: { status: 'running', runtimeError: 'simulated loop store failure' } }]));
+      await loadSessions();
+      expect(mockState.loopStatusBySession).toEqual({ sess_error: { status: 'running', runtimeError: 'simulated loop store failure',
+        turnCount: 0, maxTurns: null, pausedReason: null, prompt: null } });
+    });
     it('只把带 loopStatus 的会话注入 loopStatusBySession', async () => {
       Object.assign(mockState, {
         currentSessionId: 'sess_b',

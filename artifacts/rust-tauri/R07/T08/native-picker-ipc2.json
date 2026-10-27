@@ -1,0 +1,42 @@
+{
+  "label": "native-picker-ipc2",
+  "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+  "command": [
+    "env",
+    "CARGO_TARGET_DIR=/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target",
+    "CARGO_INCREMENTAL=0",
+    "LINGXI_DIRECTORY_PROOF=/private/tmp/lingxi-r07-t08-native-picker-ipc-hptt_1oc",
+    "LINGXI_HOME=/private/tmp/lingxi-r07-t08-native-picker-ipc-hptt_1oc/home",
+    "TAURI_WEBDRIVER_PORT=51959",
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "desktop/src-tauri/Cargo.toml",
+    "--features",
+    "e2e-test",
+    "--test",
+    "directory_picker_host",
+    "--",
+    "--nocapture"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "PATH": "/Users/study_superior/.cargo/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/share/dotnet:/Users/study_superior/.codex/tmp/arg0-macos/codex-arg0vSRIw5:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/Users/study_superior/.lmstudio/bin:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/study_superior/.lmstudio/bin",
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp",
+    "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib"
+  },
+  "startedAt": "2026-10-18T08:00:24.534394+00:00",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "f4032e71fadf7740cc742bebb380d8adc949730f7d22a3d8506f37c70ddd5c03",
+  "finalAcceptance": false,
+  "exitCode": 0,
+  "endedAt": "2026-10-18T08:00:59.207848+00:00",
+  "sourceFingerprintAfter": "ab16d7ef63595b7fc778184401a43539b3398fd25b3e63e82ab7628ed09e20fa",
+  "log": "artifacts/rust-tauri/R07/T08/native-picker-ipc2.log",
+  "logSha256": "c29defe7767dea26dc56f7a5f266efd6cb56bb83660046f607ef156f28df6462",
+  "sourceUnchanged": false
+}

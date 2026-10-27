@@ -1,0 +1,3 @@
+desktop/src/react/components/SessionList.tsx(215,50): error TS2339: Property 'showToast' does not exist on type 'StoreState'.
+desktop/src/react/components/SessionList.tsx(797,41): error TS2339: Property 'showToast' does not exist on type 'StoreState'.
+desktop/src/react/stores/browser-slice.ts(51,46): error TS2559: Type 'SessionLocatorState & Pick<BrowserSlice, "browserBySession">' has no properties in common with type 'ServerConnectionSource'.

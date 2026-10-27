@@ -1,0 +1,99 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t02_process_ownership",
+ "status": "PASS",
+ "exitCode": 0,
+ "durationSecs": 62.657,
+ "caseCount": 16,
+ "casesSha256": "019fcb605895b3ae580b197668a329c02f06adbc95761a2cf63288dfda15498a",
+ "commands": [
+  {
+   "id": "debug-renderer-build",
+   "argv": [
+    "npm",
+    "run",
+    "build:renderer"
+   ],
+   "exitCode": 0,
+   "durationSecs": 6.874,
+   "logSha256": "5e6705ef39bbdfa67f8431424615352b060f2864bba0b711de547e0ec6a91db6"
+  },
+  {
+   "id": "debug-theme-build",
+   "argv": [
+    "npm",
+    "run",
+    "build:theme"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.226,
+   "logSha256": "632d45cd6a9314d8d8af41d339b0d1fb433f02abf230ca2543f1cf541d90da13"
+  },
+  {
+   "id": "tauri-build-debug",
+   "argv": [
+    "node",
+    "scripts/tauri-build.mjs",
+    "--debug",
+    "--receipt",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t02/phase2-ownership-02/tauri-build-debug.json"
+   ],
+   "exitCode": 0,
+   "durationSecs": 7.188,
+   "logSha256": "5e8cf2fe756709a99ae876fabae5873e7c2a7d85c4befda1ddb405036e134538"
+  },
+  {
+   "id": "release-renderer-build",
+   "argv": [
+    "npm",
+    "run",
+    "build:renderer"
+   ],
+   "exitCode": 0,
+   "durationSecs": 6.779,
+   "logSha256": "572a3252116d6c0a498a972a7144532832c7fab8b589b70bd78384733d325337"
+  },
+  {
+   "id": "release-theme-build",
+   "argv": [
+    "npm",
+    "run",
+    "build:theme"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.226,
+   "logSha256": "1a4127801c2f125703aac2b731b9be08fd8db6edc7b28cd73b31a76b28eebdf3"
+  },
+  {
+   "id": "service-stage-verify-1",
+   "argv": [
+    "node",
+    "scripts/build-rust-desktop-service.mjs",
+    "--verify"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.156,
+   "logSha256": "6ec1f2ad407f3c6aade5410416fb534e7e4e03c92e7dc4e2829802be6eb9e9b8"
+  },
+  {
+   "id": "tauri-build-release",
+   "argv": [
+    "node",
+    "scripts/tauri-build.mjs",
+    "--receipt",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t02/phase2-ownership-02/tauri-build-release.json"
+   ],
+   "exitCode": 0,
+   "durationSecs": 28.25,
+   "logSha256": "dbbf5b3d3fbfdcc3ca56930fde7533c1af3f0c43c5b3345ec33b6a2cb1b43aa7"
+  }
+ ],
+ "logSha256": "c600f6a516841103ec3461618f4f113e8b39834f597a736d7f816db16a9e848a",
+ "finishedAtUnixMs": 1793025699016,
+ "platform": "macos-arm64",
+ "remoteFixture": {
+  "pid": 4515,
+  "port": 56988,
+  "home": "/private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-3459-1793025636358/home-remote"
+ }
+}

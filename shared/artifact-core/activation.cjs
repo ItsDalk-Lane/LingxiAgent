@@ -282,6 +282,13 @@ async function activateFromArchive(archivePath, manifest, opts) {
   if (kind === "server" && !opts.platformArch) {
     throw new Error("activateFromArchive: opts.platformArch is required for kind 'server'");
   }
+  const privateArtifactGuard = kind === "server" ? opts.privateArtifactGuard : null;
+  if (kind === "server" && process.platform === "win32" && process.versions.electron
+      && typeof privateArtifactGuard !== "function") {
+    throw new Error("activateFromArchive: Windows packaged server requires the trusted private artifact guard");
+  }
+  // 服务归档在接触指针和解包目录前先确认祖先不可由其他账户改写。
+  if (privateArtifactGuard) await privateArtifactGuard("prepare", homeDir);
 
   if (await pointerStore.isQuarantined(homeDir, channel, manifest.train)) {
     throw new Error(
@@ -337,6 +344,7 @@ async function activateFromArchive(archivePath, manifest, opts) {
       // re-announced, or a rollback re-announced an old version).
       // Claim it for the new pointer slot: no rm, no rename, no
       // re-extraction, no touching the existing `.verified` receipt.
+      if (privateArtifactGuard) await privateArtifactGuard("verify", homeDir, versionedDir);
       const activatedAt = new Date().toISOString();
       const pointerValue = {
         train: manifest.train,
@@ -371,6 +379,8 @@ async function activateFromArchive(archivePath, manifest, opts) {
       ...provenance,
     };
     await pointerStore.atomicWriteJson(path.join(tmpDir, ".verified"), receipt);
+    // 临时树位于已私有的父目录内；receipt 也须逐句柄封闭后才可换入当前版。
+    if (privateArtifactGuard) await privateArtifactGuard("seal", homeDir, tmpDir);
     await swapIntoPlace(tmpDir, versionedDir, finalExists);
 
     const pointerValue = {

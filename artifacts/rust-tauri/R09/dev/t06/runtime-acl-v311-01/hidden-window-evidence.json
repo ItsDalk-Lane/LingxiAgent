@@ -1,0 +1,47 @@
+{
+ "automation": true,
+ "windowVisible": false,
+ "diagnostics": [
+  {
+   "source": "diagnostics/tauri-launch/events.jsonl",
+   "event": "app-ready-window-suppressed",
+   "detail": {
+    "automation": true,
+    "windowVisible": null,
+    "alreadyReady": false,
+    "label": "main"
+   }
+  },
+  {
+   "source": "diagnostics/tauri-launch/events.jsonl",
+   "event": "app-ready",
+   "detail": {
+    "automation": true,
+    "windowVisible": false,
+    "alreadyReady": false,
+    "label": "main"
+   }
+  },
+  {
+   "source": "diagnostics/tauri-launch/events.jsonl",
+   "event": "app-ready-window-suppressed",
+   "detail": {
+    "automation": true,
+    "windowVisible": null,
+    "alreadyReady": true,
+    "label": "main"
+   }
+  },
+  {
+   "source": "diagnostics/tauri-launch/events.jsonl",
+   "event": "app-ready",
+   "detail": {
+    "automation": true,
+    "windowVisible": false,
+    "alreadyReady": true,
+    "label": "main"
+   }
+  }
+ ],
+ "modalSuppressed": null
+}

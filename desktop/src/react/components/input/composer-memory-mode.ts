@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useStore } from '../../stores';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../services/service-client';
 import { useScopedSessionPath } from '../session-scope-context';
 
 /**

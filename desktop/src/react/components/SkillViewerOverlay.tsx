@@ -7,11 +7,12 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useStore } from '../stores';
-import { lingxiFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../services/service-client';
 
 import { renderMarkdownPreview } from '../utils/markdown';
 import { useMermaidDiagrams } from '../hooks/use-mermaid-diagrams';
 import { Overlay } from '../ui';
+import { usePlatform } from '../hooks/use-platform';
 
 declare function t(key: string, vars?: Record<string, string | number>): string;
 
@@ -59,7 +60,7 @@ export function SkillViewerOverlay() {
   useEffect(() => {
     if (!data) return;
     (async () => {
-      const hana = window.hana;
+      const hana = usePlatform();
       const items = await hana?.listSkillFiles?.(data.baseDir) as TreeItem[] | undefined;
       setFiles(items || []);
       const mdPath = data.filePath || (data.baseDir + '/SKILL.md');
@@ -71,7 +72,7 @@ export function SkillViewerOverlay() {
   async function loadFile(filePath: string, name: string) {
     setActiveFile(filePath);
     setFileName(name);
-    const text = await window.hana?.readSkillFile?.(filePath);
+    const text = await usePlatform()?.readSkillFile?.(filePath);
     setContent(text ?? null);
   }
 
@@ -121,7 +122,7 @@ export function SkillViewerOverlay() {
       }
       rendered = renderMarkdownPreview(body, {
         filePath: activeFile,
-        getFileUrl: window.platform?.getFileUrl,
+        getFileUrl: usePlatform()?.getFileUrl,
       });
     }
   }

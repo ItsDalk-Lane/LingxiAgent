@@ -1,0 +1,28 @@
+
+running 14 tests
+test r07_workbench::resource_watch_shutdown_releases_resources_with_live_state_reference ... ok
+test r07_workbench::workbench_files_search_projection_and_guards ... ok
+test r07_workbench::workspaces_list_create_disable_cycle ... ok
+test r07_workbench::legacy_experiment_map_survives_snapshot_single_edit_and_restart ... ok
+test r07_workbench::workbench_on_mount_root_end_to_end ... ok
+test r07_workbench::coverage::search_default_limit_with_more_than_eighty_real_matches ... ok
+test r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files ... ok
+test r07_workbench::workbench_actions_full_cycle ... ok
+test r07_workbench::mount_disable_retires_watch_and_subscription_before_returning ... ok
+test r07_workbench::workbench_upload_and_content ... ok
+test r07_workbench::remote_writes_refuse_unwritable_lease_registry_before_mutation ... ok
+test r07_workbench::lease_settlement_failure_reports_landed_action_and_upload_without_fake_success ... ok
+test r07_workbench::workbench_scope_gate_and_remote_write_lease ... ok
+test r07_workbench::remote_writes_refuse_corrupt_or_unreadable_lease_registry_without_file_changes ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 16.06s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r07_workbench") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.79s
+     Running tests/r07_workbench.rs (rust/target/debug/deps/r07_workbench-d1dd4fafdfc5d2e7)

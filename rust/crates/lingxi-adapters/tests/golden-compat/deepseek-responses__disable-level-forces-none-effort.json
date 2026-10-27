@@ -1,0 +1,37 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "deepseek-responses",
+  "case": "disable-level-forces-none-effort",
+  "model": {
+    "provider": "deepseek",
+    "baseUrl": "https://api.deepseek.com",
+    "id": "deepseek-v4.2",
+    "reasoning": true,
+    "api": "openai-responses"
+  },
+  "payload": {
+    "model": "deepseek-v4.2",
+    "input": [],
+    "reasoning": {
+      "effort": "high"
+    },
+    "max_tokens": 4096
+  },
+  "options": {
+    "mode": "chat",
+    "reasoningLevel": "off"
+  },
+  "expected": {
+    "thinkingFormat": null,
+    "reasoningProfile": "deepseek-v4-responses",
+    "matched": "deepseek-responses",
+    "result": {
+      "model": "deepseek-v4.2",
+      "input": [],
+      "reasoning": {
+        "effort": "none"
+      },
+      "max_output_tokens": 4096
+    }
+  }
+}

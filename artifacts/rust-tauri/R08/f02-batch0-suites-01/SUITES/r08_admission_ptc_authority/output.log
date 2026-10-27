@@ -1,0 +1,17 @@
+
+running 5 tests
+test actual_registry_disable_while_child_waits_approval_refuses_old_approval ... ok
+test actual_registry_schema_generation_change_refuses_old_approval ... ok
+test actual_resource_grant_revoked_while_child_waits_approval_refuses_dispatch ... ok
+test same_explicit_request_replay_and_real_event_resume_never_repeat_children ... ok
+test real_tool_quota_one_releases_parent_and_serializes_each_child ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.66s
+
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r08_admission_ptc_authority.rs (rust/target/debug/deps/r08_admission_ptc_authority-23a9c64c6bcaacac)

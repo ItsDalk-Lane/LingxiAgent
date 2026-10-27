@@ -1,0 +1,16 @@
+{
+ "schema": "lingxi.r08.suite-receipt.v1",
+ "suite": "r08_t06_d3",
+ "exitCode": 0,
+ "guardFailures": [],
+ "argv": [
+  "node",
+  "scripts/rust-tauri/r08_t06_d3_drill.mjs",
+  "--bin",
+  "rust/target/debug/lingxi-service",
+  "--work",
+  "/private/tmp/lingxi-r08-verify/r08_t06_d3-25793-1792955346501"
+ ],
+ "durationSecs": 21.377,
+ "logSha256": "1e2580f6837ccd5f62f1ae1a9d7e15040cd07da7d90321f048072f494c6ce1cb"
+}

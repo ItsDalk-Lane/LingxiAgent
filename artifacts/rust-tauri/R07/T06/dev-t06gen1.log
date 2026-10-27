@@ -1,0 +1,324 @@
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0408]: variable `reason` is not bound in all patterns
+   --> crates/lingxi-service/src/media_generate.rs:404:57
+    |
+404 |                 ApprovalDecision::Rejected { reason } | ApprovalDecision::Aborted => {
+    |                                              ------     ^^^^^^^^^^^^^^^^^^^^^^^^^ pattern doesn't bind `reason`
+    |                                              |
+    |                                              variable not in all patterns
+
+error[E0433]: failed to resolve: could not find `fs` in `tokio`
+   --> crates/lingxi-service/src/media_generate.rs:932:33
+    |
+932 |     let metadata = match tokio::fs::metadata(&path).await {
+    |                                 ^^ could not find `fs` in `tokio`
+    |
+note: found an item that was configured out
+   --> /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/lib.rs:523:13
+    |
+522 | / cfg_fs! {
+523 | |     pub mod fs;
+    | |             ^^
+524 | | }
+    | |_- the item is gated behind the `fs` feature
+help: consider importing this module
+    |
+ 25 + use std::fs;
+    |
+help: if you import `fs`, refer to it directly
+    |
+932 -     let metadata = match tokio::fs::metadata(&path).await {
+932 +     let metadata = match fs::metadata(&path).await {
+    |
+
+error[E0433]: failed to resolve: could not find `fs` in `tokio`
+    --> crates/lingxi-service/src/media_generate.rs:1025:27
+     |
+1025 |     let mut file = tokio::fs::File::open(path).await?;
+     |                           ^^ could not find `fs` in `tokio`
+     |
+note: found an item that was configured out
+    --> /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/lib.rs:523:13
+     |
+ 522 | / cfg_fs! {
+ 523 | |     pub mod fs;
+     | |             ^^
+ 524 | | }
+     | |_- the item is gated behind the `fs` feature
+note: struct `crate::input_drafts::File` exists but is inaccessible
+    --> crates/lingxi-service/src/input_drafts.rs:49:1
+     |
+  49 | struct File {
+     | ^^^^^^^^^^^ not accessible
+help: consider importing this struct
+     |
+  25 + use std::fs::File;
+     |
+help: if you import `File`, refer to it directly
+     |
+1025 -     let mut file = tokio::fs::File::open(path).await?;
+1025 +     let mut file = File::open(path).await?;
+     |
+
+error[E0599]: no method named `record_invocation_intent` found for reference `&std::sync::Arc<RunDatabase>` in the current scope
+   --> crates/lingxi-service/src/media_generate.rs:282:16
+    |
+282 |             db.record_invocation_intent(
+    |             ---^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: there is a method `record_invocation_receipt` with a similar name, but with different arguments
+   --> /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel/src/ports.rs:432:5
+    |
+432 | /     fn record_invocation_receipt(
+433 | |         &self,
+434 | |         ctx: &RunContext,
+435 | |         journal_id: &ToolCallId,
+436 | |         receipt: InvocationReceipt,
+437 | |         now_unix_ms: u64,
+438 | |     ) -> impl std::future::Future<Output = Result<(), StorageError>> + Send;
+    | |____________________________________________________________________________^
+help: trait `StoragePort` which provides `record_invocation_intent` is implemented but not in scope; perhaps you want to import it
+    |
+ 25 + use lingxi_kernel::ports::StoragePort;
+    |
+
+error[E0282]: type annotations needed
+   --> crates/lingxi-service/src/media_generate.rs:282:13
+    |
+282 | /             db.record_invocation_intent(
+283 | |                 ctx,
+284 | |                 InvocationIntent {
+285 | |                     journal_id: call.clone(),
+...   |
+293 | |             .await
+    | |__________________^ cannot infer type
+
+error[E0282]: type annotations needed
+   --> crates/lingxi-service/src/media_generate.rs:294:23
+    |
+294 |             .map_err(|e| e.to_string())?;
+    |                       ^  - type must be known at this point
+    |
+help: consider giving this closure parameter an explicit type
+    |
+294 |             .map_err(|e: /* Type */| e.to_string())?;
+    |                        ++++++++++++
+
+error[E0599]: no method named `record_invocation_receipt` found for reference `&std::sync::Arc<RunDatabase>` in the current scope
+   --> crates/lingxi-service/src/media_generate.rs:295:16
+    |
+295 |             db.record_invocation_receipt(
+    |             ---^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: there is a method `record_invocation_intent` with a similar name, but with different arguments
+   --> /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel/src/ports.rs:401:5
+    |
+401 | /     fn record_invocation_intent(
+402 | |         &self,
+403 | |         ctx: &RunContext,
+404 | |         intent: InvocationIntent,
+405 | |         now_unix_ms: u64,
+406 | |     ) -> impl std::future::Future<Output = Result<(), StorageError>> + Send;
+    | |____________________________________________________________________________^
+help: trait `StoragePort` which provides `record_invocation_receipt` is implemented but not in scope; perhaps you want to import it
+    |
+ 25 + use lingxi_kernel::ports::StoragePort;
+    |
+
+error[E0282]: type annotations needed
+   --> crates/lingxi-service/src/media_generate.rs:295:13
+    |
+295 | /             db.record_invocation_receipt(
+296 | |                 ctx,
+297 | |                 &call,
+298 | |                 InvocationReceipt {
+...   |
+306 | |             .await
+    | |__________________^ cannot infer type
+
+error[E0282]: type annotations needed
+   --> crates/lingxi-service/src/media_generate.rs:307:23
+    |
+307 |             .map_err(|e| e.to_string())?;
+    |                       ^  - type must be known at this point
+    |
+help: consider giving this closure parameter an explicit type
+    |
+307 |             .map_err(|e: /* Type */| e.to_string())?;
+    |                        ++++++++++++
+
+error[E0599]: no method named `record_invocation_intent` found for reference `&std::sync::Arc<RunDatabase>` in the current scope
+   --> crates/lingxi-service/src/media_generate.rs:340:28
+    |
+340 |     if let Err(error) = db.record_invocation_intent(ctx, intent, now).await {
+    |                            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: there is a method `record_invocation_receipt` with a similar name, but with different arguments
+   --> /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel/src/ports.rs:432:5
+    |
+432 | /     fn record_invocation_receipt(
+433 | |         &self,
+434 | |         ctx: &RunContext,
+435 | |         journal_id: &ToolCallId,
+436 | |         receipt: InvocationReceipt,
+437 | |         now_unix_ms: u64,
+438 | |     ) -> impl std::future::Future<Output = Result<(), StorageError>> + Send;
+    | |____________________________________________________________________________^
+help: trait `StoragePort` which provides `record_invocation_intent` is implemented but not in scope; perhaps you want to import it
+    |
+ 25 + use lingxi_kernel::ports::StoragePort;
+    |
+
+error[E0282]: type annotations needed
+   --> crates/lingxi-service/src/media_generate.rs:343:48
+    |
+343 |             Err(EndpointError::invalid_message(error.to_string())),
+    |                                                ^^^^^ cannot infer type
+
+error[E0599]: no method named `advance_invocation` found for reference `&std::sync::Arc<RunDatabase>` in the current scope
+   --> crates/lingxi-service/src/media_generate.rs:440:32
+    |
+440 |         if let Err(error) = db.advance_invocation(ctx, &call, phase, now).await {
+    |                                ^^^^^^^^^^^^^^^^^^ method not found in `&std::sync::Arc<RunDatabase>`
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `StoragePort` which provides `advance_invocation` is implemented but not in scope; perhaps you want to import it
+    |
+ 25 + use lingxi_kernel::ports::StoragePort;
+    |
+
+error[E0282]: type annotations needed
+   --> crates/lingxi-service/src/media_generate.rs:443:52
+    |
+443 |                 Err(EndpointError::invalid_message(error.to_string())),
+    |                                                    ^^^^^ cannot infer type
+
+error[E0599]: no method named `record_invocation_receipt` found for reference `&std::sync::Arc<RunDatabase>` in the current scope
+   --> crates/lingxi-service/src/media_generate.rs:475:28
+    |
+475 |     if let Err(error) = db.record_invocation_receipt(ctx, &call, receipt, now).await {
+    |                            ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: there is a method `record_invocation_intent` with a similar name, but with different arguments
+   --> /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel/src/ports.rs:401:5
+    |
+401 | /     fn record_invocation_intent(
+402 | |         &self,
+403 | |         ctx: &RunContext,
+404 | |         intent: InvocationIntent,
+405 | |         now_unix_ms: u64,
+406 | |     ) -> impl std::future::Future<Output = Result<(), StorageError>> + Send;
+    | |____________________________________________________________________________^
+help: trait `StoragePort` which provides `record_invocation_receipt` is implemented but not in scope; perhaps you want to import it
+    |
+ 25 + use lingxi_kernel::ports::StoragePort;
+    |
+
+error[E0282]: type annotations needed
+   --> crates/lingxi-service/src/media_generate.rs:478:48
+    |
+478 |             Err(EndpointError::invalid_message(error.to_string())),
+    |                                                ^^^^^ cannot infer type
+
+error[E0308]: mismatched types
+    --> crates/lingxi-service/src/media_generate.rs:553:69
+     |
+ 553 |         Err(rejection) => return EndpointError::from_json_rejection(rejection).into_response(),
+     |                                  ---------------------------------- ^^^^^^^^^ expected `&JsonRejection`, found `JsonRejection`
+     |                                  |
+     |                                  arguments to this function are incorrect
+     |
+note: associated function defined here
+    --> crates/lingxi-service/src/lib.rs:3376:12
+     |
+3376 |     pub fn from_json_rejection(rejection: &axum::extract::rejection::JsonRejection) -> Self {
+     |            ^^^^^^^^^^^^^^^^^^^ ---------------------------------------------------
+help: consider borrowing here
+     |
+ 553 |         Err(rejection) => return EndpointError::from_json_rejection(&rejection).into_response(),
+     |                                                                     +
+
+error[E0308]: mismatched types
+    --> crates/lingxi-service/src/media_generate.rs:570:69
+     |
+ 570 |         Err(rejection) => return EndpointError::from_json_rejection(rejection).into_response(),
+     |                                  ---------------------------------- ^^^^^^^^^ expected `&JsonRejection`, found `JsonRejection`
+     |                                  |
+     |                                  arguments to this function are incorrect
+     |
+note: associated function defined here
+    --> crates/lingxi-service/src/lib.rs:3376:12
+     |
+3376 |     pub fn from_json_rejection(rejection: &axum::extract::rejection::JsonRejection) -> Self {
+     |            ^^^^^^^^^^^^^^^^^^^ ---------------------------------------------------
+help: consider borrowing here
+     |
+ 570 |         Err(rejection) => return EndpointError::from_json_rejection(&rejection).into_response(),
+     |                                                                     +
+
+error[E0282]: type annotations needed
+   --> crates/lingxi-service/src/media_generate.rs:933:25
+    |
+933 |         Ok(metadata) if metadata.is_file() => metadata,
+    |                         ^^^^^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+    --> crates/lingxi-service/src/media_generate.rs:1025:9
+     |
+1025 |     let mut file = tokio::fs::File::open(path).await?;
+     |         ^^^^^^^^
+1026 |     file.seek(std::io::SeekFrom::Start(start)).await?;
+     |     ---- type must be known at this point
+     |
+help: consider giving `file` an explicit type
+     |
+1025 |     let mut file: /* Type */ = tokio::fs::File::open(path).await?;
+     |                 ++++++++++++
+
+error[E0597]: `state` does not live long enough
+    --> crates/lingxi-service/src/media_generate.rs:1051:24
+     |
+1033 |     State(state): State<ServiceState>,
+     |           ----- binding `state` declared here
+...
+1051 |     let Some(opener) = state.media_file_opener() else {
+     |                        ^^^^^ borrowed value does not live long enough
+...
+1060 |     match tokio::task::spawn_blocking(move || opener(&path)).await {
+     |           -------------------------------------------------- argument requires that `state` is borrowed for `'static`
+...
+1075 | }
+     | - `state` dropped here while still borrowed
+     |
+note: requirement that the value outlives `'static` introduced here
+    --> /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/task/blocking.rs:222:35
+     |
+ 222 |         F: FnOnce() -> R + Send + 'static,
+     |                                   ^^^^^^^
+
+error[E0308]: mismatched types
+    --> crates/lingxi-service/src/media_generate.rs:1090:69
+     |
+1090 |         Err(rejection) => return EndpointError::from_json_rejection(rejection).into_response(),
+     |                                  ---------------------------------- ^^^^^^^^^ expected `&JsonRejection`, found `JsonRejection`
+     |                                  |
+     |                                  arguments to this function are incorrect
+     |
+note: associated function defined here
+    --> crates/lingxi-service/src/lib.rs:3376:12
+     |
+3376 |     pub fn from_json_rejection(rejection: &axum::extract::rejection::JsonRejection) -> Self {
+     |            ^^^^^^^^^^^^^^^^^^^ ---------------------------------------------------
+help: consider borrowing here
+     |
+1090 |         Err(rejection) => return EndpointError::from_json_rejection(&rejection).into_response(),
+     |                                                                     +
+
+Some errors have detailed explanations: E0282, E0308, E0408, E0433, E0597, E0599.
+For more information about an error, try `rustc --explain E0282`.
+error: could not compile `lingxi-service` (lib) due to 21 previous errors

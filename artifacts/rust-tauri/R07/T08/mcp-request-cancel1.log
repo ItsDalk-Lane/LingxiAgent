@@ -1,0 +1,25 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0639]: cannot create non-exhaustive struct using struct expression
+   --> crates/lingxi-service/src/mcpbridge.rs:712:48
+    |
+712 |                   ClientRequest::CallToolRequest(CallToolRequest {
+    |  ________________________________________________^
+713 | |                     method: Default::default(),
+714 | |                     params,
+715 | |                     extensions: Default::default(),
+716 | |                 }),
+    | |_________________^
+
+error[E0639]: cannot create non-exhaustive struct using struct expression
+   --> crates/lingxi-service/src/mcpbridge.rs:787:40
+    |
+787 |               self.peer.notify_cancelled(CancelledNotificationParam {
+    |  ________________________________________^
+788 | |                 request_id: Some(request_id),
+789 | |                 reason: Some("调用已取消或超时；远端结果尚未确认".into()),
+790 | |                 meta: None,
+791 | |             }),
+    | |_____________^
+
+For more information about this error, try `rustc --explain E0639`.
+error: could not compile `lingxi-service` (lib test) due to 2 previous errors

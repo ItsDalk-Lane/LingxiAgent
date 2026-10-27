@@ -35,6 +35,8 @@
     "copySource": "소스 복사"
   },
   "quickChat": {
+    "title": "빠른 채팅",
+    "openSessionFailed": "대화를 열지 못했습니다. 빠른 채팅 창은 그대로 열려 있습니다.",
     "close": "빠른 채팅 닫기",
     "openFullSession": "전체 대화 열기",
     "waitingReply": "답장을 기다리는 중...",
@@ -142,6 +144,8 @@
     "settingsVectorRetentionHint": "모델 교체나 재색인으로 남은 구버전 벡터는 설정한 일수(1–3650) 동안 쿼리되지 않으면 자동 삭제됩니다. 사용 중인 최신 버전에는 영향이 없습니다"
   },
   "channel": {
+    "loadFailed": "불러오지 못했습니다. 기존 내용은 유지됩니다.",
+    "retry": "다시 시도",
     "tab": "채널",
     "chatTab": "채팅",
     "moreTabs": "더 많은 탭",
@@ -290,6 +294,7 @@
     },
     "archivedChats": "보관 대화",
     "runningGroup": "실행 중",
+    "ungroupedChats": "그룹 없음",
     "actionBadge": {
       "askUser": "질문 중",
       "approval": "승인 대기",
@@ -510,7 +515,31 @@
       "retryFailed": "재생성 실패",
       "submitting": "제출 중",
       "retryLabel": "{kind} 재생성",
-      "kindSpeech": "음성"
+      "kindSpeech": "음성",
+      "phase": {
+        "submitting": "생성 요청을 제출하는 중",
+        "submitted": "제출 완료, 생성 대기 중",
+        "generating": "생성 중",
+        "downloading": "생성 완료, 다운로드 중",
+        "completed": "생성 및 파일 전달 완료",
+        "failed": "생성 실패",
+        "cancelled": "로컬 대기를 중지했습니다",
+        "unknown": "결과가 확인되지 않았습니다"
+      },
+      "stopWaiting": "대기 중지",
+      "stopFailed": "대기를 중지하지 못했습니다",
+      "taskFailed": "미디어 작업이 완료되지 않았습니다",
+      "localDeliveryStopped": "이 대화에 대한 추가 파일 전달을 중지했습니다.",
+      "remoteOutcome": {
+        "failed": "제공자가 생성 실패를 확인했습니다.",
+        "completed": "원격 생성이 완료되었으며 전달된 파일은 계속 열 수 있습니다.",
+        "unknown": "원격 결과가 확인되지 않았으며 생성이 계속될 수 있습니다."
+      },
+      "remoteCancel": {
+        "confirmed": "원격 취소가 확인되었습니다.",
+        "unsupported": "제공자가 취소를 지원하지 않아 생성이 완료될 수 있습니다.",
+        "unknown": "원격 취소 여부가 확인되지 않았습니다."
+      }
     },
     "turnStatus": {
       "missingFinalAnswer": "최종 답변이 생성되지 않았습니다",
@@ -611,6 +640,15 @@
     "serverNotReady": "서버가 준비되지 않았어요",
     "loading": "로딩 중...",
     "reconnecting": "재연결 중",
+    "reconnected": "다시 연결됨",
+    "wsTicketFailed": "연결 티켓을 가져오지 못했어요",
+    "wsHandshakeFailed": "서버 연결 프로토콜이 맞지 않아요",
+    "wsHandshakeTimedOut": "서버 연결 확인 시간이 초과됐어요",
+    "wsConnectionFailed": "서버에 연결할 수 없어요",
+    "wsConnectionClosed": "서버 연결이 끊어졌어요",
+    "serverRestartInvalid": "서버 재시작 정보가 올바르지 않아요. 다시 시도하세요.",
+    "rustCoreUnavailable": "Rust 서비스에 연결했지만 채팅 기능이 아직 이전되지 않아 메시지를 보낼 수 없습니다.",
+    "serverRestarting": "서버를 다시 시작하는 중이에요",
     "reconnect": "다시 연결"
   },
   "input": {
@@ -785,6 +823,9 @@
     "memoryOn": "기억",
     "memoryOff": "이 대화에서는 기억을 사용하지 않아요",
     "memoryDisabled": "기억이 꺼져 있어요",
+    "fileTask": "파일 작업",
+    "fileTaskBusy": "파일 선택 중…",
+    "fileTaskHint": "파일을 선택해 파일 작업 시작",
     "agentSelector": "에이전트 선택",
     "placeholderTips": [
       "/ 를 입력하면 명령 메뉴가 열려요",
@@ -1051,7 +1092,20 @@
       "failed": "📎 파일이 준비되지 않았어요"
     },
     "browser": {
+      "stateReadFailed": "브라우저 상태를 불러올 수 없습니다",
+      "controlledWindow": "제어 브라우저",
+      "executionNode": "실행 위치",
+      "sameWindowHint": "페이지는 이 서비스가 제어하는 Chromium 창에 있습니다. 표시, 직접 제어, 반환은 같은 페이지에서 작동합니다.",
+      "userTakeover": "직접 제어 중",
+      "suspended": "일시 정지",
       "running": "🌐 {name}이(가) 브라우저를 쓰고 있어요",
+      "stopped": "중지됨",
+      "revoked": "도우미 권한 취소됨",
+      "showControlled": "브라우저 표시",
+      "takeover": "직접 제어",
+      "release": "도우미에게 반환",
+      "noVisibleWindow": "이 서비스는 브라우저 창을 표시할 수 없어 직접 제어할 수 없습니다.",
+      "workspaceUnavailable": "이 채팅에 사용할 수 있는 브라우저가 없습니다",
       "done": "🌐 {name} 브라우저 작업 끝났어요",
       "failed": "🌐 {name} 브라우저가 말을 안 들어요"
     },
@@ -1108,6 +1162,7 @@
       "failed": "⚙️ 설정이 바뀌지 않았어요"
     },
     "automation": {
+      "importBlocked": "이전 작업 {count}개를 가져오지 못해 일시 중지했습니다. 원래 작업 정보를 확인하세요.",
       "running": "🤖 {name}이(가) 자동화를 준비하는 중",
       "done": "🤖 {name}이(가) 자동화를 준비했어요",
       "failed": "🤖 자동화가 준비되지 않았어요"
@@ -1516,6 +1571,7 @@
     "saved": "저장됨 ✿",
     "saveFailed": "저장 실패",
     "refreshFailed": "새로고침 실패",
+    "rustCoreUnavailable": "Rust 서비스에서는 에이전트, 모델, 일반 설정을 아직 사용할 수 없습니다. 접근 설정만 사용할 수 있습니다.",
     "fileChangedOnDisk": "파일이 외부에서 변경되어 오래된 저장을 건너뛰었습니다",
     "noChanges": "저장할 내용이 없어요",
     "autoSaved": "자동 저장됨 ✿",
@@ -1550,6 +1606,7 @@
       "cookiesTitle": "Cookies",
       "acceptCookies": "Cookies 허용",
       "acceptCookiesHint": "켜면 내장 브라우저가 일반 브라우저처럼 사이트 Cookies를 저장하고 전송합니다.",
+      "cookiePolicyChangeHint": "Cookie 정책을 바꾸면 현재 제어 중인 페이지가 닫힙니다. URL과 기존 로그인 정보는 유지되지만, 제출하지 않은 양식 내용은 사라질 수 있습니다. 페이지를 다시 열면 새 정책이 적용됩니다.",
       "clearCookies": "Cookies 지우기",
       "clearCookiesHint": "내장 브라우저에 저장된 Cookies와 사이트 데이터를 지웁니다.",
       "clearCookiesButton": "지우기",
@@ -1673,6 +1730,7 @@
       "hardwareAcceleration": "하드웨어 가속",
       "hardwareAccelerationHint": "GPU로 앱 창을 렌더링합니다. 끄면 다음 실행부터 소프트웨어 렌더링을 사용해 Windows GPU 드라이버로 인한 시작 충돌 복구에 도움이 됩니다.",
       "sidebar": "사이드바",
+      "sidebarLoadFailed": "사이드바 설정을 불러오지 못했습니다. 다시 시도해 주세요.",
       "sessionListSingleLine": "세션 목록 한 줄 표시",
       "sessionListSingleLineHint": "켜면 각 세션이 한 줄만 사용해요. 마우스를 올리면 오른쪽 작업 버튼이 나타나고 제목은 말줄임표로 줄어들어요.",
       "rollbackFileChanges": "되돌릴 때 파일 변경도 취소",
@@ -2047,6 +2105,7 @@
       "retention7d": "7일",
       "maxFileSize": "다음 크기 이상 무시",
       "viewBackups": "백업 보기",
+      "backupsLoadFailed": "백업 목록을 불러오지 못했습니다. 다시 시도해 주세요.",
       "hideBackups": "닫기",
       "restoreBtn": "복원",
       "noBackups": "아직 백업이 없습니다",
@@ -2067,7 +2126,11 @@
       "cancel": "취소",
       "confirm": "확인",
       "updated": "아바타 업데이트됨 ✿",
-      "reset": "아바타가 기본값으로 복원됨"
+      "reset": "아바타가 기본값으로 복원됨",
+      "selectAgent": "먼저 도우미를 선택하세요",
+      "readFailed": "아바타 이미지를 읽을 수 없습니다",
+      "ownerChanged": "연결 또는 도우미가 변경되었습니다. 이미지를 다시 선택하세요.",
+      "canvasUnavailable": "아바타 자르기 캔버스를 사용할 수 없습니다"
     },
     "providers": {
       "title": "등록된 Provider",
@@ -2166,6 +2229,11 @@
       "globalDefaults": "전역 기본값"
     },
     "oauth": {
+      "notPersisted": "이번 세션에 로그인했지만 인증 정보는 저장되지 않았습니다. 다시 시작하면 재로그인이 필요할 수 있습니다.",
+      "loginRefreshFailed": "로그인했지만 화면 갱신에 실패했습니다. 상태를 다시 불러오세요.",
+      "logoutRefreshFailed": "로그아웃했지만 화면 갱신에 실패했습니다. 상태를 다시 불러오세요.",
+      "browserUnavailable": "이 창에서 인증 페이지를 열 수 없습니다.",
+      "waitCancelled": "로컬 대기를 중지했습니다. 공급자 측 인증은 계속 완료될 수 있습니다.",
       "title": "간편 로그인",
       "login": "로그인",
       "logout": "로그아웃",
@@ -2556,6 +2624,7 @@
       "disabled": "비활성화됨",
       "noSkills": "사용 가능한 스킬이 없어요",
       "noUser": "사용자 정의 스킬 없음",
+      "loadFailed": "스킬을 불러오지 못했습니다. 다시 시도해 주세요.",
       "workspaceBadge": "프로젝트",
       "copyToSkills": "내 스킬로 복사",
       "copied": "복사됨 ✓",
@@ -2640,6 +2709,7 @@
       "goalToggleDesc": "긴 작업에 토큰/시간 예산 부여, 초과 시 한 번 알림"
     },
     "mcp": {
+      "selectAgentForDetails": "연결 세부 정보와 어시스턴트 권한을 보려면 어시스턴트를 만들거나 선택하세요.",
       "masterTitle": "Master Switch",
       "masterName": "Enable Connectors",
       "masterDesc": "When off, new sessions receive no MCP connector tools. Frozen sessions keep their snapshot, but calls return an explicit error.",
@@ -3940,6 +4010,7 @@
       "saved": "단축키가 저장되었습니다",
       "resetDone": "모두 기본값으로 복원되었습니다",
       "registrationFailed": "단축키 등록에 실패했습니다. 다른 앱에서 사용 중일 수 있습니다",
+      "savedReloadFailed": "키 설정은 저장되었지만 단축키 적용이 완료되지 않았습니다. 다시 시도하거나 앱을 재시작해 주세요.",
       "noResults": "일치하는 단축키가 없습니다",
       "footnote": "로컬 단축키는 해당 화면에 포커스가 있을 때만 작동합니다. 기본 키는 macOS와 Windows/Linux가 다릅니다.",
       "footnoteMac": "로컬 단축키는 해당 화면에 포커스가 있을 때만 작동합니다. ⌘는 Command 키를 의미합니다.",
@@ -3967,6 +4038,29 @@
         "checking": "확인 중…",
         "unavailable": "데스크톱 앱에서 확인 가능"
       }
+    },
+    "agentDeletion": {
+      "progressTitle": "삭제 정리 진행 상황",
+      "loadFailure": "삭제 진행 상황을 읽거나 갱신할 수 없습니다: {error}",
+      "deleted": "도우미 {id}이(가) 삭제되었습니다.",
+      "cleanupPending": "남은 파일 정리가 필요합니다.",
+      "referencesPending": "도우미 참조 갱신이 필요합니다. 다른 도우미로의 전환은 확인되지 않았습니다.",
+      "journalPending": "삭제 기록 저장이 필요합니다.",
+      "retry": "정리 다시 시도",
+      "formatError": "삭제 진행 응답 형식이 잘못되었습니다",
+      "connectionChanged": "연결이 변경되었습니다. 삭제 진행 상황을 다시 여세요.",
+      "resultChanged": "연결이 변경되어 이전 서버의 정리 결과가 아직 반영되지 않았습니다."
+    },
+    "transfer": {
+      "title": "설정 가져오기 및 내보내기",
+      "hint": "내보내기는 비밀 값을 숨깁니다. 가져오기는 포함된 항목만 병합하고 다른 설정은 유지합니다.",
+      "export": "설정 내보내기",
+      "import": "설정 가져오기",
+      "tooLarge": "설정 파일은 2 MiB 이하여야 합니다.",
+      "connectionChanged": "연결이 변경되었습니다. 다시 시도해 주세요.",
+      "partialApplied": "설정이 적용되었지만 후속 단계가 완료되지 않았습니다.",
+      "savedNotApplied": "설정이 저장되었지만 아직 적용되지 않았습니다.",
+      "partialSaved": "일부 설정이 저장되었습니다. 다시 불러온 후 변경해 주세요."
     }
   },
   "onboarding": {
@@ -4088,6 +4182,11 @@
     }
   },
   "activity": {
+    "listLoadFailed": "활동을 불러오지 못했어요. 이전 결과를 유지합니다.",
+    "actionFailed": "작업을 완료하지 못했어요. 다시 시도하세요.",
+    "unconfirmed": "결과 미확인",
+    "cancelled": "중지됨",
+    "skipped": "이번 실행 건너뜀",
     "title": "활동",
     "empty": "아직 활동이 없어요. 순찰과 예약 작업이 여기에 표시돼요.",
     "back": "뒤로",
@@ -4927,6 +5026,8 @@
     }
   },
   "devtools": {
+    "cardWindowUnsupported": "이 창은 아직 안전한 대화형 카드를 지원하지 않습니다",
+    "cardServiceUnsupported": "이 서비스는 아직 안전한 대화형 카드를 지원하지 않습니다",
     "heartbeat": "하트비트",
     "memoryExport": "메모리 내보내기",
     "onboarding": "Onboarding",
@@ -5420,6 +5521,12 @@
     "mediaNoDisplayableFiles": "생성 결과에 표시 가능한 파일이 없어요"
   },
   "sessionCollab": {
+    "decisionNotPersisted": "작업은 완료됐지만 확인 결과를 저장하지 못했습니다. 다시 연 뒤 같은 작업을 반복하지 마세요.",
+    "queued": "대기 중",
+    "queuedHint": "확인 후 대기열에 추가했습니다. 대상 대화가 비면 메시지를 보냅니다.",
+    "unknown": "결과 미확인",
+    "deliveryUnknown": "전달 여부를 확인하지 못했습니다. 다시 보내기 전에 대상 대화를 확인하세요.",
+    "retryMessage": "첫 메시지 다시 시도",
     "messagePrefix": "[에이전트 \"{name}\"의 메시지입니다. 사용자 본인이 아닙니다]",
     "fromAgent": "{name}의 메시지",
     "expand": "펼치기",
@@ -5727,5 +5834,30 @@
   },
   "labels": {
     "thinking": "생각"
+  },
+  "systemPermissions": {
+    "title": "시스템 권한",
+    "description": "Lingxi는 마이크, 음성 인식, 알림 권한이 필요합니다. 아래 버튼으로 시스템 요청을 표시합니다.",
+    "microphone": "마이크",
+    "speech": "음성 인식",
+    "notification": "알림",
+    "request": "권한 요청",
+    "testNotification": "테스트 알림 보내기",
+    "granted": "승인됨",
+    "denied": "거부됨",
+    "unsupported": "지원되지 않음",
+    "failed": "요청 실패",
+    "notRequested": "요청 안 됨",
+    "micGranted": "마이크가 승인되었습니다",
+    "micDenied": "마이크가 거부되었습니다",
+    "micUnsupported": "마이크 요청을 지원하지 않습니다",
+    "speechGranted": "음성 인식이 승인되었습니다",
+    "speechDenied": "음성 인식이 거부되었습니다",
+    "speechResult": "권한 상태가 업데이트되었습니다",
+    "notificationTitle": "Lingxi 알림 테스트",
+    "notificationBody": "이 알림이 보이면 알림 권한이 정상입니다.",
+    "notificationSent": "테스트 알림을 보냈습니다",
+    "notificationFailed": "테스트 알림 전송 실패",
+    "dismiss": "닫기"
   }
 }

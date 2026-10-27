@@ -1,0 +1,238 @@
+    Checking serde_json v1.0.151
+    Checking hashbrown v0.17.1
+    Checking regex-automata v0.4.18
+    Checking lingxi-test-guard v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-test-guard)
+    Checking idna v1.1.0
+    Checking indexmap v2.14.2
+    Checking schemars v1.2.2
+    Checking url v2.5.8
+    Checking h2 v0.4.19
+    Checking tower-http v0.6.11
+    Checking regex v1.13.1
+    Checking hashlink v0.12.2
+    Checking lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+    Checking rusqlite v0.40.2
+    Checking serde_yaml_ng v0.10.0
+    Checking jieba-rs v0.6.8
+    Checking matchers v0.2.0
+    Checking hyper v1.11.1
+    Checking rmcp v3.4.1
+    Checking hyper-util v0.1.21
+    Checking tracing-subscriber v0.3.23
+    Checking lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Checking hyper-rustls v0.27.10
+    Checking axum v0.8.9
+    Checking reqwest v0.13.5
+    Checking boa_interner v0.20.0
+    Checking boa_ast v0.20.0
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking lopdf v0.42.0
+    Checking boa_parser v0.20.0
+    Checking zip v9.0.3
+    Checking getrandom v0.3.4
+    Checking boa_engine v0.20.0
+    Checking num-rational v0.4.2
+    Checking num-iter v0.1.46
+    Checking pdf-extract v0.12.1
+    Checking num-complex v0.4.6
+    Checking ahash v0.8.12
+    Checking num v0.4.3
+    Checking borrow-or-share v0.2.4
+    Checking bit-vec v0.8.0
+    Checking fluent-uri v0.4.1
+    Checking bit-set v0.8.0
+    Checking fraction v0.17.0
+    Checking bytecount v0.6.9
+    Checking micromap v0.3.0
+    Checking vsimd v0.8.0
+    Checking outref v0.5.2
+    Checking num-cmp v0.1.0
+    Checking uuid-simd v0.8.0
+    Checking referencing v0.57.0
+    Checking jsonschema-value v0.57.0
+    Checking unicode-general-category v1.1.0
+    Checking fancy-regex v0.19.2
+    Checking strum v0.28.0
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Checking jsonschema-regex v0.57.0
+    Checking email_address v0.2.9
+    Checking data-encoding v2.11.1
+    Checking lingxi-browser-spike v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-browser-spike)
+    Checking jsonschema v0.57.0
+    Checking lingxi-spike v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-spike)
+    Checking xtask v0.1.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask)
+error: compiling a regex in a loop
+   --> crates/lingxi-service/src/automation_activity.rs:594:13
+    |
+594 |             regex::Regex::new(r"[\p{L}\p{N}]+(?:['’.-][\p{L}\p{N}]+)*").expect("固定摘要词数表达式").find_iter(text).count()
+    |             ^^^^^^^^^^^^^^^^^
+    |
+help: move the regex construction outside this loop
+   --> crates/lingxi-service/src/automation_activity.rs:582:5
+    |
+582 |     for attempt in 0..=2 {
+    |     ^^^^^^^^^^^^^^^^^^^^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#regex_creation_in_loops
+    = note: `-D clippy::regex-creation-in-loops` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::regex_creation_in_loops)]`
+
+error: this expression creates a reference which is immediately dereferenced by the compiler
+   --> crates/lingxi-service/src/automation_activity.rs:615:36
+    |
+615 |     let read = match read_activity(&state, &principal, id, false).await {
+    |                                    ^^^^^^ help: change this to: `state`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_borrow
+    = note: `-D clippy::needless-borrow` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::needless_borrow)]`
+
+error: this expression creates a reference which is immediately dereferenced by the compiler
+   --> crates/lingxi-service/src/automation_activity.rs:615:44
+    |
+615 |     let read = match read_activity(&state, &principal, id, false).await {
+    |                                            ^^^^^^^^^^ help: change this to: `principal`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_borrow
+
+error: this expression creates a reference which is immediately dereferenced by the compiler
+   --> crates/lingxi-service/src/automation_activity.rs:745:47
+    |
+745 |             if let Err(error) = read_activity(&state, &principal, id, false).await {
+    |                                               ^^^^^^ help: change this to: `state`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_borrow
+
+error: this expression creates a reference which is immediately dereferenced by the compiler
+   --> crates/lingxi-service/src/automation_activity.rs:745:55
+    |
+745 |             if let Err(error) = read_activity(&state, &principal, id, false).await {
+    |                                                       ^^^^^^^^^^ help: change this to: `principal`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_borrow
+
+error: this expression creates a reference which is immediately dereferenced by the compiler
+   --> crates/lingxi-service/src/automation_activity.rs:835:39
+    |
+835 |     if let Err(error) = read_activity(&state, &principal, id, false).await {
+    |                                       ^^^^^^ help: change this to: `state`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_borrow
+
+error: this expression creates a reference which is immediately dereferenced by the compiler
+   --> crates/lingxi-service/src/automation_activity.rs:835:47
+    |
+835 |     if let Err(error) = read_activity(&state, &principal, id, false).await {
+    |                                               ^^^^^^^^^^ help: change this to: `principal`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_borrow
+
+error: this function has too many arguments (8/7)
+   --> crates/lingxi-service/src/diary.rs:954:1
+    |
+954 | / async fn temporary_summary(
+955 | |     state: &ServiceState,
+956 | |     agent_id: &str,
+957 | |     run_id: &str,
+...   |
+962 | |     previous_summary: &str,
+963 | | ) -> Result<String, String> {
+    | |___________________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#too_many_arguments
+    = note: `-D clippy::too-many-arguments` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::too_many_arguments)]`
+
+error: this function has too many arguments (12/7)
+    --> crates/lingxi-service/src/diary.rs:1011:1
+     |
+1011 | / async fn optional_temporary(
+1012 | |     state: &ServiceState,
+1013 | |     agent_id: &str,
+1014 | |     run_id: &str,
+...    |
+1023 | |     previous_summary: &str,
+1024 | | ) -> String {
+     | |___________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#too_many_arguments
+
+error: the loop variable `index` is only used to index `sessions`
+    --> crates/lingxi-service/src/diary.rs:1362:18
+     |
+1362 |     for index in 0..sessions.len() {
+     |                  ^^^^^^^^^^^^^^^^^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_range_loop
+     = note: `-D clippy::needless-range-loop` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::needless_range_loop)]`
+help: consider using an iterator
+     |
+1362 -     for index in 0..sessions.len() {
+1362 +     for <item> in &sessions {
+     |
+
+error: very complex type used. Consider factoring parts into `type` definitions
+   --> crates/lingxi-service/src/loopx.rs:549:28
+    |
+549 |     storage_error_handler: Mutex<Option<Arc<dyn Fn(&str, &str) + Send + Sync>>>,
+    |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#type_complexity
+    = note: `-D clippy::type-complexity` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::type_complexity)]`
+
+error: very complex type used. Consider factoring parts into `type` definitions
+    --> crates/lingxi-service/src/loopx.rs:1025:54
+     |
+1025 |     pub fn set_storage_error_handler(&self, handler: Arc<dyn Fn(&str, &str) + Send + Sync>) {
+     |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#type_complexity
+
+error: usage of `bool::then` in `filter_map`
+   --> crates/lingxi-service/src/workflow.rs:847:14
+    |
+847 |               .filter_map(|(id, task)| {
+    |  ______________^
+848 | |                 (task.session_id == session_id).then(|| {
+849 | |                     task.scope.cancel("workflow session cancelled");
+850 | |                     id.clone()
+851 | |                 })
+852 | |             })
+    | |______________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#filter_map_bool_then
+    = note: `-D clippy::filter-map-bool-then` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::filter_map_bool_then)]`
+help: use `filter` then `map` instead
+    |
+847 ~             .filter(|&(id, task)| (task.session_id == session_id)).map(|(id, task)| {
+848 +                     task.scope.cancel("workflow session cancelled");
+849 +                     id.clone()
+850 +                 })
+    |
+
+error: usage of `bool::then` in `filter_map`
+   --> crates/lingxi-service/src/workflow.rs:862:14
+    |
+862 |               .filter_map(|(id, task)| {
+    |  ______________^
+863 | |                 (task.calling_run_id == run_id).then(|| {
+864 | |                     task.scope.cancel("workflow parent run cancelled");
+865 | |                     id.clone()
+866 | |                 })
+867 | |             })
+    | |______________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#filter_map_bool_then
+help: use `filter` then `map` instead
+    |
+862 ~             .filter(|&(id, task)| (task.calling_run_id == run_id)).map(|(id, task)| {
+863 +                     task.scope.cancel("workflow parent run cancelled");
+864 +                     id.clone()
+865 +                 })
+    |
+
+error: could not compile `lingxi-service` (lib) due to 14 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `lingxi-service` (lib test) due to 14 previous errors

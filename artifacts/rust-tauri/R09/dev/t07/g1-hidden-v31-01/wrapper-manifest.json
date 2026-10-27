@@ -1,0 +1,15 @@
+{
+ "schema": "lingxi.r09.t07.evidence-wrapper.v3.1",
+ "wrapperApp": "/private/tmp/lingxi-r09-t07/evidence-app-v31-20261026-234821/Lingxi.app",
+ "sourceApp": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app (v3.1 delivery frozen, read-only copy)",
+ "deliveryMainExeSha256BeforeReplace": "248a8e346e526b18b7657c8edd5b7068061bd6c8645105aa129d6ae965ade8b8",
+ "candidateEvidenceExeSha256BeforeSigning": "54f93eacb6cd54e671c947c315042072bdcffc6e35f78e620a65128f8293f180",
+ "wrapperMainExeSha256AfterAdhocSign": "ac729159dbf9e8cbcf373aaed907f69a2475add1f9e8fc2d1463887be9a54a52",
+ "signExit": 0,
+ "verifyExit": 0,
+ "handoff": "artifacts/rust-tauri/R09/dev/t06/candidate-handoff-v3.1/candidate-handoff.json",
+ "handoffDeliveryExeSha256": "248a8e346e526b18b7657c8edd5b7068061bd6c8645105aa129d6ae965ade8b8",
+ "handoffEvidenceExeSha256": "54f93eacb6cd54e671c947c315042072bdcffc6e35f78e620a65128f8293f180",
+ "sidecarBuildJsonSha256": "f1dc84f9a79682fe74281d56ed022b7b57f9837ac43719f8be87fca35ab7337f",
+ "signing": "ad-hoc (-) 仅 /tmp 副本；非交付产物"
+}

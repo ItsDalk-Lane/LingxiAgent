@@ -17,6 +17,8 @@ const mockState: MockState = {};
 
 vi.mock('../../settings/store', () => ({
   useSettingsStore: {
+    // 编排夹具补齐真实store已有订阅接口；连接隔离仍由当前原生窗口回归检查。
+    subscribe: () => () => {},
     getState: () => mockState,
     setState: (patch: MockState | ((s: MockState) => MockState)) => {
       const next = typeof patch === 'function' ? patch(mockState) : patch;
@@ -28,6 +30,8 @@ vi.mock('../../settings/store', () => ({
 const mockFetch = vi.fn();
 
 vi.mock('../../settings/api', () => ({
+  // 本组使用旧服务编排，连接键仍按该夹具的所选连接计算。
+  settingsConnectionKey: () => mockState.activeServerConnectionId ?? null,
   lingxiFetch: (...args: unknown[]) => mockFetch(...args),
   lingxiFetchJson: async (...args: unknown[]) => {
     const response = await mockFetch(...args);

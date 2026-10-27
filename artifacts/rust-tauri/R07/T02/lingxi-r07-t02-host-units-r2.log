@@ -1,0 +1,46 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 45.06s
+     Running unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_service-0591b361ca6dec9e)
+
+running 19 tests
+test mcpbridge::tests::remote_resource_uris_never_map_to_local_refs ... ok
+test bridge_effects::tests::draft_character_limit_preserves_complete_unicode_characters ... ok
+test bridge_permission::tests::legacy_and_current_modes_share_one_strict_result ... ok
+test history::history_content::tests::bridge_time_tag_strip_matches_ts ... ok
+test mcpbridge::tests::mcp_target_ids_are_origin_namespaced ... ok
+test bridge_effect_text::tests::draft_withholds_incomplete_time_marker_and_never_publishes_backlog ... ok
+test mcpbridge::tests::server_annotations_never_soften_the_permission_or_recovery ... ok
+test mcpbridge::tests::structured_output_validation_uses_the_catalog_rules ... ok
+test bridge_effects::tests::native_selection_requires_actual_scope_and_supported_mode_and_honors_rich_preference ... ok
+test auth::bridge_identity_tests::bridge_actors_and_takeover_are_host_only_restricted_identities ... ok
+test bridge_media_pipe::tests::exact_bytes_only_after_complete_and_bound_to_message ... ok
+test bridge_media_pipe::tests::out_of_order_oversize_and_interrupted_media_are_refused ... ok
+test sessions::tests::bridge_inbox_run_survives_restart_without_a_second_run_even_before_host_bind ... ok
+test bridge::revoke_tests::revoked_while_model_parked_cancels_before_any_tool_dispatch ... FAILED
+test bridge::revoke_tests::revoke_cancels_accepted_unbound_run_after_inbox_becomes_unknown ... FAILED
+test bridge_media_pipe::tests::transferred_media_keeps_its_reservation_until_bytes_are_released ... ok
+test bridge_media_pipe::tests::aggregate_budget_and_local_paths_cannot_be_smuggled ... ok
+test bridge_media_pipe::tests::zero_byte_document_has_a_bounded_attachment_identity ... ok
+test bridge::revoke_tests::permission_narrowed_while_model_parked_cancels_before_write_or_exec_dispatch ... ok
+
+failures:
+
+---- bridge::revoke_tests::revoked_while_model_parked_cancels_before_any_tool_dispatch stdout ----
+
+thread 'bridge::revoke_tests::revoked_while_model_parked_cancels_before_any_tool_dispatch' (470528) panicked at crates/lingxi-service/src/bridge_revoke_tests.rs:333:10:
+called `Result::unwrap()` on an `Err` value: Storage(Corrupted { detail: "unknown session permission mode: auto" })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- bridge::revoke_tests::revoke_cancels_accepted_unbound_run_after_inbox_becomes_unknown stdout ----
+
+thread 'bridge::revoke_tests::revoke_cancels_accepted_unbound_run_after_inbox_becomes_unknown' (470527) panicked at crates/lingxi-service/src/bridge_revoke_tests.rs:333:10:
+called `Result::unwrap()` on an `Err` value: Storage(Corrupted { detail: "unknown session permission mode: auto" })
+
+
+failures:
+    bridge::revoke_tests::revoke_cancels_accepted_unbound_run_after_inbox_becomes_unknown
+    bridge::revoke_tests::revoked_while_model_parked_cancels_before_any_tool_dispatch
+
+test result: FAILED. 17 passed; 2 failed; 0 ignored; 0 measured; 439 filtered out; finished in 0.36s
+
+error: test failed, to rerun pass `-p lingxi-service --lib`

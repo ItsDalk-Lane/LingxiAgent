@@ -57,6 +57,7 @@ vi.mock('../../components/input/extensions/skill-badge', () => ({
 }));
 
 import { createTestTranslator } from '../helpers/i18n-test-strings';
+import { getDesktopHost } from '../../host/desktop-host';
 
 const testT = createTestTranslator();
 
@@ -315,7 +316,7 @@ describe('InputArea media send', () => {
     await waitFor(() => {
       expect(mocks.wsSend).toHaveBeenCalledTimes(1);
     });
-    expect(window.platform.readFileBase64).toHaveBeenCalledWith('/tmp/hana/session-files/pasted.png');
+    expect(getDesktopHost().api.readFileBase64).toHaveBeenCalledWith('/tmp/hana/session-files/pasted.png');
     const payload = JSON.parse(String(mocks.wsSend.mock.calls[0][0]));
     expect(payload.images).toEqual([{
       type: 'image',
@@ -411,7 +412,7 @@ describe('InputArea media send', () => {
       visionAuxiliary: false,
     });
     // 不读图片字节
-    expect(window.platform.readFileBase64).not.toHaveBeenCalled();
+    expect(getDesktopHost().api.readFileBase64).not.toHaveBeenCalled();
   });
 
   it('keeps the send alive as file-only when reading image bytes fails (#1647)', async () => {
@@ -503,7 +504,7 @@ describe('InputArea media send', () => {
       expect(mocks.wsSend).toHaveBeenCalledTimes(1);
     });
     const payload = JSON.parse(String(mocks.wsSend.mock.calls[0][0]));
-    expect(window.platform.readFileBase64).toHaveBeenCalledWith('/tmp/hana/session-files/voice.wav');
+    expect(getDesktopHost().api.readFileBase64).toHaveBeenCalledWith('/tmp/hana/session-files/voice.wav');
     expect(payload.text).toBe('');
     expect(payload.audios).toEqual([{
       type: 'audio',
@@ -567,7 +568,7 @@ describe('InputArea media send', () => {
       expect(mocks.wsSend).toHaveBeenCalledTimes(1);
     });
     const payload = JSON.parse(String(mocks.wsSend.mock.calls[0][0]));
-    expect(window.platform.readFileBase64).toHaveBeenCalledWith('/tmp/hana/session-files/recording.wav');
+    expect(getDesktopHost().api.readFileBase64).toHaveBeenCalledWith('/tmp/hana/session-files/recording.wav');
     expect(payload.text).toBe('');
     expect(payload.audios).toEqual([{
       type: 'audio',
@@ -681,7 +682,7 @@ describe('InputArea media send', () => {
       label: 'voice.wav',
       kind: 'attachment',
     }]);
-    expect(window.platform.readFileBase64).not.toHaveBeenCalled();
+    expect(getDesktopHost().api.readFileBase64).not.toHaveBeenCalled();
   });
 
   it('rejects video before send when the selected model does not support video', async () => {
@@ -712,7 +713,7 @@ describe('InputArea media send', () => {
       expect(useStore.getState().toasts.some(toast => toast.type === 'warning')).toBe(true);
     });
     expect(mocks.wsSend).not.toHaveBeenCalled();
-    expect(window.platform.readFileBase64).not.toHaveBeenCalled();
+    expect(getDesktopHost().api.readFileBase64).not.toHaveBeenCalled();
   });
 
   it('sends a valid video as an independent native media type for a supported provider', async () => {
@@ -743,7 +744,7 @@ describe('InputArea media send', () => {
         }],
       },
     } as never);
-    vi.mocked(window.platform.readFileBase64).mockResolvedValueOnce(mp4Base64);
+    vi.mocked(getDesktopHost().api.readFileBase64).mockResolvedValueOnce(mp4Base64);
 
     render(React.createElement(InputArea));
     fireEvent.click(screen.getByTestId('send'));
@@ -769,7 +770,7 @@ describe('InputArea media send', () => {
         }],
       },
     } as never);
-    vi.mocked(window.platform.readFileBase64).mockResolvedValueOnce(Buffer.from('plain text').toString('base64'));
+    vi.mocked(getDesktopHost().api.readFileBase64).mockResolvedValueOnce(Buffer.from('plain text').toString('base64'));
 
     render(React.createElement(InputArea));
     fireEvent.click(screen.getByTestId('send'));

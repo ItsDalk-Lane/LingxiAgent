@@ -1,0 +1,22 @@
+{
+  "createdAt": "2026-10-18T12:22:18.921772+00:00",
+  "scope": "原始失败子检查JSON保全，尚不判根因；源代码/父运行保持不动",
+  "records": [
+    {
+      "scenario": "boundaries",
+      "source": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-boundaries-58431-1792325989726543000/home/ui-result.json",
+      "copy": "artifacts/rust-tauri/R07/T08/t08g-native-ui-failure-snapshots1/boundaries-ui-result.json",
+      "sha256": "33df3909ae3cc78ed6b58d9e3af79235a75bb71560e0520b2d1f1c20dd63707f",
+      "passed": 0,
+      "failed": 1
+    },
+    {
+      "scenario": "workflow",
+      "source": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-workflow-58431-1792325989726549000/home/ui-result.json",
+      "copy": "artifacts/rust-tauri/R07/T08/t08g-native-ui-failure-snapshots1/workflow-ui-result.json",
+      "sha256": "70f045394e316ab6478a663f449ab1b5c717fda30bf0e819ae08078775006f48",
+      "passed": 0,
+      "failed": 1
+    }
+  ]
+}

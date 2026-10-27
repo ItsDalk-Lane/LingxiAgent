@@ -1,0 +1,44 @@
+{
+  "scope": "SDK_FEATURE_RESOLUTION_NOT_COMPILE_OR_FUNCTIONAL_ACCEPTANCE",
+  "resolveReceipt": "artifacts/rust-tauri/R07/T08/mcp-sdk-lock-resolve1.json",
+  "added": [
+    {
+      "name": "async-trait",
+      "version": "0.1.89"
+    },
+    {
+      "name": "base64",
+      "version": "0.22.1"
+    },
+    {
+      "name": "oauth2",
+      "version": "5.0.0"
+    },
+    {
+      "name": "sse-stream",
+      "version": "0.2.4"
+    },
+    {
+      "name": "thiserror",
+      "version": "1.0.69"
+    },
+    {
+      "name": "thiserror-impl",
+      "version": "1.0.69"
+    },
+    {
+      "name": "wasm-streams",
+      "version": "0.5.0"
+    }
+  ],
+  "removed": [],
+  "existingPackageVersionsRetained": true,
+  "rmcpVersions": [
+    "3.4.1"
+  ],
+  "reqwestVersions": [
+    "0.13.5"
+  ],
+  "beforeSha256": "00dd5fd4bd5b48dd8fb647cce1e91b37e4effa7631d4a62f84a704985b71aa12",
+  "afterSha256": "ae9ac557310fcaba768ebc55973c97cfcf18bf57b20d78e665e8fc65aac1b4a3"
+}

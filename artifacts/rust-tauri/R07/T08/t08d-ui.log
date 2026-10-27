@@ -1,0 +1,425 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stderr | desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx > R07 原生消息平台页面，真实UI与HTTP协议边界 > 会话详情读取原生权威历史，重置失败保留已读内容和会话
+[session] 历史读取失败，保留当前内容 Error: unmapped Rust UI route: /lingxi/v1/sessions/session/media/jobs
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx:42:11
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx:98:14
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at sessionOwnerFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/session-connection-owner.ts:76:28)
+    at requestReceipt (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/rust-media.ts:126:28)
+    at refreshRustMediaJobs (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/rust-media.ts:136:26)
+    at loadMessages (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:458:13)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/BridgePanel.tsx:244:7
+
+stderr | desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx > R07 原生消息平台页面，真实UI与HTTP协议边界 > 会话详情读取原生权威历史，重置失败保留已读内容和会话
+[bridge] open session failed: Error: unmapped Rust UI route: /lingxi/v1/sessions/session/media/jobs
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx:42:11
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx:98:14
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at sessionOwnerFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/session-connection-owner.ts:76:28)
+    at requestReceipt (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/rust-media.ts:126:28)
+    at refreshRustMediaJobs (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/rust-media.ts:136:26)
+    at loadMessages (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:458:13)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/BridgePanel.tsx:244:7
+
+ ❯ desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx (10 tests | 1 failed) 1939ms
+     × 会话详情读取原生权威历史，重置失败保留已读内容和会话 1011ms
+ ❯ desktop/src/react/__tests__/settings/OAuthCredentials.test.tsx (1 test | 1 failed) 1086ms
+     × requests the explicit browser login method and keeps the callback session local 1086ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/settings/OAuthCredentials.test.tsx > OAuthCredentials > requests the explicit browser login method and keeps the callback session local
+AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_pv-credentials_4045f0"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_pv-cred-row_4045f0"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"_pv-cred-label_4045f0"[39m
+          [36m>[39m
+            [0mOAuth[0m
+          [36m</span>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"_oauth-login-btn_4045f0"[39m
+          [36m>[39m
+            [0msettings.oauth.login[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mrole[39m=[32m"alert"[39m
+        [36m>[39m
+          [0msettings.oauth.failed: [vitest] No "lingxiFetchJson" export is defined on the "../../settings/api" mock. Did you forget to return it from "vi.mock"?
+If you need to partially mock a module, you can use "importOriginal" helper inside:
+[0m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+ ❯ desktop/src/react/__tests__/settings/OAuthCredentials.test.tsx:73:51
+     71|     fireEvent.click(screen.getByRole('button', { name: 'settings.oauth…
+     72|
+     73|     await waitFor(() => expect(mocks.lingxiFetch).toHaveBeenCalledTime…
+       |                                                   ^
+     74|     const [startPath, startOptions] = mocks.lingxiFetch.mock.calls[0];
+     75|     expect(startPath).toBe('/api/auth/oauth/start');
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx > R07 原生消息平台页面，真实UI与HTTP协议边界 > 会话详情读取原生权威历史，重置失败保留已读内容和会话
+TestingLibraryElementError: Unable to find an element with the text: 真实历史正文. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_floatingPanel_c0da78 _bridgePanelWide_c0da78"[39m
+      [33mid[39m=[32m"bridgePanel"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_floatingPanelInner_c0da78"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_floatingPanelHeader_c0da78"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_bridgeTabs_c0da78"[39m
+            [33mid[39m=[32m"bridgeTabs"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_bridgeTab_c0da78 _bridgeTabActive_c0da78"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_bridgeTabDot_c0da78 bridge-dot-ok"[39m
+              [36m/>[39m
+              [36m<span>[39m
+                [0msettings.bridge.feishu[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_bridgeTab_c0da78"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_bridgeTabDot_c0da78 bridge-dot-off"[39m
+              [36m/>[39m
+              [36m<span>[39m
+                [0msettings.bridge.dingtalk[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_bridgeTab_c0da78"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_bridgeTabDot_c0da78 bridge-dot-ok"[39m
+              [36m/>[39m
+              [36m<span>[39m
+                [0msettings.bridge.telegram[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_bridgeTab_c0da78"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_bridgeTabDot_c0da78 bridge-dot-off"[39m
+              [36m/>[39m
+              [36m<span>[39m
+                [0mWhatsApp[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_bridgeTab_c0da78"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_bridgeTabDot_c0da78 bridge-dot-off"[39m
+              [36m/>[39m
+              [36m<span>[39m
+                [0mQQ[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_bridgeTab_c0da78"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_bridgeTabDot_c0da78 bridge-dot-off"[39m
+              [36m/>[39m
+              [36m<span>[39m
+                [0msettings.bridge.wechat[0m
+              [36m</span>[39m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"_floatingPanelClose_c0da78"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"14"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"14"[39m
+            [36m>[39m
+              [36m<line[39m
+                [33mx1[39m=[32m"18"[39m
+                [33mx2[39m=[32m"6"[39m
+                [33my1[39m=[32m"6"[39m
+                [33my2[39m=[32m"18"[39m
+              [36m/>[39m
+              [36m<line[39m
+                [33mx1[39m=[32m"6"[39m
+                [33mx2[39m=[32m"18"[39m
+                [33my1[39m=[32m"6"[39m
+                [33my2[39m=[32m"18"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mrole[39m=[32m"alert"[39m
+          [33mstyle[39m=[32m"padding: 8px 16px; color: var(--text-error, #c44);"[39m
+        [36m>[39m
+          [0munmapped Rust UI route: /lingxi/v1/sessions/session/media/jobs[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_bridgeBody_c0da78"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_bridgeSidebar_c0da78"[39m
+            [33mid[39m=[32m"bridgeSidebar"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_bridgeContactList_c0da78"[39m
+              [33mid[39m=[32m"bridgeContactList"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_bridgeContactItem_c0da78"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_bridgeContactAvatar_c0da78"[39m
+                [36m>[39m
+                  [0m已[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_bridgeContactInfo_c0da78"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"_bridgeContactName_c0da78"[39m
+                  [36m>[39m
+                    [0m已有联系人[0m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_bridgeChat_c0da78"[39m
+            [33mid[39m=[32m"bridgeChat"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_bridgeChatEmpty_c0da78"[39m
+              [33mid[39m=[32m"bridgeChatEmpty"[39m
+            [36m>[39m
+              [36m<span>[39m
+                [0mbridge.selectChat[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_floatingPanel_c0da78 _bridgePanelWide_c0da78"[39m
+      [33mid[39m=[32m"bridgePanel"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_floatingPanelInner_c0da78"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_floatingPanelHeader_c0da78"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_bridgeTabs_c0da78"[39m
+            [33mid[39m=[32m"bridgeTabs"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_bridgeTab_c0da78 _bridgeTabActive_c0da78"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_bridgeTabDot_c0da78 bridge-dot-ok"[39m
+              [36m/>[39m
+              [36m<span>[39m
+                [0msettings.bridge.feishu[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_bridgeTab_c0da78"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_bridgeTabDot_c0da78 bridge-dot-off"[39m
+              [36m/>[39m
+              [36m<span>[39m
+                [0msettings.bridge.dingtalk[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_bridgeTab_c0da78"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_bridgeTabDot_c0da78 bridge-dot-ok"[39m
+              [36m/>[39m
+              [36m<span>[39m
+                [0msettings.bridge.telegram[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_bridgeTab_c0da78"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_bridgeTabDot_c0da78 bridge-dot-off"[39m
+              [36m/>[39m
+              [36m<span>[39m
+                [0mWhatsApp[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_bridgeTab_c0da78"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_bridgeTabDot_c0da78 bridge-dot-off"[39m
+              [36m/>[39m
+              [36m<span>[39m
+                [0mQQ[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_bridgeTab_c0da78"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_bridgeTabDot_c0da78 bridge-dot-off"[39m
+              [36m/>[39m
+              [36m<span>[39m
+                [0msettings.bridge.wechat[0m
+              [36m</span>[39m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"_floatingPanelClose_c0da78"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"14"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"14"[39m
+            [36m>[39m
+              [36m<line[39m
+                [33mx1[39m=[32m"18"[39m
+                [33mx2[39m=[32m"6"[39m
+                [33my1[39m=[32m"6"[39m
+                [33my2[39m=[32m"18"[39m
+              [36m/>[39m
+              [36m<line[39m
+                [33mx1[39m=[32m"6"[39m
+                [33mx2[39m=[32m"18"[39m
+                [33my1[39m=[32m"6"[39m
+                [33my2[39m=[32m"18"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mrole[39m=[32m"alert"[39m
+          [33mstyle[39m=[32m"padding: 8px 16px; color: var(--text-error, #c44);"[39m
+        [36m>[39m
+          [0munmapped Rust UI route: /lingxi/v1/sessions/session/media/jobs[0m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_bridgeBody_c0da78"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_bridgeSidebar_c0da78"[39m
+            [33mid[39m=[32m"bridgeSidebar"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_bridgeContactList_c0da78"[39m
+              [33mid[39m=[32m"bridgeContactList"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_bridgeContactItem_c0da78"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_bridgeContactAvatar_c0da78"[39m
+                [36m>[39m
+                  [0m已[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_bridgeContactInfo_c0da78"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"_bridgeContactName_c0da78"[39m
+                  [36m>[39m
+                    [0m已有联系人[0m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_bridgeChat_c0da78"[39m
+            [33mid[39m=[32m"bridgeChat"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_bridgeChatEmpty_c0da78"[39m
+              [33mid[39m=[32m"bridgeChatEmpty"[39m
+            [36m>[39m
+              [36m<span>[39m
+                [0mbridge.selectChat[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx:101:18
+     99|     });
+    100|     render(<BridgePanel />); fireEvent.click(await screen.findByText('…
+    101|     await screen.findByText('真实历史正文');
+       |                  ^
+    102|     fireEvent.click(screen.getByText('bridge.resetContext'));
+    103|     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextCo…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 63 passed (65)
+      Tests  2 failed | 538 passed (540)
+   Start at  17:01:09
+   Duration  22.24s (transform 2.82s, setup 374ms, import 7.54s, tests 16.67s, environment 15.13s)
+

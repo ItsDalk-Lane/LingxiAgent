@@ -1,0 +1,40 @@
+{
+  "$defs": {
+    "EventId": {
+      "description": "Identity of one protocol event (dedup key; unique per stream).\n\nOpaque string identifier. Equality and ordering carry no\nsemantics; the string form is preserved verbatim across\nmigrations (legacy IDs are never renumbered). On the wire this is\na plain JSON string (`#[serde(transparent)]`).",
+      "type": "string"
+    },
+    "Seq": {
+      "description": "Monotonic sequence as a decimal string. Values may exceed 2^53-1; consumers must not parse this into a JS number when precision matters.",
+      "pattern": "^(0|[1-9][0-9]*)$",
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One entry of a paginated history listing.",
+  "properties": {
+    "eventId": {
+      "$ref": "#/$defs/EventId"
+    },
+    "eventType": {
+      "type": "string"
+    },
+    "seq": {
+      "$ref": "#/$defs/Seq"
+    },
+    "summary": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "seq",
+    "eventId",
+    "eventType"
+  ],
+  "title": "HistoryEntry",
+  "type": "object"
+}

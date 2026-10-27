@@ -1,0 +1,23 @@
+{
+  "$defs": {
+    "SidebarSessionListRowMode": {
+      "enum": [
+        "two-line",
+        "single-line"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "rowMode": {
+      "$ref": "#/$defs/SidebarSessionListRowMode"
+    }
+  },
+  "required": [
+    "rowMode"
+  ],
+  "title": "SidebarSessionListPreferences",
+  "type": "object"
+}

@@ -7,7 +7,7 @@
  * httpOk=false 时携带 error / code，由 UI 决定如何提示。
  */
 
-import { lingxiFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../services/service-client';
 
 export type GitFileState = 'modified' | 'added' | 'deleted' | 'untracked' | 'binary';
 

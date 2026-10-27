@@ -1,0 +1,39 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: method `apply_cover_frozen` is never used
+   --> crates/lingxi-service/src/office_tools.rs:408:25
+    |
+165 | impl OfficeApi {
+    | -------------- method in this implementation
+...
+408 |     pub(crate) async fn apply_cover_frozen(
+    |                         ^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+error[E0507]: cannot move out of dereference of `std::sync::MutexGuard<'_, Option<PathBuf>>`
+    --> crates/lingxi-service/tests/r07_office/mod.rs:1025:24
+     |
+1025 |             let path = slot.lock().unwrap().expect("目标已记录");
+     |                        ^^^^^^^^^^^^^^^^^^^^ -------------------- value moved due to this method call
+     |                        |
+     |                        move occurs because value has type `Option<PathBuf>`, which does not implement the `Copy` trait
+     |
+note: `Option::<T>::expect` takes ownership of the receiver `self`, which moves value
+    --> /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/option.rs:966:24
+help: consider calling `.as_ref()` to borrow the value's contents
+     |
+1025 |             let path = slot.lock().unwrap().as_ref().expect("目标已记录");
+     |                                            +++++++++
+help: consider calling `.as_mut()` to mutably borrow the value's contents
+     |
+1025 |             let path = slot.lock().unwrap().as_mut().expect("目标已记录");
+     |                                            +++++++++
+help: you can `clone` the value and consume it, but this might not be your desired behavior
+     |
+1025 |             let path = <Option<PathBuf> as Clone>::clone(&slot.lock().unwrap()).expect("目标已记录");
+     |                        +++++++++++++++++++++++++++++++++++                    +
+
+For more information about this error, try `rustc --explain E0507`.
+error: could not compile `lingxi-service` (test "r07_office_tools") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

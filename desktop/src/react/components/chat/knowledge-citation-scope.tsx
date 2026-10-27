@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { ChatListItem } from '../../stores/chat-types';
 import { useStore } from '../../stores';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 import { resolveKnowledgeCitation, type KnowledgeResolvedCitationDto } from '../knowledge/knowledge-api';
 
 export function knowledgeCitationId(href: string): string | null {

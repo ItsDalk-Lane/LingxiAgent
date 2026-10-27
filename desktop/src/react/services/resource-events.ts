@@ -1,4 +1,6 @@
 import { lingxiFetch } from '../hooks/use-hana-fetch';
+import { useStore } from '../stores';
+import { appendConnectionAuth, buildConnectionUrl, resolveServerConnection, type ServerConnection } from './server-connection';
 
 export type ResourceRef =
   | { kind: 'local-file'; path: string }
@@ -13,6 +15,10 @@ type WatchEntry = {
   disposed: boolean;
   released: boolean;
   ready: Promise<void>;
+  owner: ServerConnection | null;
+  unsubscribeOwner?: () => void;
+  generation: number;
+  paused: boolean;
 };
 
 const watches = new Map<string, WatchEntry>();
@@ -62,9 +68,9 @@ export function createResourceEventClient({
       throwOnHttpError: false,
     });
     const data = await res.json();
-    if (data?.stale) {
+    if (data?.stale || (Number.isFinite(data?.latestSequence) && Number(data.latestSequence) < lastSeenSequence)) {
       await resubscribeWatches?.();
-      if (Number.isFinite(data.latestSequence) && Number(data.latestSequence) > lastSeenSequence) {
+      if (Number.isFinite(data.latestSequence) && Number(data.latestSequence) >= 0) {
         lastSeenSequence = Math.floor(Number(data.latestSequence));
       }
       return data;
@@ -119,7 +125,7 @@ export function retainResourceWatch(ref: ResourceRef): () => void {
   const existing = watches.get(key);
   if (existing) {
     existing.refCount += 1;
-    return () => releaseResourceWatch(key);
+    return () => releaseResourceWatch(key, existing);
   }
 
   const entry: WatchEntry = {
@@ -130,10 +136,37 @@ export function retainResourceWatch(ref: ResourceRef): () => void {
     disposed: false,
     released: false,
     ready: Promise.resolve(),
+    owner: null,
+    generation: 0,
+    paused: false,
   };
+  const connection = resolveServerConnection(useStore.getState());
+  if (connection?.serverNodeKind === 'lingxi-service') {
+    const ownerKey = JSON.stringify(connection);
+    entry.owner = JSON.parse(ownerKey);
+    entry.unsubscribeOwner = useStore.subscribe(() => {
+      if (JSON.stringify(resolveServerConnection(useStore.getState())) === ownerKey) return;
+      entry.disposed = true;
+      entry.generation++;
+      entry.unsubscribeOwner?.();
+      if (watches.get(key) === entry) watches.delete(key);
+      releaseEntry(entry);
+    });
+  }
   entry.ready = subscribeEntry(entry);
   watches.set(key, entry);
-  return () => releaseResourceWatch(key);
+  return () => releaseResourceWatch(key, entry);
+}
+
+/** 取消订阅也须使用创建它的原连接，不能把旧订阅编号发到新服务。 */
+function watchRequest(entry: WatchEntry, path: string, opts: RequestInit): Promise<{ json: () => Promise<any> }> {
+  if (!entry.owner) return lingxiFetch(path, { ...opts, throwOnHttpError: false });
+  return fetch(buildConnectionUrl(entry.owner, `/lingxi/v1${path.slice('/api'.length)}`), {
+    ...opts, headers: appendConnectionAuth(entry.owner, opts.headers), signal: AbortSignal.timeout(30_000),
+  }).then(response => {
+    if (!response.ok) throw new Error(`资源订阅请求失败 (${response.status})`);
+    return response;
+  });
 }
 
 /**
@@ -153,22 +186,24 @@ function resolvedLocalPathFromSubscription(ref: ResourceRef, data: any): string 
 }
 
 function subscribeEntry(entry: WatchEntry): Promise<void> {
+  const generation = ++entry.generation;
   entry.released = false;
-  return lingxiFetch('/api/resource-io/subscribe', {
+  return watchRequest(entry, '/api/resource-io/subscribe', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ purpose: 'resource-watch', resources: [entry.ref] }),
-    throwOnHttpError: false,
   })
     .then(res => res.json())
     .then((data) => {
       if (typeof data?.subscriptionId === 'string') {
+        if (entry.disposed || entry.paused || entry.generation !== generation) {
+          return releaseSubscription(entry, data.subscriptionId);
+        }
         entry.subscriptionId = data.subscriptionId;
         entry.resolvedPath = resolvedLocalPathFromSubscription(entry.ref, data);
       } else {
         console.warn('[resource-events] watch failed:', data?.error || entry.ref);
       }
-      if (entry.disposed) releaseEntry(entry);
     })
     .catch((err) => {
       if (!entry.disposed) console.warn('[resource-events] watch failed:', err);
@@ -192,43 +227,58 @@ export function resolvedLocalPathAlias(filePath: string | null | undefined): str
   return resourceWatchKey(normalized) === key ? null : normalized.path;
 }
 
-function releaseResourceWatch(key: string): void {
+function releaseResourceWatch(key: string, ownedEntry: WatchEntry): void {
   const entry = watches.get(key);
-  if (!entry) return;
+  if (!entry || entry !== ownedEntry) return;
   if (entry.refCount > 1) {
     entry.refCount -= 1;
     return;
   }
   watches.delete(key);
   entry.disposed = true;
+  entry.generation++;
+  entry.unsubscribeOwner?.();
   void entry.ready.then(() => releaseEntry(entry));
 }
 
 function releaseEntry(entry: WatchEntry): void {
   if (entry.released || !entry.subscriptionId) return;
   entry.released = true;
-  void lingxiFetch(`/api/resource-io/subscriptions/${encodeURIComponent(entry.subscriptionId)}`, {
+  const subscriptionId = entry.subscriptionId;
+  entry.subscriptionId = null;
+  void releaseSubscription(entry, subscriptionId);
+}
+
+function releaseSubscription(entry: WatchEntry, subscriptionId: string): Promise<void> {
+  return watchRequest(entry, `/api/resource-io/subscriptions/${encodeURIComponent(subscriptionId)}`, {
     method: 'DELETE',
-    throwOnHttpError: false,
-  }).catch((err) => {
+  }).then(() => undefined).catch((err) => {
     console.warn('[resource-events] unwatch failed:', err);
   });
 }
 
-async function resubscribeActiveWatches(): Promise<void> {
+/** 断连时暂停正式订阅；保留页面引用，重连后重新申请，迟到收据按原服务回收。 */
+export function pauseRustResourceWatches(connection: ServerConnection): void {
+  const key = JSON.stringify(connection);
+  for (const entry of watches.values()) {
+    if (!entry.owner || JSON.stringify(entry.owner) !== key) continue;
+    entry.paused = true;
+    entry.generation++;
+    releaseEntry(entry);
+  }
+}
+
+export async function resubscribeActiveWatches(): Promise<void> {
   const entries = [...watches.values()].filter(entry => !entry.disposed);
   await Promise.all(entries.map(async (entry) => {
     const previousSubscriptionId = entry.subscriptionId;
     entry.subscriptionId = null;
+    entry.generation++;
+    entry.paused = false;
     if (previousSubscriptionId) {
-      await lingxiFetch(`/api/resource-io/subscriptions/${encodeURIComponent(previousSubscriptionId)}`, {
-        method: 'DELETE',
-        throwOnHttpError: false,
-      }).catch((err) => {
-        console.warn('[resource-events] stale unwatch failed:', err);
-      });
+      await releaseSubscription(entry, previousSubscriptionId);
     }
-    if (!entry.disposed) entry.ready = subscribeEntry(entry);
+    if (!entry.disposed && !entry.paused) entry.ready = subscribeEntry(entry);
     await entry.ready;
   }));
 }

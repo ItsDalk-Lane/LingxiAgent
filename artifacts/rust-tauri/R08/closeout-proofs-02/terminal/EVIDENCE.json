@@ -1,0 +1,336 @@
+{
+  "schema": "lingxi.r08.terminal-ab-evidence.v1",
+  "stage": "R08 closeout round 6 / D13",
+  "generatedAt": "2026-10-26",
+  "suiteFile": "desktop/src/react/__tests__/r08/r08-t07-terminal-ab.test.ts",
+  "observationTask": "leaf.terminal.positive",
+  "drill": {
+    "script": "scripts/rust-tauri/r08_t07_ab_drill.mjs",
+    "binary": "rust/target/debug/lingxi-service (rustup cargo 1.98.1, --locked build)",
+    "command": "PATH=\"$HOME/.cargo/bin:$PATH\" LINGXI_R08_AB_TEST_FILTER='leaf.terminal.positive' node scripts/rust-tauri/r08_t07_ab_drill.mjs --bin rust/target/debug/lingxi-service --work /private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02 --suite-files desktop/src/react/__tests__/r08/r08-t07-terminal-ab.test.ts",
+    "exitCode": 0,
+    "runs": [
+      {
+        "work": "/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-01",
+        "verdict": "parity",
+        "AB_RESULT": "tasks=1 parity=1 differs=0 recorded=0 failedA=0 failedB=0"
+      },
+      {
+        "work": "/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02",
+        "verdict": "parity",
+        "AB_RESULT": "tasks=1 parity=1 differs=0 recorded=0 failedA=0 failedB=0"
+      }
+    ],
+    "evidenceRoot": "artifacts/rust-tauri/R08/closeout-proofs-02/terminal/",
+    "caseResults": {
+      "A": {
+        "snapshot.current-terminal-listed": true,
+        "snapshot.lists-both-session-terminals": true,
+        "snapshot.identity-mismatch-rejected": true,
+        "snapshot.other-session-no-leak": true,
+        "tail.initial-window": true,
+        "tail.new-output-after-since": true,
+        "tail.identity-mismatch-rejected": true,
+        "tail.foreign-terminal-rejected": true,
+        "close.reports-killed-or-already-stopped": true,
+        "close.process-really-stopped": true,
+        "close.unknown-id-rejected": true,
+        "close.foreign-terminal-rejected": true,
+        "close.identity-mismatch-rejected": true,
+        "transport.survives-frame-family": true
+      },
+      "B": {
+        "snapshot.current-terminal-listed": true,
+        "snapshot.lists-both-session-terminals": true,
+        "snapshot.identity-mismatch-rejected": true,
+        "snapshot.other-session-no-leak": true,
+        "tail.initial-window": true,
+        "tail.new-output-after-since": true,
+        "tail.identity-mismatch-rejected": true,
+        "tail.foreign-terminal-rejected": true,
+        "close.reports-killed-or-already-stopped": true,
+        "close.process-really-stopped": true,
+        "close.unknown-id-rejected": true,
+        "close.foreign-terminal-rejected": true,
+        "close.identity-mismatch-rejected": true,
+        "transport.survives-frame-family": true
+      },
+      "verdict": "parity"
+    }
+  },
+  "assertionToCases": {
+    "R00-T02-LA-CE69063550AA": {
+      "F-D13-WS_IN-WS-IN-TERMINAL-SNAPSHOT-REQUEST-CE6906": {
+        "A0 通过 terminalWsBridge 送当前终端快照": [
+          "leaf::leaf.terminal.positive.snapshot.current-terminal-listed",
+          "leaf::leaf.terminal.positive.snapshot.lists-both-session-terminals"
+        ],
+        "A1 会话身份不符时拒绝，不送他人终端内容": [
+          "leaf::leaf.terminal.positive.snapshot.identity-mismatch-rejected",
+          "leaf::leaf.terminal.positive.snapshot.other-session-no-leak"
+        ]
+      }
+    },
+    "R00-T02-LA-4C35E6AEC6F7": {
+      "F-D13-WS_IN-WS-IN-TERMINAL-TAIL-REQUEST-4C35E6": {
+        "A0 按 terminalId/sinceSeq 返回后续输出": [
+          "leaf::leaf.terminal.positive.tail.initial-window",
+          "leaf::leaf.terminal.positive.tail.new-output-after-since"
+        ],
+        "A1 无权会话或不匹配终端拒绝，不接续错误进程": [
+          "leaf::leaf.terminal.positive.tail.identity-mismatch-rejected",
+          "leaf::leaf.terminal.positive.tail.foreign-terminal-rejected"
+        ]
+      }
+    },
+    "R00-T02-LA-CFD9F02BC6AA": {
+      "F-D13-WS_IN-WS-IN-TERMINAL-CLOSE-REQUEST-CFD9F0": {
+        "A0 终止指定 terminalId 并返回 killed 或 already_stopped（真实进程被终止）": [
+          "leaf::leaf.terminal.positive.close.reports-killed-or-already-stopped",
+          "leaf::leaf.terminal.positive.close.process-really-stopped"
+        ],
+        "A1 终端管理器不可用/ID 不匹配返回 rejected，不谎报已停止": [
+          "leaf::leaf.terminal.positive.close.unknown-id-rejected",
+          "leaf::leaf.terminal.positive.close.foreign-terminal-rejected",
+          "leaf::leaf.terminal.positive.close.identity-mismatch-rejected"
+        ]
+      }
+    },
+    "transport": {
+      "帧族之后连接存活": [
+        "leaf::leaf.terminal.positive.transport.survives-frame-family"
+      ]
+    }
+  },
+  "probes": {
+    "node": {
+      "managerUnavailableReachable": false,
+      "snapshot": {
+        "type": "terminal_snapshot",
+        "currentStatus": "running",
+        "terminalCount": 2,
+        "currentKeys": [
+          "agentId",
+          "command",
+          "createdAt",
+          "cwd",
+          "exitCode",
+          "exitedAt",
+          "label",
+          "lastActivityAt",
+          "seq",
+          "sessionId",
+          "sessionPath",
+          "signal",
+          "status",
+          "terminalId",
+          "toolCallId",
+          "transcriptPath"
+        ],
+        "mismatch": {
+          "type": "error",
+          "code": "session_identity_mismatch",
+          "leakedTerminalFrames": 0
+        },
+        "foreign": {
+          "type": "terminal_snapshot",
+          "terminals": 0,
+          "leaked": false
+        }
+      },
+      "tail": {
+        "initial": {
+          "type": "terminal_tail",
+          "chunks": 2,
+          "lastSeq": 2,
+          "truncated": false
+        },
+        "writeFinal": true,
+        "next": {
+          "type": "terminal_tail",
+          "lastSeq": 3,
+          "markerSeen": true,
+          "truncated": false
+        },
+        "mismatch": {
+          "type": "error",
+          "code": "session_identity_mismatch",
+          "terminalTailFrames": 0
+        },
+        "foreign": {
+          "type": "error",
+          "code": null,
+          "terminalTailFrames": 0
+        }
+      },
+      "close": {
+        "requested": {
+          "status": "killed",
+          "requestIdEcho": "term-close-1"
+        },
+        "heartbeat": {
+          "before": 185,
+          "after1": 185,
+          "after2": 185
+        },
+        "unknown": {
+          "type": "terminal_close_result",
+          "status": "rejected",
+          "reason": "terminal_not_found_or_mismatch"
+        },
+        "foreign": {
+          "status": "rejected",
+          "reason": "terminal_not_found_or_mismatch",
+          "terminalStillRunning": true
+        },
+        "mismatch": {
+          "type": "error",
+          "status": null,
+          "code": "session_identity_mismatch"
+        },
+        "interactive": {
+          "status": "killed",
+          "requestIdEcho": "term-close-interactive"
+        }
+      }
+    },
+    "rust": {
+      "managerUnavailableReachable": false,
+      "snapshot": {
+        "type": "terminal_snapshot",
+        "currentStatus": "running",
+        "terminalCount": 2,
+        "currentKeys": [
+          "agentId",
+          "command",
+          "createdAt",
+          "cwd",
+          "exitCode",
+          "exitedAt",
+          "label",
+          "lastActivityAt",
+          "seq",
+          "sessionId",
+          "sessionPath",
+          "signal",
+          "status",
+          "terminalId",
+          "toolCallId",
+          "transcriptPath"
+        ],
+        "mismatch": {
+          "type": "error",
+          "code": "session_identity_mismatch",
+          "leakedTerminalFrames": 0
+        },
+        "foreign": {
+          "type": "terminal_snapshot",
+          "terminals": 0,
+          "leaked": false
+        }
+      },
+      "tail": {
+        "initial": {
+          "type": "terminal_tail",
+          "chunks": 2,
+          "lastSeq": 2,
+          "truncated": false
+        },
+        "writeFinal": true,
+        "next": {
+          "type": "terminal_tail",
+          "lastSeq": 21,
+          "markerSeen": true,
+          "truncated": false
+        },
+        "mismatch": {
+          "type": "error",
+          "code": "session_identity_mismatch",
+          "terminalTailFrames": 0
+        },
+        "foreign": {
+          "type": "error",
+          "code": "terminal_not_found_or_mismatch",
+          "terminalTailFrames": 0
+        }
+      },
+      "close": {
+        "requested": {
+          "status": "killed",
+          "requestIdEcho": "term-close-1"
+        },
+        "heartbeat": {
+          "before": 195,
+          "after1": 195,
+          "after2": 195
+        },
+        "unknown": {
+          "type": "terminal_close_result",
+          "status": "rejected",
+          "reason": "terminal_not_found_or_mismatch"
+        },
+        "foreign": {
+          "status": "rejected",
+          "reason": "terminal_not_found_or_mismatch",
+          "terminalStillRunning": true
+        },
+        "mismatch": {
+          "type": "error",
+          "status": null,
+          "code": "session_identity_mismatch"
+        },
+        "interactive": {
+          "status": "killed",
+          "requestIdEcho": "term-close-interactive"
+        }
+      }
+    }
+  },
+  "rustChanges": {
+    "new": [
+      "rust/crates/lingxi-service/src/terminals.rs (frames + authorization + close mapping + 5 unit tests)"
+    ],
+    "modified": [
+      "rust/crates/lingxi-service/src/procsupervisor.rs (cwd on record; read-only bounded TerminalLog + utf8 tail; persistent_terminals/persistent_terminal/terminal_tail queries; terminal_log wiring in the pty reader)",
+      "rust/crates/lingxi-service/src/lib.rs (pub mod terminals; handle_terminal_frame dispatch in the WS session loop; the previous unconditional terminal_unavailable blocks removed)",
+      "rust/crates/lingxi-service/src/ws.rs (comment-only: stale \"no terminal subsystem / explicit capability error\" note replaced by the real-implementation note; wire variants unchanged this round)"
+    ]
+  },
+  "rustTests": {
+    "terminals_unit": "cargo test -p lingxi-service --lib terminals:: → 5 passed / 0 failed",
+    "procsup": "cargo test -p lingxi-service --lib procsupervisor:: → 23 passed / 0 failed",
+    "ws": "cargo test -p lingxi-service --lib 'ws::' → 13 passed / 0 failed",
+    "exectools": "cargo test -p lingxi-service --lib 'exectools::' → 9 passed / 0 failed",
+    "fullLib": "cargo test -p lingxi-service --lib → 706 passed / 3 failed (all 3 pre-existing env precondition: McpSettingsManager read_home=None \"MCP 原始只读目录不可用\" in background_tasks/memorytools/sessiontools; failed tests exist in HEAD and are unrelated to the touched modules)"
+  },
+  "legacyRecordedImpact": {
+    "task": "leaf.ws.terminal (main suite, recorded since before this round)",
+    "command": "PATH=\"$HOME/.cargo/bin:$PATH\" LINGXI_R08_AB_TEST_FILTER='leaf.ws.terminal' node scripts/rust-tauri/r08_t07_ab_drill.mjs --bin rust/target/debug/lingxi-service --work /private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-legacy-01 --suite-files desktop/src/react/__tests__/r08/r08-t07-kernel-ab.test.ts",
+    "exitCode": 0,
+    "verdict": "recorded",
+    "A_cases": {
+      "snapshot.explicit-reply": true,
+      "tail.rust-explicit-or-old-real": true,
+      "close.result-rejected-explicit": true,
+      "transport.survives-frame-family": true
+    },
+    "B_cases": {
+      "snapshot.explicit-reply": true,
+      "tail.rust-explicit-or-old-real": false,
+      "close.result-rejected-explicit": true,
+      "transport.survives-frame-family": true
+    },
+    "note": "Rust 腿观测从「terminal_unavailable 显式能力错误」变为「真实快照/真实 close rejected（terminal_not_found_or_mismatch）」；旧任务 tail 探测的匹配串只认 terminal_tail|terminal_unavailable，故其观测 case tail.rust-explicit-or-old-real 从 true 变 false，但该 case 不在 recorded 判定面（判定面=snapshot.explicit-reply + close.result-rejected-explicit + transport.survives-frame-family），verdict 仍为 recorded，既有 3 recorded 判定面不变。"
+  },
+  "limitations": [
+    "「终端管理器不可用」分支在 A/B 双腿均不可达（两内核均接线管理器）；Rust 该分支由单测 terminals::a_wire_without_a_supervisor_is_an_explicit_capability_error 覆盖，旧栈由 chat.ts 的 terminal_unavailable 分支覆盖。观测字段 probes.managerUnavailableReachable=false 如实披露。",
+    "本套件是 WS 传输面驱动（全局 WebSocket 服务 + 真实工具回合），不是像素级 DOM；与主演习同一 UI 绑定层口径。",
+    "旧栈 tail 的 foreign-terminal 拒绝为通用 error frame（无 code），Rust 为 terminal_not_found_or_mismatch code；语义同为显式拒绝，probes 如实记录，不作 case 判定面。"
+  ],
+  "clientChanges": {
+    "new": [
+      "desktop/src/react/__tests__/r08/r08-t07-terminal-ab.test.ts (independent A/B suite; 14 cases)"
+    ],
+    "note": "无产品客户端改动：Rust 侧现在回答现役契约帧，TerminalCard/terminal-client 的既有发送路径无需变更。"
+  }
+}

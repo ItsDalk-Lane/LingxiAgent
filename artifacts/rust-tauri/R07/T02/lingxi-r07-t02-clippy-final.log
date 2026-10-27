@@ -1,0 +1,67 @@
+   Compiling serde_json v1.0.151
+   Compiling num-traits v0.2.19
+    Checking allocator-api2 v0.2.21
+    Checking dtor v0.3.0
+    Checking ctor v0.8.0
+    Checking hashbrown v0.17.1
+    Checking regex-automata v0.4.18
+    Checking indexmap v2.14.2
+    Checking h2 v0.4.19
+    Checking chrono v0.4.45
+    Checking lingxi-test-guard v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-test-guard)
+    Checking idna v1.1.0
+    Checking regex v1.13.1
+    Checking url v2.5.8
+    Checking hashlink v0.12.2
+    Checking schemars v1.2.2
+    Checking rusqlite v0.40.2
+    Checking tower-http v0.6.11
+    Checking lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+    Checking jieba-rs v0.6.8
+    Checking serde_yaml_ng v0.10.0
+    Checking hyper v1.11.1
+    Checking serde-saphyr v1.3.0
+    Checking matchers v0.2.0
+    Checking rmcp v3.4.1
+    Checking hyper-util v0.1.21
+    Checking tracing-subscriber v0.3.23
+error: large size difference between variants
+   --> crates/lingxi-protocol/src/bridge.rs:189:1
+    |
+189 | /   pub enum BridgeWorkerEvent {
+190 | |       Ready {
+191 | |           connector_id: String,
+192 | |           #[schemars(range(max = 4294967295u64))]
+...   |
+204 | | /     Message {
+205 | | |         connector_id: String,
+206 | | |         #[schemars(range(max = 4294967295u64))]
+207 | | |         generation: u32,
+...   | |
+218 | | |         reply_context: Option<BridgeReplyContext>,
+219 | | |     },
+    | | |_____- the largest variant contains at least 429 bytes
+...   |
+253 | | /     EffectReceipt {
+254 | | |         connector_id: String,
+255 | | |         #[schemars(range(max = 4294967295u64))]
+256 | | |         generation: u32,
+257 | | |         receipt: crate::BridgeEffectReceipt,
+258 | | |     },
+    | | |_____- the second-largest variant contains at least 156 bytes
+...   |
+269 | |       },
+270 | |   }
+    | |___^ the entire enum is at least 432 bytes
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#large_enum_variant
+    = note: `-D clippy::large-enum-variant` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::large_enum_variant)]`
+help: consider boxing the large fields or introducing indirection in some other way to reduce the total size of the enum
+    |
+218 -         reply_context: Option<BridgeReplyContext>,
+218 +         reply_context: Box<Option<BridgeReplyContext>>,
+    |
+
+error: could not compile `lingxi-protocol` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

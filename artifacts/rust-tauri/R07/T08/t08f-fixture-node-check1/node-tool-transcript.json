@@ -1,0 +1,30 @@
+{
+  "kind": "persisted-tool-result-transcript",
+  "captureNote": "执行时未直接重定向到磁盘。本文件于执行后逐项保存本会话工具实际返回的两个输出块及真实exit_code；不是声称原进程当时生成了独立原始日志。",
+  "command": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "desktop/src/react/settings/__tests__/AgentDeleteInitialization.test.ts",
+    "--maxWorkers=1",
+    "--reporter=verbose"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "exitCode": 0,
+  "chunks": [
+    {
+      "tool": "exec_command",
+      "sessionId": 42480,
+      "chunkId": "2bb384",
+      "exitCode": null,
+      "output": "\n RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent\n\n"
+    },
+    {
+      "tool": "write_stdin",
+      "sessionId": 42480,
+      "chunkId": "0fb47d",
+      "exitCode": 0,
+      "output": " ✓ desktop/src/react/settings/__tests__/AgentDeleteInitialization.test.ts > ready=true仍拒绝真实资源的错误状态 29ms\n ✓ desktop/src/react/settings/__tests__/AgentDeleteInitialization.test.ts > 15秒兜底的ready=true不能放行删除 1ms\n ✓ desktop/src/react/settings/__tests__/AgentDeleteInitialization.test.ts > 身份HTTP成功但属于另一个服务时立即拒绝 3ms\n\n Test Files  1 passed (1)\n      Tests  3 passed (3)\n   Start at  17:27:22\n   Duration  693ms (transform 239ms, setup 20ms, import 319ms, tests 33ms, environment 252ms)\n\n"
+    }
+  ]
+}

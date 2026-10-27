@@ -1,0 +1,492 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t03_native_matrix",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 53.905,
+ "caseCount": 143,
+ "casesSha256": "e809c2c48051918573045326c432993c71032c7fe9dabd1dcb1b13ca05771991",
+ "commands": [
+  {
+   "id": "build::native-harness",
+   "argv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "rustc",
+    "--test",
+    "--edition",
+    "2021",
+    "--cfg",
+    "r09_standalone_test",
+    "--crate-name",
+    "native_host_harness",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t03/v36-native-01/harness/lib.rs",
+    "-o",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t03/v36-native-01/harness/native_host_harness"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.702,
+   "logSha256": "7ab229f078f9e824b90dced20dea76e3539a9808c0a0a0832e6d858008fef944"
+  },
+  {
+   "id": "test::all",
+   "argv": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t03/v36-native-01/harness/native_host_harness",
+    "--test-threads",
+    "1"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.316,
+   "logSha256": "1bd8ab49d628348112177043197781cf29d913f11000541f6a98686adafcb2dc"
+  }
+ ],
+ "logSha256": "73ff2af98720651fc11eece46d854f6b661c8264f15525eb5162f757e2a8f718",
+ "finishedAtUnixMs": 1793065083387,
+ "guiStats": {
+  "executed": 60,
+  "passed": 5,
+  "manual": 3,
+  "manualPassed": 0,
+  "blocked": 3,
+  "failed": 52,
+  "cases": [
+   {
+    "case": "leaf:R00-T02-LA-0DEEE4813B0A::a1-spawn-viewer-window",
+    "status": "pass"
+   },
+   {
+    "case": "leaf:R00-T02-LA-0DEEE4813B0A::a2-viewer-missing-payload",
+    "status": "fail",
+    "detail": {
+     "error": "ValueError: not enough values to unpack (expected 2, got 1)"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-1120B2AA320D::a1-onboarding-complete-open-main",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/f3eff122-e0c3-44c2-b827-b7bd2cd21de9/execute/async -> HTTP 500: {\"value\":{\"error\":\"javascript error\",\"message\":\"A JavaScript exception occurred (code 4): TypeError: undefined is not an object (evaluating 'window.__TAURI__.core') @ 0:0\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-1120B2AA320D::a2-onboarding-complete-save-failure",
+    "status": "fail",
+    "detail": {
+     "open": {
+      "error": "WINDOW_NOT_ALLOWED: 窗口 onboarding（onboarding）不允许调用该能力",
+      "ok": false
+     }
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-15DFB1AED8F2::a1-drag-out-single-multi",
+    "status": "manual-pending"
+   },
+   {
+    "case": "leaf:R00-T02-LA-15DFB1AED8F2::a2-drag-out-missing-target",
+    "status": "pass"
+   },
+   {
+    "case": "leaf:R00-T02-LA-15E163FBFBE8::a1-settings-broadcast-fanout",
+    "status": "pass"
+   },
+   {
+    "case": "leaf:R00-T02-LA-15E163FBFBE8::a2-settings-broadcast-missing-window",
+    "status": "fail",
+    "detail": {
+     "invoke": {
+      "error": "settings_changed not allowed on window \"onboarding\", webview \"onboarding\", URL: local\n\nallowed on: [windows: \"browser-viewer\", URL: local], [windows: \"main\", URL: local], [windows: \"settings\", URL: local]\n\nreferenced by: capability: r09-browser-viewer, permission: allow-settings-changed || capability: r09-host, permission: allow-settings-changed || capability: settings, permission: allow-settings-changed",
+      "ok": false
+     },
+     "windowsBefore": 3
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-18FE3FDFF9A5::a1-appearance-read-no-write",
+    "status": "pass"
+   },
+   {
+    "case": "leaf:R00-T02-LA-18FE3FDFF9A5::a2-appearance-invalid-write",
+    "status": "fail",
+    "detail": {
+     "invoke": {
+      "error": "window_theme_changed not allowed on window \"onboarding\", webview \"onboarding\", URL: local\n\nallowed on: [windows: \"quick-chat\", URL: local], [windows: \"browser-viewer\", URL: local], [windows: \"main\", URL: local], [windows: \"settings\", URL: local]\n\nreferenced by: capability: quick-chat, permission: allow-window-theme-changed || capability: r09-browser-viewer, permission: allow-window-theme-changed || capability: r09-host, permission: allow-window-theme-changed || capability: settings, permission: allow-window-theme-changed",
+      "ok": false
+     },
+     "hashBefore": "02c4e3d48bb411c901ff32d3d5f85813c9d3e9b727dfe54db6772d116aded687",
+     "hashAfter": null
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-1C41525D379C::a1-onboarding-open-focus",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/f3eff122-e0c3-44c2-b827-b7bd2cd21de9/execute/async -> HTTP 404: {\"value\":{\"error\":\"no such window\",\"message\":\"No window could be found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-1C41525D379C::a2-onboarding-open-no-complete",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: GET /lingxi/v1/settings/snapshot?agent_id=r09-fixture 无有效 JSON（last=HTTP 400 body={'_invalidJson': 'Failed to deserialize query string: missing field `agentId`'}）"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-1E6EDB731186::a1-onboarding-preview-shows-steps",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/f3eff122-e0c3-44c2-b827-b7bd2cd21de9/execute/async -> HTTP 404: {\"value\":{\"error\":\"no such window\",\"message\":\"No window could be found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-1E6EDB731186::a2-onboarding-preview-no-side-effects",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/f3eff122-e0c3-44c2-b827-b7bd2cd21de9/execute/async -> HTTP 404: {\"value\":{\"error\":\"no such window\",\"message\":\"No window could be found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-322E02C7F2F9::a1-reload-main-window",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/f3eff122-e0c3-44c2-b827-b7bd2cd21de9/execute/async -> HTTP 404: {\"value\":{\"error\":\"no such window\",\"message\":\"No window could be found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-322E02C7F2F9::a2-reload-not-update-success",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/f3eff122-e0c3-44c2-b827-b7bd2cd21de9/execute/async -> HTTP 404: {\"value\":{\"error\":\"no such window\",\"message\":\"No window could be found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-37E6C3B9A7B8::a1-docx-preview-render",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/f3eff122-e0c3-44c2-b827-b7bd2cd21de9/execute/async -> HTTP 404: {\"value\":{\"error\":\"no such window\",\"message\":\"No window could be found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-37E6C3B9A7B8::a2-docx-preview-invalid-input",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/f3eff122-e0c3-44c2-b827-b7bd2cd21de9/execute/async -> HTTP 404: {\"value\":{\"error\":\"no such window\",\"message\":\"No window could be found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-394DD07D2968::a1-keybindings-update-registered",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/f3eff122-e0c3-44c2-b827-b7bd2cd21de9/execute/async -> HTTP 404: {\"value\":{\"error\":\"no such window\",\"message\":\"No window could be found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-394DD07D2968::a2-keybindings-invalid-body",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/f3eff122-e0c3-44c2-b827-b7bd2cd21de9/execute/async -> HTTP 404: {\"value\":{\"error\":\"no such window\",\"message\":\"No window could be found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-57728C0A6D0A::a1-open-settings-window-focus",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/f3eff122-e0c3-44c2-b827-b7bd2cd21de9/execute/async -> HTTP 404: {\"value\":{\"error\":\"no such window\",\"message\":\"No window could be found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-57728C0A6D0A::a2-open-settings-not-saved",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: GET /lingxi/v1/settings/snapshot?agent_id=r09-fixture 无有效 JSON（last=HTTP 400 body={'_invalidJson': 'Failed to deserialize query string: missing field `agentId`'}）"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-58822B6B138B::a1-window-readiness-main-after-splash",
+    "status": "pass"
+   },
+   {
+    "case": "leaf:R00-T02-LA-58822B6B138B::a2-window-readiness-not-early",
+    "status": "fail",
+    "detail": {
+     "firstSnapshot": [
+      {
+       "name": "Lingxi · Rust 预览",
+       "onscreen": true,
+       "number": 25367
+      }
+     ],
+     "serviceChildren": [
+      {
+       "pid": 43033,
+       "ppid": 43009,
+       "command": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/../../rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t03_native_matrix-42934-1793065029481/home"
+      }
+     ]
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-5D5938D61A00::a1-shortcut-register-and-trigger",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/f3eff122-e0c3-44c2-b827-b7bd2cd21de9/execute/async -> HTTP 404: {\"value\":{\"error\":\"no such window\",\"message\":\"No window could be found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-5D5938D61A00::a2-shortcut-conflict-unavailable",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/f3eff122-e0c3-44c2-b827-b7bd2cd21de9/execute/async -> HTTP 404: {\"value\":{\"error\":\"no such window\",\"message\":\"No window could be found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-6774E79F6714::a1-setup-complete-followup-launch",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/f3eff122-e0c3-44c2-b827-b7bd2cd21de9/execute/async -> HTTP 404: {\"value\":{\"error\":\"no such window\",\"message\":\"No window could be found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-6774E79F6714::a2-setup-complete-manager-unavailable",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/f3eff122-e0c3-44c2-b827-b7bd2cd21de9/execute/async -> HTTP 404: {\"value\":{\"error\":\"no such window\",\"message\":\"No window could be found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-9350C3E12165::a1-restart-process-identity",
+    "status": "fail",
+    "detail": {
+     "invoke": {
+      "ok": true,
+      "restartDisconnected": "WebDriver POST /session/f3eff122-e0c3-44c2-b827-b7bd2cd21de9/execute/async -> HTTP 404: {\"value\":{\"error\":\"no such window\",\"message\":\"No window could be found\",\"stacktrace\":\"\"}}"
+     },
+     "oldPid": 43009,
+     "newPid": 43009,
+     "oldServicePids": [
+      43033
+     ],
+     "recovery": {
+      "path": "webdriver-session-recovered",
+      "ready": true
+     }
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-9350C3E12165::a2-restart-blocked-explicit",
+    "status": "fail",
+    "detail": {
+     "error": "RemoteDisconnected: Remote end closed connection without response"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-98B458390B7E::a1-keybindings-read-effective",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async 不可达: <urlopen error [Errno 61] Connection refused>"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-98B458390B7E::a2-keybindings-read-invalid",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async 不可达: <urlopen error [Errno 61] Connection refused>"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-A2E507EBDEF2::a1-autolaunch-read-toggle",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async 不可达: <urlopen error [Errno 61] Connection refused>"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-A2E507EBDEF2::a2-autolaunch-write-failure",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async 不可达: <urlopen error [Errno 61] Connection refused>"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-AC5B6EDA3FBD::a1-splash-info-avatar",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async 不可达: <urlopen error [Errno 61] Connection refused>"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-AC5B6EDA3FBD::a2-splash-info-fallback",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async 不可达: <urlopen error [Errno 61] Connection refused>"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-ACA2C4C1158D::a1-open-external-http",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 8231f524-5eaf-4b0c-9800-5eba6c85ed96 not found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-ACA2C4C1158D::a2-open-external-invalid",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 8231f524-5eaf-4b0c-9800-5eba6c85ed96 not found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-B6A97A19F2CB::a1-settings-modal-open-tab",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 8231f524-5eaf-4b0c-9800-5eba6c85ed96 not found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-B6A97A19F2CB::a2-settings-modal-unknown-tab",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: GET /lingxi/v1/settings/snapshot?agent_id=r09-fixture 无有效 JSON（last=HTTP 400 body={'_invalidJson': 'Failed to deserialize query string: missing field `agentId`'}）"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-B72A6D3886B7::a1-keepawake-on-off-assertion",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 8231f524-5eaf-4b0c-9800-5eba6c85ed96 not found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-B72A6D3886B7::a2-keepawake-unsupported",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 8231f524-5eaf-4b0c-9800-5eba6c85ed96 not found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-BEC2074CC33C::a1-locale-switch-tray-labels",
+    "status": "manual-pending"
+   },
+   {
+    "case": "leaf:R00-T02-LA-BEC2074CC33C::a2-locale-fallback-no-new-language",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 8231f524-5eaf-4b0c-9800-5eba6c85ed96 not found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-D15E0ADC0608::a1-notification-prefs-update-bridge",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 8231f524-5eaf-4b0c-9800-5eba6c85ed96 not found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-D15E0ADC0608::a2-notification-prefs-invalid",
+    "status": "fail",
+    "detail": {
+     "invalid": 200,
+     "prefsUnchanged": true
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-D29DE479076C::a1-theme-broadcast-redraw",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 8231f524-5eaf-4b0c-9800-5eba6c85ed96 not found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-D29DE479076C::a2-theme-no-persistence-claim",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 8231f524-5eaf-4b0c-9800-5eba6c85ed96 not found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-DF4B5168ABB5::a1-notification-delivered-and-click-focus",
+    "status": "manual-pending"
+   },
+   {
+    "case": "leaf:R00-T02-LA-DF4B5168ABB5::a2-notification-suppressed-or-unsupported",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 8231f524-5eaf-4b0c-9800-5eba6c85ed96 not found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-E6FB08FBBFAA::a1-notification-prefs-read",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 8231f524-5eaf-4b0c-9800-5eba6c85ed96 not found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-E6FB08FBBFAA::a2-notification-prefs-read-invalid",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 8231f524-5eaf-4b0c-9800-5eba6c85ed96 not found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-E84F01456B6C::a1-xlsx-preview-render",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 8231f524-5eaf-4b0c-9800-5eba6c85ed96 not found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-E84F01456B6C::a2-xlsx-preview-invalid",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 8231f524-5eaf-4b0c-9800-5eba6c85ed96 not found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-F5DBF2A80E28::a1-appearance-update-window-theme",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 8231f524-5eaf-4b0c-9800-5eba6c85ed96 not found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-F5DBF2A80E28::a2-appearance-update-invalid",
+    "status": "fail",
+    "detail": {
+     "invalid": 200,
+     "prefsUnchanged": false
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-F9786414DD11::a1-window-controls-caller-only",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 8231f524-5eaf-4b0c-9800-5eba6c85ed96 not found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-F9786414DD11::a2-window-controls-no-window",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 8231f524-5eaf-4b0c-9800-5eba6c85ed96 not found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-FF1B331F1019::a1-settings-tab-activation",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: WebDriver POST /session/8231f524-5eaf-4b0c-9800-5eba6c85ed96/execute/async -> HTTP 404: {\"value\":{\"error\":\"invalid session id\",\"message\":\"Session 8231f524-5eaf-4b0c-9800-5eba6c85ed96 not found\",\"stacktrace\":\"\"}}"
+    }
+   },
+   {
+    "case": "leaf:R00-T02-LA-FF1B331F1019::a2-settings-unknown-tab-no-action",
+    "status": "fail",
+    "detail": {
+     "error": "HarnessError: GET /lingxi/v1/settings/snapshot?agent_id=r09-fixture 无有效 JSON（last=HTTP 400 body={'_invalidJson': 'Failed to deserialize query string: missing field `agentId`'}）"
+    }
+   }
+  ]
+ },
+ "blockedKind": "VISIBLE_BATCH_PARTIAL"
+}

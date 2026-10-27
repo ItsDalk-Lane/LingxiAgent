@@ -1,0 +1,33 @@
+{
+  "identifier": "resource-main",
+  "description": "R09-T06 收口：本地文件/技能/资源操作主窗口。插件权限仅 core:event listen/unlisten leaf；无 shell/http/fs 泛化权限。",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    "allow-select-files",
+    "allow-select-folder",
+    "allow-read-file",
+    "allow-read-file-snapshot",
+    "allow-read-file-base64",
+    "allow-file-info",
+    "allow-write-file",
+    "allow-write-file-binary",
+    "allow-copy-file",
+    "allow-write-file-if-unchanged",
+    "allow-open-file",
+    "allow-trash-item",
+    "allow-run-edit-command",
+    "allow-watch-file",
+    "allow-unwatch-file",
+    "allow-resource-subscribe",
+    "allow-resource-events",
+    "allow-resource-unsubscribe",
+    "allow-spawn-viewer",
+    "allow-open-skill-viewer",
+    "allow-list-skill-files",
+    "allow-read-skill-file"
+  ]
+}

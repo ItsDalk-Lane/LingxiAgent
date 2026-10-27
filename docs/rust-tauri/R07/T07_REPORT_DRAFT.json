@@ -1,0 +1,1296 @@
+{
+  "schemaVersion": 1,
+  "stage": "R07",
+  "task": "T07",
+  "status": "DRAFT_T07C_ADAPTER_FAILURE_DIAGNOSIS_PENDING",
+  "stageStatus": "IN_PROGRESS",
+  "candidate": {
+    "id": "t07c",
+    "manifest": "artifacts/rust-tauri/R07/T07/SOURCE_MANIFEST_t07c.json",
+    "sourceFiles": 543,
+    "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+    "archiveSha256": "34e1ab9afb13b51f849cb83ce0372b696a70c47da1f408f5d9567fbaa6b64e30",
+    "acceptance": "FAILED_ADAPTER_GATE_DIAGNOSIS_PENDING_NOT_FINAL_ACCEPTANCE",
+    "disposition": "artifacts/rust-tauri/R07/T07/t07c-DISPOSITION.json"
+  },
+  "latestDevelopmentReceipt": "artifacts/rust-tauri/R07/T07/dev-resume-integrated15.json",
+  "developmentResult": {
+    "serviceLibPassed": 619,
+    "goalLoopPassed": 11,
+    "workflowPassed": 19,
+    "totalPassed": 649,
+    "finalAcceptance": false
+  },
+  "failureHistory": "docs/rust-tauri/R07/T07_FAILURE_HISTORY.json",
+  "leafEvidenceDraft": "docs/rust-tauri/R07/T07_LEAF_EVIDENCE_DRAFT.json",
+  "gates": {
+    "fmt": {
+      "name": "fmt",
+      "status": "PASSED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-fmt.json",
+      "receiptSha256": "b9f17e61743dfa7f8dfac8ab8d9ceb525f16a41426e03a2ce2e2ff328603c5f7",
+      "exitCode": 0,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-fmt.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logHashMatches": true,
+      "testCounts": null,
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    "clippy": {
+      "name": "clippy",
+      "status": "PASSED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-clippy.json",
+      "receiptSha256": "e73c1e7ad21db69c316cd8f4c4f097f3fc28b5644232f0604241bd3aaf9fcf57",
+      "exitCode": 0,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-clippy.log",
+      "logSha256": "9a30d54c8b16d7e49510b182028079bca120aeebb7d662e88f8566e6196a49f6",
+      "logHashMatches": true,
+      "testCounts": null,
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    "service": {
+      "name": "service",
+      "status": "PASSED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-service.json",
+      "receiptSha256": "fce9fa4b8201a11b163c1078ff8fff1933035c2f1923a71e21a6016fd3e91faf",
+      "exitCode": 0,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-service.log",
+      "logSha256": "5b6bd73e3d314cc80c90a3ac410d94c6e9f6f7ce256af5779389c932555fa755",
+      "logHashMatches": true,
+      "testCounts": {
+        "passed": 1080,
+        "failed": 0,
+        "ignored": 0,
+        "summaryGroups": 50
+      },
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    "adapter": {
+      "name": "adapter",
+      "status": "FAILED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-adapter.json",
+      "receiptSha256": "63e6b71bf726bb8fc94d2b7be3ce93c50e43206f06fefe41e8e618d1f982f450",
+      "exitCode": 101,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-adapter.log",
+      "logSha256": "bcfa954bcca461a075d13dba3a5b8e1d2e3171d7d9f9ebeaeda7a46400cb0a3d",
+      "logHashMatches": true,
+      "testCounts": {
+        "passed": 249,
+        "failed": 1,
+        "ignored": 13,
+        "summaryGroups": 16
+      },
+      "failedTests": [
+        "trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock"
+      ],
+      "finalAcceptance": false
+    },
+    "kernel": {
+      "name": "kernel",
+      "status": "PASSED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-kernel.json",
+      "receiptSha256": "2dac29d1101b117a12eb7979e20ea9cb1c30081e76e19a4d860a3fb62a8e4194",
+      "exitCode": 0,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-kernel.log",
+      "logSha256": "f21afab48784c9f89c4e69be43c22b7e81f0861f7e088733e0fce49c04638967",
+      "logHashMatches": true,
+      "testCounts": {
+        "passed": 193,
+        "failed": 0,
+        "ignored": 0,
+        "summaryGroups": 4
+      },
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    "protocol": {
+      "name": "protocol",
+      "status": "PASSED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-protocol.json",
+      "receiptSha256": "892203af61c311d1fae0e12a56606b7e27f90ce36394aa3120bd65b1036c8c6c",
+      "exitCode": 0,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-protocol.log",
+      "logSha256": "41aa43acf572a22b07245f608695a7f66dbb8f1312b1fa2e3bff87ffeab261f0",
+      "logHashMatches": true,
+      "testCounts": null,
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    "boundaries": {
+      "name": "boundaries",
+      "status": "PASSED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-boundaries.json",
+      "receiptSha256": "5af29ec9f4091f0f5c5441611557c5e88b7e7ca1f690d061fd20ba566a53e951",
+      "exitCode": 0,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-boundaries.log",
+      "logSha256": "639c14da4d4db5655ec2449ed7c401ab077a13e2a5255019489a41ea88a20dc6",
+      "logHashMatches": true,
+      "testCounts": null,
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    "build": {
+      "name": "build",
+      "status": "PASSED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-build.json",
+      "receiptSha256": "6c5fe7af6c2401fce28c736eb69b51b6b88d2930e63522d7fae478eec564b413",
+      "exitCode": 0,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-build.log",
+      "logSha256": "c489b333b5a6ec4f1e6f6383558a840f38176bddab3da84c586c2527ef1d1cd1",
+      "logHashMatches": true,
+      "testCounts": null,
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    "ui": {
+      "name": "ui",
+      "status": "PASSED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-ui.json",
+      "receiptSha256": "c7fecc144be4baa821c3b357d80583e49e98a76365cff598425bf006d0bc9b3e",
+      "exitCode": 0,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-ui.log",
+      "logSha256": "18ecc6c48592943cdd455c1fcacdb7ecf80d74fcebee56af29bdf6b41afcad0e",
+      "logHashMatches": true,
+      "testCounts": {
+        "suitesPassed": 21,
+        "passed": 495,
+        "failed": 0
+      },
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    "types": {
+      "name": "types",
+      "status": "PASSED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-types.json",
+      "receiptSha256": "11744c01325ef14440aa741d7b4f0e34137a5808dd0160142046aec6c9ba2a70",
+      "exitCode": 0,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-types.log",
+      "logSha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "logHashMatches": true,
+      "testCounts": null,
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    "protocol-tests": {
+      "name": "protocol-tests",
+      "status": "PASSED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-protocol-tests.json",
+      "receiptSha256": "90a7740255d8a7687b6e1d136d3598b8769a95a89197737a77743e3fa0ef680c",
+      "exitCode": 0,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-protocol-tests.log",
+      "logSha256": "02141e8dd206dc03d337d74f845b486c01a955a97ddcbae450a2fdcb62794582",
+      "logHashMatches": true,
+      "testCounts": {
+        "passed": 41,
+        "failed": 0,
+        "ignored": 0,
+        "summaryGroups": 5
+      },
+      "failedTests": [],
+      "finalAcceptance": false
+    }
+  },
+  "leafResults": {
+    "R00-T02-LA-CECACC73463E": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "desktop/src/react/__tests__/components/DeskSection.test.tsx::watches the workspace root plus expanded folders and reloads visible dirty tree keys from workspace events",
+        "desktop/src/react/__tests__/components/DeskSection.test.tsx::Rust 挂载使用显式监听权限，撤回权限和切换连接都会释放旧订阅",
+        "desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts::隔离目录中新建文件、便笺、挂载与监听实际生效，撤权和退出回收资源（无 LINGXI_R07_SERVICE_BIN 明确跳过）"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-DD087FDD3244": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_phone_runtime::actual_http_channel_management_and_dm_read_surfaces_preserve_real_state"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-83F82782EBE0": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_phone_runtime::actual_member_removal_cancels_waiting_models_before_any_publication",
+        "r07_session_collab::removing_phone_member_blocks_a_previously_confirmed_busy_collaboration_queue"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-85E238ED0A35": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_phone_runtime::actual_http_channel_management_and_dm_read_surfaces_preserve_real_state"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-D6260D4602D4": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_phone_runtime::actual_http_channel_management_and_dm_read_surfaces_preserve_real_state"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-2D0E80691667": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_session_collab::phone_ticker_distinguishes_claims_actual_runs_and_the_persisted_reminder_slot",
+        "r07_phone_runtime::actual_completed_run_before_activity_restart_waits_full_interval_from_terminal_time"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-4E5926A9497C": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_phone_runtime::actual_http_channel_management_and_dm_read_surfaces_preserve_real_state"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-58E05103F577": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_phone_runtime::actual_http_channel_management_and_dm_read_surfaces_preserve_real_state"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-64A517AF731B": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_phone_runtime::actual_http_channel_management_and_dm_read_surfaces_preserve_real_state"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-65D8750AA9E8": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_phone_runtime::actual_http_channel_management_and_dm_read_surfaces_preserve_real_state"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-A3FF205AEA4E": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_phone_runtime::actual_http_channel_management_and_dm_read_surfaces_preserve_real_state"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-9C2C9DDD5C20": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_phone_runtime::actual_http_channel_management_and_dm_read_surfaces_preserve_real_state"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-21462479CB14": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_phone_runtime::actual_http_channel_management_and_dm_read_surfaces_preserve_real_state"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-AB6659451E92": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_phone_runtime::actual_proactive_31_minutes_obeys_disable_enable_and_restart_slot_receipt",
+        "r07_session_collab::disabling_channels_blocks_a_previously_confirmed_busy_collaboration_queue"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-6663A77204AC": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_phone_runtime::actual_http_channel_management_and_dm_read_surfaces_preserve_real_state"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-4B76B864DF95": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_session_collab::narrowing_phone_mode_blocks_queued_collaboration_before_any_target_run_is_created",
+        "r07_phone_runtime::actual_read_only_phone_rejects_native_write_and_hides_recursive_tools",
+        "r07_phone_runtime::actual_http_channel_management_and_dm_read_surfaces_preserve_real_state"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-01631175277C": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_automation_activity::overdue_activity_list_cancels_real_run_before_publishing_timeout_and_keeps_receipt_after_restart"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-F6F578E62D72": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_automation_activity::completed_activity_promotes_the_same_real_session_without_new_messages_or_runs"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-B8313FF711C7": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_desk_files::files_listing_and_subdir_guards",
+        "r07_desk_files::scope_gates",
+        "desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts::隔离目录中新建文件、便笺、挂载与监听实际生效，撤权和退出回收资源（无 LINGXI_R07_SERVICE_BIN 明确跳过）"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-6A5E3FEEA80D": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_desk_files::jian_cycle_and_locale",
+        "desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts::隔离目录中新建文件、便笺、挂载与监听实际生效，撤权和退出回收资源（无 LINGXI_R07_SERVICE_BIN 明确跳过）"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-23824E784D71": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_automation_activity::desk_logs_return_real_bounded_records_and_reject_device_or_missing_credentials"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-5530FFB14481": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_desk_files::path_default_override_and_approval",
+        "r07_desk_files::no_workspace_fallbacks"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-8192BCF388CF": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_desk_files::search_files_flow"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-F6CEE2A4A3CE": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_automation_activity::completed_activity_promotes_the_same_real_session_without_new_messages_or_runs",
+        "r07_automation_activity::running_activity_uses_actual_state_and_cannot_be_promoted_while_busy",
+        "r07_activity_promotion::session_admin_refuses_live_lease_then_promotes_same_identity_after_release"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-4AC692C4C7C8": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::activity_summary_actual_http_uses_summarize_slot_and_records_success_and_failure",
+        "r07_git_panel::activity_summary_revocation_cancels_call_records_unknown_usage_and_releases_permit",
+        "r07_git_panel::activity_summary_empty_missing_and_device_permission_are_honest"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-770B9A0E7420": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_desk_files::upload_gate_and_flow"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-2AB1A11D81C8": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_desk_files::create_and_actions_flow",
+        "desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts::隔离目录中新建文件、便笺、挂载与监听实际生效，撤权和退出回收资源（无 LINGXI_R07_SERVICE_BIN 明确跳过）"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-DAE825843EAE": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_desk_files::create_and_actions_flow"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-E4CC01D8499E": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_desk_files::create_and_actions_flow"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-3F0215CE6CAC": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_desk_files::create_and_actions_flow"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-3EDEDFD7E60D": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_desk_files::create_and_actions_flow"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-8C68B3F74F1F": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_desk_files::create_and_actions_flow"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-034CA4E35DBF": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_desk_files::jian_cycle_and_locale",
+        "desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts::隔离目录中新建文件、便笺、挂载与监听实际生效，撤权和退出回收资源（无 LINGXI_R07_SERVICE_BIN 明确跳过）"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-2396CADB0FE6": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_desk_files::jian_cycle_and_locale"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-67D6791650C6": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_diary::list_missing_dir_then_utf16_descending",
+        "r07_diary::list_uses_locale_diary_dir_label"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-6DBCFD556C3B": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_diary::write_with_summary_material_produces_diary_file",
+        "r07_diary::write_session_without_summary_uses_temporary_material",
+        "r07_diary::write_for_yesterday_ignores_todays_session",
+        "r07_diary::write_strips_mood_blocks_and_fallback_title",
+        "r07_diary::write_llm_failure_maps_400_with_localized_message",
+        "r07_diary::write_temporary_failure_surfaces_warning_envelope",
+        "r07_diary::diary_includes_same_agent_real_cron_activity_but_excludes_promoted_activity"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-0C94E56AF61D": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_phone_runtime::actual_http_channel_management_and_dm_read_surfaces_preserve_real_state"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-963D7804F78C": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_phone_runtime::actual_http_channel_management_and_dm_read_surfaces_preserve_real_state"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-021F8ADF489B": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_phone_runtime::actual_same_second_dm_reset_hides_old_history_without_replaying_or_losing_new_action",
+        "r07_phone_runtime::actual_http_channel_management_and_dm_read_surfaces_preserve_real_state"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-0B65FD6CD7E5": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::branches_current_detached_and_checked_out_elsewhere",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-0834433949CC": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::file_diff_tracked_untracked_binary_and_invalid",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-E0BF25B2ED9B": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::log_clamps_limit_and_parses_refs",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-6D46753E0639": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::stash_full_flow",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-AAADF271CD6B": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::status_reports_totals_states_and_placeholders",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-FD2E061B3671": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::worktree_info_and_list_main_and_linked",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-F015FF4D21DA": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::worktree_info_and_list_main_and_linked",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-5BC7E9B6E685": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::ai_commit_message_happy_path_sanitizes_and_records_usage",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-2FBA38276D6F": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::amend_flow",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-B1AD1F46E5D9": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::checkout_matrix",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-D5A24E89CAD8": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::commit_flow",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-1F90C9FBB34A": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::create_branch_matrix",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-894C4F341048": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::discard_flows",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-2C7CEEE7EFAF": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::push_pull_fetch_buckets",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-64688EE37795": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::log_stats_batch_whitelist_and_merge_first_parent",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-51554C8D7A34": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::push_pull_fetch_buckets",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-0FE1C5FDF210": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::push_pull_fetch_buckets",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-2CCA30D19E3A": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::stage_unstage_flows",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-EB7503027079": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::stash_full_flow",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-B2FEED2A7016": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::stage_unstage_flows",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-4D50C9CC2745": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::stash_full_flow",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-4AB50464D6F6": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::stash_full_flow",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-ECCCAB205D99": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_git_panel::worktree_create_matrix",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-CC0271AAE0BD": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_workbench::workbench_upload_and_content",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease",
+        "r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-BD5448131631": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_workbench::workbench_files_search_projection_and_guards",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease",
+        "r07_workbench::workbench_on_mount_root_end_to_end",
+        "r07_workbench::coverage::search_default_limit_with_more_than_eighty_real_matches"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-5F675621186C": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_workbench::workbench_files_search_projection_and_guards",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease",
+        "r07_workbench::workbench_on_mount_root_end_to_end",
+        "r07_workbench::coverage::search_default_limit_with_more_than_eighty_real_matches",
+        "r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-46F9CB129DD1": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_workbench::workbench_actions_full_cycle",
+        "r07_workbench::workbench_on_mount_root_end_to_end",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease",
+        "r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-9F44400169B1": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_workbench::workbench_actions_full_cycle",
+        "r07_workbench::workbench_on_mount_root_end_to_end",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease",
+        "r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-361D16F25214": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_workbench::workbench_actions_full_cycle",
+        "r07_workbench::workbench_on_mount_root_end_to_end",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease",
+        "r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-D85EC29D698A": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_workbench::workbench_actions_full_cycle",
+        "r07_workbench::workbench_on_mount_root_end_to_end",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease",
+        "r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-1BDB6B867DBA": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_workbench::workbench_actions_full_cycle",
+        "r07_workbench::workbench_on_mount_root_end_to_end",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease",
+        "r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-EE30E2A3381C": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_workbench::workbench_actions_full_cycle",
+        "r07_workbench::workbench_on_mount_root_end_to_end",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease",
+        "r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-BEAB7F136A6F": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_workbench::workbench_upload_and_content",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease",
+        "r07_workbench::remote_writes_refuse_corrupt_or_unreadable_lease_registry_without_file_changes",
+        "r07_workbench::remote_writes_refuse_unwritable_lease_registry_before_mutation",
+        "r07_workbench::lease_settlement_failure_reports_landed_action_and_upload_without_fake_success",
+        "r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-1F41AFB4207D": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_goal_loop::goal_preferences_read_is_pure_and_single_edit_preserves_budget_and_unknown_settings"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-2CB7D4AE4478": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_goal_loop::goal_preferences_read_is_pure_and_single_edit_preserves_budget_and_unknown_settings"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-0FB9CBC86E41": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_session_collab::registered_tool_only_cards_then_busy_queue_accepts_one_causal_run_and_records_edits",
+        "r07_session_collab::create_apply_is_single_target_and_survives_restart_without_replay",
+        "r07_session_collab_store",
+        "SessionCollabDraftCard.test.tsx"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-E76F081F6E5B": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_session_collab::reject_expiry_readonly_and_spoofed_source_are_checked_by_real_records",
+        "SessionCollabDraftCard.test.tsx"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-52A0034B50CF": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_workbench::workspaces_list_create_disable_cycle",
+        "r07_workbench::mount_disable_retires_watch_and_subscription_before_returning",
+        "desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts::隔离目录中新建文件、便笺、挂载与监听实际生效，撤权和退出回收资源（无 LINGXI_R07_SERVICE_BIN 明确跳过）"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-ED2647610C7B": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_workbench::workspaces_list_create_disable_cycle",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-A08713994B5B": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_workbench::workspaces_list_create_disable_cycle",
+        "r07_workbench::workbench_on_mount_root_end_to_end"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-932719987220": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_workbench::workspaces_list_create_disable_cycle",
+        "r07_workbench::workbench_on_mount_root_end_to_end",
+        "desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts::隔离目录中新建文件、便笺、挂载与监听实际生效，撤权和退出回收资源（无 LINGXI_R07_SERVICE_BIN 明确跳过）"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-125BFE1EE56C": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_goal_loop::loop_slash_lifecycle_alarm_wakeup_and_loop_control",
+        "r07_goal_loop::real_database_lock_stop_supersedes_http_loop_start_without_new_run",
+        "r07_goal_loop::same_home_restart_recovers_overdue_loop_without_replaying_kickoff",
+        "r07_goal_loop::real_composition_releases_loop_workflow_and_gateway_after_stop",
+        "r07_goal_loop::actual_loop_cancel_settles_once_and_next_user_run_cannot_borrow_old_active_mark",
+        "r07_goal_loop::real_wal_registered_before_started_cannot_borrow_new_loop_identity",
+        "r07_goal_loop::real_db_admission_waiting_injection_cannot_claim_replacement_loop",
+        "r07_workflow::loop_parent_is_counted_only_after_its_real_terminal_not_child_completion"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-361603791D9E": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "r07_conversation_tools"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-E09C077F0100": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_goal_loop::goal_six_actions_close_loop_and_over_budget_fires_exactly_once",
+        "r07_goal_loop::goal_corrupt_sidecar_is_tool_failure_through_real_run_and_never_replaced",
+        "r07_goal_loop::goal_write_fault_is_tool_failure_and_no_budget_notification_through_real_run"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-1DFC5E1E130A": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_goal_loop::loop_slash_lifecycle_alarm_wakeup_and_loop_control",
+        "r07_goal_loop::real_database_lock_stop_supersedes_http_loop_start_without_new_run",
+        "r07_goal_loop::same_home_restart_recovers_overdue_loop_without_replaying_kickoff",
+        "r07_goal_loop::real_composition_releases_loop_workflow_and_gateway_after_stop",
+        "r07_goal_loop::actual_loop_cancel_settles_once_and_next_user_run_cannot_borrow_old_active_mark",
+        "r07_goal_loop::real_wal_registered_before_started_cannot_borrow_new_loop_identity",
+        "r07_goal_loop::real_db_admission_waiting_injection_cannot_claim_replacement_loop",
+        "r07_workflow::loop_parent_is_counted_only_after_its_real_terminal_not_child_completion"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-C1BA7A7C2737": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "r07_workflow::fanout_dispatch_events_journal_and_completion_delivery",
+        "r07_workflow::resume_reuses_unchanged_nodes_and_reruns_from_first_change",
+        "r07_workflow::actual_task_stop_route_joins_workflow_and_running_model",
+        "r07_workflow::first_node_failure_cancels_parallel_blocked_sibling",
+        "r07_workflow::resume_requires_same_session_and_agent_before_reading_cached_results",
+        "r07_workflow::damaged_resume_journal_is_rejected_without_rerunning_nodes",
+        "r07_workflow::journal_write_failure_reports_unsafe_resume_and_unrelated_run_cannot_cancel",
+        "r07_workflow::completed_workflow_wakes_running_idle_loop_once_after_cleanup",
+        "r07_workflow::actual_http_activity_snapshot_checks_owner_and_survives_same_home_restart",
+        "r07_workflow::loop_parent_is_counted_only_after_its_real_terminal_not_child_completion"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-51E2C5A963ED": {
+      "status": "PASS_LOCAL_T03",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": true,
+      "testIds": [
+        "channel-actions.test.ts",
+        "ChannelsPanel.requests.test.tsx",
+        "conversation-request-scope.test.ts",
+        "channel-new-message-ws.test.ts",
+        "rust-chat-history.test.ts"
+      ],
+      "finalEvidence": []
+    },
+    "R00-T02-LA-E3A8057D7156": {
+      "status": "NOT_RUN",
+      "currentCandidateStatus": "NOT_RUN",
+      "inheritedT03": false,
+      "testIds": [
+        "desktop/src/react/__tests__/settings/WorkTab.test.tsx::renders the current agent desk settings from settingsConfig on the first paint",
+        "desktop/src/react/__tests__/settings/WorkTab.test.tsx::saves the selected agent workspace without sending frontend business IPC",
+        "desktop/src/react/__tests__/settings/WorkTab.test.tsx::clears the selected agent workspace without sending frontend business IPC",
+        "desktop/src/react/__tests__/settings/WorkTab.test.tsx::uses automation.permissionMode and does not render the removed cron auto-approve row",
+        "desktop/src/react/__tests__/settings/WorkTab.test.tsx::saves the selected agent AGENTS.md injection toggle",
+        "desktop/src/react/__tests__/settings/WorkTab.test.tsx::saves the two project skill discovery switches independently",
+        "desktop/src/react/__tests__/settings/WorkTab.test.tsx::rolls a project skill switch back when the Agent config save fails",
+        "desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts::隔离目录中新建文件、便笺、挂载与监听实际生效，撤权和退出回收资源（无 LINGXI_R07_SERVICE_BIN 明确跳过）"
+      ],
+      "finalEvidence": []
+    }
+  },
+  "boundaryHandoffs": [
+    "A14现役配置导入/导出联动由T08实际验证，不拿只读快照当导入通过。",
+    "五平台真实账号、其他操作系统、正式包和真实供应商仍按既有边界保留，不以本地fixture替代。"
+  ],
+  "counts": {
+    "total": 87,
+    "inheritedT03": 22,
+    "currentTaskPending": 65
+  },
+  "notes": [
+    "本结构只预留最终回填位置；现存部分门禁回执不得因字段为空误判未运行，最终统一核对后再填。",
+    "原13测试失败、clippy5失败和t07a作废均保留；后续通过另列，不追改原始记录。",
+    "未提交、未推送。"
+  ],
+  "updatedAt": "2026-10-18T03:31:33.187958+00:00",
+  "supplementaryGates": [],
+  "uiBinaryBinding": {
+    "record": "artifacts/rust-tauri/R07/T07/t07c-ui-binary-binding.json",
+    "receiptSha256": "c3941856e2d8f03382acf0181980553fc80895a831b69d96e4a0162eb58c49b6",
+    "binarySha256": "915c392e1433d74a9351540e7bb0dbde0832c2ae293b6120b3d57b590e369f7b",
+    "beforeAfterMatch": true,
+    "buildReceiptHashMatches": true,
+    "uiReceiptHashMatches": true,
+    "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+    "testCounts": {
+      "suitesPassed": 21,
+      "passed": 495,
+      "failed": 0
+    }
+  },
+  "manualBrowserChecks": [
+    {
+      "testId": "same_page_native_human_takeover_records_only_owned_target",
+      "status": "NOT_RUN_ON_T07C",
+      "historicalEvidenceRetained": true
+    },
+    {
+      "testId": "externally_restored_suspended_window_is_never_reaped_or_evicted",
+      "status": "NOT_RUN_ON_T07C",
+      "historicalEvidenceRetained": true
+    }
+  ],
+  "postDispositionDevelopment": {
+    "status": "DEVELOPMENT_CORRECTIONS_NOT_FROZEN_CANDIDATE",
+    "records": [
+      {
+        "record": "artifacts/rust-tauri/R07/T07/dev-integrated16.json",
+        "exitCode": 0,
+        "logSha256": "50d444f9e092739af860a2a99d46358eed84bf4ef3d417e5eea891690988ff21",
+        "sourceUnchanged": true,
+        "sourceFingerprint": "880e9abcb0ba38fb085748d03e11eb4c04e5a6b7f2493978319bcfe68574264f"
+      },
+      {
+        "record": "artifacts/rust-tauri/R07/T07/dev-fanout-diagnosis1.json",
+        "exitCode": 0,
+        "logSha256": "d75fe79cac406675f9318283a8c2dfd6c504d5cb01bc64f687a15bba56ea23cd",
+        "sourceUnchanged": true,
+        "sourceFingerprint": "880e9abcb0ba38fb085748d03e11eb4c04e5a6b7f2493978319bcfe68574264f"
+      },
+      {
+        "record": "artifacts/rust-tauri/R07/T07/dev-prompt-race1.json",
+        "exitCode": 101,
+        "logSha256": "61bf7f9df486d6c261a21b8a4f5035335125e842a38f4dcccfaa32c55adbe841",
+        "sourceUnchanged": true,
+        "sourceFingerprint": "c49f653ea4d66a57387f15bc06ccbf5616f2b67a5ddae3212248072557b65a96"
+      },
+      {
+        "record": "artifacts/rust-tauri/R07/T07/dev-prompt-race2.json",
+        "exitCode": 0,
+        "logSha256": "691b076a21cc652dec7d8c93f7c7a7f019d3ea28ed2022526d649e8aa692213f",
+        "sourceUnchanged": true,
+        "sourceFingerprint": "1f11ff61da4007af79668d1aaea7eb63a1eeb79aaa3967c73a780ded30b810b4"
+      }
+    ],
+    "integrated16": "623lib/14native/19workflow通过，同源码开发结果。",
+    "fanoutDiagnosis": "原fanout单跑30次皆0，仅未复现，原t07b失败保留。",
+    "atomicWriteReproduction": "真实现役函数16线程×128写入，2048中287次ENOENT，prompt-race1 exit101。",
+    "atomicWriteCorrection": "PID+时间+计数唯一temp/create_new/失败清理；prompt-race2完整workflow20通过，含原fanout和2048真实并发完整JSON/无tmp。",
+    "epistemicLimit": "已证实并发文件写bug及其修复；没有直接还原原t07b fanout唯一cause。暂无新固定候选通过。"
+  },
+  "previousCandidateDisposition": "artifacts/rust-tauri/R07/T07/t07b-DISPOSITION.json",
+  "currentCandidateDiagnostics": [
+    {
+      "record": "artifacts/rust-tauri/R07/T07/t07c-popup-diagnosis.json",
+      "receiptSha256": "439938d8825d053cd1012fca068b90db31b0cbf5ffbf1da1faba105ffb6d6998",
+      "logSha256": "45effc938382c469776ab8c38c8be7ef10ae028b24ab806d359a705459ef8395",
+      "exitCode": 0,
+      "sameCandidateSource": true,
+      "originalPopupCaseIterations": 10,
+      "allIterationExitsZero": true,
+      "binarySha256Before": "f8b20807a4615578cd7e16210ee17a23d723606efb1fa23a85c6413e485f7ab5",
+      "binarySha256After": "f8b20807a4615578cd7e16210ee17a23d723606efb1fa23a85c6413e485f7ab5",
+      "status": "NOT_REPRODUCED_DIAGNOSTIC_ONLY_ORIGINAL_FAILURE_RETAINED"
+    },
+    {
+      "record": "artifacts/rust-tauri/R07/T07/browser-close-probe/result.json",
+      "recordSha256": "40ef25969b9aa4fb8be612f6924c994a5742e007e244ea01cd871f5fdd918138",
+      "status": "OBSERVED",
+      "version": "Chrome/155.0.8059.82",
+      "checks": [
+        {
+          "round": 0,
+          "normal_history_seconds": 0.0012278340000193566,
+          "normal_history_entries": 2,
+          "alert_open_event_observed": true,
+          "history_responded_within_2_2_seconds_before_accept": true,
+          "evaluate_responded_before_accept": false,
+          "history_responded_after_accept": true,
+          "evaluate_result_after_accept": {
+            "result": {
+              "type": "string",
+              "value": "done"
+            }
+          },
+          "targets_count_during_alert": 5
+        },
+        {
+          "round": 1,
+          "normal_history_seconds": 0.0005801669976790436,
+          "normal_history_entries": 2,
+          "alert_open_event_observed": true,
+          "history_responded_within_2_2_seconds_before_accept": true,
+          "evaluate_responded_before_accept": false,
+          "history_responded_after_accept": true,
+          "evaluate_result_after_accept": {
+            "result": {
+              "type": "string",
+              "value": "done"
+            }
+          },
+          "targets_count_during_alert": 5
+        }
+      ],
+      "conclusion": "两轮真实Chrome155 pipe在alert期间getNavigationHistory均在2.2秒内响应，排除必然modal死锁；normal_history_seconds约0.58–1.23ms是正常页面数值，不混成alert响应延迟。"
+    },
+    {
+      "record": "artifacts/rust-tauri/R07/T07/browser-close-probe/result.json.attempt1",
+      "recordSha256": "ba3d04bff98117a8261b6cd442477a219828af4df14f0cc0ee1b91a6a6145196",
+      "status": "FAILED",
+      "error": "TimeoutError('CDP id 2')",
+      "conclusion": "初次独立探针CDP id2超时、checks为空；原失败保留，不当候选popup复现或通过。"
+    }
+  ]
+}

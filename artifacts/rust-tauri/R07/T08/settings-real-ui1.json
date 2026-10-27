@@ -1,0 +1,30 @@
+{
+  "label": "settings-real-ui1",
+  "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+  "command": [
+    "env",
+    "LINGXI_R07_SERVICE_BIN=/private/tmp/lingxi-r07-build/debug/lingxi-service",
+    "npx",
+    "vitest",
+    "run",
+    "desktop/src/react/__tests__/services/r07-settings-real-service.test.tsx",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-18T05:41:32.921714+00:00",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "75d1eb0621e031f1b958e2c7defb824529241b7d3ad4d0491e656a4b7a593da1",
+  "finalAcceptance": false,
+  "exitCode": 1,
+  "endedAt": "2026-10-18T05:41:36.933212+00:00",
+  "sourceFingerprintAfter": "75d1eb0621e031f1b958e2c7defb824529241b7d3ad4d0491e656a4b7a593da1",
+  "log": "artifacts/rust-tauri/R07/T08/settings-real-ui1.log",
+  "logSha256": "0519f676b4b66c208945623ea16cfee46c0dbdd03affd71746e7d94019316f40",
+  "sourceUnchanged": true
+}

@@ -1,0 +1,16 @@
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+error[E0433]: cannot find type `ModelOperation` in this scope
+   --> crates/lingxi-adapters/src/models/gateway.rs:260:70
+    |
+260 |                     .protocol_for(provider, provider_entry.protocol, ModelOperation::Chat)
+    |                                                                      ^^^^^^^^^^^^^^ use of undeclared type `ModelOperation`
+
+error[E0433]: cannot find type `ModelOperation` in this scope
+   --> crates/lingxi-adapters/src/models/gateway.rs:261:56
+    |
+261 |                     .filter(|protocol| protocol.serves(ModelOperation::Chat.operation_class()))
+    |                                                        ^^^^^^^^^^^^^^ use of undeclared type `ModelOperation`
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `lingxi-adapters` (lib) due to 2 previous errors

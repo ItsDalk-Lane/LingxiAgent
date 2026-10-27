@@ -1,0 +1,104 @@
+{
+  "schema": "r07-t08-independent-mcp-current-consumers-review-v1",
+  "reviewedAt": "2026-10-18T11:20:32.615474+00:00",
+  "finalAcceptance": "pending",
+  "mode": "read-only product and tests; new evidence only; no runtime execution",
+  "sourceSha256": {
+    "desktop/src/settings-main.tsx": "4977170718a7f264518656dcb125e7c9b70b8f70763c2eb3885070a06603244b",
+    "desktop/src/react/settings/SettingsApp.tsx": "a3819f4bea096cfdb9022e5a6ec2627bd26db1c8cfc924562d0a00dbf9f34667",
+    "desktop/src/react/components/SettingsModalShell.tsx": "4b466b2ea4d467314448afbf57243356c4aef22472d654dfbdc9670ffabdc05d",
+    "desktop/src/react/settings/SettingsContent.tsx": "cd7db8b154cf2b8ef3732739c4501d63c59d2647c13473de7740c38e4b3ffaf8",
+    "desktop/src/react/settings/tabs/McpTab.tsx": "dc493feb2de09f59a7c819ee949693035d523e5aa285f3f56939105001e7893d",
+    "desktop/src/react/settings/tabs/mcp/mcp-api.ts": "95015aa1a32781f34c88aee21fa5455ecca1422ebf5c5dc14d38f7702fe157f1",
+    "desktop/src/react/settings/tabs/mcp/ConnectorForm.tsx": "4638b7e0fca3fc35493076a2f86fbe94970353c73756eca8bd818b6a78528bdd",
+    "desktop/src/react/settings/tabs/mcp/ConnectorDetail.tsx": "930c9be76c0e2c8a77a8e39b5628df458f04abc6624e5e8b7a8cf723e00ba02d",
+    "desktop/src/react/settings/tabs/mcp/OAuthWaitCard.tsx": "f3c33c91987cfdd64a6e1138730c8f057818f7f8dbda4268cd728ec1257bce6d",
+    "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx": "d7e533d6a228c08d6e1d30e5264250613f3a665b94a35830726813cc488b4011",
+    "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx": "4b3f42514447ea22d51fdc01c414d28cc18d73a956c89f4371ac8bb61d7c7292",
+    "desktop/src/react/__tests__/settings/R07McpRustAPI.test.ts": "0b242725f665d116d4109f04bfe5412476cf0537cafd9824c92fe30d3b8964bd",
+    "desktop/src/react/settings/tabs/__tests__/McpTab.test.tsx": "5a9170137b890e7f0390ed3e631b20639fc3a256de388257654c09245b916af9",
+    "desktop/main.cjs": "dcb386bd5119759bf2a54a83b26100fd8d2b0ca9c1f2dc55fc7cbbe9667af3cb",
+    "desktop/preload.cjs": "db10e3dd3a32db63d435b2058c14acaee0ac0fd50fcbbb3c0c52f53e732d4be2",
+    "desktop/ipc-wrapper.cjs": "64a9ae14101ddada79350e75bc9285e0ebcc76ac40b6fff0cd7839d381314940",
+    "desktop/src-tauri/tauri.conf.json": "a81d14f1e8f0186a3a45a61b69681e4c299426225b47ecb336e4707b8ac08583",
+    "desktop/src/tauri-resources/main.tsx": "c903e321014e5a84a4bf1e16100e98a552b67dc1d3f04552744610b5a93f16f4",
+    "core/mcp/manager.ts": "cf95adb316f2f28c130260b325a25ba774b839983abf86408f96f8f7e7173895",
+    "server/routes/mcp.ts": "6bc19e8639d17d8986ddbde7ef182d7e2530c3b950a23b1ecd8bfada02c9b707"
+  },
+  "originalScope": [
+    {
+      "id": "R00-T02-LA-E1FBE1A59BC6",
+      "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+      "then": "返回 MCP 应用及连接器状态；未初始化返回 503"
+    },
+    {
+      "id": "R00-T02-LA-7FF8D4E48BC9",
+      "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+      "then": "把 launchInput 交给指定连接器工具，返回启动结果或错误"
+    },
+    {
+      "id": "R00-T02-LA-04A6A2BD1547",
+      "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+      "then": "按 uri 返回连接器资源内容；缺 uri 或无内容拒绝"
+    }
+  ],
+  "actualCurrentPaths": [
+    {
+      "feature": "Settings MCP and connector OAuth",
+      "trace": [
+        "desktop/src/settings-main.tsx -> SettingsApp -> SettingsContent",
+        "main window SettingsModalShell -> same SettingsContent",
+        "TAB_COMPONENTS.mcp = McpTab; mcp included in RUST_SETTINGS_TABS after owned real identity",
+        "McpTab -> loadMcpState and nine settings actions -> usesRustMcp -> /lingxi/v1/mcp/state or settings-action",
+        "ConnectorForm remote/authType=oauth -> same Source connector add/update",
+        "ConnectorDetail -> OAuthWaitCard buttons -> McpTab connect/cancel/disconnectOAuth -> mcp-api Rust OAuth start/poll/cancel/logout routes"
+      ],
+      "conclusion": "Static real user control path is present and no longer forces Rust connections into the Node /api MCP routes. Existing /api branches remain explicit Node compatibility, not evidence Rust is still misrouted."
+    },
+    {
+      "feature": "Apps list, launch and resources",
+      "trace": [
+        "Rust MCP router registers /lingxi/v1/mcp/apps, connectors/{id}/apps/{tool}/launch, connectors/{id}/resources",
+        "Repository searches of desktop React/main/preload/shared/lib/core/server found no current desktop app-list/viewer consumer for these three paths",
+        "Old Node manager listApps/launchApp/readResource and tool-result mcpAppCard construction exist; this does not establish a rendered desktop viewer"
+      ],
+      "conclusion": "The original three leaves explicitly use an authorized HTTP client and do not claim an existing builtin button. Evaluate actual HTTP -> Source/current SDK positive tests; do not fabricate a UI button/viewer requirement, and do not label HTTP-only proof as a user-visible app opening or rendered resource."
+    },
+    {
+      "feature": "Launch meaning and callToolUrl",
+      "trace": [
+        "Old core/mcp/manager.ts launchApp builds mcp_app descriptor, original launchInput and binding",
+        "New mcp_apps.rs launch_route does the equivalent with real accepted SDK metadata/live identity",
+        "callToolUrl is a descriptor field; this handler does not dispatch tools/call"
+      ],
+      "conclusion": "Launch descriptor acceptance does not mean app tool execution occurred. The distinct app-tools call leaf 15AD is not within the inherited 35/408 R07 responsibility, per prior scope reconciliation; no new tool-call path is required merely to make this descriptor field executable."
+    }
+  ],
+  "evidenceLimits": [
+    "Current R07McpRustAPI cases stub fetch: they demonstrate URL/DTO/old-owner handling, not live Rust, Source writes, SDK discovery or actual OAuth browser operation.",
+    "McpTab component cases stub mcp-api: twenty UI mechanism results cannot be averaged into a true UI -> SDK positive.",
+    "The real SettingsContent all-pages case navigates seventeen tabs and waits real page requests, but does not add a remote MCP connector, click connector OAuth, consume SDK results, or open app resources. Seventeen navigation steps remain one named case.",
+    "New r07_t08_mcp_remote actual HTTP/official SDK owned endpoint cases have not been run by this reviewer; root owns actual execution and failure retention.",
+    "Existing r07-oauth-real-service is model-provider OAuthCredentials, not connector MCP OAuth; its URL+GET platform replacement explicitly does not prove OS browser startup.",
+    "Current Tauri main window remains ResourceDesktop frontend. Shared React settings paths are actual existing application consumers, but this review does not establish a new Tauri settings window or native browser launch."
+  ],
+  "staticConsumerFinding": {
+    "id": "mcp-oauth-browser-launch-feedback",
+    "status": "STATIC_NOT_RUNTIME_REPRODUCED",
+    "locations": [
+      "McpTab.tsx connectOAuth platform?.openExternal?.(url)",
+      "desktop/preload.cjs openExternal IPC",
+      "desktop/main.cjs open-external best-effort handler"
+    ],
+    "finding": "McpTab does not require or await openExternal. Missing platform support or a rejected platform Promise bypasses the component catch and leaves polling until its five-minute budget. Moreover existing Electron handler neither returns/awaits shell.openExternal nor exposes failures through its best-effort wrapper; component-only await cannot establish native OS failure feedback.",
+    "minimumCheck": "At the actual McpTab control, reject platform.openExternal and assert visible failure without continuing OAuth polling; this is consumer mechanism proof. To claim real native failure feedback, bind the real shell Promise to an observable IPC result and verify that path separately.",
+    "limit": "No OS/browser error was executed here. Do not label this a reproduced product failure or claim model-provider coverage proves it."
+  },
+  "changesByReviewer": [
+    "Created this independent evidence artifact only; no previous report or failure record overwritten."
+  ],
+  "commandsRunByReviewer": [
+    "Read/search source and original scope metadata; SHA-256 current reviewed files."
+  ],
+  "testsRunByReviewer": []
+}

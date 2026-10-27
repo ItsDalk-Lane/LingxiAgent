@@ -1,0 +1,46 @@
+PASS stub provider ready :: 62560
+PASS fixture gen
+PASS root-a prepared (knowledge integrity ok) :: ok
+PASS root-b migrated (T05 path)
+PASS kernel A (node) ready :: port=62563
+PASS kernel B (rust) ready :: 127.0.0.1:62569
+PASS suite ran on A (observations present) :: vitest exit=0
+PASS suite ran on B (observations present) :: vitest exit=0
+PASS [identity] parity
+PASS [sessions.list] parity
+RECORD [sessions.switch] recorded :: {"A":{"focused":false,"messages":null},"B":{"focused":true,"messages":null}}
+PASS [sessions.rename] parity
+PASS [sessions.pin] parity
+RECORD [sessions.create] recorded :: {"A":{"created":false,"delta":0},"B":{"created":false,"delta":0}}
+PASS [sessions.archive] parity
+FAIL [sessions.maintenance] differs :: {"A":{"cleanupDeletedIsNumber":true,"cleanupDeletedAtLeastOne":false,"sweptIsNumber":true},"B":{"cleanupDeletedIsNumber":true,"cleanupDeletedAtLeastOne":true,"sweptIsNumber":true}}
+PASS [sessions.capabilities] parity
+PASS [sessions.todos] parity
+PASS [permissions.default] parity
+PASS [preferences.appearance] parity
+PASS [error-path.unauthorized] parity
+PASS [error-path.not-found] parity
+PASS [drift-guard] parity
+PASS [leaf.rename.negative] parity
+PASS [leaf.pin.negative] parity
+PASS [leaf.todos.negative] parity
+FAIL [leaf.cleanup.boundary] differs :: {"A":{"freshKept":false,"purgedOk":false,"expiringGone":false,"skipped":true},"B":{"freshKept":false,"purgedOk":false,"expiringGone":false,"skipped":true}}
+PASS [leaf.list.fields] parity
+PASS [leaf.permissions.read-idempotent] parity
+PASS [leaf.mcp.state] parity
+PASS [leaf.mcp.state.unauthorized] parity
+FAIL [leaf.permission.session-mode] differs :: {"A":{"modePresent":false,"modeValue":null,"status":500,"idempotent":false},"B":{"modePresent":true,"modeValue":"ask","status":200,"idempotent":true}}
+PASS [leaf.permission.default-set] parity
+PASS [leaf.archive.negative] parity
+PASS [leaf.pin-order] parity
+PASS [leaf.pin.projection] parity
+PASS [leaf.read-ports] parity
+PASS [leaf.auth-folders] parity
+FAIL [leaf.memory-snapshot] differs :: {"A":{"memoryRead":true,"memorySet":true,"snapshotOk":false,"invalidRejected":true,"memStatus":200,"setStatus":200,"snapStatus":500,"badMemStatus":403,"badSnapStatus":403},"B":{"memoryRead":true,"memorySet":true,"snapshotOk":true,"invalidRejected":true,"memSta
+PASS [leaf.archive.workspace] parity
+FAIL [leaf.find.in-session] differs :: {"A":{"status":200,"rowsIsArray":true,"hitAtLeastOne":true,"badStatus":403,"invalidRejected":true},"B":{"status":400,"rowsIsArray":true,"hitAtLeastOne":false,"badStatus":400,"invalidRejected":true}}
+PASS [leaf.archived-delete] parity
+PASS [leaf.search] parity
+PASS harness integrity: both suites produced observations
+AB_RESULT tasks=35 parity=28 differs=5 recorded=2 failedA=0 failedB=0 out=/private/tmp/lingxi-r08-verify/r08_t07_ab-10676-1792890443266/out
+T07 AB OK

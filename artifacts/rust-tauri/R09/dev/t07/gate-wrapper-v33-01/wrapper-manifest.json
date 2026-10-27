@@ -1,0 +1,20 @@
+{
+ "schema": "lingxi.r09.t07.gate-wrapper.v3.3",
+ "purpose": "final-02 只读 evidence wrapper（delivery v3.3 骨架 + 冻结 G1 exe 稳定副本）",
+ "wrapperApp": "/private/tmp/lingxi-r09-t07/evidence-app-gate-v33-20261027-002322/Lingxi.app",
+ "deliveryMainExeSha256BeforeReplace": "ddbd1fad42a8b172c85204cbba0e621fabd3bf52a0ced95dd0d2a1b06af40543",
+ "frozenG1ExeSha256StableCopy": "27bf075a70e57ccca607365276d261eed79764e02b663bfd881df472e51a31b6",
+ "wrapperMainExeSha256AfterAdhocSign": "6fb2371cafddcfdc1a837ccb67648f37b04f422c13dceecc205f08a07e94f759",
+ "signExit": 0,
+ "verifyExit": 0,
+ "stableG1Copy": "/private/tmp/lingxi-r09-evidence/lingxi-resource-desktop-v33-27bf075a",
+ "handoff": "artifacts/rust-tauri/R09/dev/t06/candidate-handoff-v3.3/candidate-handoff.json",
+ "deliveryAppTreeSha256": "97f226bffba064c7b408656c6be941b58f5e6e01b191d5ae6a30f89a1fbd4ccc",
+ "deliveryExeSha256": "ddbd1fad42a8b172c85204cbba0e621fabd3bf52a0ced95dd0d2a1b06af40543",
+ "g1ExeSha256": "27bf075a70e57ccca607365276d261eed79764e02b663bfd881df472e51a31b6",
+ "g1ReceiptSha256": "1ac08dafaad97bf50ce400bf22d3afe7319f27c6fef2f037927b38f7145365ee",
+ "releaseReceiptSha256": "d12ff32f9d849ad9a45593402ee06c4c551d363af2e384f31edbff60bf298dff",
+ "releaseEvidenceAppTreeSha256": "48993e01213ab4e4715c4c77e90f819cd646b6037ffe4f530b57d26b79641341",
+ "releaseEvidenceExeSha256": "d0072dbea750dffac45357c595a7ae59a5fbc49dd4f3fe433ce8bdbcabac708d",
+ "sidecarBuildJsonSha256": "372c2b88748dcd96e9a74956c13554fb8d0e764638c28bc52b524c3a506473f9"
+}

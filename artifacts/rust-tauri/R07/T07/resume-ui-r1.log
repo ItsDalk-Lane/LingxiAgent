@@ -1,0 +1,49 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/services/resource-events.test.ts (6 tests | 1 failed) 350ms
+     × shares one backend resource subscription per local file and releases it after the last subscriber leaves 327ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/resource-events.test.ts > resource-events > shares one backend resource subscription per local file and releases it after the last subscriber leaves
+AssertionError: expected "vi.fn()" to be called with arguments: [ …(2) ]
+
+Received:
+
+  1st vi.fn() call:
+
+  [
+-   "/api/resource-io/subscriptions/sub-1",
+-   ObjectContaining {
+-     "method": "DELETE",
++   "/api/resource-io/subscribe",
++   {
++     "body": "{\"purpose\":\"resource-watch\",\"resources\":[{\"kind\":\"local-file\",\"path\":\"/tmp/note.md\"}]}",
++     "headers": {
++       "Content-Type": "application/json",
++     },
++     "method": "POST",
++     "throwOnHttpError": false,
+    },
+  ]
+
+
+Number of calls: 1
+
+ ❯ desktop/src/react/__tests__/services/resource-events.test.ts:42:25
+     40|     await Promise.resolve();
+     41|
+     42|     expect(lingxiFetch).toHaveBeenCalledWith('/api/resource-io/subscri…
+       |                         ^
+     43|       method: 'DELETE',
+     44|     }));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 6 passed (7)
+      Tests  1 failed | 242 passed (243)
+   Start at  09:14:42
+   Duration  5.37s (transform 823ms, setup 53ms, import 861ms, tests 5.77s, environment 517ms)
+

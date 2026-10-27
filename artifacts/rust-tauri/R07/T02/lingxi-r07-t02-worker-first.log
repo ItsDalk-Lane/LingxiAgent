@@ -1,0 +1,24 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+error[E0277]: the trait bound `Array<u8, UInt<UInt<UInt<UInt<..., ...>, ...>, ...>, ...>>: LowerHex` is not satisfied
+   --> crates/lingxi-adapters/src/storage/bridge.rs:191:222
+    |
+191 | ...h.update(part.as_bytes());}format!("bridge-{:x}",hash.finalize())
+    |                                               ----  ^^^^^^^^^^^^^^^ the trait `LowerHex` is not implemented for `Array<u8, UInt<UInt<UInt<UInt<UInt<..., ...>, ...>, ...>, ...>, ...>>`
+    |                                               |
+    |                                               required by this formatting parameter
+    |
+    = help: the following other types implement trait `LowerHex`:
+              &T
+              &mut T
+              OpenFlags
+              PrepFlags
+              Saturating<T>
+              Wrapping<T>
+              bytes::bytes::Bytes
+              bytes::bytes_mut::BytesMut
+            and 35 others
+    = note: the full name for the type has been written to '/private/tmp/lingxi-r07-build/debug/deps/lingxi_adapters-4c4cf2328fe64669.long-type-13159557697414235007.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `lingxi-adapters` (lib) due to 1 previous error

@@ -1,0 +1,219 @@
+{
+  "schema": "r08-t03-a06-crash/v1",
+  "error": "Error: electron-b-exit: timeout after 45000ms\n    at waitFor (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t03_a06_drill.mjs:98:38)\n    at async main (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t03_a06_drill.mjs:623:5)",
+  "homes": [
+    "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-svc-QoX4Ek",
+    "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliA-X8s8yO",
+    "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliB-pV1kCy"
+  ],
+  "journal": [
+    {
+      "at": "2026-10-22T16:03:49.902Z",
+      "step": "svc-home",
+      "data": {
+        "svcHome": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-svc-QoX4Ek"
+      }
+    },
+    {
+      "at": "2026-10-22T16:03:50.107Z",
+      "step": "stub",
+      "data": {
+        "pid": 97724,
+        "port": 58535
+      }
+    },
+    {
+      "at": "2026-10-22T16:03:50.324Z",
+      "step": "stamp",
+      "data": {
+        "stamp": {
+          "committedDataEpoch": 1,
+          "epoch": 1,
+          "lastVersion": "0.0.0",
+          "minimumReaderEpoch": 1,
+          "schemaVersion": 2,
+          "updatedAt": "2026-10-22T16:03:50.128Z"
+        }
+      }
+    },
+    {
+      "at": "2026-10-22T16:03:50.325Z",
+      "step": "service-spawn",
+      "data": {
+        "pid": 97726
+      }
+    },
+    {
+      "at": "2026-10-22T16:03:50.829Z",
+      "step": "rust-service",
+      "data": {
+        "pid": 97726,
+        "port": 58537,
+        "baseUrl": "http://127.0.0.1:58537"
+      }
+    },
+    {
+      "at": "2026-10-22T16:03:50.839Z",
+      "step": "electron-A",
+      "data": {
+        "pid": 97727,
+        "cdpPort": 9446,
+        "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliA-X8s8yO"
+      }
+    },
+    {
+      "at": "2026-10-22T16:03:54.899Z",
+      "step": "conn-info-A",
+      "data": {
+        "connInfo": {
+          "port": 58537,
+          "token": "<redacted>",
+          "serverNodeKind": "lingxi-service",
+          "serverNodeTransport": "http",
+          "host": "127.0.0.1"
+        }
+      }
+    },
+    {
+      "at": "2026-10-22T16:03:54.901Z",
+      "step": "electron-B",
+      "data": {
+        "pid": 97947,
+        "cdpPort": 9946,
+        "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliB-pV1kCy"
+      }
+    },
+    {
+      "at": "2026-10-22T16:03:58.933Z",
+      "step": "conn-info-B",
+      "data": {
+        "connInfo": {
+          "port": 58537,
+          "token": "<redacted>",
+          "serverNodeKind": "lingxi-service",
+          "serverNodeTransport": "http",
+          "host": "127.0.0.1"
+        }
+      }
+    },
+    {
+      "at": "2026-10-22T16:03:59.881Z",
+      "step": "leg-a1",
+      "data": {
+        "sessionId": "a06-clientA-leg1",
+        "frameCount": 10,
+        "runEnded": true,
+        "runEndReason": null,
+        "sawFinal": true,
+        "sawMarker": true
+      }
+    },
+    {
+      "at": "2026-10-22T16:04:00.004Z",
+      "step": "quit-b-proc-keystroke-1",
+      "data": {
+        "status": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    {
+      "at": "2026-10-22T16:04:20.287Z",
+      "step": "quit-b-menu-quit-1",
+      "data": {
+        "status": 1,
+        "stdout": "",
+        "stderr": "83:147: execution error: “System Events”遇到一个错误：不能获得“menu item \"Quit Electron\" of menu \"Electron\" of menu bar 1 of process 1 whose unix id = 97947”。 (-1728)"
+      }
+    },
+    {
+      "at": "2026-10-22T16:04:40.486Z",
+      "step": "quit-b-proc-keystroke-2",
+      "data": {
+        "status": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    {
+      "at": "2026-10-22T16:05:00.750Z",
+      "step": "quit-b-menu-quit-2",
+      "data": {
+        "status": 1,
+        "stdout": "",
+        "stderr": "83:147: execution error: “System Events”遇到一个错误：不能获得“menu item \"Quit Electron\" of menu \"Electron\" of menu bar 1 of process 1 whose unix id = 97947”。 (-1728)"
+      }
+    },
+    {
+      "at": "2026-10-22T16:05:20.951Z",
+      "step": "quit-b-proc-keystroke-3",
+      "data": {
+        "status": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    {
+      "at": "2026-10-22T16:05:41.206Z",
+      "step": "quit-b-menu-quit-3",
+      "data": {
+        "status": 1,
+        "stdout": "",
+        "stderr": "83:147: execution error: “System Events”遇到一个错误：不能获得“menu item \"Quit Electron\" of menu \"Electron\" of menu bar 1 of process 1 whose unix id = 97947”。 (-1728)"
+      }
+    },
+    {
+      "at": "2026-10-22T16:06:46.433Z",
+      "step": "reap-service",
+      "data": {
+        "pid": 97726,
+        "aliveAtReap": true
+      }
+    },
+    {
+      "at": "2026-10-22T16:06:46.449Z",
+      "step": "service-exit",
+      "data": {
+        "code": 0,
+        "signal": null
+      }
+    },
+    {
+      "at": "2026-10-22T16:06:46.449Z",
+      "step": "reap-service-result",
+      "data": {
+        "exited": {
+          "code": 0,
+          "signal": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-22T16:06:46.517Z",
+      "step": "electron-A-exit",
+      "data": {
+        "code": 0,
+        "signal": null
+      }
+    },
+    {
+      "at": "2026-10-22T16:06:46.563Z",
+      "step": "electron-B-exit",
+      "data": {
+        "code": 0,
+        "signal": null
+      }
+    },
+    {
+      "at": "2026-10-22T16:06:52.622Z",
+      "step": "cleanup",
+      "data": {
+        "homes": [
+          "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-svc-QoX4Ek",
+          "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliA-X8s8yO",
+          "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliB-pV1kCy"
+        ]
+      }
+    }
+  ]
+}

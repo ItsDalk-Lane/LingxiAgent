@@ -1,0 +1,36 @@
+{
+  "label": "t08g-native-drag-readiness-fix1",
+  "createdAt": "2026-10-18T12:35:37.776686+00:00",
+  "scope": "DEVELOPMENT_FIXTURE_NOT_RUNTIME_VERIFIED",
+  "finalAcceptance": false,
+  "ownedSource": "desktop/src/react/settings/__tests__/r06-settings-electron-main.cjs",
+  "sourceSha256": "e07646495e7a53de35c8ddfbfe79862eb396c42a58816dbd5d5a483da7357fac",
+  "originalFailure": "artifacts/rust-tauri/R07/T08/t08g-native-drag-readonly1/diagnosis.json",
+  "changes": [
+    "真实show/focus后仅在window.isFocused+document.hasFocus、实际整数elementFromPoint目标及真实mouseMove后的container:hover同时满足时才发down；悬停布局变化时重读整数点并复核。",
+    "原15秒deadline从准备开始贯穿真实手势/排序结果，不为每个步骤另起15秒；保存错误与GET阶段仍各不超过原5秒，且受总deadline约束。",
+    "原sendInputEvent与官方CDP touchStart/Move/Cancel保留，不派发DOM逻辑事件，不直接调用排序保存HTTP替代手势。",
+    "鼠标down后需实际可信down+产品pointerCapture，真实move后需产品wasDragged和可信move，再真实up；异常也真实up释放按键。",
+    "记录有限安全焦点时刻、hover、整数点及命中、可信pointer链/捕获/顺序，失败trace保全，不记录凭证或请求正文。",
+    "失败恢复先实际PUT500，再实际后续GET，再原顺序/磁盘字节恢复；保原检查名称/九十余操作与其他非拖动部分不变。"
+  ],
+  "unchanged": [
+    "产品AgentCardStack/Rust/权限/接口/协议",
+    "原可信pointercancel零排序写入/原序",
+    "workflow排序真实持久化",
+    "边界排序磁盘不可写500、回读及原字节",
+    "旧g全部失败回执/源码归档"
+  ],
+  "notIntroduced": [
+    "没有原生窗口串行锁；焦点争用尚未被证明。",
+    "没有扩大120秒子进程限制或15秒结果等待。"
+  ],
+  "validation": [
+    {
+      "command": "node --check desktop/src/react/settings/__tests__/r06-settings-electron-main.cjs",
+      "exitCode": 0,
+      "meaning": "仅语法检查，不是Electron实链通过"
+    }
+  ],
+  "pending": "root唯一Cargo原r06_agent_settings_live全14真实目标。No Cargo/build/GUI/rerun executed by this agent."
+}

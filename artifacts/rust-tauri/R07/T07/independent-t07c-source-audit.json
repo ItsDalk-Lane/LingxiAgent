@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "candidate": "t07c",
+  "reviewer": "r07_t07_candidate_review",
+  "checkedAt": "2026-10-18T03:20:14.152617+00:00",
+  "files": 543,
+  "workingTreeCodeFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+  "archiveSha256": "34e1ab9afb13b51f849cb83ce0372b696a70c47da1f408f5d9567fbaa6b64e30",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceAndArchiveMatch": true,
+  "unlistedSources": [],
+  "issues": [],
+  "method": "独立读取每项当前文件及tar成员的字节、长度、模式，重算规范JSON指纹和完整归档摘要；独立枚举git差异源项，未调用原证据工具。"
+}

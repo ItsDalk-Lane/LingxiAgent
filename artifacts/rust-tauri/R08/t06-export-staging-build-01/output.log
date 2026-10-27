@@ -1,0 +1,79 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+error[E0308]: mismatched types
+   --> crates/lingxi-adapters/src/storage/rollback_delta.rs:425:40
+    |
+425 |         for table in list_delta_tables(&conn)? {
+    |                      ----------------- ^^^^^ expected `&Connection`, found `&Result<Connection, DeltaError>`
+    |                      |
+    |                      arguments to this function are incorrect
+    |
+    = note: expected reference `&rusqlite::Connection`
+               found reference `&std::result::Result<rusqlite::Connection, DeltaError>`
+note: function defined here
+   --> crates/lingxi-adapters/src/storage/rollback_delta.rs:335:4
+    |
+335 | fn list_delta_tables(conn: &rusqlite::Connection) -> Result<Vec<String>, DeltaError> {
+    |    ^^^^^^^^^^^^^^^^^ ---------------------------
+
+error[E0308]: mismatched types
+   --> crates/lingxi-adapters/src/storage/rollback_delta.rs:426:34
+    |
+426 |         let pk_cols = pk_columns(&conn, &table)?;
+    |                       ---------- ^^^^^ expected `&Connection`, found `&Result<Connection, DeltaError>`
+    |                       |
+    |                       arguments to this function are incorrect
+    |
+    = note: expected reference `&rusqlite::Connection`
+               found reference `&std::result::Result<rusqlite::Connection, DeltaError>`
+note: function defined here
+   --> crates/lingxi-adapters/src/storage/rollback_delta.rs:354:4
+    |
+354 | fn pk_columns(conn: &rusqlite::Connection, table: &str) -> Result<Vec<String>, DeltaError> {
+    |    ^^^^^^^^^^ ---------------------------
+
+error[E0599]: no method named `prepare` found for enum `std::result::Result<T, E>` in the current scope
+   --> crates/lingxi-adapters/src/storage/rollback_delta.rs:429:14
+    |
+428 |           let mut stmt = conn
+    |  ________________________-
+429 | |             .prepare(&format!("SELECT * FROM {quoted}"))
+    | |             -^^^^^^^ method not found in `std::result::Result<rusqlite::Connection, DeltaError>`
+    | |_____________|
+    |
+    |
+note: the method `prepare` exists on the type `rusqlite::Connection`
+   --> /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rusqlite-0.40.2/src/lib.rs:781:5
+    |
+781 |     pub fn prepare(&self, sql: &str) -> Result<Statement<'_>> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: use the `?` operator to extract the `rusqlite::Connection` value, propagating a `Result::Err` value to the caller
+    |
+428 |         let mut stmt = conn?
+    |                            +
+
+error[E0282]: type annotations needed
+   --> crates/lingxi-adapters/src/storage/rollback_delta.rs:432:45
+    |
+432 |             stmt.column_names().iter().map(|s| s.to_string()).collect();
+    |                                             ^  - type must be known at this point
+    |
+help: consider giving this closure parameter an explicit type
+    |
+432 |             stmt.column_names().iter().map(|s: /* Type */| s.to_string()).collect();
+    |                                              ++++++++++++
+
+error[E0282]: type annotations needed
+   --> crates/lingxi-adapters/src/storage/rollback_delta.rs:454:25
+    |
+454 |                 let v = row
+    |                         ^^^ cannot infer type
+
+error[E0282]: type annotations needed
+   --> crates/lingxi-adapters/src/storage/rollback_delta.rs:457:28
+    |
+457 |                 obj.insert(name.clone(), sql_value_to_json(v));
+    |                            ^^^^ cannot infer type
+
+Some errors have detailed explanations: E0282, E0308, E0599.
+For more information about an error, try `rustc --explain E0282`.
+error: could not compile `lingxi-adapters` (lib) due to 6 previous errors

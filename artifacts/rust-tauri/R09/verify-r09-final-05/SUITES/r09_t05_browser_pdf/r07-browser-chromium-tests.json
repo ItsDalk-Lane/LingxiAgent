@@ -1,0 +1,43 @@
+{
+ "tests": {
+  "downloads_are_actual_owned_bytes_and_ack_removes_only_confirmed_guid": true,
+  "fixture_idle_connection_never_invents_a_form_response": true,
+  "independent_persistent_profiles_auxiliary_locale_and_site_data_cleanup": true,
+  "page_cannot_move_or_forge_a_snapshot_reference_to_another_element": true,
+  "password_values_never_enter_normal_or_compact_snapshots_and_stay_in_the_page": true,
+  "permanent_forget_removes_owned_profile_and_rejects_late_scopes": true,
+  "pool_lru_is_bounded_and_idle_reap_keeps_cold_metadata": true,
+  "same_real_target_input_snapshot_generations_and_empty_workspace": true,
+  "scope_revoke_interrupts_real_pending_page_and_stale_node_never_launches": true,
+  "trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock": true
+ },
+ "result": {
+  "passed": 10,
+  "failed": 0,
+  "ignored": 0
+ },
+ "attempts": [
+  {
+   "attempt": 1,
+   "exitCode": 0,
+   "passed": 10,
+   "failed": 0,
+   "failedTests": [],
+   "log": "r07-browser-chromium-attempt1.log"
+  }
+ ],
+ "flakyRetry": {
+  "used": false,
+  "attempts": [
+   {
+    "attempt": 1,
+    "exitCode": 0,
+    "passed": 10,
+    "failed": 0,
+    "failedTests": [],
+    "log": "r07-browser-chromium-attempt1.log"
+   }
+  ],
+  "note": "第一次尝试的真实红日志保留（attempt1.log）；重试次数上限 1，对应 R07 已登记的真实 Chromium 集成抖动，不是产品缺陷判定。"
+ }
+}

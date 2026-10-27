@@ -25,14 +25,16 @@ vi.mock('../actions', () => ({
   updateSettingsSnapshot: vi.fn(),
 }));
 
-vi.mock('../api', () => ({
-  lingxiFetch: vi.fn(async (url: string) => {
-    if (url === '/api/config') {
-      return new Response(JSON.stringify({ locale: 'zh-CN' }));
-    }
+vi.mock('../api', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../api')>();
+  const request = vi.fn(async (url: string, _options?: RequestInit) => {
+    if (url === '/api/config') return new Response(JSON.stringify({ locale: 'zh-CN' }));
     return new Response(JSON.stringify({ experiments: [] }));
-  }),
-}));
+  });
+  return { ...actual, lingxiFetch: request,
+    lingxiFetchJson: async (url: string, options?: RequestInit) => (await request(url, options)).json(),
+  };
+});
 
 describe('SettingsContent tab heading', () => {
   let settingsChangedHandler: ((type: string, data: unknown) => void) | undefined;
@@ -72,6 +74,7 @@ describe('SettingsContent tab heading', () => {
       activeTab: 'experiments',
       platformName: 'darwin',
       ready: true,
+      rustSettingsUnavailable: false,
     } as never);
   });
 
@@ -216,6 +219,39 @@ describe('SettingsContent tab heading', () => {
 
     await waitFor(() => expect(actionMocks.loadProvidersSummary).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(useSettingsStore.getState().ready).toBe(true));
+  });
+
+  it('clears foreign cached data and blocks settings when the Rust identity is incomplete', async () => {
+    window.platform.getServerConnectionInfo = vi.fn(async () => ({
+      port: 63002, token: 'rust-token', serverNodeKind: 'lingxi-service', serverNodeTransport: 'http',
+    }));
+    const { lingxiFetch } = await import('../api');
+    vi.mocked(lingxiFetch).mockImplementation(async (url: string) => {
+      if (url === '/lingxi/v1/server/identity') {
+        return new Response(JSON.stringify({ serverNodeKind: 'lingxi-service' }));
+      }
+      throw new Error(`unexpected settings request: ${url}`);
+    });
+    useSettingsStore.setState({
+      activeTab: 'access', ready: false, rustSettingsUnavailable: false,
+      activeServerConnection: null, activeServerConnectionId: null, serverConnections: {},
+      settingsConfig: { oldNodeData: true }, agents: [{ id: 'old', name: 'Old', yuan: 'old', isPrimary: true }],
+      runtimeModels: [{ id: 'old', name: 'Old', provider: 'old' }],
+    } as never);
+
+    render(React.createElement(SettingsContent, { variant: 'window' }));
+    await waitFor(() => expect(useSettingsStore.getState().ready).toBe(true));
+    expect(lingxiFetch).toHaveBeenCalledWith('/lingxi/v1/server/identity');
+    expect(useSettingsStore.getState()).toMatchObject({
+      activeTab: 'access', rustSettingsUnavailable: true, settingsConfig: null,
+      settingsConfigStatus: 'error', agents: [], runtimeModels: [], settingsIdentityOwner: null, settingsDataOwner: null, settingsDataAgentId: null,
+    });
+    expect(actionMocks.loadAgents).not.toHaveBeenCalled();
+    expect(actionMocks.loadSettingsModels).not.toHaveBeenCalled();
+    useSettingsStore.getState().set({ activeTab: 'agent' });
+    await waitFor(() => expect(screen.getAllByRole('alert').some(
+      alert => alert.textContent?.includes('settings.rustCoreUnavailable'),
+    )).toBe(true));
   });
 
   it('loads the settings snapshot only after agents have resolved the agent id', async () => {

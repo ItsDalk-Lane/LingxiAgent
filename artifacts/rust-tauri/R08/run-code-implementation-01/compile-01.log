@@ -1,0 +1,72 @@
+   Compiling lingxi-test-guard v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-test-guard)
+   Compiling rmcp v3.4.1
+   Compiling ring v0.17.14
+   Compiling yasna v0.6.0
+   Compiling pem v4.0.0
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling rcgen v0.14.10
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0277]: the trait bound `Arc<RunDatabase>: StoragePort` is not satisfied
+    --> crates/lingxi-service/tests/r08_admission_run_code.rs:643:25
+     |
+ 643 |         .cancel_run_for(h.state.storage(), h.state.runs(), &h.principal(), &run)
+     |          -------------- ^^^^^^^^^^^^^^^^^ the trait `StoragePort` is not implemented for `Arc<RunDatabase>`
+     |          |
+     |          required by a bound introduced by this call
+     |
+help: the trait `StoragePort` is implemented for `RunDatabase`
+    --> crates/lingxi-adapters/src/storage/run_store.rs:1644:1
+     |
+1644 | impl StoragePort for RunDatabase {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: required by a bound in `SessionStore::cancel_run_for`
+    --> crates/lingxi-service/src/sessions.rs:2101:36
+     |
+2101 |     pub async fn cancel_run_for<P: StoragePort>(
+     |                                    ^^^^^^^^^^^ required by this bound in `SessionStore::cancel_run_for`
+
+error[E0277]: the trait bound `Arc<RunDatabase>: StoragePort` is not satisfied
+    --> crates/lingxi-service/tests/r08_admission_run_code.rs:641:5
+     |
+ 641 | /     h.state
+ 642 | |         .sessions()
+ 643 | |         .cancel_run_for(h.state.storage(), h.state.runs(), &h.principal(), &run)
+     | |________________________________________________________________________________^ the trait `StoragePort` is not implemented for `Arc<RunDatabase>`
+     |
+help: the trait `StoragePort` is implemented for `RunDatabase`
+    --> crates/lingxi-adapters/src/storage/run_store.rs:1644:1
+     |
+1644 | impl StoragePort for RunDatabase {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: required by a bound in `SessionStore::cancel_run_for`
+    --> crates/lingxi-service/src/sessions.rs:2101:36
+     |
+2101 |     pub async fn cancel_run_for<P: StoragePort>(
+     |                                    ^^^^^^^^^^^ required by this bound in `SessionStore::cancel_run_for`
+
+error[E0277]: the trait bound `Arc<RunDatabase>: StoragePort` is not satisfied
+    --> crates/lingxi-service/tests/r08_admission_run_code.rs:644:10
+     |
+ 644 |         .await
+     |          ^^^^^ the trait `StoragePort` is not implemented for `Arc<RunDatabase>`
+     |
+help: the trait `StoragePort` is implemented for `RunDatabase`
+    --> crates/lingxi-adapters/src/storage/run_store.rs:1644:1
+     |
+1644 | impl StoragePort for RunDatabase {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: required by a bound in `SessionStore::cancel_run_for`
+    --> crates/lingxi-service/src/sessions.rs:2101:36
+     |
+2101 |     pub async fn cancel_run_for<P: StoragePort>(
+     |                                    ^^^^^^^^^^^ required by this bound in `SessionStore::cancel_run_for`
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `lingxi-service` (test "r08_admission_run_code") due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning

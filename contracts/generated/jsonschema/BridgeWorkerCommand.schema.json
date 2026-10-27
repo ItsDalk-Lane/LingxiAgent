@@ -1,0 +1,440 @@
+{
+  "$defs": {
+    "BridgeEffectOperation": {
+      "enum": [
+        "receipt_start",
+        "receipt_stop",
+        "stream_update",
+        "stream_finish",
+        "stream_cancel"
+      ],
+      "type": "string"
+    },
+    "BridgeEffectRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "conversationId": {
+          "type": "string"
+        },
+        "deliveryId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "effectId": {
+          "type": "string"
+        },
+        "inboxId": {
+          "type": "string"
+        },
+        "operation": {
+          "$ref": "#/$defs/BridgeEffectOperation"
+        },
+        "replyContext": {
+          "$ref": "#/$defs/BridgeReplyContext"
+        },
+        "rich": {
+          "type": "boolean"
+        },
+        "runId": {
+          "type": "string"
+        },
+        "sequence": {
+          "format": "uint32",
+          "maximum": 4294967295,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "streamId": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "effectId",
+        "streamId",
+        "inboxId",
+        "runId",
+        "sequence",
+        "operation",
+        "conversationId",
+        "replyContext",
+        "text",
+        "rich"
+      ],
+      "type": "object"
+    },
+    "BridgeReplyContext": {
+      "additionalProperties": false,
+      "properties": {
+        "channelId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "contextToken": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "guildId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "isGroup": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "messageId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "messageThreadId": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "parentId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "rootId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "senderId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "targetChatId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "targetType": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BridgeTargetType"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "text": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "BridgeTargetType": {
+      "enum": [
+        "user",
+        "group",
+        "channel"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "generation 在启动边界显式拒绝超过 u32；不能截断持久配置代次。",
+  "oneOf": [
+    {
+      "additionalProperties": false,
+      "properties": {
+        "config": true,
+        "connectorId": {
+          "type": "string"
+        },
+        "generation": {
+          "format": "uint32",
+          "maximum": 4294967295,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "kind": {
+          "const": "init",
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "connectorId",
+        "generation",
+        "platform",
+        "config"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "attachments": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "connectorId": {
+          "type": "string"
+        },
+        "conversationId": {
+          "type": "string"
+        },
+        "deliveryId": {
+          "type": "string"
+        },
+        "dispatchSeq": {
+          "description": "可信管道在正式派发时填入；同一 worker 生命周期内严格递增。",
+          "format": "uint32",
+          "maximum": 4294967295,
+          "minimum": 1,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "generation": {
+          "format": "uint32",
+          "maximum": 4294967295,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "kind": {
+          "const": "send",
+          "type": "string"
+        },
+        "replyContext": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BridgeReplyContext"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "connectorId",
+        "generation",
+        "deliveryId",
+        "conversationId",
+        "text",
+        "attachments"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "attachmentId": {
+          "type": "string"
+        },
+        "connectorId": {
+          "type": "string"
+        },
+        "filename": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "generation": {
+          "format": "uint32",
+          "maximum": 4294967295,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "kind": {
+          "const": "media_begin",
+          "type": "string"
+        },
+        "messageId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mime": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sizeBytes": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "connectorId",
+        "generation",
+        "attachmentId",
+        "sizeBytes"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "attachmentId": {
+          "type": "string"
+        },
+        "connectorId": {
+          "type": "string"
+        },
+        "data": {
+          "type": "string"
+        },
+        "generation": {
+          "format": "uint32",
+          "maximum": 4294967295,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "kind": {
+          "const": "media_chunk",
+          "type": "string"
+        },
+        "seq": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "connectorId",
+        "generation",
+        "attachmentId",
+        "seq",
+        "data"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "attachmentId": {
+          "type": "string"
+        },
+        "connectorId": {
+          "type": "string"
+        },
+        "generation": {
+          "format": "uint32",
+          "maximum": 4294967295,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "kind": {
+          "const": "media_end",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "connectorId",
+        "generation",
+        "attachmentId"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "connectorId": {
+          "type": "string"
+        },
+        "dispatchSeq": {
+          "format": "uint32",
+          "maximum": 4294967295,
+          "minimum": 1,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "effect": {
+          "$ref": "#/$defs/BridgeEffectRequest"
+        },
+        "generation": {
+          "format": "uint32",
+          "maximum": 4294967295,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "kind": {
+          "const": "effect",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "connectorId",
+        "generation",
+        "effect"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "connectorId": {
+          "type": "string"
+        },
+        "generation": {
+          "format": "uint32",
+          "maximum": 4294967295,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "kind": {
+          "const": "stop",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "connectorId",
+        "generation"
+      ],
+      "type": "object"
+    }
+  ],
+  "title": "BridgeWorkerCommand"
+}

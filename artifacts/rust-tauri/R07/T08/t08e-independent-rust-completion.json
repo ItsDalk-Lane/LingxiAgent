@@ -1,0 +1,26 @@
+{
+  "candidate": "t08e",
+  "results": [
+    {
+      "gate": "model-regression",
+      "wrapperExitCode": 0
+    },
+    {
+      "gate": "native-skills",
+      "wrapperExitCode": 0
+    },
+    {
+      "gate": "native-picker-binding",
+      "wrapperExitCode": 0
+    },
+    {
+      "gate": "skills-current",
+      "wrapperExitCode": 0
+    },
+    {
+      "gate": "build",
+      "wrapperExitCode": 0
+    }
+  ],
+  "fullStagePassClaimed": false
+}

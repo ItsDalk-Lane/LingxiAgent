@@ -1,0 +1,99 @@
+{
+  "$defs": {
+    "BeautifyUploadedImage": {
+      "additionalProperties": false,
+      "properties": {
+        "contentBase64": {
+          "type": "string"
+        },
+        "filename": {
+          "default": null,
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "contentBase64"
+      ],
+      "type": "object"
+    },
+    "BeautifyWorkbenchTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string"
+        },
+        "mountId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "rootId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "subdir": {
+          "default": "",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "filePath": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "image": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BeautifyUploadedImage"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "imageFilePath": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "requestId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "target": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BeautifyWorkbenchTarget"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "title": "BeautifyApplyRequest",
+  "type": "object"
+}

@@ -1,0 +1,14 @@
+{
+ "label": "s3",
+ "unixMs": 1793032588787,
+ "app": [],
+ "services": [],
+ "allServices": [
+  {
+   "pid": 84240,
+   "ppid": 84237,
+   "pgid": 84237,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-84237-1793032583342/home-remote"
+  }
+ ]
+}

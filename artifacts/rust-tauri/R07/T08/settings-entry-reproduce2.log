@@ -1,0 +1,362 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面
+[settings] models load failed: Error: model plane unavailable
+    at errorWithCode (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/errors/error-presenter.ts:38:17)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/api.ts:72:13)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at lingxiFetchJson (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/api.ts:89:15)
+    at loadSettingsModels (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/actions.ts:113:18)
+    at async Promise.all (index 3)
+    at initSettings (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/SettingsContent.tsx:480:7)
+
+ × desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面 14705ms
+   → expected 'model plane unavailable' to be null
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_settings-content-root_4045f0"[39m
+        [33mdata-input-ctx-zone[39m=[32m"settings"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"settings-panel _settings-panel-modal_4045f0"[39m
+          [33mid[39m=[32m"settingsPanel"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"settings-header _settings-header-modal_4045f0"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_settings-title-group_4045f0"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-label[39m=[32m"settings.back"[39m
+                [33mclass[39m=[32m"_settings-return-btn_4045f0"[39m
+                [33mdata-settings-return[39m=[32m"true"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"22"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.7"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"22"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M15 18l-6-6 6-6"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+              [36m</button>[39m
+              [36m<h1[39m
+                [33mclass[39m=[32m"_settings-title_4045f0"[39m
+              [36m>[39m
+                [0msettings.title[0m
+              [36m</h1>[39m
+            [36m</div>[39m
+            [36m<h1[39m
+              [33mclass[39m=[32m"_settings-header-tab-title_4045f0"[39m
+            [36m>[39m
+              [0msettings.tabs.access[0m
+            [36m</h1>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_settings-body_4045f0"[39m
+          [36m>[39m
+            [36m<nav[39m
+              [33mclass[39m=[32m"_settings-nav_4045f0"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_settings-search-shell_4045f0"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"_settings-search-icon_4045f0"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"15"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.8"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"15"[39m
+                [36m>[39m
+                  [36m<circle[39m
+                    [33mcx[39m=[32m"11"[39m
+                    [33mcy[39m=[32m"11"[39m
+                    [33mr[39m=[32m"7"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"m20 20-3.5-3.5"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<input[39m
+                  [33mclass[39m=[32m"_settings-search-input_4045f0"[39m
+                  [33mplaceholder[39m=[32m"settings.settingsSearch.placeholder"[39m
+                  [33mtype[39m=[32m"search"[39m
+                  [33mvalue[39m=[32m""[39m
+                [36m/>[39m
+              [36m</div>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+                [33mdata-tab[39m=[32m"agent"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.5"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M12 2a5 5 0 0 1 5 5c0 2.76-2.24 5-5 5s-5-2.24-5-5a5 5 0 0 1 5-5z"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<span>[39m
+                  [0msettings.tabs.agent[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+                [33mdata-tab[39m=[32m"me"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.5"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"[39m
+                  [36m/>[39m
+                  [36m<circle[39m
+                    [33mcx[39m=[32m"12"[39m
+                    [33mcy[39m=[32m"7"[39m
+                    [33mr[39m=[32m"4"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<span>[39m
+                  [0msettings.tabs.me[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+                [33mdata-tab[39m=[32m"interface"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.5"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<circle[39m
+                    [33mcx[39...
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面
+AssertionError: expected 'model plane unavailable' to be null
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_settings-content-root_4045f0"[39m
+        [33mdata-input-ctx-zone[39m=[32m"settings"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"settings-panel _settings-panel-modal_4045f0"[39m
+          [33mid[39m=[32m"settingsPanel"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"settings-header _settings-header-modal_4045f0"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_settings-title-group_4045f0"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-label[39m=[32m"settings.back"[39m
+                [33mclass[39m=[32m"_settings-return-btn_4045f0"[39m
+                [33mdata-settings-return[39m=[32m"true"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"22"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.7"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"22"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M15 18l-6-6 6-6"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+              [36m</button>[39m
+              [36m<h1[39m
+                [33mclass[39m=[32m"_settings-title_4045f0"[39m
+              [36m>[39m
+                [0msettings.title[0m
+              [36m</h1>[39m
+            [36m</div>[39m
+            [36m<h1[39m
+              [33mclass[39m=[32m"_settings-header-tab-title_4045f0"[39m
+            [36m>[39m
+              [0msettings.tabs.access[0m
+            [36m</h1>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_settings-body_4045f0"[39m
+          [36m>[39m
+            [36m<nav[39m
+              [33mclass[39m=[32m"_settings-nav_4045f0"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_settings-search-shell_4045f0"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"_settings-search-icon_4045f0"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"15"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.8"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"15"[39m
+                [36m>[39m
+                  [36m<circle[39m
+                    [33mcx[39m=[32m"11"[39m
+                    [33mcy[39m=[32m"11"[39m
+                    [33mr[39m=[32m"7"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"m20 20-3.5-3.5"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<input[39m
+                  [33mclass[39m=[32m"_settings-search-input_4045f0"[39m
+                  [33mplaceholder[39m=[32m"settings.settingsSearch.placeholder"[39m
+                  [33mtype[39m=[32m"search"[39m
+                  [33mvalue[39m=[32m""[39m
+                [36m/>[39m
+              [36m</div>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+                [33mdata-tab[39m=[32m"agent"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.5"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M12 2a5 5 0 0 1 5 5c0 2.76-2.24 5-5 5s-5-2.24-5-5a5 5 0 0 1 5-5z"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<span>[39m
+                  [0msettings.tabs.agent[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+                [33mdata-tab[39m=[32m"me"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.5"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"[39m
+                  [36m/>[39m
+                  [36m<circle[39m
+                    [33mcx[39m=[32m"12"[39m
+                    [33mcy[39m=[32m"7"[39m
+                    [33mr[39m=[32m"4"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<span>[39m
+                  [0msettings.tabs.me[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+                [33mdata-tab[39m=[32m"interface"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.5"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<circle[39m
+                    [33mcx[39...
+
+- Expected:
+null
+
++ Received:
+"model plane unavailable"
+
+ ❯ timeout desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx:77:90
+     75|       expect(state.settingsDataAgentId).toBe('entry-agent');
+     76|       expect(ownsSettingsConnection(state.settingsDataOwner)).toBe(tru…
+     77|       expect(state.agentsError || state.settingsConfigError || state.r…
+       |                                                                                          ^
+     78|     }, { timeout: 14_500 });
+     79|     expect(requests.some(request => request.path === '/lingxi/v1/serve…
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  17:42:30
+   Duration  16.45s (transform 1.13s, setup 17ms, import 1.42s, tests 14.71s, environment 242ms)
+

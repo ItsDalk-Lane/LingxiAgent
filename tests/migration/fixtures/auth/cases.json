@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "note": "服务端认证失败矩阵。回放走真实 core/server-auth.ts createServerAuthService().authenticateRequestDetailed（server/http/request-principal.ts 每个 HTTP 请求都经它解析 principal；失败即 403 forbidden 面）。runtimeContext 全部为合成标识。",
+  "runtimeContext": {
+    "serverId": "server_synthetic",
+    "serverNodeId": "node_synthetic",
+    "userId": "user_synthetic",
+    "studioId": "studio_synthetic",
+    "connectionKind": "local",
+    "credentialKind": "loopback_token",
+    "platformAccountId": null,
+    "officialServiceKind": null,
+    "capabilities": ["chat", "resources", "tools"]
+  },
+  "loopbackToken": "synthetic-loopback-token-not-a-secret",
+  "cases": [
+    { "id": "valid-local-loopback", "authorization": "Bearer synthetic-loopback-token-not-a-secret", "connectionKind": "local", "expectation": "principal.kind=local_user（对照面：合法路径可用）" },
+    { "id": "wrong-token-local", "authorization": "Bearer not-the-token", "connectionKind": "local", "expectation": "principal=null + 结构化 deny reason=invalid_credential" },
+    { "id": "valid-token-lan", "authorization": "Bearer synthetic-loopback-token-not-a-secret", "connectionKind": "lan", "expectation": "loopback 凭证不得跨连接类型使用 → 拒绝" },
+    { "id": "missing-credential", "authorization": null, "connectionKind": "local", "expectation": "principal=null + 结构化 deny reason=missing_credential" },
+    { "id": "connection-not-allowed", "authorization": "Bearer synthetic-loopback-token-not-a-secret", "connectionKind": "custom_remote", "expectation": "local 凭证过非本地传输 → 拒绝" }
+  ]
+}

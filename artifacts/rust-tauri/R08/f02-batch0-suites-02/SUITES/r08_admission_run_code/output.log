@@ -1,0 +1,21 @@
+
+running 9 tests
+test absent_real_interpreters_report_install_guidance_without_starting_kernel ... ok
+test actual_code_output_and_side_effect_reload_from_real_history_without_reexecution ... ok
+test cancelling_real_run_stops_persistent_python_kernel_and_its_actual_grandchild ... ok
+test missing_language_child ... ok
+test output_is_real_bounded_head_tail_utf8_and_dead_kernel_requires_explicit_restart ... ok
+test python_and_node_real_kernels_preserve_variables_functions_imports_and_isolate_agent_sessions ... ok
+test real_gateway_status_remains_read_only_and_code_never_inherits_service_secrets ... ok
+test real_thirty_second_cap_reports_timeout_keeps_busy_state_and_restart_ends_it_without_replay ... ok
+test real_workflow_write_roots_cannot_be_bypassed_by_persistent_interpreter_run_or_restart ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 33.20s
+
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r08_admission_run_code.rs (rust/target/debug/deps/r08_admission_run_code-465a18f4152e0455)

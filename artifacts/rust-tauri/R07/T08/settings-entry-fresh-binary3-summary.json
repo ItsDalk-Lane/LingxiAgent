@@ -1,0 +1,22 @@
+{
+  "status": "DEVELOPMENT_CHECKS_PASSED_NOT_FINAL_ACCEPTANCE",
+  "receipt": "artifacts/rust-tauri/R07/T08/settings-entry-fresh-binary3.json",
+  "receiptSha256": "1dd309907fb5153981cfd6787f7f2903c0c0bf948da8b367fa734c2d7cbb06d6",
+  "logSha256": "c9453107efeee539ea610e9e041dbb4e6b489f5f74c459c3cf9ca299463da089",
+  "exitCode": 0,
+  "fileCount": 4,
+  "namedCasesPassed": 34,
+  "entryServiceCases": 8,
+  "allPagesNavigationIsOneCombinedCase": true,
+  "navigationPages": 17,
+  "sourceUnchanged": true,
+  "binaryCopy": "/private/tmp/lingxi-r07-tests/binaries/settings-entry-backend-build2/lingxi-service",
+  "binarySha256ObservedAfterRun": "d7b56a69dfb584747618d8f0eb36d6ca92484b496158328c2fbc426ba4db2ece",
+  "binaryBeforeEvidence": "artifacts/rust-tauri/R07/T08/settings-entry-backend-build2-binary.json",
+  "limits": [
+    "旧401例只延迟真实响应，不代填新身份；单次坏凭据例不是设备撤权。",
+    "17页导航不等于全部保存/平台交互动作。",
+    "26组件/机制case不称26真实服务case，固定副本不包含随后MCP六叶/会话授权的新实现。",
+    "后继统一候选尚未冻结。"
+  ]
+}

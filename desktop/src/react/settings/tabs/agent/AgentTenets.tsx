@@ -43,6 +43,8 @@ async function tenetsRequest(path: string, init: RequestInit = {}): Promise<any>
   if (!response.ok) {
     throw new Error(data?.error || `${response.status} ${response.statusText}`);
   }
+  if (data?.error) throw new Error(typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
+  if (!data) throw new Error('原则响应格式无效');
   return data;
 }
 
@@ -56,7 +58,8 @@ export function AgentTenets({ agentId }: { agentId: string }) {
   const refresh = useCallback(async (signal?: AbortSignal) => {
     try {
       const data = await tenetsRequest(`/api/agents/${encodeURIComponent(agentId)}/tenets`, { signal });
-      setTenets(Array.isArray(data?.tenets) ? data.tenets : []);
+      if (!Array.isArray(data?.tenets)) throw new Error('原则列表响应缺少 tenets');
+      setTenets(data.tenets);
       setError(null);
     } catch (err: any) {
       if (signal?.aborted) return;

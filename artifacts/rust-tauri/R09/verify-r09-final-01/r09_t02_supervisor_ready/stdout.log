@@ -1,0 +1,1 @@
+suite r09_t02_supervisor_ready: status=FAIL exit=2 cases=31 failed=['t02::failure-dialog-suppressed-all']

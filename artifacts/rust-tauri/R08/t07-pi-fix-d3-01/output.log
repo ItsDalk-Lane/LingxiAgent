@@ -1,0 +1,28 @@
+PASS fixture gen exit 0
+PASS migrate committed
+PASS agents create
+PASS sessions/new :: 200
+PASS attachments/local
+PASS preferences/appearance
+PASS bridge POST config
+PASS bridge POST owner
+PASS bridge POST config
+PASS sentinels exactly 3 (no queued) :: [["conv-t06-s2","unknown"],["conv-t06-s1","confirmed"],["conv-t06-s3","started"]]
+PASS external sends once per leg (gen) :: {"s1":1,"s2":1,"s3":1,"other":0}
+PASS rollback committed
+PASS delta package dir exists :: /private/tmp/t07-pi-fix-d3/delta-out/rb-1792769774151-15055
+PASS reforward-B exit 0
+PASS reforward-B committed :: s_done":89,"batches_pending_convert":0,"issues":5,"status":"complete","interrupted":false,"receipt_path":"/private/tmp/t07-pi-fix-d3/recovered-root/legacy-import/migration-receipt.json"}
+REFORWARD_RESULT reforwardId=rf-1792769778427-15356 phase=committed outcome=committed detail=reforward committed
+
+PASS pointer → recovered root :: {"schemaVersion":1,"activeDataRoot":"/private/tmp/t07-pi-fix-d3/recovered-root","cutoverId":"rf-1792769778427-15356","committedAt":"2026-10-23T15:36:19.818Z"}
+PASS reforward receipt present :: /private/tmp/t07-pi-fix-d3/rb-work/reforward-receipt.json
+PASS J4 secondImportZeroGrowth=true in receipt :: {"generatedAt":"2026-10-23T15:36:20.035Z","hashConvention":"manifest-domain sha256 values use the internal double-hash convention (same domain as T04/T05 manifests, comparison-only); delta package payload entries carry true content sha256 (shasum-verifiable)","lineage":{"deltaPackageSha256":"febd90e
+PASS A11 session/message counts equal (recovered root) :: {"sessions":12,"messages":835} → {"sessions":12,"messages":835}
+PASS A11 attachments: every original-new-root file byte-identical in recovered root (subset) :: []
+A11_REIMPORTED_LEGACY_FILES count=3 ["e1bcfbf68c6456df067aa1ad/legacy-file-broken-1-big.bin","e1bcfbf68c6456df067aa1ad/legacy-file-good-1-notes.md","e4e7c6710b86cbd718cfd22e/legacy-file-good-2-chart.json"]
+PASS A11 settings edit recovered
+PASS A12 S1 confirmed + receipt byte-identical (recovered) :: ["{\"platform\":\"telegram\",\"messageIds\":[\"t06-standin-1\"],\"rawJson\":null}","{\"platform\":\"telegram\",\"messageIds\":[\"t06-standin-1\"],\"rawJson\":null}"]
+PASS A12 S2 unknown unchanged (recovered) :: {"delivery_id":"reply:bridge-84807b9ee62d8a6464a92286ff566bcf7b38318e46c49fd7d4ebe6d9c8022f4f","conversation_id":"conv-t06-s2","status":"unknown","platform_receipt_json":null,"error":"platform_returned_no_message_id"}
+PASS A12 S3 settled unknown controlled (recovered) :: {"delivery_id":"reply:bridge-b8adcba2bd4834ec02187b61d40ac6e8e5b55ebc61abebc4280eda9779a927b0","conversation_id":"conv-t06-s3","status":"unknown","platform_receipt_json":null,"error":"worker stopped before a confirmed receipt"}
+D3_ABORT TypeError: fetch failed

@@ -1,0 +1,713 @@
+stderr | desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx > panel_same_owner_get_failures_keep_old_lists_and_two_bundle_writes_preserve_real_partial_result
+[skills-panel] load failed: Error: lingxiFetch /api/skills?agentId=agentA&runtime=1: 403 Forbidden
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/hooks/use-hana-fetch.ts:74:13)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async Promise.all (index 0)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/SkillsPanel.tsx:199:39
+
+stderr | desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx > panel_same_owner_get_failures_keep_old_lists_and_two_bundle_writes_preserve_real_partial_result
+[skills-panel] load failed: Error: lingxiFetch /api/skills/bundles?agentId=agentA: 403 Forbidden
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/hooks/use-hana-fetch.ts:74:13)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async Promise.all (index 1)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/SkillsPanel.tsx:199:39
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx > settings_same_owner_get_failures_keep_old_lists_and_two_bundle_writes_preserve_real_partial_result
+TestingLibraryElementError: Found multiple elements by: [data-testid="skill-bundle-header-settings-source"]
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, style
+[36m<div[39m
+  [33mclass[39m=[32m"_skill-bundle-header_4045f0"[39m
+  [33mdata-testid[39m=[32m"skill-bundle-header-settings-source"[39m
+  [33mdraggable[39m=[32m"true"[39m
+[36m>[39m
+  [36m<button[39m
+    [33maria-label[39m=[32m"settings.skills.expandBundleAriaLabel"[39m
+    [33mclass[39m=[32m"_skill-bundle-caret_4045f0"[39m
+    [33mtitle[39m=[32m"settings.skills.expandBundleAriaLabel"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m>[39m
+    [0m›[0m
+  [36m</button>[39m
+  [36m<div[39m
+    [33mclass[39m=[32m"_skill-bundle-title_4045f0"[39m
+  [36m>[39m
+    [36m<span>[39m
+      [0msettings-source[0m
+    [36m</span>[39m
+    [36m<small>[39m
+      [0m1[0m
+      [0m skills[0m
+    [36m</small>[39m
+  [36m</div>[39m
+  [36m<div[39m
+    [33mclass[39m=[32m"_skill-bundle-actions_4045f0"[39m
+  [36m>[39m
+    [36m<button[39m
+      [33maria-label[39m=[32m"settings.skills.renameBundleAriaLabel"[39m
+      [33mclass[39m=[32m"_skill-bundle-icon-button_4045f0"[39m
+      [33mtitle[39m=[32m"settings.skills.renameBundleTitle"[39m
+      [33mtype[39m=[32m"button"[39m
+    [36m>[39m
+      [36m<svg[39m
+        [33mfill[39m=[32m"none"[39m
+        [33mheight[39m=[32m"13"[39m
+        [33mstroke[39m=[32m"currentColor"[39m
+        [33mstroke-linecap[39m=[32m"round"[39m
+        [33mstroke-linejoin[39m=[32m"round"[39m
+        [33mstroke-width[39m=[32m"1.7"[39m
+        [33mviewBox[39m=[32m"0 0 24 24"[39m
+        [33mwidth[39m=[32m"13"[39m
+      [36m>[39m
+        [36m<path[39m
+          [33md[39m=[32m"M12 20h9"[39m
+        [36m/>[39m
+        [36m<path[39m
+          [33md[39m=[32m"M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"[39m
+        [36m/>[39m
+      [36m</svg>[39m
+    [36m</button>[39m
+    [36m<button[39m
+      [33maria-label[39m=[32m"settings.skills.exportBundleAriaLabel"[39m
+      [33mclass[39m=[32m"_skill-bundle-icon-button_4045f0"[39m
+      [33mtitle[39m=[32m"settings.skills.exportBundleTitle"[39m
+      [33mtype[39m=[32m"button"[39m
+    [36m>[39m
+      [36m<svg[39m
+        [33mfill[39m=[32m"none"[39m
+        [33mheight[39m=[32m"13"[39m
+        [33mstroke[39m=[32m"currentColor"[39m
+        [33mstroke-linecap[39m=[32m"round"[39m
+        [33mstroke-linejoin[39m=[32m"round"[39m
+        [33mstroke-width[39m=[32m"1.7"[39m
+        [33mviewBox[39m=[32m"0 0 24 24"[39m
+        [33mwidth[39m=[32m"13"[39m
+      [36m>[39m
+        [36m<path[39m
+          [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+        [36m/>[39m
+        [36m<polyline[39m
+          [33mpoints[39m=[32m"7 10 12 15 17 10"[39m
+        [36m/>[39m
+        [36m<line[39m
+          [33mx1[39m=[32m"12"[39m
+          [33mx2[39m=[32m"12"[39m
+          [33my1[39m=[32m"15"[39m
+          [33my2[39m=[32m"3"[39m
+        [36m/>[39m
+      [36m</svg>[39m
+    [36m</button>[39m
+    [36m<button[39m
+      [33maria-label[39m=[32m"settings.skills.dissolveBundleAriaLabel"[39m
+      [33mclass[39m=[32m"_skill-card-delete_4045f0"[39m
+      [33mtitle[39m=[32m"settings.skills.dissolveBundleTitle"[39m
+      [33mtype[39m=[32m"button"[39m
+    [36m>[39m
+      [36m<svg[39m
+        [33mfill[39m=[32m"none"[39m
+        [33mheight[39m=[32m"12"[39m
+        [33mstroke[39m=[32m"currentColor"[39m
+        [33mstroke-linecap[39m=[32m"round"[39m
+        [33mstroke-linejoin[39m=[32m"round"[39m
+        [33mstroke-width[39m=[32m"1.5"[39m
+        [33mviewBox[39m=[32m"0 0 24 24"[39m
+        [33mwidth[39m=[32m"12"[39m
+      [36m>[39m
+        [36m<line[39m
+          [33mx1[39m=[32m"18"[39m
+          [33mx2[39m=[32m"6"[39m
+          [33my1[39m=[32m"6"[39m
+          [33my2[39m=[32m"18"[39m
+        [36m/>[39m
+        [36m<line[39m
+          [33mx1[39m=[32m"6"[39m
+          [33mx2[39m=[32m"18"[39m
+          [33my1[39m=[32m"6"[39m
+          [33my2[39m=[32m"18"[39m
+        [36m/>[39m
+      [36m</svg>[39m
+    [36m</button>[39m
+  [36m</div>[39m
+[36m</div>[39m
+
+Ignored nodes: comments, script, style
+[36m<div[39m
+  [33mclass[39m=[32m"_skill-bundle-header_4045f0"[39m
+  [33mdata-testid[39m=[32m"skill-bundle-header-settings-source"[39m
+  [33mdraggable[39m=[32m"false"[39m
+[36m>[39m
+  [36m<button[39m
+    [33maria-label[39m=[32m"settings.skills.expandBundleAriaLabel"[39m
+    [33mclass[39m=[32m"_skill-bundle-caret_4045f0"[39m
+    [33mtitle[39m=[32m"settings.skills.expandBundleAriaLabel"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m>[39m
+    [0m›[0m
+  [36m</button>[39m
+  [36m<div[39m
+    [33mclass[39m=[32m"_skill-bundle-title_4045f0"[39m
+  [36m>[39m
+    [36m<span>[39m
+      [0msettings-source[0m
+    [36m</span>[39m
+    [36m<small>[39m
+      [0m1[0m
+      [0m skills[0m
+    [36m</small>[39m
+  [36m</div>[39m
+  [36m<div[39m
+    [33mclass[39m=[32m"_skill-bundle-actions_4045f0"[39m
+  [36m>[39m
+    [36m<button[39m
+      [33maria-label[39m=[32m"settings.skills.disableBundleAriaLabel"[39m
+      [33mclass[39m=[32m"hana-toggle mini on"[39m
+      [33mdata-testid[39m=[32m"skill-bundle-toggle-settings-source"[39m
+      [33mtitle[39m=[32m"settings.skills.disableBundleTitle"[39m
+      [33mtype[39m=[32m"button"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</div>[39m
+
+(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_settings-tab-content_4045f0 _active_4045f0"[39m
+      [33mdata-tab[39m=[32m"skills"[39m
+    [36m>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_8_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25 _sectionPlain_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_8_-title"[39m
+          [36m>[39m
+            [0msettings.skills.manageTitle[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfacePlain_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"plain"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_skills-dropzone_4045f0"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"18"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"1.5"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"18"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+              [36m/>[39m
+              [36m<polyline[39m
+                [33mpoints[39m=[32m"17 8 12 3 7 8"[39m
+              [36m/>[39m
+              [36m<line[39m
+                [33mx1[39m=[32m"12"[39m
+                [33mx2[39m=[32m"12"[39m
+                [33my1[39m=[32m"3"[39m
+                [33my2[39m=[32m"15"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span>[39m
+              [0msettings.skills.dropzone[0m
+            [36m</span>[39m
+          [36m</div>[39m
+          [36m<input[39m
+            [33maccept[39m=[32m".zip,.skill"[39m
+            [33mhidden[39m=[32m""[39m
+            [33mtype[39m=[32m"file"[39m
+          [36m/>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_skill-bundle-tree_4045f0"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_skill-bundle-toolbar_4045f0"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-label[39m=[32m"settings.skills.createBundleAriaLabel"[39m
+                [33mclass[39m=[32m"_skill-bundle-create_4045f0"[39m
+                [33mtitle[39m=[32m"settings.skills.createBundleTitle"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msettings.skills.createBundleBtn[0m
+              [36m</button>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_skills-list-block_4045f0"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_skill-bundle-group_4045f0"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_skill-bundle-header_4045f0"[39m
+                  [33mdata-testid[39m=[32m"skill-bundle-header-settings-source"[39m
+                  [33mdraggable[39m=[32m"true"[39m
+                [36m>[39m
+                  [36m<button[39m
+                    [33maria-label[39m=[32m"settings.skills.expandBundleAriaLabel"[39m
+                    [33mclass[39m=[32m"_skill-bundle-caret_4045f0"[39m
+                    [33mtitle[39m=[32m"settings.skills.expandBundleAriaLabel"[39m
+                    [33mtype[39m=[32m"button"[39m
+                  [36m>[39m
+                    [0m›[0m
+                  [36m</button>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"_skill-bundle-title_4045f0"[39m
+                  [36m>[39m
+                    [36m<span>[39m
+                      [0msettings-source[0m
+                    [36m</span>[39m
+                    [36m<small>[39m
+                      [0m1[0m
+                      [0m skills[0m
+                    [36m</small>[39m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"_skill-bundle-actions_4045f0"[39m
+                  [36m>[39m
+                    [36m<button[39m
+                      [33maria-label[39m=[32m"settings.skills.renameBundleAriaLabel"[39m
+                      [33mclass[39m=[32m"_skill-bundle-icon-button_4045f0"[39m
+                      [33mtitle[39m=[32m"settings.skills.renameBundleTitle"[39m
+                      [33mtype[39m=[32m"button"[39m
+                    [36m>[39m
+                      [36m<svg[39m
+                        [33mfill[39m=[32m"none"[39m
+                        [33mheight[39m=[32m"13"[39m
+                        [33mstroke[39m=[32m"currentColor"[39m
+                        [33mstroke-linecap[39m=[32m"round"[39m
+                        [33mstroke-linejoin[39m=[32m"round"[39m
+                        [33mstroke-width[39m=[32m"1.7"[39m
+                        [33mviewBox[39m=[32m"0 0 24 24"[39m
+                        [33mwidth[39m=[32m"13"[39m
+                      [36m>[39m
+                        [36m<path[39m
+                          [33md[39m=[32m"M12 20h9"[39m
+                        [36m/>[39m
+                        [36m<path[39m
+                          [33md[39m=[32m"M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"[39m
+                        [36m/>[39m
+                      [36m</svg>[39m
+                    [36m</button>[39m
+                    [36m<button[39m
+                      [33maria-label[39m=[32m"settings.skills.exportBundleAriaLabel"[39m
+                      [33mclass[39m=[32m"_skill-bundle-icon-button_4045f0"[39m
+                      [33mtitle[39m=[32m"settings.skills.exportBundleTitle"[39m
+                      [33mtype[39m=[32m"button"[39m
+                    [36m>[39m
+                      [36m<svg[39m
+                        [33mfill[39m=[32m"none"[39m
+                        [33mheight[39m=[32m"13"[39m
+                        [33mstroke[39m=[32m"currentColor"[39m
+                        [33mstroke-linecap[39m=[32m"round"[39m
+                        [33mstroke-linejoin[39m=[32m"round"[39m
+                        [33mstroke-width[39m=[32m"1.7"[39m
+                        [33mviewBox[39m=[32m"0 0 24 24"[39m
+                        [33mwidth[39m=[32m"13"[39m
+                      [36m>[39m
+                        [36m<path[39m
+                          [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"...
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_settings-tab-content_4045f0 _active_4045f0"[39m
+        [33mdata-tab[39m=[32m"skills"[39m
+      [36m>[39m
+        [36m<section[39m
+          [33maria-labelledby[39m=[32m"_r_8_-title"[39m
+          [33mclass[39m=[32m"_section_c3cd25 _sectionPlain_c3cd25"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+              [33mid[39m=[32m"_r_8_-title"[39m
+            [36m>[39m
+              [0msettings.skills.manageTitle[0m
+            [36m</h2>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_surface_c3cd25 _surfacePlain_c3cd25 _sectionBody_c3cd25"[39m
+            [33mdata-settings-surface[39m=[32m"plain"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_skills-dropzone_4045f0"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"18"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.5"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"18"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"[39m
+                [36m/>[39m
+                [36m<polyline[39m
+                  [33mpoints[39m=[32m"17 8 12 3 7 8"[39m
+                [36m/>[39m
+                [36m<line[39m
+                  [33mx1[39m=[32m"12"[39m
+                  [33mx2[39m=[32m"12"[39m
+                  [33my1[39m=[32m"3"[39m
+                  [33my2[39m=[32m"15"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<span>[39m
+                [0msettings.skills.dropzone[0m
+              [36m</span>[39m
+            [36m</div>[39m
+            [36m<input[39m
+              [33maccept[39m=[32m".zip,.skill"[39m
+              [33mhidden[39m=[32m""[39m
+              [33mtype[39m=[32m"file"[39m
+            [36m/>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_skill-bundle-tree_4045f0"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_skill-bundle-toolbar_4045f0"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33maria-label[39m=[32m"settings.skills.createBundleAriaLabel"[39m
+                  [33mclass[39m=[32m"_skill-bundle-create_4045f0"[39m
+                  [33mtitle[39m=[32m"settings.skills.createBundleTitle"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [0msettings.skills.createBundleBtn[0m
+                [36m</button>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_skills-list-block_4045f0"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_skill-bundle-group_4045f0"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"_skill-bundle-header_4045f0"[39m
+                    [33mdata-testid[39m=[32m"skill-bundle-header-settings-source"[39m
+                    [33mdraggable[39m=[32m"true"[39m
+                  [36m>[39m
+                    [36m<button[39m
+                      [33maria-label[39m=[32m"settings.skills.expandBundleAriaLabel"[39m
+                      [33mclass[39m=[32m"_skill-bundle-caret_4045f0"[39m
+                      [33mtitle[39m=[32m"settings.skills.expandBundleAriaLabel"[39m
+                      [33mtype[39m=[32m"button"[39m
+                    [36m>[39m
+                      [0m›[0m
+                    [36m</button>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"_skill-bundle-title_4045f0"[39m
+                    [36m>[39m
+                      [36m<span>[39m
+                        [0msettings-source[0m
+                      [36m</span>[39m
+                      [36m<small>[39m
+                        [0m1[0m
+                        [0m skills[0m
+                      [36m</small>[39m
+                    [36m</div>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"_skill-bundle-actions_4045f0"[39m
+                    [36m>[39m
+                      [36m<button[39m
+                        [33maria-label[39m=[32m"settings.skills.renameBundleAriaLabel"[39m
+                        [33mclass[39m=[32m"_skill-bundle-icon-button_4045f0"[39m
+                        [33mtitle[39m=[32m"settings.skills.renameBundleTitle"[39m
+                        [33mtype[39m=[32m"button"[39m
+                      [36m>[39m
+                        [36m<svg[39m
+                          [33mfill[39m=[32m"none"[39m
+                          [33mheight[39m=[32m"13"[39m
+                          [33mstroke[39m=[32m"currentColor"[39m
+                          [33mstroke-linecap[39m=[32m"round"[39m
+                          [33mstroke-linejoin[39m=[32m"round"[39m
+                          [33mstroke-width[39m=[32m"1.7"[39m
+                          [33mviewBox[39m=[32m"0 0 24 24"[39m
+                          [33mwidth[39m=[32m"13"[39m
+                        [36m>[39m
+                          [36m<path[39m
+                            [33md[39m=[32m"M12 20h9"[39m
+                          [36m/>[39m
+                          [36m<path[39m
+                            [33md[39m=[32m"M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"[39m
+                          [36m/>[39m
+                        [36m</svg>[39m
+                      [36m</button>[39m
+                      [36m<button[39m
+                        [33maria-label[39m=[32m"settings.skills.exportBundleAriaLabel"[39m
+                        [33mclass[39m=[32m"_skill-bundle-icon-button_4045f0"[39m
+                        [33mtitle[39m=[32m"settings.skills.exportBundleTitle"[39m
+                        [33mtype[39m=[32m"button"[39m
+                      [36m>[39m
+                        [36m<svg[39m
+                          [33mfill[39m=[32m"none"[39m
+                          [33mheight[39m=[32m"13"[39m
+                          [33mstroke[39m=[32m"currentColor"[39m
+                          [33mstroke-linecap[39m=[32m"round"[39m
+                          [33mstroke-linejoin[39m=[32m"round"[39m
+                   ...
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx:109:11
+    107|     const b: Bundle = (await h.ownerRequest('POST', `${bundlePath}?age…
+    108|     h.mount();
+    109|     await waitFor(() => expect(screen.getByTestId(`skill-bundle-header…
+       |           ^
+    110|     fireEvent.click(within(screen.getByTestId(`skill-bundle-header-${a…
+    111|     await waitFor(() => expect(screen.getAllByText(skillName).length).…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx > panel_same_owner_get_failures_keep_old_lists_and_two_bundle_writes_preserve_real_partial_result
+AssertionError: expected [ { …(4) }, { …(4) }, { …(4) } ] to have a length of 2 but got 3
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_floatingPanel_c0da78"[39m
+        [33mid[39m=[32m"skillsPanel"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_floatingPanelInner_c0da78"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_floatingPanelHeader_c0da78"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"_floatingPanelTitle_c0da78"[39m
+            [36m>[39m
+              [0mskills.panel.title[0m
+            [36m</h2>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m"common.close"[39m
+              [33mclass[39m=[32m"_floatingPanelClose_c0da78"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"14"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"14"[39m
+              [36m>[39m
+                [36m<line[39m
+                  [33mx1[39m=[32m"18"[39m
+                  [33mx2[39m=[32m"6"[39m
+                  [33my1[39m=[32m"6"[39m
+                  [33my2[39m=[32m"18"[39m
+                [36m/>[39m
+                [36m<line[39m
+                  [33mx1[39m=[32m"6"[39m
+                  [33mx2[39m=[32m"18"[39m
+                  [33my1[39m=[32m"6"[39m
+                  [33my2[39m=[32m"18"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_floatingPanelBody_c0da78"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_dropSurface_5ad96c"[39m
+              [33mdata-testid[39m=[32m"skills-panel-drop-surface"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_agentTabsFrame_c23dd6"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33maria-label[39m=[32m"skills.panel.previousAgent"[39m
+                  [33mclass[39m=[32m"_agentTabsArrow_c23dd6"[39m
+                  [33mdisabled[39m=[32m""[39m
+                  [33mtitle[39m=[32m"skills.panel.previousAgent"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33maria-hidden[39m=[32m"true"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mheight[39m=[32m"14"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"2"[39m
+                    [33mviewBox[39m=[32m"0 0 24 24"[39m
+                    [33mwidth[39m=[32m"14"[39m
+                  [36m>[39m
+                    [36m<polyline[39m
+                      [33mpoints[39m=[32m"15 18 9 12 15 6"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                [36m</button>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_agentTabsShell_c23dd6"[39m
+                  [33mdata-testid[39m=[32m"agent-tab-scroller"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33maria-label[39m=[32m"skills.panel.agentTabs"[39m
+                    [33mclass[39m=[32m"_agentTabs_c23dd6"[39m
+                    [33mrole[39m=[32m"tablist"[39m
+                  [36m>[39m
+                    [36m<button[39m
+                      [33maria-selected[39m=[32m"true"[39m
+                      [33mclass[39m=[32m"_agentTab_c23dd6"[39m
+                      [33mdata-active[39m=[32m"true"[39m
+                      [33mdata-agent-id[39m=[32m"__all_skills__"[39m
+                      [33mrole[39m=[32m"tab"[39m
+                      [33mtabindex[39m=[32m"0"[39m
+                      [33mtype[39m=[32m"button"[39m
+                    [36m>[39m
+                      [36m<span[39m
+                        [33maria-hidden[39m=[32m"true"[39m
+                        [33mclass[39m=[32m"_agentTabAvatarWrap_c23dd6"[39m
+                      [36m>[39m
+                        [36m<span[39m
+                          [33maria-hidden[39m=[32m"true"[39m
+                          [33mclass[39m=[32m"_allAvatar_5ad96c"[39m
+                        [36m>[39m
+                          [36m<svg[39m
+                            [33mfill[39m=[32m"none"[39m
+                            [33mheight[39m=[32m"22"[39m
+                            [33mstroke[39m=[32m"currentColor"[39m
+                            [33mstroke-linecap[39m=[32m"round"[39m
+                            [33mstroke-linejoin[39m=[32m"round"[39m
+                            [33mstroke-width[39m=[32m"1.5"[39m
+                            [33mviewBox[39m=[32m"0 0 24 24"[39m
+                            [33mwidth[39m=[32m"22"[39m
+                          [36m>[39m
+                            [36m<path[39m
+                              [33md[39m=[32m"M10.5766 8.70419C11.2099 7.56806 11.5266 7 12 7C12.4734 7 12.7901 7.56806 13.4234 8.70419L13.5873 8.99812C13.7672 9.32097 13.8572 9.48239 13.9975 9.5889C14.1378 9.69541 14.3126 9.73495 14.6621 9.81402L14.9802 9.88601C16.2101 10.1643 16.825 10.3034 16.9713 10.7739C17.1176 11.2443 16.6984 11.7345 15.86 12.715L15.643 12.9686C15.4048 13.2472 15.2857 13.3865 15.2321 13.5589C15.1785 13.7312 15.1965 13.9171 15.2325 14.2888L15.2653 14.6272C15.3921 15.9353 15.4554 16.5894 15.0724 16.8801C14.6894 17.1709 14.1137 16.9058 12.9622 16.3756L12.6643 16.2384C12.337 16.0878 12.1734 16.0124 12 16.0124C11.8266 16.0124 11.663 16.0878 11.3357 16.2384L11.0378 16.3756C9.88634 16.9058 9.31059 17.1709 8.92757 16.8801C8.54456 16.5894 8.60794 15.9353 8.7347 14.6272L8.76749 14.2888C8.80351 13.9171 8.82152 13.7312 8.76793 13.5589C8.71434 13.3865 8.59521 13.2472 8.35696 12.9686L8.14005 12.715C7.30162 11.7345 6.88241 11.2443 7.02871 10.7739C7.17501 10.3034 7.78993 10.1643 9.01977 9.88601L9.33794 9.81402C9.68743 9.73495 9.86217 9.69541 10.0025 9.5889C10.1428 9.48239 10.2328 9.32097 10.4127 8.99812L10.5766 8.70419Z"[39m
+                            [36m/>[39m
+                            [36m<path[39m
+                              [33md[39m=[32m"M12 2V4"[39m
+                              [33mopacity[39m=[32m"0.5"[39m
+                            [36m/>[39m
+                            [36m...
+
+- Expected
++ Received
+
+- 2
++ 3
+
+ ❯ desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx:134:94
+
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 4 unhandled errors during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+RangeError: Maximum call stack size exceeded
+ ❯ registerCalls node_modules/@vitest/spy/dist/index.js:383:23
+ ❯ addToast node_modules/@vitest/spy/dist/index.js:288:3
+ ❯ desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx:61:125
+
+ ❯ addToast node_modules/@vitest/spy/dist/index.js:332:34
+ ❯ desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx:61:125
+ ❯ addToast node_modules/@vitest/spy/dist/index.js:332:34
+ ❯ desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx:61:125
+ ❯ addToast node_modules/@vitest/spy/dist/index.js:332:34
+ ❯ desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx:61:125
+ ❯ addToast node_modules/@vitest/spy/dist/index.js:332:34
+
+This error originated in "desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "panel_first_bundles_get_real_scope_denial_is_visible_not_empty_success". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+RangeError: Maximum call stack size exceeded
+ ❯ registerCalls node_modules/@vitest/spy/dist/index.js:383:23
+ ❯ addToast node_modules/@vitest/spy/dist/index.js:288:3
+ ❯ desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx:61:125
+
+ ❯ addToast node_modules/@vitest/spy/dist/index.js:332:34
+ ❯ desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx:61:125
+ ❯ addToast node_modules/@vitest/spy/dist/index.js:332:34
+ ❯ desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx:61:125
+ ❯ addToast node_modules/@vitest/spy/dist/index.js:332:34
+ ❯ desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx:61:125
+ ❯ addToast node_modules/@vitest/spy/dist/index.js:332:34
+
+This error originated in "desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "panel_same_owner_get_failures_keep_old_lists_and_two_bundle_writes_preserve_real_partial_result". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+RangeError: Maximum call stack size exceeded
+ ❯ registerCalls node_modules/@vitest/spy/dist/index.js:383:23
+ ❯ addToast node_modules/@vitest/spy/dist/index.js:288:3
+ ❯ desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx:61:125
+
+ ❯ addToast node_modules/@vitest/spy/dist/index.js:332:34
+ ❯ desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx:61:125
+ ❯ addToast node_modules/@vitest/spy/dist/index.js:332:34
+ ❯ desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx:61:125
+ ❯ addToast node_modules/@vitest/spy/dist/index.js:332:34
+ ❯ desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx:61:125
+ ❯ addToast node_modules/@vitest/spy/dist/index.js:332:34
+
+This error originated in "desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "panel_same_owner_get_failures_keep_old_lists_and_two_bundle_writes_preserve_real_partial_result". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+RangeError: Maximum call stack size exceeded
+ ❯ registerCalls node_modules/@vitest/spy/dist/index.js:383:23
+ ❯ addToast node_modules/@vitest/spy/dist/index.js:288:3
+ ❯ desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx:61:125
+
+ ❯ addToast node_modules/@vitest/spy/dist/index.js:332:34
+ ❯ desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx:61:125
+ ❯ addToast node_modules/@vitest/spy/dist/index.js:332:34
+ ❯ desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx:61:125
+ ❯ addToast node_modules/@vitest/spy/dist/index.js:332:34
+ ❯ desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx:61:125
+ ❯ addToast node_modules/@vitest/spy/dist/index.js:332:34
+
+This error originated in "desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "panel_same_owner_get_failures_keep_old_lists_and_two_bundle_writes_preserve_real_partial_result". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+

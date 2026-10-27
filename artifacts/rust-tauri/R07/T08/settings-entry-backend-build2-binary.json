@@ -1,0 +1,12 @@
+{
+  "scope": "DEVELOPMENT_BUILD_FIXED_COPY_NOT_FROZEN_ACCEPTANCE",
+  "buildReceipt": "artifacts/rust-tauri/R07/T08/settings-entry-backend-build2.json",
+  "buildReceiptSha256": "d575f4ce1b94fe2945bfc9287a17984953112aa9f1284d69d519b6383885b1b3",
+  "binary": "/private/tmp/lingxi-r07-tests/binaries/settings-entry-backend-build2/lingxi-service",
+  "binarySha256": "d7b56a69dfb584747618d8f0eb36d6ca92484b496158328c2fbc426ba4db2ece",
+  "bytes": 255584512,
+  "sourceFingerprintBefore": "54ade8c3f1055bc70fa36e7b3a56da243593dfe2054c69aa23e293da5968ae7f",
+  "sourceFingerprintAfter": "54ade8c3f1055bc70fa36e7b3a56da243593dfe2054c69aa23e293da5968ae7f",
+  "sourceUnchanged": true,
+  "sourceBinarySha256AtCopy": "d7b56a69dfb584747618d8f0eb36d6ca92484b496158328c2fbc426ba4db2ece"
+}

@@ -1,0 +1,19 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_adapters-6c8c124e84396616)
+
+running 1 test
+test browser::host::manual_capture::same_page_native_human_takeover_records_only_owned_target ... MANUAL_READY=/private/tmp/lingxi-r07-t04-manual-r7/capture-56067bbb104cf696a3352af7bf8af14b/ready.json
+
+thread 'browser::host::manual_capture::same_page_native_human_takeover_records_only_owned_target' (1072047) panicked at crates/lingxi-adapters/src/browser/manual_capture.rs:324:9:
+等待原生表单操作超时，已准备清理自有Chrome；证据目录 /private/tmp/lingxi-r07-t04-manual-r7/capture-56067bbb104cf696a3352af7bf8af14b
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    browser::host::manual_capture::same_page_native_human_takeover_records_only_owned_target
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 141 filtered out; finished in 120.94s
+
+error: test failed, to rerun pass `-p lingxi-adapters --lib`

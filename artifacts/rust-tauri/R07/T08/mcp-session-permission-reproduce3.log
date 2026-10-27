@@ -1,0 +1,55 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r07_t08_mcp_session_permissions") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 21s
+     Running tests/r07_t08_mcp_session_permissions.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_mcp_session_permissions-02f840a290300758)
+
+running 5 tests
+LINGXI_AUTH_REJECTED request_id="req-bf3401af91434a2e4588543b531f7f70" method=POST path=/lingxi/v1/mcp/session-permissions status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:49475
+实际grant读后归档恢复交错：HTTP=200 response={"capability":"mcp.alpha.invoke","ok":true,"persisted":false,"sessionId":"mcp-grant-lifecycle-race","targetId":"tool:mcp:fixture:alpha"} home=/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-session-permission-3f556f7b44747a63
+
+thread 'in_flight_grant_cannot_land_after_real_archive_restore_completed' (3365347) panicked at crates/lingxi-service/tests/r07_t08_mcp_session_permissions.rs:920:5:
+assertion `left == right` failed: 归档恢复已完成，先前读到active的旧在途授权不能迟到插入：{"capability":"mcp.alpha.invoke","ok":true,"persisted":false,"sessionId":"mcp-grant-lifecycle-race","targetId":"tool:mcp:fixture:alpha"}
+  left: 200
+ right: 409
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test in_flight_grant_cannot_land_after_real_archive_restore_completed ... FAILED
+MCP批准观测：stage=first-alpha session=mcp-session-a poll=1 status=200 requestMs=2498 elapsedMs=2498 pendingCount=1
+MCP批准观测：stage=ws-first-alpha session=mcp-ws-session poll=1 status=200 requestMs=1242 elapsedMs=1242 pendingCount=1
+LINGXI_AUTH_REJECTED request_id="req-32992aeb474b6c553bcd35ded9d24e85" method=POST path=/lingxi/v1/mcp/session-permissions status=403 reason=insufficient_scope remote=127.0.0.1:49482
+MCP批准观测：stage=ws-second-alpha session=mcp-ws-session poll=1 status=200 requestMs=1248 elapsedMs=1248 pendingCount=0
+MCP批准观测：stage=fresh-credential-before-restart session=mcp-restart-check poll=1 status=200 requestMs=2486 elapsedMs=2486 pendingCount=0
+MCP批准观测：stage=ws-second-alpha session=mcp-ws-session poll=1 status=200 requestMs=1245 elapsedMs=1245 pendingCount=0
+test actual_ws_prompt_reuses_session_capability_for_second_different_arguments_without_approval ... ok
+MCP批准观测：stage=fresh-credential-before-restart session=mcp-restart-check poll=2 status=200 requestMs=1218 elapsedMs=4207 pendingCount=1
+MCP批准观测：stage=other-session-alpha session=mcp-session-b poll=1 status=200 requestMs=2420 elapsedMs=2420 pendingCount=0
+MCP批准观测：stage=other-session-alpha session=mcp-session-b poll=2 status=200 requestMs=1214 elapsedMs=4136 pendingCount=1
+
+thread 'credential_revocation_and_same_home_real_restart_do_not_restore_temporary_grants' (3365346) panicked at crates/lingxi-service/tests/r07_t08_mcp_session_permissions.rs:414:14:
+called `Result::unwrap()` on an `Err` value: Serve { source: Custom { kind: Other, error: McpSettingsError { status: 500, code: "mcp_cleanup_unconfirmed", message: "MCP 子进程或连接退出未确认：MCP 连接或子进程回收未确认：停止自有进程组失败：Operation not permitted (os error 1); owned_pid=24956, actual_pgid=-1", saved: false, runtime_applied: false, results: [] } } }
+test credential_revocation_and_same_home_real_restart_do_not_restore_temporary_grants ... FAILED
+MCP批准观测：stage=other-capability-beta session=mcp-session-a poll=1 status=200 requestMs=1204 elapsedMs=1204 pendingCount=0
+MCP批准观测：stage=other-capability-beta session=mcp-session-a poll=2 status=200 requestMs=1900 elapsedMs=3606 pendingCount=0
+
+thread 'paired_scope_grants_same_session_exact_capability_across_arguments_without_persisting' (3365349) panicked at crates/lingxi-service/tests/r07_t08_mcp_session_permissions.rs:353:17:
+真实批准超时，不延长预算：stage=other-capability-beta session=mcp-session-a home=/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-session-permission-44874c7929adfad4 polls=3 elapsedMs=5322 error=Elapsed(()) lastHTTP=Some(Object {"approvals": Array []}) actualRuns=Some("[{\"runId\":\"run_000001a14eb8f4c3_000001\",\"status\":\"completed\",\"reason\":\"completed.with_final\",\"createdAt\":1792322106563,\"updatedAt\":1792322110288},{\"runId\":\"run_000001a14eb90cea_000002\",\"status\":\"completed\",\"reason\":\"completed.with_final\",\"createdAt\":1792322112746,\"updatedAt\":1792322112765},{\"runId\":\"run_000001a14eb92b59_000004\",\"status\":\"waiting_approval\",\"reason\":null,\"createdAt\":1792322120537,\"updatedAt\":1792322120537}]") actualEvents=Some("{\"from\":\"queued\",\"to\":\"running\",\"type\":\"run_state_changed\"}\n{\"toolCall\":{\"argsDigest\":{\"algorithm\":\"sha256\",\"canonicalization\":\"lingxi-canonical-json-v1\",\"hex\":\"2bfd14f43d17fc7cea24e0917a8879b4b2f880b8baeec1b9d90fbaad655e71bd\"},\"target\":\"tool:mcp:fixture:alpha\",\"toolCallId\":\"run_000001a14eb8f4c3_000001-tc0001\"},\"type\":\"tool_call_started\"}\n{\"from\":\"running\",\"reason\":\"approval_required\",\"to\":\"waiting_approval\",\"type\":\"run_state_changed\"}\n{\"from\":\"waiting_approval\",\"reason\":\"approval_resolved\",\"to\":\"running\",\"type\":\"run_state_changed\"}\n{\"result\":{\"content\":[{\"text\":\"{\\\"_meta\\\":{\\\"progressToken\\\":1},\\\"arguments\\\":{\\\"n\\\":1},\\\"name\\\":\\\"alpha\\\"}\",\"type\":\"text\"}],\"status\":\"success\",\"truncated\":false},\"toolCallId\":\"run_000001a14eb8f4c3_000001-tc0001\",\"type\":\"tool_call_completed\"}\n{\"from\":\"running\",\"reason\":\"completed.with_final\",\"to\":\"completed\",\"type\":\"run_state_changed\"}\n{\"from\":\"queued\",\"to\":\"running\",\"type\":\"run_state_changed\"}\n{\"toolCall\":{\"argsDigest\":{\"algorithm\":\"sha256\",\"canonicalization\":\"lingxi-canonical-json-v1\",\"hex\":\"363379742f80b51bdb9206579af7754911543079b9399cb3fc315fb199f476e8\"},\"target\":\"tool:mcp:fixture:alpha\",\"toolCallId\":\"run_000001a14eb90cea_000002-tc0001\"},\"type\":\"tool_call_started\"}\n{\"result\":{\"content\":[{\"text\":\"{\\\"_meta\\\":{\\\"progressToken\\\":2},\\\"arguments\\\":{\\\"n\\\":2},\\\"name\\\":\\\"alpha\\\"}\",\"type\":\"text\"}],\"status\":\"success\",\"truncated\":false},\"toolCallId\":\"run_000001a14eb90cea_000002-tc0001\",\"type\":\"tool_call_completed\"}\n{\"from\":\"running\",\"reason\":\"completed.with_final\",\"to\":\"completed\",\"type\":\"run_state_changed\"}\n{\"from\":\"queued\",\"to\":\"running\",\"type\":\"run_state_changed\"}\n{\"toolCall\":{\"argsDigest\":{\"algorithm\":\"sha256\",\"canonicalization\":\"lingxi-canonical-json-v1\",\"hex\":\"f3e0792e105e2bfe88e7b3bab5097b93a59a8c5b239fe3c6f87a8d0f72ab9032\"},\"target\":\"tool:mcp:fixture:beta\",\"toolCallId\":\"run_000001a14eb92b59_000004-tc0001\"},\"type\":\"tool_call_started\"}\n{\"from\":\"running\",\"reason\":\"approval_required\",\"to\":\"waiting_approval\",\"type\":\"run_state_changed\"}")
+test paired_scope_grants_same_session_exact_capability_across_arguments_without_persisting ... FAILED
+MCP批准观测：stage=restored-session-alpha session=mcp-scope-check poll=1 status=200 requestMs=2405 elapsedMs=2405 pendingCount=1
+MCP批准观测：stage=restarted-connector-alpha session=mcp-scope-check poll=1 status=200 requestMs=2416 elapsedMs=2416 pendingCount=0
+MCP批准观测：stage=restarted-connector-alpha session=mcp-scope-check poll=2 status=200 requestMs=1239 elapsedMs=4157 pendingCount=1
+test missing_scope_foreign_session_and_damaged_payload_never_grant_and_connector_restart_invalidates ... ok
+
+failures:
+
+failures:
+    credential_revocation_and_same_home_real_restart_do_not_restore_temporary_grants
+    in_flight_grant_cannot_land_after_real_archive_restore_completed
+    paired_scope_grants_same_session_exact_capability_across_arguments_without_persisting
+
+test result: FAILED. 2 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 32.99s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t08_mcp_session_permissions`

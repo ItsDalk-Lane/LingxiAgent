@@ -1,0 +1,18 @@
+
+running 10 tests
+test daily_boundaries_are_local_and_failures_or_remaining_work_retry_after_one_hour ... ok
+test slots_are_unix_aligned_and_manual_requests_have_independent_cooldown ... ok
+test auto_heartbeat_requires_explicit_agent_opt_in_and_master_gate ... ok
+test real_resource_listing_shape_is_strict_and_no_bad_entry_becomes_an_empty_scan ... ok
+test output_segments_preserve_current_locale_labels_and_cannot_traverse ... ok
+test jian_status_keeps_concurrent_user_body_and_program_owned_start_snapshot ... ok
+test unchanged_jian_is_still_planned_so_model_can_continue_or_skip_using_saved_state ... ok
+test patrol_plan_excludes_own_outputs_and_includes_both_root_and_first_level_jian ... ok
+test patrol_log_is_utf8_and_display_is_limited_without_modifying_original_material ... ok
+test deeper_hidden_unknown_and_duplicate_jian_roots_are_refused ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.53s
+     Running tests/r07_heartbeat_plan.rs (rust/target/debug/deps/r07_heartbeat_plan-f858c06a3a865289)

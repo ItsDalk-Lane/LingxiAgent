@@ -1,0 +1,20 @@
+{
+ "schema": "lingxi.r08.suite-receipt.v1",
+ "suite": "r08_desktop_boundary_vitest",
+ "exitCode": 0,
+ "guardFailures": [],
+ "argv": [
+  "npx",
+  "vitest",
+  "run",
+  "desktop/src/react/__tests__/host/r08-a03-web-desktop-host.test.tsx",
+  "desktop/src/react/__tests__/services/r08-a01-ui-projection.test.ts",
+  "desktop/src/react/__tests__/services/r08-p1-data-epoch-hello.test.ts",
+  "desktop/src/react/__tests__/services/r08-session-legacy-compat.test.ts",
+  "desktop/src/react/__tests__/services/r08-pin-projection-compat.test.ts",
+  "desktop/src/react/__tests__/services/r08-continue-disposal-compat.test.ts",
+  "desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts"
+ ],
+ "durationSecs": 6.137,
+ "logSha256": "ea914435268992f831d02354ecbfc19f8cccee876292adddb75af04d5bb20197"
+}

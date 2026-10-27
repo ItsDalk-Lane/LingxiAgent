@@ -1,0 +1,316 @@
+{
+  "schema": "lingxi-rust-tauri/PERFORMANCE_THRESHOLDS/1",
+  "task": "R00-T06",
+  "frozen_at": "2026-09-23T23:20:53.000Z",
+  "frozen_at_basis": "rev1 首次写入时刻（文件系统 mtime 2026-09-24T07:20:53+0800，R1 验收 F05 取证在案）。早先草稿字段误写 23:15:00Z（执行者拟定的名义时刻，早于其引用的最终 run 数据产出时刻 23:17:18Z，不可能成立）——R1 修复轮按可核证文件系统历史更正，见 change_log rev2。门槛数值的冻结语义不变。",
+  "frozen_before_rust_results": {
+    "verified": true,
+    "evidence": "冻结时工作区（HEAD 64c302ec482888222833136d0d20c64d4cbb350b）不存在 rust/ 目录、不存在任何 Rust 侧性能测量数据；G2/G3 组别尚未实现。R1 修复轮（2026-09-24T01:5xZ）再次独立复核：仍无 rust/ 目录、无 Cargo.toml、无任何 Rust 性能数据——该前提与任何时间戳字段无关地持续成立。",
+    "rule": "本文件先于 Rust 实现结果冻结（任务书 05 §6.2 与 R00-A12）。之后任何修改必须附独立变更记录（change_log），不得为使测试通过而放宽。"
+  },
+  "measurement_protocol": "docs/rust-tauri/R00/R00-T06_PROTOCOL.md",
+  "baseline": "artifacts/rust-tauri/R00/T06/BASELINE_BENCHMARK.json",
+  "comparison_groups": {
+    "G1": "旧 Electron+Node（R00-T06 已实测，本文件所有 baseline_* 数字来自它）",
+    "G2": "旧 Electron+Rust（R08 起测）",
+    "G3": "Tauri+Rust（R09/R10 起测）"
+  },
+  "platforms": {
+    "darwin-arm64": {
+      "status": "MEASURED",
+      "hardware": "Apple M3 Ultra（Mac15,14）28 核 / 96GiB / macOS 27.0 (26A428) / AC 电源 / lowpowermode=0",
+      "baseline_head": "64c302ec482888222833136d0d20c64d4cbb350b",
+      "baseline_build": "发布优化构建（dist-server/mac-arm64 生产 bundle + electron-builder --dir Lingxi.app，一次性 ed25519 测试签名）"
+    },
+    "darwin-x64": {
+      "status": "PENDING_MEASUREMENT",
+      "note": "在对应平台按同一协议实测后填充，不得由 arm64 数据外推"
+    },
+    "win32-x64": {
+      "status": "PENDING_MEASUREMENT",
+      "note": "同上；进程内存口径届时按协议 §6 的 Windows 等价（RSS 求和）执行并登记差异"
+    },
+    "linux-x64": {
+      "status": "PENDING_MEASUREMENT",
+      "note": "同上"
+    }
+  },
+  "metrics": [
+    {
+      "id": "cancel_local_ack",
+      "name": "受控本地取消受理",
+      "threshold": {
+        "metric": "p95",
+        "op": "<=",
+        "value": 250,
+        "unit": "ms"
+      },
+      "applies_to": [
+        "G2",
+        "G3"
+      ],
+      "scope": "全部平台；发布优化构建；协议 §7 stub hang 模式（请求停留在流中时 WS abort → abort_result 受理），模型等待为本地确定性模拟",
+      "baseline_g1": {
+        "p95_ms": 6.46,
+        "median_ms": 2.99,
+        "n": 32,
+        "note": "server 腿 WS abort→abort_result；measurement: run-2026-09-23T23-12-26-989Z"
+      },
+      "noise_tolerance": "旧系统实测 CV≈0.4（stdev≈1.47ms）；250ms 门槛相对基线有 >40 倍裕度，单机噪声不可能影响判定；若 p95 落在 200–250ms 区间需复查测量条件而非放宽门槛",
+      "rationale": "任务书 05 §6.2 建议起始值（p95 ≤ 250ms）。测量边界：service 收到取消到持久化 cancel_requested/返回确认，不等同外部操作已撤销。",
+      "source": "taskbook-recommended"
+    },
+    {
+      "id": "process_tree_cleanup",
+      "name": "进程树清理",
+      "threshold": [
+        {
+          "case": "正常终止（SIGTERM/优雅退出）",
+          "metric": "total_window",
+          "op": "<=",
+          "value": 3000,
+          "unit": "ms"
+        },
+        {
+          "case": "强制终止（SIGKILL 兜底后）",
+          "metric": "total_window",
+          "op": "<=",
+          "value": 5000,
+          "unit": "ms"
+        }
+      ],
+      "applies_to": [
+        "G2",
+        "G3"
+      ],
+      "scope": "全部平台；发布优化构建；SIGTERM 主进程 → 捕获的整树全部 PID 消失（协议 §10 口径：退出前捕获树，事后按 PID 存活核对，防 reparent 漏算）；哨兵进程不得被杀",
+      "baseline_g1": {
+        "desktop_teardown_all_gone_ms": {
+          "median": 258.71,
+          "p95": 307.56,
+          "n": 32
+        },
+        "server_sigterm_tree_exit_ms": {
+          "median": 93.59,
+          "n": 32
+        },
+        "note": "run-2026-09-23T23-12-26-989Z / run-2026-09-23T22-47-51-720Z（R1 修复 F01b：原值 258.3/260.7 系被弃桌面 run run-2026-09-23T22-23-53-802Z 的数字误植，note 却引用最终 run；已按最终 run raw 重算更正，门槛 3000/5000ms 不变）"
+      },
+      "noise_tolerance": "桌面退出最终 run 实测 CV≈0.046（stdev≈12.1ms，cold 序列；warm 0.056/≈14.6ms）——噪声带 <20ms；3s/5s 窗口裕度充足，无噪声借口（R1 修复 F01b：原「CV≈0.004（≈1ms）」同源于被弃 run，已更正）",
+      "rationale": "任务书 05 §6.2 建议值；平台无法证明清理则该平台该项记 FAIL，不得豁免。",
+      "source": "taskbook-recommended"
+    },
+    {
+      "id": "local_business_history_read",
+      "name": "本地业务处理/历史读取（1000 条长会话首页）",
+      "threshold": {
+        "metric": "p95",
+        "op": "<=",
+        "value": 24,
+        "unit": "ms"
+      },
+      "applies_to": [
+        "G2",
+        "G3"
+      ],
+      "scope": "darwin-arm64 已有基线的平台；发布优化构建；GET /api/sessions/messages?limit=50 首屏（协议 §8 语料 1000 条、keepalive、127.0.0.1）",
+      "baseline_g1": {
+        "median_ms": 1.79,
+        "p95_ms": 3.66,
+        "max_ms": 25.99,
+        "n": 32
+      },
+      "noise_tolerance": "基线 max 26ms（首样本冷缓存离群）；门槛取「max(2×baseline_p95, baseline_p95+20ms)=24ms」冻结，覆盖实测噪声带；新系统同条件采样 n≥30，若 p95>24ms 记 FAIL（不得以离群为由重采样到通过）",
+      "rationale": "任务书 05 §6.2「p95 不劣于基线 10% 以上」+ 事前量化噪声容限；网络/模型等待已按协议 §7 分离，本项不含模型等待。",
+      "source": "taskbook-recommended+noise-adjusted",
+      "note": "其余本地读取（短会话首页、ETag 304、全量翻页）同规则：p95 ≤ max(2×基线同项 p95, 基线同项 p95+20ms)，基线同项数值见 BASELINE_BENCHMARK.json"
+    },
+    {
+      "id": "fixed_prefix_overhead",
+      "name": "提示词/固定工具开销",
+      "threshold": {
+        "metric": "bytes",
+        "op": "<=",
+        "value": 10626,
+        "unit": "bytes"
+      },
+      "applies_to": [
+        "G2",
+        "G3"
+      ],
+      "scope": "全部平台；同任务（同一 system prompt 来源、同一工具能力面、tokenizer 与语言设置相同、功能开关相同）；字节定义与测量命令见 baseline_g1.measurement（主聊天会话 system prompt UTF-8 字节，诊断与 wire 双通道）",
+      "baseline_g1": {
+        "system_prompt_bytes": 10626,
+        "main_chat_request_body_bytes": 28599,
+        "title_sidecall_request_body_bytes": 666,
+        "visible_tool_count": 7,
+        "tools_schema_json_bytes": 10287,
+        "measurement": {
+          "session_type": "主聊天会话（POST /api/sessions/new {memoryEnabled:false, permissionMode:\"operate\"} → WS /ws prompt），发布优化产物 dist-server/mac-arm64，冻结夹具（stub 模型 bench-fast、memory 后台关闭）",
+          "channels": [
+            "产品诊断：LINGXI_CACHE_CONTRACT_DEBUG=1 的 cache_contract（drift_auto_re renew 后）systemPromptBytes=10626（core/session-coordinator.ts:380；字节定义 lib/llm/cache-prefix-contract.ts:81 = 会话最终 system prompt 的 UTF-8 字节）",
+            "wire 实测：主聊天请求（stream=true、toolCount=7）首条 system 消息 UTF-8 字节=10626；tools 数组 JSON=10287B；user 消息为数组形态含上下文（≈7.2KB，随提示文本变化，不计入固定前缀）"
+          ],
+          "evidence": "artifacts/rust-tauri/R00/T06/raw/server/fixed-prefix-probe-*.json（可复现命令：node scripts/rust-tauri/r00-t06-probe-fixed-prefix.mjs）；stub journal 交叉：stream 相主聊天请求 32 行 median 28,599B、cancel 相（hang，按 seq 去重）32 行 median 28,591B",
+          "request_body_explained": "666B 请求 = 每样本首轮后的「对话标题生成器」侧线调用（system≈403B、无 tools、用户消息含首轮对话摘要故携带 bench marker——曾被误当作主聊天请求体）；28,599/28,591B = 主聊天请求体（system 10,626B + tools schema 10,287B + user 上下文数组；stream 相 28,599 为 canonical 同任务口径）。G2/G3 同口径以主聊天请求为准。"
+        },
+        "note": "R1 修复 F04：原值 10620 无落盘证据且与实测差 6B；按真实会话路径双通道实测更正为 10626（数值溯源更正，非为通过任何测试放宽——G2/G3 结果尚不存在）。"
+      },
+      "noise_tolerance": "system prompt 字节测量确定性（同输入同输出：诊断与 wire 双通道同值 10626，跨样本 0 波动）；请求体总量随提示文本长度有 ±几十 B 变化（marker 文本差异），不构成该门槛的判定变量。容限 0：除已批准的显式功能增量（须在变更记录中列出条目与字节数）外不得超基线",
+      "rationale": "任务书 05 §6.2「不高于旧同任务固定前缀，除已批准增量」；不得删除必要能力换分数。",
+      "source": "taskbook-recommended"
+    },
+    {
+      "id": "long_run_resource_growth",
+      "name": "长时资源增长",
+      "threshold": {
+        "duration": "2 小时或 1000 次受控任务（先到者）",
+        "rule": "无未清理任务/FD/子进程持续单调增长；进程树 RSS 无未解释的单调增长斜率",
+        "unit": "qualitative+slope"
+      },
+      "applies_to": [
+        "G2",
+        "G3"
+      ],
+      "scope": "全部平台；发布优化构建；受控任务=协议 §7 fast 模式聊天往返 + 每任务资源采样；缓存须有固定上限与淘汰证据",
+      "baseline_g1": {
+        "status": "NOT_RUN_THIS_ROUND",
+        "note": "旧系统 2 小时长跑本轮未执行（R00 范围为协议冻结与稳态基线）；该项基线在 R10 性能证明阶段按同协议补测 G1 后对照"
+      },
+      "noise_tolerance": "采样间隔抖动按协议 §5 统计；判定看趋势斜率而非单点",
+      "rationale": "任务书 05 §6.2 建议值；执行端真实运行、记录采样。",
+      "source": "taskbook-recommended"
+    },
+    {
+      "id": "migration_benefit_distribution",
+      "name": "迁移收益（预先选定：分发占用）",
+      "threshold": {
+        "metric": "bytes_reduction",
+        "op": ">=",
+        "value": 25,
+        "unit": "percent"
+      },
+      "applies_to": [
+        "G3"
+      ],
+      "scope": "darwin-arm64 首个对照平台；G3 发布产物（安装包/应用目录字节，du 口径）对 G1 同口径。口径冻结（R1-F03）：只取 du -sk 分配字节——G1 基线字段 = BASELINE_BENCHMARK.json desktopLeg.distributionSize.lingxiApp.bytes（812,728,320，与 build.desktopApp.duBytes 同值互证）；禁止取 build.desktopApp.logicalBytes（statSync 逻辑字节 971,247,121，APFS 分配/逻辑差 ≈158MB，跨口径混算会算错 25% 收益基数）",
+      "baseline_g1": {
+        "lingxi_app_bytes": 812728320,
+        "lingxi_app_bytes_caliber": "du -sk 分配字节（协议 §9 冻结口径）",
+        "lingxi_app_logical_bytes_reference_only": 971247121,
+        "lingxi_app_bytes_human": "≈775 MiB（electron-builder --dir 应用目录，含 seed 归档、Electron 运行时、computer-use/speech helpers、bundled-bin）",
+        "seed_unpacked_bytes": 793124864,
+        "note": "run-2026-09-23T22-47-51-720Z size 阶段"
+      },
+      "noise_tolerance": "du 字节级确定性（同产物重测差 0）；安装包压缩格式差异须在报告注明但不改变字节口径；阈值 25% 远超噪声",
+      "rationale": "预先选定的收益指标（任务书 05 §6.2：至少一个目标指标改善超过噪声界限）。G1 775MiB 中 Electron 运行时+Chromium 与双份 Node server 树占绝对大头，Tauri 复用系统 WebView + Rust 单二进制的架构目标有充分空间；25% 为保守下限。其他关键指标（取消/清理/历史读取/固定前缀/启动回归）仍须全部满足各自门槛——收益指标不豁免回归。",
+      "source": "r00-preselected"
+    },
+    {
+      "id": "desktop_startup_regression",
+      "name": "桌面启动到可交互（回归门槛）",
+      "threshold": {
+        "metric": "p95",
+        "op": "<=",
+        "value": 19400,
+        "unit": "ms"
+      },
+      "applies_to": [
+        "G2",
+        "G3"
+      ],
+      "scope": "darwin-arm64；发布优化构建；spawn → app-ready（或新宿主等价可交互信号）；冷启动口径（协议 §3）",
+      "baseline_g1": {
+        "median_ms": 9227,
+        "p95_ms": 9375,
+        "n": 32
+      },
+      "noise_tolerance": "基线 CV≈0.014（stdev≈131ms）；2×p95 的回归上限远超噪声带",
+      "rationale": "任务书 05 §6.2「其他关键指标满足回归门槛」的落地：启动是预期改善区，先设防回归上限（2×基线 p95）；G3 若宣称启动收益另按报告实际数据陈述，不在此强制。",
+      "source": "r00-derived"
+    },
+    {
+      "id": "idle_memory_regression",
+      "name": "空闲进程树内存（回归门槛）",
+      "threshold": {
+        "metric": "rss_tree_sum_p95_of_window_medians",
+        "op": "<=",
+        "value": 1573000,
+        "unit": "KB"
+      },
+      "applies_to": [
+        "G2",
+        "G3"
+      ],
+      "scope": "darwin-arm64；发布优化构建；协议 §6 口径（树 RSS 求和不去重，10×500ms 窗）；空闲=就绪+10s 稳定，无交互",
+      "baseline_g1": {
+        "desktop_rss_median_kb": 1048784,
+        "desktop_procs": 5,
+        "server_rss_median_kb": 451504,
+        "note": "R1 修复（F01c）：server_rss_median_kb 原值 455200 系被弃中间 run run-2026-09-23T22-05-11-181Z 的数字；最终 run run-2026-09-23T23-12-26-989Z 实测 451504，已更正。门槛值 1573000KB 不变。"
+      },
+      "noise_tolerance": "内存窗中位数跨样本波动 <2%；1.5× 上限覆盖口径换算误差",
+      "rationale": "回归门槛（1.5× 基线）：WKWebView/新宿主的进程模型与 Electron 不同，留 50% 余量防口径性回退，但不允许无解释翻倍。",
+      "source": "r00-derived"
+    }
+  ],
+  "judgment_rules": {
+    "sampling": "每项 ≥30 独立样本；n/median/p95/min/max/stdev/CV + 原始逐样本数据落盘；禁止丢弃离群后重报（离群如实进原始数据）",
+    "build_mode": "只比发布优化构建；禁止 debug vs release 混算",
+    "model_wait": "模型等待经协议 §7 分离；真实供应商测量单列，绝不并入本地改善百分比",
+    "platform_honesty": "未实测平台的门槛数值保留建议值并标 PENDING_MEASUREMENT；不得用 arm64 数据冒充其他平台结果",
+    "failure_honesty": "最终没有证明改善时，如实报告「完成架构迁移但性能目标未通过」，不得换指标追认成功，不得以 Rust 主进程小而忽略外置 WebView/Chromium 成本"
+  },
+  "change_log": [
+    {
+      "rev": 1,
+      "date": "2026-09-23",
+      "change": "首次冻结（R00-T06，先于任何 Rust 测量结果）",
+      "author": "R00-T06 执行代理"
+    },
+    {
+      "rev": 2,
+      "date": "2026-09-24",
+      "author": "REPAIR-R00-T06-R1（R1 验收后修复轮）",
+      "basis": "R1 独立验收报告 docs/rust-tauri/R00/R00-T06_REVIEW_R1.md（PASS + F01–F07 须修复轮处理）；全部更正为数值溯源/证据补采，无一项为通过测试而放宽门槛；G2/G3 测量结果至今不存在（修复轮再次独立复核无 rust/ 目录），冻结先于 Rust 结果的前提不受影响。",
+      "changes": [
+        {
+          "finding": "F05",
+          "field": "frozen_at",
+          "from": "2026-09-23T23:15:00.000Z",
+          "to": "2026-09-23T23:20:53.000Z",
+          "reason": "23:15 为执行者草拟的名义时刻，早于本文件引用的最终 run 数据实际产出时刻（run-2026-09-23T23-12-26-989Z summary 写入于 23:17:18Z），不可能成立。更正为 rev1 首次写入的文件系统 mtime（2026-09-24T07:20:53+0800，R1 验收已取证）。新增 frozen_at_basis 留档来历。"
+        },
+        {
+          "finding": "F01b",
+          "field": "process_tree_cleanup.baseline_g1.desktop_teardown_all_gone_ms + noise_tolerance",
+          "from": "median 258.3 / p95 260.7；noise CV≈0.004（≈1ms）",
+          "to": "median 258.71 / p95 307.56；noise CV≈0.046（stdev≈12.1ms）",
+          "reason": "原数值系被弃桌面 run run-2026-09-23T22-23-53-802Z 误植（note 却引用最终 run）；按最终 run run-2026-09-23T22-47-51-720Z raw（startup-run JSONL）重算更正。门槛 3000/5000ms 不变。"
+        },
+        {
+          "finding": "F01c（同族新增，验收报告未点名）",
+          "field": "idle_memory_regression.baseline_g1.server_rss_median_kb",
+          "from": 455200,
+          "to": 451504,
+          "reason": "原值来自被弃中间 run run-2026-09-23T22-05-11-181Z；最终 run run-2026-09-23T23-12-26-989Z 的 idle-tree 实测为 451504。门槛 1573000KB 不变。"
+        },
+        {
+          "finding": "F04",
+          "field": "fixed_prefix_overhead（threshold.value 与 baseline_g1）",
+          "from": "system_prompt_bytes=10620（无落盘证据）；chat_request_body_bytes=666（实为标题侧线调用）",
+          "to": "system_prompt_bytes=10626；新增 main_chat_request_body_bytes=28599、tools_schema_json_bytes=10287、title_sidecall_request_body_bytes=666、measurement（会话类型/双通道字节定义/复现命令/666B 与 28,591B 的构成解释）",
+          "reason": "补采可复现真实会话路径证据：产品诊断 LINGXI_CACHE_CONTRACT_DEBUG=1 的 cache_contract systemPromptBytes=10626 与 wire 实测（主聊天请求 system 消息 UTF-8 字节=10626）双通道一致，证明原 10620 差 6B 无证据支持。数值溯源更正（+6B），非为通过任何测试放宽（G2/G3 结果不存在）；666B 系「对话标题生成器」侧线调用（system≈403B、无 tools），原字段将其误标为主聊天请求体。证据：raw/server/fixed-prefix-probe-*.json + scripts/rust-tauri/r00-t06-probe-fixed-prefix.mjs。"
+        },
+        {
+          "finding": "F03",
+          "field": "migration_benefit_distribution.scope + baseline_g1 口径标注",
+          "from": "未区分逻辑字节/分配字节",
+          "to": "明确 25% 收益对照只取 du -sk 分配字节（desktopLeg.distributionSize.lingxiApp=812,728,320 与 build.desktopApp.duBytes 同值互证），logicalBytes=971,247,121 仅作参考、禁止混算",
+          "reason": "BASELINE_BENCHMARK.json 同文件内 971,247,121（statSync 逻辑字节）与 812,728,320（du 分配字节）并存且原无标注，G3 对照若取错字段基数差 ≈158MB。"
+        }
+      ],
+      "unchanged": "cancel_local_ack（p95≤250ms）、process_tree_cleanup 门槛（3s/5s）、local_business_history_read（p95≤24ms 公式与值）、long_run_resource_growth、migration_benefit 门槛（≥25%）、desktop_startup_regression（p95≤19400ms）、idle_memory_regression 门槛（≤1573000KB）——全部门槛判定值未变动。"
+    }
+  ]
+}

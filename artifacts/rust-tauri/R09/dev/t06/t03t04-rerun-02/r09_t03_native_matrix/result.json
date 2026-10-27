@@ -1,0 +1,58 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t03_native_matrix",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 3.391,
+ "caseCount": 73,
+ "casesSha256": "44a767ec58d709ba5842312b52048875f4d3af653299ab32c914e23d19710287",
+ "commands": [
+  {
+   "id": "build::native-harness",
+   "argv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "rustc",
+    "--test",
+    "--edition",
+    "2021",
+    "--cfg",
+    "r09_standalone_test",
+    "--crate-name",
+    "native_host_harness",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-02/r09_t03_native_matrix/harness/lib.rs",
+    "-o",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-02/r09_t03_native_matrix/harness/native_host_harness"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.665,
+   "logSha256": "005595edbe71b7d21de03004d90180c65a1fe6dc387aba8c63022d337b536fc1"
+  },
+  {
+   "id": "test::all",
+   "argv": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-02/r09_t03_native_matrix/harness/native_host_harness",
+    "--test-threads",
+    "1"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.105,
+   "logSha256": "d624c5846c4d19a14d26e4318519461d36221351f3e4ac0c7ba6a88a6b235b4a"
+  }
+ ],
+ "logSha256": "ec286e6b18b5f8e72e4dbc3a9fff1f590b3a973d449229f17d7577fc5c2fac08",
+ "finishedAtUnixMs": 1793026564730,
+ "blockedPendingRegistration": [
+  "native::tray 注册已合并（T06 命令面收口）；托盘真实创建/双击/右键菜单需真实 GUI 会话（Lead GUI 禁令）",
+  "命令面已注册；OS 级快捷键注册/冲突/合成 CGEvent 触发需真实 GUI 会话 + 辅助功能授权",
+  "show_notification 已注册；系统通知真实投递与点击聚焦需真实 GUI 会话 + 通知权限（OQ-03）",
+  "select_skill/open_folder 已注册；原生面板与取消路径需真实 GUI 会话",
+  "start_drag 命令已注册（Tauri 文件拖出后端待 T03/T07）；真实拖放需 GUI 会话",
+  "auto-launch 命令已注册；真实 enable/disable 受 BLOCKED-SIGNING-IDENTITY 限制",
+  "keep-awake 命令已注册；IOPMAssertion 真实生效需 pmset 探针 + 真实 GUI 会话",
+  "窗口控制命令已注册；真实最小化/最大化/Restore 需真实 GUI 会话"
+ ],
+ "blockedKind": "BLOCKED_GUI_SMOKE",
+ "note": "可独立验证的纯逻辑/跨文件一致性已真实通过；命令面已注册，真实系统动作待 Lead cleared GUI 批次"
+}

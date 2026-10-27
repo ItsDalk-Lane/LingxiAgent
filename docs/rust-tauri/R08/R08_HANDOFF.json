@@ -1,0 +1,204 @@
+{
+  "schema": "lingxi.r08.handoff.v2",
+  "generatedAt": "2026-10-26",
+  "gitHead": "aa99d2ec1dae7f0aef5971bab049734f22fcf7d8",
+  "gitHeadNote": "tested candidate = HEAD aa99d2ec1 + uncommitted closeout working tree (worktreeDirty=true in gate receipts); the closeout docs commit (if any) is separate from the tested candidate and is NOT itself gate-tested",
+  "branch": "codex/rust-tauri-migration",
+  "uncommittedWorkspaceIsSoleCopy": true,
+  "stageOutcome": "R08_COMPLETE_PASS: verify-r08-closeout-08 = commands 22/22 PASS, scenarios 16/16 PASS, candidateSourceBinding.stable=true, supplemental leaves 126 PASS / 0 BLOCKED / 0 FAIL, overall=PASS. In-gate A/B drill: 71 tasks = 68 parity + 3 recorded (ADJ-4/5 + legacy terminal-transport task) + 0 differs. R09 admission: granted (subject to the repository owner's commit/push instruction and the independent review record).",
+  "closeoutRound": {
+    "gateReceipts": [
+      "artifacts/rust-tauri/R08/verify-r08-closeout-01 (stable=true; 18/20 commands — a04_ui guard parser bug (3 tests actually green) + a05 intermittent electron-exit 45s; 14/16 scenarios; leaves 47/79/0) — kept as real red",
+      "artifacts/rust-tauri/R08/verify-r08-closeout-02 (stable=true; 20/20 commands; 16/16 scenarios; leaves 47 PASS / 79 BLOCKED / 0 FAIL; overall FAIL)",
+      "artifacts/rust-tauri/R08/verify-r08-closeout-03 (stable=true; 19/20 commands — a05 env red; 15/16 scenarios; leaves 61 PASS / 65 BLOCKED / 0 FAIL; overall FAIL)",
+      "artifacts/rust-tauri/R08/verify-r08-closeout-04 (stable=true; 20/21 commands — a05 env red; 15/16 scenarios; leaves 76 PASS / 50 BLOCKED / 0 FAIL; overall FAIL)",
+      "artifacts/rust-tauri/R08/verify-r08-closeout-05 (stable=true; 21/21 commands — a05 green this run; 16/16 scenarios; leaves 84 PASS / 42 BLOCKED / 0 FAIL; overall FAIL)",
+      "artifacts/rust-tauri/R08/verify-r08-closeout-06 (stable=true; 21/21 commands; 16/16 scenarios; leaves 97 PASS / 29 BLOCKED / 0 FAIL; overall FAIL; AB 60 tasks = 55 parity + 5 recorded + 0 differs)",
+      "artifacts/rust-tauri/R08/verify-r08-closeout-07 (stable=true; commands 21/22 — real red: r08_a15_isolation V4 found the r08_ui_pages suite argv containing a repo-worktree evidence path; scenarios 14/16; leaves 126 PASS / 0 BLOCKED / 0 FAIL; overall FAIL) — kept as real red",
+      "artifacts/rust-tauri/R08/verify-r08-closeout-08 (stable=true; commands 22/22; scenarios 16/16; leaves 126 PASS / 0 BLOCKED / 0 FAIL; overall PASS; AB 71 tasks = 68 parity + 3 recorded + 0 differs)"
+    ],
+    "proofs": "artifacts/rust-tauri/R08/closeout-proofs-01/ (B-domain d3 red/green logs; fresh-compact red/green probes); artifacts/rust-tauri/R08/closeout-proofs-02/ (round 6: lead/ targeted lazy-content+mcp.face red->green, terminal/ D13 A/B with EVIDENCE.json, interactive/ ask_user+task-abort A/B, ui-pages/ 87-case client evidence + coverage matrix)",
+    "acceptanceInfrastructure": [
+      "A04 bound to r08_a04_no_final_ws (suiteTestAnchor) + r08_a04_ui_vitest (ui-cases.json contract); both now executed every gate",
+      "generator refuses registered-but-unreferenced or referenced-but-unregistered commands; --check regenerates the whole graph byte-for-byte",
+      "vitest acceptance suites fail on any skipped test (LINGXI_R07_SERVICE_BIN injected; previously the legacy-compat test was silently skipped in-gate)",
+      "A13/A14 assertionContract over ab-parity-cases.json (all A/B tasks parity or RECORDED_APPROVALS-registered)",
+      "a15 isolation check now V1–V5 hard checks with controlled before/after real-home digests and per-suite argv sweep; exits non-zero on violation",
+      "r08_t07_ab drill supports --suite-files (main + domain extension suites merged by task key; duplicate keys are loud failures) and LINGXI_R08_AB_TEST_FILTER for single-task dev loops; unknown tasks are judged by the generic casesParity rule",
+      "B-leg --config now carries the isolated workspace (LINGXI_R08_AB_WORKSPACE), so file/exec resident tools are registered and real-process leaves (deferred content, terminal) can be exercised on both kernels",
+      "r08_ui_pages producer: 5 UI leaves (87 cases) = jsdom real component projection + existing dedicated unit tests + real Electron live suites (session-map 19 checks, quickchat 9 checks); producer output is written to a synthetic /private/tmp scratch and copied into the evidence dir (A15 V4: suite argv must not reference the repo worktree)",
+      "terminal and interactive A/B extension suites are executed inside the same r08_t07_ab command; EXPECTED_EXTRA_TASKS makes a missing extension observation a loud gate failure"
+    ],
+    "rustDefectsFixed": [
+      "rollback_delta: session_files managed_cache rows rebased to the recovered root (PathRebase; lineage carries originNewRoot)",
+      "rollback_delta: all Register-strategy files (agents/<id>/config.yaml etc.) enter the delta (category register); device-access-registries excluded per T06 §4.2",
+      "rollback_delta: legacy-identity sessions rows enter the delta (mutable metadata; oldUiReadable=true); ledgers still skipped",
+      "history_content: in-session find applies Bridge sanitization for bridge-bound sessions (loop_conversation_by_session)",
+      "lib.rs new-detached: agent existence check (ghost agentId previously 201)",
+      "session_focus: permissionMode 'auto' resolved to default concrete mode (UI default previously 400 on Rust)",
+      "model_history: skip legacy-unknown-block control rows; project migrated message rows to normalized role/content/modelCallId (migrated real Pi sessions could not be compacted/continued before)",
+      "round5: model_history.rs — user-action todo-state-v1 entries (todos routes complete/cancel/dismiss; no source Run) made the next run fail 'interactive UI entry lacks a source Run'; now skipped as UI state (action in complete_all/cancel_remaining/dismiss), branch-rewrite check likewise",
+      "round5: sessiontools.rs approvals answer — already-settled/unknown approval now 404 (original ConfirmStore semantics) instead of 200/409; confirmation-resolved app event published on settle",
+      "round5: agent_config_readback.rs current_status.model — falls back to the published chat route binding when the agent config has no models.chat (value now matches the model the run actually used)",
+      "round6: history_content.rs session content route — large content referenced in the session history as a tool artifact (exec-output:<file> spill) returned 404 because only session-file res_ resources were resolved; now a referenced local artifact inside data_home is served (canonical path must stay inside data_home, 8MiB cap, history reference is not an authorization credential); unit test proves the boundary",
+      "round6: terminal WS frame family implemented for real (was an explicit terminal_unavailable capability error): procsupervisor gained a read-only TerminalLog/view/tail that never consumes the write_stdin delivery cursor; terminals.rs resolves frame identity (session_locator → session ownership) and owner-filters records; close goes through supervisor.terminate and never fabricates a stop"
+    ],
+    "clientFixes": [
+      "pinnedAt wire shape normalized at the store boundary (list + pin response)",
+      "continue-deleted-agent / workspace-disposal translated; continue response path adapted (native:<sessionId>)",
+      "in-session find translated to /sessions/{id}/find?q= (removed from coarse serviceRoute map)",
+      "delete-project assignment.sessionIds mapped to local paths"
+    ],
+    "abDrill": "r08_t07_ab (main + terminal + interactive suites): 71 tasks = 68 parity + 3 recorded + 0 differs; 383 derived case pins (AB producers), all bound leaf cases 1",
+    "leavesPassByDomain": {
+      "D01": 23,
+      "D02": 66,
+      "D03": 19,
+      "D04": 12,
+      "D13": 3,
+      "D20": 3
+    },
+    "leavesPendingByDomain": {},
+    "decisionsNeeded": [
+      "ALL ADJUDICATED 2026-10-26 — see CLOSEOUT_ADJUDICATIONS.md (ADJ-1 spec-correction-by-doc, ADJ-2 accept-equivalent, ADJ-3 keep-strict, ADJ-4/5 Rust-authoritative for /new,/reset)"
+    ],
+    "resumePoints": [],
+    "envBlockers": [],
+    "newRustImplementations": [
+      "rollback_delta: session_files managed_cache rows rebased to the recovered root (PathRebase; lineage carries originNewRoot)",
+      "rollback_delta: all Register-strategy files (agents/<id>/config.yaml etc.) enter the delta (category register); device-access-registries excluded per T06 §4.2",
+      "rollback_delta: legacy-identity sessions rows enter the delta (mutable metadata; oldUiReadable=true); ledgers still skipped",
+      "history_content: in-session find applies Bridge sanitization for bridge-bound sessions (loop_conversation_by_session)",
+      "lib.rs new-detached: agent existence check (ghost agentId previously 201)",
+      "session_focus: permissionMode 'auto' resolved to default concrete mode (UI default previously 400 on Rust)",
+      "model_history: skip legacy-unknown-block control rows; project migrated message rows to normalized role/content/modelCallId (migrated real Pi sessions could not be compacted/continued before)",
+      "/lingxi/v1/plan-mode GET/POST (old /api/plan-mode semantics: no-mode -> !!enabled toggles read_only/operate, mode takes precedence) + client serviceRoute mapping",
+      "round5: slash.rs /confirm(/approve) and /reject(/deny) (owner-only; verbatim incumbent texts; resolve via approval service; already-processed never re-decides)",
+      "round5: status_tools.rs — current_status and session_folders first-party tools registered on the gateway (previously HTTP-only; models calling them via mcp_call hit unknown tool); kernel toolcatalog resolves ArgumentAwareSessionFolders by action (list read / add·remove execute)",
+      "round6: r08_service terminals.rs — real terminal WS subsystem over the existing PTY substrate (snapshot/tail/close; owner-filtered; killed/already_stopped/rejected; CleanupTimedOut reported as rejected/termination_unconfirmed)",
+      "round6: procsupervisor.rs read-only TerminalLog + persistent_terminals/terminal_tail queries (independent of the write_stdin cursor)",
+      "round6: history_content.rs referenced-artifact fallback for the session content route (data_home-contained local files only, 8MiB cap)"
+    ],
+    "newClientFixes": [
+      "pinnedAt wire shape normalized at the store boundary (list + pin response)",
+      "continue-deleted-agent / workspace-disposal translated; continue response path adapted (native:<sessionId>)",
+      "in-session find translated to /sessions/{id}/find?q= (removed from coarse serviceRoute map)",
+      "delete-project assignment.sessionIds mapped to local paths",
+      "legacy-only wire frames no longer sent to Rust connections (context_usage / terminal_snapshot_request on session switch, context_usage after assistant_run_end, app-init requestContextUsage) — previously each caused Rust close 1008",
+      "round5 (legacy stack, defect): todo subsystem blind to todo_write results delivered through the mcp_call bridge (default path since todo_write is on-demand) — lib/tools/todo-compat.ts, server/history-read/incremental.ts, desktop utils/todo-compat.ts, ws-message-handler.ts now use isTodoToolResult (name or versioned payload shape); tests added",
+      "round5 (legacy stack, defect): checkpoint/rewind tools resolved the FOCUSED session via callback, writing checkpoints/confirmation cards into another session during non-focused runs — now getToolSessionPath(ctx) first (lib/tools/checkpoint-tool.ts, rewind-tool.ts)",
+      "round5 (legacy stack, defect): confirmed in-turn rewind always failed 'session is busy' because core/agent.ts read engine.getDeferredResultStore()/getTaskRegistry() which do not exist on Engine — now agent callbacks getDeferredResults/getTaskRegistry"
+    ],
+    "newImplementations": [
+      "rollback_delta: session_files managed_cache rows rebased to the recovered root (PathRebase; lineage carries originNewRoot)",
+      "rollback_delta: all Register-strategy files (agents/<id>/config.yaml etc.) enter the delta (category register); device-access-registries excluded per T06 §4.2",
+      "rollback_delta: legacy-identity sessions rows enter the delta (mutable metadata; oldUiReadable=true); ledgers still skipped",
+      "history_content: in-session find applies Bridge sanitization for bridge-bound sessions (loop_conversation_by_session)",
+      "lib.rs new-detached: agent existence check (ghost agentId previously 201)",
+      "session_focus: permissionMode 'auto' resolved to default concrete mode (UI default previously 400 on Rust)",
+      "model_history: skip legacy-unknown-block control rows; project migrated message rows to normalized role/content/modelCallId (migrated real Pi sessions could not be compacted/continued before)",
+      "/lingxi/v1/plan-mode GET/POST (old /api/plan-mode semantics: no-mode -> !!enabled toggles read_only/operate, mode takes precedence) + client serviceRoute mapping",
+      "POST /lingxi/v1/sessions/{id}/turns/rollback-preview (read-only turn rollback preview: pref-off branch, checkpoint file listing, no writes) + client translation",
+      "agent deletion now leaves the incumbent-shape .deleted-agent.json tombstone (continue/is-deleted/scan-live all see deletion via one convention)",
+      "round6: r08_service terminals.rs — real terminal WS subsystem over the existing PTY substrate (snapshot/tail/close; owner-filtered; killed/already_stopped/rejected; CleanupTimedOut reported as rejected/termination_unconfirmed)",
+      "round6: procsupervisor.rs read-only TerminalLog + persistent_terminals/terminal_tail queries (independent of the write_stdin cursor)",
+      "round6: history_content.rs referenced-artifact fallback for the session content route (data_home-contained local files only, 8MiB cap)"
+    ],
+    "deterministicStandins": [
+      "r08_mcp_standin.cjs (stdio JSON-RPC MCP server: initialize/tools/resources; both kernels really spawn it) — enabled 12 MCP CRUD leaves; A06-CHAT-TASK marker prompts for replay/retry/continue transcript turns on both kernels",
+      "R08-TOOL-PLAN <token> <base64url{steps}>: multi-step tool-call plan for the stub provider (both kernels use the same on-demand catalog protocol mcp_describe_tool → mcp_call); final echoes R08-TOOL-FINAL <token> steps=<n> last=<result>; kernel-initiated continuation rounds get explicit R08-TOOL-CONT; steer text reaching the model echoes R08-STEER-SEEN",
+      "r08_ui_pages.mjs enumerates UI evidence over real components and the existing Electron live runners (tests/rust-native/session-map-live.py, quickchat-live.py)"
+    ]
+  },
+  "deliverables": {
+    "report": "docs/rust-tauri/R08/R08_REPORT.md",
+    "closeoutProgress": "docs/rust-tauri/R08/CLOSEOUT_PROGRESS.md",
+    "closeoutBlocked": "docs/rust-tauri/R08/CLOSEOUT_BLOCKED.md",
+    "closeoutChecklist": "docs/rust-tauri/R08/CLOSEOUT_CHECKLIST.json (126 items; all PASS from verify-r08-closeout-08)",
+    "runbook": "docs/rust-tauri/R08/T06_ROLLBACK_RUNBOOK.md",
+    "t06Review": "docs/rust-tauri/R08/T06_REVIEW.md (PASS-with-MINORS B0/M0/N5; rev-t06-* reruns green)",
+    "uiDifferenceReport": "docs/rust-tauri/R08/T07_UI_DIFFERENCE_REPORT.md (closeout section appended)",
+    "featureParityResults": "docs/rust-tauri/R08/FEATURE_PARITY_RESULTS.json",
+    "stageMap": "rust/crates/xtask/src/stage_maps/R08.json (22 commands / 16 scenarios / 126 leaves: 126 full_original_behavior, 0 required_behavior_pending)",
+    "migrationCommand": "lingxi-service migrate (unchanged this stage)",
+    "rollbackCommands": [
+      "lingxi-service rollback",
+      "lingxi-service reforward"
+    ],
+    "evidenceRoot": "artifacts/rust-tauri/R08/ (final gates verify-r08-final-01..15, closeout-01..08; round-6 proofs closeout-proofs-02/)",
+    "a06UnlockGuide": "docs/rust-tauri/R08/A06_HOST_AUTOMATION_UNLOCK.md",
+    "decisionBrief": "docs/rust-tauri/R08/R08_DECISION_BRIEF.md (updated for the closeout round)"
+  },
+  "interfaceVersions": {
+    "rustBinarySha256Note": "debug binary is re-linked non-reproducibly; authoritative baseline = verify-r08-closeout-08/SUITES/r08_a16_versions/a16-versions.json",
+    "fixtureAnchors": {
+      "v3Base": "80a8d2c2640e2b2974b299a10f36679bc19daf0911e51f82f0c43399cb32feaa",
+      "v2Bulk": "40f42dc1fdb7dc026ee1ce6444914a02a085c12c53b7598e70fc453fdb388c9e"
+    },
+    "clientBoundary": "desktop/src/react (lingxiFetch translation incl. F-T07-2 write ports, closeout C②/C③ routes, pinnedAt normalization)"
+  },
+  "majorFixesHistory": "see R08_REPORT.md §三 (T01–T08 rounds) and §八 (closeout round)",
+  "openItems": {
+    "PPG": [
+      "PPG-1",
+      "PPG-3 accepted preview-limited, post-R08 fix"
+    ],
+    "differences": [
+      "D-1 title projection (recorded)",
+      "D-2/D-3/D-5 eliminated by harness model plane + roster compensation",
+      "D-7 closed; D-9 fixture-aligned; D-10 closed; D-16 reversed (harness id bug) and leaf bound",
+      "D-11 boot auto-session (decision), D-12 invalid-mode strictness (decision), FIXTURE-PROMPT-SNAPSHOT (superseded by leaf.prompt-snapshot.real with a real-round session)",
+      "D-15 terminal: real PTY terminal WS subsystem implemented and leaves bound (legacy transport-face task stays recorded for history only)",
+      "D-17..D-22 round-5 legacy/Rust defects fixed in case; D-22 stays an observed stricter-Rust difference (ADJ-3 family, not in cases)"
+    ],
+    "pendingLeaves": 0,
+    "envReds": [],
+    "residualDisclosures": [
+      "ConfirmStore-unavailable and tool-level no-session sub-clauses of ask_user A4 have no public live toggle; covered by existing dedicated kernel tests on both stacks (tests/ask-user-tool.test.ts, rust/crates/lingxi-service/tests/r06_interactive_completion.rs) and disclosed, not claimed as live-A/B",
+      "UI sub-clauses without live-constructible surface (MCP poll error/timeout, Web window.open path, per-child error states) are listed in artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/R08_UI_COVERAGE_MATRIX.md",
+      "the old stack retains a kernel-side tool-output retention window, so the deferred-content leaf asserts \"real large body, not the 240-char preview\" rather than an identical byte set across kernels",
+      "F1 slash bridge-takeover/no-history sub-clauses are not directly pinned in the R08 gate; recorded for an R09 bridge-takeover A/B scenario (see independentReview.findings).",
+      "F4 two UI negative sub-clauses are asserted against the current explicit alert+retry implementation; R00 text reconciliation is an R09 item under the ADJ-1 mechanism.",
+      "F5 the A13 contract shares the drill RULES truth source; R09 should add a guard against whole-task deletion shrinking the contract (not triggered this round: RULES only grew)."
+    ]
+  },
+  "r09Constraints": [
+    "不得重改模型协议或数据架构",
+    "以 verify-r08-closeout-08/SUITES/r08_a16_versions/a16-versions.json 为对照基线",
+    "R08 已完成：126/126 叶逐断言证据、正式门 overall=PASS、候选绑定 stable；提交/推送/发布需业主另行指令，R09 未在本会话开展"
+  ],
+  "independentReview": {
+    "status": "ADMIT_R09 (independent reviewer, 2026-10-26 20:14-20:30, implementation/review separated; candidate sources read-only during review; formal gate NOT re-run)",
+    "report": "artifacts/rust-tauri/R08/closeout-proofs-02/independent-review/INDEPENDENT_REVIEW_R08_CLOSEOUT.md",
+    "reportJson": "artifacts/rust-tauri/R08/closeout-proofs-02/independent-review/INDEPENDENT_REVIEW_R08_CLOSEOUT.json",
+    "tooling": "artifacts/rust-tauri/R08/closeout-proofs-02/independent-review/tooling/ (3 read-only scripts that do NOT import the generator)",
+    "findings": [
+      "F1 (record for R09, sub-clause level): slash family bridge-takeover/no-history sub-clauses are not directly pinned in the R08 gate — /new leaf 485B2D0A8A02 has no test for the takeover state or the no-history-still-rotates branch (Rust implementation slash.rs:641-702 exists); /reset and /fresh-compact takeover rejection is covered by rust/crates/lingxi-service/tests/r06_slash_completion.rs:708-745 but that suite is not a gate-08 command; /stop has only the non-takeover other-session case. Add a bridge-takeover A/B scenario in R09.",
+      "F2 (mitigated in docs): CLOSEOUT_CHECKLIST.json items had no evidenceRequired field / ADJ notes; round 6 injected the per-leaf evidenceRequired from the stage map including the 3 ADJ corrections.",
+      "F3 (R09 text cleanup): RECORDED_APPROVALS[\"leaf.prompt-snapshot\"] basis text is outdated (the leaf is now bound through leaf.prompt-snapshot.real); editing the generator script after the gate would change the tested candidate, so it is recorded for R09 instead.",
+      "F4 (R09 doc reconciliation): two UI negative sub-clauses are accepted per the current alert+retry implementation while R00 text describes console.error/false-empty (already disclosed in the UI coverage matrix); reconcile the R00 text under the ADJ-1 mechanism in R09.",
+      "F5 (R09 design check): the A13 contract is derived from the same RULES set as the drill and the gate uses subsetMode — a whole-task deletion could theoretically shrink the contract silently; this round RULES only grew (no deletions), 68+3 tasks all observed, so it did not trigger.",
+      "F6 (unproven boundary): the reviewer did not re-read every sub-clause of all 281 assertions, did not re-run the formal gate, and ADJ ruling originals are document-only."
+    ],
+    "independentlyReproduced": [
+      "r08_ui_pages producer re-run: exit 0, 87/87 cases, case set/values diff=0 vs gate-08; live quickchat 9 + session-map 19 PASS",
+      "terminal single-task A/B re-run: exit 0, tasks=1 parity=1, 14/14 cases true on both legs; binary sha matches the A16 baseline",
+      "python3 -B scripts/rust-tauri/r08_stage_inputs.py --check: exit 0 (digest + whole-graph byte match)"
+    ]
+  },
+  "gitState": {
+    "branch": "codex/rust-tauri-migration",
+    "head": "307877337b073bc3ba28104a6cd6641a5c453d28",
+    "pushed": "origin/codex/rust-tauri-migration (aa99d2ec1..307877337)",
+    "commits": [
+      "ecacab152 feat(r08): complete closeout — 126/126 leaf evidence, real terminal WS subsystem (69 files)",
+      "307877337 chore(r08): file closeout gate receipts + round-6 evidence (827 files)"
+    ],
+    "unstagedButKeptOnDisk": [
+      "artifacts/rust-tauri/R08/verify-r08-closeout-*/candidate-source-*.json (gitignored machine snapshots; binding digests are inside verify-stage-result.json)",
+      "artifacts/rust-tauri/R08/verify-r08-closeout-07/08/SUITES/r08_ui_pages/{live,raw} (large Electron/Vite run caches; live receipts archived in closeout-proofs-02/ui-pages/live, vitest JSON in ui-pages/raw)"
+    ],
+    "auditSeal": "NOT advanced: .sync-audit/verified-source-sha.txt still ab4f2281…; the post-verification audit seal test will treat the R08 commits as non-whitelisted diff (expected red). Coordinate advancement/sealing is a separately authorized workflow; no whitelist edit, no gate retirement, no verification-semantics change in this session.",
+    "notes": "Gate evidence is bound to the same worktree that was committed (gate receipt worktreeDirty=true, candidate binding stable). No main push, no release, no merge."
+  }
+}

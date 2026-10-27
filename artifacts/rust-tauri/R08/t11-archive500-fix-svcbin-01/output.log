@@ -1,0 +1,25 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 58.69s
+     Running unittests src/main.rs (rust/target/debug/deps/lingxi_service-5d637fada23fba97)
+
+running 16 tests
+test cutover_rollback::tests::http_get_status_parses_status_line ... ok
+test cutover_orchestrator::tests::resume_without_journal_is_loud ... ok
+test cutover_rollback::tests::knowledge_production_shape_not_flagged ... ok
+test cutover_rollback::tests::copy_tree_full_copies_regular_files_and_refuses_symlinks ... ok
+test cutover_rollback::tests::journal_refuse_is_terminal_and_persisted ... ok
+test cutover_rollback::tests::open_journal_resume_discipline ... ok
+test cutover_rollback::tests::journal_lifecycle_create_advance_stop_resume ... ok
+test cutover_orchestrator::tests::ruling_shape_is_pinned ... ok
+test cutover_rollback::tests::write_set_classification_whitelist ... ok
+test cutover_rollback::tests::control_probe_write_set_pinned_allows_evidence_derived_whitelist ... ok
+test cutover_orchestrator::tests::reverify_rewinds_when_stillpoint_missing ... ok
+test cutover_rollback::tests::knowledge_synthetic_detection_rename_idempotent ... ok
+test cutover_orchestrator::tests::resume_with_wrong_id_is_loud ... ok
+test cutover_orchestrator::tests::double_run_guard_refuses_without_resume ... ok
+test cutover_orchestrator::tests::fresh_run_requires_no_resume_and_writes_journal ... ok
+test cutover_orchestrator::tests::stop_after_phase_threads_each_boundary ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+

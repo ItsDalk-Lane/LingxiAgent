@@ -1,0 +1,21 @@
+{
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "desktop/src/react/__tests__/services/rust-workbench.test.ts",
+    "desktop/src/react/__tests__/services/rust-agent-activities.test.ts",
+    "desktop/src/react/__tests__/services/resource-events.test.ts",
+    "desktop/src/react/__tests__/services/app-event-actions.test.ts",
+    "desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts",
+    "desktop/src/react/__tests__/services/rust-automation.test.ts",
+    "desktop/src/react/__tests__/services/websocket.test.ts",
+    "desktop/src/react/__tests__/services/ws-message-handler.test.ts",
+    "desktop/src/react/__tests__/components/DeskSection.test.tsx",
+    "desktop/src/react/__tests__/utils/preview-document-refresh.test.ts",
+    "--maxWorkers=2"
+  ],
+  "exitCode": 0,
+  "logSha256": "348b977ac6cd882349d1ac1c801bda4f82fb2701866fab2b1b26a12d09cbef97",
+  "time": "2026-10-18T01:18:42.536902+00:00"
+}

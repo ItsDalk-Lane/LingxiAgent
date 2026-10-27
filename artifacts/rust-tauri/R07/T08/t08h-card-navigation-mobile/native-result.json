@@ -1,0 +1,494 @@
+{
+  "checks": [
+    "actual-frame-no-owner-token",
+    "actual-component-put-and-get",
+    "actual-script-executed",
+    "actual-self-navigation-blocked"
+  ],
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/react/__tests__/components/r07-t08-card-fixture.html",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@vite/client",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/vite/dist/client/env.mjs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/__tests__/components/r07-t08-card-fixture.tsx",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/services/session-connection-owner.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/index.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/components/chat/InteractiveCard.tsx",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/side-chat-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/services/server-connection.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/components/input/composer-memory-mode.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/connection-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/components/chat/InteractiveCard.module.css",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/session-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/session-project-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/streaming-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/agent-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/ui-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/channel-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/desk-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/model-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/input-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/knowledge-reference-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/chat-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/chat-find-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/toast-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/preview-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/context-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/automation-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/browser-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/activity-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/agent-activity-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/terminal-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/bridge-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/selection-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/computer-overlay-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/subagent-preview-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/screenshot-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/sidebar-ui-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/file-history-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/conversation-map-slice.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/message-live-version.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/live-turn-store.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/hooks/use-hana-fetch.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/components/session-scope-context.tsx",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/services/studio-access.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/contract-versions.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/input-draft-sync.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/input-drafts.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/stream-invalidator.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/stores/selectors/file-refs.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/utils/chat-performance.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/utils/content-semantics.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/utils/turn-outcome.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/utils/turn-projector.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/utils/history-run-merge.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/sidebar-ui-state.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/services/rust-bridge.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/services/rust-automation.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/services/rust-browser.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/services/rust-settings.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/services/rust-workbench.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/contract-versions.json",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/studio-access-contract.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/utils/file-kind.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/services/conversation-request-scope.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/utils/history-builder.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/services/resource-events.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/utils/message-parser.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/utils/markdown.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/utils/assistant-block-builder.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/utils/quoted-selection.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/utils/history-segment-sanitizer.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/yuan-visuals.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/internal-mood-block.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/reserved-tag-stream.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/tool-outcome.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/private/tmp/lingxi-card-nav-sMNWdA/home/.card-vite-cache/deps/zustand.js",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/private/tmp/lingxi-card-nav-sMNWdA/home/.card-vite-cache/deps/react.js",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/private/tmp/lingxi-card-nav-sMNWdA/home/.card-vite-cache/deps/react_jsx-dev-runtime.js",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/private/tmp/lingxi-card-nav-sMNWdA/home/.card-vite-cache/deps/markdown-it.js",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/private/tmp/lingxi-card-nav-sMNWdA/home/.card-vite-cache/deps/markdown-it-task-lists.js",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/katex/dist/katex.min.css",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/utils/markdown-html-sanitizer.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/react/utils/markdown-document.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/tool-presentation.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/private/tmp/lingxi-card-nav-sMNWdA/home/.card-vite-cache/deps/@traptitech_markdown-it-katex.js",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/private/tmp/lingxi-card-nav-sMNWdA/home/.card-vite-cache/deps/chunk-PR4QN5HX.js",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/private/tmp/lingxi-card-nav-sMNWdA/home/.card-vite-cache/deps/chunk-IYSVTW2B.js",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/secret-custody.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/private/tmp/lingxi-card-nav-sMNWdA/home/.card-vite-cache/deps/js-yaml.js",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/private/tmp/lingxi-card-nav-sMNWdA/home/.card-vite-cache/deps/react-dom_client.js",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/@fs/private/tmp/lingxi-card-nav-sMNWdA/home/.card-vite-cache/deps/chunk-IX5DG2PM.js",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/cards/navigation-probe",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/cards/navigation-probe/frame/d593ce6ff7f6bfc46815a2c06a70f7f3e3cdc782cc5a020f5fa931b57c517905",
+      "status": 200
+    }
+  ],
+  "outcome": {
+    "count": 0,
+    "observed": []
+  },
+  "blockedNavigations": [],
+  "cspMessages": [
+    "Framing '[URL] violates the following Content Security Policy directive: \"frame-src 'self' blob:\". The request has been blocked.\n"
+  ],
+  "navigationFailures": [
+    {
+      "code": -30,
+      "description": "ERR_BLOCKED_BY_CSP"
+    }
+  ]
+}

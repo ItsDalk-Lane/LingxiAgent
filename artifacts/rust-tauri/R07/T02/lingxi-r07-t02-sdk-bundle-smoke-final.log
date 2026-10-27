@@ -1,0 +1,14 @@
+[
+  {
+    "artifact": "bridge-sdk-worker",
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "artifact": "bridge-sdk-diagnostic",
+    "exitCode": 0,
+    "stdout": "{\"kind\":\"diagnostic_result\",\"ok\":false,\"error\":\"diagnostic_request_failed\"}\n",
+    "stderr": ""
+  }
+]

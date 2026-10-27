@@ -1,0 +1,44 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 35.76s
+     Running tests/r07_automation_flow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_flow-2ab8cb00acd1866c)
+
+running 11 tests
+test notification_preference_updates_preserve_other_settings_and_reject_damage ... ok
+test existing_global_switch_and_agent_setting_roundtrip_preserve_other_fields ... ok
+test management_preserves_minute_strings_and_millisecond_numbers_from_real_ui ... ok
+test slash_apply_uses_frozen_owned_suggestion ... ok
+test real_tool_suggestion_requires_apply_and_replays_after_expiry ... ok
+test unsupported_future_schema_is_preserved_and_does_not_block_later_jobs ... ok
+test started_display_with_no_receipt_becomes_unknown_without_resend ... ok
+test real_notify_tool_claim_and_receipt_survive_restart_without_resend ... ok
+test scheduled_reminder_keeps_trigger_run_and_confirmed_delivery_after_restart ... ok
+test completion_preference_only_queues_real_terminal_results_and_keeps_focus_policy ... ok
+test restart_between_real_run_completion_and_receipt_settlement_catches_up_once ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.17s
+
+     Running tests/r07_heartbeat_runtime.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_heartbeat_runtime-da6b06f5236e8dcc)
+
+running 6 tests
+test create_if_absent_never_overwrites_a_competing_resource ... ok
+test missing_agent_cannot_receive_a_workspace_scope_or_background_run ... ok
+test ordinary_chat_cannot_borrow_heartbeat_program_log_target ... ok
+test config_switch_off_cancels_real_inflight_patrol_and_does_not_write_log ... ok
+test separate_agents_run_together_but_same_agent_overlap_is_discarded ... ok
+test real_patrol_and_root_first_level_jian_use_gateway_fixed_logs ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.01s
+
+     Running tests/r07_scheduler.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_scheduler-cfa258b8f5871d0d)
+
+running 7 tests
+test revoked_source_is_rejected_without_a_run ... ok
+test edits_preserve_unknown_fields_and_stale_revisions_are_rejected ... ok
+test cancellation_drops_pending_automatic_review_before_any_tool_dispatch ... ok
+test one_shot_is_disabled_after_real_execution ... ok
+test unknown_claim_after_restart_is_not_reexecuted ... ok
+test real_management_dispatch_and_restart_keep_one_trigger_one_run ... ok
+test background_input_and_real_tool_results_reload_after_restart_without_user_messages ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.63s
+

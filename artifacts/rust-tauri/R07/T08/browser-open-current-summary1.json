@@ -1,0 +1,91 @@
+{
+  "recordedAt": "2026-10-18T11:46:21.709175+00:00",
+  "status": "DEVELOPMENT_MECHANISMS_VERIFIED_NOT_NATIVE_BROWSER_PROOF",
+  "runs": [
+    {
+      "label": "oauth-browser-open-reproduce1",
+      "receipt": "artifacts/rust-tauri/R07/T08/oauth-browser-open-reproduce1.json",
+      "receiptSha256": "2ab3b4e1b8be8ceb8f0cadd2f00a8213f6b7d23ffc842e5866714c7080f956f6",
+      "exitCode": 1,
+      "sourceUnchanged": false,
+      "logSha256": "f11768a39c93d781208c0e9abca7b6ccd5f0f7c641a4dd6af73dc82b57fcd589"
+    },
+    {
+      "label": "oauth-browser-open-reproduce2",
+      "receipt": "artifacts/rust-tauri/R07/T08/oauth-browser-open-reproduce2.json",
+      "receiptSha256": "73819d95ec9063b8eb384dc2c991f6287ddf82919bd2bb7117c615d215f0a47d",
+      "exitCode": 1,
+      "sourceUnchanged": true,
+      "logSha256": "efc0c71ef8c1c677aeed3ac114152f4af5a13343a742d1ee3dcfd00e4b63db8d"
+    },
+    {
+      "label": "oauth-browser-open-fixed1",
+      "receipt": "artifacts/rust-tauri/R07/T08/oauth-browser-open-fixed1.json",
+      "receiptSha256": "3479813eed4873792a4191fa43cf56b145fc29ffb640544dc0fd409510c3085f",
+      "exitCode": 1,
+      "sourceUnchanged": true,
+      "logSha256": "d88849afa15e60ba9f12bff46739bf617f5eb0baf097fcf033eef4204f68e0f5"
+    },
+    {
+      "label": "oauth-browser-open-fixed2",
+      "receipt": "artifacts/rust-tauri/R07/T08/oauth-browser-open-fixed2.json",
+      "receiptSha256": "27eec75ba1a24e4876a67b755000ed55a5e17cfcbd297fe6924f8b479e9aa494",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "logSha256": "cccf22a1532ecac5d5f49e99bacacc07292eeaf87ac3ea40a2900f8fc953f88e"
+    },
+    {
+      "label": "oauth-browser-open-fixed3",
+      "receipt": "artifacts/rust-tauri/R07/T08/oauth-browser-open-fixed3.json",
+      "receiptSha256": "d6e4f9fa214cc6e5a8b655c8e2fcc7a9e32d242a16f5d1c48903c047186600dc",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "logSha256": "29a661be69331df3bd6bf564b1260581a613b8835ffb624569140782626ba9a1"
+    },
+    {
+      "label": "oauth-browser-open-types1",
+      "receipt": "artifacts/rust-tauri/R07/T08/oauth-browser-open-types1.json",
+      "receiptSha256": "ab00713fbd5245dc21bf2b2fb4f790a8a95fedd938994a618e2b6bf7bd236fb2",
+      "exitCode": 0,
+      "sourceUnchanged": false,
+      "logSha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8"
+    },
+    {
+      "label": "mcp-ui-and-browser-types2",
+      "receipt": "artifacts/rust-tauri/R07/T08/mcp-ui-and-browser-types2.json",
+      "receiptSha256": "a3e7064a2574e66d0ae42eafe9a98475ec910c9314a58bb8ace34995664cc683",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "logSha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8"
+    }
+  ],
+  "currentSourceHashesAfterRuns": {
+    "desktop/main.cjs": "bc8afa8a2f0894863b264e6a950f0430afca4dc6cb44184646b98741f2feafcf",
+    "desktop/src/react/types.ts": "e54a11d32eff39b6acf581fcb2237872b46556586fe4db5543da98be290eeeda",
+    "desktop/src/react/settings/tabs/McpTab.tsx": "edca0934d710c04758469fc6beb7d89b49d96d2731a3c5a033fdb7a117d2538f",
+    "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx": "e784c6bffeebed2b0c41143a055827e036fa30d12457076b46f7076547ee0d99",
+    "desktop/src/react/mobile/mobile-platform.ts": "336e86b0cfcaab79d74964edbc01c8a5d67e20395514f1cac9bd86ec9ec872d4",
+    "desktop/src/react/settings/tabs/__tests__/McpTab.test.tsx": "e3b2800f9af62af62da3a5289135b127f6f9e519e51547c2f33b7781680aa960",
+    "desktop/src/react/settings/tabs/providers/__tests__/OAuthCredentials.test.tsx": "ebdd3aa70232c45b7d449d77b4f8aa0adaf698b0228120937af985ea723a448c",
+    "desktop/src/react/__tests__/mobile/mobile-platform.test.ts": "b085b4f2023592b3464861e735ac854792d41e271e1d8b176180d1f46b610454",
+    "tests/desktop-open-external.test.ts": "0325800207e1ae8ee24fa16845ffb534e430354bb74dd294a0be2558be0b7c06"
+  },
+  "verifiedScopes": [
+    "现役Electron处理函数等待shell Promise并返回明确成功/失败；未调用真实系统shell",
+    "MCP缺能力/Promise拒绝/明确失败回执停止poll并请求取消；取消失败保留两项事实",
+    "打开Promise迟到拒绝不污染新连接等待；用户取消后晚成功不继续poll",
+    "模型OAuth消费明确失败；mobile旧window.open保持void，不把noopener返回值当回执"
+  ],
+  "actualLatestCounts": {
+    "files": 5,
+    "passed": 44,
+    "failed": 0,
+    "skipped": 0
+  },
+  "limits": [
+    "这些结果不是原生系统浏览器确已启动的证据",
+    "真实MCP设置页到SDK新父目标首轮停fixture错误状态文字/空模型服务准备，仍未整体通过",
+    "不是冻结候选，不改原f CHECKS_PASSED_NOT_ACCEPTED或失败历史"
+  ],
+  "acceptanceClaimed": false
+}

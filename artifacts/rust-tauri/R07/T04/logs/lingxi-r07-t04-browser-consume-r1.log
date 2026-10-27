@@ -1,0 +1,41 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/services/rust-browser-events-http.test.ts (1 test | 1 failed) 151ms
+     × binds browser updates to their service, preserves manual collapse, and clears actual stopped state 150ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/rust-browser-events-http.test.ts > Rust browser events: HTTP cursor → shared production handler → actual store > binds browser updates to their service, preserves manual collapse, and clears actual stopped state
+AssertionError: expected { executionNode: 'server-a', …(9) } to match object { Object (running, collapsed, ...) }
+(5 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "collapsed": true,
+    "running": true,
+    "thumbnail": "ZmFrZS1qcGVn",
+-   "thumbnailFresh": false,
+-   "url": "https://right.example/next",
++   "thumbnailFresh": true,
++   "url": "https://right.example",
+  }
+
+ ❯ desktop/src/react/__tests__/services/rust-browser-events-http.test.ts:59:23
+     57|       await vi.advanceTimersByTimeAsync(0); await vi.advanceTimersByTi…
+     58|       await vi.waitFor(() => expect(seen).toHaveLength(4));
+     59|       expect(seen[2]).toMatchObject({ running: true, collapsed: true, …
+       |                       ^
+     60|       expect(seen[3]).toMatchObject({ running: false, collapsed: true,…
+     61|       expect(paths).toContain('/lingxi/v1/app-events?since=2');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  05:34:19
+   Duration  823ms (transform 304ms, setup 20ms, import 360ms, tests 151ms, environment 228ms)
+

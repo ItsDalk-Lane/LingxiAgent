@@ -1,0 +1,58 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t03_native_matrix",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 3.673,
+ "caseCount": 73,
+ "casesSha256": "a4a17d403e3347c1f65a55b78b440366ccf035d81b3e64f5dc9ed70ec8a3727c",
+ "commands": [
+  {
+   "id": "build::native-harness",
+   "argv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "rustc",
+    "--test",
+    "--edition",
+    "2021",
+    "--cfg",
+    "r09_standalone_test",
+    "--crate-name",
+    "native_host_harness",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-01/r09_t03_native_matrix/harness/lib.rs",
+    "-o",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-01/r09_t03_native_matrix/harness/native_host_harness"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.65,
+   "logSha256": "79672ce584f1b56a712e781686034b8280b624f4325bb5e8f5abf0b9b07e7381"
+  },
+  {
+   "id": "test::all",
+   "argv": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-01/r09_t03_native_matrix/harness/native_host_harness",
+    "--test-threads",
+    "1"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.459,
+   "logSha256": "2731c079a2e512ed92aec7c645a1095215e582aa390119bb74901cb0b7f54061"
+  }
+ ],
+ "logSha256": "0f740a448926ef70e2be2ecbf5635f76e430b6684b3add84e3548d7313b72116",
+ "finishedAtUnixMs": 1793026527831,
+ "blockedPendingRegistration": [
+  "托盘图标创建/双击/右键菜单需 host-core 合并 native::tray 注册并在真实 GUI 会话观察",
+  "全局快捷键 OS 注册/冲突/合成 CGEvent 触发需已注册宿主 + 辅助功能授权",
+  "系统通知真实投递与点击聚焦需已注册宿主 + 通知权限；click 回调 OQ-03 未解决",
+  "原生文件/目录面板与取消路径需已注册宿主（Cmd+period cancel:）",
+  "拖出到 Finder / Finder 拖入需真实 GUI 会话",
+  "开机自启动真实 enable/disable 受 BLOCKED-SIGNING-IDENTITY 限制",
+  "IOPMAssertion 真实生效需 pmset 探针 + 已注册宿主",
+  "窗口真实最小化/最大化/Restore 事件需已注册宿主窗口"
+ ],
+ "blockedKind": "BLOCKED_PENDING_REGISTRATION",
+ "note": "可独立验证的纯逻辑/跨文件一致性已真实通过；真实系统动作在 native/ 注册合并后重跑"
+}

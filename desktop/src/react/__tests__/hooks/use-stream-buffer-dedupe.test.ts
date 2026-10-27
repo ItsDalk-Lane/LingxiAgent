@@ -88,6 +88,19 @@ describe('streamBufferManager 重放幂等', () => {
     expect(skillTools[0]?.done).toBe(true);
   });
 
+  it('实际工具完成回执生成一次协作确认卡，重放不重复', () => {
+    const detail = { suggestionId: 'collab-real', kind: 'session_send_draft', target: { type: 'session', sessionId: 'other' }, draft: { message: '真实草稿' } };
+    canonicalTurn([
+      { type: 'assistant_run_start', runId: 'collab-run' },
+      { type: 'tool_start', id: 'collab-call', name: 'tool:first-party:session', args: {}, seq: 2 },
+      { type: 'tool_end', id: 'collab-call', name: 'tool:first-party:session', success: true, status: 'succeeded', details: detail, seq: 3 },
+      { type: 'tool_end', id: 'collab-call', name: 'tool:first-party:session', success: true, status: 'succeeded', details: detail, seq: 3 },
+    ]);
+    expect(assistantBlocks().filter(block => block.type === 'suggestion_card')).toEqual([
+      expect.objectContaining({ suggestionId: 'collab-real', kind: 'session_send_draft', status: 'pending', detail: expect.objectContaining({draft:{message:'真实草稿'}}) }),
+    ]);
+  });
+
   it('不同工具的正常投递不受幂等防御影响', () => {
     canonicalTurn([
       { type: 'assistant_run_start', runId: 'run-dedupe-2' },

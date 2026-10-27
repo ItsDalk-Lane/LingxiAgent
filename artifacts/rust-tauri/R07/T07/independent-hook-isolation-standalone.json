@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "status": "STANDALONE_HOOK_TESTS_ONLY_CRATE_VERIFICATION_PENDING",
+  "checkedAt": "2026-10-18T03:09:05.678650+00:00",
+  "sourcePath": "rust/crates/lingxi-service/src/agent_deletions.rs",
+  "sourceSha256": "4f4100c1f65274fb6a5eedfadd026a157a31c32e88358f8d1a3713b64e8c6a78",
+  "extractedMechanismAndTestsSha256": "2319058acc410dcd55cd70cdfb883d0fb2d9df8d71f0a681893c2163c353094e",
+  "method": "从实际单文件逐字提取纯std登记机制和四个新单测，用独立临时目录rustc --test编译并并行执行；不是整crate验证，不运行Cargo。",
+  "cargoExecuted": false,
+  "results": [
+    {
+      "step": "standalone-rustc-test-compile",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "step": "standalone-four-concurrent-tests",
+      "exitCode": 0,
+      "output": "\nrunning 4 tests\ntest hook_tests::dropping_older_same_home_guard_never_deletes_newer_or_revives_old_hook ... ok\ntest hook_tests::dropping_newer_same_home_guard_restores_only_still_live_older_hook ... ok\ntest hook_tests::probe_callback_can_register_and_release_another_hook_outside_registry_lock ... ok\ntest hook_tests::concurrent_homes_keep_their_own_registered_probe ... ok\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n"
+    }
+  ]
+}

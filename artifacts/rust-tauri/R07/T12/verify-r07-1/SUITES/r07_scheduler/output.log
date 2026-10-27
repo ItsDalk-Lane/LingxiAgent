@@ -1,0 +1,33 @@
+
+running 7 tests
+test edits_preserve_unknown_fields_and_stale_revisions_are_rejected ... ok
+test revoked_source_is_rejected_without_a_run ... ok
+test one_shot_is_disabled_after_real_execution ... ok
+test cancellation_drops_pending_automatic_review_before_any_tool_dispatch ... ok
+test unknown_claim_after_restart_is_not_reexecuted ... ok
+test real_management_dispatch_and_restart_keep_one_trigger_one_run ... ok
+test background_input_and_real_tool_results_reload_after_restart_without_user_messages ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.12s
+
+   Compiling ring v0.17.14
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+   Compiling rcgen v0.14.10
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 59.99s
+     Running tests/r07_scheduler.rs (rust/target-r07/debug/deps/r07_scheduler-0189f811d16c711f)

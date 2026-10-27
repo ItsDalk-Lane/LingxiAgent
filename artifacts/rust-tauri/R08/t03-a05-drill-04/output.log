@@ -1,0 +1,4 @@
+[r08-t03-a05] orchestrator crashed: Error: title: timeout after 90000ms
+    at waitFor (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t03_a05_drill.mjs:77:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async main (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t03_a05_drill.mjs:485:21)

@@ -1,0 +1,15 @@
+{
+  "identifier": "skill-viewer",
+  "description": "R09-T06 收口：技能只读窗口。只读自身解压目录；Rust zip 实现，禁止 exec unzip/powershell。",
+  "windows": [
+    "skill-viewer-*"
+  ],
+  "permissions": [
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    "allow-list-skill-files",
+    "allow-read-skill-file",
+    "allow-skill-viewer-close",
+    "allow-skill-viewer-load"
+  ]
+}

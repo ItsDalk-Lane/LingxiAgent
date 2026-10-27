@@ -1,0 +1,328 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 24.67s
+     Running unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_adapters-76aedbe66c45cbad)
+
+running 2 tests
+test storage::media_gallery::tests::gallery_status_mapping_never_claims_success_for_non_delivery ... ok
+test storage::media_gallery::tests::task_type_is_the_incumbent_media_kind ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 149 filtered out; finished in 0.00s
+
+     Running unittests src/bin/lingxi-storage-inspect.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_storage_inspect-716521db79cda86d)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/active_run_listing.rs (/private/tmp/lingxi-r07-build/debug/deps/active_run_listing-fd445cd2133b90a9)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/agent_memory_r06t06.rs (/private/tmp/lingxi-r07-build/debug/deps/agent_memory_r06t06-5f2a8fef9d841e4c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 14 filtered out; finished in 0.00s
+
+     Running tests/backup_faults.rs (/private/tmp/lingxi-r07-build/debug/deps/backup_faults-73b0d0cb001bda36)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/backup_restore.rs (/private/tmp/lingxi-r07-build/debug/deps/backup_restore-17efae2bb1eae93c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.00s
+
+     Running tests/canonical_message_store.rs (/private/tmp/lingxi-r07-build/debug/deps/canonical_message_store-a99dca174b6042a7)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.00s
+
+     Running tests/context_material_commit_r06ex01.rs (/private/tmp/lingxi-r07-build/debug/deps/context_material_commit_r06ex01-3653b20908563476)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/disk_full_fault.rs (/private/tmp/lingxi-r07-build/debug/deps/disk_full_fault-104e2fcdd4928a85)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/event_store_reads.rs (/private/tmp/lingxi-r07-build/debug/deps/event_store_reads-3a072c25c8b137bb)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/ex08_independent_review.rs (/private/tmp/lingxi-r07-build/debug/deps/ex08_independent_review-6beac38bb9e6ff2a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/invocation_journal_store.rs (/private/tmp/lingxi-r07-build/debug/deps/invocation_journal_store-62612a5c920ab13e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/knowledge_store_r06t07.rs (/private/tmp/lingxi-r07-build/debug/deps/knowledge_store_r06t07-80cb87a9416a3461)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.00s
+
+     Running tests/late_result_fencing_property.rs (/private/tmp/lingxi-r07-build/debug/deps/late_result_fencing_property-8276e492ee5cff2c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/migration_idempotency.rs (/private/tmp/lingxi-r07-build/debug/deps/migration_idempotency-96031a74096f20b9)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/r05_t02_oauth_flows.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t02_oauth_flows-18123000c3c77763)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 21 filtered out; finished in 0.00s
+
+     Running tests/r05_t03_goldens.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t03_goldens-dce2905506bbecec)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/r05_t03_rr1_replay.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t03_rr1_replay-71f21c4167a0ed93)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 33 filtered out; finished in 0.00s
+
+     Running tests/r05_t04_rr1_batch_terminal.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t04_rr1_batch_terminal-026a6efc8938b0f1)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.00s
+
+     Running tests/r05_t04_streaming.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t04_streaming-6fc204d5d72765ee)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.00s
+
+     Running tests/r05_t05_compat.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t05_compat-e65c2b9623b4bdb9)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/r05_t05_timeouts.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t05_timeouts-6729824bc6e81b84)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 13 filtered out; finished in 0.00s
+
+     Running tests/r05_t06_operations.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t06_operations-650eed186c592e9d)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 27 filtered out; finished in 0.00s
+
+     Running tests/r05_t07_rr1_usage_strict.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t07_rr1_usage_strict-e6283e01d6bd8cd8)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+
+     Running tests/r05_t07_usage_families.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t07_usage_families-2ec73a818e301d93)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 14 filtered out; finished in 0.00s
+
+     Running tests/r06_ar_f06_config_preservation.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f06_config_preservation-833304953f7aa03e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.00s
+
+     Running tests/r06_ar_f06_d2_replay_probe.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f06_d2_replay_probe-1b125b5a36b754df)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/r06_ar_f12_cache_preservation.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f12_cache_preservation-a642ecc12b911409)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 22 filtered out; finished in 0.00s
+
+     Running tests/r06_ar_f14_migration_receipts.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f14_migration_receipts-58619811c6c049c2)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/r06_ar_w09_vector_integrity.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_w09_vector_integrity-42dad0b321d4fbf2)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.00s
+
+     Running tests/r06_ex05_independent_review.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ex05_independent_review-45ff7be3acd0aa63)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/r06_ex05_restore_atomicity.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ex05_restore_atomicity-45dbbf1d9027a9f9)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+     Running tests/r06_ex09_search_cache.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ex09_search_cache-d9b896342ac5f924)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.00s
+
+     Running tests/r06_t02_compaction_render.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t02_compaction_render-d3a498fa642c81a7)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.00s
+
+     Running tests/r07_activity_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_activity_store-edd15ed4447363a9)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+     Running tests/r07_automation_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_store-7617e106cdd18634)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.00s
+
+     Running tests/r07_automation_suggestions.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_suggestions-b29fc85df2ba1b20)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.00s
+
+     Running tests/r07_bridge_effect_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_effect_store-9989d1116ff54361)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.00s
+
+     Running tests/r07_bridge_message_projection.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_message_projection-4e7fb19381c70dcb)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/r07_bridge_notice_render.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_notice_render-e8cc1d25041d6194)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/r07_bridge_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_store-b9160a62019a4589)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 14 filtered out; finished in 0.00s
+
+     Running tests/r07_browser_chromium.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_browser_chromium-0054360289904d7c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.00s
+
+     Running tests/r07_browser_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_browser_store-ec4c13c1494c1624)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/r07_conversation_files.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_conversation_files-f9caa80fe35ce83c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.00s
+
+     Running tests/r07_pdf_chromium.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_pdf_chromium-eec57902555a5c07)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+
+     Running tests/r07_phone_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_phone_store-c4e412af2dd28839)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.00s
+
+     Running tests/r07_session_collab_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_session_collab_store-2316da6513f10e52)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.00s
+
+     Running tests/r07_t05_media_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t05_media_store-e35c266c889fb207)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/run_finalize_property.rs (/private/tmp/lingxi-r07-build/debug/deps/run_finalize_property-dd15572a0420b332)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/run_id_allocator.rs (/private/tmp/lingxi-r07-build/debug/deps/run_id_allocator-8da1a8672dd8d133)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/run_lineage_store.rs (/private/tmp/lingxi-r07-build/debug/deps/run_lineage_store-4fc68247aba37a42)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/session_file_store.rs (/private/tmp/lingxi-r07-build/debug/deps/session_file_store-1f7bf0df88d79e67)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 13 filtered out; finished in 0.00s
+
+     Running tests/session_tree_r06t03.rs (/private/tmp/lingxi-r07-build/debug/deps/session_tree_r06t03-4c503f4ca3b2d6b0)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.00s
+
+     Running tests/storage_transactions.rs (/private/tmp/lingxi-r07-build/debug/deps/storage_transactions-d541093f04efcaa2)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+

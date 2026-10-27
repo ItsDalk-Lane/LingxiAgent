@@ -9,12 +9,8 @@
     "baseUrl": "."
   },
   "include": [
-    "core/**/*.ts",
     "lib/**/*.ts",
-    "server/**/*.ts",
     "shared/**/*.ts",
-    "hub/**/*.ts",
-    "cli/**/*.ts",
     "plugins/**/*.ts"
   ],
   "exclude": [

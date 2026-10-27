@@ -1,0 +1,13 @@
+
+running 5 tests
+test worker_uses_real_pipe_and_does_not_inherit_service_secrets ... ok
+test command_limit_refuses_dispatch_and_existing_worker_remains_stoppable ... ok
+test oversized_output_is_bounded_and_worker_is_reaped ... ok
+test incomplete_frame_and_malformed_output_never_become_messages ... ok
+test cancelled_read_preserves_partial_frame ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.79s
+     Running tests/r07_bridge_worker.rs (rust/target/debug/deps/r07_bridge_worker-0c3f2ea824685f47)

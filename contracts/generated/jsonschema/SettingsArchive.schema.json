@@ -1,0 +1,38 @@
+{
+  "$defs": {
+    "SettingsArchiveFormat": {
+      "enum": [
+        "lingxi-settings"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "内部设置沿现役字段校验；根结构关闭，禁止夹带其他导入动作。",
+  "properties": {
+    "config": true,
+    "experiments": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "format": {
+      "$ref": "#/$defs/SettingsArchiveFormat"
+    },
+    "modelPreferences": true,
+    "version": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "format",
+    "version",
+    "config",
+    "modelPreferences",
+    "experiments"
+  ],
+  "title": "SettingsArchive",
+  "type": "object"
+}

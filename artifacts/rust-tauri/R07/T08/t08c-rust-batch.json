@@ -1,0 +1,66 @@
+{
+  "candidate": "t08c",
+  "scope": "T08_RELATED_CHECKS_NOT_FINAL_R07",
+  "runnerSha256": "032c525d9b38fa7cc07eefe2f88aa685ca3dc9a76c6cbcd1bd637568ffde292c",
+  "planSha256": "15d583f903a6d37dfcc8b7fd564cfc0ec7045835c1a365d4b66d5cb8acb19128",
+  "results": {
+    "fmt": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08c-fmt.json"
+    },
+    "diff": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08c-diff.json"
+    },
+    "clippy": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08c-clippy.json"
+    },
+    "protocol": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08c-protocol.json"
+    },
+    "protocol-roundtrip": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08c-protocol-roundtrip.json"
+    },
+    "protocol-tests": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08c-protocol-tests.json"
+    },
+    "kernel": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08c-kernel.json"
+    },
+    "boundaries": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08c-boundaries.json"
+    },
+    "adapter": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08c-adapter.json"
+    },
+    "service": {
+      "wrapperExitCode": 101,
+      "productCommandExecuted": true,
+      "receipt": "t08c-service.json"
+    }
+  },
+  "notRun": [
+    "model-regression",
+    "native-skills",
+    "native-picker-binding",
+    "skills-current",
+    "build"
+  ],
+  "fullStagePassClaimed": false
+}

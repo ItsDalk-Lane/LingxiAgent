@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "同一配置来源保存与运行时发布的实际回执，失败时也保留已完成的事实。",
+  "properties": {
+    "activated": {
+      "type": "boolean"
+    },
+    "applied": {
+      "type": "boolean"
+    },
+    "auditRecorded": {
+      "type": "boolean"
+    },
+    "clearedBindings": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "generation": {
+      "type": "string"
+    },
+    "projectionConfirmed": {
+      "type": "boolean"
+    },
+    "saved": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "saved",
+    "applied",
+    "generation",
+    "activated",
+    "clearedBindings",
+    "auditRecorded",
+    "projectionConfirmed"
+  ],
+  "title": "ModelConfigurationApplyReport",
+  "type": "object"
+}

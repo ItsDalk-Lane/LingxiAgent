@@ -1,0 +1,38 @@
+{
+ "note": "R01-T05 冻结基线兼容性恢复：未跟踪工作区文件，非 R09 候选实现；R07 判据/历史证据不变",
+ "commit": "15fa0cee3^",
+ "files": [
+  {
+   "path": "artifacts/rust-tauri/R01/T05/a09/new/probe/probe.json",
+   "gitCommit": "15fa0cee3^",
+   "gitBlobSha1": "69744cb4c6974cc8bb9603a2f8704c5cb388309a",
+   "sha256": "6ff9527f0a2f1e0d73b9c18bcb5dde6bb0a877b3c76d4c79c49c6a9af00503d4",
+   "restored": false,
+   "note": "兼容性恢复的未跟踪工作区文件，非 R09 候选实现；R07 判据不变"
+  },
+  {
+   "path": "artifacts/rust-tauri/R01/T05/a09/new/probe/text.txt",
+   "gitCommit": "15fa0cee3^",
+   "gitBlobSha1": "12bab09e5f8557bb28f29b5c80300c9ec022bb60",
+   "sha256": "aed576b3ab4629f9a4e8092765b7205ec3552d231536d4cc65a065c1de5fd5ec",
+   "restored": false,
+   "note": "兼容性恢复的未跟踪工作区文件，非 R09 候选实现；R07 判据不变"
+  },
+  {
+   "path": "artifacts/rust-tauri/R01/T05/a09/old/probe/probe.json",
+   "gitCommit": "15fa0cee3^",
+   "gitBlobSha1": "76db4518c2d0a662be4666bd0e9b9b0ce46b5e4f",
+   "sha256": "b117fc1833ab2fc97c5fde390089f192e1134a520139aa90902ff5fd7b47e58f",
+   "restored": false,
+   "note": "兼容性恢复的未跟踪工作区文件，非 R09 候选实现；R07 判据不变"
+  },
+  {
+   "path": "artifacts/rust-tauri/R01/T05/a09/old/probe/text.txt",
+   "gitCommit": "15fa0cee3^",
+   "gitBlobSha1": "afa556f924254ef224ed3e9cf0eecde8d76e9127",
+   "sha256": "3071523347e0bf9fd55e2c42806a3f1a555ce7d4e539b9a80840acda35328151",
+   "restored": false,
+   "note": "兼容性恢复的未跟踪工作区文件，非 R09 候选实现；R07 判据不变"
+  }
+ ]
+}

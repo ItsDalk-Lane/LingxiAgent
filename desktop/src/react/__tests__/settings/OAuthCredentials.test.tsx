@@ -10,10 +10,19 @@ import type { ProviderSummary } from '../../settings/store';
 
 const mocks = vi.hoisted(() => ({
   lingxiFetch: vi.fn(),
+  openExternal: vi.fn(),
 }));
+const originalPlatform = Object.getOwnPropertyDescriptor(window, 'platform');
 
 vi.mock('../../settings/api', () => ({
   lingxiFetch: (...args: unknown[]) => mocks.lingxiFetch(...args),
+  // 现役授权服务通过JSON入口读取，仍记录同一底层请求以核对浏览器方式和本地回调。
+  lingxiFetchJson: async (...args: unknown[]) => {
+    const response = await mocks.lingxiFetch(...args);
+    const data = await response.json();
+    if (!response.ok || data?.error) throw new Error(data?.error || `HTTP ${response.status}`);
+    return data;
+  },
 }));
 
 vi.mock('../../settings/helpers', () => ({
@@ -48,6 +57,8 @@ const summary: ProviderSummary = {
 describe('OAuthCredentials', () => {
   beforeEach(() => {
     mocks.lingxiFetch.mockReset();
+    mocks.openExternal.mockReset().mockResolvedValue(undefined);
+    Object.defineProperty(window, 'platform', { configurable: true, value: { openExternal: mocks.openExternal } });
     mocks.lingxiFetch.mockResolvedValue(jsonResponse({
       sessionId: 'oauth-session-1',
       url: 'https://auth.example/start',
@@ -56,6 +67,8 @@ describe('OAuthCredentials', () => {
 
   afterEach(() => {
     cleanup();
+    if (originalPlatform) Object.defineProperty(window, 'platform', originalPlatform);
+    else Reflect.deleteProperty(window, 'platform');
   });
 
   it('requests the explicit browser login method and keeps the callback session local', async () => {
@@ -77,6 +90,7 @@ describe('OAuthCredentials', () => {
       provider: 'openai-codex-oauth',
       loginMethod: 'browser',
     });
+    await waitFor(() => expect(mocks.openExternal).toHaveBeenCalledWith('https://auth.example/start'));
 
     mocks.lingxiFetch.mockResolvedValueOnce(jsonResponse({ ok: true }));
     fireEvent.change(await screen.findByRole('textbox'), { target: { value: 'manual-code' } });

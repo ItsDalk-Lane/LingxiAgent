@@ -1,0 +1,10 @@
+
+> lingxi@0.1.43 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+desktop/src/react/__tests__/host/r08-a03-web-desktop-host.test.tsx(161,25): error TS2352: Conversion of type '[]' to type '[string, RequestInit]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Source has 0 element(s) but target requires 2.
+desktop/src/react/__tests__/host/r08-a03-web-desktop-host.test.tsx(205,22): error TS2352: Conversion of type '[input: URL | RequestInfo]' to type '[string, RequestInit]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Source has 1 element(s) but target requires 2.
+desktop/src/react/splash/SplashApp.tsx(70,24): error TS2532: Object is possibly 'undefined'.
+desktop/src/react/splash/SplashApp.tsx(70,24): error TS2722: Cannot invoke an object which is possibly 'undefined'.

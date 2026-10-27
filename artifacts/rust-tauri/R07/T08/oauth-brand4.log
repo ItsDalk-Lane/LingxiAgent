@@ -1,0 +1,15 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.02s
+     Running tests/r07_t08_oauth_alias.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_oauth_alias-d5d7d52e4580cbf1)
+
+running 1 test
+LINGXI_AUTH_REJECTED request_id="req-66564f3eeb7a5c73a12f72e260d09526" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58790
+LINGXI_AUTH_REJECTED request_id="req-d659d289b905ed04de8a5fb2aabf9b1c" method=POST [token] status=403 reason=local_owner_required remote=127.0.0.1:58791
+LINGXI_AUTH_REJECTED request_id="req-11d1b2afd4890b2c0f84b6d2c177c613" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58828
+LINGXI_AUTH_REJECTED request_id="req-43188847d3a3199df1edf4591eb3f17b" method=POST [token] status=403 reason=local_owner_required remote=127.0.0.1:58847
+LINGXI_AUTH_REJECTED request_id="req-4654c1a5dbfe7d22f0549b172b7e00bb" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58875
+LINGXI_AUTH_REJECTED request_id="req-6b06796f91fae10f832d5bc8366cc43e" method=POST [token] status=403 reason=local_owner_required remote=127.0.0.1:58876
+test oauth_display_alias_reaches_pkce_device_registry_logout_revoke_and_actual_model_without_renaming_source ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.03s
+

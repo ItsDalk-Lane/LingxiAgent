@@ -1,0 +1,20 @@
+{
+  "purpose": "T07接续前端定向开发验证，保留r1微任务时序失败",
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "desktop/src/react/__tests__/services/rust-workbench.test.ts",
+    "desktop/src/react/__tests__/services/resource-events.test.ts",
+    "desktop/src/react/__tests__/services/app-event-actions.test.ts",
+    "desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts",
+    "desktop/src/react/__tests__/services/rust-automation.test.ts",
+    "desktop/src/react/__tests__/services/websocket.test.ts",
+    "desktop/src/react/__tests__/services/ws-message-handler.test.ts",
+    "--maxWorkers=2"
+  ],
+  "exitCode": 0,
+  "log": "artifacts/rust-tauri/R07/T07/resume-ui-r2.log",
+  "logSha256": "abda8e79dfebc6eef3b8a61d307be53a69357cf47305f790fdcf0f185b725029",
+  "time": "2026-10-18T01:15:03.424617+00:00"
+}

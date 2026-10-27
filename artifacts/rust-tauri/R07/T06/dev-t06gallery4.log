@@ -1,0 +1,17 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r07_browser_chromium.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_browser_chromium-0054360289904d7c)
+
+running 10 tests
+test fixture_idle_connection_never_invents_a_form_response ... ok
+test password_values_never_enter_normal_or_compact_snapshots_and_stay_in_the_page ... ok
+test page_cannot_move_or_forge_a_snapshot_reference_to_another_element ... ok
+test downloads_are_actual_owned_bytes_and_ack_removes_only_confirmed_guid ... ok
+test trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock ... ok
+test same_real_target_input_snapshot_generations_and_empty_workspace ... ok
+test scope_revoke_interrupts_real_pending_page_and_stale_node_never_launches ... ok
+test permanent_forget_removes_owned_profile_and_rejects_late_scopes ... ok
+test pool_lru_is_bounded_and_idle_reap_keeps_cold_metadata ... ok
+test independent_persistent_profiles_auxiliary_locale_and_site_data_cleanup ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.20s
+

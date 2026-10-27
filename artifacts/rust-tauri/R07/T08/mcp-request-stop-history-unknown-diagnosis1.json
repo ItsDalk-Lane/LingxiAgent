@@ -1,0 +1,66 @@
+{
+  "label": "mcp-request-stop-history-unknown-diagnosis1",
+  "createdAt": "2026-10-18T11:59:00.521262+00:00",
+  "scope": "DEVELOPMENT_REGRESSION_DIAGNOSIS_AND_NOT_RUN_FIX",
+  "finalAcceptance": false,
+  "originalReceipt": {
+    "path": "artifacts/rust-tauri/R07/T08/mcp-request-stop-regression1.json",
+    "exitCode": 101,
+    "sourceUnchanged": true,
+    "log": "artifacts/rust-tauri/R07/T08/mcp-request-stop-regression1.log",
+    "logSha256": "07b170bf447a7d8395a11f7beb62fdaae3079a3f42f22b8544a02204c455c984",
+    "passed": 7,
+    "failed": 1,
+    "filteredOut": 641,
+    "failure": "OwnedExternal::close unwrap received CleanupFailed for historical request cancellation delivery timeout."
+  },
+  "safeSceneObservation": {
+    "path": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-real-backpressure-4092849432cc65f2",
+    "ownedPid": 49046,
+    "observedAfterOriginalRun": true,
+    "originalPidAssertionReached": false,
+    "originalFailureDoesNotProvePidAssertionPassed": true,
+    "currentProcessProbe": {
+      "kill0Result": -1,
+      "errno": 3,
+      "name": "ESRCH"
+    },
+    "arrivalsSha256": "078281d2b2555fcbb6e3387f204b0a7dbef63025dcaba78b11d8c37e5b40a45d",
+    "methodCounts": {
+      "initialize": 1,
+      "notifications/initialized": 1,
+      "tools/call": 1026,
+      "notifications/cancelled": 1
+    },
+    "queuedDeadlineArrivals": 1
+  },
+  "cause": {
+    "actualLoggedDeadlineElapsedMs": 2084,
+    "sdkQueueCapacityObserved": 1024,
+    "pendingQueueObserved": 76,
+    "payloadBytes": 65536,
+    "mechanism": "Deadline80ms结束后，外端仍暂停，原官方取消通知2秒投递预算耗尽，lifetime.cancellation_unconfirmed被置true；恢复后全部已入队请求有真实回执且同连接echo成功。关闭时active已无本地任务，原drain仍因历史flag返回CleanupFailed。",
+    "localCleanupBeforeError": "原McpConnection.stop先捕获request_result，再实际await child.stop与SDK.cancel，之后and合并结果。故该错误不等同进程回收失败；当时PID后置断言因unwrap未执行，现仅有事后ESRCH观测。"
+  },
+  "minimalFix": [
+    "drain仅在原2秒内本地active守卫未结束时报CleanupFailed；仍继续回收进程与SDK。",
+    "保留历史取消未知标记和单次DeadlineExceeded/Cancelled语义，drain记录明确历史远端unknown警告，不能将历史unknown黏成本次本地退出失败。",
+    "保留close.unwrap和全部原进程gone、同连接echo、禁止晚投/重复/串扰断言；新增断言原未知flag仍true、active0，真实退出后才打印PID已wait回收。"
+  ],
+  "sourceSha256": {
+    "rust/crates/lingxi-service/src/mcpbridge.rs": "121bef4c2f67d7b16197cd073a1811081d51883a25fb5c4f89b08677e14bfe90",
+    "rust/crates/lingxi-service/src/mcpbridge_request_tests.rs": "967bdb483bbd0c211b8f45618e6003eff91ab9de77efaf429e4cc49513c76273",
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_remote.rs": "f2cbda5904bdced7a7940129ee4fe4ab7d9829a811097a6dd9882243b6d593c8"
+  },
+  "executedByAgent": {
+    "cargo": false,
+    "functionalTests": false,
+    "rustfmt": true,
+    "readOnlyOwnedPidProbe": true
+  },
+  "pending": [
+    "sole root Cargo lib8回归",
+    "whole remote7/MCP22/sessionpermission5实际回执",
+    "candidate g 尚未冻结，不宣称T08完成"
+  ]
+}

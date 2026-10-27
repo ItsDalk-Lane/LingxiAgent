@@ -1,0 +1,893 @@
+[
+  {
+    "id": "agnes",
+    "exportName": "agnesPlugin",
+    "file": "lib/providers/agnes.ts",
+    "sha256": "7e91d5c720a3024803b33f8abce30add54f727fb89b93d43370282d439b92400",
+    "source": {
+      "path": "lib/providers/agnes.ts",
+      "line": 38,
+      "endLine": 87,
+      "text": "{\n  id: \"agnes\",\n  displayName: \"Agnes AI\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://apihub.agnes-ai.com/v1\",\n  defaultApi: \"openai-completions\",\n  capabilities: {\n    media: {\n      imageGeneration: {\n        defaultModelId: \"agnes-image-2.1-flash\",\n        models: [\n          {\n            id: \"agnes-image-2.1-flash\",\n            displayName: \"Agnes Image 2.1 Flash\",\n            protocolId: \"agnes-images\",\n            inputs: [\"text\", \"image\"],\n            outputs: [\"image\"],\n            supportsEdit: true,\n            modes: [\n              mediaMode(\"text2image\", \"Text to image\", AGNES_IMAGE_PROPERTIES, AGNES_IMAGE_DEFAULTS, noReferenceImages()),\n              mediaMode(\"image2image\", \"Image edit/reference\", AGNES_IMAGE_PROPERTIES, AGNES_IMAGE_DEFAULTS, referenceImages()),\n            ],\n            ratios: AGNES_IMAGE_RATIOS,\n            resolutions: [\"1K\"],\n          },\n        ],\n      },\n      videoGeneration: {\n        defaultModelId: \"agnes-video-v2.0\",\n        models: [\n          {\n            id: \"agnes-video-v2.0\",\n            displayName: \"Agnes Video V2.0\",\n            protocolId: \"agnes-videos\",\n            inputs: [\"text\", \"image\"],\n            outputs: [\"video\"],\n            supportsAsync: true,\n            modes: [\n              mediaMode(\"text2video\", \"Text to video\", AGNES_VIDEO_PROPERTIES, AGNES_VIDEO_DEFAULTS, noReferenceImages()),\n              mediaMode(\"image2video\", \"Image to video\", AGNES_VIDEO_PROPERTIES, AGNES_VIDEO_DEFAULTS, referenceImages({ max: 1 })),\n              mediaMode(\"multiframe2video\", \"Multi-image to video\", AGNES_VIDEO_PROPERTIES, AGNES_VIDEO_DEFAULTS, referenceImages({ min: 2 })),\n            ],\n            ratios: AGNES_VIDEO_RATIOS,\n            resolutions: AGNES_VIDEO_RESOLUTIONS,\n          },\n        ],\n      },\n    },\n  },\n}"
+    },
+    "capabilities": [
+      {
+        "capability": "imageGeneration",
+        "declaration": [
+          {
+            "path": "lib/providers/agnes.ts",
+            "line": 46,
+            "endLine": 64,
+            "text": "imageGeneration: {\n        defaultModelId: \"agnes-image-2.1-flash\",\n        models: [\n          {\n            id: \"agnes-image-2.1-flash\",\n            displayName: \"Agnes Image 2.1 Flash\",\n            protocolId: \"agnes-images\",\n            inputs: [\"text\", \"image\"],\n            outputs: [\"image\"],\n            supportsEdit: true,\n            modes: [\n              mediaMode(\"text2image\", \"Text to image\", AGNES_IMAGE_PROPERTIES, AGNES_IMAGE_DEFAULTS, noReferenceImages()),\n              mediaMode(\"image2image\", \"Image edit/reference\", AGNES_IMAGE_PROPERTIES, AGNES_IMAGE_DEFAULTS, referenceImages()),\n            ],\n            ratios: AGNES_IMAGE_RATIOS,\n            resolutions: [\"1K\"],\n          },\n        ],\n      }"
+          }
+        ],
+        "credentialLanes": [],
+        "explicitLanes": false,
+        "modelProtocols": [
+          "agnes-images"
+        ]
+      },
+      {
+        "capability": "videoGeneration",
+        "declaration": [
+          {
+            "path": "lib/providers/agnes.ts",
+            "line": 65,
+            "endLine": 84,
+            "text": "videoGeneration: {\n        defaultModelId: \"agnes-video-v2.0\",\n        models: [\n          {\n            id: \"agnes-video-v2.0\",\n            displayName: \"Agnes Video V2.0\",\n            protocolId: \"agnes-videos\",\n            inputs: [\"text\", \"image\"],\n            outputs: [\"video\"],\n            supportsAsync: true,\n            modes: [\n              mediaMode(\"text2video\", \"Text to video\", AGNES_VIDEO_PROPERTIES, AGNES_VIDEO_DEFAULTS, noReferenceImages()),\n              mediaMode(\"image2video\", \"Image to video\", AGNES_VIDEO_PROPERTIES, AGNES_VIDEO_DEFAULTS, referenceImages({ max: 1 })),\n              mediaMode(\"multiframe2video\", \"Multi-image to video\", AGNES_VIDEO_PROPERTIES, AGNES_VIDEO_DEFAULTS, referenceImages({ min: 2 })),\n            ],\n            ratios: AGNES_VIDEO_RATIOS,\n            resolutions: AGNES_VIDEO_RESOLUTIONS,\n          },\n        ],\n      }"
+          }
+        ],
+        "credentialLanes": [],
+        "explicitLanes": false,
+        "modelProtocols": [
+          "agnes-videos"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "anthropic",
+    "exportName": "anthropicPlugin",
+    "file": "lib/providers/anthropic.ts",
+    "sha256": "2c03055e3147d08d20b43ee11fc229018d19586018db0baca1bcda80181ccce3",
+    "source": {
+      "path": "lib/providers/anthropic.ts",
+      "line": 6,
+      "endLine": 12,
+      "text": "{\n  id: \"anthropic\",\n  displayName: \"Anthropic\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api.anthropic.com\",\n  defaultApi: \"anthropic-messages\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "baichuan",
+    "exportName": "baichuanPlugin",
+    "file": "lib/providers/baichuan.ts",
+    "sha256": "9be427768fb5c9f94294faf672103556392cbef47a639a1a27a84318de95c29c",
+    "source": {
+      "path": "lib/providers/baichuan.ts",
+      "line": 8,
+      "endLine": 14,
+      "text": "{\n  id: \"baichuan\",\n  displayName: \"百川智能\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api.baichuan-ai.com/v1\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "baidu-cloud",
+    "exportName": "baiduCloudPlugin",
+    "file": "lib/providers/baidu-cloud.ts",
+    "sha256": "65d120656b3f6cf38eda36ceed68951999d315f2dd906a17ad649c8576ff9424",
+    "source": {
+      "path": "lib/providers/baidu-cloud.ts",
+      "line": 8,
+      "endLine": 14,
+      "text": "{\n  id: \"baidu-cloud\",\n  displayName: \"百度智能云 (文心)\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://qianfan.baidubce.com/v2\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "dashscope-coding",
+    "exportName": "dashscopeCodingPlugin",
+    "file": "lib/providers/dashscope-coding.ts",
+    "sha256": "0490d389a1e7d523b8aa1b20fae88ab254608056a850ca9d17ce6739e2065f45",
+    "source": {
+      "path": "lib/providers/dashscope-coding.ts",
+      "line": 11,
+      "endLine": 17,
+      "text": "{\n  id: \"dashscope-coding\",\n  displayName: \"百炼 Coding Plan\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://coding.dashscope.aliyuncs.com/v1\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "dashscope",
+    "exportName": "dashscopePlugin",
+    "file": "lib/providers/dashscope.ts",
+    "sha256": "87a9600790110639083745ac19af22f7e2012b488ce0d461ced7210bff9e507a",
+    "source": {
+      "path": "lib/providers/dashscope.ts",
+      "line": 122,
+      "endLine": 154,
+      "text": "{\n  id: \"dashscope\",\n  displayName: \"阿里云百炼 (DashScope)\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://dashscope.aliyuncs.com/compatible-mode/v1\",\n  defaultApi: \"openai-completions\",\n  capabilities: {\n    media: {\n      speechGeneration: {\n        defaultModelId: \"qwen-tts-latest\",\n        models: [\n          { id: \"qwen-tts-latest\", displayName: \"Qwen TTS\", protocolId: \"dashscope-qwen-tts\", inputs: [\"text\"], outputs: [\"audio\"] },\n        ],\n      },\n      imageGeneration: {\n        defaultModelId: \"wan2.7-image-pro\",\n        models: [\n          wanModel(\"wan2.7-image-pro\", \"Wan 2.7 Image Pro\", [\"wan-2.7-pro\"], [\"1K\", \"2K\", \"4K\"], [\"1K\", \"2K\"]),\n          wanModel(\"wan2.7-image\", \"Wan 2.7 Image\", [\"wan-2.7\"], [\"1K\", \"2K\"], [\"1K\", \"2K\"]),\n          qwen20Model(\"qwen-image-2.0-pro\", \"Qwen Image 2.0 Pro\", [\"qwen-image-pro\"]),\n          qwenTextModel(\"qwen-image-plus\", \"Qwen Image Plus\", [\"qwen-image\"]),\n          qwenTextModel(\"qwen-image\", \"Qwen Image\"),\n        ],\n      },\n      speechRecognition: {\n        defaultModelId: \"qwen3-asr-flash\",\n        models: [\n          { id: \"qwen3-asr-flash\", displayName: \"Qwen3 ASR Flash\", protocolId: \"dashscope-qwen-asr-chat\", inputs: [\"audio\"], outputs: [\"text\"] },\n        ],\n      },\n    },\n  },\n}"
+    },
+    "capabilities": [
+      {
+        "capability": "speechGeneration",
+        "declaration": [
+          {
+            "path": "lib/providers/dashscope.ts",
+            "line": 130,
+            "endLine": 135,
+            "text": "speechGeneration: {\n        defaultModelId: \"qwen-tts-latest\",\n        models: [\n          { id: \"qwen-tts-latest\", displayName: \"Qwen TTS\", protocolId: \"dashscope-qwen-tts\", inputs: [\"text\"], outputs: [\"audio\"] },\n        ],\n      }"
+          }
+        ],
+        "credentialLanes": [],
+        "explicitLanes": false,
+        "modelProtocols": [
+          "dashscope-qwen-tts"
+        ]
+      },
+      {
+        "capability": "imageGeneration",
+        "declaration": [
+          {
+            "path": "lib/providers/dashscope.ts",
+            "line": 136,
+            "endLine": 145,
+            "text": "imageGeneration: {\n        defaultModelId: \"wan2.7-image-pro\",\n        models: [\n          wanModel(\"wan2.7-image-pro\", \"Wan 2.7 Image Pro\", [\"wan-2.7-pro\"], [\"1K\", \"2K\", \"4K\"], [\"1K\", \"2K\"]),\n          wanModel(\"wan2.7-image\", \"Wan 2.7 Image\", [\"wan-2.7\"], [\"1K\", \"2K\"], [\"1K\", \"2K\"]),\n          qwen20Model(\"qwen-image-2.0-pro\", \"Qwen Image 2.0 Pro\", [\"qwen-image-pro\"]),\n          qwenTextModel(\"qwen-image-plus\", \"Qwen Image Plus\", [\"qwen-image\"]),\n          qwenTextModel(\"qwen-image\", \"Qwen Image\"),\n        ],\n      }"
+          }
+        ],
+        "credentialLanes": [],
+        "explicitLanes": false,
+        "modelProtocols": []
+      },
+      {
+        "capability": "speechRecognition",
+        "declaration": [
+          {
+            "path": "lib/providers/dashscope.ts",
+            "line": 146,
+            "endLine": 151,
+            "text": "speechRecognition: {\n        defaultModelId: \"qwen3-asr-flash\",\n        models: [\n          { id: \"qwen3-asr-flash\", displayName: \"Qwen3 ASR Flash\", protocolId: \"dashscope-qwen-asr-chat\", inputs: [\"audio\"], outputs: [\"text\"] },\n        ],\n      }"
+          }
+        ],
+        "credentialLanes": [],
+        "explicitLanes": false,
+        "modelProtocols": [
+          "dashscope-qwen-asr-chat"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "deepseek-responses",
+    "exportName": "deepseekResponsesPlugin",
+    "file": "lib/providers/deepseek-responses.ts",
+    "sha256": "e1f769159a8f21e501b3de8241fa6faee7ad47c32feab6b76b1ffae50ee08074",
+    "source": {
+      "path": "lib/providers/deepseek-responses.ts",
+      "line": 46,
+      "endLine": 53,
+      "text": "{\n  id: \"deepseek-responses\",\n  displayName: \"DeepSeek (Responses)\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api.deepseek.com\",\n  defaultApi: \"openai-responses\",\n  models: DEEPSEEK_RESPONSES_MODELS,\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "deepseek",
+    "exportName": "deepseekPlugin",
+    "file": "lib/providers/deepseek.ts",
+    "sha256": "1aaac9f5252d7c9e3e201409d09bacb0020c03643dc4c4da7985775e795cacbe",
+    "source": {
+      "path": "lib/providers/deepseek.ts",
+      "line": 6,
+      "endLine": 12,
+      "text": "{\n  id: \"deepseek\",\n  displayName: \"DeepSeek\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api.deepseek.com\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "fireworks",
+    "exportName": "fireworksPlugin",
+    "file": "lib/providers/fireworks.ts",
+    "sha256": "a3ab1932c59438d3dae2492cf6529e39aff5102c2e4ac1eb306ccb16dcf4a829",
+    "source": {
+      "path": "lib/providers/fireworks.ts",
+      "line": 8,
+      "endLine": 14,
+      "text": "{\n  id: \"fireworks\",\n  displayName: \"Fireworks AI\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api.fireworks.ai/inference/v1\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "gemini",
+    "exportName": "geminiPlugin",
+    "file": "lib/providers/gemini.ts",
+    "sha256": "b5f8edd44b232f28d674407481f8f7758e1902ebb83140184340d9c4041a597e",
+    "source": {
+      "path": "lib/providers/gemini.ts",
+      "line": 56,
+      "endLine": 74,
+      "text": "{\n  id: \"gemini\",\n  displayName: \"Google Gemini\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://generativelanguage.googleapis.com/v1beta\",\n  defaultApi: \"google-generative-ai\",\n  capabilities: {\n    media: {\n      imageGeneration: {\n        defaultModelId: \"gemini-3.1-flash-image\",\n        models: [\n          geminiImageModel(\"gemini-2.5-flash-image\", \"Gemini 2.5 Flash Image\", [\"nano-banana\"], GEMINI_25_IMAGE_RATIOS, null, 3),\n          geminiImageModel(\"gemini-3.1-flash-image\", \"Gemini 3.1 Flash Image\", [\"nano-banana-2\", \"gemini-3.1-flash-image-preview\"], GEMINI_31_FLASH_IMAGE_RATIOS, [\"512\", \"1K\", \"2K\", \"4K\"], 14),\n          geminiImageModel(\"gemini-3-pro-image\", \"Gemini 3 Pro Image\", [\"nano-banana-pro\", \"gemini-3-pro-image-preview\"], GEMINI_3_PRO_IMAGE_RATIOS, [\"1K\", \"2K\", \"4K\"], 14),\n        ],\n      },\n    },\n  },\n}"
+    },
+    "capabilities": [
+      {
+        "capability": "imageGeneration",
+        "declaration": [
+          {
+            "path": "lib/providers/gemini.ts",
+            "line": 64,
+            "endLine": 71,
+            "text": "imageGeneration: {\n        defaultModelId: \"gemini-3.1-flash-image\",\n        models: [\n          geminiImageModel(\"gemini-2.5-flash-image\", \"Gemini 2.5 Flash Image\", [\"nano-banana\"], GEMINI_25_IMAGE_RATIOS, null, 3),\n          geminiImageModel(\"gemini-3.1-flash-image\", \"Gemini 3.1 Flash Image\", [\"nano-banana-2\", \"gemini-3.1-flash-image-preview\"], GEMINI_31_FLASH_IMAGE_RATIOS, [\"512\", \"1K\", \"2K\", \"4K\"], 14),\n          geminiImageModel(\"gemini-3-pro-image\", \"Gemini 3 Pro Image\", [\"nano-banana-pro\", \"gemini-3-pro-image-preview\"], GEMINI_3_PRO_IMAGE_RATIOS, [\"1K\", \"2K\", \"4K\"], 14),\n        ],\n      }"
+          }
+        ],
+        "credentialLanes": [],
+        "explicitLanes": false,
+        "modelProtocols": []
+      }
+    ]
+  },
+  {
+    "id": "groq",
+    "exportName": "groqPlugin",
+    "file": "lib/providers/groq.ts",
+    "sha256": "ee1ffc876b638237bcbd0a3789799936dbcafb75250cd330477290d576b2f5a1",
+    "source": {
+      "path": "lib/providers/groq.ts",
+      "line": 9,
+      "endLine": 31,
+      "text": "{\n  id: \"groq\",\n  displayName: \"Groq\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api.groq.com/openai/v1\",\n  defaultApi: \"openai-completions\",\n  capabilities: {\n    media: {\n      speechGeneration: {\n        defaultModelId: \"playai-tts\",\n        models: [\n          {\n            id: \"playai-tts\",\n            displayName: \"PlayAI TTS\",\n            protocolId: \"openai-audio-speech\",\n            inputs: [\"text\"],\n            outputs: [\"audio\"],\n          },\n        ],\n      },\n    },\n  },\n}"
+    },
+    "capabilities": [
+      {
+        "capability": "speechGeneration",
+        "declaration": [
+          {
+            "path": "lib/providers/groq.ts",
+            "line": 17,
+            "endLine": 28,
+            "text": "speechGeneration: {\n        defaultModelId: \"playai-tts\",\n        models: [\n          {\n            id: \"playai-tts\",\n            displayName: \"PlayAI TTS\",\n            protocolId: \"openai-audio-speech\",\n            inputs: [\"text\"],\n            outputs: [\"audio\"],\n          },\n        ],\n      }"
+          }
+        ],
+        "credentialLanes": [],
+        "explicitLanes": false,
+        "modelProtocols": [
+          "openai-audio-speech"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hunyuan",
+    "exportName": "hunyuanPlugin",
+    "file": "lib/providers/hunyuan.ts",
+    "sha256": "e56ed1e8412854933408dc3656433a9fd893e5c7ddf9c08d4947cfc21a6a51a6",
+    "source": {
+      "path": "lib/providers/hunyuan.ts",
+      "line": 8,
+      "endLine": 14,
+      "text": "{\n  id: \"hunyuan\",\n  displayName: \"腾讯混元\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api.hunyuan.cloud.tencent.com/v1\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "infini",
+    "exportName": "infiniPlugin",
+    "file": "lib/providers/infini.ts",
+    "sha256": "6e943d71867f699b55e0d6aab57b63d149b776e60409f2f05bc3060ee98ff379",
+    "source": {
+      "path": "lib/providers/infini.ts",
+      "line": 8,
+      "endLine": 14,
+      "text": "{\n  id: \"infini\",\n  displayName: \"无问芯穹 (Infini)\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://cloud.infini-ai.com/maas/v1\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "kimi-coding",
+    "exportName": "kimiCodingPlugin",
+    "file": "lib/providers/kimi-coding.ts",
+    "sha256": "2a3fc99d9951e6a5d2ac036bbd0fdce3b9e201b72e2068efd17a37dff5096070",
+    "source": {
+      "path": "lib/providers/kimi-coding.ts",
+      "line": 11,
+      "endLine": 17,
+      "text": "{\n  id: \"kimi-coding\",\n  displayName: \"Kimi Coding Plan\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api.kimi.com/coding/v1\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "mimo-token-plan",
+    "exportName": "mimoTokenPlanPlugin",
+    "file": "lib/providers/mimo-token-plan.ts",
+    "sha256": "6a289a9ddf19be2f993e156fc6d35f4ea296ddf29f8359c9c796f09c618feabd",
+    "source": {
+      "path": "lib/providers/mimo-token-plan.ts",
+      "line": 10,
+      "endLine": 26,
+      "text": "{\n  id: \"mimo-token-plan\",\n  displayName: \"Xiaomi MiMo Token Plan\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://token-plan-cn.xiaomimimo.com/v1\",\n  defaultApi: \"openai-completions\",\n  capabilities: {\n    media: {\n      speechRecognition: {\n        defaultModelId: \"mimo-v2.5-asr\",\n        models: [\n          { id: \"mimo-v2.5-asr\", displayName: \"MiMo V2.5 ASR\", protocolId: \"mimo-chat-completions-asr\", inputs: [\"audio\"], outputs: [\"text\"] },\n        ],\n      },\n    },\n  },\n}"
+    },
+    "capabilities": [
+      {
+        "capability": "speechRecognition",
+        "declaration": [
+          {
+            "path": "lib/providers/mimo-token-plan.ts",
+            "line": 18,
+            "endLine": 23,
+            "text": "speechRecognition: {\n        defaultModelId: \"mimo-v2.5-asr\",\n        models: [\n          { id: \"mimo-v2.5-asr\", displayName: \"MiMo V2.5 ASR\", protocolId: \"mimo-chat-completions-asr\", inputs: [\"audio\"], outputs: [\"text\"] },\n        ],\n      }"
+          }
+        ],
+        "credentialLanes": [],
+        "explicitLanes": false,
+        "modelProtocols": [
+          "mimo-chat-completions-asr"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mimo",
+    "exportName": "mimoPlugin",
+    "file": "lib/providers/mimo.ts",
+    "sha256": "631d61423e66cbab17a505690042acb60de602e70d95a192bb323e0ec2431d94",
+    "source": {
+      "path": "lib/providers/mimo.ts",
+      "line": 8,
+      "endLine": 24,
+      "text": "{\n  id: \"mimo\",\n  displayName: \"Xiaomi (MiMo)\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api.xiaomimimo.com/v1\",\n  defaultApi: \"openai-completions\",\n  capabilities: {\n    media: {\n      speechRecognition: {\n        defaultModelId: \"mimo-v2.5-asr\",\n        models: [\n          { id: \"mimo-v2.5-asr\", displayName: \"MiMo V2.5 ASR\", protocolId: \"mimo-chat-completions-asr\", inputs: [\"audio\"], outputs: [\"text\"] },\n        ],\n      },\n    },\n  },\n}"
+    },
+    "capabilities": [
+      {
+        "capability": "speechRecognition",
+        "declaration": [
+          {
+            "path": "lib/providers/mimo.ts",
+            "line": 16,
+            "endLine": 21,
+            "text": "speechRecognition: {\n        defaultModelId: \"mimo-v2.5-asr\",\n        models: [\n          { id: \"mimo-v2.5-asr\", displayName: \"MiMo V2.5 ASR\", protocolId: \"mimo-chat-completions-asr\", inputs: [\"audio\"], outputs: [\"text\"] },\n        ],\n      }"
+          }
+        ],
+        "credentialLanes": [],
+        "explicitLanes": false,
+        "modelProtocols": [
+          "mimo-chat-completions-asr"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "minimax-token-plan",
+    "exportName": "minimaxTokenPlanPlugin",
+    "file": "lib/providers/minimax-token-plan.ts",
+    "sha256": "8af45fa81d54f24cfcba141fcd3464f612e07e6ec551d1c52fb45d8293f5425f",
+    "source": {
+      "path": "lib/providers/minimax-token-plan.ts",
+      "line": 10,
+      "endLine": 16,
+      "text": "{\n  id: \"minimax-token-plan\",\n  displayName: \"MiniMax Token Plan\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api.minimaxi.com/anthropic\",\n  defaultApi: \"anthropic-messages\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "minimax",
+    "exportName": "minimaxPlugin",
+    "file": "lib/providers/minimax.ts",
+    "sha256": "0b0ffdfd55d9df8b5e59db30d2c985d3366cab213e865ff487613f374a27653a",
+    "source": {
+      "path": "lib/providers/minimax.ts",
+      "line": 56,
+      "endLine": 74,
+      "text": "{\n  id: \"minimax\",\n  displayName: \"MiniMax\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api.minimaxi.com/anthropic\",\n  defaultApi: \"anthropic-messages\",\n  capabilities: {\n    media: {\n      imageGeneration: minimaxImageGenerationCapability,\n      speechGeneration: {\n        defaultModelId: \"speech-02-hd\",\n        models: [\n          { id: \"speech-02-hd\", displayName: \"Speech 02 HD\", protocolId: \"minimax-tts\", inputs: [\"text\"], outputs: [\"audio\"] },\n          { id: \"speech-02-turbo\", displayName: \"Speech 02 Turbo\", protocolId: \"minimax-tts\", inputs: [\"text\"], outputs: [\"audio\"] },\n        ],\n      },\n    },\n  },\n}"
+    },
+    "capabilities": [
+      {
+        "capability": "imageGeneration",
+        "declaration": [
+          {
+            "path": "lib/providers/minimax.ts",
+            "line": 64,
+            "endLine": 64,
+            "text": "imageGeneration: minimaxImageGenerationCapability"
+          },
+          {
+            "path": "lib/providers/minimax.ts",
+            "line": 43,
+            "endLine": 53,
+            "text": "{\n  defaultModelId: \"image-01\",\n  credentialLanes: [\n    { id: \"minimax\", providerId: \"minimax\", label: \"MiniMax\" },\n    { id: \"minimax-token-plan\", providerId: \"minimax-token-plan\", label: \"MiniMax Token Plan\" },\n  ],\n  models: [\n    minimaxImageModel(\"image-01\", \"MiniMax Image 01\"),\n    minimaxImageModel(\"image-01-live\", \"MiniMax Image 01 Live\"),\n  ],\n}"
+          }
+        ],
+        "credentialLanes": [
+          {
+            "id": "minimax",
+            "providerId": "minimax",
+            "source": {
+              "path": "lib/providers/minimax.ts",
+              "line": 46,
+              "endLine": 46,
+              "text": "{ id: \"minimax\", providerId: \"minimax\", label: \"MiniMax\" }"
+            }
+          },
+          {
+            "id": "minimax-token-plan",
+            "providerId": "minimax-token-plan",
+            "source": {
+              "path": "lib/providers/minimax.ts",
+              "line": 47,
+              "endLine": 47,
+              "text": "{ id: \"minimax-token-plan\", providerId: \"minimax-token-plan\", label: \"MiniMax Token Plan\" }"
+            }
+          }
+        ],
+        "explicitLanes": true,
+        "modelProtocols": []
+      },
+      {
+        "capability": "speechGeneration",
+        "declaration": [
+          {
+            "path": "lib/providers/minimax.ts",
+            "line": 65,
+            "endLine": 71,
+            "text": "speechGeneration: {\n        defaultModelId: \"speech-02-hd\",\n        models: [\n          { id: \"speech-02-hd\", displayName: \"Speech 02 HD\", protocolId: \"minimax-tts\", inputs: [\"text\"], outputs: [\"audio\"] },\n          { id: \"speech-02-turbo\", displayName: \"Speech 02 Turbo\", protocolId: \"minimax-tts\", inputs: [\"text\"], outputs: [\"audio\"] },\n        ],\n      }"
+          }
+        ],
+        "credentialLanes": [],
+        "explicitLanes": false,
+        "modelProtocols": [
+          "minimax-tts"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mistral",
+    "exportName": "mistralPlugin",
+    "file": "lib/providers/mistral.ts",
+    "sha256": "68f48863550d865b7425c296f1546013fdffb3f47381b68a0dd7014692be9bc2",
+    "source": {
+      "path": "lib/providers/mistral.ts",
+      "line": 8,
+      "endLine": 14,
+      "text": "{\n  id: \"mistral\",\n  displayName: \"Mistral AI\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api.mistral.ai/v1\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "modelscope",
+    "exportName": "modelscopePlugin",
+    "file": "lib/providers/modelscope.ts",
+    "sha256": "89bb36ec0a619af57683ff2edee2f1639f8cc517b2df58648b393ef5f3a36297",
+    "source": {
+      "path": "lib/providers/modelscope.ts",
+      "line": 9,
+      "endLine": 15,
+      "text": "{\n  id: \"modelscope\",\n  displayName: \"魔搭 (ModelScope)\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api-inference.modelscope.cn/v1\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "moonshot",
+    "exportName": "moonshotPlugin",
+    "file": "lib/providers/moonshot.ts",
+    "sha256": "cb15df82c73f303350d5715afe430149992b7d7fc7c2c6a172e446d5c0a9d82d",
+    "source": {
+      "path": "lib/providers/moonshot.ts",
+      "line": 8,
+      "endLine": 14,
+      "text": "{\n  id: \"moonshot\",\n  displayName: \"Moonshot (Kimi)\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api.moonshot.cn/v1\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "ollama",
+    "exportName": "ollamaPlugin",
+    "file": "lib/providers/ollama.ts",
+    "sha256": "e2d7a8104cabcf2becbca9ab1458e30dca451f6379b121a793cef897e6c3f539",
+    "source": {
+      "path": "lib/providers/ollama.ts",
+      "line": 8,
+      "endLine": 14,
+      "text": "{\n  id: \"ollama\",\n  displayName: \"Ollama (本地)\",\n  authType: \"none\",\n  defaultBaseUrl: \"http://localhost:11434/v1\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "openai-codex-oauth",
+    "exportName": "openaiCodexOAuthPlugin",
+    "file": "lib/providers/openai-codex-oauth.ts",
+    "sha256": "3b060ab75380e48e28da75596a934819fd27cfe6b34b3614820cacd129cfcc54",
+    "source": {
+      "path": "lib/providers/openai-codex-oauth.ts",
+      "line": 28,
+      "endLine": 86,
+      "text": "{\n  id: \"openai-codex-oauth\",\n  displayName: \"OpenAI Codex (OAuth)\",\n  authType: \"oauth\",\n  defaultBaseUrl: \"https://chatgpt.com/backend-api\",\n  defaultApi: \"openai-codex-responses\",\n  authJsonKey: \"openai-codex\",\n  // Hana owns the Codex model catalog. A missing Provider Catalog `models`\n  // field uses this list; an explicit [] remains an intentional opt-out.\n  models: [\n    \"gpt-5.6-sol\",\n    \"gpt-5.6-terra\",\n    \"gpt-5.6-luna\",\n    \"gpt-5.5\",\n    \"gpt-5.4\",\n    \"gpt-5.4-mini\",\n    \"gpt-5.2\",\n  ],\n  capabilities: {\n    chat: {\n      runtimeProviderId: \"openai-codex\",\n      displayProviderId: \"openai-codex\",\n      projection: \"models-json\",\n      credentialSource: \"auth-storage\",\n      allowListSource: \"provider.models\",\n    },\n    media: {\n      imageGeneration: {\n        defaultModelId: \"gpt-image-2\",\n        credentialLanes: [\n          {\n            id: \"codex-oauth\",\n            providerId: \"openai-codex-oauth\",\n            authJsonKey: \"openai-codex\",\n            label: \"Codex OAuth\",\n          },\n        ],\n        models: [\n          {\n            id: \"gpt-image-2\",\n            displayName: \"GPT Image 2\",\n            protocolId: \"openai-codex-responses-image\",\n            credentialLaneId: \"codex-oauth\",\n            inputs: [\"text\", \"image\"],\n            outputs: [\"image\"],\n            supportsEdit: true,\n            aliases: [\"2\", \"image-2\"],\n            modes: [\n              mediaMode(\"text2image\", \"Text to image\", GPT_IMAGE_2_PROPERTIES, GPT_IMAGE_2_DEFAULTS, noReferenceImages()),\n              mediaMode(\"image2image\", \"Image edit/reference\", GPT_IMAGE_2_PROPERTIES, GPT_IMAGE_2_DEFAULTS, referenceImages()),\n            ],\n            ratios: [...OPENAI_FLEXIBLE_IMAGE_RATIOS],\n            resolutions: [\"1K\", \"2K\"],\n          },\n        ],\n      },\n    },\n  },\n}"
+    },
+    "capabilities": [
+      {
+        "capability": "imageGeneration",
+        "declaration": [
+          {
+            "path": "lib/providers/openai-codex-oauth.ts",
+            "line": 55,
+            "endLine": 83,
+            "text": "imageGeneration: {\n        defaultModelId: \"gpt-image-2\",\n        credentialLanes: [\n          {\n            id: \"codex-oauth\",\n            providerId: \"openai-codex-oauth\",\n            authJsonKey: \"openai-codex\",\n            label: \"Codex OAuth\",\n          },\n        ],\n        models: [\n          {\n            id: \"gpt-image-2\",\n            displayName: \"GPT Image 2\",\n            protocolId: \"openai-codex-responses-image\",\n            credentialLaneId: \"codex-oauth\",\n            inputs: [\"text\", \"image\"],\n            outputs: [\"image\"],\n            supportsEdit: true,\n            aliases: [\"2\", \"image-2\"],\n            modes: [\n              mediaMode(\"text2image\", \"Text to image\", GPT_IMAGE_2_PROPERTIES, GPT_IMAGE_2_DEFAULTS, noReferenceImages()),\n              mediaMode(\"image2image\", \"Image edit/reference\", GPT_IMAGE_2_PROPERTIES, GPT_IMAGE_2_DEFAULTS, referenceImages()),\n            ],\n            ratios: [...OPENAI_FLEXIBLE_IMAGE_RATIOS],\n            resolutions: [\"1K\", \"2K\"],\n          },\n        ],\n      }"
+          }
+        ],
+        "credentialLanes": [
+          {
+            "id": "codex-oauth",
+            "providerId": "openai-codex-oauth",
+            "source": {
+              "path": "lib/providers/openai-codex-oauth.ts",
+              "line": 58,
+              "endLine": 63,
+              "text": "{\n            id: \"codex-oauth\",\n            providerId: \"openai-codex-oauth\",\n            authJsonKey: \"openai-codex\",\n            label: \"Codex OAuth\",\n          }"
+            }
+          }
+        ],
+        "explicitLanes": true,
+        "modelProtocols": [
+          "openai-codex-responses-image"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "openai",
+    "exportName": "openaiPlugin",
+    "file": "lib/providers/openai.ts",
+    "sha256": "a2499823b831e0f3b8dab0dc9aeb75c84f2820cfc9966008fe9a4922ad42d836",
+    "source": {
+      "path": "lib/providers/openai.ts",
+      "line": 56,
+      "endLine": 121,
+      "text": "{\n  id: \"openai\",\n  displayName: \"OpenAI\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api.openai.com/v1\",\n  defaultApi: \"openai-completions\",\n  capabilities: {\n    media: {\n      imageGeneration: {\n        defaultModelId: \"gpt-image-1.5\",\n        models: [\n          gptImageModel(\"gpt-image-1.5\", \"GPT Image 1.5\", [\"1.5\"]),\n          gptImageModel(\"gpt-image-1\", \"GPT Image 1\", [\"1\"]),\n          gptImageModel(\"gpt-image-1-mini\", \"GPT Image 1 Mini\", [\"1-mini\", \"mini\"]),\n          {\n            id: \"dall-e-3\",\n            displayName: \"DALL-E 3\",\n            protocolId: \"openai-images\",\n            inputs: [\"text\"],\n            outputs: [\"image\"],\n            aliases: [\"dalle3\"],\n            modes: [\n              mediaMode(\"text2image\", \"Text to image\", DALL_E_3_PROPERTIES, DALL_E_3_DEFAULTS, noReferenceImages()),\n            ],\n            ratios: [\"1:1\", \"16:9\", \"9:16\"],\n            resolutions: [\"1K\"],\n          },\n        ],\n      },\n      speechGeneration: {\n        defaultModelId: \"gpt-4o-mini-tts\",\n        models: [\n          {\n            id: \"gpt-4o-mini-tts\",\n            displayName: \"GPT-4o Mini TTS\",\n            protocolId: \"openai-audio-speech\",\n            inputs: [\"text\"],\n            outputs: [\"audio\"],\n          },\n          {\n            id: \"tts-1\",\n            displayName: \"TTS-1\",\n            protocolId: \"openai-audio-speech\",\n            inputs: [\"text\"],\n            outputs: [\"audio\"],\n          },\n          {\n            id: \"tts-1-hd\",\n            displayName: \"TTS-1 HD\",\n            protocolId: \"openai-audio-speech\",\n            inputs: [\"text\"],\n            outputs: [\"audio\"],\n          },\n        ],\n      },\n      speechRecognition: {\n        defaultModelId: \"gpt-4o-mini-transcribe\",\n        models: [\n          { id: \"gpt-4o-transcribe\", displayName: \"GPT-4o Transcribe\", protocolId: \"openai-audio-transcriptions\", inputs: [\"audio\"], outputs: [\"text\"] },\n          { id: \"gpt-4o-mini-transcribe\", displayName: \"GPT-4o Mini Transcribe\", protocolId: \"openai-audio-transcriptions\", inputs: [\"audio\"], outputs: [\"text\"] },\n          { id: \"whisper-1\", displayName: \"Whisper 1\", protocolId: \"openai-audio-transcriptions\", inputs: [\"audio\"], outputs: [\"text\"] },\n        ],\n      },\n    },\n  },\n}"
+    },
+    "capabilities": [
+      {
+        "capability": "imageGeneration",
+        "declaration": [
+          {
+            "path": "lib/providers/openai.ts",
+            "line": 64,
+            "endLine": 84,
+            "text": "imageGeneration: {\n        defaultModelId: \"gpt-image-1.5\",\n        models: [\n          gptImageModel(\"gpt-image-1.5\", \"GPT Image 1.5\", [\"1.5\"]),\n          gptImageModel(\"gpt-image-1\", \"GPT Image 1\", [\"1\"]),\n          gptImageModel(\"gpt-image-1-mini\", \"GPT Image 1 Mini\", [\"1-mini\", \"mini\"]),\n          {\n            id: \"dall-e-3\",\n            displayName: \"DALL-E 3\",\n            protocolId: \"openai-images\",\n            inputs: [\"text\"],\n            outputs: [\"image\"],\n            aliases: [\"dalle3\"],\n            modes: [\n              mediaMode(\"text2image\", \"Text to image\", DALL_E_3_PROPERTIES, DALL_E_3_DEFAULTS, noReferenceImages()),\n            ],\n            ratios: [\"1:1\", \"16:9\", \"9:16\"],\n            resolutions: [\"1K\"],\n          },\n        ],\n      }"
+          }
+        ],
+        "credentialLanes": [],
+        "explicitLanes": false,
+        "modelProtocols": [
+          "openai-images"
+        ]
+      },
+      {
+        "capability": "speechGeneration",
+        "declaration": [
+          {
+            "path": "lib/providers/openai.ts",
+            "line": 85,
+            "endLine": 110,
+            "text": "speechGeneration: {\n        defaultModelId: \"gpt-4o-mini-tts\",\n        models: [\n          {\n            id: \"gpt-4o-mini-tts\",\n            displayName: \"GPT-4o Mini TTS\",\n            protocolId: \"openai-audio-speech\",\n            inputs: [\"text\"],\n            outputs: [\"audio\"],\n          },\n          {\n            id: \"tts-1\",\n            displayName: \"TTS-1\",\n            protocolId: \"openai-audio-speech\",\n            inputs: [\"text\"],\n            outputs: [\"audio\"],\n          },\n          {\n            id: \"tts-1-hd\",\n            displayName: \"TTS-1 HD\",\n            protocolId: \"openai-audio-speech\",\n            inputs: [\"text\"],\n            outputs: [\"audio\"],\n          },\n        ],\n      }"
+          }
+        ],
+        "credentialLanes": [],
+        "explicitLanes": false,
+        "modelProtocols": [
+          "openai-audio-speech"
+        ]
+      },
+      {
+        "capability": "speechRecognition",
+        "declaration": [
+          {
+            "path": "lib/providers/openai.ts",
+            "line": 111,
+            "endLine": 118,
+            "text": "speechRecognition: {\n        defaultModelId: \"gpt-4o-mini-transcribe\",\n        models: [\n          { id: \"gpt-4o-transcribe\", displayName: \"GPT-4o Transcribe\", protocolId: \"openai-audio-transcriptions\", inputs: [\"audio\"], outputs: [\"text\"] },\n          { id: \"gpt-4o-mini-transcribe\", displayName: \"GPT-4o Mini Transcribe\", protocolId: \"openai-audio-transcriptions\", inputs: [\"audio\"], outputs: [\"text\"] },\n          { id: \"whisper-1\", displayName: \"Whisper 1\", protocolId: \"openai-audio-transcriptions\", inputs: [\"audio\"], outputs: [\"text\"] },\n        ],\n      }"
+          }
+        ],
+        "credentialLanes": [],
+        "explicitLanes": false,
+        "modelProtocols": [
+          "openai-audio-transcriptions"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "opencode-go",
+    "exportName": "opencodeGoPlugin",
+    "file": "lib/providers/opencode-go.ts",
+    "sha256": "68c97e28e251279ec4ff52a148c59da9235d5e36066b33a154eb364bc742bee7",
+    "source": {
+      "path": "lib/providers/opencode-go.ts",
+      "line": 10,
+      "endLine": 16,
+      "text": "{\n  id: \"opencode-go\",\n  displayName: \"OpenCode Go\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://opencode.ai/zen/go/v1\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "opencode",
+    "exportName": "opencodePlugin",
+    "file": "lib/providers/opencode.ts",
+    "sha256": "1b3d0b225510cec8d29b8478624ef2190f1bea8a85d57bfbd4e6bc3d0812fec0",
+    "source": {
+      "path": "lib/providers/opencode.ts",
+      "line": 24,
+      "endLine": 31,
+      "text": "{\n  id: \"opencode\",\n  displayName: \"OpenCode Zen\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://opencode.ai/zen\",\n  defaultApi: \"anthropic-messages\",\n  models,\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "openrouter",
+    "exportName": "openrouterPlugin",
+    "file": "lib/providers/openrouter.ts",
+    "sha256": "bc46ed07b9040d5b785bf7a0fed7eab3da46522e2c3bea04ca4cfd9d0015dba0",
+    "source": {
+      "path": "lib/providers/openrouter.ts",
+      "line": 10,
+      "endLine": 16,
+      "text": "{\n  id: \"openrouter\",\n  displayName: \"OpenRouter\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://openrouter.ai/api/v1\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "perplexity",
+    "exportName": "perplexityPlugin",
+    "file": "lib/providers/perplexity.ts",
+    "sha256": "2bd49c07804247a94ab8a1fbf7ff3741549beb64e00230c0d2398d2aa7724fe5",
+    "source": {
+      "path": "lib/providers/perplexity.ts",
+      "line": 9,
+      "endLine": 15,
+      "text": "{\n  id: \"perplexity\",\n  displayName: \"Perplexity\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api.perplexity.ai\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "siliconflow",
+    "exportName": "siliconflowPlugin",
+    "file": "lib/providers/siliconflow.ts",
+    "sha256": "8ed836a40fc35b32e87fdbb04ebecfd95b17bb6879d1b4660dca150ad971556a",
+    "source": {
+      "path": "lib/providers/siliconflow.ts",
+      "line": 9,
+      "endLine": 31,
+      "text": "{\n  id: \"siliconflow\",\n  displayName: \"SiliconFlow (硅基流动)\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api.siliconflow.cn/v1\",\n  defaultApi: \"openai-completions\",\n  capabilities: {\n    media: {\n      speechGeneration: {\n        defaultModelId: \"FunAudioLLM/CosyVoice2-0.5B\",\n        models: [\n          {\n            id: \"FunAudioLLM/CosyVoice2-0.5B\",\n            displayName: \"CosyVoice2 0.5B\",\n            protocolId: \"openai-audio-speech\",\n            inputs: [\"text\"],\n            outputs: [\"audio\"],\n          },\n        ],\n      },\n    },\n  },\n}"
+    },
+    "capabilities": [
+      {
+        "capability": "speechGeneration",
+        "declaration": [
+          {
+            "path": "lib/providers/siliconflow.ts",
+            "line": 17,
+            "endLine": 28,
+            "text": "speechGeneration: {\n        defaultModelId: \"FunAudioLLM/CosyVoice2-0.5B\",\n        models: [\n          {\n            id: \"FunAudioLLM/CosyVoice2-0.5B\",\n            displayName: \"CosyVoice2 0.5B\",\n            protocolId: \"openai-audio-speech\",\n            inputs: [\"text\"],\n            outputs: [\"audio\"],\n          },\n        ],\n      }"
+          }
+        ],
+        "credentialLanes": [],
+        "explicitLanes": false,
+        "modelProtocols": [
+          "openai-audio-speech"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "stepfun",
+    "exportName": "stepfunPlugin",
+    "file": "lib/providers/stepfun.ts",
+    "sha256": "5f553c72e003934b16b0945c9dc6eff7d75d8e694127fa256c9d793910d98dc4",
+    "source": {
+      "path": "lib/providers/stepfun.ts",
+      "line": 8,
+      "endLine": 14,
+      "text": "{\n  id: \"stepfun\",\n  displayName: \"阶跃星辰 (StepFun)\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api.stepfun.com/v1\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "system-speech",
+    "exportName": "systemSpeechPlugin",
+    "file": "lib/providers/system-speech.ts",
+    "sha256": "284884f50333cbb3a5deb419479101fe3b188beee4db8c464db0cf689da5b8ac",
+    "source": {
+      "path": "lib/providers/system-speech.ts",
+      "line": 9,
+      "endLine": 37,
+      "text": "{\n  id: \"system-speech\",\n  displayName: \"系统语音识别\",\n  authType: \"none\",\n  defaultBaseUrl: \"\",\n  defaultApi: \"system-speech\",\n  capabilities: {\n    chat: {\n      projection: \"none\",\n      runtimeProviderId: \"system-speech\",\n      displayProviderId: \"system-speech\",\n      allowListSource: \"none\",\n    },\n    media: {\n      speechGeneration: {\n        defaultModelId: \"system-speech-tts\",\n        models: [\n          { id: \"system-speech-tts\", displayName: \"系统语音合成（本地）\", protocolId: \"system-speech\", inputs: [\"text\"], outputs: [\"audio\"] },\n        ],\n      },\n      speechRecognition: {\n        defaultModelId: \"system-speech\",\n        models: [\n          { id: \"system-speech\", displayName: \"系统语音识别\", protocolId: \"system-speech-recognition\", inputs: [\"audio\"], outputs: [\"text\"] },\n        ],\n      },\n    },\n  },\n}"
+    },
+    "capabilities": [
+      {
+        "capability": "speechGeneration",
+        "declaration": [
+          {
+            "path": "lib/providers/system-speech.ts",
+            "line": 23,
+            "endLine": 28,
+            "text": "speechGeneration: {\n        defaultModelId: \"system-speech-tts\",\n        models: [\n          { id: \"system-speech-tts\", displayName: \"系统语音合成（本地）\", protocolId: \"system-speech\", inputs: [\"text\"], outputs: [\"audio\"] },\n        ],\n      }"
+          }
+        ],
+        "credentialLanes": [],
+        "explicitLanes": false,
+        "modelProtocols": [
+          "system-speech"
+        ]
+      },
+      {
+        "capability": "speechRecognition",
+        "declaration": [
+          {
+            "path": "lib/providers/system-speech.ts",
+            "line": 29,
+            "endLine": 34,
+            "text": "speechRecognition: {\n        defaultModelId: \"system-speech\",\n        models: [\n          { id: \"system-speech\", displayName: \"系统语音识别\", protocolId: \"system-speech-recognition\", inputs: [\"audio\"], outputs: [\"text\"] },\n        ],\n      }"
+          }
+        ],
+        "credentialLanes": [],
+        "explicitLanes": false,
+        "modelProtocols": [
+          "system-speech-recognition"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "together",
+    "exportName": "togetherPlugin",
+    "file": "lib/providers/together.ts",
+    "sha256": "cda9f3e1c0a3296ffcf43bccef1ee5d56d2e9fbd929a32de35a720884f89f185",
+    "source": {
+      "path": "lib/providers/together.ts",
+      "line": 8,
+      "endLine": 14,
+      "text": "{\n  id: \"together\",\n  displayName: \"Together AI\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api.together.xyz/v1\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "volcengine-coding",
+    "exportName": "volcegineCodingPlugin",
+    "file": "lib/providers/volcengine-coding.ts",
+    "sha256": "debafc87bc19859c1d0eb14fc76ed8f12336a4e380282b2be594e78651c879c4",
+    "source": {
+      "path": "lib/providers/volcengine-coding.ts",
+      "line": 11,
+      "endLine": 17,
+      "text": "{\n  id: \"volcengine-coding\",\n  displayName: \"火山引擎 Coding Plan\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://ark.cn-beijing.volces.com/api/coding/v3\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "volcengine-speech",
+    "exportName": "volcengineSpeechPlugin",
+    "file": "lib/providers/volcengine-speech.ts",
+    "sha256": "c66e63879b5fbafdbc647eb99c60765a646f88257043565eb5f8c102d24b22d5",
+    "source": {
+      "path": "lib/providers/volcengine-speech.ts",
+      "line": 9,
+      "endLine": 25,
+      "text": "{\n  id: \"volcengine-speech\",\n  displayName: \"火山引擎语音 (BigASR)\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://openspeech.bytedance.com\",\n  defaultApi: \"volcengine-bigasr\",\n  capabilities: {\n    media: {\n      speechRecognition: {\n        defaultModelId: \"bigasr-flash\",\n        models: [\n          { id: \"bigasr-flash\", displayName: \"BigASR Flash\", protocolId: \"volcengine-bigasr-transcription\", inputs: [\"audio\"], outputs: [\"text\"], aliases: [\"bigasr\", \"bigasr-auc\"] },\n        ],\n      },\n    },\n  },\n}"
+    },
+    "capabilities": [
+      {
+        "capability": "speechRecognition",
+        "declaration": [
+          {
+            "path": "lib/providers/volcengine-speech.ts",
+            "line": 17,
+            "endLine": 22,
+            "text": "speechRecognition: {\n        defaultModelId: \"bigasr-flash\",\n        models: [\n          { id: \"bigasr-flash\", displayName: \"BigASR Flash\", protocolId: \"volcengine-bigasr-transcription\", inputs: [\"audio\"], outputs: [\"text\"], aliases: [\"bigasr\", \"bigasr-auc\"] },\n        ],\n      }"
+          }
+        ],
+        "credentialLanes": [],
+        "explicitLanes": false,
+        "modelProtocols": [
+          "volcengine-bigasr-transcription"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "volcengine",
+    "exportName": "volcenginePlugin",
+    "file": "lib/providers/volcengine.ts",
+    "sha256": "fc85cb6215019b52bf9b502aec9549a95921c035a727d6188b6688f9b8e039f8",
+    "source": {
+      "path": "lib/providers/volcengine.ts",
+      "line": 89,
+      "endLine": 121,
+      "text": "{\n  id: \"volcengine\",\n  displayName: \"火山引擎 (豆包)\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://ark.cn-beijing.volces.com/api/v3\",\n  defaultApi: \"openai-completions\",\n  capabilities: {\n    media: {\n      imageGeneration: {\n        defaultModelId: \"doubao-seedream-5-0-lite-260128\",\n        credentialLanes: [\n          {\n            id: \"volcengine\",\n            providerId: \"volcengine\",\n            label: \"火山引擎 API Key\",\n          },\n          {\n            id: \"volcengine-coding\",\n            providerId: \"volcengine-coding\",\n            label: \"火山引擎 Coding Plan\",\n          },\n        ],\n        models: [\n          seedreamTextOnlyModel(\"doubao-seedream-3-0-t2i\", \"Seedream 3.0\", [\"3.0\"]),\n          seedreamReferenceModel(\"doubao-seedream-4-0-250828\", \"Seedream 4.0\", [\"4.0\"]),\n          seedreamReferenceModel(\"doubao-seedream-4-5-251128\", \"Seedream 4.5\", [\"4.5\"]),\n          seedreamReferenceModel(\"doubao-seedream-5-0-lite-260128\", \"Seedream 5.0 Lite\", [\"5.0-lite\"], SEEDREAM_5_PROPERTIES),\n          seedreamReferenceModel(\"doubao-seedream-5-0-260128\", \"Seedream 5.0\", [\"5.0\"], SEEDREAM_5_PROPERTIES),\n        ],\n      },\n    },\n  },\n}"
+    },
+    "capabilities": [
+      {
+        "capability": "imageGeneration",
+        "declaration": [
+          {
+            "path": "lib/providers/volcengine.ts",
+            "line": 97,
+            "endLine": 118,
+            "text": "imageGeneration: {\n        defaultModelId: \"doubao-seedream-5-0-lite-260128\",\n        credentialLanes: [\n          {\n            id: \"volcengine\",\n            providerId: \"volcengine\",\n            label: \"火山引擎 API Key\",\n          },\n          {\n            id: \"volcengine-coding\",\n            providerId: \"volcengine-coding\",\n            label: \"火山引擎 Coding Plan\",\n          },\n        ],\n        models: [\n          seedreamTextOnlyModel(\"doubao-seedream-3-0-t2i\", \"Seedream 3.0\", [\"3.0\"]),\n          seedreamReferenceModel(\"doubao-seedream-4-0-250828\", \"Seedream 4.0\", [\"4.0\"]),\n          seedreamReferenceModel(\"doubao-seedream-4-5-251128\", \"Seedream 4.5\", [\"4.5\"]),\n          seedreamReferenceModel(\"doubao-seedream-5-0-lite-260128\", \"Seedream 5.0 Lite\", [\"5.0-lite\"], SEEDREAM_5_PROPERTIES),\n          seedreamReferenceModel(\"doubao-seedream-5-0-260128\", \"Seedream 5.0\", [\"5.0\"], SEEDREAM_5_PROPERTIES),\n        ],\n      }"
+          }
+        ],
+        "credentialLanes": [
+          {
+            "id": "volcengine",
+            "providerId": "volcengine",
+            "source": {
+              "path": "lib/providers/volcengine.ts",
+              "line": 100,
+              "endLine": 104,
+              "text": "{\n            id: \"volcengine\",\n            providerId: \"volcengine\",\n            label: \"火山引擎 API Key\",\n          }"
+            }
+          },
+          {
+            "id": "volcengine-coding",
+            "providerId": "volcengine-coding",
+            "source": {
+              "path": "lib/providers/volcengine.ts",
+              "line": 105,
+              "endLine": 109,
+              "text": "{\n            id: \"volcengine-coding\",\n            providerId: \"volcengine-coding\",\n            label: \"火山引擎 Coding Plan\",\n          }"
+            }
+          }
+        ],
+        "explicitLanes": true,
+        "modelProtocols": []
+      }
+    ]
+  },
+  {
+    "id": "xai-oauth",
+    "exportName": "xaiOAuthPlugin",
+    "file": "lib/providers/xai-oauth.ts",
+    "sha256": "edad32b7d9483d6b2d940aff81cd85bb9b132d36f30f57f100f51b2e4a80b020",
+    "source": {
+      "path": "lib/providers/xai-oauth.ts",
+      "line": 52,
+      "endLine": 86,
+      "text": "{\n  id: \"xai-oauth\",\n  displayName: \"xAI Grok (OAuth)\",\n  authType: \"oauth\",\n  authJsonKey: \"xai-oauth\",\n  defaultBaseUrl: XAI_OAUTH_RESOURCE_URL,\n  defaultApi: \"openai-responses\",\n  headers: XAI_OAUTH_CLI_PROVIDER_HEADERS,\n  models: GROK_OAUTH_MODELS,\n  modelExecutionHeaders: buildXaiOauthCliModelHeaders,\n  capabilities: {\n    chat: {\n      runtimeProviderId: \"xai-oauth\",\n      displayProviderId: \"xai-oauth\",\n      projection: \"models-json\",\n      credentialSource: \"auth-storage\",\n      allowListSource: \"provider.models\",\n    },\n  },\n  runtime: {\n    kind: \"oauth-http\",\n    protocolId: \"openai-responses\",\n    allowedBaseUrlOrigins: [\"https://cli-chat-proxy.grok.com\"],\n  },\n  sdkProvider: {\n    providerId: \"xai-oauth\",\n    config: {\n      name: \"xAI Grok (OAuth)\",\n      baseUrl: XAI_OAUTH_RESOURCE_URL,\n      api: \"openai-responses\",\n      headers: XAI_OAUTH_CLI_PROVIDER_HEADERS,\n      oauth: xaiOAuthProvider,\n    },\n  },\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "xai",
+    "exportName": "xaiPlugin",
+    "file": "lib/providers/xai.ts",
+    "sha256": "2bc35a646a5245e8c253fba59cca8d0ffb35f1883b2ef318913c40f6f27f81fc",
+    "source": {
+      "path": "lib/providers/xai.ts",
+      "line": 8,
+      "endLine": 14,
+      "text": "{\n  id: \"xai\",\n  displayName: \"xAI (Grok)\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api.x.ai/v1\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "zhipu-coding",
+    "exportName": "zhipuCodingPlugin",
+    "file": "lib/providers/zhipu-coding.ts",
+    "sha256": "d2477e3e9a83eae219569ed5082481ddd5b91868cf5723955843610f33a1e1b0",
+    "source": {
+      "path": "lib/providers/zhipu-coding.ts",
+      "line": 12,
+      "endLine": 18,
+      "text": "{\n  id: \"zhipu-coding\",\n  displayName: \"智谱 GLM Coding Plan\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://api.z.ai/api/coding/paas/v4\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  },
+  {
+    "id": "zhipu",
+    "exportName": "zhipuPlugin",
+    "file": "lib/providers/zhipu.ts",
+    "sha256": "6964bba5ffcf6cdfc71168ae6d1af94a8f002c2cd48d623e13ff8be25355d730",
+    "source": {
+      "path": "lib/providers/zhipu.ts",
+      "line": 9,
+      "endLine": 15,
+      "text": "{\n  id: \"zhipu\",\n  displayName: \"智谱 AI (GLM)\",\n  authType: \"api-key\",\n  defaultBaseUrl: \"https://open.bigmodel.cn/api/paas/v4\",\n  defaultApi: \"openai-completions\",\n}"
+    },
+    "capabilities": []
+  }
+]

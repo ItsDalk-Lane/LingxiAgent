@@ -1,0 +1,69 @@
+2026-10-26T11:15:08.918360Z  INFO lingxi_service: data root resolved [token] source=config-file ignored_sources=none
+2026-10-26T11:15:08.918575Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) [token] [token]
+2026-10-26T11:15:08.918808Z  INFO lingxi_service: model plane resolved (credentials never logged) model_plane_source=Some("/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02/service-config-b.json") providers=1
+2026-10-26T11:15:08.919427Z  INFO lingxi_service: single-writer lock acquired [token] start_nonce=60903102e16151e5 pid=33299 entropy="os-random-device" lock=/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02/root-b-rust/lingxi-service/instance.lock network_mode=loopback
+2026-10-26T11:15:08.919848Z  INFO lingxi_service: data-epoch gate passed [token] decision=ProceedSteady(EpochStamp { format: V2, minimum_reader_epoch: 2, committed_data_epoch: 2, last_version: Some("0.0.0") })
+2026-10-26T11:15:08.944620Z  INFO lingxi_adapters::storage::run_store: session seed skipped: sessions table is not empty (fresh-database-only seed) session_count=6
+2026-10-26T11:15:08.969213Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded local_token_file=/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02/root-b-rust/lingxi-service/local-token.json run_database=/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02/root-b-rust/lingxi-service/data/runs.db
+2026-10-26T11:15:08.980448Z  INFO lingxi_service: instance record published (atomic write) record=/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02/root-b-rust/lingxi-service/instance.json bind_addr=127.0.0.1:61168
+LINGXI_SERVICE_READY addr=127.0.0.1:61168 home=/private/tmp/lingxi-r08-verify/r08_t07_ab-terminal-dev-02/root-b-rust source=config-file
+2026-10-26T11:15:08.982179Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a177ebde34_000002 session_id="[token]"
+2026-10-26T11:15:08.997496Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a177ebde34_000002 outcome=failed.provider_error
+2026-10-26T11:15:09.013817Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a177ebde54_000003 session_id="[token]"
+2026-10-26T11:15:09.027690Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a177ebde54_000003 outcome=failed.provider_error
+2026-10-26T11:15:27.179370Z  INFO lingxi_service: request handled request_id="req-4cde4353217c452ddc8b826483a93b75" method=GET path=/lingxi/v1/agents status=200
+2026-10-26T11:15:27.186848Z  INFO lingxi_service: request handled request_id="req-156b739134eefb145c3a04d7c026f2be" method=POST path=/lingxi/v1/agents status=200
+2026-10-26T11:15:27.220526Z  INFO lingxi_service: request handled request_id="req-fa5deaf7b6f933ea45c4c81e66b0b5a4" method=POST path=/lingxi/v1/sessions/new-detached status=201
+2026-10-26T11:15:27.222756Z  INFO lingxi_service: request handled request_id="req-5e097da2dce75be6273857171873db97" method=POST path=/lingxi/v1/session-permission-mode status=200
+2026-10-26T11:15:27.224766Z  INFO lingxi_service: request handled request_id="req-4b2535fc948b51abe41446b2db4a005c" method=POST path=/lingxi/v1/sessions/new-detached status=201
+2026-10-26T11:15:27.226951Z  INFO lingxi_service: request handled request_id="req-d21fc082f3b926590d80b087ff755304" method=POST path=/lingxi/v1/session-permission-mode status=200
+2026-10-26T11:15:27.574139Z  INFO lingxi_service: request handled request_id="req-371798af6677aa881fdf8cf1a5281a44" method=GET path=/lingxi/v1/ws status=101
+2026-10-26T11:15:27.583721Z  INFO lingxi_service: request handled request_id="req-01847d2f253683b0a3f718aaac5642d9" method=GET path=/lingxi/v1/resource-io/events status=200
+2026-10-26T11:15:27.584233Z  INFO lingxi_service: request handled request_id="req-7d2e83abe49d461892f151949eaae664" method=GET path=/lingxi/v1/app-events status=200
+2026-10-26T11:15:27.586258Z  INFO lingxi_service: request handled request_id="req-3dfed9a45df022efe411e05c84ab8fee" method=GET path=/lingxi/v1/desk/activities status=200
+2026-10-26T11:15:27.587941Z  INFO lingxi_service: request handled request_id="req-4e073a8c7d521ff2793a41f2fc5bd2da" method=GET path=/lingxi/v1/browser/workspaces status=200
+2026-10-26T11:15:27.774728Z  INFO lingxi_service: request handled request_id="req-010ca84ee38170447cbc436a33c6203d" method=GET [token] status=200
+2026-10-26T11:15:27.777417Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a177ec27a0_000004 session_id="sess-33299-1a177ec2573-0"
+2026-10-26T11:15:28.147003Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:exec_command entry="direct" permission_context="user_session" capability=exec_command.run permission_kind="execute" target_generation=1 catalog_generation=91 prepared_at_unix_ms=1793013328145 binding_reason=R04-T05 native exec_command executor (real processes, process-group cleanup)
+2026-10-26T11:15:28.480548Z  INFO lingxi_service: request handled request_id="req-785328f38e67877e24a648b04ba8c23e" method=GET [token] status=200
+2026-10-26T11:15:28.526330Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:exec_command entry="direct" permission_context="user_session" capability=exec_command.run permission_kind="execute" target_generation=1 catalog_generation=91 prepared_at_unix_ms=1793013328524 binding_reason=R04-T05 native exec_command executor (real processes, process-group cleanup)
+2026-10-26T11:15:28.586635Z  INFO lingxi_service: request handled request_id="req-69923ea3bdaf50805e7f9d99488ea587" method=GET path=/lingxi/v1/resource-io/events status=200
+2026-10-26T11:15:29.186442Z  INFO lingxi_service: request handled request_id="req-820ab87ee6f717e08dab374199e15676" method=GET [token] status=200
+2026-10-26T11:15:29.588955Z  INFO lingxi_service: request handled request_id="req-c5dc1211ad8758ff4b0fb16520819dcb" method=GET path=/lingxi/v1/resource-io/events status=200
+2026-10-26T11:15:29.893247Z  INFO lingxi_service: request handled request_id="req-bb4f41fc011ade67c44544c2de1bbd48" method=GET [token] status=200
+2026-10-26T11:15:30.047811Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a177ec27a0_000004 outcome=completed.with_final
+2026-10-26T11:15:30.311424Z  INFO lingxi_service: request handled request_id="req-0aa3e31cc9712d8e1bfa067c50718409" method=GET path=/lingxi/v1/sessions/studio-list status=200
+2026-10-26T11:15:30.316601Z  INFO lingxi_service: request handled request_id="req-1ee7cf7205b1f900890e21a0e0b0b579" method=POST path=/lingxi/v1/sessions/switch status=200
+2026-10-26T11:15:30.317863Z  INFO lingxi_service: request handled request_id="req-73bf6f2754ee366cec1e038ff4748ad3" method=GET [token] status=200
+2026-10-26T11:15:30.319619Z  INFO lingxi_service: request handled request_id="req-6f5e37f491e196585e65357e69ee6908" method=GET [token] status=200
+2026-10-26T11:15:30.324619Z  INFO lingxi_service: request handled request_id="req-fcc82d0881d15bd455a9f2f8bd99db94" method=GET [token] status=200
+2026-10-26T11:15:30.328957Z  INFO lingxi_service: request handled request_id="req-05b07cbdb63139b40d8fd82755d62dba" method=GET path=/lingxi/v1/chat/models status=200
+2026-10-26T11:15:30.591884Z  INFO lingxi_service: request handled request_id="req-0cbbe65b0635fbc9bbf49d7d153eb6fe" method=GET path=/lingxi/v1/resource-io/events status=200
+2026-10-26T11:15:30.598906Z  INFO lingxi_service: request handled request_id="req-1a681784dbec432bfa3824ddba3abebf" method=GET [token] status=200
+2026-10-26T11:15:31.594225Z  INFO lingxi_service: request handled request_id="req-eb9f65631261d7a5d173ad168c4c0310" method=GET path=/lingxi/v1/resource-io/events status=200
+2026-10-26T11:15:32.211910Z  INFO lingxi_service: request handled request_id="req-31496a9c86044f38b6392110f2894631" method=GET [token] status=200
+2026-10-26T11:15:32.212855Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a177ec38f2_000005 session_id="sess-33299-1a177ec2573-0"
+2026-10-26T11:15:32.584605Z  INFO lingxi_service: request handled request_id="req-16fd73b050f1638ac4183f31b3199e41" method=GET [token] status=200
+2026-10-26T11:15:32.587430Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:mcp_describe_tool entry="direct" permission_context="user_session" capability=tool_catalog permission_kind="read" target_generation=1 catalog_generation=91 prepared_at_unix_ms=1793013332586 binding_reason=生产按需目录基础设施
+2026-10-26T11:15:32.589570Z  INFO lingxi_service: request handled request_id="req-c01a2a0e7c3c521d1118e5baee1e4954" method=GET path=/lingxi/v1/app-events status=200
+2026-10-26T11:15:32.595860Z  INFO lingxi_service: request handled request_id="req-459faba25ac54019ba5b3b4e671f66e4" method=GET path=/lingxi/v1/resource-io/events status=200
+2026-10-26T11:15:32.919364Z  INFO lingxi_service: request handled request_id="req-7bed3027d446770f5e66a70d7d69e657" method=GET [token] status=200
+2026-10-26T11:15:32.955028Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:write_stdin entry="direct" permission_context="user_session" capability=write_stdin.io permission_kind="execute" target_generation=1 catalog_generation=91 prepared_at_unix_ms=1793013332954 binding_reason=R04-T05 native write_stdin executor (owner-checked terminal I/O)
+2026-10-26T11:15:33.597173Z  INFO lingxi_service: request handled request_id="req-5db4ed54e62f17077145f1a8e8388a12" method=GET path=/lingxi/v1/resource-io/events status=200
+2026-10-26T11:15:33.627190Z  INFO lingxi_service: request handled request_id="req-f3b7828256a17aa1c0dd3e96159a1d98" method=GET [token] status=200
+2026-10-26T11:15:34.336097Z  INFO lingxi_service: request handled request_id="req-80e28155b9ede2bfa7057e908d8abd02" method=GET [token] status=200
+2026-10-26T11:15:34.472900Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a177ec38f2_000005 outcome=completed.with_final
+2026-10-26T11:15:34.599685Z  INFO lingxi_service: request handled request_id="req-c1467422f365cb15ff1802ed15e1ce51" method=GET path=/lingxi/v1/resource-io/events status=200
+2026-10-26T11:15:34.733383Z  INFO lingxi_service: request handled request_id="req-5c1798443b1b0295bd97e9981617450e" method=GET path=/lingxi/v1/sessions/studio-list status=200
+2026-10-26T11:15:35.045434Z  INFO lingxi_service: request handled request_id="req-5cb7335001fc8b48143601542e12018f" method=GET [token] status=200
+2026-10-26T11:15:35.602083Z  INFO lingxi_service: request handled request_id="req-2d412f05dc97e37fc412d9d548b9d598" method=GET path=/lingxi/v1/resource-io/events status=200
+2026-10-26T11:15:36.604382Z  INFO lingxi_service: request handled request_id="req-58ff86261e7c8c59385f500b3e4c2e5b" method=GET path=/lingxi/v1/resource-io/events status=200
+2026-10-26T11:15:37.587952Z  INFO lingxi_service: request handled request_id="req-4c8e38ab1e8c0f3659131b976bbfea17" method=GET [token] status=200
+2026-10-26T11:15:37.592297Z  INFO lingxi_service: request handled request_id="req-d4be6c38db8918368f7f0b25c74a2de5" method=GET path=/lingxi/v1/app-events status=200
+2026-10-26T11:15:37.606908Z  INFO lingxi_service: request handled request_id="req-71aa6de0e35a98a6429d0e2d44b98f1c" method=GET path=/lingxi/v1/resource-io/events status=200
+2026-10-26T11:15:38.609468Z  INFO lingxi_service: request handled request_id="req-c3692d2fe4085105b12efa93864450e6" method=GET path=/lingxi/v1/resource-io/events status=200
+2026-10-26T11:15:39.611176Z  INFO lingxi_service: request handled request_id="req-2e742ef860ac8438520f6500b58cfc3a" method=GET path=/lingxi/v1/resource-io/events status=200
+2026-10-26T11:15:39.642630Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-10-26T11:15:39.647829Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-10-26T11:15:39.648134Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-10-26T11:15:39.648188Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

@@ -1,0 +1,15 @@
+
+running 2 tests
+test damaged_public_material_is_a_visible_error_and_cannot_fall_back_to_private_files ... ok
+test guest_reads_only_public_persona_and_never_private_preferences_or_memory ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.69s
+     Running tests/r07_bridge_guest_context.rs (rust/target/debug/deps/r07_bridge_guest_context-af6eddb1851c77c0)

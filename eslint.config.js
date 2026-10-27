@@ -69,7 +69,33 @@ export default [
       'tests/**/*.{js,mjs,ts,tsx}',
       // 同步审计脚本是入版本控制的 node 工具（build-sync-matrix/migration-smoke 等）
       '.sync-audit/**/*.{js,mjs}',
+      // docs/ 下随仓库分发的 node 工具脚本（如 docs/rust-tauri/** 的盘点/校验器）
+      'docs/**/*.{js,mjs}',
     ],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        fetch: 'readonly',
+        AbortSignal: 'readonly',
+      },
+    },
+  },
+
+  // R01-T06 Tauri spike 原型（隔离目录，不进入生产入口；规则不放宽，只声明
+  // 真实运行环境）：app/frontend 页面探针运行在 Tauri webview（浏览器环境）。
+  {
+    files: ['spike/tauri-shell/app/frontend/**/*.js'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+      },
+    },
+  },
+
+  // spike scripts 是 Node 侧 runner/证据服务器/WDIO 探针（loopback 吊具）；
+  // fetch/AbortSignal 为 Node 18+ 内建，与上面 Node 块同一约定。
+  {
+    files: ['spike/tauri-shell/scripts/**/*.mjs'],
     languageOptions: {
       globals: {
         ...globals.node,

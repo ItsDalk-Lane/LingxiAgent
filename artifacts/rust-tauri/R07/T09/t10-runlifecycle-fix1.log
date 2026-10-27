@@ -1,0 +1,41 @@
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 13.89s
+     Running tests/run_lifecycle.rs (rust/target-r07/debug/deps/run_lifecycle-f46c409fe3ad7a47)
+
+running 12 tests
+test duplicate_finalize_replays_and_conflicting_finalize_is_diagnosed ... ok
+test empty_reply_completes_without_final_and_names_the_cause ... ok
+test no_provider_configuration_is_explicit_and_r02_compatible ... ok
+test non_retryable_failure_settles_without_extra_attempts ... ok
+test process_only_run_completes_without_final_and_names_the_cause ... ok
+test r03_a01_three_model_calls_produce_exactly_one_task_terminal ... ok
+test retry_budget_exhaustion_fails_loudly_with_attempt_count_honest ... ok
+test retryable_provider_failure_reopens_attempt_on_the_same_run ... ok
+test terminal_run_rejects_late_attempts_and_events_loudly ... ok
+test tool_partial_failure_has_its_own_outcome_not_a_fabricated_answer ... ok
+test tool_request_without_executor_is_a_loud_failure ... ok
+test turn_budget_exhaustion_fails_loudly_never_fake_completes ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.14s
+

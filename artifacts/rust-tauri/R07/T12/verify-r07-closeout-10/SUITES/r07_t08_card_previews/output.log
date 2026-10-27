@@ -1,0 +1,10 @@
+
+running 3 tests
+test oversized_theme_variables_clear_by_utf8_bytes_while_valid_card_still_registers ... ok
+test plan_assets_read_real_bytes_and_refuse_missing_invalid_and_escape_without_mutation ... ok
+test export_plan_alias_matches_preview_without_package_write_then_real_export_and_asset ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.01s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.18s
+     Running tests/r07_t08_card_previews.rs (rust/target/debug/deps/r07_t08_card_previews-cbfdf7c0ce4a4fd4)

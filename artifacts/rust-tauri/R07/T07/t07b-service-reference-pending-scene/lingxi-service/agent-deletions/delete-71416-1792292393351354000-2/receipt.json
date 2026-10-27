@@ -1,0 +1,16 @@
+{
+  "agentId": "agentA",
+  "cleanupError": null,
+  "cleanupPending": false,
+  "createdAt": "2026-10-18T02:59:53.374Z",
+  "deletionId": "delete-71416-1792292393351354000-2",
+  "logicalDeleted": true,
+  "referenceError": null,
+  "referencesPending": false,
+  "replacementAgentId": null,
+  "schemaVersion": 1,
+  "status": "completed",
+  "targetReplacementAgentId": "agentB",
+  "updatedAt": "2026-10-18T02:59:53.579Z",
+  "wasReferenced": false
+}

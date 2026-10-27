@@ -2,10 +2,9 @@
  * ChannelList — 频道列表渲染（DM + Group 分区）
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useStore } from '../../stores';
 import { useI18n } from '../../hooks/use-i18n';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import {
   loadChannels,
   openChannel,
@@ -174,8 +173,19 @@ export function ChannelList() {
   const userAvatarUrl = useStore((s) => s.userAvatarUrl);
   const currentAgentId = useStore((s) => s.currentAgentId);
 
+  const listError = useStore(s => s.channelListError);
+  const loading = useStore(s => s.channelListLoading);
   const agentMap = useMemo(() => buildAgentMap(agents), [agents]);
+  const feedback = listError ? (
+    <div role="alert" className="session-empty">
+      <span>{t('channel.loadFailed')}</span>
+      <button type="button" disabled={loading} onClick={() => { void loadChannels(); }}>{t('channel.retry')}</button>
+    </div>
+  ) : null;
 
+  if (channels.length === 0 && (listError || loading)) {
+    return feedback || <div className="session-empty">{t('common.loading')}</div>;
+  }
   if (channels.length === 0) {
     return <div className="session-empty">{t('channel.empty')}</div>;
   }
@@ -185,6 +195,7 @@ export function ChannelList() {
 
   return (
     <>
+      {feedback}
       {dms.length > 0 && (
         <>
           <div className={styles.channelSectionLabel}>

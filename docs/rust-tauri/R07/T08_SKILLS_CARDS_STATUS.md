@@ -1,0 +1,25 @@
+# T08 技能与卡片实施断点
+
+状态：IMPLEMENTING，未验收；不提交、不推送、不触真实账号。T07 C/D浏览器失败按原回执保留交T12复查，不因进入T08改通过。
+
+技能外部目录保存与其他偏好共用preferences_locked，严格读取损坏/不可读偏好，直到内存发布结束才放锁；未知字段保留。路径数组逐项验证，非字符串不被过滤成空列表。角色卡预检新增受限图片文件头/MIME匹配，损坏素材在创建Agent前拒绝；该检查不是完整图像解码。
+
+互动卡片保留按用户隔离的256项/64MiB缓存，code512KiB/vars16KiB，普通GET/PUT维持LocalOnly。show_card工具限额与HTTP一致。统一协议登记响应新增frameUrl；frame专属票据120秒、每卡8份、总2048份，绑定原归属、卡片及当前内容，换内容/逐出/重启失效。精确GET入口再次检查本机连接与原身份当前有效性；通用凭证不再进入脚本文档地址。Electron全WebContents导航阻断已接线，网页仅同源且父策略限制self/blob时显示；缺保护或旧服务无票据给出明确“不支持安全互动卡片”。新二进制开发复测已证明票据地址没有整机凭证，且真实宿主阻断外送；完整固定候选尚待，不能标整项完成。
+
+旧实现的外泄是**已证实失败**：旧独立真实服务bin+归档旧组件，经真实DOM按钮click可将location里的合成整机凭证送至自有loopback收集器。两次成功复现均count1、tokenReadableAndSent=true；诊断退出0不等于产品安全通过。两次原生鼠标未命中的失败也保留，不把DOM操作冒称OS人工操作。见T08_CARD_SECURITY及card-security-disposition.json。
+
+当前已运行开发检查：
+
+- 最新前端2套8项通过（card-frame-ui-ticket4.log），覆盖连接归属、无整机token、无保护拒绝、无安全票据拒绝、网页同源策略和宿主导航决定；不是固定候选门禁。早期3项ui2/ui3通过和ui1误选生产组件路径退出1均保留。
+- core-flow4真实Rust Run→show_card→当前实际Electron组件登记、读取、真实DOM按钮操作、CSP阻止fetch及窗口回收通过。不是mock HTTP，不称OS鼠标人工验收。
+- 同组另外4项失败原样保留：3项在HTTP前直接写合成preferences时缺user目录，报ENOENT；1项大量LRU请求到217时被真实速率限制429。已仅修fixture创建user，并在LRU每64请求用既有ManualClock跨61秒窗口，保留产品速率限制与原断言，**待重新运行**。原日志SHA 5d598b64e0a8339c78b27afebf66081dd3d313b31766314cd35cd765a6040915，现场facts保存在cards-flow4-scene。
+- 当前mobile.html原父策略在实际Chromium+当前组件+同源代理下给出ERR_BLOCKED_BY_CSP，外origin导航收集器零请求；首轮错误断言原文档仍存在的失败保留。仅证明策略行为，不代表真实手机全功能。新票据实际链也复测通过（专属GET200、frame URL无owner token、父CSP真实阻断、收集器0）；不是手机全功能验收。
+- types2测试fixture四处类型错误已最小修复，原退出2保留；types3退出0但并行源码变化，属于开发检查。
+
+新binary SHA55d160b62243aecbdd1be59cfd37e588b40440e3001a9f6d2e91629033f13c37的桌面与同源mobile票据探针均通过，r2另记录两个服务实际退出0、两个收集器关闭。桌面使用与生产相同的导航guard，手机场景不装Electron guard，分别核对了两条保护链。证据见card-navigation-ticket-{desktop,mobile}及各自-r2；完整固定候选仍未验收。
+
+当前Tauri宿主只提供ResourceDesktop/NativeSkillViewer，未提供聊天/Run卡片宿主；只读现状及候选接法保留，不新增独立产品窗口扩大本轮范围，不称Tauri卡片通过或环境阻塞。旧Node cards没有安全frameUrl，明确暂不支持，绝不回退unsafe token地址。R07最终与后阶段按原任务份额核算。
+
+身份设备复用r00_management_leaves真实检查；原生技能选择/查看窗口复用r06_skills_completion现役Tauri reader/host，不沿早期递延文字判未实现，仍须本轮实际门禁。完整T08及全部功能未领PASS。
+
+core-flow5复验：技能/卡片4/5通过；并发保存的16轮实盘检查均通过，最后重启GET断言错误地从顶层取default_token_budget，现役接口实际包在goal对象内。原Null失败保留，仅修测试读取为goal.default_token_budget并先核HTTP200，待统一重跑。其余4项已通过不改旧失败记录。

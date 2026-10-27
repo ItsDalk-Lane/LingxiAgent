@@ -1,0 +1,10 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 31s
+     Running tests/r06_agent_settings_live.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_agent_settings_live-49278c6a1fd55505)
+
+running 1 test
+SETTINGS-UI-CHILD[failures]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/settings-completion-failures-49937-1792306208727600000/home/ui-result.json
+test native_settings_current_electron_real_io_failures_and_partial_writes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 13 filtered out; finished in 7.76s
+

@@ -1,0 +1,20 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 30.18s
+     Running tests/r07_t08_mcp_settings.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_mcp_settings-5528f6df6edb0028)
+
+running 1 test
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-98107b8bd131d3d6
+
+thread 'concurrent_registration_never_exposes_a_bare_executor_to_disabled_agent' (2314163) panicked at crates/lingxi-service/tests/r07_t08_mcp_settings.rs:474:14:
+服务应正常退出: Serve { source: Custom { kind: Other, error: McpSettingsError { status: 500, code: "mcp_cleanup_unconfirmed", message: "MCP 子进程或连接退出未确认：MCP 连接或子进程回收未确认：停止自有进程组失败：Operation not permitted (os error 1); owned_pid=81630, actual_pgid=-1", saved: false, runtime_applied: false } } }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test concurrent_registration_never_exposes_a_bare_executor_to_disabled_agent ... FAILED
+
+failures:
+
+failures:
+    concurrent_registration_never_exposes_a_bare_executor_to_disabled_agent
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 10 filtered out; finished in 2.78s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t08_mcp_settings`

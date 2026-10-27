@@ -1,148 +1,90 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { lingxiFetch } from '../api';
 import { t } from '../helpers';
+import { useSettingsStore } from '../store';
+import { bridgeConnectionKey, bridgePublicConnectionKey, readBridgeResponse } from '../../services/bridge-response';
 import { Overlay } from '../../ui';
 import styles from './WechatQrcodeOverlay.module.css';
 
 type QrStatus = 'loading' | 'waiting' | 'scanned' | 'confirmed' | 'expired' | 'error';
-
-const MAX_REFRESH = 3;
+interface LoginFlow { agentId: string; connectionKey: string; abort: AbortController; timers: Set<ReturnType<typeof setTimeout>> }
 
 export function WechatQrcodeOverlay() {
   const [visible, setVisible] = useState(false);
   const [qrcodeUrl, setQrcodeUrl] = useState('');
-  const [qrcodeId, setQrcodeId] = useState('');
   const [status, setStatus] = useState<QrStatus>('loading');
   const [error, setError] = useState('');
-  const [refreshCount, setRefreshCount] = useState(0);
-  const agentIdRef = useRef<string | null>(null);
-  const stoppedRef = useRef(true);
-
-  const stopPolling = useCallback(() => { stoppedRef.current = true; }, []);
-
-  const close = useCallback(() => {
-    stopPolling();
-    setVisible(false);
-    setQrcodeUrl('');
-    setQrcodeId('');
-    setStatus('loading');
-    setError('');
-    setRefreshCount(0);
-    agentIdRef.current = null;
-  }, [stopPolling]);
-
-  const fetchQrcode = useCallback(async () => {
-    setStatus('loading');
-    setError('');
-    try {
-      const res = await lingxiFetch('/api/bridge/wechat/qrcode', { method: 'POST' });
-      const data = await res.json();
-      if (data.ok && data.qrcodeUrl) {
-        setQrcodeUrl(data.qrcodeUrl);
-        setQrcodeId(data.qrcodeId);
-        setStatus('waiting');
-      } else {
-        setStatus('error');
-        setError(data.error || t('settings.bridge.wechatLoginFailed'));
-      }
-    } catch (err: unknown) {
-      setStatus('error');
-      setError(err instanceof Error ? err.message : String(err));
-    }
+  const activeRef = useRef<LoginFlow | null>(null);
+  const connectionKey = useSettingsStore(state => bridgeConnectionKey(state));
+  const stop = useCallback(() => {
+    const previous = activeRef.current;
+    activeRef.current = null;
+    previous?.abort.abort();
+    previous?.timers.forEach(timer => clearTimeout(timer));
   }, []);
+  const close = useCallback(() => { stop(); setVisible(false); setQrcodeUrl(''); setStatus('loading'); setError(''); }, [stop]);
+  const owns = (flow: LoginFlow) => activeRef.current === flow && !flow.abort.signal.aborted
+    && flow.connectionKey === bridgeConnectionKey(useSettingsStore.getState());
 
-  /**
-   * 递归 await 轮询。每次等上一个请求完成后再等 1s 发下一个，
-   * 避免 setInterval 在长轮询（35s hold）期间堆叠请求。
-   */
-  const startPolling = useCallback((id: string) => {
-    stoppedRef.current = false;
-
-    (async () => {
-      while (!stoppedRef.current) {
-        try {
-          const res = await lingxiFetch('/api/bridge/wechat/qrcode-status', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ qrcodeId: id }),
-          });
-          if (stoppedRef.current) return;
-          const data = await res.json();
-
-          if (data.status === 'scanned') {
-            setStatus('scanned');
-          } else if (data.status === 'confirmed' && data.botToken) {
-            stoppedRef.current = true;
+  const begin = useCallback(async (agentId: string) => {
+    stop(); setVisible(true); setStatus('loading'); setError(''); setQrcodeUrl('');
+    if (!agentId) { setStatus('error'); setError('请先选择要绑定的助手'); return; }
+    const flow: LoginFlow = { agentId, connectionKey: bridgeConnectionKey(useSettingsStore.getState()), abort: new AbortController(), timers: new Set() };
+    activeRef.current = flow;
+    const query = `?agentId=${encodeURIComponent(flow.agentId)}`;
+    const post = async (path: string, body?: unknown, timeout?: number) => {
+      if (!owns(flow)) throw new Error('连接已切换');
+      const result = await readBridgeResponse(await lingxiFetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, ...(body === undefined ? {} : { body: JSON.stringify(body) }), signal: flow.abort.signal, timeout }));
+      if (!owns(flow)) throw new Error('连接已切换');
+      return result;
+    };
+    const wait = () => new Promise<void>(resolve => {
+      const onAbort = () => { clearTimeout(timer); flow.timers.delete(timer); resolve(); };
+      const timer = setTimeout(() => { flow.abort.signal.removeEventListener('abort', onAbort); flow.timers.delete(timer); resolve(); }, 1000);
+      flow.timers.add(timer);
+      flow.abort.signal.addEventListener('abort', onAbort, { once: true });
+    });
+    try {
+      for (let refresh = 0; refresh < 3 && owns(flow); refresh++) {
+        const qr = await post(`/api/bridge/wechat/qrcode${query}`);
+        if (qr.ok !== true || typeof qr.qrcodeUrl !== 'string' || typeof qr.qrcodeId !== 'string') throw new Error('二维码返回内容无效');
+        setQrcodeUrl(qr.qrcodeUrl); setStatus('waiting');
+        while (owns(flow)) {
+          const result = await post(`/api/bridge/wechat/qrcode-status${query}`, { qrcodeId: qr.qrcodeId }, 45_000);
+          if (result.status === 'confirmed') {
+            if (typeof result.botToken !== 'string' || !result.botToken || typeof result.userId !== 'string' || !result.userId) throw new Error('扫码结果缺少账号信息，尚未启用');
+            // 先保留为停用，再绑定主人；两步均真实成功后才启用接收，避免短暂误判访客。
+            await post(`/api/bridge/config${query}`, { platform: 'wechat', credentials: { botToken: result.botToken }, enabled: false });
+            await post(`/api/bridge/owner${query}`, { platform: 'wechat', userId: result.userId });
+            await post(`/api/bridge/config${query}`, { platform: 'wechat', credentials: null, enabled: true });
             setStatus('confirmed');
-            // Read agentId from ref — always current, not stale closure
-            const agentQuery = agentIdRef.current ? `?agentId=${encodeURIComponent(agentIdRef.current)}` : '';
-            await lingxiFetch(`/api/bridge/config${agentQuery}`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                platform: 'wechat',
-                credentials: { botToken: data.botToken },
-                enabled: true,
-              }),
-            });
-            // 微信只绑定一个账号，扫码用户即 owner
-            if (data.userId) {
-              await lingxiFetch(`/api/bridge/owner${agentQuery}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ platform: 'wechat', userId: data.userId }),
-              }).catch((err: unknown) => console.warn('[WechatQrcodeOverlay] set owner failed', err));
-            }
-            window.dispatchEvent(new Event('hana-bridge-reload'));
-            setTimeout(close, 1200);
-            return;
-          } else if (data.status === 'expired') {
-            stoppedRef.current = true;
-            setRefreshCount((prev) => {
-              const next = prev + 1;
-              if (next >= MAX_REFRESH) {
-                setStatus('error');
-                setError(t('settings.bridge.wechatExpired'));
-              } else {
-                fetchQrcode();
-              }
-              return next;
-            });
+            window.dispatchEvent(new CustomEvent('hana-bridge-reload', { detail: { agentId: flow.agentId, connectionKey: bridgePublicConnectionKey(useSettingsStore.getState()) } }));
+            const timer = setTimeout(() => { flow.timers.delete(timer); if (owns(flow)) close(); }, 1200);
+            flow.timers.add(timer);
             return;
           }
-        } catch { /* 网络错误静默重试 */ }
-
-        // 请求完成后等 1 秒再发下一个
-        if (!stoppedRef.current) {
-          await new Promise((r) => setTimeout(r, 1000));
+          if (result.status === 'expired') { setStatus('expired'); break; }
+          if (result.status !== 'waiting' && result.status !== 'scanned') throw new Error(result.error || '扫码状态读取失败');
+          setStatus(result.status);
+          await wait();
         }
       }
-    })();
-  }, [close, fetchQrcode]);
-
-  // 监听显示事件
-  useEffect(() => {
-    const show = (e: Event) => {
-      const detail = (e as CustomEvent<{ agentId?: string | null }>).detail;
-      agentIdRef.current = detail?.agentId ?? null;
-      setVisible(true);
-      setRefreshCount(0);
-      fetchQrcode();
-    };
-    window.addEventListener('hana-show-wechat-qrcode', show);
-    return () => {
-      window.removeEventListener('hana-show-wechat-qrcode', show);
-      stopPolling();
-    };
-  }, [fetchQrcode, stopPolling]);
-
-  // qrcodeId 变化时开始轮询（不依赖 status，避免 scanned 状态触发 cleanup）
-  useEffect(() => {
-    if (qrcodeId) {
-      startPolling(qrcodeId);
+      if (owns(flow)) { setStatus('error'); setError(t('settings.bridge.wechatExpired')); }
+    } catch (failure) {
+      if (owns(flow)) { setStatus('error'); setError(failure instanceof Error ? failure.message : t('settings.bridge.wechatLoginFailed')); }
     }
-    return stopPolling;
-  }, [qrcodeId, startPolling, stopPolling]);
+  }, [close, stop]);
+
+  useEffect(() => {
+    if (activeRef.current && activeRef.current.connectionKey !== connectionKey) {
+      stop(); setStatus('error'); setError('连接已切换，请重新扫码');
+    }
+  }, [connectionKey, stop]);
+  useEffect(() => {
+    const show = (event: Event) => { void begin((event as CustomEvent<{ agentId?: string }>).detail?.agentId || ''); };
+    window.addEventListener('hana-show-wechat-qrcode', show);
+    return () => { window.removeEventListener('hana-show-wechat-qrcode', show); stop(); };
+  }, [begin, stop]);
 
   const statusLabel = (() => {
     switch (status) {
@@ -186,7 +128,7 @@ export function WechatQrcodeOverlay() {
           )}
         </div>
 
-        <div className={`${styles.statusText} ${statusClass}`}>{statusLabel}</div>
+        <div role={status === 'error' ? 'alert' : 'status'} className={`${styles.statusText} ${statusClass}`}>{statusLabel}</div>
     </Overlay>
   );
 }

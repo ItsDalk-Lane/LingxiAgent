@@ -1,0 +1,57 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "anthropic",
+  "case": "user-sourced-budget-vetoes-the-raise",
+  "model": {
+    "provider": "anthropic",
+    "id": "claude-opus-5",
+    "baseUrl": "https://api.anthropic.com",
+    "api": "anthropic-messages",
+    "maxTokens": 96000
+  },
+  "payload": {
+    "model": "claude-opus-5",
+    "messages": [
+      {
+        "role": "user",
+        "content": "hi"
+      }
+    ],
+    "max_tokens": 32000
+  },
+  "options": {
+    "mode": "chat",
+    "reasoningLevel": "max",
+    "outputBudgetSource": "user"
+  },
+  "expected": {
+    "thinkingFormat": "anthropic",
+    "reasoningProfile": null,
+    "matched": "anthropic",
+    "result": {
+      "model": "claude-opus-5",
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "hi",
+              "cache_control": {
+                "type": "ephemeral"
+              }
+            }
+          ]
+        }
+      ],
+      "max_tokens": 32000,
+      "thinking": {
+        "type": "adaptive",
+        "display": "summarized"
+      },
+      "output_config": {
+        "effort": "max"
+      }
+    }
+  }
+}

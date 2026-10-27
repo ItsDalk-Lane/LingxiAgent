@@ -83,6 +83,7 @@ export interface InputSlice {
   /** @deprecated Use quotedSelections for committed quotes and quoteCandidate for transient selection UI. */
   quotedSelection: QuotedSelection | null;
   addAttachedFile: (file: AttachedFile) => void;
+  setAttachedFilesForSession: (sessionPath: string, files: AttachedFile[]) => void;
   removeAttachedFile: (index: number) => void;
   setAttachedFiles: (files: AttachedFile[]) => void;
   clearAttachedFiles: () => void;
@@ -255,6 +256,15 @@ export const createInputSlice = (
     })),
   clearAttachedFiles: () =>
     set((s) => syncCurrentSessionAttachments(s as InputSlice & { currentSessionPath?: string | null }, [])),
+  setAttachedFilesForSession: (sessionPath, files) =>
+    set((s) => {
+      const key = sessionScopedKey(s as never, sessionPath) || sessionPath;
+      return {
+        attachedFilesBySession: putSessionBucket(s.attachedFilesBySession, sessionPath, files, key),
+        ...(isPrimarySessionTarget(s as never, sessionPath) ? {attachedFiles: files} : {}),
+        ...bumpComposerRevision(s as never, key),
+      };
+    }),
   clearAttachedFilesForSession: (sessionPath) =>
     set((s) => {
       const state = s as InputSlice & { currentSessionPath?: string | null };

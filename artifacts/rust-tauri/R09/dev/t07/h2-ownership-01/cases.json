@@ -1,0 +1,46 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t02_process_ownership",
+ "cases": [
+  {
+   "case": "t02::candidate.debug-consume-only",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "source": "env",
+    "mode": "debug",
+    "executableSha256": "992f0a7b78bfc6b53a1b3931a591dd11a5631448a504bcc32b85e48df07b02ab"
+   }
+  },
+  {
+   "case": "t02::candidate.debug-features",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "features": [
+     "e2e-test",
+     "r09-host",
+     "r09-test-hooks"
+    ]
+   }
+  },
+  {
+   "case": "r09_t02_process_ownership::producer",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "error": "CANDIDATE_REQUIRED: 需要 LINGXI_R09_T02_RELEASE_APP（v2 delivery .app；T02 禁止自行构建）"
+   }
+  },
+  {
+   "case": "isolation::no-residual-processes",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "killed": [],
+    "residual": [],
+    "marker": "/private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-53468-1793030172651"
+   }
+  }
+ ]
+}

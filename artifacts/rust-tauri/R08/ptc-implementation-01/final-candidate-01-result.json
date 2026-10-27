@@ -1,0 +1,97 @@
+{
+  "status": "LOCAL_SELF_TESTS_PASS_PENDING_INDEPENDENT_REVIEW",
+  "completedAtUtc": "2026-10-21T17:16:13.460402+00:00",
+  "head": "86840d1700397d3dd620a41f2b884df4cddd5cc2",
+  "startReceipt": "final-candidate-01-start.json",
+  "listedSourcesAndBinariesStable": true,
+  "changed": {},
+  "afterSha256": {
+    "rust/crates/lingxi-service/src/coding_run_code.rs": "f97771a4dbc2189712af2b5e1d84867db70a3638a40a71ac3248667d28618a85",
+    "rust/crates/lingxi-service/src/coding_ptc.rs": "1d9ce7f54f01b4676c668b96f2edd493c625a20aa36a54262682c78075e63856",
+    "rust/crates/lingxi-service/tests/r08_admission_run_code.rs": "92e587e8d1704ebd341951293291116034c5dc376111b8a7b30d3b1f4b888b0e",
+    "rust/crates/lingxi-service/tests/r08_admission_ptc.rs": "73b562dfcbe6c34abe5f9f9f0127bf1cb43832c8a80f8ffbce9bfa2c52ac70e6",
+    "scripts/rust-tauri/r08-ptc-worker.mjs": "4e0775b4bf8532009727edfca9dee78d6c898b9873a3774ad235f5e7babc8cd0",
+    "lib/ptc/ptc-runtime.ts": "a2ec0f6e7f5af2ca966d717117fa0b6ade03593239363594fbbeab09dcbcd252",
+    "rust/crates/lingxi-service/src/runs.rs": "e311d708475e1a1d8a31c626585a25004b4d6d05d8fa2d943a6cee820b06dfb4",
+    "rust/crates/lingxi-service/src/toolgateway.rs": "fd435fa0fc0bff0ecc80870c295b4c3521adddf81c82f695772cbeb2d2b8f197",
+    "rust/target/debug/deps/r08_admission_ptc-5d41adb521f581e6": "7bc377de7a4ce789a7d8f388b83d0f5c9a2f03bc1a596fa5bb764b8374aeffab",
+    "rust/target/debug/deps/r08_admission_run_code-465a18f4152e0455": "65a8a483ff69f5de26b2aaa99eb1cc67d5ef946f612811ddf4340731a4c7932d"
+  },
+  "commands": [
+    {
+      "command": "rust/target/debug/deps/r08_admission_run_code-465a18f4152e0455 --nocapture --test-threads=1",
+      "exitCode": 0,
+      "log": "artifacts/rust-tauri/R08/run-code-implementation-01/test-final-candidate-01.log",
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 0,
+      "seconds": 33.83
+    },
+    {
+      "command": "rust/target/debug/deps/r08_admission_ptc-5d41adb521f581e6 --nocapture --test-threads=1",
+      "exitCode": 134,
+      "log": "artifacts/rust-tauri/R08/ptc-implementation-01/rust-test-final-candidate-01.log",
+      "result": "机器保护器整进程600秒先中止；保留红；不是产品默认超时通过"
+    },
+    {
+      "command": "rust/target/debug/deps/r08_admission_ptc-5d41adb521f581e6 actual_vm_escape_cannot_read_write_connect_or_delegate_a_host_write cancelling_actual_program_reaps_its_real_node_process later_program_failure_keeps_real_completed_effect_and_exposes_it_in_receipts real_child_approval_is_separate_from_outer_approval_and_denial_writes_nothing real_file_child_receipts_bound_arguments_and_outputs_without_losing_head_tail real_parallel_children_only_return_selected_summary_and_keep_bounded_ui_receipts unknown_recursive_and_sandbox_failures_are_explicit_and_catchable --exact --nocapture --test-threads=1",
+      "exitCode": 0,
+      "log": "artifacts/rust-tauri/R08/ptc-implementation-01/rust-functional-final-candidate-02.log",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 1,
+      "seconds": 2.11
+    },
+    {
+      "command": "TEST_TIME_LIMIT_SEC=660 rust/target/debug/deps/r08_admission_ptc-5d41adb521f581e6 real_default_ten_minute_timeout_keeps_completed_action_and_reaps_worker --exact --nocapture",
+      "exitCode": 0,
+      "log": "artifacts/rust-tauri/R08/ptc-implementation-01/real-default-timeout-02.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 7,
+      "seconds": 600.3
+    }
+  ],
+  "logSha256": {
+    "artifacts/rust-tauri/R08/run-code-implementation-01/test-final-candidate-01.log": "6d71e679d977c85ced163581230ccfaff834d50010e3567a749adf2bfdae7fdf",
+    "artifacts/rust-tauri/R08/ptc-implementation-01/rust-test-final-candidate-01.log": "ad22583576dd005f2669c5c9331bb05aeb2b74572e4778ca2d743157888eb86e",
+    "artifacts/rust-tauri/R08/ptc-implementation-01/rust-functional-final-candidate-02.log": "adc160846d502e4dcd186624fb8fec1bd5e7bccdc4965710224ea3072e1d3eae",
+    "artifacts/rust-tauri/R08/ptc-implementation-01/real-default-timeout-02.log": "f1335ead172d16b1696bccf26bc2f9474d511a399562e8a9dd0c974c6e5eb66e"
+  },
+  "coverage": {
+    "run_code": "9测试，原四断言与新增真实workflow write_roots反例；实现者本域验证",
+    "run_tools": "七项功能与单项默认10分钟分两次精确匹配执行，合计覆盖全部八项；无忽略，过滤仅为两组分区，不将未执行项记通过"
+  },
+  "testGuardDifference": {
+    "defaultWholeProcessSeconds": 600,
+    "actualDefaultProgramSeconds": 600,
+    "successfulSingleCaseWholeProcessSeconds": 660,
+    "memoryLimitGiB": 8,
+    "productionBudgetChanged": false,
+    "guardDisabled": false,
+    "requiresIndependentReview": true
+  },
+  "substitutions": {
+    "externalModel": "deterministic fixture",
+    "metadataClock": "ManualClock固定NOW=1800000000000，仅元数据/授权时间夹具",
+    "wallTimeoutAndCancellation": "真实std/tokio/Node计时与实际进程",
+    "kernelGatewayStorage": "真实实现与SQLite，无假manager/核心/存储"
+  },
+  "constraints": [
+    "仅自建合成根",
+    "无提交/推送/发布",
+    "无全局HOME修改",
+    "未做真实用户目录完整前后摘要，不能代称该项通过"
+  ],
+  "limits": [
+    "独立审查仍FAIL未关闭",
+    "默认组合根与完整权限/自动审核/quota/settlement等公共driver独审不由本域自测代领",
+    "关库重开历史尚未执行",
+    "本机macOS实测；Linux严格bwrap仅实现未实测；Windows明确拒绝",
+    "F02证据绑定与R08 T01—T08迁移/回滚/再次前滚/UI/最终入口未完成",
+    "根主任务当前因宿主内容风险标记errored，未接管公共实现或宣布整体完成"
+  ]
+}

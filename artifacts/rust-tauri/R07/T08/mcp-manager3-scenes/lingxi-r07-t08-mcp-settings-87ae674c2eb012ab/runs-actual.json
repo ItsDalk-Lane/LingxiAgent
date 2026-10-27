@@ -1,0 +1,16 @@
+[
+  {
+    "run_id": "run_000001a14dd7fc64_000001",
+    "session_id": "mcp-inflight-stop",
+    "owner_kind": "local_user",
+    "owner_subject": "user_local",
+    "principal_id": "principal_local",
+    "attempt_count": 1,
+    "status": "failed",
+    "terminal_reason": "failed.provider_error",
+    "generation": 1,
+    "created_at_unix_ms": 1792307362916,
+    "updated_at_unix_ms": 1792307362950,
+    "last_event_seq": 4
+  }
+]

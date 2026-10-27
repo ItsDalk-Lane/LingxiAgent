@@ -1,0 +1,223 @@
+{
+ "schema": "lingxi.r09.t06.candidate-handoff.v3.1",
+ "generatedAt": "2026-10-26T23:47:32+0800",
+ "gitHead": "aac8cb9fe6bb7bfa7a41d75528221136bfe55e50",
+ "supersedes": "candidate-handoff-v3（v3 renderer fragment 仍有 5 成员未接线 → v3.1 renderer 补全后 supersede 重建）",
+ "v31RendererChanges": {
+  "patchedBy": "host-core（仅 renderer，未改 Rust）",
+  "wiredMembers": [
+   "watchWorkspace",
+   "unwatchWorkspace",
+   "onWorkspaceChanged",
+   "onViewerClosed",
+   "onShowSkillViewer"
+  ],
+  "verification": {
+   "tsc": "exit 0",
+   "hostVitest": "16/16 pass",
+   "platformApi": "109 = 真实 76 / no-op 0 / 可选缺失+理由 6 / 显式受限+理由 27"
+  },
+  "remainingDeferred": [
+   "browser-update 全流（保持 connection-changed 部分映射）",
+   "file_drop_paths（renderer FIFO 已可用）"
+  ]
+ },
+ "policy": {
+  "path": "docs/rust-tauri/R09/R09_COMMAND_POLICY.json",
+  "sha256": "8e6357775024d58541770d2d64c4759211f1c7e1de40b005da651b309fad3a36",
+  "commandCount": 73,
+  "windows": {
+   "main": 65,
+   "settings": 29,
+   "quick-chat": 10,
+   "splash": 3,
+   "onboarding": 7,
+   "browser-viewer": 6,
+   "viewer-*": 12,
+   "skill-viewer-*": 4
+  }
+ },
+ "delivery": {
+  "app": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+  "appTreeSha256": "1bae1e2806c5fc025c605c60878cdd8a59f87d86e78092b1d0a99b22f40768a9",
+  "files": {
+   "Contents/Info.plist": "da9ebff0b848d9ff1e3e6e5ac545c7270904ceb2a65677095cbb3e400e01919a",
+   "Contents/MacOS/lingxi-resource-desktop": "248a8e346e526b18b7657c8edd5b7068061bd6c8645105aa129d6ae965ade8b8",
+   "Contents/MacOS/lingxi-service": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+   "Contents/Resources/Lingxi.icns": "0951f493d51b3537f2b5826d45e117bba1ead1802c38658e2c0ebb1d7706b4d3",
+   "Contents/Resources/rust-service/build.json": "f1dc84f9a79682fe74281d56ed022b7b57f9837ac43719f8be87fca35ab7337f",
+   "Contents/_CodeSignature/CodeResources": "29f762fbdee2d3cc08f4950a26c3e11c89a7bbcaa61e79449ae8da12f8109c70"
+  },
+  "receipt": "desktop/src-tauri/.tauri-build/build-receipt-release.json",
+  "receiptSha256": "6ccd89a7632f37179234a3c6c2b5b3500b472612b71b0fb0222ed70538d02122",
+  "featureList": [
+   "r09-host"
+  ],
+  "evidenceBuild": false,
+  "rendererDigest": "cba1d4f39d01e7272dd3c1b9c024cef9a3529f97267cbf55e8277900fe11dec9",
+  "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+  "rendererBuild": [],
+  "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+  "executableSha256": "248a8e346e526b18b7657c8edd5b7068061bd6c8645105aa129d6ae965ade8b8",
+  "codesign": {
+   "verifyCommand": "/usr/bin/codesign --verify --deep --strict /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+   "verify": {
+    "command": "/usr/bin/codesign --verify --deep --strict /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+   },
+   "detailsCommand": "/usr/bin/codesign -dv --verbose=4 /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+   "details": {
+    "command": "/usr/bin/codesign -dv --verbose=4 /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": "Executable=/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop\nIdentifier=com.lingxi.app\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20500 size=116495 flags=0x10002(adhoc,runtime) hashes=3634+3 location=embedded\nVersionPlatform=1\nVersionMin=720896\nVersionSDK=1769472\nHash type=sha256 size=32\nCandidateCDHash sha256=20141d5f4cae48e3ffdefd1f03a53b0e9ed42fe0\nCandidateCDHashFull sha256=20141d5f4cae48e3ffdefd1f03a53b0e9ed42fe054d29e975b1224b33af8957e\nHash choices=sha256\nCMSDigest=20141d5f4cae48e3ffdefd1f03a53b0e9ed42fe054d29e975b1224b33af8957e\nCMSDigestType=2\nExecutable Segment base=0\nExecutable Segment limit=53903360\nExecutable Segment flags=0x1\nPage size=16384\nCDHash=20141d5f4cae48e3ffdefd1f03a53b0e9ed42fe0\nSignature=adhoc\nInfo.plist entries=16\nTeamIdentifier=not set\nRuntime Version=27.0.0\nSealed Resources version=2 rules=13 files=3\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1"
+   },
+   "summary": {
+    "identifier": "Identifier=com.lingxi.app",
+    "signature": "Signature=adhoc",
+    "format": "Format=app bundle with Mach-O thin (arm64)",
+    "teamIdentifier": "TeamIdentifier=not set"
+   }
+  },
+  "service": {
+   "stage": "/Users/study_superior/Desktop/Code/LingxiAgent/dist-rust-service/mac-arm64",
+   "sidecar": "desktop/src-tauri/binaries/lingxi-service-aarch64-apple-darwin",
+   "sidecarSha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+   "resourcesManifest": "desktop/src-tauri/resources/rust-service/build.json",
+   "manifestSha256": "f1dc84f9a79682fe74281d56ed022b7b57f9837ac43719f8be87fca35ab7337f",
+   "protocol": {
+    "serverKind": "lingxi-service",
+    "wireProtocolMin": 1,
+    "wireProtocolMax": 1,
+    "dataEpoch": 2
+   },
+   "binarySha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+   "contentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0"
+  },
+  "config": {
+   "file": "desktop/src-tauri/tauri.release.generated.conf.json",
+   "generatedSha256": "6b21c309f5143976e6a0b22225b4004e20194d7008b963b435212524894878ad"
+  }
+ },
+ "g1Evidence": {
+  "receipt": "desktop/src-tauri/.tauri-build/build-receipt-debug.json",
+  "receiptSha256": "79cba8b640b0d4c4c0d227782957be1c82eb032579c87360253a07b9e325ff90",
+  "mode": "debug",
+  "featureList": [
+   "e2e-test",
+   "r09-host",
+   "r09-test-hooks"
+  ],
+  "evidenceBuild": true,
+  "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/debug/lingxi-resource-desktop",
+  "executableSha256": "54f93eacb6cd54e671c947c315042072bdcffc6e35f78e620a65128f8293f180",
+  "rendererDigest": "cba1d4f39d01e7272dd3c1b9c024cef9a3529f97267cbf55e8277900fe11dec9",
+  "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+  "rendererBuild": [],
+  "note": "debug --features r09-host,r09-test-hooks,e2e-test；与 delivery 同一 rendererDigest，供 T07 G1-hidden 只读消费。"
+ },
+ "releaseEvidence": {
+  "path": "/private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app",
+  "isolatedTargetDir": "/private/tmp/lingxi-r09-t06-release-evidence-target",
+  "features": [
+   "r09-host",
+   "r09-test-hooks"
+  ],
+  "evidenceBuild": true,
+  "releaseEvidence": true,
+  "appTreeSha256": "07df2e932c432c60af1593e7d31f61f9522d7827a82cf5da8208361c0320fd55",
+  "files": {
+   "Contents/Info.plist": "da9ebff0b848d9ff1e3e6e5ac545c7270904ceb2a65677095cbb3e400e01919a",
+   "Contents/MacOS/lingxi-resource-desktop": "fd8b5cd735c8c3c7336f990742d6816dc8c8d7bd11727ecad26512cd124dff31",
+   "Contents/MacOS/lingxi-service": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+   "Contents/Resources/Lingxi.icns": "0951f493d51b3537f2b5826d45e117bba1ead1802c38658e2c0ebb1d7706b4d3",
+   "Contents/Resources/rust-service/build.json": "f1dc84f9a79682fe74281d56ed022b7b57f9837ac43719f8be87fca35ab7337f",
+   "Contents/_CodeSignature/CodeResources": "29f762fbdee2d3cc08f4950a26c3e11c89a7bbcaa61e79449ae8da12f8109c70"
+  },
+  "exeSha256": "fd8b5cd735c8c3c7336f990742d6816dc8c8d7bd11727ecad26512cd124dff31",
+  "sidecarSha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+  "buildJsonSha256": "f1dc84f9a79682fe74281d56ed022b7b57f9837ac43719f8be87fca35ab7337f",
+  "rendererSha256InBuildJson": "cba1d4f39d01e7272dd3c1b9c024cef9a3529f97267cbf55e8277900fe11dec9",
+  "rendererMatchesFrozen": true,
+  "crateSourceDigest": "b5923974d7498a762683978444be0a7cae9b7cab2c2b12b57062adab0c613aa7",
+  "crateSourceFileCount": 167,
+  "codesignVerifyExit": 0,
+  "codesignSummary": {
+   "Identifier": "Identifier=com.lingxi.app",
+   "Format": "Format=app bundle with Mach-O thin (arm64)",
+   "Signature": "Signature=adhoc",
+   "TeamIdentifier": "TeamIdentifier=not set"
+  },
+  "buildLog": "/private/tmp/r09-t06-release-evidence-build.log",
+  "note": "T02 supervisor/ownership hidden release 负向用；不弹用户可见原生弹窗；v3.1 构建后 repo 生成物已恢复、delivery 未触碰。"
+ },
+ "renderer": {
+  "buildCommands": [
+   "npm run build:renderer",
+   "npm run build:theme"
+  ],
+  "rendererDigest": "cba1d4f39d01e7272dd3c1b9c024cef9a3529f97267cbf55e8277900fe11dec9",
+  "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+  "rendererBuildRecordedIn": "artifacts/rust-tauri/R09/dev/t06/build-v31-delivery/tauri-build-release.json（delivery 用 --no-renderer-build，renderer 显式 npm 构建后绑定）"
+ },
+ "staticGates": {
+  "capabilityAudit": {
+   "evidence": "artifacts/rust-tauri/R09/dev/t06/v31-audit-01",
+   "status": "PASS",
+   "exitCode": 0,
+   "caseCount": 57,
+   "failedCases": [],
+   "gapRemaining": 0,
+   "registeredCommandCount": 73
+  },
+  "releaseAttackSurface": {
+   "evidence": "artifacts/rust-tauri/R09/dev/t06/v31-scan-01",
+   "status": "PASS",
+   "caseCount": 45,
+   "failedCases": [],
+   "artifactChangedDuringScan": false,
+   "aclCommandCount": 72
+  },
+  "releaseSuite": {
+   "evidence": "artifacts/rust-tauri/R09/dev/t06/v31-release-suite-01",
+   "status": "PASS",
+   "exitCode": 0,
+   "caseCount": 51
+  },
+  "capabilityMatrix": {
+   "evidence": "artifacts/rust-tauri/R09/dev/t06/v31-capability-matrix-01",
+   "status": "FAIL",
+   "exitCode": 2,
+   "caseCount": 90,
+   "blockedCaseCount": 21,
+   "note": "FAIL exit 2 仅因 21 个 blocked::runtime.* GUI 项；静态全 PASS"
+  }
+ },
+ "v3RustPatchCarriedOver": [
+  "viewer-closed（数字 windowId）/ viewer-window.html / show-skill-viewer overlay / watch_workspace+unwatch_workspace+workspace-changed / capability+policy（命令面 73）"
+ ],
+ "deferred": {
+  "browser-update-full-flow": "保持现有 browser:connection-changed 部分映射；完整 browser-update 增量流 deferred（T05/T07）",
+  "file_drop_paths": "不新增 Rust 命令；renderer 拖放 FIFO 已可用；命令面 deferred",
+  "onboarding_complete": "继续 NOT_IMPLEMENTED（T06-ONBOARD-01）",
+  "t03-file-01-remaining": "read_docx_html/read_xlsx_html/observability_export_begin/write/end/abort（6 条）"
+ },
+ "freeze": {
+  "frozenAt": "2026-10-26T23:47:32+0800",
+  "psResidualCount": 0,
+  "appTreeSha256": "1bae1e2806c5fc025c605c60878cdd8a59f87d86e78092b1d0a99b22f40768a9",
+  "files": {
+   "Contents/Info.plist": "da9ebff0b848d9ff1e3e6e5ac545c7270904ceb2a65677095cbb3e400e01919a",
+   "Contents/MacOS/lingxi-resource-desktop": "248a8e346e526b18b7657c8edd5b7068061bd6c8645105aa129d6ae965ade8b8",
+   "Contents/MacOS/lingxi-service": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+   "Contents/Resources/Lingxi.icns": "0951f493d51b3537f2b5826d45e117bba1ead1802c38658e2c0ebb1d7706b4d3",
+   "Contents/Resources/rust-service/build.json": "f1dc84f9a79682fe74281d56ed022b7b57f9837ac43719f8be87fca35ab7337f",
+   "Contents/_CodeSignature/CodeResources": "29f762fbdee2d3cc08f4950a26c3e11c89a7bbcaa61e79449ae8da12f8109c70"
+  },
+  "deliveryReceiptSha256": "6ccd89a7632f37179234a3c6c2b5b3500b472612b71b0fb0222ed70538d02122",
+  "g1ReceiptSha256": "79cba8b640b0d4c4c0d227782957be1c82eb032579c87360253a07b9e325ff90",
+  "note": "v3.1 候选冻结；desktop/src-tauri 自本 handoff 起不再写/构建。v1/v2/v3 证据 STALE，本文件为 T07 G1/G2 与 T02 release-evidence 唯一只读输入。"
+ }
+}

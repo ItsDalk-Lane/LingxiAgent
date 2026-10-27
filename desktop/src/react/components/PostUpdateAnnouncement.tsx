@@ -11,6 +11,7 @@ import { NoticeDialog } from '../ui';
 import { useI18n } from '../hooks/use-i18n';
 import { digestLocale, digestText, kindLabel } from './shared/release-digest-text';
 import styles from './AutoUpdateStatus.module.css';
+import { usePlatform } from '../hooks/use-platform';
 
 interface PendingAnnouncement {
   version: string;
@@ -50,7 +51,7 @@ export function PostUpdateAnnouncement() {
 
   useEffect(() => {
     let cancelled = false;
-    window.hana?.getPendingAnnouncement?.().then((pending) => {
+    usePlatform()?.getPendingAnnouncement?.().then((pending) => {
       if (cancelled || !pending) return;
       setAnnouncement(pending);
       setOpen(true);
@@ -64,7 +65,7 @@ export function PostUpdateAnnouncement() {
 
   const handleConfirm = () => {
     setOpen(false);
-    void window.hana?.ackAnnouncement?.();
+    void usePlatform()?.ackAnnouncement?.();
   };
 
   return (

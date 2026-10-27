@@ -1,0 +1,65 @@
+{
+  "schema": "r07-t08-independent-mcp-request-stop-lifetime-review-v1",
+  "reviewedAt": "2026-10-18T11:55:09.428522+00:00",
+  "finalAcceptance": "pending",
+  "mode": "read-only source/test review; no Cargo or functional execution",
+  "readyManifest": {
+    "path": "artifacts/rust-tauri/R07/T08/mcp-stop-request-lifetime-ready1.json",
+    "sha256": "82ded59dcf8944f2f54717d734971a7cb3f6d030cfad176c7c35ea7a14eec326",
+    "ownedSha256AllMatched": true
+  },
+  "reviewedSourceSha256": {
+    "rust/crates/lingxi-service/src/mcpbridge.rs": "5fa1eef2fcc4506e2fc4cf3c77e3b2d9e119288bbcdc62a2ee8ce0e49789e6d8",
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_remote.rs": "f2cbda5904bdced7a7940129ee4fe4ab7d9829a811097a6dd9882243b6d593c8"
+  },
+  "previousRuntimeFailure": {
+    "receipt": "artifacts/rust-tauri/R07/T08/mcp-remote-and-permission-fixed2.json",
+    "exitCode": 101,
+    "sourceUnchanged": true,
+    "logSha256": "4056343e1c93f228c21d85ea442229bbde908038b73475f8ad22475659971ace",
+    "remotePassed": 6,
+    "remoteFailed": 1,
+    "resourceCounters": {
+      "wireCancel": 0,
+      "handlerNotify": 0,
+      "ctCancelled": false,
+      "drop": 0,
+      "remoteActive": 1,
+      "DELETE": 1
+    }
+  },
+  "staticReview": [
+    {
+      "subject": "connection ownership and admission",
+      "conclusion": "Each finalized connection gets its own Arc<McpRequestLifetime>; only original lifetime is sealed/woken. enter is called while holding actual connection lock and checks stopping before and after active increment. A sealed connection rejects calls before SDK send. Subsequent reconnect gets a separate lifetime, so an old cancellation signal cannot affect it."
+    },
+    {
+      "subject": "locks and wakeups",
+      "conclusion": "request_raw releases connection lock after capturing peer/lifetime and active guard; its wait and cancellation do not require the disconnect-held connection lock. cancelled/drain register Notify before checking atomics, avoiding missed stop/drain wakeups. begin_stop uses the independent synchronous token snapshot and does not first invalidate SDK."
+    },
+    {
+      "subject": "exact SDK request cancellation",
+      "conclusion": "send_cancellable_request completion installs original peer/requestId cancellation guard before the next await. Explicit cancel, deadline and lifetime stop await official notify_cancelled. Dropping the outer request transfers active ownership into asynchronous cleanup; active remains held until notification completes or its bounded unknown result. The no-current-runtime path marks cancellation_unconfirmed and releases the guard truthfully."
+    },
+    {
+      "subject": "disconnect failure handling",
+      "conclusion": "McpConnection.stop seals, drains the original active guards for the existing two-second budget, then still runs child stop and SDK service cancellation even if request drain failed. Cancellation failure is sticky for that connection and produces CleanupFailed instead of claiming success. The runtime manager translates this to its existing cleanup-unconfirmed receipt."
+    },
+    {
+      "subject": "listing and initialization",
+      "conclusion": "tools/list pages now use request_raw with existing page/count limits and bounded bytes; no alternate uncancelled SDK listing path remains. Connect initialization remains under its original manager deadline/authorization cancellation and McpChild RAII; the new lifetime is only published at successful finalize."
+    }
+  ],
+  "testReview": {
+    "status": "PREPARED_NOT_RUNTIME_VERIFIED_BY_REVIEWER",
+    "stdio": "Existing real scope/deadline/direct-future-abort/echo assertions retained. Additional assertions require exact cancellation ID, SDK open before cancel, rejected sealed request zero delivery, active zero after disconnect and old-lifetime signal not harming reconnect.",
+    "remote": "Original three-second actual owned handler exit/drop+zero-active requirement retained, with protocol versions and wire/handler/cancellation/delete facts added.",
+    "interpretation": "Official modern streamable HTTP may consume notify_cancelled locally to cancel a precise HTTP exchange; wireCancel=0 alone is not failure. Actual remote handler exit/drop and zero active remain required; no wire-count relaxation substitutes for resource cleanup."
+  },
+  "newBlockingFinding": null,
+  "limitations": [
+    "Root mcp-resource-stop-fixed1 was still first-run pending when this review was written; no new runtime pass claimed.",
+    "Static review cannot establish remote handler release; prior real active1/drop0/DELETE1 failure remains retained.",
+    "Reviewer created only this new independent evidence file and did not modify source/tests/contracts/plans/runner/old records."
+  ]
+}

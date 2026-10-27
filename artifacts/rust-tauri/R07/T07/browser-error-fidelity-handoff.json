@@ -1,0 +1,78 @@
+{
+  "recordedAt": "2026-10-18T03:34:06.560161+00:00",
+  "status": "IMPLEMENTED_FORMAT_CHECKED_CARGO_AND_REAL_CHROME_VERIFICATION_PENDING",
+  "sourceBaseline": "t07c",
+  "scope": [
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/cdp.rs",
+      "t07cSha256": "272af850aa41cc27e46ed7de3d0bdcb8bacc59ae831240ed0242cecfa1451f6f",
+      "currentSha256": "7c146cb0774536cf31c511b73043a8be35419a7505642b9645e2392e2c70c10f"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/runtime.rs",
+      "t07cSha256": "e64f784c1ea9a06309c4a6dc6a4b2bb61945d3ece9417cf6bfb0bbd1cb59de01",
+      "currentSha256": "21b1c56ae6f1aee75407ab314f54a6e53f888431cd13385f6970938f4be163e0"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r07_browser_chromium.rs",
+      "t07cSha256": "2d3a2a2c8b3cadd443f5dfab2a8f26011d7fb998f18eaae3ef6530145780b315",
+      "currentSha256": "93dcc2f3c09f1eb935f8e9f40e61606186496c259cd6560437ee8508dee478b7"
+    }
+  ],
+  "allManifestContentChanges": [
+    "rust/crates/lingxi-adapters/src/browser/cdp.rs",
+    "rust/crates/lingxi-adapters/src/browser/runtime.rs",
+    "rust/crates/lingxi-adapters/tests/r07_browser_chromium.rs"
+  ],
+  "onlyThreeAuthorizedSourceFilesChanged": true,
+  "patch": "browser-error-fidelity-working.patch",
+  "patchSha256": "5f4d301c8f84b7c3ba64b336b153687e0a036895fcf9c5e4ba3310643d8b8cbe",
+  "checks": [
+    {
+      "command": "rustup run 1.98.1 rustfmt --edition 2021 <3 files>",
+      "exitCode": 127,
+      "note": "rustup不在当前PATH；未运行，通过已存在的同版本绝对路径继续。"
+    },
+    {
+      "command": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustfmt --edition 2021 <3 files>",
+      "exitCode": 0
+    },
+    {
+      "command": "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustfmt --edition 2021 --check <3 files>",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  ],
+  "cargoExecuted": false,
+  "newUnitTargets": [
+    "browser::cdp::tests::first_close_cause_reaches_written_and_unwritten_calls_with_their_own_effects",
+    "browser::cdp::tests::written_cooperative_cancellation_keeps_its_cause_for_later_unwritten_calls"
+  ],
+  "extendedUnitTargets": [
+    "browser::cdp::tests::eof_wakes_pending_commands_without_waiting_for_their_full_deadline",
+    "browser::cdp::tests::a_stalled_pipe_write_obeys_the_same_deadline_and_removes_its_pending_id"
+  ],
+  "runtimeCounterexamples": [
+    {
+      "oldBehavior": "reader EOF后下一个尚未写出的有副作用命令直接复制terminal.effect_unknown=true。",
+      "newAssertion": "现有真实EOF单测新增later.effect_unknown=false，EOF来源仍可见。"
+    },
+    {
+      "oldBehavior": "真实pipe写入超时后普通close将后续原因改成browser_closed。",
+      "newAssertion": "现有stalled pipe单测新增later.code=browser_timeout且unknown=false。"
+    },
+    {
+      "oldBehavior": "已写出合作取消后普通close丢失cancelled原因。",
+      "newAssertion": "新增真实pipe完整帧确认后取消；当前cancelled/unknown=true，后续cancelled/unknown=false。"
+    },
+    {
+      "oldBehavior": "fail仅state保首因，pending发送的是本次cause；不同close原因可能影响不同观察者。",
+      "newAssertion": "新增两个实际已写出请求通过首因终止，后来不同close及普通close不得覆盖首因；两个请求各按自身effect，后续未写出false。"
+    }
+  ],
+  "realIntegrationTarget": "lingxi-adapters --test r07_browser_chromium（全10项原并发/原预算/原断言）",
+  "oldFailureDisposition": "t07c原adapter101及其popup失败完整保留，尚未定位根因；本次只修复原因丢失与诊断误报，不宣称原浏览器失败已关闭。"
+}

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "after": {
+      "type": "string"
+    },
+    "before": {
+      "type": "string"
+    },
+    "key": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "key",
+    "label",
+    "before",
+    "after"
+  ],
+  "title": "McpSettingsChange",
+  "type": "object"
+}

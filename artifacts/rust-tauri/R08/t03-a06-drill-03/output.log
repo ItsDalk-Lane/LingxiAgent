@@ -1,0 +1,40 @@
+[PASS] freshness: 构建产物新鲜（main/preload/src 均无新于 dist-renderer 的改动；实测 main=0 preload=0 src=0）
+[journal] svc-home {"svcHome":"/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-svc-QoX4Ek"}
+[journal] stub {"pid":97724,"port":58535}
+[journal] stamp {"stamp":{"committedDataEpoch":1,"epoch":1,"lastVersion":"0.0.0","minimumReaderEpoch":1,"schemaVersion":2,"updatedAt":"2026-10-22T16:03:50.128Z"}}
+[PASS] stamp: 服务自盖章 data-epoch.json schemaVersion===2（实测 2）
+[journal] service-spawn {"pid":97726}
+[journal] rust-service {"pid":97726,"port":58537,"baseUrl":"http://127.0.0.1:58537"}
+[PASS] rust-service: rust service pid 97726 alive
+[journal] electron-A {"pid":97727,"cdpPort":9446,"home":"/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliA-X8s8yO"}
+[journal] conn-info-A {"connInfo":{"port":58537,"token":"<redacted>","serverNodeKind":"lingxi-service","serverNodeTransport":"http","host":"127.0.0.1"}}
+[PASS] remote-mode-A: 客户端 A GSCI 确证 remote 分支（host/port/kind/transport；实测 {"port":58537,"token":"<redacted>","serverNodeKind":"lingxi-service","serverNodeTransport":"http","host":"127.0.0.1"}）
+[PASS] zero-touch-instance-A: 客户端 A HOME 下无 lingxi-service/instance.json（remote 零接触）
+[journal] electron-B {"pid":97947,"cdpPort":9946,"home":"/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliB-pV1kCy"}
+[journal] conn-info-B {"connInfo":{"port":58537,"token":"<redacted>","serverNodeKind":"lingxi-service","serverNodeTransport":"http","host":"127.0.0.1"}}
+[PASS] remote-mode-B: 客户端 B GSCI 确证 remote 分支（host/port/kind/transport；实测 {"port":58537,"token":"<redacted>","serverNodeKind":"lingxi-service","serverNodeTransport":"http","host":"127.0.0.1"}）
+[PASS] zero-touch-instance-B: 客户端 B HOME 下无 lingxi-service/instance.json（remote 零接触）
+[PASS] tree-s1: harness 子树 node-kernel count 0 !== 0（硬断言）
+[PASS] tree-s1: harness 子树 rust-kernel count 1 !== 1
+[PASS] tree-s1: harness 子树 Electron 主进程 count 2 !== 2
+[PASS] tree-s1-rust-pid: 子树内唯一 rust-kernel = harness 服务 pid 97726（实测 97726）
+[journal] leg-a1 {"sessionId":"a06-clientA-leg1","frameCount":10,"runEnded":true,"runEndReason":null,"sawFinal":true,"sawMarker":true}
+[PASS] leg-a1-run-end: leg-a1 assistant_run_end 到达且 reason 为空（成功语义；实测 {"runEnded":true,"reason":null}）
+[PASS] leg-a1-final: leg-a1 帧含 A06-CHAT-FINAL leg-a1（任务真实完成）
+[PASS] history-leg-a1: leg-a1 服务侧历史含终结回答（status=200）
+[journal] quit-b-proc-keystroke-1 {"status":0,"stdout":"","stderr":""}
+[journal] quit-b-menu-quit-1 {"status":1,"stdout":"","stderr":"83:147: execution error: “System Events”遇到一个错误：不能获得“menu item \"Quit Electron\" of menu \"Electron\" of menu bar 1 of process 1 whose unix id = 97947”。 (-1728)"}
+[journal] quit-b-proc-keystroke-2 {"status":0,"stdout":"","stderr":""}
+[journal] quit-b-menu-quit-2 {"status":1,"stdout":"","stderr":"83:147: execution error: “System Events”遇到一个错误：不能获得“menu item \"Quit Electron\" of menu \"Electron\" of menu bar 1 of process 1 whose unix id = 97947”。 (-1728)"}
+[journal] quit-b-proc-keystroke-3 {"status":0,"stdout":"","stderr":""}
+[journal] quit-b-menu-quit-3 {"status":1,"stdout":"","stderr":"83:147: execution error: “System Events”遇到一个错误：不能获得“menu item \"Quit Electron\" of menu \"Electron\" of menu bar 1 of process 1 whose unix id = 97947”。 (-1728)"}
+[journal] reap-service {"pid":97726,"aliveAtReap":true}
+[journal] service-exit {"code":0,"signal":null}
+[journal] reap-service-result {"exited":{"code":0,"signal":null}}
+[PASS] reap-service: harness 回收服务（SIGTERM 收敛；实测 {"code":0,"signal":null}）
+[journal] electron-A-exit {"code":0,"signal":null}
+[journal] electron-B-exit {"code":0,"signal":null}
+[journal] cleanup {"homes":["/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-svc-QoX4Ek","/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliA-X8s8yO","/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliB-pV1kCy"]}
+[r08-t03-a06] crash: Error: electron-b-exit: timeout after 45000ms
+    at waitFor (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t03_a06_drill.mjs:98:38)
+    at async main (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t03_a06_drill.mjs:623:5)

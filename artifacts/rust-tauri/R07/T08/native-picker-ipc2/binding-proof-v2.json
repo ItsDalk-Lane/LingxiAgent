@@ -1,0 +1,127 @@
+{
+  "recordedAt": "2026-10-18T08:01:35.945431+00:00",
+  "status": "LOCAL_NATIVE_IPC_CHECK_PASSED_NOT_FROZEN_CANDIDATE",
+  "actualTestExitCode": 0,
+  "actualTestReceipt": "../native-picker-ipc2.json",
+  "actualTestReceiptSha256": "13fb303babb8d7bf67fdbb9c10b82bf1b52b1cdc30024e31ad806451904237c3",
+  "nativeResults": {
+    "cancelled": {
+      "input": "/private/tmp/lingxi-r07-t08-native-picker-ipc-hptt_1oc/selected-skill",
+      "notice": "已取消选择目录",
+      "result": null
+    },
+    "checks": [
+      "actual-native-dialog-selected-path",
+      "current-ui-retains-selected-path-not-installed",
+      "actual-cancel-null-keeps-existing-selection",
+      "source-bytes-unchanged-no-install",
+      "readonly-window-rejected"
+    ],
+    "readonly": {
+      "invokeError": "select_folder not allowed on window \"skill-viewer-0\", webview \"skill-viewer-0\", URL: local\n\nallowed on: [windows: \"main\", URL: local]\n\nreferenced by: capability: resource-main, permission: allow-select-folder",
+      "ok": false
+    },
+    "selected": {
+      "input": "/private/tmp/lingxi-r07-t08-native-picker-ipc-hptt_1oc/selected-skill",
+      "notice": "已选择目录，可用于查看或后续配置；尚未安装技能。",
+      "result": "/private/tmp/lingxi-r07-t08-native-picker-ipc-hptt_1oc/selected-skill"
+    }
+  },
+  "nativeSourcesUnchanged": true,
+  "changedNativeSources": [],
+  "binary": {
+    "path": "/private/tmp/lingxi-r07-t08-native-picker-ipc-hptt_1oc/Lingxi Directory Proof.app/Contents/MacOS/lingxi-resource-desktop",
+    "sha256": "dd7582b9b59de8f4b3739a97309f10b4790e5e3167932e5b6fd4d15d3a125281",
+    "sameInodeAsCurrentBuild": true,
+    "hashCaptureTime": "实际运行后立即记录，未伪造运行前SHA"
+  },
+  "cleanup": {
+    "driverPortClosed": true,
+    "ownedAppProcesses": [],
+    "applicationRawExitCode": "NOT_CAPTURED;测试NativeApp Drop已kill/wait，不推断应用exit0"
+  },
+  "evidence": [
+    {
+      "path": "native-receipt.json",
+      "bytes": 967,
+      "sha256": "f7a760f38702fa5819434be5da6242c0050cc7a7c4ac890cffe9aa981f35d351"
+    },
+    {
+      "path": "selection-and-cancel.json",
+      "bytes": 451,
+      "sha256": "eb0b582dba1e54e7aef42b2330f53012c2da511404a8a67b16a973c2c0509dcc"
+    },
+    {
+      "path": "selected.png",
+      "bytes": 57585,
+      "sha256": "59a86b87a13605fa31e532bbbb5a9921194c0085866ff815c220c6c87daeaa69"
+    },
+    {
+      "path": "native-app.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "choose-ready.json",
+      "bytes": 99,
+      "sha256": "7f063a205d99ffbf64148f9b0d5d0e031c755b8309d103040c4eb9474920e28a"
+    },
+    {
+      "path": "cancel-ready.json",
+      "bytes": 18,
+      "sha256": "743c0f0c416606932f4fb52f23f2ec8689e252568494bc586d5952448f0aebba"
+    },
+    {
+      "path": "launch.json",
+      "bytes": 2617,
+      "sha256": "ab108b8e790b9efd5eaccb84943fe6d4cdceb6b7ff14d5326f300d7ab7fb5da8"
+    }
+  ],
+  "scope": "真实CUA选目录/取消+实际IPC值捕获和只读窗口拒绝；全工作区并行编辑导致开发sourceUnchanged=false，但所有此原生入口源逐项未变；不借此领取未跑的最终候选整阶段验收。",
+  "toolObservation": "点击Cancel后的getAXState报告App quit，因原生测试已完成全部断言后退出；以真实Cargo退出0、native receipt、端口关闭证明，不伪报CUA最后AX成功。",
+  "originalBoundaryReceipt": {
+    "path": "boundary-and-cleanup.json",
+    "sha256": "4fcf6b970eef2b859e6739f3bee49ca1352a102084a9235fdad8d2b822a2fa3a"
+  },
+  "nativeSourceClosureAfterActualRun": {
+    "capturedAt": "2026-10-18T08:03:46.755387+00:00",
+    "scope": "实际运行后立即补充当前构建所用原生仓库源/构建定义/权限/前端/依赖锁闭包；不伪称之前未捕获文件有运行前SHA。后继候选必须先真实重新构建native-skills，再核二进制完全同字节及此闭包。",
+    "files": {
+      "desktop/src-tauri/Cargo.lock": "b8a875b8feaa1898886788ac0bacfa17b05877206c38937af3c0b2be98faea5d",
+      "desktop/src-tauri/Cargo.toml": "57564574d5995ac9b0125938f48538c7c173804e98b848339a09d546af6fde72",
+      "desktop/src-tauri/README.md": "cdd6184591536a1ffdeb8b046ab3b9629af70f208e00c0f79385cde234180d54",
+      "desktop/src-tauri/build.rs": "f07acaf157598edf1f37464aafb6a24a72bbbcb03e680ff7916e227f35f89f2c",
+      "desktop/src-tauri/capabilities/main.json": "177f2a1074a744532c3783d47e22b2efaef8ad2af10d81eb7574210e73183dc8",
+      "desktop/src-tauri/capabilities/skill-viewer.json": "93467c70893af3862296f48a51c102027f28265fa397b312768a10814d75ecc4",
+      "desktop/src-tauri/capabilities/viewer.json": "759c96786e75346bdb48c255cfa4a706113a06b4041de7d2e21cae3235223f65",
+      "desktop/src-tauri/icons/icon.png": "3ed46bb2051e134a243f7b24da8503af03ba7d5b1cbd5c2b48bfe791be720154",
+      "desktop/src-tauri/src/files.rs": "955cbfc0bd428a1195fea4a0f82624d479ecddc9b2f2c5537619a54c498e9a80",
+      "desktop/src-tauri/src/lib.rs": "62700408c1f581934546ff0e7e89db202903232c48bc5b57d9127f80c0e5aa9e",
+      "desktop/src-tauri/src/main.rs": "3b051cd46c97bba8dfafc7ffdc4107306571188ffb457fe8f42992f3a01a5f76",
+      "desktop/src-tauri/src/resource_bridge.rs": "2fd9d8bb2b438656348397a508eb2d9492359f08fcbbfe40afcba463cbc67868",
+      "desktop/src-tauri/src/skills.rs": "e955f6636c849d3ac013463c8cab2ed1e1eeaa33fefaa61e6695de637a46ace1",
+      "desktop/src-tauri/tauri.conf.json": "a81d14f1e8f0186a3a45a61b69681e4c299426225b47ecb336e4707b8ac08583",
+      "desktop/src-tauri/tests/desktop_host.rs": "6c7e17086be787d55403cb3caac8e152cd0fac95c392f148eb5d7e763a9ee278",
+      "desktop/src-tauri/tests/directory_picker_host.rs": "6f1a6a4b2d7717b803ce0eee3eae1509d6dca60fb480d0dc20fec3c4dde2fd79",
+      "desktop/src-tauri/tests/edit_current_host.rs": "3e7d839d789b2c331ca424ed1f618164adb3b211e3277a5581cf4b0761f2325d",
+      "desktop/src-tauri/tests/experiments_host.rs": "775f3ba6b31e51e7ba66d0c178f2a5a4b6789c9fbf074873e0a324e48807fc72",
+      "desktop/src-tauri/tests/interaction_host.rs": "768550e7364f885e68914b6e61988a12da9e9c8266f839569b199b20b200bb2d",
+      "desktop/src-tauri/tests/native_resources.rs": "119c4a1540e5fa0489f99bfe624d1a810763accac469846a75236473b8f6674e",
+      "desktop/src-tauri/tests/resource_current_host.rs": "83826b6c91e87c9dc6166aff42192adfa077c022b51b7ef447fa7c69a7a0d4e4",
+      "desktop/src-tauri/tests/skill_viewer_host.rs": "24f8c101b79c8aee9569b31fe0d241959597a067253f28bf49ae559cfe176950",
+      "desktop/src/tauri-resources/App.tsx": "2a793c3518e31e67d01053ac1726451fef69634dc28db842b55b1d5c8c9d209f",
+      "desktop/src/tauri-resources/SkillViewer.tsx": "754413e17dbc70753df5caae4a4c9fde36e525ae39a747493e598c085626a920",
+      "desktop/src/tauri-resources/__tests__/resource-desktop.test.tsx": "eae2a4debc8e9e0d9fd08c6adfba0769ca11ef9b097d65d22cf60525c4b54a28",
+      "desktop/src/tauri-resources/bridge.ts": "a2658aedbf6b5c1acb5a4daca9812b9b08b42d8198e6808433b4dcc147e525ab",
+      "desktop/src/tauri-resources/content.ts": "bedd7b296e5335536f536647b84720e5603e5d8f04d6d96d79122b6997d78017",
+      "desktop/src/tauri-resources/index.html": "a7a79cc03a62b7909efd433c91378d167e09618c52ac663f376fda47e29fce7c",
+      "desktop/src/tauri-resources/main.tsx": "c903e321014e5a84a4bf1e16100e98a552b67dc1d3f04552744610b5a93f16f4",
+      "desktop/src/tauri-resources/mammoth-browser.d.ts": "081ab9befdc7d1c1ebd8ab475e040a3add7744b54cbf3f741b300ea33a679f2f",
+      "desktop/src/tauri-resources/style.css": "709e9ca83f305e71e38aca05b8a3d32a3e346dffb79381920f06085c1dad5622",
+      "desktop/vite.tauri-resources.config.ts": "35fe2940df91f4488f9e884f8b00c381b9cf830d1bd1d07aeecc31cd65cae1a5",
+      "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+      "package.json": "83767a9dd10f5cb7a15d8eb3af1a18fc25a8682182a6da8d1d3ff1febbe55c84",
+      "rust-toolchain.toml": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37"
+    }
+  }
+}

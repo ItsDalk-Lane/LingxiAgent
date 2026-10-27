@@ -1,9 +1,10 @@
+import type { SettingsConnectionOwner } from './connection-owner';
 /**
  * Settings window Zustand store
  * 独立于主窗口 store，设置窗口有自己的 BrowserWindow + JS context
  */
 import { create } from 'zustand';
-import type { ServerConnection, ServerConnectionRegistry } from '../services/server-connection';
+import type { ServerConnection, ServerConnectionRegistry } from '../services/service-client';
 import { createRemoteResource, type RemoteResource, type RemoteResourceStatus } from './resource-state';
 
 export interface Agent {
@@ -143,11 +144,18 @@ export interface SettingsState {
   // config
   settingsConfig: Record<string, any> | null;
   settingsConfigKey: string | null;
+  settingsAgentsOwner: SettingsConnectionOwner | null;
+  settingsIdentityOwner: SettingsConnectionOwner | null;
+  settingsDataOwner: SettingsConnectionOwner | null;
+  settingsDataAgentId: string | null;
   settingsConfigStatus: RemoteResourceStatus;
   settingsConfigError: string | null;
   settingsSnapshot: RemoteResource<SettingsSnapshot>;
   globalModelsConfig: Record<string, any> | null;
   runtimeModels: RuntimeModelInfo[];
+  runtimeModelsError: string | null;
+  providersSummaryError: string | null;
+  agentsError: string | null;
   homeFolder: string | null;
 
   // ui
@@ -155,6 +163,7 @@ export interface SettingsState {
   activeSubTabs: Record<string, string>;
   platformName: string | null;
   ready: boolean;
+  rustSettingsUnavailable: boolean;
 
   // pins
 
@@ -203,11 +212,18 @@ export const useSettingsStore = create<SettingsStore>()((set, get) => ({
   // config
   settingsConfig: null,
   settingsConfigKey: null,
+  settingsAgentsOwner: null,
+  settingsIdentityOwner: null,
+  settingsDataOwner: null,
+  settingsDataAgentId: null,
   settingsConfigStatus: 'idle',
   settingsConfigError: null,
   settingsSnapshot: createRemoteResource<SettingsSnapshot>(),
   globalModelsConfig: null,
   runtimeModels: [],
+  runtimeModelsError: null,
+  providersSummaryError: null,
+  agentsError: null,
   homeFolder: null,
 
   // ui
@@ -215,6 +231,7 @@ export const useSettingsStore = create<SettingsStore>()((set, get) => ({
   activeSubTabs: {},
   platformName: null,
   ready: false,
+  rustSettingsUnavailable: false,
 
   // pins
 

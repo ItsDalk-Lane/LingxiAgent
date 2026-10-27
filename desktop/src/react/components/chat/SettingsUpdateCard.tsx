@@ -8,9 +8,11 @@ interface Props {
 
 export const SettingsUpdateCard = memo(function SettingsUpdateCard({ update }: Props) {
   const changes = Array.isArray(update.changes) ? update.changes : [];
-  const statusClass = update.status === 'failed'
-    ? styles.settingsUpdateCardFailed
-    : styles.settingsUpdateCardApplied;
+  const statusClass = update.status === 'applied'
+    ? styles.settingsUpdateCardApplied
+    : update.status === 'failed'
+      ? styles.settingsUpdateCardFailed
+      : styles.settingsUpdateCardUnchanged;
 
   return (
     <div className={`${styles.settingsUpdateCard} ${statusClass}`}>

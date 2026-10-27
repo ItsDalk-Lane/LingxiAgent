@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStore } from '../stores';
 import { usePanel } from '../hooks/use-panel';
-import { lingxiFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../services/service-client';
 import { AgentAvatar, resolveAgentDisplayInfo } from '../utils/agent-display';
 import fp from './FloatingPanels.module.css';
 import styles from './automation/AutomationPanel.module.css';
@@ -95,7 +95,10 @@ export function AutomationPanel() {
       const nextJobs = cronData.jobs || [];
       setJobs(nextJobs);
       setAvailableModels(modelOptions);
-      setLoadError(null);
+      const blocked = cronData.importReport?.blocked;
+      setLoadError(typeof blocked === 'number' && blocked > 0
+        ? (window.t ?? ((key: string) => key))('automation.importBlocked').replace('{count}', String(blocked))
+        : null);
       updateBadge(nextJobs);
     } catch (err) {
       console.error('[automation] load failed:', err);

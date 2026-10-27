@@ -1,0 +1,30 @@
+{
+  "status": "RUNNING_NOT_PASS",
+  "startedAtUtc": "2026-10-21T16:53:04.690861+00:00",
+  "sourceAndBinarySha256": {
+    "rust/crates/lingxi-service/src/coding_run_code.rs": "f97771a4dbc2189712af2b5e1d84867db70a3638a40a71ac3248667d28618a85",
+    "rust/crates/lingxi-service/src/coding_ptc.rs": "1d9ce7f54f01b4676c668b96f2edd493c625a20aa36a54262682c78075e63856",
+    "rust/crates/lingxi-service/tests/r08_admission_run_code.rs": "92e587e8d1704ebd341951293291116034c5dc376111b8a7b30d3b1f4b888b0e",
+    "rust/crates/lingxi-service/tests/r08_admission_ptc.rs": "73b562dfcbe6c34abe5f9f9f0127bf1cb43832c8a80f8ffbce9bfa2c52ac70e6",
+    "scripts/rust-tauri/r08-ptc-worker.mjs": "4e0775b4bf8532009727edfca9dee78d6c898b9873a3774ad235f5e7babc8cd0",
+    "lib/ptc/ptc-runtime.ts": "a2ec0f6e7f5af2ca966d717117fa0b6ade03593239363594fbbeab09dcbcd252",
+    "rust/crates/lingxi-service/src/runs.rs": "e311d708475e1a1d8a31c626585a25004b4d6d05d8fa2d943a6cee820b06dfb4",
+    "rust/crates/lingxi-service/src/toolgateway.rs": "fd435fa0fc0bff0ecc80870c295b4c3521adddf81c82f695772cbeb2d2b8f197",
+    "rust/target/debug/deps/r08_admission_ptc-5d41adb521f581e6": "7bc377de7a4ce789a7d8f388b83d0f5c9a2f03bc1a596fa5bb764b8374aeffab",
+    "rust/target/debug/deps/r08_admission_run_code-465a18f4152e0455": "65a8a483ff69f5de26b2aaa99eb1cc67d5ef946f612811ddf4340731a4c7932d"
+  },
+  "commands": [
+    {
+      "command": "rust/target/debug/deps/r08_admission_ptc-5d41adb521f581e6 --nocapture --test-threads=1",
+      "log": "artifacts/rust-tauri/R08/ptc-implementation-01/rust-test-final-candidate-01.log",
+      "sessionId": 96417,
+      "exitCode": null
+    },
+    {
+      "command": "rust/target/debug/deps/r08_admission_run_code-465a18f4152e0455 --nocapture --test-threads=1",
+      "log": "artifacts/rust-tauri/R08/run-code-implementation-01/test-final-candidate-01.log",
+      "sessionId": 36901,
+      "exitCode": null
+    }
+  ]
+}

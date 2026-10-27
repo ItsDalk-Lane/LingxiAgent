@@ -1,0 +1,640 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/desktop-open-external.test.ts (6 tests | 6 failed) 46ms
+     × 真实处理函数等待系统 Promise 完成才返回成功 40ms
+     × 系统拒绝时返回明确失败而不假报已打开 2ms
+     × 损坏或不支持的地址不交系统： 1ms
+     × 损坏或不支持的地址不交系统：broken url 1ms
+     × 损坏或不支持的地址不交系统：javascript:alert(1) 1ms
+     × 损坏或不支持的地址不交系统：file:///private/owned 1ms
+ ❯ desktop/src/react/settings/tabs/__tests__/McpTab.test.tsx (15 tests | 3 failed) 4027ms
+     × 打开登录浏览器失败须立即显示原因并停止轮询：missing 1159ms
+     × 打开登录浏览器失败须立即显示原因并停止轮询：rejected 1059ms
+     × 打开登录浏览器失败须立即显示原因并停止轮询：receipt 1045ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/desktop-open-external.test.ts > 现役打开外部浏览器的系统回执 > 真实处理函数等待系统 Promise 完成才返回成功
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/desktop-open-external.test.ts:27:58
+     25|     const result = Promise.resolve(actualHandler(open)({}, 'https://ex…
+     26|     await Promise.resolve();
+     27|     expect(open).toHaveBeenCalledOnce(); expect(settled).toBe(false);
+       |                                                          ^
+     28|     finish(); expect(await result).toEqual({ ok: true });
+     29|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  tests/desktop-open-external.test.ts > 现役打开外部浏览器的系统回执 > 系统拒绝时返回明确失败而不假报已打开
+AssertionError: expected undefined to deeply equal { ok: false, error: '自有系统打开失败' }
+
+- Expected:
+{
+  "error": "自有系统打开失败",
+  "ok": false,
+}
+
++ Received:
+undefined
+
+ ❯ tests/desktop-open-external.test.ts:34:57
+     32|     void rejected.catch(() => {});
+     33|     const handler = actualHandler(() => rejected);
+     34|     expect(await handler({}, 'http://127.0.0.1/owned')).toEqual({ ok: …
+       |                                                         ^
+     35|   });
+     36|   it.each(['', 'broken url', 'javascript:alert(1)', 'file:///private/o…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  tests/desktop-open-external.test.ts > 现役打开外部浏览器的系统回执 > 损坏或不支持的地址不交系统：
+ FAIL  tests/desktop-open-external.test.ts > 现役打开外部浏览器的系统回执 > 损坏或不支持的地址不交系统：broken url
+ FAIL  tests/desktop-open-external.test.ts > 现役打开外部浏览器的系统回执 > 损坏或不支持的地址不交系统：javascript:alert(1)
+ FAIL  tests/desktop-open-external.test.ts > 现役打开外部浏览器的系统回执 > 损坏或不支持的地址不交系统：file:///private/owned
+TypeError: Cannot read properties of undefined (reading 'ok')
+ ❯ tests/desktop-open-external.test.ts:38:49
+     36|   it.each(['', 'broken url', 'javascript:alert(1)', 'file:///private/o…
+     37|     const open = vi.fn(async () => {});
+     38|     expect((await actualHandler(open)({}, url)).ok).toBe(false);
+       |                                                 ^
+     39|     expect(open).not.toHaveBeenCalled();
+     40|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  desktop/src/react/settings/tabs/__tests__/McpTab.test.tsx > McpTab > 打开登录浏览器失败须立即显示原因并停止轮询：missing
+AssertionError: expected '' to contain 'settings.oauth.browserUnavailable'
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_settings-tab-content_4045f0 _active_4045f0"[39m
+        [33mdata-tab[39m=[32m"mcp"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"mcp-connector-detail-browser-check"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_mcp-detail-header_4045f0"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m"common.back"[39m
+              [33mclass[39m=[32m"_settings-return-btn_4045f0"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"22"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"22"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M15 18l-6-6 6-6"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_mcp-detail-heading_4045f0"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_skills-list-name_4045f0"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"_pv-status-dot_4045f0"[39m
+                [36m/>[39m
+                [0mOwned browser failure[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_skills-list-desc_4045f0"[39m
+              [36m>[39m
+                [0mbrowser-check[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_skills-list-actions_4045f0"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_pv-add-form-btn_4045f0"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msettings.mcp.start[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_pv-add-form-btn_4045f0"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msettings.mcp.stop[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_pv-add-form-btn_4045f0"[39m
+                [33mdisabled[39m=[32m""[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msettings.mcp.refresh[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"_r_3_-title"[39m
+            [33mclass[39m=[32m"_section_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+            [36m>[39m
+              [36m<h2[39m
+                [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+                [33mid[39m=[32m"_r_3_-title"[39m
+              [36m>[39m
+                [0msettings.mcp.authOAuth[0m
+              [36m</h2>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+              [33mdata-settings-surface[39m=[32m"card"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_mcp-oauth-card_4045f0"[39m
+                [33mdata-testid[39m=[32m"mcp-oauth-waiting"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_skills-list-info_4045f0"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"_skills-list-name_4045f0"[39m
+                  [36m>[39m
+                    [0msettings.mcp.oauthWaiting[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"_skills-list-desc_4045f0"[39m
+                  [36m>[39m
+                    [0msettings.mcp.oauthWaitingHint[0m
+                  [36m</div>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_skills-list-actions_4045f0"[39m
+                [36m>[39m
+                  [36m<button[39m
+                    [33mclass[39m=[32m"_pv-add-form-btn_4045f0"[39m
+                    [33mtype[39m=[32m"button"[39m
+                  [36m>[39m
+                    [0mcommon.cancel[0m
+                  [36m</button>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"_r_4_-title"[39m
+            [33mclass[39m=[32m"_section_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+            [36m>[39m
+              [36m<h2[39m
+                [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+                [33mid[39m=[32m"_r_4_-title"[39m
+              [36m>[39m
+                [0msettings.mcp.connectionTitle[0m
+              [36m</h2>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+              [33mdata-settings-surface[39m=[32m"card"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_pv-add-form_4045f0"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_settings-form-grid_4045f0"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"_settings-form-field_4045f0 _settings-form-field-half_4045f0"[39m
+                  [36m>[39m
+                    [36m<label[39m
+                      [33mclass[39m=[32m"_settings-form-label_4045f0"[39m
+                    [36m>[39m
+                      [0msettings.mcp.connectorName[0m
+                    [36m</label>[39m
+                    [36m<input[39m
+                      [33mclass[39m=[32m"_settings-input_4045f0"[39m
+                      [33mplaceholder[39m=[32m"GitHub"[39m
+                      [33mvalue[39m=[32m"Owned browser failure"[39m
+                    [36m/>[39m
+                  [36m</d...
+
+- Expected
++ Received
+
+- settings.oauth.browserUnavailable
+
+ ❯ desktop/src/react/settings/tabs/__tests__/McpTab.test.tsx:100:74
+     98|     fireEvent.click(await screen.findByRole('button', { name: 'setting…
+     99|     fireEvent.click(screen.getByRole('button', { name: 'settings.mcp.o…
+    100|     await waitFor(() => expect(useSettingsStore.getState().toastMessag…
+       |                                                                          ^
+    101|     expect(useSettingsStore.getState().toastType).toBe('error');
+    102|     expect(screen.queryByTestId('mcp-oauth-waiting')).toBeNull();
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  desktop/src/react/settings/tabs/__tests__/McpTab.test.tsx > McpTab > 打开登录浏览器失败须立即显示原因并停止轮询：rejected
+AssertionError: expected '' to contain '系统拒绝打开浏览器'
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_settings-tab-content_4045f0 _active_4045f0"[39m
+        [33mdata-tab[39m=[32m"mcp"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"mcp-connector-detail-browser-check"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_mcp-detail-header_4045f0"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m"common.back"[39m
+              [33mclass[39m=[32m"_settings-return-btn_4045f0"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"22"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"22"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M15 18l-6-6 6-6"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_mcp-detail-heading_4045f0"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_skills-list-name_4045f0"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"_pv-status-dot_4045f0"[39m
+                [36m/>[39m
+                [0mOwned browser failure[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_skills-list-desc_4045f0"[39m
+              [36m>[39m
+                [0mbrowser-check[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_skills-list-actions_4045f0"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_pv-add-form-btn_4045f0"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msettings.mcp.start[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_pv-add-form-btn_4045f0"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msettings.mcp.stop[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_pv-add-form-btn_4045f0"[39m
+                [33mdisabled[39m=[32m""[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msettings.mcp.refresh[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"_r_c_-title"[39m
+            [33mclass[39m=[32m"_section_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+            [36m>[39m
+              [36m<h2[39m
+                [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+                [33mid[39m=[32m"_r_c_-title"[39m
+              [36m>[39m
+                [0msettings.mcp.authOAuth[0m
+              [36m</h2>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+              [33mdata-settings-surface[39m=[32m"card"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_mcp-oauth-card_4045f0"[39m
+                [33mdata-testid[39m=[32m"mcp-oauth-waiting"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_skills-list-info_4045f0"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"_skills-list-name_4045f0"[39m
+                  [36m>[39m
+                    [0msettings.mcp.oauthWaiting[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"_skills-list-desc_4045f0"[39m
+                  [36m>[39m
+                    [0msettings.mcp.oauthWaitingHint[0m
+                  [36m</div>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_skills-list-actions_4045f0"[39m
+                [36m>[39m
+                  [36m<button[39m
+                    [33mclass[39m=[32m"_pv-add-form-btn_4045f0"[39m
+                    [33mtype[39m=[32m"button"[39m
+                  [36m>[39m
+                    [0mcommon.cancel[0m
+                  [36m</button>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"_r_d_-title"[39m
+            [33mclass[39m=[32m"_section_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+            [36m>[39m
+              [36m<h2[39m
+                [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+                [33mid[39m=[32m"_r_d_-title"[39m
+              [36m>[39m
+                [0msettings.mcp.connectionTitle[0m
+              [36m</h2>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+              [33mdata-settings-surface[39m=[32m"card"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_pv-add-form_4045f0"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_settings-form-grid_4045f0"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"_settings-form-field_4045f0 _settings-form-field-half_4045f0"[39m
+                  [36m>[39m
+                    [36m<label[39m
+                      [33mclass[39m=[32m"_settings-form-label_4045f0"[39m
+                    [36m>[39m
+                      [0msettings.mcp.connectorName[0m
+                    [36m</label>[39m
+                    [36m<input[39m
+                      [33mclass[39m=[32m"_settings-input_4045f0"[39m
+                      [33mplaceholder[39m=[32m"GitHub"[39m
+                      [33mvalue[39m=[32m"Owned browser failure"[39m
+                    [36m/>[39m
+                  [36m</d...
+
+- Expected
++ Received
+
+- 系统拒绝打开浏览器
+
+ ❯ desktop/src/react/settings/tabs/__tests__/McpTab.test.tsx:100:74
+     98|     fireEvent.click(await screen.findByRole('button', { name: 'setting…
+     99|     fireEvent.click(screen.getByRole('button', { name: 'settings.mcp.o…
+    100|     await waitFor(() => expect(useSettingsStore.getState().toastMessag…
+       |                                                                          ^
+    101|     expect(useSettingsStore.getState().toastType).toBe('error');
+    102|     expect(screen.queryByTestId('mcp-oauth-waiting')).toBeNull();
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+ FAIL  desktop/src/react/settings/tabs/__tests__/McpTab.test.tsx > McpTab > 打开登录浏览器失败须立即显示原因并停止轮询：receipt
+AssertionError: expected '' to contain '系统拒绝打开浏览器'
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_settings-tab-content_4045f0 _active_4045f0"[39m
+        [33mdata-tab[39m=[32m"mcp"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mdata-testid[39m=[32m"mcp-connector-detail-browser-check"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_mcp-detail-header_4045f0"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m"common.back"[39m
+              [33mclass[39m=[32m"_settings-return-btn_4045f0"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"22"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"22"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M15 18l-6-6 6-6"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_mcp-detail-heading_4045f0"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_skills-list-name_4045f0"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"_pv-status-dot_4045f0"[39m
+                [36m/>[39m
+                [0mOwned browser failure[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_skills-list-desc_4045f0"[39m
+              [36m>[39m
+                [0mbrowser-check[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_skills-list-actions_4045f0"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_pv-add-form-btn_4045f0"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msettings.mcp.start[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_pv-add-form-btn_4045f0"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msettings.mcp.stop[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_pv-add-form-btn_4045f0"[39m
+                [33mdisabled[39m=[32m""[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msettings.mcp.refresh[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"_r_l_-title"[39m
+            [33mclass[39m=[32m"_section_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+            [36m>[39m
+              [36m<h2[39m
+                [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+                [33mid[39m=[32m"_r_l_-title"[39m
+              [36m>[39m
+                [0msettings.mcp.authOAuth[0m
+              [36m</h2>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+              [33mdata-settings-surface[39m=[32m"card"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_mcp-oauth-card_4045f0"[39m
+                [33mdata-testid[39m=[32m"mcp-oauth-waiting"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_skills-list-info_4045f0"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"_skills-list-name_4045f0"[39m
+                  [36m>[39m
+                    [0msettings.mcp.oauthWaiting[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"_skills-list-desc_4045f0"[39m
+                  [36m>[39m
+                    [0msettings.mcp.oauthWaitingHint[0m
+                  [36m</div>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_skills-list-actions_4045f0"[39m
+                [36m>[39m
+                  [36m<button[39m
+                    [33mclass[39m=[32m"_pv-add-form-btn_4045f0"[39m
+                    [33mtype[39m=[32m"button"[39m
+                  [36m>[39m
+                    [0mcommon.cancel[0m
+                  [36m</button>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"_r_m_-title"[39m
+            [33mclass[39m=[32m"_section_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+            [36m>[39m
+              [36m<h2[39m
+                [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+                [33mid[39m=[32m"_r_m_-title"[39m
+              [36m>[39m
+                [0msettings.mcp.connectionTitle[0m
+              [36m</h2>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+              [33mdata-settings-surface[39m=[32m"card"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_pv-add-form_4045f0"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_settings-form-grid_4045f0"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"_settings-form-field_4045f0 _settings-form-field-half_4045f0"[39m
+                  [36m>[39m
+                    [36m<label[39m
+                      [33mclass[39m=[32m"_settings-form-label_4045f0"[39m
+                    [36m>[39m
+                      [0msettings.mcp.connectorName[0m
+                    [36m</label>[39m
+                    [36m<input[39m
+                      [33mclass[39m=[32m"_settings-input_4045f0"[39m
+                      [33mplaceholder[39m=[32m"GitHub"[39m
+                      [33mvalue[39m=[32m"Owned browser failure"[39m
+                    [36m/>[39m
+                  [36m</d...
+
+- Expected
++ Received
+
+- 系统拒绝打开浏览器
+
+ ❯ desktop/src/react/settings/tabs/__tests__/McpTab.test.tsx:100:74
+     98|     fireEvent.click(await screen.findByRole('button', { name: 'setting…
+     99|     fireEvent.click(screen.getByRole('button', { name: 'settings.mcp.o…
+    100|     await waitFor(() => expect(useSettingsStore.getState().toastMessag…
+       |                                                                          ^
+    101|     expect(useSettingsStore.getState().toastType).toBe('error');
+    102|     expect(screen.queryByTestId('mcp-oauth-waiting')).toBeNull();
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  9 failed | 12 passed (21)
+   Start at  19:23:30
+   Duration  5.06s (transform 436ms, setup 43ms, import 595ms, tests 4.07s, environment 293ms)
+

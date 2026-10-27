@@ -1,0 +1,1868 @@
+//! R06-T06 MemoryService: per-agent memory faces (facts / tenets / compiled
+//! memory / experience / dream revisions / context notes).
+//!
+//! Route/permission anchors (RC-2, base `e89c91a2…`; design doc §3):
+//! - `server/routes/config.ts:406-681` — memory CRUD faces; the explicit
+//!   `agentId` is the ownership boundary (`getStoreForAgent` :419-427);
+//!   writes require `settings.write` (`server/http/route-security.ts:464-493`),
+//!   reads `settings.read` (:361-399).
+//! - `server/routes/agents.ts:936-1188` — pinned shim / experience / tenets.
+//! - `server/routes/memory-dream.ts:54-136` — dream faces (ticker-absent →
+//!   `503 dream_unavailable`).
+//!
+//! Every face resolves the per-agent roots through
+//! [`lingxi_adapters::storage::agent_memory::resolve_agent_roots`]: physical
+//! per-agent isolation (A11). There is NO cross-agent handle anywhere in this
+//! module — a request names exactly one agent and touches only that agent's
+//! files.
+
+use std::path::{Path, PathBuf};
+
+use axum::extract::{Path as AxumPath, RawQuery, State};
+use axum::http::StatusCode;
+use axum::response::{IntoResponse, Response};
+use axum::Json;
+use serde_json::{json, Value};
+
+use lingxi_adapters::storage::agent_memory as am;
+use lingxi_adapters::storage::agent_memory::{
+    resolve_agent_roots, validate_agent_id, AgentConfigFlags, AgentConfigPatch,
+    CompiledMemoryStore, ContextNotesStore, DreamRevisionStore, ExperienceStore, FactStore,
+    MemoryError, TenetsStore,
+};
+
+use crate::context_compiler::scan_preferences;
+use crate::ServiceState;
+
+#[derive(Clone)]
+struct SearchEmbeddingPlane {
+    gateway: std::sync::Arc<dyn lingxi_kernel::model_exchange::ModelGatewayPort>,
+    operations: std::sync::Arc<crate::operations::OperationService>,
+}
+
+pub enum SearchEmbeddingResolution {
+    Unwired,
+    NoModel,
+    Ready(std::sync::Arc<dyn crate::knowledge::KnowledgeEmbedder>),
+}
+
+pub struct MemoryService {
+    search_plane: std::sync::Mutex<Option<SearchEmbeddingPlane>>,
+    home: PathBuf,
+    runtime_dir: PathBuf,
+    dream: crate::dream_service::DreamService,
+    search_embedder:
+        std::sync::Mutex<Option<std::sync::Arc<dyn crate::knowledge::KnowledgeEmbedder>>>,
+}
+
+impl MemoryService {
+    pub fn new(home: PathBuf, runtime_dir: PathBuf) -> Self {
+        Self {
+            search_plane: std::sync::Mutex::new(None),
+            home,
+            runtime_dir,
+            dream: crate::dream_service::DreamService::default(),
+            search_embedder: std::sync::Mutex::new(None),
+        }
+    }
+
+    /// 复用模型网关的真实嵌入链；未接线与未配置模型分别报告。
+    pub fn set_search_embedder(
+        &self,
+        embedder: Option<std::sync::Arc<dyn crate::knowledge::KnowledgeEmbedder>>,
+    ) {
+        *self
+            .search_embedder
+            .lock()
+            .unwrap_or_else(|p| p.into_inner()) = embedder;
+    }
+    pub fn search_embedder(
+        &self,
+    ) -> Option<std::sync::Arc<dyn crate::knowledge::KnowledgeEmbedder>> {
+        self.search_embedder
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .clone()
+    }
+
+    /// 只保存执行平面；每次查询重新读取有权助手的显式选择，绝不继承知识全局模型。
+    pub fn set_search_embedding_plane(
+        &self,
+        gateway: std::sync::Arc<dyn lingxi_kernel::model_exchange::ModelGatewayPort>,
+        operations: std::sync::Arc<crate::operations::OperationService>,
+    ) {
+        *self.search_plane.lock().unwrap_or_else(|p| p.into_inner()) = Some(SearchEmbeddingPlane {
+            gateway,
+            operations,
+        });
+    }
+
+    pub fn search_embedder_for_agent(
+        &self,
+        agent_id: &str,
+    ) -> Result<SearchEmbeddingResolution, MemoryError> {
+        use lingxi_kernel::model_exchange::{ModelOperation, ModelRouteRequest};
+        let plane = self
+            .search_plane
+            .lock()
+            .map_err(|_| MemoryError::Io("memory embedding plane lock poisoned".into()))?
+            .clone();
+        let Some(plane) = plane else {
+            return Ok(self
+                .search_embedder()
+                .map(SearchEmbeddingResolution::Ready)
+                .unwrap_or(SearchEmbeddingResolution::Unwired));
+        };
+        let path = self.config_path(agent_id)?;
+        let document = am::config::read_agent_config(&path)?;
+        let Some((provider, model)) = document.model_reference("memory", "embedding_model")? else {
+            return Ok(SearchEmbeddingResolution::NoModel);
+        };
+        let selection = ModelRouteRequest {
+            operation: ModelOperation::Embedding,
+            provider: Some(provider.clone()),
+            model: Some(model.clone()),
+        };
+        // 显式运行配置中的已知模型或现役目录中的嵌入模型才是可解析选择。
+        let configured = plane
+            .gateway
+            .resolve_route(&ModelRouteRequest::for_operation(ModelOperation::Embedding))
+            .is_ok_and(|route| route.provider == provider && route.model == model);
+        if !configured {
+            let catalog =
+                crate::agents_admin::agent_config_readback::merged_catalog_providers_with(
+                    &self.home, false,
+                )
+                .map_err(MemoryError::InvalidRequest)?;
+            let known = catalog
+                .get(&provider)
+                .and_then(|p| p["models"].as_array())
+                .is_some_and(|models| {
+                    models.iter().any(|entry| {
+                        entry["id"] == model
+                            && (entry["type"] == "embedding"
+                                || entry["operations"]
+                                    .as_array()
+                                    .is_some_and(|ops| ops.iter().any(|op| op == "embedding")))
+                    })
+                });
+            if !known {
+                return Err(MemoryError::InvalidRequest("memory embedding model is absent from the configured embedding route and provider catalog".into()));
+            }
+        }
+        plane
+            .gateway
+            .resolve_route(&selection)
+            .map_err(|error| MemoryError::InvalidRequest(error.to_string()))?;
+        Ok(SearchEmbeddingResolution::Ready(std::sync::Arc::new(
+            crate::knowledge::GatewayKnowledgeEmbedder::with_selection(
+                plane.gateway,
+                plane.operations,
+                selection,
+            ),
+        )))
+    }
+
+    pub fn dream(&self) -> &crate::dream_service::DreamService {
+        &self.dream
+    }
+
+    pub(crate) fn deletion_runtime_dir(&self) -> &Path {
+        &self.runtime_dir
+    }
+
+    pub fn home(&self) -> &Path {
+        &self.home
+    }
+
+    pub fn agents_root(&self) -> PathBuf {
+        self.home.join("agents")
+    }
+
+    pub fn is_agent_deleted_checked(&self, agent_id: &str) -> Result<bool, MemoryError> {
+        validate_agent_id(agent_id)?;
+        let marker = self
+            .agents_root()
+            .join(agent_id)
+            .join(".deleted-agent.json");
+        match std::fs::symlink_metadata(marker) {
+            Ok(_) => Ok(true),
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(false),
+            Err(error) => Err(error.into()),
+        }
+    }
+
+    pub fn user_dir(&self) -> PathBuf {
+        self.home.join("user")
+    }
+
+    fn rollback_preferences(&self) -> Result<Value, MemoryError> {
+        let path = self.user_dir().join("preferences.json");
+        let value = match std::fs::read(&path) {
+            Ok(bytes) => serde_json::from_slice::<Value>(&bytes)
+                .map_err(|err| MemoryError::Io(format!("invalid preferences.json: {err}")))?,
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => json!({}),
+            Err(err) => {
+                return Err(MemoryError::Io(format!(
+                    "cannot read preferences.json: {err}"
+                )));
+            }
+        };
+        if !value.is_object() {
+            return Err(MemoryError::Io(
+                "preferences.json must contain an object".into(),
+            ));
+        }
+        if value
+            .get("rollback_file_changes")
+            .is_some_and(|enabled| !enabled.is_boolean())
+        {
+            return Err(MemoryError::Io(
+                "saved rollback_file_changes must be a boolean".into(),
+            ));
+        }
+        Ok(value)
+    }
+
+    pub fn rollback_file_changes(&self) -> Result<bool, MemoryError> {
+        Ok(self.rollback_preferences()?["rollback_file_changes"]
+            .as_bool()
+            .unwrap_or(false))
+    }
+
+    pub fn save_rollback_file_changes(&self, enabled: bool) -> Result<(), MemoryError> {
+        let mut preferences = self.rollback_preferences()?;
+        preferences["rollback_file_changes"] = json!(enabled);
+        let text = serde_json::to_string_pretty(&preferences)
+            .map_err(|err| MemoryError::Io(format!("cannot encode preferences.json: {err}")))?;
+        am::atomic_write(&self.user_dir().join("preferences.json"), &text)
+            .map_err(|err| MemoryError::Io(format!("cannot save preferences.json: {err}")))
+    }
+
+    /// Locale chain (persona-source.ts:124-130 + agent.ts resolveLocale):
+    /// agent config locale → global prefs locale → "en".
+    pub fn locale_is_zh(&self, agent_dir: &Path) -> Result<bool, MemoryError> {
+        let config_locale = am::config::read_agent_config(&agent_dir.join("config.yaml"))?
+            .scan()?
+            .locale;
+        let prefs_locale = scan_preferences(
+            am::read_json_file(&self.user_dir().join("preferences.json")).as_ref(),
+        )
+        .locale;
+        let locale = config_locale
+            .filter(|l| !l.trim().is_empty())
+            .or(prefs_locale.filter(|l| !l.trim().is_empty()))
+            .unwrap_or_else(|| "en".to_string());
+        Ok(locale.starts_with("zh"))
+    }
+
+    pub fn roots(&self, agent_id: &str) -> Result<am::AgentMemoryRoots, MemoryError> {
+        resolve_agent_roots(&self.agents_root(), agent_id)
+    }
+
+    pub fn fact_store(&self, agent_id: &str) -> Result<FactStore, MemoryError> {
+        let roots = self.roots(agent_id)?;
+        FactStore::open(&roots.memory_dir.join("facts.db"))
+    }
+
+    pub fn tenets_store(&self, agent_id: &str) -> Result<TenetsStore, MemoryError> {
+        let roots = self.roots(agent_id)?;
+        Ok(TenetsStore::new(&roots.memory_dir))
+    }
+
+    pub fn compiled_store(&self, agent_id: &str) -> Result<CompiledMemoryStore, MemoryError> {
+        let roots = self.roots(agent_id)?;
+        let is_zh = self.locale_is_zh(&roots.agent_dir)?;
+        Ok(CompiledMemoryStore::new(&roots.memory_dir, is_zh))
+    }
+
+    pub fn experience_store(&self, agent_id: &str) -> Result<ExperienceStore, MemoryError> {
+        let roots = self.roots(agent_id)?;
+        Ok(ExperienceStore::new(&roots.agent_dir))
+    }
+
+    pub fn dream_store(&self, agent_id: &str) -> Result<DreamRevisionStore, MemoryError> {
+        let roots = self.roots(agent_id)?;
+        let store = DreamRevisionStore::new(&roots.memory_dir)
+            .with_locale(self.locale_is_zh(&roots.agent_dir)?);
+        store.recover_pending()?;
+        Ok(store)
+    }
+
+    pub fn context_notes(&self) -> ContextNotesStore {
+        ContextNotesStore::new(&self.runtime_dir)
+    }
+
+    pub fn config_path(&self, agent_id: &str) -> Result<PathBuf, MemoryError> {
+        let roots = self.roots(agent_id)?;
+        Ok(roots.agent_dir.join("config.yaml"))
+    }
+
+    /// config.yaml flags read (memory.enabled / experience.enabled /
+    /// workspace_context policy).
+    pub fn read_flags(&self, agent_id: &str) -> Result<AgentConfigFlags, MemoryError> {
+        let path = self.config_path(agent_id)?;
+        am::config::read_agent_config(&path)?.flags()
+    }
+
+    pub fn patch_flags(
+        &self,
+        agent_id: &str,
+        patch: AgentConfigFlags,
+    ) -> Result<String, MemoryError> {
+        let toggle = patch.memory_enabled;
+        self.patch_flags_with_toggle(agent_id, patch, toggle)
+    }
+
+    /// 总开关时间标记与业务暂停共用配置保存入口；非记忆字段不会刷新时间。
+    pub fn patch_flags_with_toggle(
+        &self,
+        agent_id: &str,
+        patch: AgentConfigFlags,
+        toggle: Option<bool>,
+    ) -> Result<String, MemoryError> {
+        let path = self.config_path(agent_id)?;
+        self.dream().save_config(agent_id, toggle, || {
+            am::patch_agent_config(&path, |text| {
+                let text = AgentConfigPatch::write_flags(text, &patch)?;
+                if let Some(enabled) = toggle {
+                    let mut document = am::config::AgentConfigDocument::parse(&text)?;
+                    let key = if enabled {
+                        "reenableAt"
+                    } else {
+                        "disabledSince"
+                    };
+                    let mut memory = serde_json::Map::new();
+                    memory.insert(key.into(), json!(am::now_iso()));
+                    document.deep_merge(&json!({"memory":memory}))?;
+                    document.render()
+                } else {
+                    Ok(text)
+                }
+            })
+        })
+    }
+
+    pub fn resolve_primary_agent_checked(&self) -> Result<Option<String>, MemoryError> {
+        let path = self.user_dir().join("preferences.json");
+        let preferences: Value = match std::fs::read_to_string(path) {
+            Ok(text) => serde_json::from_str(&text)
+                .map_err(|error| MemoryError::Store(format!("invalid preferences: {error}")))?,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => serde_json::json!({}),
+            Err(error) => return Err(error.into()),
+        };
+        let object = preferences
+            .as_object()
+            .ok_or_else(|| MemoryError::Store("preferences must be an object".into()))?;
+        if let Some(value) = object.get("primary_agent_id") {
+            let id = value
+                .as_str()
+                .ok_or_else(|| MemoryError::Store("primary_agent_id must be a string".into()))?;
+            validate_agent_id(id)
+                .map_err(|_| MemoryError::Store("stored primary_agent_id is invalid".into()))?;
+            let config = self.agents_root().join(id).join("config.yaml");
+            match std::fs::metadata(config) {
+                Ok(metadata) if metadata.is_file() => return Ok(Some(id.to_string())),
+                Ok(_) => {
+                    return Err(MemoryError::Store(
+                        "stored primary agent configuration is not a file".into(),
+                    ));
+                }
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                    return Err(MemoryError::Store("stored primary agent is missing".into()));
+                }
+                Err(error) => return Err(error.into()),
+            }
+        }
+        let entries = match std::fs::read_dir(self.agents_root()) {
+            Ok(entries) => entries,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+            Err(error) => return Err(error.into()),
+        };
+        let mut candidates = Vec::new();
+        for entry in entries {
+            let entry = entry?;
+            if !entry.file_type()?.is_dir() {
+                continue;
+            }
+            let id = entry.file_name().to_string_lossy().into_owned();
+            if validate_agent_id(&id).is_err() {
+                continue;
+            }
+            match std::fs::metadata(entry.path().join("config.yaml")) {
+                Ok(metadata) if metadata.is_file() => candidates.push(id),
+                Ok(_) => {
+                    return Err(MemoryError::Store(
+                        "agent configuration is not a file".into(),
+                    ));
+                }
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+                Err(error) => return Err(error.into()),
+            }
+        }
+        candidates.sort();
+        Ok(candidates.into_iter().next())
+    }
+
+    /// Primary agent id for tool binding: preferences `primary_agent_id` →
+    /// first id-sorted agent dir with a config.yaml (deterministic).
+    pub fn resolve_primary_agent(&self) -> Option<String> {
+        let prefs = am::read_json_file(&self.user_dir().join("preferences.json"));
+        if let Some(primary) = prefs
+            .as_ref()
+            .and_then(|p| p.get("primary_agent_id"))
+            .and_then(Value::as_str)
+        {
+            if validate_agent_id(primary).is_ok() && self.agents_root().join(primary).is_dir() {
+                return Some(primary.to_string());
+            }
+        }
+        let mut candidates: Vec<String> = std::fs::read_dir(self.agents_root())
+            .ok()?
+            .flatten()
+            .filter(|e| e.file_type().map(|t| t.is_dir()).unwrap_or(false))
+            .map(|e| e.file_name().to_string_lossy().to_string())
+            .filter(|n| {
+                validate_agent_id(n).is_ok()
+                    && self.agents_root().join(n).join("config.yaml").is_file()
+            })
+            .collect();
+        candidates.sort();
+        candidates.into_iter().next()
+    }
+}
+
+/// MemoryError → HTTP response with the incumbent error vocabulary.
+pub(crate) fn error_response(err: &MemoryError) -> Response {
+    let (status, body): (StatusCode, Value) = match err {
+        MemoryError::InvalidRequest(msg) => (StatusCode::BAD_REQUEST, json!({ "error": msg })),
+        MemoryError::AgentNotFound(msg) | MemoryError::NotFound(msg) => {
+            (StatusCode::NOT_FOUND, json!({ "error": msg }))
+        }
+        MemoryError::Conflict { code, message } => {
+            let status = match code.as_str() {
+                "TENET_NOT_FOUND" => StatusCode::NOT_FOUND,
+                "TENET_LIMIT_REACHED" | "TENET_PENDING_FULL" | "TENET_INVALID" => {
+                    StatusCode::CONFLICT
+                }
+                "CONTEXT_NOTES_OVERSIZE" => StatusCode::CONFLICT,
+                _ => StatusCode::CONFLICT,
+            };
+            (status, json!({ "error": message, "code": code }))
+        }
+        MemoryError::Io(detail) | MemoryError::Store(detail) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            json!({ "error": detail }),
+        ),
+    };
+    (status, Json(body)).into_response()
+}
+
+#[allow(clippy::result_large_err)] // Err 直携构造好的响应（fsread.rs 同例）；拒绝路径非热路径。
+fn agent_id_from_query(query: Option<&str>) -> Result<String, Response> {
+    let raw = query.unwrap_or("");
+    let mut agent_id: Option<String> = None;
+    for pair in raw.split('&') {
+        if pair.is_empty() {
+            continue;
+        }
+        let (key, value) = pair.split_once('=').unwrap_or((pair, ""));
+        if key != "agentId" {
+            return Err((
+                StatusCode::BAD_REQUEST,
+                Json(json!({ "error": format!("unknown memory query parameter: {key}") })),
+            )
+                .into_response());
+        }
+        if agent_id.is_some() {
+            return Err((
+                StatusCode::BAD_REQUEST,
+                Json(json!({ "error": "duplicate agentId query parameter" })),
+            )
+                .into_response());
+        }
+        agent_id = Some(urldecode(value));
+    }
+    match agent_id {
+        Some(id) if !id.is_empty() => Ok(id),
+        _ => Err((
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "error": "agentId is required" })),
+        )
+            .into_response()),
+    }
+}
+
+/// Percent-decodes one query value (`application/x-www-form-urlencoded`
+/// rules: `+` → space, `%XX` → byte; a malformed escape stays literal).
+/// Decoding happens at the byte level and is lifted lossily to UTF-8, so
+/// multi-byte sequences survive and no slice can panic on a non-char
+/// boundary; the caller re-validates the id (`validate_agent_id`).
+///
+/// Every arm advances the cursor by at least one byte — the loop is
+/// structurally bounded by `bytes.len()`. The previous revision's
+/// catch-all arm pushed without advancing and spun forever on any literal
+/// byte (`agentId=agentA`), growing the output String unboundedly (the
+/// R06-T06 machine-exhaustion incident).
+fn urldecode(value: &str) -> String {
+    fn hex_digit(byte: u8) -> Option<u8> {
+        match byte {
+            b'0'..=b'9' => Some(byte - b'0'),
+            b'a'..=b'f' => Some(byte - b'a' + 10),
+            b'A'..=b'F' => Some(byte - b'A' + 10),
+            _ => None,
+        }
+    }
+    let bytes = value.as_bytes();
+    let mut out: Vec<u8> = Vec::with_capacity(bytes.len());
+    let mut i = 0;
+    while i < bytes.len() {
+        match bytes[i] {
+            b'%' if i + 2 < bytes.len() => {
+                match (hex_digit(bytes[i + 1]), hex_digit(bytes[i + 2])) {
+                    (Some(hi), Some(lo)) => {
+                        out.push((hi << 4) | lo);
+                        i += 3;
+                    }
+                    _ => {
+                        out.push(bytes[i]);
+                        i += 1;
+                    }
+                }
+            }
+            b'+' => {
+                out.push(b' ');
+                i += 1;
+            }
+            byte => {
+                out.push(byte);
+                i += 1;
+            }
+        }
+    }
+    String::from_utf8_lossy(&out).into_owned()
+}
+
+#[allow(clippy::result_large_err)] // Err 直携构造好的响应（fsread.rs 同例）；拒绝路径非热路径。
+fn body_json(bytes: &[u8]) -> Result<Value, Response> {
+    serde_json::from_slice(bytes).map_err(|err| {
+        (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "error": format!("invalid JSON body: {err}") })),
+        )
+            .into_response()
+    })
+}
+
+// ── facts faces ─────────────────────────────────────────────────────────────
+
+/// GET /lingxi/v1/memories?agentId= (config.ts:443-448).
+pub async fn memories_list_route(
+    State(state): State<ServiceState>,
+    RawQuery(query): RawQuery,
+) -> Response {
+    let agent_id = match agent_id_from_query(query.as_deref()) {
+        Ok(id) => id,
+        Err(resp) => return resp,
+    };
+    match state
+        .memory()
+        .fact_store(&agent_id)
+        .and_then(|store| store.export_all())
+    {
+        Ok(rows) => Json(json!({ "memories": rows.iter().map(fact_row_json).collect::<Vec<_>>() }))
+            .into_response(),
+        Err(err) => error_response(&err),
+    }
+}
+
+fn fact_row_json(row: &am::FactRow) -> Value {
+    json!({
+        "id": row.id,
+        "fact": row.fact,
+        "tags": row.tags,
+        "time": row.time,
+        "session_id": row.session_id,
+        "created_at": row.created_at,
+    })
+}
+
+/// GET /lingxi/v1/memories/health?agentId= (config.ts:133-160 buildMemoryHealth
+/// candidate shape; the ticker-dependent steps report their absence honestly).
+pub async fn memories_health_route(
+    State(state): State<ServiceState>,
+    RawQuery(query): RawQuery,
+) -> Response {
+    let agent_id = match agent_id_from_query(query.as_deref()) {
+        Ok(id) => id,
+        Err(resp) => return resp,
+    };
+    let service = state.memory();
+    let flags = match service.read_flags(&agent_id) {
+        Ok(flags) => flags,
+        Err(err) => return error_response(&err),
+    };
+    let enabled = flags.memory_enabled.unwrap_or(true);
+    let mut steps = Vec::new();
+    if !enabled {
+        steps.push(json!({"step": "memory_ticker", "ok": false, "reason": "memory_disabled", "ticker":service.dream().ticker().snapshot(&agent_id)}));
+    } else {
+        match service.fact_store(&agent_id) {
+            Ok(store) => match store.size() {
+                Ok(_) => steps.push(json!({"step": "fact_store", "ok": true})),
+                Err(err) => {
+                    steps
+                        .push(json!({"step": "fact_store", "ok": false, "error": err.to_string()}));
+                }
+            },
+            Err(err) => {
+                steps.push(json!({"step": "fact_store", "ok": false, "error": err.to_string()}));
+            }
+        }
+        let ticker = service.dream().ticker().snapshot(&agent_id);
+        let available = ticker["available"] == true;
+        let error = ticker["lastError"]
+            .as_str()
+            .or_else(|| ticker["hostError"].as_str());
+        steps.push(json!({"step":"memory_ticker","ok":available && error.is_none(),"scope":"automatic_dream","reason":if available {Value::Null} else {json!("ticker_absent_in_candidate")},"error":error,"ticker":ticker}));
+        // 自动Dream已有真宿主，其余每日编译/摘要/深层维护的份额仍显式缺失。
+        steps.push(json!({"step":"daily_memory_maintenance","ok":false,"reason":"daily_pipeline_absent_in_candidate"}));
+    }
+    let healthy = enabled && steps.iter().all(|step| step["ok"] == true);
+    Json(json!({
+        "agentId": agent_id,
+        "enabled": enabled,
+        "healthy": healthy,
+        "steps": steps,
+    }))
+    .into_response()
+}
+
+/// GET /lingxi/v1/memories/compiled?agentId= (config.ts:457-475).
+pub async fn memories_compiled_get_route(
+    State(state): State<ServiceState>,
+    RawQuery(query): RawQuery,
+) -> Response {
+    let agent_id = match agent_id_from_query(query.as_deref()) {
+        Ok(id) => id,
+        Err(resp) => return resp,
+    };
+    let service = state.memory();
+    let compiled = match service.compiled_store(&agent_id) {
+        Ok(store) => store,
+        Err(err) => return error_response(&err),
+    };
+    if let Err(err) = compiled.migrate_legacy_editable_facts() {
+        return error_response(&err);
+    }
+    match compiled.read_sections() {
+        Ok(sections) => {
+            let content = match compiled.read_assembled() {
+                Ok(content) => content,
+                Err(err) => return error_response(&err),
+            };
+            Json(json!({
+                "content": content,
+                "editableFactsEnabled": true,
+                "sections": {
+                    "facts": sections.facts,
+                    "today": sections.today,
+                    "week": sections.week,
+                    "longterm": sections.longterm,
+                },
+            }))
+            .into_response()
+        }
+        Err(err) => error_response(&err),
+    }
+}
+
+macro_rules! compiled_put_route {
+    ($handler:ident, $field:literal) => {
+        /// PUT /lingxi/v1/memories/compiled/{facts,today,longterm}?agentId=
+        pub async fn $handler(
+            State(state): State<ServiceState>,
+            RawQuery(query): RawQuery,
+            body: axum::body::Bytes,
+        ) -> Response {
+            let agent_id = match agent_id_from_query(query.as_deref()) {
+                Ok(id) => id,
+                Err(resp) => return resp,
+            };
+            let payload = match body_json(&body) {
+                Ok(value) => value,
+                Err(resp) => return resp,
+            };
+            let Some(text) = payload.get($field).and_then(Value::as_str) else {
+                return (
+                    StatusCode::BAD_REQUEST,
+                    Json(json!({ "error": concat!($field, " must be a string") })),
+                )
+                    .into_response();
+            };
+            let service = state.memory();
+            let compiled = match service.compiled_store(&agent_id) {
+                Ok(store) => store,
+                Err(err) => return error_response(&err),
+            };
+            if let Err(err) = compiled.migrate_legacy_editable_facts() {
+                return error_response(&err);
+            }
+            let result = match $field {
+                "facts" => compiled.write_facts(text),
+                "today" => compiled.write_today(text),
+                _ => compiled.write_longterm(text),
+            };
+            match result {
+                Ok(normalized) => Json(json!({ "ok": true, $field: normalized })).into_response(),
+                Err(err) => error_response(&err),
+            }
+        }
+    };
+}
+
+compiled_put_route!(memories_compiled_facts_route, "facts");
+compiled_put_route!(memories_compiled_today_route, "today");
+compiled_put_route!(memories_compiled_longterm_route, "longterm");
+
+/// GET /lingxi/v1/memories/compiled/week/days?agentId= (config.ts:546-556).
+pub async fn memories_week_days_route(
+    State(state): State<ServiceState>,
+    RawQuery(query): RawQuery,
+) -> Response {
+    let agent_id = match agent_id_from_query(query.as_deref()) {
+        Ok(id) => id,
+        Err(resp) => return resp,
+    };
+    match state
+        .memory()
+        .compiled_store(&agent_id)
+        .and_then(|store| store.list_week_days())
+    {
+        Ok(days) => Json(json!({
+            "days": days.iter().map(|(date, body)| json!({"date": date, "body": body})).collect::<Vec<_>>()
+        }))
+        .into_response(),
+        Err(err) => error_response(&err),
+    }
+}
+
+/// PUT /lingxi/v1/memories/compiled/week/days/{date}?agentId= (config.ts:559-586).
+pub async fn memories_week_day_put_route(
+    State(state): State<ServiceState>,
+    AxumPath(date): AxumPath<String>,
+    RawQuery(query): RawQuery,
+    body: axum::body::Bytes,
+) -> Response {
+    let agent_id = match agent_id_from_query(query.as_deref()) {
+        Ok(id) => id,
+        Err(resp) => return resp,
+    };
+    let payload = match body_json(&body) {
+        Ok(value) => value,
+        Err(resp) => return resp,
+    };
+    let Some(text) = payload.get("body").and_then(Value::as_str) else {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "error": "body must be a string" })),
+        )
+            .into_response();
+    };
+    match state
+        .memory()
+        .compiled_store(&agent_id)
+        .and_then(|store| store.write_week_day(&date, text))
+    {
+        Ok(normalized) => {
+            Json(json!({ "ok": true, "date": date, "body": normalized })).into_response()
+        }
+        Err(err) => error_response(&err),
+    }
+}
+
+/// 清除当前助手的编译产物及直接 JSON 总结来源，留下重置标记，保留原始事实。
+pub async fn memories_compiled_delete_route(
+    State(state): State<ServiceState>,
+    RawQuery(query): RawQuery,
+) -> Response {
+    let agent_id = match agent_id_from_query(query.as_deref()) {
+        Ok(id) => id,
+        Err(resp) => return resp,
+    };
+    let service = state.memory();
+    let compiled = match service.compiled_store(&agent_id) {
+        Ok(store) => store,
+        Err(err) => return error_response(&err),
+    };
+    let result = compiled.reset_and_clear();
+    match result {
+        Ok(()) => Json(json!({ "ok": true })).into_response(),
+        Err(err) => error_response(&err),
+    }
+}
+
+/// 清除当前助手的事实、编译产物及直接 JSON 总结来源，留下重置标记。
+pub async fn memories_delete_route(
+    State(state): State<ServiceState>,
+    RawQuery(query): RawQuery,
+) -> Response {
+    let agent_id = match agent_id_from_query(query.as_deref()) {
+        Ok(id) => id,
+        Err(resp) => return resp,
+    };
+    let service = state.memory();
+    let result = (|| -> Result<(), MemoryError> {
+        let compiled = service.compiled_store(&agent_id)?;
+        let store = service.fact_store(&agent_id)?;
+        compiled.reset_and_clear_all_facts(&store)
+    })();
+    match result {
+        Ok(()) => Json(json!({ "ok": true })).into_response(),
+        Err(err) => error_response(&err),
+    }
+}
+
+/// GET /lingxi/v1/memories/export?agentId= (config.ts:630-644).
+pub async fn memories_export_route(
+    State(state): State<ServiceState>,
+    RawQuery(query): RawQuery,
+) -> Response {
+    let agent_id = match agent_id_from_query(query.as_deref()) {
+        Ok(id) => id,
+        Err(resp) => return resp,
+    };
+    match state
+        .memory()
+        .fact_store(&agent_id)
+        .and_then(|store| store.export_all())
+    {
+        Ok(rows) => Json(json!({
+            "version": 2,
+            "exportedAt": am::now_iso(),
+            "facts": rows.iter().map(fact_row_json).collect::<Vec<_>>(),
+        }))
+        .into_response(),
+        Err(err) => error_response(&err),
+    }
+}
+
+/// POST /lingxi/v1/memories/import?agentId= (config.ts:648-681): accepts v2
+/// `facts` and legacy v1 `memories` shapes.
+pub async fn memories_import_route(
+    State(state): State<ServiceState>,
+    RawQuery(query): RawQuery,
+    body: axum::body::Bytes,
+) -> Response {
+    let agent_id = match agent_id_from_query(query.as_deref()) {
+        Ok(id) => id,
+        Err(resp) => return resp,
+    };
+    let payload = match body_json(&body) {
+        Ok(value) => value,
+        Err(resp) => return resp,
+    };
+    let entries = payload
+        .get("facts")
+        .or_else(|| payload.get("memories"))
+        .and_then(Value::as_array)
+        .cloned()
+        .unwrap_or_default();
+    if entries.is_empty() {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "error": "facts must be a non-empty array" })),
+        )
+            .into_response();
+    }
+    // Owned normalization (v1 memories / v2 facts shapes).
+    let owned: Vec<(String, Vec<String>, Option<String>, String)> = entries
+        .iter()
+        .map(|entry| {
+            (
+                entry
+                    .get("fact")
+                    .or_else(|| entry.get("content"))
+                    .and_then(Value::as_str)
+                    .unwrap_or("")
+                    .to_string(),
+                entry
+                    .get("tags")
+                    .and_then(Value::as_array)
+                    .map(|a| {
+                        a.iter()
+                            .filter_map(Value::as_str)
+                            .map(str::to_string)
+                            .collect()
+                    })
+                    .unwrap_or_default(),
+                entry
+                    .get("time")
+                    .or_else(|| entry.get("date"))
+                    .and_then(Value::as_str)
+                    .map(str::to_string),
+                entry
+                    .get("session_id")
+                    .and_then(Value::as_str)
+                    .map(|s| {
+                        if s.is_empty() {
+                            "imported".to_string()
+                        } else {
+                            s.to_string()
+                        }
+                    })
+                    .unwrap_or_else(|| "imported".to_string()),
+            )
+        })
+        .collect();
+    let inserts: Vec<am::FactInsert<'_>> = owned
+        .iter()
+        .map(|(fact, tags, time, session)| am::FactInsert {
+            fact,
+            tags,
+            time: time.as_deref(),
+            session_id: Some(session.as_str()),
+        })
+        .collect();
+    match state
+        .memory()
+        .fact_store(&agent_id)
+        .and_then(|store| store.import_all(&inserts))
+    {
+        Ok(count) => Json(json!({ "ok": true, "imported": count })).into_response(),
+        Err(err) => error_response(&err),
+    }
+}
+
+// ── dream faces (memory-dream.ts) ───────────────────────────────────────────
+
+/// 手动整理核心的真实状态；核心停止与模型未配置分别标注原因。
+/// 定时触发仍由调度层负责，不能用是否配置模型冒充核心是否存在。
+pub async fn dream_status_route(
+    State(state): State<ServiceState>,
+    RawQuery(query): RawQuery,
+) -> Response {
+    let agent_id = match agent_id_from_query(query.as_deref()) {
+        Ok(id) => id,
+        Err(resp) => return resp,
+    };
+    match state.memory().dream().status(&state, &agent_id) {
+        Ok(status) => Json(status).into_response(),
+        Err(error) => dream_error_response(error, "dream_unavailable"),
+    }
+}
+
+/// 启动真实后台五阶段整理；返回运行ID后可读取同一持久状态。
+pub async fn dream_run_route(
+    State(state): State<ServiceState>,
+    RawQuery(query): RawQuery,
+) -> Response {
+    let agent_id = match agent_id_from_query(query.as_deref()) {
+        Ok(id) => id,
+        Err(response) => return response,
+    };
+    match state.memory().dream().start(state.clone(), agent_id) {
+        Ok(started) => (StatusCode::ACCEPTED, Json(started)).into_response(),
+        Err(error) => dream_error_response(error, "dream_run_failed"),
+    }
+}
+
+/// 取消请求不抹去已经发生的付费用量；模型返回后不再发布正文。
+pub async fn dream_cancel_route(
+    State(state): State<ServiceState>,
+    RawQuery(query): RawQuery,
+) -> Response {
+    let agent_id = match agent_id_from_query(query.as_deref()) {
+        Ok(id) => id,
+        Err(response) => return response,
+    };
+    if let Err(error) = state.memory().roots(&agent_id) {
+        return error_response(&error);
+    }
+    match state.memory().dream().cancel(&agent_id) {
+        Ok(()) => (
+            StatusCode::ACCEPTED,
+            Json(json!({"agentId":agent_id,"status":"cancelling"})),
+        )
+            .into_response(),
+        Err(error) => dream_error_response(error, "dream_run_failed"),
+    }
+}
+
+fn dream_revision_summary(revision: &Value) -> Value {
+    let empty = vec![];
+    let sections = revision.get("before");
+    let text_len = |key: &str| {
+        sections
+            .and_then(|s| s.get(key))
+            .and_then(Value::as_str)
+            .map(str::len)
+            .unwrap_or(0)
+    };
+    let week: usize = sections
+        .and_then(|s| s.get("weekDays"))
+        .and_then(Value::as_array)
+        .unwrap_or(&empty)
+        .iter()
+        .map(|d| {
+            d.get("body")
+                .and_then(Value::as_str)
+                .map(str::len)
+                .unwrap_or(0)
+        })
+        .sum();
+    let mut summary = revision.clone();
+    summary["bodyChars"] =
+        json!(text_len("facts") + text_len("today") + week + text_len("longterm"));
+    summary["sectionChars"] = json!({
+        "facts": text_len("facts"),
+        "today": text_len("today"),
+        "week": week,
+        "longterm": text_len("longterm"),
+    });
+    if let Some(obj) = summary.as_object_mut() {
+        obj.remove("before");
+    }
+    summary
+}
+
+/// GET /lingxi/v1/memories/dream/revisions?agentId= (:87-97).
+pub async fn dream_revisions_route(
+    State(state): State<ServiceState>,
+    RawQuery(query): RawQuery,
+) -> Response {
+    let agent_id = match agent_id_from_query(query.as_deref()) {
+        Ok(id) => id,
+        Err(resp) => return resp,
+    };
+    if let Err(error) = state.memory().dream().lifecycle(&state, &agent_id) {
+        return dream_error_response(error, "dream_unavailable");
+    }
+    match state
+        .memory()
+        .dream_store(&agent_id)
+        .and_then(|store| store.list())
+    {
+        Ok(revisions) => Json(json!({
+            "agentId": agent_id,
+            "revisions": revisions.iter().map(dream_revision_summary).collect::<Vec<_>>(),
+        }))
+        .into_response(),
+        Err(err) => error_response(&err),
+    }
+}
+
+/// GET /lingxi/v1/memories/dream/revisions/{id}?agentId= (:99-118): revision
+/// plus the CURRENT compiled snapshot read live.
+pub async fn dream_revision_detail_route(
+    State(state): State<ServiceState>,
+    AxumPath(revision_id): AxumPath<String>,
+    RawQuery(query): RawQuery,
+) -> Response {
+    let agent_id = match agent_id_from_query(query.as_deref()) {
+        Ok(id) => id,
+        Err(resp) => return resp,
+    };
+    if let Err(error) = state.memory().dream().lifecycle(&state, &agent_id) {
+        return dream_error_response(error, "dream_unavailable");
+    }
+
+    let service = state.memory();
+    let store = match service.dream_store(&agent_id) {
+        Ok(store) => store,
+        Err(err) => return error_response(&err),
+    };
+    match store.read(&revision_id) {
+        Ok(revision) => {
+            let current = match store.snapshot_sections() {
+                Ok(current) => current,
+                Err(err) => return error_response(&err),
+            };
+            Json(json!({
+                "agentId": agent_id,
+                "revision": revision,
+                "current": current,
+                "lastRestore": match store.restore_status() { Ok(value)=>value,Err(err)=>return error_response(&err) },
+                "currentHash": match am::dream_snapshot_hash(&current) {
+                    Ok(hash) => hash,
+                    Err(err) => return dream_error_response(err, "dream_unavailable"),
+                },
+            }))
+            .into_response()
+        }
+        Err(err) => dream_error_response(err, "dream_unavailable"),
+    }
+}
+
+fn dream_error_response(err: MemoryError, fallback: &str) -> Response {
+    if matches!(
+        err,
+        MemoryError::InvalidRequest(_) | MemoryError::AgentNotFound(_)
+    ) {
+        return error_response(&err);
+    }
+
+    let code = match &err {
+        MemoryError::AgentNotFound(_) => "agent_not_found",
+        MemoryError::NotFound(_) => "dream_revision_not_found",
+        MemoryError::Conflict { code, .. }
+            if matches!(
+                code.as_str(),
+                "dream_memory_changed"
+                    | "dream_memory_busy"
+                    | "dream_already_running"
+                    | "dream_memory_disabled"
+                    | "dream_unavailable"
+                    | "dream_not_running"
+            ) =>
+        {
+            code.as_str()
+        }
+        _ => fallback,
+    };
+    let status = match code {
+        "dream_revision_not_found" | "agent_not_found" => StatusCode::NOT_FOUND,
+        "dream_unavailable" => StatusCode::SERVICE_UNAVAILABLE,
+        "dream_memory_changed"
+        | "dream_memory_busy"
+        | "dream_already_running"
+        | "dream_memory_disabled"
+        | "dream_not_running" => StatusCode::CONFLICT,
+        _ => StatusCode::INTERNAL_SERVER_ERROR,
+    };
+    (
+        status,
+        Json(json!({ "code": code, "error": err.to_string(), "reason": match &err {MemoryError::Conflict {message,..} if code=="dream_unavailable" => message.split(':').next(), _=>None}, "coreAvailable": if code=="dream_unavailable" {Some(!matches!(&err,MemoryError::Conflict{message,..} if message.starts_with("dream_core_stopped")))}else{None} })),
+    )
+        .into_response()
+}
+
+/// POST /lingxi/v1/memories/dream/revisions/{id}/restore?agentId= (:120-136).
+pub async fn dream_revision_restore_route(
+    State(state): State<ServiceState>,
+    AxumPath(revision_id): AxumPath<String>,
+    RawQuery(query): RawQuery,
+    body: axum::body::Bytes,
+) -> Response {
+    let agent_id = match agent_id_from_query(query.as_deref()) {
+        Ok(id) => id,
+        Err(resp) => return resp,
+    };
+    if let Err(error) = state.memory().dream().lifecycle(&state, &agent_id) {
+        return dream_error_response(error, "dream_unavailable");
+    }
+
+    let payload = if body.is_empty() {
+        json!({})
+    } else {
+        match body_json(&body) {
+            Ok(value) => value,
+            Err(response) => return response,
+        }
+    };
+    if !payload.is_object() {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({"error":"restore body must be an object"})),
+        )
+            .into_response();
+    }
+    let expected = match payload.get("expectedCurrentHash") {
+        None => None,
+        Some(Value::String(hash))
+            if hash.len() == 64 && hash.bytes().all(|byte| byte.is_ascii_hexdigit()) =>
+        {
+            Some(hash.to_ascii_lowercase())
+        }
+        _ => {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(json!({"error":"expectedCurrentHash must be a SHA-256 digest"})),
+            )
+                .into_response();
+        }
+    };
+    match state
+        .memory()
+        .dream_store(&agent_id)
+        .and_then(|store| store.restore_if_current(&revision_id, expected.as_deref()))
+    {
+        Ok(mut result) => {
+            if let Some(obj) = result.as_object_mut() {
+                obj.insert("agentId".into(), json!(agent_id));
+                obj.insert("ok".into(), json!(true));
+            }
+            Json(result).into_response()
+        }
+        Err(err) => dream_error_response(err, "dream_restore_failed"),
+    }
+}
+
+// ── tenets faces (agents.ts:1111-1188 + :936-988) ───────────────────────────
+
+fn tenet_json(tenet: &lingxi_kernel::memory::Tenet) -> Value {
+    am::tenet_to_json(tenet)
+}
+
+/// GET /lingxi/v1/agents/{id}/tenets.
+pub async fn tenets_list_route(
+    State(state): State<ServiceState>,
+    AxumPath(agent_id): AxumPath<String>,
+) -> Response {
+    match state
+        .memory()
+        .tenets_store(&agent_id)
+        .and_then(|store| store.read_strict())
+    {
+        Ok(mut file) => {
+            lingxi_kernel::memory::sort_tenets(&mut file.tenets);
+            Json(json!({"tenets": file.tenets.iter().map(tenet_json).collect::<Vec<_>>() }))
+                .into_response()
+        }
+        Err(err) => error_response(&err),
+    }
+}
+
+/// POST /lingxi/v1/agents/{id}/tenets — user direct add (immediately active).
+pub async fn tenets_post_route(
+    State(state): State<ServiceState>,
+    AxumPath(agent_id): AxumPath<String>,
+    body: axum::body::Bytes,
+) -> Response {
+    let payload = match body_json(&body) {
+        Ok(value) => value,
+        Err(resp) => return resp,
+    };
+    let Some(content) = payload
+        .get("content")
+        .and_then(Value::as_str)
+        .map(str::trim)
+        .filter(|c| !c.is_empty())
+    else {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "error": "content must be a non-empty string" })),
+        )
+            .into_response();
+    };
+    let priority = payload.get("priority").and_then(Value::as_str);
+    let new_id = format!("tenet-{}", am::random_token_suffix());
+    match state
+        .memory()
+        .tenets_store(&agent_id)
+        .and_then(|store| store.add_direct(content, priority, new_id))
+    {
+        Ok((tenet, duplicate)) => {
+            // 与现役一致：重复提交仍属于成功响应，也广播所属助手的原则变化。
+            state
+                .app_events()
+                .publish("tenets-changed", json!({ "agentId": agent_id }));
+            Json(json!({
+                "ok": true,
+                "tenet": tenet_json(&tenet),
+                "duplicate": duplicate,
+            }))
+            .into_response()
+        }
+        Err(err) => error_response(&err),
+    }
+}
+
+/// POST /lingxi/v1/agents/{id}/tenets/{tenetId}/decide — approve/reject.
+pub async fn tenets_decide_route(
+    State(state): State<ServiceState>,
+    AxumPath((agent_id, tenet_id)): AxumPath<(String, String)>,
+    body: axum::body::Bytes,
+) -> Response {
+    let payload = match body_json(&body) {
+        Ok(value) => value,
+        Err(resp) => return resp,
+    };
+    let approve = payload
+        .get("approve")
+        .and_then(Value::as_bool)
+        .unwrap_or(true);
+    match state
+        .memory()
+        .tenets_store(&agent_id)
+        .and_then(|store| store.decide(&tenet_id, approve))
+    {
+        Ok(tenet) => Json(json!({ "ok": true, "tenet": tenet_json(&tenet) })).into_response(),
+        Err(err) => error_response(&err),
+    }
+}
+
+/// DELETE /lingxi/v1/agents/{id}/tenets/{tenetId}.
+pub async fn tenets_delete_route(
+    State(state): State<ServiceState>,
+    AxumPath((agent_id, tenet_id)): AxumPath<(String, String)>,
+) -> Response {
+    match state
+        .memory()
+        .tenets_store(&agent_id)
+        .and_then(|store| store.remove(&tenet_id))
+    {
+        Ok(true) => {
+            // 现役 removeTenet 成功后广播 tenets-changed。
+            state.app_events().publish(
+                "tenets-changed",
+                json!({ "agentId": agent_id, "tenetId": tenet_id }),
+            );
+            Json(json!({ "ok": true })).into_response()
+        }
+        Ok(false) => (
+            StatusCode::NOT_FOUND,
+            Json(json!({ "error": "tenet not found" })),
+        )
+            .into_response(),
+        Err(err) => error_response(&err),
+    }
+}
+
+/// GET /lingxi/v1/agents/{id}/pinned — active contents only (compat shim).
+pub async fn pinned_get_route(
+    State(state): State<ServiceState>,
+    AxumPath(agent_id): AxumPath<String>,
+) -> Response {
+    match state.memory().tenets_store(&agent_id) {
+        Ok(store) => Json(json!({
+            "pins": store.active().iter().map(|t| Value::String(t.content.clone())).collect::<Vec<_>>()
+        }))
+        .into_response(),
+        Err(err) => error_response(&err),
+    }
+}
+
+/// PUT /lingxi/v1/agents/{id}/pinned — full replace.
+pub async fn pinned_put_route(
+    State(state): State<ServiceState>,
+    AxumPath(agent_id): AxumPath<String>,
+    body: axum::body::Bytes,
+) -> Response {
+    let payload = match body_json(&body) {
+        Ok(value) => value,
+        Err(resp) => return resp,
+    };
+    let Some(pins) = payload.get("pins").and_then(Value::as_array) else {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "error": "pins must be an array" })),
+        )
+            .into_response();
+    };
+    let pins: Vec<String> = pins
+        .iter()
+        .filter_map(Value::as_str)
+        .map(str::to_string)
+        .collect();
+    let new_id = format!("pin-{}", am::random_token_suffix());
+    match state
+        .memory()
+        .tenets_store(&agent_id)
+        .and_then(|store| store.replace_pinned(&pins, new_id))
+    {
+        Ok(created) => {
+            let store = match state.memory().tenets_store(&agent_id) {
+                Ok(store) => store,
+                Err(err) => return error_response(&err),
+            };
+            state
+                .app_events()
+                .publish("agent-updated", json!({ "agentId": agent_id }));
+            Json(json!({
+                "ok": true,
+                "pins": store.active().iter().map(|t| Value::String(t.content.clone())).collect::<Vec<_>>(),
+                "added": created.iter().map(tenet_json).collect::<Vec<_>>(),
+            })).into_response()
+        }
+        Err(err) => error_response(&err),
+    }
+}
+
+// ── experience faces (agents.ts:991-1108) ───────────────────────────────────
+
+fn experience_enabled(flags: &AgentConfigFlags) -> bool {
+    flags.experience_enabled.unwrap_or(false)
+}
+
+/// GET /lingxi/v1/agents/{id}/experience — paused → 403 (:1000-1002).
+pub async fn experience_get_route(
+    State(state): State<ServiceState>,
+    AxumPath(agent_id): AxumPath<String>,
+) -> Response {
+    let service = state.memory();
+    let flags = match service.read_flags(&agent_id) {
+        Ok(flags) => flags,
+        Err(err) => return error_response(&err),
+    };
+    if !experience_enabled(&flags) {
+        return (
+            StatusCode::FORBIDDEN,
+            Json(json!({ "error": "experience is paused" })),
+        )
+            .into_response();
+    }
+    let store = match service.experience_store(&agent_id) {
+        Ok(store) => store,
+        Err(err) => return error_response(&err),
+    };
+    let (merged, _files) = match store.read_merged_checked() {
+        Ok(value) => value,
+        Err(error) => return error_response(&error),
+    };
+    Json(json!({ "content": merged })).into_response()
+}
+
+/// GET /lingxi/v1/agents/{id}/experience/search?q= — 匹配经验与来源路径，
+/// 不修改任何记忆文件；命中只来自当前 Agent 的经验目录。
+pub async fn experience_search_route(
+    State(state): State<ServiceState>,
+    AxumPath(agent_id): AxumPath<String>,
+    axum::extract::Query(query): axum::extract::Query<std::collections::HashMap<String, String>>,
+) -> Response {
+    let service = state.memory();
+    let Some(needle) = query
+        .get("q")
+        .map(|q| q.trim().to_lowercase())
+        .filter(|q| !q.is_empty())
+    else {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "error": "q is required" })),
+        )
+            .into_response();
+    };
+    let flags = match service.read_flags(&agent_id) {
+        Ok(flags) => flags,
+        Err(err) => return error_response(&err),
+    };
+    if !experience_enabled(&flags) {
+        return (
+            StatusCode::FORBIDDEN,
+            Json(json!({ "error": "experience is paused" })),
+        )
+            .into_response();
+    }
+    let store = match service.experience_store(&agent_id) {
+        Ok(store) => store,
+        Err(err) => return error_response(&err),
+    };
+    let dir = match service.roots(&agent_id) {
+        Ok(roots) => roots.agent_dir.join("experience"),
+        Err(err) => return error_response(&err),
+    };
+    let mut matches = Vec::new();
+    for doc in store.list_documents() {
+        for (index, line) in doc.body.lines().enumerate() {
+            if line.to_lowercase().contains(&needle) {
+                matches.push(json!({
+                    "path": dir.join(&doc.file).to_string_lossy(),
+                    "title": doc.title,
+                    "line": index + 1,
+                    "excerpt": line.trim().chars().take(120).collect::<String>(),
+                }));
+            }
+        }
+    }
+    Json(json!({ "ok": true, "count": matches.len(), "matches": matches })).into_response()
+}
+
+/// PUT /lingxi/v1/agents/{id}/experience — whole-document sync by `#` headings.
+pub async fn experience_put_route(
+    State(state): State<ServiceState>,
+    AxumPath(agent_id): AxumPath<String>,
+    body: axum::body::Bytes,
+) -> Response {
+    let payload = match body_json(&body) {
+        Ok(value) => value,
+        Err(resp) => return resp,
+    };
+    let service = state.memory();
+    let flags = match service.read_flags(&agent_id) {
+        Ok(flags) => flags,
+        Err(err) => return error_response(&err),
+    };
+    if !experience_enabled(&flags) {
+        return (
+            StatusCode::FORBIDDEN,
+            Json(json!({ "error": "experience is paused" })),
+        )
+            .into_response();
+    }
+    let Some(content) = payload.get("content").and_then(Value::as_str) else {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "error": "content must be a string" })),
+        )
+            .into_response();
+    };
+    // 标题可使用任意空白分隔；重复分类正文合并，与现役 Map 的语义一致。
+    let mut categories: Vec<(String, String)> = Vec::new();
+    let mut current: Option<usize> = None;
+    for line in content.split('\n') {
+        let heading = line.strip_prefix('#').filter(|rest| {
+            rest.chars().next().is_some_and(char::is_whitespace) && !rest.trim().is_empty()
+        });
+        if let Some(title) = heading.map(str::trim) {
+            let Some(normalized) = lingxi_kernel::memory::normalize_experience_category(title)
+            else {
+                return (
+                    StatusCode::BAD_REQUEST,
+                    Json(json!({ "error": "invalid experience category" })),
+                )
+                    .into_response();
+            };
+            let index = categories
+                .iter()
+                .position(|(name, _)| name == &normalized)
+                .unwrap_or_else(|| {
+                    categories.push((normalized, String::new()));
+                    categories.len() - 1
+                });
+            current = Some(index);
+        } else if let Some(index) = current {
+            categories[index].1.push_str(line);
+            categories[index].1.push('\n');
+        }
+    }
+    match service
+        .experience_store(&agent_id)
+        .and_then(|store| store.sync_categories(&categories))
+    {
+        Ok(()) => {
+            // 编译端每次运行重新读取配置和提示词材料，经验读取端实时读分类及索引。
+            // 更新通知只在同步成功后发送；没有独立的旧助手缓存需要替换。
+            state
+                .app_events()
+                .publish("agent-updated", json!({ "agentId": agent_id }));
+            Json(json!({ "ok": true })).into_response()
+        }
+        Err(err) => error_response(&err),
+    }
+}
+
+/// POST /lingxi/v1/agents/{id}/experience/feedback (:1065-1108): rating
+/// up/down, excerpt required + truncated to 200; not gated by
+/// experience.enabled.
+pub async fn experience_feedback_route(
+    State(state): State<ServiceState>,
+    AxumPath(agent_id): AxumPath<String>,
+    body: axum::body::Bytes,
+) -> Response {
+    let payload = match body_json(&body) {
+        Ok(value) => value,
+        Err(resp) => return resp,
+    };
+    let rating = payload.get("rating").and_then(Value::as_str);
+    let Some(rating) = rating.filter(|r| *r == "up" || *r == "down") else {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "error": "rating must be 'up' or 'down'" })),
+        )
+            .into_response();
+    };
+    let excerpt: String = payload
+        .get("excerpt")
+        .and_then(Value::as_str)
+        .unwrap_or("")
+        .trim()
+        .chars()
+        .take(200)
+        .collect();
+    if excerpt.is_empty() {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "error": "excerpt is required" })),
+        )
+            .into_response();
+    }
+    let session_id: String = payload
+        .get("sessionId")
+        .and_then(Value::as_str)
+        .unwrap_or("")
+        .trim()
+        .chars()
+        .take(128)
+        .collect();
+    let service = state.memory();
+    let flags = match service.read_flags(&agent_id) {
+        Ok(flags) => flags,
+        Err(err) => return error_response(&err),
+    };
+    let date = &am::now_iso()[..10];
+    let category = if rating == "up" {
+        "用户认可的做法"
+    } else {
+        "用户不认可的做法"
+    };
+    let mark = if rating == "up" { "✓" } else { "✗" };
+    let session_note = if session_id.is_empty() {
+        String::new()
+    } else {
+        let short: String = session_id.chars().take(8).collect();
+        format!("（会话 {short}）")
+    };
+    let content = format!("[{date}] {mark} {excerpt}{session_note}");
+    let store = match service.experience_store(&agent_id) {
+        Ok(store) => store,
+        Err(err) => return error_response(&err),
+    };
+    match store.record_entry(category, &content) {
+        Ok((added, _)) => Json(json!({
+            "ok": true,
+            "added": added,
+            "duplicate": !added,
+            "category": category,
+            "experienceEnabled": experience_enabled(&flags),
+        }))
+        .into_response(),
+        Err(err) => error_response(&err),
+    }
+}
+
+// ── agent config flags (memory/experience/workspace skill policy) ───────────
+
+/// PATCH /lingxi/v1/agents/{id}/config — the T06-owned boolean leaves
+/// (`memory.enabled`, `experience.enabled`,
+/// `workspace_context.discover_project_skills`,
+/// `workspace_context.discover_compatible_project_skills`). The wider agent
+/// config face (providers/models/tools) belongs to the R05/R07 config owner
+/// and is NOT accepted here (loud 400 on unknown keys).
+pub async fn agent_config_patch_route(
+    State(state): State<ServiceState>,
+    AxumPath(agent_id): AxumPath<String>,
+    body: axum::body::Bytes,
+) -> Response {
+    let payload = match body_json(&body) {
+        Ok(value) => value,
+        Err(resp) => return resp,
+    };
+    let mut flags = match state.memory().read_flags(&agent_id) {
+        Ok(flags) => flags,
+        Err(err) => return error_response(&err),
+    };
+    let mut known = false;
+    if let Some(v) = payload
+        .get("memory")
+        .and_then(|m| m.get("enabled"))
+        .and_then(Value::as_bool)
+    {
+        flags.memory_enabled = Some(v);
+        known = true;
+    }
+    if let Some(v) = payload
+        .get("experience")
+        .and_then(|m| m.get("enabled"))
+        .and_then(Value::as_bool)
+    {
+        flags.experience_enabled = Some(v);
+        known = true;
+    }
+    if let Some(v) = payload
+        .get("workspace_context")
+        .and_then(|m| m.get("discover_project_skills"))
+        .and_then(Value::as_bool)
+    {
+        flags.discover_project_skills = Some(v);
+        known = true;
+    }
+    if let Some(v) = payload
+        .get("workspace_context")
+        .and_then(|m| m.get("discover_compatible_project_skills"))
+        .and_then(Value::as_bool)
+    {
+        flags.discover_compatible_project_skills = Some(v);
+        known = true;
+    }
+    // R06 splitByScope 全局 setter：全局字段经 setter 写 preferences.json，
+    // 纯全局 patch（agentPartial 为空）不触碰助手 config.yaml。
+    let mut global_applied: Vec<&str> = Vec::new();
+    let mut global_bad: Option<String> = None;
+    for (key, kind) in [
+        ("locale", "string"),
+        ("keep_awake", "bool"),
+        ("editor", "object"),
+        ("network_proxy", "object"),
+    ] {
+        let Some(value) = payload.get(key) else {
+            continue;
+        };
+        let valid = match kind {
+            "string" => value.is_string(),
+            "bool" => value.is_boolean(),
+            _ => value.is_object(),
+        };
+        if !valid {
+            global_bad = Some(format!("{key} has invalid type"));
+            break;
+        }
+        let mut root = match state.memory().read_preferences_root() {
+            Ok(root) => root,
+            Err(message) => {
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(json!({ "error": message })),
+                )
+                    .into_response();
+            }
+        };
+        root[key] = value.clone();
+        if let Err(message) = state.memory().write_preferences_root(&root) {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({ "error": message })),
+            )
+                .into_response();
+        }
+        global_applied.push(key);
+    }
+    if let Some(detail) = global_bad {
+        return (StatusCode::BAD_REQUEST, Json(json!({ "error": detail }))).into_response();
+    }
+    if !known {
+        if global_applied.is_empty() {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(json!({ "error": "no T06-owned config key in patch (memory.enabled / experience.enabled / workspace_context.*)" })),
+            )
+                .into_response();
+        }
+        // 纯全局 patch：agentPartial 为空，直接返回已应用的全局键。
+        return Json(json!({ "ok": true, "globalApplied": global_applied })).into_response();
+    }
+    let memory_toggle = payload.pointer("/memory/enabled").and_then(Value::as_bool);
+    let patch = state
+        .memory()
+        .patch_flags_with_toggle(&agent_id, flags, memory_toggle);
+    match patch {
+        Ok(_text) => {
+            if let Some(enabled) = memory_toggle {
+                state.app_events().publish(
+                    "memory-master-changed",
+                    json!({"agentId":agent_id,"enabled":enabled}),
+                );
+            }
+            // 工作区技能策略变化 → 通知运行时重筛（agents.ts PUT config 的
+            // skills-changed 端口；T06 拆出的 flag 面保持同一通知语义）。
+            if payload
+                .get("workspace_context")
+                .and_then(Value::as_object)
+                .is_some_and(|map| {
+                    map.contains_key("discover_project_skills")
+                        || map.contains_key("discover_compatible_project_skills")
+                })
+            {
+                state
+                    .app_events()
+                    .publish("skills-changed", json!({ "agentId": agent_id }));
+            }
+            Json(json!({ "ok": true, "globalApplied": global_applied })).into_response()
+        }
+        Err(err) => error_response(&err),
+    }
+}
+
+/// GET /lingxi/v1/agents/{id}/config-flags — read side of the T06-owned keys.
+/// 附带最小全局偏好读回面：splitByScope 全局键在 preferences.json 的当前值
+/// （原 GET /agents/:id/config 的 injectGlobalFields 跨助手注入的最小端口；
+/// 任一助手读到的都是同一份全局值，未写盘的键为 null）。
+pub async fn agent_config_flags_route(
+    State(state): State<ServiceState>,
+    AxumPath(agent_id): AxumPath<String>,
+) -> Response {
+    let flags = match state.memory().read_flags(&agent_id) {
+        Ok(flags) => flags,
+        Err(err) => return error_response(&err),
+    };
+    let preferences = state
+        .memory()
+        .read_preferences_root()
+        .unwrap_or_else(|_| json!({}));
+    let preference = |key: &str| preferences.get(key).cloned().unwrap_or(Value::Null);
+    Json(json!({
+        "memoryEnabled": flags.memory_enabled.unwrap_or(true),
+        "experienceEnabled": flags.experience_enabled.unwrap_or(false),
+        "workspaceContext": {
+            "discoverProjectSkills": flags.discover_project_skills.unwrap_or(true),
+            "discoverCompatibleProjectSkills": flags.discover_compatible_project_skills.unwrap_or(false),
+        },
+        "preferences": {
+            "locale": preference("locale"),
+            "keep_awake": preference("keep_awake"),
+            "editor": preference("editor"),
+            "network_proxy": preference("network_proxy"),
+        },
+    }))
+    .into_response()
+}
+
+// ── context notes (session-scoped; the tool's storage face) ─────────────────
+
+pub async fn context_notes_get_route(
+    State(state): State<ServiceState>,
+    AxumPath(session_id): AxumPath<String>,
+) -> Response {
+    match state.memory().context_notes().read(&session_id) {
+        Ok(notes) => Json(json!({ "notes": notes })).into_response(),
+        Err(err) => error_response(&err),
+    }
+}
+
+pub async fn context_notes_put_route(
+    State(state): State<ServiceState>,
+    AxumPath(session_id): AxumPath<String>,
+    body: axum::body::Bytes,
+) -> Response {
+    let payload = match body_json(&body) {
+        Ok(value) => value,
+        Err(resp) => return resp,
+    };
+    let Some(text) = payload.get("notes").and_then(Value::as_str) else {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "error": "notes must be a string" })),
+        )
+            .into_response();
+    };
+    match state.memory().context_notes().write(&session_id, text) {
+        Ok(bytes) => Json(json!({ "ok": true, "bytes": bytes })).into_response(),
+        Err(err) => error_response(&err),
+    }
+}
+
+/// Re-exported for the memory tools' executor (single implementation, two
+/// entries: HTTP + R04 tool).
+pub use lingxi_kernel::memory as kernel_memory;
+
+#[cfg(test)]
+mod tests {
+    use super::urldecode;
+
+    /// R06-T06 leak regression: any literal byte must terminate (the old
+    /// catch-all arm never advanced and spun forever, growing the output
+    /// String until the process exhausted machine memory).
+    #[test]
+    fn urldecode_terminates_on_literal_bytes() {
+        assert_eq!(urldecode("agentA"), "agentA");
+        assert_eq!(urldecode("ghost"), "ghost");
+        assert_eq!(urldecode("a1-2_3"), "a1-2_3");
+        assert_eq!(urldecode(""), "");
+    }
+
+    #[test]
+    fn urldecode_decodes_percent_escapes_and_plus() {
+        assert_eq!(urldecode("..%2FagentA"), "../agentA");
+        assert_eq!(urldecode("%5Cwin"), "\\win");
+        assert_eq!(urldecode("a+b"), "a b");
+        assert_eq!(urldecode("%e4%bd%a0"), "你");
+        assert_eq!(urldecode("%E4%BD%A0"), "你");
+    }
+
+    #[test]
+    fn urldecode_keeps_malformed_escapes_literal() {
+        assert_eq!(urldecode("%zz"), "%zz");
+        assert_eq!(urldecode("100%"), "100%");
+        assert_eq!(urldecode("%2"), "%2");
+        assert_eq!(urldecode("a%"), "a%");
+    }
+}

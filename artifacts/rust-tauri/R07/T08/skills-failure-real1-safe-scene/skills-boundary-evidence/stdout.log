@@ -1,0 +1,13 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx (6 tests | 2 failed) 39842ms
+   × settings_same_owner_get_failures_keep_old_lists_and_two_bundle_writes_preserve_real_partial_result 15014ms
+   × panel_same_owner_get_failures_keep_old_lists_and_two_bundle_writes_preserve_real_partial_result 18643ms
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 4 passed (6)
+     Errors  4 errors
+   Start at  17:48:40
+   Duration  40.67s (transform 365ms, setup 18ms, import 513ms, tests 39.84s, environment 236ms)
+

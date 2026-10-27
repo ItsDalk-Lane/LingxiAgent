@@ -101,4 +101,14 @@ describe('AutomationPanel', () => {
     expect(useStore.getState().automationCount).toBe(7);
     expect(lingxiFetch).toHaveBeenCalledWith('/api/desk/cron', { throwOnHttpError: false });
   });
+  it('shows blocked legacy imports instead of presenting an empty successful list', async () => {
+    vi.mocked(lingxiFetch).mockImplementation(async (url) => new Response(JSON.stringify(
+      url === '/api/models' ? { models: [] } : { jobs: [], importReport: { blocked: 2 } }
+    ), { status: 200 }));
+    render(<AutomationPanel />);
+    expect(await screen.findByRole('alert')).toHaveTextContent('automation.importBlocked');
+    expect(screen.queryByText('automation.empty')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'automation.add' })).toBeEnabled();
+  });
+
 });

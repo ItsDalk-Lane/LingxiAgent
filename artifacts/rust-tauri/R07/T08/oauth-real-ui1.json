@@ -1,0 +1,33 @@
+{
+  "label": "oauth-real-ui1",
+  "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+  "command": [
+    "env",
+    "LINGXI_R07_SERVICE_BIN=/private/tmp/lingxi-r07-build/debug/lingxi-service",
+    "LINGXI_R07_OAUTH_EVIDENCE_DIR=/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R07/T08/oauth-real-ui1",
+    "npx",
+    "vitest",
+    "run",
+    "desktop/src/react/__tests__/services/r07-oauth-real-service.test.tsx",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "PATH": "/Users/study_superior/.cargo/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/share/dotnet:/Users/study_superior/.codex/tmp/arg0-macos/codex-arg0vSRIw5:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/Users/study_superior/.lmstudio/bin:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/study_superior/.lmstudio/bin",
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp",
+    "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib"
+  },
+  "startedAt": "2026-10-18T06:43:16.391378+00:00",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "a434af3f2d1e9088ba9545192267ab62d1060d14cc34827755fdcba0529d44eb",
+  "finalAcceptance": false,
+  "exitCode": 0,
+  "endedAt": "2026-10-18T06:43:26.133247+00:00",
+  "sourceFingerprintAfter": "699dd02600b8b05982b805fa3893a0d3ec4df5fbc1cc50af632a70231f158857",
+  "log": "artifacts/rust-tauri/R07/T08/oauth-real-ui1.log",
+  "logSha256": "4a763c0b349793eaa7ac5861b4637e59d54b3b9b16d875594fff7ae4aa8bb817",
+  "sourceUnchanged": false
+}

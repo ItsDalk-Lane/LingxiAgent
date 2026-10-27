@@ -1,0 +1,78 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t01_react_parity",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 35.682,
+ "caseCount": 18,
+ "casesSha256": "fbc74fb02da3070bcab2dff212d9c34677b23e4cabb95c0877ca1422188ec18e",
+ "commands": [
+  {
+   "id": "renderer-build",
+   "argv": [
+    "npm",
+    "run",
+    "build:renderer"
+   ],
+   "exitCode": 0,
+   "durationSecs": 7.296,
+   "logSha256": "6166243c728ac339eb9f7fc1ad6d49a4ca1bdfb73ee460fc7aa26f26ce26f4a4"
+  },
+  {
+   "id": "git-status",
+   "argv": [
+    "git",
+    "status",
+    "--porcelain",
+    "--",
+    "desktop/src/react",
+    "desktop/src/modules"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.016,
+   "logSha256": "dcb6243c17cccdefca08e0ff13c3cb5e2a282b7df4038b00a6958a0cdeb318ea"
+  },
+  {
+   "id": "tauri-build-debug",
+   "argv": [
+    "node",
+    "scripts/tauri-build.mjs",
+    "--debug",
+    "--receipt",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t01/run-03/tauri-build-debug.json"
+   ],
+   "exitCode": 0,
+   "durationSecs": 14.741,
+   "logSha256": "8bf48301ed410f08789ee76dd65b4d08592c3f109b38aa76c81b1a8aa54b8b78"
+  },
+  {
+   "id": "dist-resource-marker-scan",
+   "argv": [
+    "grep",
+    "-rl",
+    "resource-desktop",
+    "desktop/dist-renderer"
+   ],
+   "exitCode": 1,
+   "durationSecs": 0.718,
+   "logSha256": "725da0f8ac1fab16c6579e354904f4da50bdfb1bc1064cfeeac6fcdbbc4be5d7"
+  }
+ ],
+ "logSha256": "c2ffd9ab4de2cc7b04b3137c319742a25dfc36536cb653c7677650ee677d17f1",
+ "finishedAtUnixMs": 1793023076574,
+ "rendererDigest": "8868c9d14984291dc965b5cd838d78ce801ec5abb55e9bb4988de15664421f01",
+ "electronStopped": {
+  "service_residual": []
+ },
+ "tauriStopped": {
+  "timedOut": false,
+  "service_residual": []
+ },
+ "diagnosticsHome": "/private/tmp/lingxi-r09-runtime/r09_t01_react_parity-40653-1793023040892/home-tauri/diagnostics/tauri-launch/events.jsonl",
+ "platform": "macos-arm64",
+ "failedCases": [
+  "a01::tauri-build-uses-same-renderer",
+  "a01::dom-snapshot-parity",
+  "a01::isolated-homes"
+ ]
+}

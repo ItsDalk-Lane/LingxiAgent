@@ -1,0 +1,15 @@
+---- storage::legacy_import::tests::fresh_run_plans_batches_and_writes_receipt stdout ----
+
+thread 'storage::legacy_import::tests::fresh_run_plans_batches_and_writes_receipt' (14164228) panicked at crates/lingxi-adapters/src/storage/legacy_import/mod.rs:640:9:
+assertion `left == right` failed
+  left: 2
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    storage::legacy_import::tests::fresh_run_plans_batches_and_writes_receipt
+
+test result: FAILED. 17 passed; 1 failed; 0 ignored; 0 measured; 154 filtered out; finished in 0.23s
+
+error: test failed, to rerun pass `-p lingxi-adapters --lib`

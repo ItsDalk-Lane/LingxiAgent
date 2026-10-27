@@ -1,0 +1,27 @@
+{
+ "mode": "release",
+ "artifacts": {
+  "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+  "executableSha256": "8e74aa1590969a3bdc24ed3c4789f38c0000c353e05e64f1dce5678317f7c1d5",
+  "appBundle": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app"
+ },
+ "inputs": {
+  "features": [
+   "r09-host"
+  ],
+  "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9"
+ },
+ "service": {
+  "protocol": {
+   "serverKind": "lingxi-service",
+   "wireProtocolMin": 1,
+   "wireProtocolMax": 1,
+   "dataEpoch": 2
+  }
+ },
+ "candidate": {
+  "source": "LINGXI_R09_T01_RELEASE_APP",
+  "executableSha256": "8e74aa1590969a3bdc24ed3c4789f38c0000c353e05e64f1dce5678317f7c1d5",
+  "appTree": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app"
+ }
+}

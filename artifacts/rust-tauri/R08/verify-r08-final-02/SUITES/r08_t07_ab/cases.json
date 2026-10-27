@@ -1,0 +1,28 @@
+{
+ "schema": "lingxi.r08.ab-cases.v1",
+ "cases": {
+  "ab::sessions.list.count": 1,
+  "ab::sessions.list.parity": 1,
+  "ab::sessions.rename.ok": 1,
+  "ab::sessions.rename.persisted": 1,
+  "ab::sessions.pin.pin": 1,
+  "ab::sessions.pin.unpin": 1,
+  "ab::sessions.todos.complete": 1,
+  "ab::sessions.todos.cancel": 1,
+  "ab::sessions.todos.dismiss": 1,
+  "ab::sessions.maintenance.cleanup": 1,
+  "ab::sessions.maintenance.sweep": 1,
+  "ab::permissions.default.parity": 1,
+  "leaf::permissions.mode-nonnull": 1,
+  "leaf::rename.empty-title.rejected": 1,
+  "leaf::rename.invalid-session.explicit-error": 1,
+  "leaf::pin.invalid-session.explicit-error": 1,
+  "leaf::todos.invalid-session.explicit-error": 1,
+  "leaf::cleanup.fresh-archive-kept": 0,
+  "leaf::cleanup.archived-delete-with-effect": 0,
+  "leaf::list.revision-field-present": 1,
+  "leaf::list.summary-or-badge-present": 1,
+  "leaf::list.unauthorized-rejected": 1,
+  "leaf::permissions.read-idempotent": 1
+ }
+}

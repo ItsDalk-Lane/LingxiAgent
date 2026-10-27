@@ -4,7 +4,9 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { useStore } from '../stores';
 import { sessionScopedValue } from '../stores/session-slice';
 import { fetchConfig } from '../hooks/use-config';
-import { lingxiFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../services/service-client';
+import { captureConversationRequestScope } from '../services/conversation-request-scope';
+import { resolveServerConnection } from '../services/service-client';
 import { useI18n } from '../hooks/use-i18n';
 import { renderMarkdown } from '../utils/markdown';
 import { findOpenToolIndex, toolCallFromStartEvent, toolCallIdFromEvent } from '../utils/tool-call-identity';
@@ -13,6 +15,8 @@ import {
   addChannelMember,
   exportCurrentConversation,
   loadChannels,
+  loadConversationAgentPhoneSettings,
+  openChannel,
   removeChannelMember,
   saveConversationAgentPhoneSettings,
   sendChannelMessage,
@@ -63,27 +67,32 @@ function resolveDmOwnerId(channel: Channel | undefined, currentAgentId: string |
 }
 
 export function ChannelsPanel() {
-  const channelsEnabled = useStore(s => s.channelsEnabled);
-  const activeServerConnection = useStore(s => s.activeServerConnection);
-  const activeServerConnectionId = useStore(s => s.activeServerConnectionId);
+  const connectionKey = useStore(s => JSON.stringify(resolveServerConnection(s)));
+  const currentAgentId = useStore(s => s.currentAgentId);
 
-  // 启动时从后端读频道开关状态；开启时加载频道列表
   useEffect(() => {
-    if (!activeServerConnection) return;
-    const cacheKey = activeServerConnectionId || activeServerConnection.connectionId || 'local';
-    useStore.getState().setChannelsEnabled(undefined);
-    fetchConfig({ cacheKey }).then(cfg => {
-      // 默认关：只有显式 true 才算启用
-      const enabled = cfg?.channels?.enabled === true;
+    // 切换连接或助手后，缓存与在途结果不能借用上一处的内容。
+    useStore.setState({
+      channelsEnabled: undefined, channels: [], currentChannel: null,
+      channelMessages: [], channelMessageCache: {}, channelMessageCacheDirty: {},
+      channelMembers: [], channelAgentActivities: {}, channelTickerStatus: {},
+      channelTotalUnread: 0, channelHeaderName: '', channelHeaderMembersText: '',
+      channelInfoName: '', channelIsDM: false, channelListError: null,
+      channelListLoading: false, channelHistoryError: null, channelHistoryLoading: false,
+      channelSettingsError: null, channelSettingsLoading: false,
+    });
+    if (!resolveServerConnection(useStore.getState())) return;
+    const scope = captureConversationRequestScope();
+    void fetchConfig({ cacheKey: `${connectionKey}:${currentAgentId || ''}` }).then(config => {
+      if (!scope.isCurrent()) return;
+      const enabled = config?.channels?.enabled === true;
       useStore.getState().setChannelsEnabled(enabled);
-      if (enabled) loadChannels();
-    }).catch(err => console.warn('[channels] init failed:', err));
-  }, [activeServerConnection, activeServerConnectionId]);
-
-  // 开关变化后加载频道列表
-  useEffect(() => {
-    if (channelsEnabled === true && activeServerConnection) loadChannels();
-  }, [channelsEnabled, activeServerConnection]);
+      if (enabled) void loadChannels();
+    }).catch(error => {
+      if (scope.isCurrent()) useStore.setState({ channelListError: error instanceof Error ? error.message : String(error) });
+    });
+    return scope.dispose;
+  }, [connectionKey, currentAgentId]);
 
   return null;
 }
@@ -93,6 +102,8 @@ export function ChannelsPanel() {
 export function ChannelMessages() {
   const { t } = useI18n();
   const messages = useStore(s => s.channelMessages);
+  const historyError = useStore(s => s.channelHistoryError);
+  const historyLoading = useStore(s => s.channelHistoryLoading);
   const currentChannel = useStore(s => s.currentChannel);
   const channels = useStore(s => s.channels);
   const agents = useStore(s => s.agents);
@@ -165,8 +176,14 @@ export function ChannelMessages() {
     previousLengthRef.current = messages.length;
   }, [currentChannel, getScrollContainer, messages.length, scrollToBottom]);
 
+  const feedback = currentChannel && historyError ? (
+    <div role="alert" className={styles.channelWelcome}>
+      <span>{t('channel.loadFailed')}</span>
+      <button type="button" disabled={historyLoading} onClick={() => { void openChannel(currentChannel); }}>{t('channel.retry')}</button>
+    </div>
+  ) : null;
   if (!currentChannel || messages.length === 0) {
-    return <div className={styles.channelWelcome}>{t('channel.noMessages')}</div>;
+    return feedback || <div className={styles.channelWelcome}>{t(historyLoading ? 'common.loading' : 'channel.noMessages')}</div>;
   }
 
   const ch = channels.find((c) => c.id === currentChannel);
@@ -176,6 +193,7 @@ export function ChannelMessages() {
 
   return (
     <>
+      {feedback}
       <div ref={wrapperRef}>
         {messages.map((msg, idx) => {
           const isContinuation = msg.sender === lastSender;
@@ -273,6 +291,13 @@ export function ChannelMembers() {
   const currentAgentId = useStore(s => s.currentAgentId);
   const [menuPos, setMenuPos] = useState<{ x: number; y: number } | null>(null);
   const [busyMemberId, setBusyMemberId] = useState<string | null>(null);
+  const connectionKey = useStore(s => JSON.stringify(resolveServerConnection(s)));
+  const operationVersion = useRef(0);
+  useEffect(() => {
+    operationVersion.current += 1;
+    setBusyMemberId(null);
+    setMenuPos(null);
+  }, [currentChannel, currentAgentId, connectionKey]);
 
   const agentMap = useMemo(() => buildAgentMap(agents), [agents]);
 
@@ -301,11 +326,14 @@ export function ChannelMembers() {
     const confirmed = confirm(t('channel.removeMemberConfirm', { name: info.displayName }));
     if (!confirmed) return;
     const channelId = currentChannel;
+    const scope = captureConversationRequestScope(true);
+    const version = operationVersion.current;
+    const isCurrent = () => scope.isCurrent() && version === operationVersion.current;
     setBusyMemberId(memberId);
     removeChannelMember(channelId, memberId)
-      .then(() => requestChannelComposerFocus(channelId))
-      .catch((err) => alert(err?.message || t('channel.removeMemberFailed')))
-      .finally(() => setBusyMemberId(null));
+      .then(() => { if (isCurrent()) requestChannelComposerFocus(channelId); })
+      .catch((err) => { if (isCurrent()) alert(err?.message || t('channel.removeMemberFailed')); })
+      .finally(() => { if (isCurrent()) setBusyMemberId(null); scope.dispose(); });
   };
 
   const userInfo = resolve('user');
@@ -314,10 +342,13 @@ export function ChannelMembers() {
       label: agent.name || agent.id,
       action: () => {
         if (!currentChannel) return;
+        const scope = captureConversationRequestScope(true);
+        const version = operationVersion.current;
+        const isCurrent = () => scope.isCurrent() && version === operationVersion.current;
         setBusyMemberId(agent.id);
         addChannelMember(currentChannel, agent.id)
-          .catch((err) => alert(err?.message || t('channel.addMemberFailed')))
-          .finally(() => setBusyMemberId(null));
+          .catch((err) => { if (isCurrent()) alert(err?.message || t('channel.addMemberFailed')); })
+          .finally(() => { if (isCurrent()) setBusyMemberId(null); scope.dispose(); });
       },
     }))
     : [{ label: t('channel.noAvailableMembers'), disabled: true }];
@@ -411,9 +442,13 @@ export function AgentPhoneSessionPreview({ sessionPath, agentId, agentYuan }: {
   agentYuan?: string | null;
 }) {
   const { t } = useI18n();
+  const connectionKey = useStore(s => JSON.stringify(resolveServerConnection(s)));
+  const currentAgentId = useStore(s => s.currentAgentId);
   const session = useStore(s => (sessionPath ? sessionScopedValue(s, s.chatSessions, sessionPath) ?? null : null));
   const items = session?.items ?? EMPTY_CHAT_ITEMS;
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const [retryVersion, setRetryVersion] = useState(0);
   const [streamMessage, setStreamMessage] = useState<ChatMessage | null>(null);
   const [streamRevision, setStreamRevision] = useState(0);
   const streamTurnRef = useRef(0);
@@ -439,19 +474,27 @@ export function AgentPhoneSessionPreview({ sessionPath, agentId, agentYuan }: {
     streamTurnRef.current = 0;
     setStreamMessage(null);
     setStreamRevision(0);
-  }, [bottomScroll, sessionPath]);
+  }, [bottomScroll, sessionPath, connectionKey, currentAgentId]);
 
   useEffect(() => {
-    if (!sessionPath || items.length > 0 || loading) return;
+    setLoadError(false);
+    if (!sessionPath || items.length > 0) { setLoading(false); return; }
     let cancelled = false;
+    const scope = captureConversationRequestScope();
     setLoading(true);
     void loadMessages(sessionPath)
-      .catch((err: unknown) => console.warn('[channels] load phone session failed:', err))
+      .catch((error: unknown) => {
+        if (!cancelled && scope.isCurrent()) {
+          console.warn('[channels] load phone session failed:', error);
+          setLoadError(true);
+        }
+      })
       .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (!cancelled && scope.isCurrent()) setLoading(false);
+        scope.dispose();
       });
-    return () => { cancelled = true; };
-  }, [items.length, loading, sessionPath]);
+    return () => { cancelled = true; scope.dispose(); };
+  }, [items.length, sessionPath, retryVersion, connectionKey, currentAgentId]);
 
   useEffect(() => {
     bottomScroll.followBottom();
@@ -460,7 +503,9 @@ export function AgentPhoneSessionPreview({ sessionPath, agentId, agentYuan }: {
   useEffect(() => {
     if (!sessionPath) return;
 
+    const scope = captureConversationRequestScope(true);
     const updateStreamMessage = (updater: (message: ChatMessage) => ChatMessage) => {
+      if (!scope.isCurrent()) return;
       setStreamMessage((prev) => {
         const base = prev || createPhoneStreamMessage(agentId, ++streamTurnRef.current);
         return updater(base);
@@ -469,6 +514,7 @@ export function AgentPhoneSessionPreview({ sessionPath, agentId, agentYuan }: {
     };
 
     const unsubscribe = subscribeStreamKey(sessionPath, (event: any) => {
+      if (!scope.isCurrent()) return;
       switch (event.type) {
         case 'thinking_start':
           updateStreamMessage((message) => ({
@@ -598,15 +644,16 @@ export function AgentPhoneSessionPreview({ sessionPath, agentId, agentYuan }: {
           }
           break;
         case 'turn_end':
-          void loadMessages(sessionPath).then(() => setStreamMessage(null)).catch(() => {});
+          void loadMessages(sessionPath).then(() => { if (scope.isCurrent()) setStreamMessage(null); })
+            .catch(() => { if (scope.isCurrent()) setLoadError(true); });
           break;
         default:
           break;
       }
     });
 
-    return unsubscribe;
-  }, [agentId, moodYuan, sessionPath]);
+    return () => { unsubscribe(); scope.dispose(); };
+  }, [agentId, moodYuan, sessionPath, connectionKey, currentAgentId]);
 
   const phoneNotice = t('channel.phoneReceivedNewMessages') || '收到新的群聊消息';
   const displayItems = useMemo(() => {
@@ -634,6 +681,11 @@ export function AgentPhoneSessionPreview({ sessionPath, agentId, agentYuan }: {
       <div ref={contentRef}>
         {!sessionPath ? (
           <div className={styles.agentActivityEmpty}>{t('channel.agentIdle')}</div>
+        ) : loadError && displayItems.length === 0 ? (
+          <div role="alert" className={styles.agentActivityEmpty}>
+            <span>{t('channel.loadFailed')}</span>
+            <button type="button" onClick={() => setRetryVersion(value => value + 1)}>{t('channel.retry')}</button>
+          </div>
         ) : loading && displayItems.length === 0 ? (
           <div className={styles.agentActivityEmpty}>{t('common.loading')}</div>
         ) : displayItems.length === 0 ? (
@@ -738,14 +790,16 @@ export function ChannelExportPanel() {
   const handleExport = useCallback(async () => {
     if (exporting) return;
     setExporting(true);
+    const scope = captureConversationRequestScope(true);
     try {
       const filename = await exportCurrentConversation();
-      addToast(t('channel.exportSuccess', { filename }), 'success');
+      if (scope.isCurrent()) addToast(t('channel.exportSuccess', { filename }), 'success');
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      addToast(t('channel.exportFailed', { message }), 'error');
+      if (scope.isCurrent()) addToast(t('channel.exportFailed', { message }), 'error');
     } finally {
       setExporting(false);
+      scope.dispose();
     }
   }, [addToast, exporting, t]);
 
@@ -784,6 +838,10 @@ export function ChannelAgentSettingsPanel() {
   const currentChannel = useStore(s => s.currentChannel);
   const isDM = useStore(s => s.channelIsDM);
   const models = useStore(s => s.models);
+  const connectionKey = useStore(s => JSON.stringify(resolveServerConnection(s)));
+  const currentAgentId = useStore(s => s.currentAgentId);
+  const settingsError = useStore(s => s.channelSettingsError);
+  const settingsLoading = useStore(s => s.channelSettingsLoading);
   const toolMode = useStore(s => s.channelAgentPhoneToolMode);
   const replyMinChars = useStore(s => s.channelAgentReplyMinChars);
   const replyMaxChars = useStore(s => s.channelAgentReplyMaxChars);
@@ -799,6 +857,12 @@ export function ChannelAgentSettingsPanel() {
   const [draftReminder, setDraftReminder] = useState(String(reminderIntervalMinutes || 31));
   const [draftGuardLimit, setDraftGuardLimit] = useState(String(guardLimit || 36));
   const modelSelectRef = useRef<HTMLDivElement | null>(null);
+  const saveVersion = useRef(0);
+  useEffect(() => {
+    saveVersion.current += 1;
+    setSaving(false);
+    setModelOpen(false);
+  }, [currentChannel, currentAgentId, connectionKey]);
 
   useEffect(() => {
     setDraftMin(replyMinChars ? String(replyMinChars) : '');
@@ -809,13 +873,15 @@ export function ChannelAgentSettingsPanel() {
 
   useEffect(() => {
     if (models.length > 0) return;
+    const scope = captureConversationRequestScope();
     void lingxiFetch('/api/models')
       .then(res => res.ok ? res.json() : null)
       .then(data => {
-        if (data?.models) useStore.setState({ models: data.models });
+        if (scope.isCurrent() && Array.isArray(data?.models)) useStore.setState({ models: data.models });
       })
       .catch((err: unknown) => console.warn('[channels] load models failed:', err));
-  }, [models.length]);
+    return scope.dispose;
+  }, [models.length, connectionKey, currentAgentId]);
 
   useEffect(() => {
     if (!modelOpen) return;
@@ -829,16 +895,26 @@ export function ChannelAgentSettingsPanel() {
   }, [modelOpen]);
 
   if (!currentChannel) return null;
+  if (settingsError || settingsLoading) return (
+    <div className="universal-card" role={settingsError ? 'alert' : 'status'}>
+      <span>{t(settingsError ? 'channel.loadFailed' : 'common.loading')}</span>
+      {settingsError && <button type="button" onClick={() => { void loadConversationAgentPhoneSettings(currentChannel); }}>{t('channel.retry')}</button>}
+    </div>
+  );
 
   const saveSettings = async (patch: Parameters<typeof saveConversationAgentPhoneSettings>[0]) => {
     setSaving(true);
+    const scope = captureConversationRequestScope(true);
+    const version = saveVersion.current;
+    const isCurrent = () => scope.isCurrent() && version === saveVersion.current;
     try {
       await saveConversationAgentPhoneSettings(patch);
     } catch (err: any) {
       console.error('[channels] save phone settings failed:', err);
-      alert(err?.message || t('channel.settingsSaveFailed'));
+      if (isCurrent()) alert(err?.message || t('channel.settingsSaveFailed'));
     } finally {
-      setSaving(false);
+      if (isCurrent()) setSaving(false);
+      scope.dispose();
     }
   };
 
@@ -1092,12 +1168,31 @@ export function ChannelInput() {
   const [mentionStartPos, setMentionStartPos] = useState(-1);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  const composerVersion = useRef(0);
+  const connectionKey = useStore(s => JSON.stringify(resolveServerConnection(s)));
+  useEffect(() => {
+    composerVersion.current += 1;
+    setInputValue('');
+    setSending(false);
+    setMentionActive(false);
+  }, [currentChannel, currentAgentId, connectionKey]);
+
   const handleSend = useCallback(async () => {
-    if (sending || !inputValue.trim()) return;
+    if (sending || isDM || !inputValue.trim()) return;
+    const version = composerVersion.current;
+    const scope = captureConversationRequestScope(true);
+    const isCurrent = () => scope.isCurrent() && composerVersion.current === version;
     setSending(true);
-    try { await sendChannelMessage(inputValue.trim()); setInputValue(''); }
-    finally { setSending(false); }
-  }, [sending, inputValue]);
+    try {
+      await sendChannelMessage(inputValue.trim());
+      if (isCurrent()) setInputValue('');
+    } catch {
+      if (isCurrent()) useStore.getState().addToast(window.t('channel.sendFailed'), 'error');
+    } finally {
+      if (isCurrent()) setSending(false);
+      scope.dispose();
+    }
+  }, [sending, isDM, inputValue]);
 
   const checkMention = useCallback(() => {
     if (!inputRef.current) return;

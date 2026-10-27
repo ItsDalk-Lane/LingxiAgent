@@ -1,0 +1,149 @@
+{
+  "reviewer": "r07_t08_final_review",
+  "reviewedAt": "2026-10-18T09:42:09.640428+00:00",
+  "source": "artifacts/rust-tauri/R07/T12/35-handoff-source-resolved-20261018.json",
+  "sourceSha256": "a30b97a2dbeb1b3012632abbf725ee65c9e67ef0e212502077b5dcb3d6a83317",
+  "scope": "只读核原35项中与T08设置/管理/权限投影有关的原责任；不是追加35功能，也不替代逐叶验收。",
+  "facts": [
+    "35来自408内继承叶，共87原断言；其中29跨R04/R07/R08、6跨R04/R07，不是从未实现数量临时拼成。",
+    "设置MCP七复合动作与Security四复合动作都在该原集合，不得因现役容器禁用或设置API未接而自行删减/递延整体叶。",
+    "MCP设置state须按agent合入工具/权限与builtinDefer，enable/defer独立保存、connector配置管理、agent权限/pinned控件必须实际结果，不能空对象或禁用按钮冒充通过。",
+    "T11完整扩展生命周期/远程供应商验证可按已批准任务责任分别核算，但这不是将T08本地设置状态及管理控件统一推迟的授权。",
+    "当前独立审阅此前接受“旧MCP设置页T11”的说法过宽，本报告限定纠正；保留旧记录不改写。"
+  ],
+  "relevantOriginalItems": [
+    {
+      "id": "R00-T02-LA-DD47275AC5AE",
+      "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-STATE-MCP-DD4727",
+      "when": "用户查看 MCP 连接状态",
+      "then": "按 agent 配置返回连接器状态并合入内置工具延迟加载开关",
+      "assertions": [
+        "给定目标与相应权限，执行“查看 MCP 连接状态”后核对：按 agent 配置返回连接器状态并合入内置工具延迟加载开关",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-67256417FB2B",
+      "featureId": "F-D03-ROUTE_BEHAVIOR-BEHAVIOR-MCP-SESSION-PERMISSIONS-POST-672564",
+      "when": "用户批准当前会话的一次 MCP 工具能力",
+      "then": "校验会话与 sessions.write 范围后，仅在本次会话内放行指定 capability；不持久化",
+      "assertions": [
+        "执行“批准当前会话的一次 MCP 工具能力”后核对：校验会话与 sessions.write 范围后，仅在本次会话内放行指定 capability；不持久化",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-240E200EF440",
+      "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-AGENTS-AGENTID-CONNECTORS-ID-240E20",
+      "when": "用户设置指定 Agent 的连接器",
+      "then": "更新该 Agent 对连接器的配置并返回配置",
+      "assertions": [
+        "给定目标与相应权限，执行“设置指定 Agent 的连接器”后核对：更新该 Agent 对连接器的配置并返回配置",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-FAE7503D0D0F",
+      "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-ENABLED-MCP-FAE750",
+      "when": "用户开关 MCP 全局连接",
+      "then": "enabled true 启用、其他值停用，返回合并后的连接状态",
+      "assertions": [
+        "给定目标与相应权限，执行“开关 MCP 全局连接”后核对：enabled true 启用、其他值停用，返回合并后的连接状态",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-BB1BB3A9C5F4",
+      "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-SETTINGS-DEFER-MCP-BB1BB3",
+      "when": "用户设置 MCP 工具延迟加载",
+      "then": "独立更新 deferEnabled、deferThreshold、builtinDeferEnabled 中实际提供的字段，返回新状态",
+      "assertions": [
+        "给定目标与相应权限，执行“设置 MCP 工具延迟加载”后核对：独立更新 deferEnabled、deferThreshold、builtinDeferEnabled 中实际提供的字段，返回新状态",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-BC2FBD618278",
+      "featureId": "F-D04-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SERVER-INDEX-API-PLAN-MODE-READ-BC2FBD",
+      "when": "用户查看规划/权限模式",
+      "then": "返回 planMode、permissionMode、accessMode",
+      "assertions": [
+        "成功：执行“查看规划/权限模式”后，返回 planMode、permissionMode、accessMode",
+        "拒绝/边界：无参数；不应错误扩大写入或披露范围"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-5E61048F19B9",
+      "featureId": "F-D04-ROUTE_BEHAVIOR-BEHAVIOR-SERVER-INDEX-API-SESSION-PERMISSION-MOD-5E6104",
+      "when": "用户查看当前会话权限模式",
+      "then": "返回 mode、accessMode 与 defaultMode，不改变权限",
+      "assertions": [
+        "执行“查看当前会话权限模式”后核对：返回 mode、accessMode 与 defaultMode，不改变权限",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-D01766AF4475",
+      "featureId": "F-D04-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PERMISSION-MODE-SET-D01766",
+      "when": "用户设置会话权限模式",
+      "then": "body.mode 调 setSessionPermissionMode，返回 mode/accessMode",
+      "assertions": [
+        "成功：设置会话权限模式后，body.mode 调 setSessionPermissionMode，返回 mode/accessMode",
+        "边界：mode 存在时不由 enabled 决定；拒绝时目标状态不变"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-A336F79E964D",
+      "featureId": "F-D04-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-PLAN-MODE-TOGGLE-A336F7",
+      "when": "用户切换规划模式",
+      "then": "无 mode 时由 !!enabled 调 setPlanMode，返回最新状态",
+      "assertions": [
+        "成功：切换规划模式后，无 mode 时由 !!enabled 调 setPlanMode，返回最新状态",
+        "边界：enabled true/false 两向及 ok=false；拒绝时目标状态不变"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-0B669B30C854",
+      "featureId": "F-D04-ROUTE_BEHAVIOR-BEHAVIOR-SERVER-INDEX-API-SESSION-PERMISSION-MOD-0B669B",
+      "when": "用户切换指定作用域的会话权限模式",
+      "then": "按当前会话、待新建会话、指定会话或全局作用域设置模式，返回实际模式或冲突错误",
+      "assertions": [
+        "执行“切换指定作用域的会话权限模式”后核对：按当前会话、待新建会话、指定会话或全局作用域设置模式，返回实际模式或冲突错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-B4BB2438E855",
+      "featureId": "F-D03-UI-UI-SETTINGS-MCP-B4BB24",
+      "when": "逐一执行 UI 动作矩阵记录的自动加载与可见控件",
+      "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+      "assertions": [
+        "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+        "自动读取连接器状态与工具权限：成功核对 连接器列表、状态、工具与权限显示；空态/未初始化核对 无连接器显示添加入口；错误/无权限核对 连接器或权限读取失败仅 console.error，保留旧状态，无专门错误态或 toast。",
+        "全局启停与延迟工具加载：成功核对 总开关及延迟阈值保存；成功后有 agentId 时重读连接器状态与工具权限。；空态/未初始化核对 无连接器时仍可切总开关；无 agentId 时不发 state GET。；错误/无权限核对 失败恢复旧配置",
+        "添加连接器、批量导入：成功核对 新连接器出现，批量结果逐项反馈；成功后有 agentId 时重读连接器状态与工具权限。；空态/未初始化核对 空表单不可提交；无 agentId 时不发 state GET。；错误/无权限核对 批量可部分成功，不能用全成功 toast",
+        "编辑/删除连接器与启动/停止/刷新工具：成功核对 连接状态和目录更新；成功后有 agentId 时重读连接器状态与工具权限。；空态/未初始化核对 删除需确认；停用不清凭据；无 agentId 时不发 state GET。；错误/无权限核对 失败显示错误且保留连接器",
+        "按助手启停连接器、设置工具权限/置顶：成功核对 当前助手允许工具和排序更新；成功后有 agentId 时重读连接器状态与工具权限。；空态/未初始化核对 无工具显示空目录；无 agentId 时不发 state GET。；错误/无权限核对 保存失败不伪造授权",
+        "OAuth 登录、取消、退出：成功核对 登录轮询返回 done 后刷新连接器并显示保存成功；退出接口成功后经统一 run 刷新并显示成功。；成功后有 agentId 时重读连接器状态与工具权限。；OAuth 授权 URL 成功返回后打开外链并轮询，完成/退出后重读状态；取消仅 POST cancel。；桌面 platform.openExternal 走 IPC，Web/mobile 使用浏览器 window.open。；空态/未初始化核对 未登录显示登录入口；等待中可点击取消，取消请求后关闭等待卡。；无 agentId 时不发 state GET。；错误/无权限核对 启动、轮询 error/超时或取消请求失败按各自 catch 显示错误；外链打开未等待，拒绝不会进入登录 catch，仍继续轮询；轮询 cancelled 直接返回，connectOAuth 随后仍刷新并可能显示保存成功，不能将取消断言为安静退出。；启动失败不打开外链；取消分支不因取消本身重读 state。；取消本身不直接重读，但在途轮询若回到 cancelled 并正常结束，登录回调仍可能间接 loadState，需按并发结果验。"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-DA5AD5C40098",
+      "featureId": "F-D04-UI-UI-SETTINGS-SECURITY-DA5AD5",
+      "when": "逐一执行 UI 动作矩阵记录的自动加载与可见控件",
+      "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+      "assertions": [
+        "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+        "沙箱及沙箱网络开关：成功核对 两个开关通过每助手配置接口写入全局 preferences；适用保存路径后重读当前助手合成配置视图。；经 autoSaveConfig 的保存成功后立即重读助手 config 快照。；空态/未初始化核对 sandbox 状态尚未初始化时为 undefined/loading；只有显式 false 时显示关闭警告，不把未加载当关闭。；无 agentId/resourceKey 时 loadSettingsConfig 不请求；经验未启用时不 GET experience。；错误/无权限核对 保存失败恢复开关；各项 GET 失败应与前序保存结果分开判断。；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；该控件请求每助手 config 接口，但所涉字段由服务端归入全局 preferences；PUT 成功但后续 config GET 失败时可能显示保存失败，实际写入可能已生效。",
+        "检查点保留策略、展开备份列表：成功核对 保留天数与检查点列表显示；适用保存路径后重读当前助手合成配置视图。；经 autoSaveConfig 的保存成功后立即重读助手 config 快照。；空态/未初始化核对 无检查点显示空列表；无 agentId/resourceKey 时 loadSettingsConfig 不请求；经验未启用时不 GET experience。；错误/无权限核对 检查点列表 GET 失败直接设为空数组且无警告；页面可能呈假空态，不能要求显示读取错误。；各项 GET 失败应与前序保存结果分开判断。；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；该控件请求每助手 config 接口，但所涉字段由服务端归入全局 preferences；PUT 成功但后续 config GET 失败时可能显示保存失败，实际写入可能已生效。",
+        "网络代理模式及 HTTP/HTTPS/WS/WSS/noProxy 字段保存：成功核对 proxy 模式和 HTTP/HTTPS/WS/WSS/noProxy 通过每助手配置接口写入全局 preferences并通知运行时。；代理配置保存成功后广播 network-proxy-changed，IPC 应用失败仅记录日志，桌面壳据事件更新对应状态。；适用保存路径后重读当前助手合成配置视图。；经 autoSaveConfig 的保存成功后立即重读助手 config 快照。；空态/未初始化核对 系统代理或直连模式字段禁用；无 agentId/resourceKey 时 loadSettingsConfig 不请求；经验未启用时不 GET experience。；错误/无权限核对 失败提示并保留草稿；通知失败或保存失败不能冒充目标配置已完成。；各项 GET 失败应与前序保存结果分开判断。；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；该控件请求每助手 config 接口，但所涉字段由服务端归入全局 preferences；PUT 成功但后续 config GET 失败时可能显示保存失败，实际写入可能已生效。"
+      ]
+    }
+  ],
+  "reviewRequirements": [
+    "后继修复正常初始化、失败与重启路径一致，真实组合根能导航到已接页签，不只直挂测试。",
+    "连接/权限/工具设置必须沿实际服务鉴权与原Source/任务链；撤权、同ID重用和在途调用不能仅改页面投影。",
+    "按原动作必要分支取证，不用单个管理happy path代七复合动作；具体未验条款保持未验。"
+  ],
+  "finalAcceptance": "pending"
+}

@@ -1,0 +1,36 @@
+== toolchain: rustup run 1.98.1 (rustc 1.98.1 (48a229cea 2026-09-01))
+== [1/2] contracts/generated (lingxi-protocol-gen --check)
+OK: 193 generated files match regeneration (no diff) under /Users/study_superior/Desktop/Code/LingxiAgent/contracts/generated
+== [2/2] API_COMPAT_MATRIX.json (extract --check)
+DRIFT: API_COMPAT_MATRIX.json differs from regeneration
+  line 6:
+    disk:     "contentSha": "ff0008c0cdf4437bc87b269dcefa8ba21efb3bd40e413436c085345e918edf78",
+    gen:      "contentSha": "173fd85bcd4539b2ef9ef45d95ede0f456acff8ae0356a7672f9e6c20d83e5a7",
+  line 9:
+    disk:       "desktop/preload.cjs": "6e178ddc1a58e341a499c423e38d4d4ebad8743745d87b7599cdc77366f7549b",
+    gen:        "desktop/preload.cjs": "10df7f00a0f1a1182dd6eb2e23bf88a9d48d22b8dcd9a17b0f980870e6d93bcf",
+  line 10:
+    disk:       "desktop/src/react/types.ts": "1fd8f5e4bcea4b65f5145381f264009e5f14c5d76138f6bf403a14933cdb43eb",
+    gen:        "desktop/src/react/types.ts": "bf2b2977adf26748260789b5e19094b51423f0e66780a7c2c623ebc5c2c54b74",
+  line 107:
+    disk:       "invoke:get-keep-awake-status",
+    gen:        "invoke:get-browser-viewer-context",
+  line 108:
+    disk:       "invoke:get-pending-announcement",
+    gen:        "invoke:get-keep-awake-status",
+  line 109:
+    disk:       "invoke:get-platform",
+    gen:        "invoke:get-pending-announcement",
+  line 110:
+    disk:       "invoke:get-server-port",
+    gen:        "invoke:get-platform",
+  line 111:
+    disk:       "invoke:get-server-token",
+    gen:        "invoke:get-server-port",
+  line 112:
+    disk:       "invoke:get-splash-info",
+    gen:        "invoke:get-server-token",
+  line 113:
+    disk:       "invoke:get-update-digest-history",
+    gen:        "invoke:get-splash-info",
+regenerate: node scripts/rust-tauri/r01-t02-extract-api-surface.mjs

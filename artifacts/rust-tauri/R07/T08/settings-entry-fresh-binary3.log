@@ -1,0 +1,102 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（configured）
+R07_SETTINGS_ENTRY_RESULT {"blocked":[],"requests":[{"path":"/lingxi/v1/access/summary","method":"GET","status":200},{"path":"/lingxi/v1/server/identity","method":"GET","status":200},{"path":"/lingxi/v1/settings/config","method":"GET","status":200},{"path":"/lingxi/v1/agents","method":"GET","status":200},{"path":"/lingxi/v1/models","method":"GET","status":200},{"path":"/lingxi/v1/settings/snapshot","method":"GET","status":200},{"path":"/lingxi/v1/settings/avatar-health","method":"GET","status":200},{"path":"/lingxi/v1/providers/summary","method":"GET","status":200},{"path":"/lingxi/v1/preferences/quick-chat","method":"GET","status":200},{"path":"/lingxi/v1/preferences/notifications","method":"GET","status":200},{"path":"/lingxi/v1/preferences/goal","method":"GET","status":200},{"path":"/lingxi/v1/preferences/autolearn","method":"GET","status":200},{"path":"/lingxi/v1/skills/bundles","method":"GET","status":200},{"path":"/lingxi/v1/skills","method":"GET","status":200},{"path":"/lingxi/v1/skills/external-paths","method":"GET","status":200}]}
+
+ ✓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（configured） 729ms
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（without-model）
+[settings] models load failed: Error: model plane unavailable
+    at errorWithCode (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/errors/error-presenter.ts:38:17)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/api.ts:78:27)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at lingxiFetchJson (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/api.ts:95:15)
+    at loadSettingsModels (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/actions.ts:113:18)
+    at async Promise.all (index 3)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/SettingsContent.tsx:472:7
+
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（without-model）
+R07_SETTINGS_ENTRY_RESULT {"blocked":[],"requests":[{"path":"/lingxi/v1/access/summary","method":"GET","status":200},{"path":"/lingxi/v1/server/identity","method":"GET","status":200},{"path":"/lingxi/v1/settings/config","method":"GET","status":200},{"path":"/lingxi/v1/agents","method":"GET","status":200},{"path":"/lingxi/v1/models","method":"GET","status":500},{"path":"/lingxi/v1/settings/snapshot","method":"GET","status":200},{"path":"/lingxi/v1/settings/avatar-health","method":"GET","status":200},{"path":"/lingxi/v1/providers/summary","method":"GET","status":200},{"path":"/lingxi/v1/preferences/quick-chat","method":"GET","status":200},{"path":"/lingxi/v1/preferences/notifications","method":"GET","status":200},{"path":"/lingxi/v1/preferences/goal","method":"GET","status":200},{"path":"/lingxi/v1/preferences/autolearn","method":"GET","status":200},{"path":"/lingxi/v1/skills/bundles","method":"GET","status":200},{"path":"/lingxi/v1/skills","method":"GET","status":200},{"path":"/lingxi/v1/skills/external-paths","method":"GET","status":200}]}
+
+ ✓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（without-model） 327ms
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（without-agent）
+R07_SETTINGS_ENTRY_RESULT {"blocked":[],"requests":[{"path":"/lingxi/v1/server/identity","method":"GET","status":200},{"path":"/lingxi/v1/access/summary","method":"GET","status":200},{"path":"/lingxi/v1/settings/config","method":"GET","status":200},{"path":"/lingxi/v1/agents","method":"GET","status":200},{"path":"/lingxi/v1/models","method":"GET","status":200},{"path":"/lingxi/v1/settings/avatar-health","method":"GET","status":200},{"path":"/lingxi/v1/providers/summary","method":"GET","status":200},{"path":"/lingxi/v1/preferences/quick-chat","method":"GET","status":200},{"path":"/lingxi/v1/preferences/notifications","method":"GET","status":200},{"path":"/lingxi/v1/preferences/goal","method":"GET","status":200},{"path":"/lingxi/v1/skills/external-paths","method":"GET","status":200},{"path":"/lingxi/v1/preferences/autolearn","method":"GET","status":200}]}
+
+ ✓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（without-agent） 305ms
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（restart）
+R07_SETTINGS_ENTRY_RESULT {"blocked":[],"requests":[{"path":"/lingxi/v1/access/summary","method":"GET","status":200},{"path":"/lingxi/v1/server/identity","method":"GET","status":200},{"path":"/lingxi/v1/settings/config","method":"GET","status":200},{"path":"/lingxi/v1/agents","method":"GET","status":200},{"path":"/lingxi/v1/models","method":"GET","status":200},{"path":"/lingxi/v1/settings/snapshot","method":"GET","status":200},{"path":"/lingxi/v1/settings/avatar-health","method":"GET","status":200},{"path":"/lingxi/v1/providers/summary","method":"GET","status":200},{"path":"/lingxi/v1/preferences/quick-chat","method":"GET","status":200},{"path":"/lingxi/v1/preferences/notifications","method":"GET","status":200},{"path":"/lingxi/v1/preferences/goal","method":"GET","status":200},{"path":"/lingxi/v1/preferences/autolearn","method":"GET","status":200},{"path":"/lingxi/v1/skills/bundles","method":"GET","status":200},{"path":"/lingxi/v1/skills","method":"GET","status":200},{"path":"/lingxi/v1/skills/external-paths","method":"GET","status":200}]}
+
+ ✓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（restart） 605ms
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（rejected-restart）
+R07_SETTINGS_ENTRY_RESULT {"blocked":[],"requests":[{"path":"/lingxi/v1/access/summary","method":"GET","status":200},{"path":"/lingxi/v1/server/identity","method":"GET","status":200},{"path":"/lingxi/v1/settings/config","method":"GET","status":200},{"path":"/lingxi/v1/agents","method":"GET","status":200},{"path":"/lingxi/v1/models","method":"GET","status":200},{"path":"/lingxi/v1/settings/snapshot","method":"GET","status":200},{"path":"/lingxi/v1/settings/avatar-health","method":"GET","status":200},{"path":"/lingxi/v1/providers/summary","method":"GET","status":200},{"path":"/lingxi/v1/preferences/quick-chat","method":"GET","status":200},{"path":"/lingxi/v1/preferences/notifications","method":"GET","status":200},{"path":"/lingxi/v1/preferences/autolearn","method":"GET","status":200},{"path":"/lingxi/v1/preferences/goal","method":"GET","status":200},{"path":"/lingxi/v1/skills","method":"GET","status":200},{"path":"/lingxi/v1/skills/bundles","method":"GET","status":200},{"path":"/lingxi/v1/skills/external-paths","method":"GET","status":200}]}
+
+ ✓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（rejected-restart） 414ms
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（invalid-resource-credential）
+[settings] models load failed: Error: authentication required
+    at errorWithCode (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/errors/error-presenter.ts:38:17)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/api.ts:78:27)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at lingxiFetchJson (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/api.ts:95:15)
+    at loadSettingsModels (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/actions.ts:113:18)
+    at async Promise.all (index 3)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/SettingsContent.tsx:472:7 {
+  code: 'unauthorized'
+}
+
+ ✓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（invalid-resource-credential） 246ms
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（provider-refresh-failure）
+R07_SETTINGS_ENTRY_RESULT {"blocked":[],"requests":[{"path":"/lingxi/v1/access/summary","method":"GET","status":200},{"path":"/lingxi/v1/server/identity","method":"GET","status":200},{"path":"/lingxi/v1/settings/config","method":"GET","status":200},{"path":"/lingxi/v1/agents","method":"GET","status":200},{"path":"/lingxi/v1/models","method":"GET","status":200},{"path":"/lingxi/v1/settings/snapshot","method":"GET","status":200},{"path":"/lingxi/v1/settings/avatar-health","method":"GET","status":200},{"path":"/lingxi/v1/providers/summary","method":"GET","status":200},{"path":"/lingxi/v1/preferences/quick-chat","method":"GET","status":200},{"path":"/lingxi/v1/preferences/notifications","method":"GET","status":200},{"path":"/lingxi/v1/preferences/goal","method":"GET","status":200},{"path":"/lingxi/v1/preferences/autolearn","method":"GET","status":200},{"path":"/lingxi/v1/skills","method":"GET","status":200},{"path":"/lingxi/v1/skills/bundles","method":"GET","status":200},{"path":"/lingxi/v1/skills/external-paths","method":"GET","status":200}]}
+
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（provider-refresh-failure）
+[settings] load failed: Error: cannot read config.yaml: invalid agent config.yaml: unclosed bracket '[' at char 8 line 1 column 9
+    at errorWithCode (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/errors/error-presenter.ts:38:17)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/api.ts:78:27)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async Promise.all (index 0)
+    at loadSettingsConfig (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/actions.ts:175:7)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/ProvidersTab.tsx:46:5
+    at onCredentialRefresh (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/providers/ProviderDetail.tsx:29:5)
+    at refreshAfterSave (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/providers/ApiKeyCredentials.tsx:100:7)
+    at onBlur (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/providers/ApiKeyCredentials.tsx:292:22)
+
+ ✓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（provider-refresh-failure） 540ms
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（all-pages）
+R07_SETTINGS_ENTRY_RESULT {"blocked":[],"requests":[{"path":"/lingxi/v1/access/summary","method":"GET","status":200},{"path":"/lingxi/v1/server/identity","method":"GET","status":200},{"path":"/lingxi/v1/settings/config","method":"GET","status":200},{"path":"/lingxi/v1/agents","method":"GET","status":200},{"path":"/lingxi/v1/models","method":"GET","status":200},{"path":"/lingxi/v1/settings/snapshot","method":"GET","status":200},{"path":"/lingxi/v1/settings/avatar-health","method":"GET","status":200},{"path":"/lingxi/v1/providers/summary","method":"GET","status":200},{"path":"/lingxi/v1/agent-deletions","method":"GET","status":200},{"path":"/lingxi/v1/preferences/models","method":"GET","status":200},{"path":"/lingxi/v1/agents/entry-agent/tenets","method":"GET","status":200},{"path":"/lingxi/v1/agents/entry-agent/config","method":"GET","status":200},{"path":"/lingxi/v1/memories/dream/status","method":"GET","status":200},{"path":"/lingxi/v1/server/identity","method":"GET","status":200},{"path":"/lingxi/v1/agents","method":"GET","status":200},{"path":"/lingxi/v1/agents/entry-agent/config","method":"GET","status":200},{"path":"/lingxi/v1/user-profile","method":"GET","status":200},{"path":"/lingxi/v1/agents/entry-agent/public-agents-md","method":"GET","status":200},{"path":"/lingxi/v1/agents/entry-agent/identity","method":"GET","status":200},{"path":"/lingxi/v1/agents/entry-agent/agents-md","method":"GET","status":200},{"path":"/lingxi/v1/preferences/models","method":"GET","status":200},{"path":"/lingxi/v1/models","method":"GET","status":200},{"path":"/lingxi/v1/providers/summary","method":"GET","status":200},{"path":"/lingxi/v1/access/summary","method":"GET","status":200},{"path":"/lingxi/v1/preferences/sidebar-ui","method":"GET","status":200},{"path":"/lingxi/v1/sessions/workspace-rollback","method":"GET","status":200},{"path":"/lingxi/v1/preferences/keybindings","method":"GET","status":200},{"path":"/lingxi/v1/preferences/notifications","method":"GET","status":200},{"path":"/lingxi/v1/preferences/quick-chat","method":"GET","status":200},{"path":"/lingxi/v1/preferences/browser","method":"GET","status":200},{"path":"/lingxi/v1/preferences/goal","method":"GET","status":200},{"path":"/lingxi/v1/skills/external-paths","method":"GET","status":200},{"path":"/lingxi/v1/preferences/autolearn","method":"GET","status":200},{"path":"/lingxi/v1/skills","method":"GET","status":200},{"path":"/lingxi/v1/skills/bundles","method":"GET","status":200},{"path":"/lingxi/v1/mcp/state","method":"GET","status":200},{"path":"/lingxi/v1/bridge/status","method":"GET","status":200},{"path":"/lingxi/v1/media/image/providers","method":"GET","status":200},{"path":"/lingxi/v1/speech-recognition/providers","method":"GET","status":200},{"path":"/lingxi/v1/media/video/providers","method":"GET","status":200},{"path":"/lingxi/v1/media/speech/providers","method":"GET","status":200},{"path":"/lingxi/v1/preferences/computer-use","method":"GET","status":200}]}
+
+ ✓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（all-pages） 996ms
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx > SettingsContent title placement > pins the active tab title beside the settings title in the modal header 225ms
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx > SettingsContent title placement > keeps the tab title in the content area for the standalone settings window 12ms
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx > SettingsContent title placement > resets the main scroll position when switching tabs 10ms
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx > SettingsContent title placement > notifies the modal shell when the active settings tab changes 42ms
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx > SettingsContent title placement > does not echo the initially rendered tab back to the modal shell 59ms
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx > SettingsContent title placement > does not render a Computer Use tab and falls back to the agent tab for stale tab values 31ms
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx > SettingsContent title placement > keeps activeServerConnection in sync when the settings window hears server restart 57ms
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx > SettingsContent title placement > keeps the persisted remote Studio active instead of forcing settings back to local loopback 57ms
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx > SettingsContent title placement > opens settings against a persisted remote Studio when no local platform server APIs exist 58ms
+ ✓ desktop/src/react/settings/hooks/__tests__/useMediaSettingsData.test.tsx > useMediaSettingsData > loads image, video, and speech resources independently on mount 31ms
+ ✓ desktop/src/react/settings/hooks/__tests__/useMediaSettingsData.test.tsx > useMediaSettingsData > does not fail the whole resource layer when one endpoint rejects 55ms
+ ✓ desktop/src/react/settings/hooks/__tests__/useMediaSettingsData.test.tsx > useMediaSettingsData > keeps last-known-good providers when a refresh fails 55ms
+ ✓ desktop/src/react/settings/hooks/__tests__/useMediaSettingsData.test.tsx > useMediaSettingsData > sends null (not {}) to clear the default image model 55ms
+ ✓ desktop/src/react/settings/hooks/__tests__/useMediaSettingsData.test.tsx > useMediaSettingsData > syncs the speech snapshot preference after saving 3ms
+ ✓ desktop/src/react/settings/hooks/__tests__/useMediaSettingsData.test.tsx > useMediaSettingsData > serializes writes so a slower earlier response cannot overwrite a later save 161ms
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > renders experiment copy as a tab-level description 83ms
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > renders the built-in browser settings tab 15ms
+stderr | desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > clears foreign cached data and blocks settings when the Rust identity is incomplete
+[settings] init failed: Error: Rust settings server identity does not match
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/SettingsContent.tsx:462:15
+
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > lists Connectors as a static tab with no plugin-contributed tabs present 25ms
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > reloads the shared settings model catalog when models-changed arrives 16ms
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > reloads the shared settings model catalog from a same-window models event 20ms
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > passes tab ids through without aliasing 0ms
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > shows a models nav item and hides the legacy media nav item 20ms
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > loads the provider summary inside init, only after the server connection is ready 13ms
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > clears foreign cached data and blocks settings when the Rust identity is incomplete 72ms
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > loads the settings snapshot only after agents have resolved the agent id 16ms
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > reopens without the loading mask when cached config exists (silent background refresh) 59ms
+
+ Test Files  4 passed (4)
+      Tests  34 passed (34)
+   Start at  18:35:38
+   Duration  8.36s (transform 1.07s, setup 49ms, import 1.67s, tests 5.42s, environment 962ms)
+

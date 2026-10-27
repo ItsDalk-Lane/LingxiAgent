@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { InterfaceTab } from '../InterfaceTab';
 import { useSettingsStore } from '../../store';
 import registry from '../../../../shared/theme-registry';
+import { getDesktopHost } from '../../../host/desktop-host';
 
 const lingxiFetchMock = vi.fn();
 
@@ -60,6 +61,25 @@ function readSettingsComponentStyles(): string {
 }
 
 describe('InterfaceTab appearance state', () => {
+  it('shows the first sidebar read failure and retries before enabling the control', async () => {
+    let denied = true;
+    lingxiFetchMock.mockImplementation(async (path: string) => {
+      if (path === '/api/preferences/sidebar-ui') {
+        if (denied) throw new Error('sidebar denied');
+        return { json: async () => ({ sidebarUi: { projectView: { collapsedProjectIds: [], collapsedFolderIds: [], showAllProjectIds: [] }, sessionList: { rowMode: 'single-line' } } }) };
+      }
+      return { json: async () => ({}) };
+    });
+    render(<InterfaceTab />);
+    await screen.findByRole('alert');
+    const row = screen.getByText('settings.interface.sessionListSingleLine').parentElement!.parentElement!;
+    expect(within(row as HTMLElement).getByRole('switch').hasAttribute('disabled')).toBe(true);
+    denied = false;
+    fireEvent.click(screen.getByRole('button', { name: 'action.retry' }));
+    await waitFor(() => expect(within(row as HTMLElement).getByRole('switch').getAttribute('aria-checked')).toBe('true'));
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
   afterEach(() => {
     cleanup();
   });
@@ -266,7 +286,7 @@ describe('InterfaceTab appearance state', () => {
         method: 'PUT',
         body: JSON.stringify({ sessionList: { rowMode: 'single-line' } }),
       }));
-      expect(window.platform.settingsChanged).toHaveBeenCalledWith('sidebar-ui-changed', expect.objectContaining({
+      expect(getDesktopHost().api.settingsChanged).toHaveBeenCalledWith('sidebar-ui-changed', expect.objectContaining({
         sidebarUi: expect.objectContaining({
           sessionList: { rowMode: 'single-line' },
         }),

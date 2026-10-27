@@ -7,12 +7,13 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useStore } from '../../stores';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../services/service-client';
 import { canUseNativeResourcePath } from '../../services/resource-access';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 import { isWebRuntime } from '../../utils/platform-runtime';
 import type { CwdSkillInfo } from '../../stores/desk-slice';
 import css from './Desk.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 // ── 加载 CWD skills ──
 
@@ -117,7 +118,7 @@ export function DeskCwdSkillsPanel() {
     if (!dir) return;
     let installed = false;
     for (const file of files) {
-      const filePath = canUseNativePathForDrop ? window.platform?.getFilePath?.(file) : null;
+      const filePath = canUseNativePathForDrop ? usePlatform()?.getFilePath?.(file) : null;
       console.log('[cwd-skills] filePath=', filePath, 'file.name=', file.name);
       try {
         const s = useStore.getState();
@@ -188,7 +189,7 @@ export function DeskCwdSkillsPanel() {
                     key={s.name}
                     onDoubleClick={() => {
                       if (deskWorkspaceMountId || !canUseNativePath) return;
-                      window.platform?.openSkillViewer?.({
+                      usePlatform()?.openSkillViewer?.({
                         name: s.name,
                         baseDir: s.baseDir,
                         filePath: s.filePath,
@@ -226,7 +227,7 @@ export function DeskCwdSkillsPanel() {
           {!isWebRuntime() && !deskWorkspaceMountId && canUseNativePath && (
             <button onClick={() => {
               const target = cmSkill?.baseDir || (useStore.getState().deskBasePath + '/.agents/skills');
-              window.platform?.showInFinder?.(target);
+              usePlatform()?.showInFinder?.(target);
               setCmPos(null);
             }}>
               {t('desk.openInFinder')}

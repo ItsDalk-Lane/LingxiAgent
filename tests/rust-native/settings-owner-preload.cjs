@@ -1,0 +1,1 @@
+const {contextBridge,ipcRenderer}=require('electron');contextBridge.exposeInMainWorld('hana',{getServerConnectionInfo:()=>ipcRenderer.invoke('connection'),getPlatform:async()=> 'darwin',onSettingsChanged:()=>()=>{},onServerRestarted:()=>()=>{},onSwitchTab:()=>()=>{},appReady:async()=>{},syncWindowTheme:()=>{},runEditCommand:async()=>false});

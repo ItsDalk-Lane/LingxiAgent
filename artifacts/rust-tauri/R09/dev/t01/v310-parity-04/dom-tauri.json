@@ -1,0 +1,54 @@
+{
+ "projection": {
+  "bodyText": "系统权限 × 测试版需要在 macOS 系统设置中授权麦克风、语音识别与通知；点下面按钮会弹出系统请求。 麦克风: 未请求 请求授权 语音识别: not_determined 请求授权 通知: 未请求 发送测试通知 聊天 会话地图 频道 还没有对话哦 ✿ 书桌 对话文件 工作台 项目技能 过滤 时间 书桌还空空的呢 书桌是助手日常巡检的工作台，也是每次对话的默认目录 去设置里指定一个文件夹吧 前往设置 运行信息 选择工作台 记忆 发送 未配置模型 已连接",
+  "bodyTextHash": 3627538922,
+  "bodyTextLength": 229,
+  "errors": [
+   {
+    "message": "notification.is_permission_granted not allowed. Permissions associated with this command: notification:allow-is-permission-granted, notification:default",
+    "stack": null,
+    "type": "unhandledrejection"
+   }
+  ],
+  "hasHana": false,
+  "hasTauri": true,
+  "hostErrors": [],
+  "location": "tauri://localhost",
+  "platform": "darwin",
+  "reactRootMounted": true,
+  "resources": [],
+  "rootChildCount": 4,
+  "rootPath": [
+   "DIV#.",
+   "DIV#.app-shell",
+   "DIV#.connection-status.connected",
+   "DIV#.toast-container"
+  ],
+  "tauriInvoke": true,
+  "title": "Lingxi · Rust 预览"
+ },
+ "pageLoad": {
+  "event": "page-load",
+  "label": "main",
+  "phase": "Started",
+  "schema": "lingxi.r09.tauri-launch.v1",
+  "unixMs": 1793066563212,
+  "url": "tauri://localhost"
+ },
+ "events": [
+  "host-start",
+  "resolve",
+  "binary",
+  "spawn",
+  "ready",
+  "instance",
+  "identity",
+  "service-ready",
+  "host-service-ready",
+  "window-created",
+  "page-load",
+  "page-load",
+  "app-ready",
+  "dom-projection"
+ ]
+}

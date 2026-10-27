@@ -1,0 +1,15 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.71s
+     Running tests/r07_t08_metadata_redaction.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_metadata_redaction-8d9b77690df60f7a)
+
+running 3 tests
+模型扩展遮盖真实现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-metadata-redaction-d29b2b5bec918bdc
+模型扩展遮盖真实现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-metadata-redaction-59259fc5d7694efa
+模型扩展遮盖真实现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-metadata-redaction-a5095ab48ab9749d
+test auth_header_mask_refills_only_same_header_and_plain_metadata_value_stays_literal ... ok
+LINGXI_AUTH_REJECTED request_id="req-dc2f9bbcb9af2acedce91117526de7a7" method=GET path=/lingxi/v1/settings/export status=403 reason=local_owner_required remote=127.0.0.1:64891
+test metadata_reads_mask_known_nested_secrets_and_masked_model_lists_refill_only_same_id ... ok
+test providers_manage_without_secrets_write_cannot_replace_or_clear_model_extension_credentials ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.98s
+

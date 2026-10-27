@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { KnowledgePage } from '../../components/knowledge/KnowledgePage';
 import * as knowledgeApi from '../../components/knowledge/knowledge-api';
 import { useStore } from '../../stores';
+import { getDesktopHost } from '../../host/desktop-host';
 
 vi.mock('../../components/knowledge/knowledge-api', () => ({
   listKnowledgeNotebooks: vi.fn(),
@@ -333,7 +334,7 @@ describe('KnowledgePage', () => {
     vi.mocked(knowledgeApi.listKnowledgeSources)
       .mockResolvedValueOnce([sourceEntry])
       .mockResolvedValueOnce([sourceEntry]);
-    vi.mocked(window.platform.selectFiles).mockResolvedValue(['/tmp/a.md', '/tmp/b.pdf']);
+    vi.mocked(getDesktopHost().api.selectFiles).mockResolvedValue(['/tmp/a.md', '/tmp/b.pdf']);
 
     render(<KnowledgePage />);
     await screen.findByText('roadmap.md');
@@ -361,7 +362,7 @@ describe('KnowledgePage', () => {
       skipped: [{ path: 'deck.pptx', reason: 'KNOWLEDGE_IMPORT_PROCESSOR_UNAVAILABLE' }],
       failed: [],
     });
-    vi.mocked(window.platform.selectFolder).mockResolvedValue('/tmp/docs');
+    vi.mocked(getDesktopHost().api.selectFolder).mockResolvedValue('/tmp/docs');
 
     render(<KnowledgePage />);
     await screen.findByText('roadmap.md');
@@ -415,7 +416,7 @@ describe('KnowledgePage', () => {
       url: 'https://example.com/page',
       displayName: undefined,
     }));
-    expect(window.platform.selectFiles).not.toHaveBeenCalled();
+    expect(getDesktopHost().api.selectFiles).not.toHaveBeenCalled();
   });
 
   it('shows ingestion badges for pending and failed sources and retries a failed job', async () => {

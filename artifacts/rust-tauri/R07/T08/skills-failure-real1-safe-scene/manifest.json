@@ -1,0 +1,45 @@
+{
+  "originalScenePreserved": true,
+  "copiedOnlyNonSecretFixtureEvidence": true,
+  "authRegistriesAndTokensNotCopied": true,
+  "files": [
+    {
+      "original": "/private/tmp/lingxi-r07-tests/tmp/lingxi-skills-completion-e0a8cb7684db1f76/home/skill-bundles.json",
+      "copy": "artifacts/rust-tauri/R07/T08/skills-failure-real1-safe-scene/skill-bundles.json",
+      "sha256": "f323d6b55051ad1866f066d363fc6f6ba651b5eb030bc16f6df0e5050185d6f4"
+    },
+    {
+      "original": "/private/tmp/lingxi-r07-tests/tmp/lingxi-skills-completion-e0a8cb7684db1f76/home/skills-boundary-evidence/receipt.jsonl",
+      "copy": "artifacts/rust-tauri/R07/T08/skills-failure-real1-safe-scene/skills-boundary-evidence/receipt.jsonl",
+      "sha256": "01a883c61631dd608ea70b9290189b969c660a4aa6a8e0ba16c51f34b20aac15"
+    },
+    {
+      "original": "/private/tmp/lingxi-r07-tests/tmp/lingxi-skills-completion-e0a8cb7684db1f76/home/skills-boundary-evidence/stdout.log",
+      "copy": "artifacts/rust-tauri/R07/T08/skills-failure-real1-safe-scene/skills-boundary-evidence/stdout.log",
+      "sha256": "60fdcaa1718e9c6aab25faa68d84901420a558398ebf11291b500fadbce1f787"
+    },
+    {
+      "original": "/private/tmp/lingxi-r07-tests/tmp/lingxi-skills-completion-e0a8cb7684db1f76/home/skills-boundary-evidence/stderr.log",
+      "copy": "artifacts/rust-tauri/R07/T08/skills-failure-real1-safe-scene/skills-boundary-evidence/stderr.log",
+      "sha256": "72513b34cad7b4cc4f1ae8bef7ee47b23d6174059dc683359b0a6dda54f50413"
+    }
+  ],
+  "ownedHashesBeforeFix": {
+    "desktop/src/react/settings/tabs/SkillsTab.tsx": "9d005930ad5353f9299bdd61bf1cd193aec134cc0a2101a39bb7c99f52739966",
+    "desktop/src/react/components/SkillsPanel.tsx": "673e1f046aeabc682dca6597de7b7a46af44865010526461b281064d58401ded",
+    "desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx": "dcbc4272e832e1c4ad50382f5de8d3f3bc06dda10c931943787e051fd543efe4",
+    "rust/crates/lingxi-service/tests/r06_skills_completion.rs": "677e3637376303503b38058ede84f5852f338e7e07bcc213c04864c4d5838953",
+    "desktop/src/locales/zh.json": "43da0a28f7140ab9376b4665039d6afe1827e558f627d710df258482faa0832c",
+    "desktop/src/locales/en.json": "c642077fd4b2e11d566307eb27534bdcb078f8ee132371ac215027c40b9d9ab4",
+    "desktop/src/locales/ja.json": "4816fba6d19ccd596faf80a50af2180122ec8319dd7b44c3464c9582341bf5e5",
+    "desktop/src/locales/ko.json": "58d5f0443c0df5f13e950c36aba1572ac8da2b94478f2d81654ac39b7eed84ff",
+    "desktop/src/locales/zh-TW.json": "e9812c1e287cd610df5b82f3d2c41f9104245bfb36c52ff5ec7665b886fe7898"
+  },
+  "beforeExecutionHashesAvailable": false,
+  "globalUnchangedClaim": false,
+  "findings": [
+    "SkillsTab legitimately renders manage and agent trees with same bundle ids; test selected globally instead of manage tree",
+    "first settings failed before mutation; shared skill remained in its source; panel correctly issued three affected bundle PUTs",
+    "toast spy copied by Zustand updates remained a mock after restore; subsequent spy wrapped itself recursively"
+  ]
+}

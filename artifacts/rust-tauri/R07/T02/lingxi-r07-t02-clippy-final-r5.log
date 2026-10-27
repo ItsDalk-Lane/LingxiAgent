@@ -1,0 +1,108 @@
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error: this `MutexGuard` is held across an await point
+   --> crates/lingxi-service/tests/r07_bridge_sdk_platforms.rs:655:9
+    |
+655 |     let observed = h.provider.observed.lock().unwrap();
+    |         ^^^^^^^^
+    |
+    = help: consider using an async-aware `Mutex` type or ensuring the `MutexGuard` is dropped before calling `await`
+note: these are all the await points this lock is held through
+   --> crates/lingxi-service/tests/r07_bridge_sdk_platforms.rs:693:14
+    |
+693 |             .await,
+    |              ^^^^^
+...
+698 |             .await,
+    |              ^^^^^
+...
+729 |         .await;
+    |          ^^^^^
+...
+733 |     let home = h.close().await;
+    |                          ^^^^^
+734 |     let restarted = Harness::boot_with_safety(platform, Some(home), true).await;
+    |                                                                           ^^^^^
+735 |     restarted.wait_connected().await;
+    |                                ^^^^^
+...
+747 |     .await
+    |      ^^^^^
+748 |     .expect("新正式 worker 必须完成重复消息投递");
+749 |     tokio::time::sleep(Duration::from_millis(300)).await;
+    |                                                    ^^^^^
+...
+756 |             .await,
+    |              ^^^^^
+...
+759 |     assert_eq!(restarted.scalar("SELECT CAST(COUNT(*) AS TEXT) FROM invocation_journal WHERE phase='failed' AND dispatched=0").await, "...
+    |                                                                                                                                ^^^^^
+...
+768 |     let home = restarted.close().await;
+    |                                  ^^^^^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#await_holding_lock
+    = note: `-D clippy::await-holding-lock` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::await_holding_lock)]`
+
+error: this `MutexGuard` is held across an await point
+   --> crates/lingxi-service/tests/r07_bridge_sdk_platforms.rs:675:9
+    |
+675 |     let refusals = h.provider.refusals.lock().unwrap();
+    |         ^^^^^^^^
+    |
+    = help: consider using an async-aware `Mutex` type or ensuring the `MutexGuard` is dropped before calling `await`
+note: these are all the await points this lock is held through
+   --> crates/lingxi-service/tests/r07_bridge_sdk_platforms.rs:693:14
+    |
+693 |             .await,
+    |              ^^^^^
+...
+698 |             .await,
+    |              ^^^^^
+...
+729 |         .await;
+    |          ^^^^^
+...
+733 |     let home = h.close().await;
+    |                          ^^^^^
+734 |     let restarted = Harness::boot_with_safety(platform, Some(home), true).await;
+    |                                                                           ^^^^^
+735 |     restarted.wait_connected().await;
+    |                                ^^^^^
+...
+747 |     .await
+    |      ^^^^^
+748 |     .expect("新正式 worker 必须完成重复消息投递");
+749 |     tokio::time::sleep(Duration::from_millis(300)).await;
+    |                                                    ^^^^^
+...
+756 |             .await,
+    |              ^^^^^
+...
+759 |     assert_eq!(restarted.scalar("SELECT CAST(COUNT(*) AS TEXT) FROM invocation_journal WHERE phase='failed' AND dispatched=0").await, "...
+    |                                                                                                                                ^^^^^
+...
+768 |     let home = restarted.close().await;
+    |                                  ^^^^^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#await_holding_lock
+
+error: could not compile `lingxi-service` (test "r07_bridge_sdk_platforms") due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: using `clone` on type `SchemaBudget` which implements the `Copy` trait
+   --> crates/lingxi-service/tests/r07_automation_permission.rs:417:9
+    |
+417 |         budget.clone(),
+    |         ^^^^^^^^^^^^^^ help: try removing the `clone` call: `budget`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#clone_on_copy
+    = note: `-D clippy::clone-on-copy` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::clone_on_copy)]`
+
+error: using `clone` on type `SchemaBudget` which implements the `Copy` trait
+   --> crates/lingxi-service/tests/r07_automation_permission.rs:496:9
+    |
+496 |         budget.clone(),
+    |         ^^^^^^^^^^^^^^ help: try removing the `clone` call: `budget`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#clone_on_copy
+
+error: could not compile `lingxi-service` (test "r07_automation_permission") due to 2 previous errors

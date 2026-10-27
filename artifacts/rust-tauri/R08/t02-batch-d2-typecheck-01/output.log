@@ -1,0 +1,10 @@
+
+> lingxi@0.1.43 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+desktop/src/react/services/rust-browser.ts(29,7): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+desktop/src/react/services/rust-browser.ts(64,13): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+desktop/src/react/services/rust-browser.ts(67,13): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+desktop/src/react/utils/file-preview.ts(200,5): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+desktop/src/react/utils/markdown-cover-actions.ts(29,20): error TS2532: Object is possibly 'undefined'.
+desktop/src/react/utils/markdown-cover-actions.ts(29,20): error TS2722: Cannot invoke an object which is possibly 'undefined'.

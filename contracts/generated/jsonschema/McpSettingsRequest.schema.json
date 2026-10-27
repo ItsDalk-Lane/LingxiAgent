@@ -1,0 +1,43 @@
+{
+  "$defs": {
+    "McpSettingsAction": {
+      "enum": [
+        "mcp.global.enabled",
+        "mcp.global.defer",
+        "mcp.connector.add",
+        "mcp.connector.add_bulk",
+        "mcp.connector.update",
+        "mcp.connector.remove",
+        "mcp.connector.start",
+        "mcp.connector.stop",
+        "mcp.connector.refresh_tools",
+        "mcp.agent.connector.enable",
+        "mcp.agent.tool.enable"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "payload 由对应动作的管理器校验；兼容连接器保留字段，不可夹带身份或授权。",
+  "properties": {
+    "action": {
+      "$ref": "#/$defs/McpSettingsAction"
+    },
+    "agentId": {
+      "default": null,
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "payload": {
+      "default": {}
+    }
+  },
+  "required": [
+    "action"
+  ],
+  "title": "McpSettingsRequest",
+  "type": "object"
+}

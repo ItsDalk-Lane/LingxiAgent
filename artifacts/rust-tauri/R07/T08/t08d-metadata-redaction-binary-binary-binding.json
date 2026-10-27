@@ -1,0 +1,18 @@
+{
+  "candidate": "t08d",
+  "gate": "metadata-redaction-binary",
+  "wrapperSha256": "77a507461d37c22e82fcc9941e4860b462e28d67288421c1ee276fddf3490134",
+  "binary": "/private/tmp/lingxi-r07-build/debug/lingxi-service",
+  "binarySha256Before": "d91fbf82e0dd91f80b71264a66570e08972c3c0d1f0cfadaaa41a9c417a6821c",
+  "binarySha256After": "d91fbf82e0dd91f80b71264a66570e08972c3c0d1f0cfadaaa41a9c417a6821c",
+  "binaryUnchanged": true,
+  "buildReceipt": "t08d-build.json",
+  "buildReceiptSha256": "e84f233f4357107bc4fd442ba708164891d30e3ae91cb1e7f0d8fd7316a8d7f0",
+  "uiReceipt": "t08d-metadata-redaction-binary.json",
+  "uiReceiptSha256": "9fb1a2ef40e4ec6eb685b2d95c341215c19991268bfcae7ffa84968ca07505dc",
+  "sourceFingerprint": "ce4642863c79eaa2d15dedff7c579b56649a9bc2c4cf133e6647faa70879664b",
+  "startedAt": "2026-10-18T09:01:06.105324+00:00",
+  "endedAt": "2026-10-18T09:01:12.877769+00:00",
+  "wrapperExitCode": 0,
+  "scope": "fresh same-candidate build used by actual service UI test; build success does not imply other platforms or manual browser takeover"
+}

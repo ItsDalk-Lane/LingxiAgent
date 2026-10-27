@@ -1,3 +1,4 @@
+import type { BrowserAction as ProtocolBrowserAction, BrowserWorkspace as ProtocolBrowserWorkspace } from '../../../contracts/generated/ts/lingxi-protocol';
 import type { ThinkingLevel } from './stores/model-slice';
 
 // ── Auto-update ──
@@ -193,6 +194,11 @@ export interface KeepAwakeStatus {
 }
 
 export type DesktopNotificationFocusPolicy = 'always' | 'when_unfocused';
+
+export interface DesktopNotificationReceipt {
+  shown: boolean;
+  reason?: 'hana_focused' | 'unsupported' | 'failed' | 'unconfirmed';
+}
 
 export interface DesktopNotificationOptions {
   desktopFocusPolicy?: DesktopNotificationFocusPolicy;
@@ -493,7 +499,12 @@ export interface BrowserViewerTab {
   updatedAt?: number;
 }
 
+export type RustBrowserAction = Extract<ProtocolBrowserAction, 'back' | 'forward' | 'reload' | 'new_tab' | 'switch_tab' | 'close_tab' | 'show' | 'takeover' | 'release'>;
+export interface RustBrowserViewerContext { connectionKey: string; sessionPath: string; executionNode: string; serviceLabel: string; serviceUrl: string; }
+export type RustBrowserWorkspace = ProtocolBrowserWorkspace;
+
 export interface BrowserViewerUpdate {
+  executionNode?: string;
   title?: string;
   url?: string | null;
   canGoBack?: boolean;
@@ -508,17 +519,43 @@ export interface BrowserViewerUpdate {
 }
 
 export interface BrowserViewerOpenTarget {
+  connectionKey?: string;
   url?: string | null;
   sessionPath?: string | null;
 }
 
 // ── Platform API 类型声明 ──
+export interface QuickChatSessionTarget {
+  sessionPath: string;
+  sessionId: string | null;
+  ownerKey: string;
+}
+export interface QuickChatOpenSessionRequest extends QuickChatSessionTarget {
+  requestId: string;
+  expiresAt: number;
+}
+export interface QuickChatOpenSessionResult {
+  ok: boolean;
+  requestId?: string | null;
+  sessionId?: string | null;
+  sessionPath?: string | null;
+  ownerKey?: string;
+  code?: string;
+  message?: string;
+}
+
 export interface PlatformApi {
+  /** 宿主已安装互动卡片脚本的导航阻断。 */
+  cardFrameNavigationGuard?: boolean;
   getServerPort(): Promise<string>;
   getServerToken(): Promise<string>;
+  getServerConnectionInfo?(): Promise<{ port: number | null; token: string | null; serverNodeKind: string | null; serverNodeTransport: string; host?: string | null }>;
   runEditCommand?(command: 'cut' | 'copy' | 'paste' | 'selectAll'): Promise<boolean>;
   openSettings(tab?: string): void;
-  openBrowserViewer(target?: string | BrowserViewerOpenTarget): void;
+  openBrowserViewer(target?: string | BrowserViewerOpenTarget): void | Promise<unknown>;
+  setBrowserConnection?(connection: import('./services/server-connection').ServerConnection | null): Promise<string | null>;
+  getBrowserViewerContext?(): Promise<RustBrowserViewerContext | null>;
+  rustBrowserRequest?(target: BrowserViewerOpenTarget, action: RustBrowserAction | 'workspaces' | 'stop' | 'open', options?: { tabId?: string; url?: string }): Promise<unknown>;
   selectFolder(): Promise<string | null>;
   selectFiles(options?: { multiple?: boolean }): Promise<string[]>;
   selectSkill(): Promise<string | null>;
@@ -560,7 +597,7 @@ export interface PlatformApi {
   onViewerClosed?(callback: (windowId: number) => void): void;
   openFolder(path: string): void;
   openFile(path: string): void;
-  openExternal(url: string): void;
+  openExternal(url: string): void | Promise<void | { ok: boolean; error?: string }>;
   showInFinder(path: string): void;
   trashItem?(path: string): Promise<boolean>;
   browserEmergencyStop?(sessionPath?: string | null): void;
@@ -570,7 +607,7 @@ export interface PlatformApi {
   onSettingsChanged(callback: (event: string, payload: unknown) => void): void | (() => void);
   onOpenSettingsModal?(callback: (tab?: string) => void): void | (() => void);
   onSwitchTab?(callback: (tab: string) => void): void | (() => void);
-  onServerRestarted?(callback: (data: { port: number; token?: string | null }) => void): void | (() => void);
+  onServerRestarted?(callback: (data: { port: number; token?: string | null; serverNodeKind?: string | null; serverNodeTransport?: string | null }) => void): void | (() => void);
   getFilePath?(file: File): string | null;
   startDrag?(filePaths: string | string[]): void;
   appReady(): void;
@@ -605,7 +642,7 @@ export interface PlatformApi {
   onboardingComplete?(): Promise<void>;
 
   // ── Notification ──
-  showNotification?(title: string, body: string, agentId?: string | null, options?: DesktopNotificationOptions): void;
+  showNotification?(title: string, body: string, agentId?: string | null, options?: DesktopNotificationOptions): Promise<DesktopNotificationReceipt> | void;
 
   // ── App info ──
   getAppVersion?(): Promise<string>;
@@ -654,8 +691,8 @@ export interface PlatformApi {
   quickChatShortcutStatus?(): Promise<{ shortcut: string; registered: boolean; shortcuts?: string[] }>;  quickChatShow?(): void;
   quickChatHide?(): void;
   quickChatResize?(request: 'compact' | 'chat' | { mode: 'compact' | 'chat'; height?: number }): void;
-  quickChatOpenSession?(sessionPath: string): void;
-  onQuickChatOpenSession?(callback: (payload: { sessionPath?: string }) => void): (() => void) | void;
+  quickChatOpenSession?(target: QuickChatSessionTarget): Promise<QuickChatOpenSessionResult>;
+  onQuickChatOpenSession?(callback: (payload: QuickChatOpenSessionRequest) => Promise<QuickChatOpenSessionResult>): (() => void) | void;
   onQuickChatShown?(callback: () => void): (() => void) | void;
 
   // ── Skill viewer overlay ──

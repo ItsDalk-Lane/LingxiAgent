@@ -1,0 +1,41 @@
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.85s
+     Running tests/r06_memory_tool_completion.rs (rust/target-r07/debug/deps/r06_memory_tool_completion-0889d022d5fa9e86)
+
+running 12 tests
+test ex06_agent_selected_models_actual_wire_scope_usage_restart_and_invalid_configs ... ok
+test experience_failed_index_publish_keeps_operation_gate_through_document_rollback ... ok
+test experience_operation_gate_survives_memory_directory_creation_and_agent_path_alias ... ok
+test experience_record_sync_rebuild_and_rollback_share_one_agent_operation_gate ... ok
+test independent_agent_without_memory_embedding_must_not_spend_global_embedding ... ok
+test independent_concurrent_record_successes_are_all_recallable ... ok
+test large_native_details_share_projection_budget_keep_raw_and_restore_same_projection ... ok
+test memory_search_status_no_hits_not_searched_and_agent_channel_isolation ... ok
+test memory_semantic_real_provider_no_model_no_coverage_timeout_and_actual_vector_hits ... ok
+test record_and_recall_registered_tools_preserve_failures_and_agent_boundaries ... ok
+test unpin_changed_matches_during_confirmation_refuse_all_deletions ... ok
+test unpin_review_actual_scope_structured_counts_history_and_agent_isolation ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.11s
+

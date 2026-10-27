@@ -35,6 +35,8 @@
     "copySource": "Copy source"
   },
   "quickChat": {
+    "title": "Quick Chat",
+    "openSessionFailed": "Could not open this conversation. Quick Chat remains open.",
     "close": "Close Quick Chat",
     "openFullSession": "Open full chat",
     "waitingReply": "Waiting for reply...",
@@ -142,6 +144,8 @@
     "settingsVectorRetentionHint": "Stale vectors from model switches or re-ingestion are removed automatically after the configured days without query use (1–3650); the latest in-use version is never affected"
   },
   "channel": {
+    "loadFailed": "Could not load. Existing content has been kept.",
+    "retry": "Retry",
     "tab": "Channels",
     "chatTab": "Chat",
     "moreTabs": "More tabs",
@@ -299,7 +303,8 @@
     "projectMore": "More",
     "projectNewChat": "New chat",
     "projectRemove": "Remove workspace",
-    "runningGroup": "Running"
+    "runningGroup": "Running",
+    "ungroupedChats": "Ungrouped"
   },
   "titlebar": {
     "currentChatTitle": "Current chat title",
@@ -510,7 +515,31 @@
       "retryFailed": "Regeneration failed",
       "submitting": "Submitting",
       "retryLabel": "Regenerate {kind}",
-      "kindSpeech": "Speech"
+      "kindSpeech": "Speech",
+      "phase": {
+        "submitting": "Submitting request",
+        "submitted": "Submitted; waiting for generation",
+        "generating": "Generating",
+        "downloading": "Generated; downloading",
+        "completed": "Generated and delivered",
+        "failed": "Generation failed",
+        "cancelled": "Local waiting stopped",
+        "unknown": "Result unconfirmed"
+      },
+      "stopWaiting": "Stop waiting",
+      "stopFailed": "Could not stop waiting",
+      "taskFailed": "Media task incomplete",
+      "localDeliveryStopped": "Further delivery to this conversation has stopped.",
+      "remoteOutcome": {
+        "failed": "The provider confirmed that generation failed.",
+        "completed": "Generation finished remotely; delivered files remain available.",
+        "unknown": "The remote result is unconfirmed and generation may continue."
+      },
+      "remoteCancel": {
+        "confirmed": "Remote cancellation is confirmed.",
+        "unsupported": "The provider cannot cancel; generation may still finish.",
+        "unknown": "Remote cancellation is unconfirmed."
+      }
     },
     "turnStatus": {
       "missingFinalAnswer": "No final reply was generated",
@@ -611,6 +640,15 @@
     "serverNotReady": "Server not ready",
     "loading": "Loading...",
     "reconnecting": "Reconnecting",
+    "reconnected": "Reconnected",
+    "wsTicketFailed": "Could not get a connection ticket",
+    "wsHandshakeFailed": "Server connection protocol mismatch",
+    "wsHandshakeTimedOut": "Server handshake timed out",
+    "wsConnectionFailed": "Could not connect to the server",
+    "wsConnectionClosed": "Server connection closed",
+    "serverRestartInvalid": "Invalid server restart details. Please retry.",
+    "rustCoreUnavailable": "Rust service connected, but chat is not migrated yet. Messages cannot be sent.",
+    "serverRestarting": "Server is restarting",
     "reconnect": "Reconnect"
   },
   "input": {
@@ -784,6 +822,9 @@
     "memoryOn": "Memory",
     "memoryOff": "Memory not used for this chat",
     "memoryDisabled": "Memory is off",
+    "fileTask": "File task",
+    "fileTaskBusy": "Choosing files…",
+    "fileTaskHint": "Choose files to start a file task",
     "agentSelector": "Choose agent",
     "placeholderTips": [
       "Type / to bring up the command menu",
@@ -1050,7 +1091,20 @@
       "failed": "📎 The file wasn't ready"
     },
     "browser": {
+      "stateReadFailed": "Cannot load browser status",
+      "controlledWindow": "Controlled browser",
+      "executionNode": "Runs on",
+      "sameWindowHint": "The page is in this service’s controlled Chromium window. Show, take over, and release operate on that same page.",
+      "userTakeover": "You are in control",
+      "suspended": "Suspended",
       "running": "🌐 {name} is browsing the web",
+      "stopped": "Stopped",
+      "revoked": "Assistant permission revoked",
+      "showControlled": "Show browser",
+      "takeover": "Take over",
+      "release": "Return to assistant",
+      "noVisibleWindow": "This service cannot show a browser window. Manual takeover is unavailable here.",
+      "workspaceUnavailable": "No browser workspace is available for this chat",
       "done": "🌐 {name} done with the browser",
       "failed": "🌐 {name}'s browser wouldn't cooperate"
     },
@@ -1107,6 +1161,7 @@
       "failed": "⚙️ The settings didn't change"
     },
     "automation": {
+      "importBlocked": "{count} older tasks could not be imported and remain paused. Check their original task data.",
       "running": "🤖 {name} is setting up an automation",
       "done": "🤖 {name} set up the automation",
       "failed": "🤖 The automation didn't get set up"
@@ -1515,6 +1570,7 @@
     "saved": "Saved ✿",
     "saveFailed": "Failed to save",
     "refreshFailed": "Refresh failed",
+    "rustCoreUnavailable": "Agent, model, and general settings are not available on the Rust service yet. Access settings remain available.",
     "fileChangedOnDisk": "The file changed on disk, so the stale save was skipped",
     "noChanges": "Nothing to save",
     "autoSaved": "Auto-saved ✿",
@@ -1549,6 +1605,7 @@
       "cookiesTitle": "Cookies",
       "acceptCookies": "Accept Cookies",
       "acceptCookiesHint": "When enabled, the in-app browser saves and sends website Cookies like a normal browser.",
+      "cookiePolicyChangeHint": "Changing the Cookie policy closes the current controlled pages. URLs and existing sign-in data are kept, but unsubmitted form changes may be lost. Reopen the pages to use the new policy.",
       "clearCookies": "Clear Cookies",
       "clearCookiesHint": "Clear Cookies and site data saved by the in-app browser.",
       "clearCookiesButton": "Clear",
@@ -1688,6 +1745,7 @@
       "hardwareAcceleration": "Hardware Acceleration",
       "hardwareAccelerationHint": "Use the GPU to render app windows. Turning this off takes effect on next launch and uses software rendering for Windows GPU-driver startup recovery.",
       "sidebar": "Sidebar",
+      "sidebarLoadFailed": "Could not load sidebar settings. Please retry.",
       "sessionListSingleLine": "Single-line session list",
       "sessionListSingleLineHint": "When enabled, each session uses one row. Hovering reveals the right-side actions while the title shortens with an ellipsis.",
       "rollbackFileChanges": "Undo file changes on rollback",
@@ -2116,6 +2174,7 @@
       "retention7d": "7 days",
       "maxFileSize": "Ignore files larger than",
       "viewBackups": "View Backups",
+      "backupsLoadFailed": "Could not load backups. Please retry.",
       "hideBackups": "Hide",
       "restoreBtn": "Restore",
       "noBackups": "No backups yet",
@@ -2136,7 +2195,11 @@
       "cancel": "Cancel",
       "confirm": "Confirm",
       "updated": "Avatar updated ✿",
-      "reset": "Avatar reset to default"
+      "reset": "Avatar reset to default",
+      "selectAgent": "Select an assistant first",
+      "readFailed": "Could not read the avatar image",
+      "ownerChanged": "The connection or assistant changed. Select the avatar again.",
+      "canvasUnavailable": "Avatar cropping canvas is unavailable"
     },
     "providers": {
       "title": "Registered Providers",
@@ -2235,6 +2298,11 @@
       "globalDefaults": "Global Defaults"
     },
     "oauth": {
+      "notPersisted": "Signed in for this session, but credentials were not saved. You may need to sign in after restarting.",
+      "loginRefreshFailed": "Signed in, but refreshing this page failed. Reload the status.",
+      "logoutRefreshFailed": "Signed out, but refreshing this page failed. Reload the status.",
+      "browserUnavailable": "This window cannot open the authorization page.",
+      "waitCancelled": "Stopped waiting locally. Authorization at the provider may still complete.",
       "title": "Quick Login",
       "login": "Login",
       "logout": "Logout",
@@ -2624,6 +2692,7 @@
       "disabled": "Disabled",
       "noSkills": "No skills available",
       "noUser": "No custom skills",
+      "loadFailed": "Could not load skills. Please try again.",
       "workspaceBadge": "Project",
       "copyToSkills": "Copy to your skills",
       "copied": "Copied ✓",
@@ -2708,6 +2777,7 @@
       "goalToggleDesc": "Attach token/time budgets to long tasks; one over-budget notice then the decision comes back to you"
     },
     "mcp": {
+      "selectAgentForDetails": "Create or select an agent to view connection details and agent permissions.",
       "masterTitle": "Master Switch",
       "masterName": "Enable Connectors",
       "masterDesc": "When off, new sessions receive no MCP connector tools. Frozen sessions keep their snapshot, but calls return an explicit error.",
@@ -3930,6 +4000,7 @@
       "recordingModifierOnly": "Modifier keys alone don't count — press a letter, number, or function key",
       "recordingNeedsModifier": "Combos need ⌘/Ctrl or Alt (F1–F12 can be used alone)",
       "registrationFailed": "Failed to register shortcut; it may already be in use by another app",
+      "savedReloadFailed": "Bindings were saved, but shortcut activation did not finish. Retry or restart the app.",
       "removeBinding": "Remove binding",
       "resetAll": "Reset all to defaults",
       "resetDone": "All shortcuts reset to defaults",
@@ -3965,6 +4036,29 @@
         "checking": "Checking…",
         "unavailable": "Detectable in the desktop app"
       }
+    },
+    "agentDeletion": {
+      "progressTitle": "Deletion cleanup",
+      "loadFailure": "Could not read or update deletion progress: {error}",
+      "deleted": "Assistant {id} has been deleted.",
+      "cleanupPending": "Remaining files still need cleanup.",
+      "referencesPending": "Assistant references still need updating. Switching to another assistant is not confirmed.",
+      "journalPending": "The deletion record still needs saving.",
+      "retry": "Retry cleanup",
+      "formatError": "Invalid deletion progress response",
+      "connectionChanged": "The connection changed. Reopen deletion progress.",
+      "resultChanged": "The connection changed. Cleanup results from the previous server have not been refreshed here."
+    },
+    "transfer": {
+      "title": "Import and export settings",
+      "hint": "Exports hide secrets. Imports merge included items and preserve other settings.",
+      "export": "Export settings",
+      "import": "Import settings",
+      "tooLarge": "The settings file must be at most 2 MiB.",
+      "connectionChanged": "The connection changed. Please try again.",
+      "partialApplied": "Settings took effect, but a later step is incomplete.",
+      "savedNotApplied": "Settings were saved but have not taken effect.",
+      "partialSaved": "Some settings were saved. Reload before making further changes."
     }
   },
   "onboarding": {
@@ -4086,6 +4180,11 @@
     }
   },
   "activity": {
+    "listLoadFailed": "Could not load activities. Previous results are retained.",
+    "actionFailed": "The action did not complete. Try again.",
+    "unconfirmed": "Result unconfirmed",
+    "cancelled": "Stopped",
+    "skipped": "Skipped this time",
     "title": "Activity",
     "empty": "No activity yet. Patrol runs and scheduled tasks will appear here.",
     "back": "Back",
@@ -4931,6 +5030,8 @@
     }
   },
   "devtools": {
+    "cardWindowUnsupported": "This window does not yet support secure interactive cards",
+    "cardServiceUnsupported": "This service does not yet support secure interactive cards",
     "heartbeat": "Heartbeat",
     "memoryExport": "Memory Export",
     "onboarding": "Onboarding",
@@ -5424,6 +5525,12 @@
     "mediaNoDisplayableFiles": "Generation result has no displayable files"
   },
   "sessionCollab": {
+    "decisionNotPersisted": "The action completed, but the decision was not saved. Do not repeat it after reopening.",
+    "queued": "Queued",
+    "queuedHint": "Confirmed and queued. The message will be sent when the target conversation is available.",
+    "unknown": "Unconfirmed",
+    "deliveryUnknown": "Delivery could not be confirmed. Check the target conversation before trying again.",
+    "retryMessage": "Retry first message",
     "messagePrefix": "[Message from agent \"{name}\", not the user]",
     "fromAgent": "Message from {name}",
     "expand": "Expand",
@@ -5731,5 +5838,30 @@
     "zoomOut": "Zoom out",
     "ungrouped": "Ungrouped",
     "forkBusy": "This session is generating a reply — try again later"
+  },
+  "systemPermissions": {
+    "title": "System permissions",
+    "description": "Lingxi needs macOS permission for microphone, speech recognition and notifications. The buttons below trigger the real system prompts.",
+    "microphone": "Microphone",
+    "speech": "Speech recognition",
+    "notification": "Notifications",
+    "request": "Request",
+    "testNotification": "Send test notification",
+    "granted": "Granted",
+    "denied": "Denied",
+    "unsupported": "Unsupported",
+    "failed": "Request failed",
+    "notRequested": "Not requested",
+    "micGranted": "Microphone granted",
+    "micDenied": "Microphone denied; enable it in System Settings",
+    "micUnsupported": "Microphone request unsupported here",
+    "speechGranted": "Speech recognition granted",
+    "speechDenied": "Speech recognition denied/unavailable",
+    "speechResult": "Speech permission state updated",
+    "notificationTitle": "Lingxi notification test",
+    "notificationBody": "If you see this, notifications are working.",
+    "notificationSent": "Test notification sent",
+    "notificationFailed": "Test notification failed",
+    "dismiss": "Dismiss"
   }
 }

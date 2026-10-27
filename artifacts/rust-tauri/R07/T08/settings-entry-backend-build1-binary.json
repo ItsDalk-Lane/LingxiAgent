@@ -1,0 +1,11 @@
+{
+  "scope": "DEVELOPMENT_BUILD_NOT_FROZEN_CANDIDATE",
+  "buildReceipt": "artifacts/rust-tauri/R07/T08/settings-entry-backend-build1.json",
+  "buildReceiptSha256": "1bfe74ec4b4ebcf8b28c471f38e928cc1a710a98344c1c7c3408072f1eb8f846",
+  "binary": "/private/tmp/lingxi-r07-build/debug/lingxi-service",
+  "binarySha256": "d7b56a69dfb584747618d8f0eb36d6ca92484b496158328c2fbc426ba4db2ece",
+  "bytes": 255584512,
+  "sourceFingerprintBefore": "6bd4e2e38bae069353e3c85de4fc7d63a12442f5e1d4afc92d0f17ba5f105ad2",
+  "sourceFingerprintAfter": "6bd4e2e38bae069353e3c85de4fc7d63a12442f5e1d4afc92d0f17ba5f105ad2",
+  "sourceUnchanged": true
+}

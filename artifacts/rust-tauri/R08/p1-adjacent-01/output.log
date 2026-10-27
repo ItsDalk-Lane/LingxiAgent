@@ -1,0 +1,11 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/services/websocket.test.ts (2 tests) 163ms
+ ✓ desktop/src/react/__tests__/services/r08-p1-data-epoch-hello.test.ts (13 tests) 556ms
+
+ Test Files  2 passed (2)
+      Tests  15 passed (15)
+   Start at  07:46:10
+   Duration  3.54s (transform 3.94s, setup 211ms, import 5.12s, tests 719ms, environment 0ms)
+

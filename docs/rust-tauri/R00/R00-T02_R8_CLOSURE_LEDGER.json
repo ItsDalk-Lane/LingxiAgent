@@ -1,0 +1,3993 @@
+{
+  "schema_version": 1,
+  "task_id": "R00-T02",
+  "basis": [
+    "R00-T02_UI_BRANCH_REVIEW.json",
+    "R00-T02_UI_BRANCH_REVIEW_B.json",
+    "R00-T02_RESULT_DRIFT_REVIEW.json",
+    "R00-T02_UI_BRIDGE_MODELS_AUDIT.json",
+    "R00-T02_UI_SKILLS_USAGE_AUDIT.json",
+    "R00-T02_SHARED_SETTINGS_AUDIT.json",
+    "R00-T02_UI_AGENT_PROVIDERS_AUDIT.json"
+  ],
+  "scope": "R7 冻结基线独立发现到 R8 候选的逐项消差；此账表不代替独立审阅",
+  "ui_finding_count": 71,
+  "ui_findings": [
+    {
+      "id": "A01",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "enabled=false and prompt valid",
+      "source_refs": [
+        "AutomationCard.tsx:132-139,118-127 -> AutomationPanel.tsx:126-132 POST /api/desk/cron action=update -> server/routes/desk.ts:1202-1259"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:panel:automation#03",
+          "feature_id": "F-D18-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CRON-UPDATE-267BDF",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A02",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "click an unselected card",
+      "source_refs": [
+        "AgentCardStack.tsx:332-337 -> AgentTab.tsx:231 -> settings/actions.ts:314-318,287-295 GET /api/settings/snapshot?agentId=..."
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#01",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:agent#01",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-READ-A9B0BB",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:agent#01",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-READ-07A5CE",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:agent#01",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:agent#01",
+          "feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:agent#01",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:agent#01",
+          "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:agent#01",
+          "feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SETTINGS-SNAPSHOT-SETTINGS-SNAPS-F62357",
+          "target_absent": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": "A02 原辅助报告误将 browseAgent 的 loadSettingsConfig 认作 settings snapshot；R8 深追 actions.ts:314-318,116-174 更正为六路并发 GET 加经验启用时 GET。"
+    },
+    {
+      "id": "A03",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "create manually",
+      "source_refs": [
+        "AgentTab.tsx:251 -> AgentCreateOverlay.tsx:46-68 POST /api/agents then switchToAgent -> settings/actions.ts:320-348 POST /api/agents/switch"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#01",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-SWITCH-POST-8B48FD",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A04",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "create from character card file",
+      "source_refs": [
+        "AgentCreateOverlay.tsx:78-120 POST /api/character-cards/plan then POST /api/character-cards/import then switchToAgent"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#01",
+          "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHARACTER-CARDS-CHARACTER-CARDS--FC999E",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:agent#01",
+          "feature_id": "F-D21-ROUTE_BEHAVIOR-BEHAVIOR-CHARACTER-CARDS-CHARACTER-CARDS-IMPORT--1ED782",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:agent#01",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-SWITCH-POST-8B48FD",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A05",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "open delete confirmation",
+      "source_refs": [
+        "AgentTab.tsx:247-249 -> AgentDeleteOverlay.tsx:55-69,34-52 GET /api/agents/:id/skills/cleanup-preview before confirmation"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#01",
+          "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-SKILLS-CLEANUP--6EA03A",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A06",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "drag card then release at different index",
+      "source_refs": [
+        "AgentCardStack.tsx:158-280,243-256 PUT /api/agents/order -> server/routes/agents.ts:461-485; cancelled or unchanged drag sends nothing"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#19",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ORDER-PUT-8D4356",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A07",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "click Set Primary",
+      "source_refs": [
+        "AgentCardStack.tsx:384-393 -> AgentTab.tsx:246 -> settings/actions.ts:350-370 PUT /api/agents/primary -> server/routes/agents.ts:442-455"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#02",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-PRIMARY-PUT-C0ADBA",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A08",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "identity or AGENTS.md changed; either or both",
+      "source_refs": [
+        "AgentTab.tsx:379-383,129-164 conditionally PUT /api/agents/:id/identity and /agents-md -> server/routes/agents.ts:818-833,860-883; no change sends neither"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#03",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-PUT-856B28",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:agent#03",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-PUT-487080",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A09",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "edit or delete experience list item",
+      "source_refs": [
+        "AgentTab.tsx:415-428 -> AgentExperience.tsx:32-49 PUT /api/agents/:id/experience -> server/routes/agents.ts:1018+; toggle uses config update separately"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#05",
+          "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-PUT-DCF083",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A10",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "test icon clicked with edited API key",
+      "source_refs": [
+        "ApiKeyCredentials.tsx:236-245,124-175 first PUT /api/config through saveProviderConfigPatch :17-23 then optionally POST /api/providers/test :158-169; unedited key calls verifyOnly :186-215; edited empty non-local key saves without test per api-key-save-plan.ts:46-49"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:providers#06",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDER-GLOBAL-SAVE-9FBBC2",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A11",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "click Show Key while saved value is masked",
+      "source_refs": [
+        "KeyInput.tsx:121-128,33-57 -> ApiKeyCredentials.tsx:222-234,180-184 GET /api/providers/:name/api-key; Hide Key and unmasked value only change local state"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:providers#14",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-NAME-API-KEY-7ADA0D",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A12",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "select avatar then confirm crop",
+      "source_refs": [
+        "MeTab.tsx:76-110 -> CropOverlay.tsx:151-187 POST /api/avatar/user"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:me#02",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AVATAR-AVATAR-ROLE-AGENT-7570BE",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A13",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "toggle Keep Awake",
+      "source_refs": [
+        "GeneralTab.tsx:218-235 autoSaveConfig keep_awake then setKeepAwakeEnabled IPC; if IPC fails restore prior config"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:general#02",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-CONFIG-GLOBAL-UPDATE-24BC2E",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": "R9 纠正 R8 错误归属：keep_awake 虽经带助手 ID 的 PUT，splitByScope 将其移至全局 setter；空 agentPartial 不写助手 YAML。"
+    },
+    {
+      "id": "A14",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "restore all default bindings",
+      "source_refs": [
+        "KeybindingsTab.tsx:315-332 PUT /api/preferences/keybindings then keybindingsReloadGlobal -> preload.cjs:78 IPC; #02's global shortcut leaf does not cover this action"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:keybindings#03",
+          "feature_id": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-GLOBAL-SHORTCUT-5D5938",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A15",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "mount",
+      "source_refs": [
+        "AboutTab.tsx:335-341 -> preload.cjs:37 -> main.cjs:5410 get-app-version"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:about#01",
+          "feature_id": "F-D24-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-GET-APP-VERSION-01A133",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A16",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "different session; no cache or stale/conditionally revalidated cache",
+      "source_refs": [
+        "ConversationMapPage.tsx:230-242 or ConversationMapCanvas.tsx:440-445 -> session-actions.ts:1110-1217,1258-1263,856-889 GET /api/sessions/messages when cache/revision conditions require it"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:page:map#02",
+          "feature_id": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-MESSAGES-AA9EB3",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A17",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "branch send accepted or queued",
+      "source_refs": [
+        "conversation-map-send.ts:124-146 -> session-actions.ts:1110-1217 POST /api/sessions/switch and cache/revision-conditional GET messages"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:page:map#07",
+          "feature_id": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-SWITCH-FBDEED",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A18",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "external session change hidden under collapsed ancestor",
+      "source_refs": [
+        "ConversationMapPage.tsx:158-185 -> conversation-map-projection.ts:211-219 PUT layout.collapsed"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:page:map#01",
+          "feature_id": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONVERSATION-MAP-COLLAPSED-REPLA-94B9BE",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A19",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "OAuth start returns URL",
+      "source_refs": [
+        "McpTab.tsx:177-185 -> platform.openExternal(url)"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:mcp#06",
+          "feature_id": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-EXTERNAL-ACA2C4",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A20",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "successful mutation or OAuth wait resolves",
+      "source_refs": [
+        "McpTab.tsx:92-107,129-132,177-185,207-208 -> mcp-api.ts:22-37 GET /api/mcp/state"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:mcp#02",
+          "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-STATE-MCP-DD4727",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:mcp#03",
+          "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-STATE-MCP-DD4727",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:mcp#04",
+          "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-STATE-MCP-DD4727",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:mcp#05",
+          "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-STATE-MCP-DD4727",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:mcp#06",
+          "feature_id": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-STATE-MCP-DD4727",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A21",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "agent selected after beta or auto-check toggle",
+      "source_refs": [
+        "AboutTab.tsx:390-400 -> helpers.ts:92-113 -> actions.ts:116-174 GET config, identity, agents-md, public-agents-md, user-profile, preferences/models; experience enabled GET experience"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:about#03",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:about#04",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A22",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "sidebar toggle",
+      "source_refs": [
+        "ChannelList.tsx:93-105,150-157 -> channel-actions.ts:614-649 POST /api/channels/toggle"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:page:channels#01",
+          "feature_id": "F-D19-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHANNELS-CHANNELS-TOGGLE-POST-AB6659",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A23",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "valid name and at least two members",
+      "source_refs": [
+        "ChannelList.tsx:112-130 -> ChannelCreateOverlay.tsx:78-108 -> channel-actions.ts:661-681 POST /api/channels"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:page:channels#08",
+          "feature_id": "F-D19-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHANNELS-CHANNELS-POST-65D875",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A24",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "member activity with uncached session path",
+      "source_refs": [
+        "ChannelsPanel.tsx:703-723 -> ChannelsPanel.tsx:408-454 GET /api/sessions/messages"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:page:channels#06",
+          "feature_id": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-MESSAGES-AA9EB3",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A25",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "config cache miss",
+      "source_refs": [
+        "ActivityPanel.tsx:130-138 -> use-config.ts:32-39 GET /api/config"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:panel:activity#01",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-READ-A524D3",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A26",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "promote success with sessionPath",
+      "source_refs": [
+        "ActivityPanel.tsx:158-169 -> session-actions.ts:909-915,1110-1153 GET sessions then POST switch"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:panel:activity#03",
+          "feature_id": "F-D02-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSIONS-SESSIONS-SWITCH-FBDEED",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A27",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "reset success",
+      "source_refs": [
+        "BridgePanel.tsx:231-249 -> :95-116 GET status + sessions"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:panel:bridge#03",
+          "feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-STATUS-READ-5CB577",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A28",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "desktop file install chooser",
+      "source_refs": [
+        "SkillsPanel.tsx:353-361 -> preload.cjs:105 select-skill IPC"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:panel:skills#02",
+          "feature_id": "F-D21-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SELECT-SKILL-52A5D1",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A29",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "successful mutation and selected failure subpaths",
+      "source_refs": [
+        "SkillsPanel.tsx:170-198,307,345,392,416,422,460,467,490,514,556,600,604,631,646 GET skills + bundles"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:panel:skills#02",
+          "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-READ-8E11FA",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:panel:skills#03",
+          "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-READ-8E11FA",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:panel:skills#04",
+          "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-READ-8E11FA",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A30",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "shell update error or macOS DMG manual download fallback",
+      "source_refs": [
+        "AboutTab.tsx:228-240,258-275,369-372 -> preload.cjs:108 open-external IPC with releaseUrl or releases/latest"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:about#02",
+          "feature_id": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-EXTERNAL-ACA2C4",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A31",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "export succeeded and response.filePath is nonempty",
+      "source_refs": [
+        "SkillsPanel.tsx:524-543 -> preload.cjs:109 ipc:show-in-finder -> main.cjs:5986"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:panel:skills#04",
+          "feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-OPEN-CAA876",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A32",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "successful switch reaches workspace activation; file reads only with workspaceKey and endpoint depends on mountId; models GET after activation",
+      "source_refs": [
+        "session-actions.ts:1265-1291 -> desk-actions.ts:406-523,546-568,702-725; ui-helpers.ts:26-29"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:page:map#02",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A33",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "successful switch reaches workspace activation; file reads only with workspaceKey and endpoint depends on mountId; models GET after activation",
+      "source_refs": [
+        "session-actions.ts:1265-1291 -> desk-actions.ts:406-523,546-568,702-725; ui-helpers.ts:26-29"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:page:map#02",
+          "feature_id": "F-D19-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DESK-DESK-FILES-READ-B8313F",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A34",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "successful switch reaches workspace activation; file reads only with workspaceKey and endpoint depends on mountId; models GET after activation",
+      "source_refs": [
+        "session-actions.ts:1265-1291 -> desk-actions.ts:406-523,546-568,702-725; ui-helpers.ts:26-29"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:page:map#02",
+          "feature_id": "F-D19-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-WORKBENCH-WORKBENCH-FILES-BD5448",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A35",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "successful switch reaches workspace activation; file reads only with workspaceKey and endpoint depends on mountId; models GET after activation",
+      "source_refs": [
+        "session-actions.ts:1265-1291 -> desk-actions.ts:406-523,546-568,702-725; ui-helpers.ts:26-29"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:page:map#07",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A36",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "successful switch reaches workspace activation; file reads only with workspaceKey and endpoint depends on mountId; models GET after activation",
+      "source_refs": [
+        "session-actions.ts:1265-1291 -> desk-actions.ts:406-523,546-568,702-725; ui-helpers.ts:26-29"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:page:map#07",
+          "feature_id": "F-D19-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DESK-DESK-FILES-READ-B8313F",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A37",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "successful switch reaches workspace activation; file reads only with workspaceKey and endpoint depends on mountId; models GET after activation",
+      "source_refs": [
+        "session-actions.ts:1265-1291 -> desk-actions.ts:406-523,546-568,702-725; ui-helpers.ts:26-29"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:page:map#07",
+          "feature_id": "F-D19-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-WORKBENCH-WORKBENCH-FILES-BD5448",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A38",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "successful switch reaches workspace activation; file reads only with workspaceKey and endpoint depends on mountId; models GET after activation",
+      "source_refs": [
+        "session-actions.ts:1265-1291 -> desk-actions.ts:406-523,546-568,702-725; ui-helpers.ts:26-29"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:panel:activity#03",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A39",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "successful switch reaches workspace activation; file reads only with workspaceKey and endpoint depends on mountId; models GET after activation",
+      "source_refs": [
+        "session-actions.ts:1265-1291 -> desk-actions.ts:406-523,546-568,702-725; ui-helpers.ts:26-29"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:panel:activity#03",
+          "feature_id": "F-D19-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DESK-DESK-FILES-READ-B8313F",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A40",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "successful switch reaches workspace activation; file reads only with workspaceKey and endpoint depends on mountId; models GET after activation",
+      "source_refs": [
+        "session-actions.ts:1265-1291 -> desk-actions.ts:406-523,546-568,702-725; ui-helpers.ts:26-29"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:panel:activity#03",
+          "feature_id": "F-D19-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-WORKBENCH-WORKBENCH-FILES-BD5448",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A-IPC01",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "ExperimentsTab.tsx:391-416; experiment PATCH succeeds before event",
+      "source_refs": [
+        "desktop/preload.cjs:147 -> desktop/main.cjs:5653+"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:experiments#02",
+          "feature_id": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-CHANGED-15E163",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A-IPC02",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "GeneralTab.tsx:153-202; quick-chat preference PUT succeeds before event",
+      "source_refs": [
+        "desktop/preload.cjs:147 -> desktop/main.cjs:5653+"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:general#03",
+          "feature_id": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-CHANGED-15E163",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A-IPC03",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "InterfaceTab.tsx:344-375,431,449; theme/font/appearance events",
+      "source_refs": [
+        "desktop/preload.cjs:147 -> desktop/main.cjs:5653+"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:interface#02",
+          "feature_id": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-CHANGED-15E163",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A-IPC04",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "InterfaceTab.tsx:225-263; editor typography/chat layout events before save and rollback events on failed save",
+      "source_refs": [
+        "desktop/preload.cjs:147 -> desktop/main.cjs:5653+"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:interface#03",
+          "feature_id": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-CHANGED-15E163",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A-IPC05",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "InterfaceTab.tsx:265-277; hardware event after successful save",
+      "source_refs": [
+        "desktop/preload.cjs:147 -> desktop/main.cjs:5653+"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:interface#04",
+          "feature_id": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-CHANGED-15E163",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A-IPC06",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "InterfaceTab.tsx:279-305; sidebar event after successful PUT",
+      "source_refs": [
+        "desktop/preload.cjs:147 -> desktop/main.cjs:5653+"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:interface#05",
+          "feature_id": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-CHANGED-15E163",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A-IPC07",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "KeybindingsTab.tsx:219-240; event after successful PUT and optional global shortcut reload",
+      "source_refs": [
+        "desktop/preload.cjs:147 -> desktop/main.cjs:5653+"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:keybindings#02",
+          "feature_id": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-CHANGED-15E163",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A-IPC08",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "KeybindingsTab.tsx:315-332; event after successful PUT and global shortcut reload",
+      "source_refs": [
+        "desktop/preload.cjs:147 -> desktop/main.cjs:5653+"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:keybindings#03",
+          "feature_id": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-CHANGED-15E163",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "A-IPC09",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW.json",
+      "condition": "SecurityTab.tsx:113-120 after config save; main.cjs:5667-5670 applies desktop network proxy",
+      "source_refs": [
+        "desktop/preload.cjs:147 -> desktop/main.cjs:5653+"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:security#03",
+          "feature_id": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SETTINGS-CHANGED-15E163",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "B01",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "微信扫码窗口轮询返回 status=confirmed 且有 botToken；有 userId 时再绑定 owner",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/WechatSection.tsx:70",
+        "desktop/src/react/settings/tabs/bridge/WechatSection.tsx:80",
+        "desktop/src/react/settings/overlays/WechatQrcodeOverlay.tsx:123-143",
+        "desktop/src/react/settings/overlays/WechatQrcodeOverlay.tsx:64-96",
+        "server/routes/bridge.ts:367-380",
+        "server/routes/bridge.ts:383-487"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:bridge#03",
+          "feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PLATFORM-CREDENTIALS-SAVE-21BCAF",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:bridge#03",
+          "feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PLATFORM-ENABLE-29FD2C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:bridge#03",
+          "feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-OWNER-SET-34B747",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "B02",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "微信状态区开关；已有 token 时出现解绑按钮",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/WechatSection.tsx:21-56",
+        "desktop/src/react/settings/tabs/bridge/WechatSection.tsx:64-83",
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:74-80",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:358-378",
+        "server/routes/bridge.ts:367-380",
+        "server/routes/bridge.ts:383-487"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:bridge#02",
+          "feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PLATFORM-CREDENTIALS-SAVE-21BCAF",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:bridge#02",
+          "feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PLATFORM-ENABLE-29FD2C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:bridge#02",
+          "feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-PLATFORM-DISABLE-C16CB9",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:bridge#02",
+          "feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-OWNER-CLEAR-809F2D",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "B03",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "config 保存成功且仍选同一助手；owner 响应无可用 status；全局设置保存成功",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:358-378",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:423-445",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:447-473",
+        "desktop/src/react/settings/actions.ts:116-173"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:bridge#02",
+          "feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-STATUS-READ-5CB577",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:bridge#04",
+          "feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-STATUS-READ-5CB577",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:bridge#05",
+          "feature_id": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-BRIDGE-STATUS-READ-5CB577",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:bridge#05",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:bridge#05",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-READ-A9B0BB",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:bridge#05",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-READ-07A5CE",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:bridge#05",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:bridge#05",
+          "feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:bridge#05",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:bridge#05",
+          "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "B04",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "挂载 ModelsTab 的媒体默认值组件；窗口 focus 时另外重读前三类",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/ModelsTab.tsx:17-18",
+        "desktop/src/react/settings/tabs/models/MediaGlobalDefaultsSection.tsx:65-70",
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:253-337"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:models#01",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-READ-27A9F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:models#01",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-READ-1EA9E4",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:models#01",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-REA-2E137D",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:models#01",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-62106F",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "B05",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "API 子页有选中 provider 才挂 ProviderDetail；窗口 focus 重读前三类；凭据或 OAuth 状态成功后 onCredentialRefresh 重读四类；模型操作依类别与结果条件重读一类或四类",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/ProvidersTab.tsx:153-216",
+        "desktop/src/react/settings/tabs/providers/ProviderDetail.tsx:21-29",
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:253-344",
+        "desktop/src/react/settings/tabs/providers/ProviderModelList.tsx:212-217",
+        "desktop/src/react/settings/tabs/providers/ProviderModelList.tsx:219-312",
+        "desktop/src/react/settings/tabs/providers/ProviderModelList.tsx:348-381",
+        "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx:56-115",
+        "desktop/src/react/settings/actions.ts:116-173"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:providers#01",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-READ-27A9F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#01",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-READ-1EA9E4",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#01",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-REA-2E137D",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#01",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-62106F",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#04",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-READ-27A9F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#04",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-READ-1EA9E4",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#04",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-REA-2E137D",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#04",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-62106F",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#05",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-READ-27A9F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#05",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-READ-1EA9E4",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#05",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-REA-2E137D",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#05",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-62106F",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#10",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-READ-27A9F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#10",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-READ-1EA9E4",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#10",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-REA-2E137D",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#10",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-62106F",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#11",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-READ-27A9F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#11",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-READ-1EA9E4",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#11",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-REA-2E137D",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#11",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-62106F",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#12",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-READ-27A9F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#12",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-READ-1EA9E4",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#12",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-REA-2E137D",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#12",
+          "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-62106F",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#04",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#04",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-READ-A9B0BB",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#04",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-READ-07A5CE",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#04",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#04",
+          "feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#04",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#04",
+          "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#04",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#05",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#05",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-READ-A9B0BB",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#05",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-READ-07A5CE",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#05",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#05",
+          "feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#05",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#05",
+          "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#05",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#10",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#10",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-READ-A9B0BB",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#10",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-READ-07A5CE",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#10",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#10",
+          "feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#10",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#10",
+          "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#10",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#11",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#11",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-READ-A9B0BB",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#11",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-READ-07A5CE",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#11",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#11",
+          "feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#11",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#11",
+          "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#11",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#12",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#12",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-READ-A9B0BB",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#12",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-READ-07A5CE",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#12",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#12",
+          "feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#12",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#12",
+          "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#12",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": "媒体型模型仅重读相应 kind；chat/凭据/OAuth 路径才触发设置与摘要刷新。"
+    },
+    {
+      "id": "B06",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "点击安装卡，桌面 selectSkill 可用；选择路径后才安装，取消时不发 HTTP；拖入文件与浏览器文件回退不经过 selectSkill",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:170-205",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:527-549",
+        "desktop/preload.cjs:105",
+        "desktop/main.cjs:5766-5779",
+        "server/routes/skills.ts:382"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:skills#02",
+          "feature_id": "F-D21-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SELECT-SKILL-52A5D1",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "B07",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "点击技能行且 skill.baseDir 存在；组合内、未分组、外部兼容目录均使用 SkillRow；行内删除/开关阻止冒泡",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:558-572",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:600-608",
+        "desktop/src/react/settings/tabs/skills/SkillBundleTree.tsx:319-373",
+        "desktop/src/react/settings/tabs/skills/CompatPathDrawer.tsx:65-75",
+        "desktop/src/react/settings/tabs/skills/SkillRow.tsx:54-70",
+        "desktop/preload.cjs:189",
+        "desktop/main.cjs:5871"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:skills#10",
+          "feature_id": "F-D21-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SKILL-VIEWER-9CA8A4",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "B08",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "导出组合成功且服务端响应带 filePath；其他组合操作不调用此 IPC",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:280-298",
+        "desktop/preload.cjs:109",
+        "desktop/main.cjs:5986"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:skills#04",
+          "feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-OPEN-CAA876",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "B09",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "点击添加外部目录；选择系统目录后才 PUT；取消时不发请求",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:482-498",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:645",
+        "desktop/preload.cjs:103",
+        "desktop/main.cjs:5740-5751"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:skills#06",
+          "feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-PICKER-2FB382",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "B10",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "点击主页目录文本框或浏览按钮；取消目录选择不保存",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/WorkTab.tsx:198-211",
+        "desktop/src/react/settings/tabs/WorkTab.tsx:300-313",
+        "desktop/preload.cjs:103",
+        "desktop/main.cjs:5740-5751",
+        "server/routes/agents.ts:636"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:work#03",
+          "feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-PICKER-2FB382",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "B11",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "远端连接成功，或返回本机且本机连接可用",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/AccessTab.tsx:273-314",
+        "desktop/preload.cjs:138",
+        "desktop/main.cjs:6239"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:access#04",
+          "feature_id": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-RELOAD-MAIN-WINDOW-322E02",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "B12",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "人物卡导出成功且响应带 filePath；预览不触发文件管理器",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/AgentTab.tsx:175-212",
+        "desktop/preload.cjs:109",
+        "desktop/main.cjs:5986"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#06",
+          "feature_id": "F-D09-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-FILE-OPEN-CAA876",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "B13",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "OAuth start 请求成功并返回 URL",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx:23-49",
+        "desktop/preload.cjs:108"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:providers#09",
+          "feature_id": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OPEN-EXTERNAL-ACA2C4",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "B14",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "顶部刷新按钮在 usage/ledger/traces/settings 四个子页之一被点击",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:95-121",
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:183-188",
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:200-232"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:usage#03",
+          "feature_id": "F-D22-ROUTE_BEHAVIOR-BEHAVIOR-MODEL-OBSERVABILITY-MODEL-OBSERVABILITY-204546",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:usage#03",
+          "feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-5BEFE4",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:usage#06",
+          "feature_id": "F-D22-ROUTE_BEHAVIOR-BEHAVIOR-MODEL-OBSERVABILITY-MODEL-OBSERVABILITY-204546",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:usage#06",
+          "feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-5BEFE4",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:usage#09",
+          "feature_id": "F-D22-ROUTE_BEHAVIOR-BEHAVIOR-MODEL-OBSERVABILITY-MODEL-OBSERVABILITY-204546",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:usage#09",
+          "feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-5BEFE4",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:usage#11",
+          "feature_id": "F-D22-ROUTE_BEHAVIOR-BEHAVIOR-MODEL-OBSERVABILITY-MODEL-OBSERVABILITY-204546",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:usage#11",
+          "feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-5BEFE4",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "B15",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "访问摘要给出可用 mobileUrl 且网络配置不要求重启时，页面渲染二维码 img；无 mobileUrl 或需重启时不渲染",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/AccessTab.tsx:158-166",
+        "desktop/src/react/settings/tabs/AccessTab.tsx:567",
+        "server/routes/access.ts:66"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:access#01",
+          "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-QR-SVG-READ-5E4A9C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:access#03",
+          "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-QR-SVG-READ-5E4A9C",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": "同屏二维码资源读取与生成凭证按钮各自独立；#03 明列同屏自动效果。"
+    },
+    {
+      "id": "B16",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "缓存快照实验开关或只观察按钮使 next mode 等于 shadow；PATCH 成功后才重读观察记录；其他模式不重读",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:193-222",
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:245-262",
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:391-416"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:experiments#02",
+          "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-EXPERIMENTS-EXPERIMENTS-MEMORY-C-AD0384",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "B17",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "电脑使用区域显示批准列表，但没有批准或撤销控件",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:376-421",
+        "desktop/src/react/settings/tabs/ComputerUseSection.tsx:73-167",
+        "desktop/src/react/settings/tabs/ComputerUseSection.tsx:182-233",
+        "server/routes/preferences.ts:593-623"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:experiments#04",
+          "feature_id": "F-D15-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-COMPUTER-USE-AP-3FA31D",
+          "target_absent": true
+        },
+        {
+          "action_id": "ui:settings:experiments#04",
+          "feature_id": "F-D15-ROUTE_BEHAVIOR-BEHAVIOR-PREFERENCES-PREFERENCES-COMPUTER-USE-AP-38B14B",
+          "target_absent": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "B18",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "沙箱、沙箱网络、保留天数保存尝试之后；代理保存成功且已广播运行时事件之后",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:88-103",
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:113-120",
+        "desktop/src/react/settings/helpers.ts:92-108",
+        "desktop/src/react/settings/actions.ts:116-173"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:security#01",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:security#01",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-READ-A9B0BB",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:security#01",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-READ-07A5CE",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:security#01",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:security#01",
+          "feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:security#01",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:security#01",
+          "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:security#02",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:security#02",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-READ-A9B0BB",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:security#02",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-READ-07A5CE",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:security#02",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:security#02",
+          "feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:security#02",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:security#02",
+          "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:security#03",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:security#03",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-READ-A9B0BB",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:security#03",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-READ-07A5CE",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:security#03",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:security#03",
+          "feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:security#03",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:security#03",
+          "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "B19",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "姓名或个人资料至少一项变化且所发 PUT 均完成；无变化只 toast，不发请求或重读",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/MeTab.tsx:27-74",
+        "desktop/src/react/settings/tabs/MeTab.tsx:143-147",
+        "desktop/src/react/settings/actions.ts:116-173"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:me#02",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:me#02",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-READ-A9B0BB",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:me#02",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-READ-07A5CE",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:me#02",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:me#02",
+          "feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:me#02",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:me#02",
+          "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "B20",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "上述控件调用 autoSaveConfig，per-agent config PUT 成功后 helper 继续刷新配置；General 保持唤醒 IPC 失败回滚时再次调用该 helper",
+      "source_refs": [
+        "desktop/src/react/settings/helpers.ts:77-113",
+        "desktop/src/react/settings/tabs/GeneralTab.tsx:218-235",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:225-277",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:599-616",
+        "desktop/src/react/settings/tabs/WorkTab.tsx:130-136",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:281-292",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:402-405",
+        "desktop/src/react/settings/tabs/agent/AgentMemory.tsx:157-159",
+        "desktop/src/react/settings/tabs/agent/AgentToolsSection.tsx:70-77"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:general#02",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:interface#03",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:interface#04",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:interface#06",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:work#02",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:agent#02",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:agent#04",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:agent#05",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:agent#08",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "B21",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "辅助模型槽、视觉开关或搜索供应商选择调用 autoSaveGlobalModels，偏好 PUT 成功后立即重读偏好",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/AuxiliaryModelsSection.tsx:163-181",
+        "desktop/src/react/settings/tabs/providers/SearchProviderSection.tsx:30-41",
+        "desktop/src/react/settings/helpers.ts:115-135"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:models#02",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:models#03",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:providers#08",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "B22",
+      "independent_evidence": "R00-T02_UI_BRANCH_REVIEW_B.json",
+      "condition": "技能创建/远端拉取/安全审查开关提交配置后，组件总是调用 loadSettingsConfig；某些状态先打开警告弹窗，确认后才提交",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:88-107",
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:117-165",
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:192-244",
+        "desktop/src/react/settings/helpers.ts:92-113",
+        "desktop/src/react/settings/actions.ts:116-173"
+      ],
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:skills#07",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-CONFIG-READ-BC675C",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:skills#07",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-IDENTITY-READ-A9B0BB",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:skills#07",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-AGENTS-MD-READ-07A5CE",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:skills#07",
+          "feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-PUBLIC-AGENTS-M-3D7A95",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:skills#07",
+          "feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-USER-PROFILE-READ-429D86",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:skills#07",
+          "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+          "target_present": true,
+          "scenario_present": true
+        },
+        {
+          "action_id": "ui:settings:skills#07",
+          "feature_id": "F-D07-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-EXPERIENCE-READ-C8380C",
+          "target_present": true,
+          "scenario_present": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    }
+  ],
+  "result_drift_count": 67,
+  "result_drift": [
+    {
+      "no": 1,
+      "action_id": "ui:page:channels#01",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:139",
+        "desktop/src/react/components/ChannelsPanel.tsx:71",
+        "desktop/src/react/stores/channel-actions.ts:18",
+        "server/routes/channels.ts:424"
+      ],
+      "current_empty_or_uninitialized": "取消启用确认不发 toggle；停用无目录显示空态。",
+      "current_failure_or_forbidden": "toggle 失败保留原启停状态；列表读失败按各读路径表现，不把假空视为真实空。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 2,
+      "action_id": "ui:page:channels#02",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/components/channels/ChannelList.tsx:168",
+        "desktop/src/react/stores/channel-actions.ts:252",
+        "desktop/src/react/stores/channel-actions.ts:331",
+        "server/routes/channels.ts:524"
+      ],
+      "current_empty_or_uninitialized": "未选频道显示 selectHint；DM 输入只读",
+      "current_failure_or_forbidden": "频道消息 GET 失败仅记录日志，仍停在新频道的缓存/空消息；私信非 2xx 静默且不恢复旧频道；标已读 POST 失败仅 console.warn，本地未读数不回滚，无错误 toast。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 3,
+      "action_id": "ui:page:channels#03",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:139",
+        "desktop/src/react/components/ChannelsPanel.tsx:1139",
+        "desktop/src/react/components/ChannelsPanel.tsx:1210",
+        "desktop/src/react/stores/channel-actions.ts:489"
+      ],
+      "current_empty_or_uninitialized": "DM 只读；空文本禁用发送",
+      "current_failure_or_forbidden": "HTTP 或网络失败仅记录日志，消息不追加；发送函数吞错后输入框仍被清空，无 toast，原草稿不会保留。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 4,
+      "action_id": "ui:page:map#02",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:138",
+        "desktop/src/react/components/conversation-map/ConversationMapPage.tsx:274",
+        "desktop/src/react/components/conversation-map/ConversationMapCanvas.tsx:84",
+        "desktop/src/react/stores/session-actions.ts:63"
+      ],
+      "current_empty_or_uninitialized": "无当前会话不居中；已是当前会话只本地返回，不发 switch 或消息 GET；目标已有消息缓存时仍可能按修订状态条件校验/重读，修订一致且无需校验时不读取。；无工作区不读取工作区文件。",
+      "current_failure_or_forbidden": "点击卡片先更新 mapSelectedCard；异步 switchSession 失败时会话未切换且出现错误，但地图卡片已选中，不得笼统称保留原视图。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 5,
+      "action_id": "ui:panel:activity#01",
+      "r7_decision": "SPECIFY",
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:140",
+        "desktop/src/react/components/ActivityPanel.tsx:126",
+        "desktop/src/react/components/ActivityPanel.tsx:131",
+        "desktop/src/react/components/ActivityPanel.tsx:200"
+      ],
+      "current_empty_or_uninitialized": "empty/emptyForCategory 两态；配置缓存命中不发重复 GET。",
+      "current_failure_or_forbidden": "活动请求抛异常仅 console.warn 并保留旧列表；HTTP 200 的 {error} 体按 activities||[] 写成空列表，可能出现假 activity.empty。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 6,
+      "action_id": "ui:panel:activity#03",
+      "r7_decision": "FIX_BOTH",
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:140",
+        "desktop/src/react/components/ActivityPanel.tsx:160",
+        "desktop/src/react/components/ActivityPanel.tsx:360",
+        "server/routes/desk.ts:996"
+      ],
+      "current_empty_or_uninitialized": "无活动不显示；无工作区不读取工作区文件。",
+      "current_failure_or_forbidden": "promote 无 sessionPath 时直接返回，不重读/切换/移除；请求或后续切换异常仅 console.error，不显示错误 toast。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 7,
+      "action_id": "ui:panel:activity#04",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:140",
+        "desktop/src/react/components/ActivityPanel.tsx:147",
+        "desktop/src/react/components/ActivityPanel.tsx:184",
+        "server/routes/config.ts:289"
+      ],
+      "current_empty_or_uninitialized": "配置缺失显示初始值",
+      "current_failure_or_forbidden": "心跳保存失败回滚开关，无错误 toast；不可宣称已持久化。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 8,
+      "action_id": "ui:panel:automation#02",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/components/AutomationPanel.tsx:149",
+        "desktop/src/react/components/automation/AutomationCard.tsx:124",
+        "server/routes/desk.ts:331",
+        "server/routes/desk.ts:1062"
+      ],
+      "current_empty_or_uninitialized": "无助手时 toast 且不发请求；空提示词允许作为停用草稿保存。",
+      "current_failure_or_forbidden": "HTTP 非成功显示错误 toast；网络异常也由 catch 显示错误 toast，均不应显示新增成功。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 9,
+      "action_id": "ui:panel:automation#03",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/components/automation/AutomationCard.tsx:132",
+        "desktop/src/react/components/automation/AutomationCard.tsx:118",
+        "desktop/src/react/components/automation/AutomationCard.tsx:127",
+        "desktop/src/react/components/AutomationPanel.tsx:258"
+      ],
+      "current_empty_or_uninitialized": "未启用的 Agent 任务提示词为空时卡片显示错误 toast 且不发请求；未启用且其他草稿无变化时仍发送 enabled:true 的 update。",
+      "current_failure_or_forbidden": "启用 update 或停用 toggle 请求异常没有本地 catch/错误 toast，不能显示成功后的新状态；服务端拒绝启用时任务不得被视为已启用。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 10,
+      "action_id": "ui:panel:automation#04",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/components/AutomationPanel.tsx:117",
+        "desktop/src/react/components/automation/AutomationCard.tsx:124",
+        "server/routes/desk.ts:331",
+        "server/routes/desk.ts:1062"
+      ],
+      "current_empty_or_uninitialized": "没有可删任务时不显示该卡操作；无助手和空提示词不是删除限制。",
+      "current_failure_or_forbidden": "删除请求异常未由面板捕获，不能期待新增任务阶段的错误 toast；原卡不得被当作已删除。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 11,
+      "action_id": "ui:panel:automation#05",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/components/AutomationPanel.tsx:126",
+        "desktop/src/react/components/automation/AutomationCard.tsx:124",
+        "server/routes/desk.ts:331",
+        "server/routes/desk.ts:1062"
+      ],
+      "current_empty_or_uninitialized": "无字段变更不发请求；停用草稿可保留空提示词，启用限制在启停动作检查。",
+      "current_failure_or_forbidden": "更新请求异常未由面板捕获，不能期待新增任务阶段的错误 toast；失败不可宣称字段已持久保存。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 12,
+      "action_id": "ui:panel:bridge#01",
+      "r7_decision": "SPECIFY",
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:143",
+        "desktop/src/react/components/BridgePanel.tsx:86",
+        "desktop/src/react/components/BridgePanel.tsx:102",
+        "desktop/src/react/components/BridgePanel.tsx:103"
+      ],
+      "current_empty_or_uninitialized": "无会话显示空列表",
+      "current_failure_or_forbidden": "状态请求异常仅 console.error、可保留旧状态；会话列表若收到 HTTP 200 {error}，会按 sessions||[] 显示空列表。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 13,
+      "action_id": "ui:panel:bridge#02",
+      "r7_decision": "SCOPE",
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:143",
+        "desktop/src/react/components/BridgePanel.tsx:359",
+        "desktop/src/react/components/BridgePanel.tsx:390",
+        "desktop/src/react/components/BridgePanel.tsx:489"
+      ],
+      "current_empty_or_uninitialized": "无消息显示 noMessages",
+      "current_failure_or_forbidden": "共享会话消息读取失败不能算 bridge/messages 路由失败；按会话加载状态检查。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 14,
+      "action_id": "ui:panel:bridge#03",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:143",
+        "desktop/src/react/components/BridgePanel.tsx:236",
+        "desktop/src/react/components/BridgePanel.tsx:381",
+        "server/routes/bridge.ts:658"
+      ],
+      "current_empty_or_uninitialized": "无选中会话按钮不可用",
+      "current_failure_or_forbidden": "无当前 key/助手或重置失败不重读；助手切换产生 stale 结果时也不以旧结果覆盖新页。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 15,
+      "action_id": "ui:panel:bridge#04",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:143",
+        "desktop/src/react/components/BridgePanel.tsx:338",
+        "desktop/src/react/stores/settings-modal-actions.ts:9"
+      ],
+      "current_empty_or_uninitialized": "无适用空态",
+      "current_failure_or_forbidden": "本地状态切换没有窗口 IPC 失败分支；不能要求 IPC 错误提示。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 16,
+      "action_id": "ui:panel:skills#01",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:142",
+        "desktop/src/react/components/SkillsPanel.tsx:180",
+        "desktop/src/react/components/SkillsPanel.tsx:202",
+        "desktop/src/react/components/SkillsPanel.tsx:213"
+      ],
+      "current_empty_or_uninitialized": "loading 与 noUser 分开",
+      "current_failure_or_forbidden": "技能读取失败显示错误 toast 并保留旧列表；首次加载的初始空数组仍可显示 noUser 空态，不能说失败不会伪装空态。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 17,
+      "action_id": "ui:panel:skills#04",
+      "r7_decision": "SPECIFY",
+      "source_refs": [
+        "desktop/src/react/components/app/AppPages.tsx:142",
+        "desktop/src/react/components/SkillsPanel.tsx:480",
+        "desktop/src/react/components/SkillsPanel.tsx:504",
+        "desktop/src/react/components/SkillsPanel.tsx:526"
+      ],
+      "current_empty_or_uninitialized": "取消对话框无变更；导出无 filePath 不调用文件管理器，导出本身不重读双 GET。",
+      "current_failure_or_forbidden": "组合内多项移动用 Promise.all，可能部分成功；异常 toast 后不保证重载，不能承诺整体回滚或组合树完全一致。；写入失败不应把原有读取叶的成功结果当作本次写入完成。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 18,
+      "action_id": "ui:settings:about#03",
+      "r7_decision": "EQUIVALENT",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/AboutTab.tsx:195",
+        "desktop/src/react/settings/tabs/AboutTab.tsx:235",
+        "desktop/src/react/settings/tabs/AboutTab.tsx:390",
+        "desktop/src/react/settings/tabs/AboutTab.tsx:475"
+      ],
+      "current_empty_or_uninitialized": "无下载就绪禁安装；无 agentId/resourceKey 时 loadSettingsConfig 不发这些 GET。",
+      "current_failure_or_forbidden": "安装失败或平台不支持按 shell update 状态显示；train-update 的现役消费者在 SidebarNoticeSlot，不属于 About 页动作。；autoSaveConfig 失败仍会重读，不能以重读成功冒充写入成功。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 19,
+      "action_id": "ui:settings:about#04",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/AboutTab.tsx:397",
+        "desktop/src/react/settings/tabs/AboutTab.tsx:459",
+        "desktop/src/react/settings/helpers.ts:91",
+        "server/routes/agents.ts:636"
+      ],
+      "current_empty_or_uninitialized": "无适用空态；无 agentId/resourceKey 时 loadSettingsConfig 不发这些 GET。",
+      "current_failure_or_forbidden": "开关保存失败按配置路径提示；外链 void openExternal，打开失败没有页面提示。；autoSaveConfig 失败仍会重读，不能以重读成功冒充写入成功。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 20,
+      "action_id": "ui:settings:access#04",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/AccessTab.tsx:462",
+        "desktop/src/react/settings/tabs/AccessTab.tsx:587",
+        "desktop/src/react/settings/tabs/AccessTab.tsx:632",
+        "desktop/src/react/settings/tabs/AccessTab.tsx:681"
+      ],
+      "current_empty_or_uninitialized": "剪贴板 API 缺失时可跳过真实写入却仍显示 copied；远端地址或凭证缺失时连接不可完成。",
+      "current_failure_or_forbidden": "剪贴板写入 Promise 拒绝未捕获；远端连接失败由连接分支捕获提示且不切活跃服务，两种失败不能混写。；连接失败或本机连接不可用不重载。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 21,
+      "action_id": "ui:settings:agent#03",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/AgentTab.tsx:340",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:350",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:380",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:129"
+      ],
+      "current_empty_or_uninitialized": "无变更不写；无选中助手时文本若有变化，当前回调未做运行时 guard，仍可能请求 /api/agents/null/identity 或 /agents-md 并由服务端拒绝；身份与 AGENTS.md 都未变时显示无变更提示且不发这两项 PUT。",
+      "current_failure_or_forbidden": "身份或 AGENTS.md PUT 失败由 saveAgent 显示错误 toast；Yuan 切换失败仅 console.error，不统一显示 toast。；loadSettingsConfig 内部吞读错并置错误状态；Yuan 回调仅 console.error，不能保证保存失败 toast；身份/AGENTS 写入可出现部分成功。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 22,
+      "action_id": "ui:settings:agent#04",
+      "r7_decision": "SCOPE",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/AgentTab.tsx:227",
+        "desktop/src/react/settings/tabs/agent/AgentMemory.tsx:150",
+        "desktop/src/react/settings/tabs/agent/AgentMemory.tsx:156",
+        "desktop/src/react/settings/helpers.ts:91"
+      ],
+      "current_empty_or_uninitialized": "辅助模型状态未就绪时开关显示 loading；明确无辅助模型时禁用。；无 utility model 时仅本地提示/阻止，不发配置 PUT。",
+      "current_failure_or_forbidden": "保存失败不能称记忆状态已持久改变；查看、清理、梦和 tenets 分别由后续动作检查。；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 23,
+      "action_id": "ui:settings:agent#05",
+      "r7_decision": "SPECIFY",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/AgentTab.tsx:402",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:415",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:420",
+        "desktop/src/react/settings/tabs/AgentTab.tsx:426"
+      ],
+      "current_empty_or_uninitialized": "经验开关未初始化时显示加载/空状态；关闭时经验区显示暂停，开启但无经验条目时显示空提示。",
+      "current_failure_or_forbidden": "经验编辑/删除 PUT 失败显示错误 toast，但已乐观更新的列表不自动回滚；开关保存失败按 autoSaveConfig 结果处理。；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；helper 返回 false 时不执行第二轮 loadSettingsConfig；第二轮读取异常被内部记录为设置错误状态，不自动撤销已成功写入。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 24,
+      "action_id": "ui:settings:bridge#01",
+      "r7_decision": "SPECIFY",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:72",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:274",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:328",
+        "server/routes/bridge.ts:356"
+      ],
+      "current_empty_or_uninitialized": "未配置平台时服务端 status=disconnected，页面显示关闭/未连接。",
+      "current_failure_or_forbidden": "平台 status GET 失败仅 console.error 并返回 null，无错误 toast；不能把加载失败直接当未配置。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 25,
+      "action_id": "ui:settings:bridge#02",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:83",
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:129",
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:194",
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:248"
+      ],
+      "current_empty_or_uninitialized": "空凭据/未启用显示提示",
+      "current_failure_or_forbidden": "配置请求 2xx 后前端未检查 body.ok；错误响应体可能被当成功处理，需按状态与读回判断。；解绑 Promise.all 任一请求失败显示保存失败，另一请求仍可能已成功，重读后确认实际状态。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 26,
+      "action_id": "ui:settings:bridge#04",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:83",
+        "desktop/src/react/settings/tabs/bridge/PlatformSection.tsx:43",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:380",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:423"
+      ],
+      "current_empty_or_uninitialized": "未指定 owner 留空",
+      "current_failure_or_forbidden": "invalid platform 的 owner 写入可能返回 HTTP 200 且 body.ok=false；现有前端不检查 body，仍显示成功 toast，须记录此假成功。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 27,
+      "action_id": "ui:settings:bridge#06",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:340",
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:347",
+        "desktop/src/react/settings/tabs/BridgeTab.tsx:357",
+        "desktop/src/react/settings/tabs/bridge/useBridgeState.ts:140"
+      ],
+      "current_empty_or_uninitialized": "无助手时 textarea 仍可输入，但 onBlur 保存函数直接返回，不发 PUT；内容未变化也不发。",
+      "current_failure_or_forbidden": "公共说明读取失败仅 console.warn；保存 HTTP 非 2xx 或网络异常由 lingxiFetch 抛出并显示失败 toast；2xx 业务 body 未检查，可能误报保存成功。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 28,
+      "action_id": "ui:settings:experiments#01",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:200",
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:385",
+        "server/routes/experiments.ts:33",
+        "server/routes/experiments.ts:53"
+      ],
+      "current_empty_or_uninitialized": "默认关闭的实验显示 off；观察记录可空",
+      "current_failure_or_forbidden": "目录 GET 未捕获异常，finally 结束 loading，页面无专门加载错误；观察记录 GET 失败写 null，不能一概要求错误提示。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 29,
+      "action_id": "ui:settings:experiments#02",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:249",
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:313",
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:350",
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:392"
+      ],
+      "current_empty_or_uninitialized": "未注册实验不显示卡片；其它模式不触发这次观察读取。",
+      "current_failure_or_forbidden": "PATCH 抛错未由按钮处理成 toast，不能要求统一回滚/提示；主动委派仍默认关闭。；通知失败或保存失败不能冒充目标配置已完成。；observation 读取异常静默，不宣称观察记录已更新。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 30,
+      "action_id": "ui:settings:experiments#03",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:170",
+        "desktop/src/react/settings/tabs/ExperimentsTab.tsx:227",
+        "server/routes/experiments.ts:62",
+        "server/composition/open-root.ts:36"
+      ],
+      "current_empty_or_uninitialized": "原本无记录可无变化",
+      "current_failure_or_forbidden": "DELETE 抛错未由按钮处理成 toast，清除失败不可称记录已清零。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 31,
+      "action_id": "ui:settings:general#01",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/GeneralTab.tsx:97",
+        "desktop/src/react/settings/tabs/GeneralTab.tsx:117",
+        "desktop/src/react/settings/tabs/GeneralTab.tsx:138",
+        "desktop/preload.cjs:73"
+      ],
+      "current_empty_or_uninitialized": "加载前控件禁用/占位",
+      "current_failure_or_forbidden": "开机启动状态 GET 失败置 null 并隐藏开关；其他偏好按各自来源处理，不能统一断言保留快照或 toast。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 32,
+      "action_id": "ui:settings:general#02",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/GeneralTab.tsx:204",
+        "desktop/src/react/settings/tabs/GeneralTab.tsx:218",
+        "desktop/src/react/settings/tabs/GeneralTab.tsx:282",
+        "desktop/src/react/settings/tabs/GeneralTab.tsx:294"
+      ],
+      "current_empty_or_uninitialized": "平台不支持时禁用或显示不可用",
+      "current_failure_or_forbidden": "开机启动 IPC 设置失败恢复旧开关但无 toast；保持唤醒保存失败显示 toast，两项分别断言。；保持唤醒配置保存失败不调用 IPC，IPC 异常时回写旧配置。；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；该控件请求每助手 config 接口，但所涉字段由服务端归入全局 preferences；PUT 成功但后续 config GET 失败时可能显示保存失败，实际写入可能已生效。；保持唤醒 IPC 抛错时回写旧 keep_awake 后重读六项设置，经验启用时再读经验；loadSettingsConfig 自身吞读错，只记设置错误状态。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 33,
+      "action_id": "ui:settings:interface#02",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:337",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:358",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:390",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:405"
+      ],
+      "current_empty_or_uninitialized": "无适用空态",
+      "current_failure_or_forbidden": "外观同步保存失败仅 console.warn，不自动回滚当前外观，也无错误 toast；IPC 通知失败不能冒充目标设置已同步。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 34,
+      "action_id": "ui:settings:interface#06",
+      "r7_decision": "SPECIFY",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:585",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:599",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:616",
+        "desktop/src/react/settings/tabs/InterfaceTab.tsx:592"
+      ],
+      "current_empty_or_uninitialized": "无效 locale 回退已支持语言",
+      "current_failure_or_forbidden": "语言 autoSaveConfig 返回 false 时仍可调用 i18n.load 并显示成功 toast，可能与失败提示同现；时区保存失败由 helper 显示错误 toast。；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；该控件请求每助手 config 接口，但所涉字段由服务端归入全局 preferences；PUT 成功但后续 config GET 失败时可能显示保存失败，实际写入可能已生效。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 35,
+      "action_id": "ui:settings:keybindings#02",
+      "r7_decision": "SPECIFY",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/KeybindingsTab.tsx:169",
+        "desktop/src/react/settings/tabs/KeybindingsTab.tsx:219",
+        "desktop/src/react/settings/tabs/KeybindingsTab.tsx:428",
+        "desktop/src/react/settings/tabs/KeybindingsTab.tsx:438"
+      ],
+      "current_empty_or_uninitialized": "未录到有效组合不保存",
+      "current_failure_or_forbidden": "服务端 PUT 成功后若全局快捷键重载失败，前端回滚显示旧绑定，但服务端新绑定可能已持久化；冲突提示与保存失败分开核。；通知失败或保存失败不能冒充目标配置已完成。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 36,
+      "action_id": "ui:settings:keybindings#03",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/KeybindingsTab.tsx:305",
+        "desktop/src/react/settings/tabs/KeybindingsTab.tsx:310",
+        "desktop/src/react/settings/tabs/KeybindingsTab.tsx:316",
+        "desktop/src/react/settings/tabs/KeybindingsTab.tsx:371"
+      ],
+      "current_empty_or_uninitialized": "无自定义值可无变化",
+      "current_failure_or_forbidden": "单条恢复复用 saveCommandBindings：全局快捷键重载返回 ok:false 会抛错并回滚本地显示，但 PUT 已可能持久化。全部恢复的 keybindingsReloadGlobal 只 await 不检查返回 ok:false，返回失败对象仍会广播并提示恢复成功；若 IPC 抛错才进 catch 回滚本地，服务端默认值仍可能持久化。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 37,
+      "action_id": "ui:settings:mcp#01",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/McpTab.tsx:68",
+        "desktop/src/react/settings/tabs/mcp/mcp-api.ts:22",
+        "desktop/src/react/settings/tabs/McpTab.tsx:311",
+        "server/routes/mcp.ts:41"
+      ],
+      "current_empty_or_uninitialized": "无连接器显示添加入口",
+      "current_failure_or_forbidden": "连接器或权限读取失败仅 console.error，保留旧状态，无专门错误态或 toast。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 38,
+      "action_id": "ui:settings:mcp#06",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/McpTab.tsx:177",
+        "desktop/src/react/settings/tabs/mcp/OAuthWaitCard.tsx:24",
+        "desktop/src/react/settings/tabs/mcp/mcp-api.ts:22",
+        "server/routes/mcp.ts:351"
+      ],
+      "current_empty_or_uninitialized": "未登录显示登录入口；等待中可点击取消，取消请求后关闭等待卡。；无 agentId 时不发 state GET。",
+      "current_failure_or_forbidden": "启动、轮询 error/超时或取消请求失败按各自 catch 显示错误；外链打开未等待，拒绝不会进入登录 catch，仍继续轮询；轮询 cancelled 直接返回，connectOAuth 随后仍刷新并可能显示保存成功，不能将取消断言为安静退出。；启动失败不打开外链；取消分支不因取消本身重读 state。；取消本身不直接重读，但在途轮询若回到 cancelled 并正常结束，登录回调仍可能间接 loadState，需按并发结果验。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 39,
+      "action_id": "ui:settings:models#05",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/models/MediaGlobalDefaultsSection.tsx:95",
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:328",
+        "server/routes/media.ts:154"
+      ],
+      "current_empty_or_uninitialized": "加载中占位；无凭据或 adapter 不可用选项禁用",
+      "current_failure_or_forbidden": "图片配置 GET 失败只留在 hook.error，页面初次加载呈禁用/占位且没有专门错误提示；HTTP 非 2xx 或网络异常由 lingxiFetch 抛错，hook 显示错误 toast；200 响应无 values/config 时本地 patch 更新并显示成功，未追加 GET 校验。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 40,
+      "action_id": "ui:settings:models#06",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/models/MediaGlobalDefaultsSection.tsx:111",
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:328",
+        "server/routes/media.ts:176"
+      ],
+      "current_empty_or_uninitialized": "加载中占位；无凭据或 adapter 不可用选项禁用",
+      "current_failure_or_forbidden": "视频配置 GET 失败只留在 hook.error，页面初次加载呈禁用/占位且没有专门错误提示；HTTP 非 2xx 或网络异常由 lingxiFetch 抛错，hook 显示错误 toast；200 响应无 values/config 时本地 patch 更新并显示成功，未追加 GET 校验。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 41,
+      "action_id": "ui:settings:models#07",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/models/MediaGlobalDefaultsSection.tsx:127",
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:328",
+        "server/routes/media.ts:78"
+      ],
+      "current_empty_or_uninitialized": "加载中占位；无凭据或 adapter 不可用选项禁用",
+      "current_failure_or_forbidden": "语音合成配置 GET 失败只留在 hook.error，页面初次加载呈禁用/占位且没有专门错误提示；HTTP 非 2xx 或网络异常由 lingxiFetch 抛错，hook 显示错误 toast；200 响应无 values/config 时本地 patch 更新并显示成功，未追加 GET 校验。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 42,
+      "action_id": "ui:settings:models#08",
+      "r7_decision": "EQUIVALENT",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/models/MediaGlobalDefaultsSection.tsx:143",
+        "desktop/src/react/settings/hooks/useMediaSettingsData.ts:328",
+        "server/routes/speech-recognition.ts:67"
+      ],
+      "current_empty_or_uninitialized": "加载中占位；无凭据或 adapter 不可用选项禁用；语音转录总开关关闭时默认模型下拉禁用。",
+      "current_failure_or_forbidden": "语音转录配置 GET 失败由 hook 显示错误 toast，页面初次加载仍呈禁用/占位；PUT 保存失败也由 hook 显示错误 toast。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 43,
+      "action_id": "ui:settings:providers#01",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/ProvidersTab.tsx:13",
+        "desktop/src/react/settings/tabs/../actions.ts:29",
+        "server/routes/providers.ts:122",
+        "server/routes/config.ts:190"
+      ],
+      "current_empty_or_uninitialized": "配置中无供应商显示添加入口；摘要尚未返回时状态徽标可暂缺，不能据此认定未配置。",
+      "current_failure_or_forbidden": "供应商摘要请求失败在初始化处静默吞掉，不显示专门错误状态，旧摘要或空徽标可保留；配置快照加载失败另按设置初始化状态判断。；四类读取分别处理失败，不能把某一类失败伪装为全部成功。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 44,
+      "action_id": "ui:settings:providers#02",
+      "r7_decision": "SPECIFY",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/ProvidersTab.tsx:82",
+        "desktop/src/react/settings/tabs/ProvidersTab.tsx:164",
+        "desktop/src/react/settings/tabs/providers/ProviderList.tsx:92",
+        "desktop/src/react/settings/tabs/providers/ProviderList.tsx:96"
+      ],
+      "current_empty_or_uninitialized": "未配置项草稿未保存，重开页面不当作已持久配置；提交表单名称或 URL 空时显示表单错误。",
+      "current_failure_or_forbidden": "本地选择无网络保存失败；真正提交保存失败显示 toast，不能把临时草稿视为持久配置。；写入已成功而设置重读失败时 loadSettingsConfig 标 error，后续摘要刷新不执行，可能显示操作失败但服务端已持久化。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 45,
+      "action_id": "ui:settings:providers#04",
+      "r7_decision": "SCOPE",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/ProviderDetail.tsx:54",
+        "desktop/src/react/settings/tabs/providers/ApiKeyCredentials.tsx:18",
+        "desktop/src/react/settings/tabs/providers/ApiKeyCredentials.tsx:159",
+        "server/routes/config.ts:183"
+      ],
+      "current_empty_or_uninitialized": "无凭据显示 needs_setup；无助手时 loadSettingsConfig 不发设置读取；无媒体详情或未触发对应操作时不重读媒体集合。；Base URL 未编辑或修剪后与现值相同不写；API Format 未变不写；预设首次配置的 API Format 只更新本地草稿，等待首次保存。",
+      "current_failure_or_forbidden": "保存失败显示 toast，保留旧配置；连接测试失败由 #06 检查，不能混作保存失败。；四类读取分别处理失败，不能把某一类失败伪装为全部成功。；无选中助手或设置重读未 ready 时 ProviderTab.onRefresh 抛错，后续供应商摘要和媒体刷新不会执行；先前写入可能已成功。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 46,
+      "action_id": "ui:settings:providers#05",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/ProviderModelList.tsx:179",
+        "desktop/src/react/settings/tabs/providers/ProviderModelList.tsx:225",
+        "desktop/src/react/settings/tabs/providers/ProviderModelList.tsx:247",
+        "desktop/src/react/settings/tabs/providers/ProviderModelList.tsx:362"
+      ],
+      "current_empty_or_uninitialized": "发现返回零项显示发现失败提示；未添加模型时列表为空，不能把发现候选算作已保存。；无助手时 loadSettingsConfig 不发设置读取；无媒体详情或未触发对应操作时不重读媒体集合。；缓存 GET 返回无 models 时下拉候选为空。",
+      "current_failure_or_forbidden": "发现失败显示内联提示；聊天及媒体持久写入失败显示 toast，原保存列表不可冒称已变更。；四类读取分别处理失败，不能把某一类失败伪装为全部成功。；无选中助手或设置重读未 ready 时 ProviderTab.onRefresh 抛错，后续供应商摘要和媒体刷新不会执行；先前写入可能已成功。；缓存 GET 失败由 catch 静默，保留原候选状态，不显示主动发现失败提示。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 47,
+      "action_id": "ui:settings:providers#06",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/ApiKeyCredentials.tsx:236",
+        "desktop/src/react/settings/tabs/providers/ApiKeyCredentials.tsx:239",
+        "desktop/src/react/settings/tabs/providers/ApiKeyCredentials.tsx:242",
+        "desktop/src/react/settings/tabs/providers/ApiKeyCredentials.tsx:186"
+      ],
+      "current_empty_or_uninitialized": "输入框为空且 key 未编辑时 verifyOnly 仍可用已保存凭据；已编辑清空非本地 key 时不发送测试请求。",
+      "current_failure_or_forbidden": "保存或刷新失败不发送测试；实际测试失败显示错误 toast，不能把保存成功误称测试成功。；写入已成功而设置重读失败时 loadSettingsConfig 标 error，后续摘要/媒体刷新不执行，可能显示操作失败但服务端已持久化。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 48,
+      "action_id": "ui:settings:providers#07",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/ProviderModelList.tsx:690",
+        "desktop/src/react/settings/tabs/providers/ProviderModelList.tsx:698",
+        "desktop/src/react/settings/tabs/providers/ProviderMediaDefaultsModal.tsx:17",
+        "server/routes/media.ts:154"
+      ],
+      "current_empty_or_uninitialized": "没有已添加的对应媒体模型时默认参数按钮不出现。",
+      "current_failure_or_forbidden": "参数保存失败显示提示，不得称已改变全局默认图片/视频模型。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 49,
+      "action_id": "ui:settings:providers#08",
+      "r7_decision": "SPECIFY",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/ProvidersTab.tsx:256",
+        "desktop/src/react/settings/tabs/providers/SearchProviderSection.tsx:36",
+        "desktop/src/react/settings/tabs/providers/SearchApiKeyConfig.tsx:62",
+        "server/routes/preferences.ts:187"
+      ],
+      "current_empty_or_uninitialized": "尚未选择搜索供应商或缺有效 key 时按各控件状态处理；选择本身不代表 key 已通过验证。",
+      "current_failure_or_forbidden": "偏好保存失败与 API key 验证失败分别提示；验证成功后 loadSettingsConfig 读取失败仅在设置 store 标 error，仍保留此前成功 toast，不能承诺视图刷新。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 50,
+      "action_id": "ui:settings:providers#09",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/ProviderDetail.tsx:50",
+        "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx:25",
+        "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx:40",
+        "server/routes/auth.ts:194"
+      ],
+      "current_empty_or_uninitialized": "未登录显示登录按钮",
+      "current_failure_or_forbidden": "OAuth 启动请求失败显示 toast；授权 URL 的 openExternal 未 await，外部打开拒绝不会进入此 catch，页面仍可能显示码并开始轮询。；start 失败不打开外链。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 51,
+      "action_id": "ui:settings:providers#11",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx:82",
+        "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx:100",
+        "server/routes/auth.ts:322",
+        "server/routes/auth.ts:133"
+      ],
+      "current_empty_or_uninitialized": "300 秒内无结果结束轮询且未登录；无助手时 loadSettingsConfig 不发设置读取；无媒体详情或未触发对应操作时不重读媒体集合。",
+      "current_failure_or_forbidden": "轮询 HTTP 非 2xx 由 lingxiFetch 抛错，结束轮询并显示错误 toast；HTTP 2xx 若 status=error 同样报错。HTTP 2xx 缺少 status 时继续轮询直至超时；四类媒体读取分别处理失败，不能把某一类失败伪装为全部成功。；status=done 后 onRefresh 失败仍会先有成功 toast 再有失败 toast，服务端可能已登录。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 52,
+      "action_id": "ui:settings:providers#12",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx:107",
+        "server/routes/auth.ts:72",
+        "server/routes/auth.ts:372"
+      ],
+      "current_empty_or_uninitialized": "原未登录无退出按钮；无助手时 loadSettingsConfig 不发设置读取；无媒体详情或未触发对应操作时不重读媒体集合。",
+      "current_failure_or_forbidden": "退出登录 HTTP 非 2xx 或网络异常由 lingxiFetch 抛错并显示错误 toast，不进入成功刷新；HTTP 2xx 的 body 未读取，若业务上仍返回失败字段，成功 toast 不足以证明已退出；四类媒体读取分别处理失败。；logout 已成功但 onRefresh 失败时先成功 toast 后失败 toast，服务端可能已退出而界面状态未刷新。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 53,
+      "action_id": "ui:settings:security#01",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:88",
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:93",
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:156",
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:172"
+      ],
+      "current_empty_or_uninitialized": "sandbox 状态尚未初始化时为 undefined/loading；只有显式 false 时显示关闭警告，不把未加载当关闭。；无 agentId/resourceKey 时 loadSettingsConfig 不请求；经验未启用时不 GET experience。",
+      "current_failure_or_forbidden": "保存失败恢复开关；各项 GET 失败应与前序保存结果分开判断。；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；该控件请求每助手 config 接口，但所涉字段由服务端归入全局 preferences；PUT 成功但后续 config GET 失败时可能显示保存失败，实际写入可能已生效。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 54,
+      "action_id": "ui:settings:security#02",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:98",
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:122",
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:184",
+        "desktop/src/react/settings/tabs/SecurityTab.tsx:200"
+      ],
+      "current_empty_or_uninitialized": "无检查点显示空列表；无 agentId/resourceKey 时 loadSettingsConfig 不请求；经验未启用时不 GET experience。",
+      "current_failure_or_forbidden": "检查点列表 GET 失败直接设为空数组且无警告；页面可能呈假空态，不能要求显示读取错误。；各项 GET 失败应与前序保存结果分开判断。；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；该控件请求每助手 config 接口，但所涉字段由服务端归入全局 preferences；PUT 成功但后续 config GET 失败时可能显示保存失败，实际写入可能已生效。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 55,
+      "action_id": "ui:settings:sharing#01",
+      "r7_decision": "EQUIVALENT",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SharingTab.tsx:35",
+        "desktop/src/react/settings/tabs/SharingTab.tsx:81",
+        "desktop/src/react/settings/tabs/SharingTab.tsx:92",
+        "desktop/src/react/utils/screenshot-segments.ts:8"
+      ],
+      "current_empty_or_uninitialized": "默认 light",
+      "current_failure_or_forbidden": "当前同步 localStorage 写入无 catch/提示；浏览器禁止存储时该操作抛错，未观察到成功提示。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 56,
+      "action_id": "ui:settings:sharing#02",
+      "r7_decision": "EQUIVALENT",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SharingTab.tsx:38",
+        "desktop/src/react/settings/tabs/SharingTab.tsx:101",
+        "desktop/src/react/settings/tabs/SharingTab.tsx:113"
+      ],
+      "current_empty_or_uninitialized": "默认 mobile",
+      "current_failure_or_forbidden": "当前同步 localStorage 写入无 catch/提示；浏览器禁止存储时该操作抛错，未观察到成功提示。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 57,
+      "action_id": "ui:settings:sharing#03",
+      "r7_decision": "EQUIVALENT",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SharingTab.tsx:41",
+        "desktop/src/react/settings/tabs/SharingTab.tsx:52",
+        "desktop/src/react/settings/tabs/SharingTab.tsx:130",
+        "desktop/src/react/settings/tabs/SharingTab.tsx:144"
+      ],
+      "current_empty_or_uninitialized": "默认跟随阅读字体、默认上限",
+      "current_failure_or_forbidden": "当前同步 localStorage 写入无 catch/提示；浏览器禁止存储时该操作抛错，未观察到成功提示。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 58,
+      "action_id": "ui:settings:skills#07",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:577",
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:117",
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:143",
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:155"
+      ],
+      "current_empty_or_uninitialized": "配置未就绪开关为未加载态",
+      "current_failure_or_forbidden": "autoSaveConfig 失败须按返回值/提示核对，不能自动认为已保存；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；helper PUT 已成功但后续快照 GET 失败可能提示保存失败，需读回判实际状态。；SkillCapabilities 未检查 autoSaveConfig 返回值，保存失败后仍尝试 loadSettingsConfig。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 59,
+      "action_id": "ui:settings:skills#08",
+      "r7_decision": "SCOPE",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:32",
+        "desktop/src/react/settings/tabs/skills/SkillCapabilities.tsx:59",
+        "server/routes/preferences.ts:410",
+        "server/routes/preferences.ts:385"
+      ],
+      "current_empty_or_uninitialized": "读取失败保持 undefined 未加载态",
+      "current_failure_or_forbidden": "GET 失败静默保留未加载态；此自动读取动作没有 PUT 保存失败。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 60,
+      "action_id": "ui:settings:usage#01",
+      "r7_decision": "SCOPE",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/UsageTab.tsx:11",
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:95",
+        "desktop/src/react/settings/tabs/observability/model-observability-actions.ts:246",
+        "server/routes/model-observability.ts:89"
+      ],
+      "current_empty_or_uninitialized": "初始 settings 为 null，等待请求",
+      "current_failure_or_forbidden": "settings 请求失败使 bootstrap 显示 forbidden/network 全页 role=alert",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 61,
+      "action_id": "ui:settings:usage#02",
+      "r7_decision": "EQUIVALENT",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:95",
+        "desktop/src/react/settings/tabs/observability/model-observability-actions.ts:204",
+        "server/routes/model-observability.ts:80"
+      ],
+      "current_empty_or_uninitialized": "health 未就绪时保持初始状态，不等同零用量",
+      "current_failure_or_forbidden": "403 与网络错误显示不同 alert",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 62,
+      "action_id": "ui:settings:usage#04",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ObservabilityUsagePanel.tsx:128",
+        "desktop/src/react/settings/tabs/observability/ObservabilityUsagePanel.tsx:133",
+        "desktop/src/react/settings/tabs/observability/ObservabilityMetrics.tsx:67",
+        "server/routes/model-observability.ts:159"
+      ],
+      "current_empty_or_uninitialized": "无分组时洞察为空",
+      "current_failure_or_forbidden": "洞察查询失败保留上次事实，不打断十卡",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 63,
+      "action_id": "ui:settings:usage#05",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ObservabilityUsagePanel.tsx:160",
+        "desktop/src/react/settings/tabs/observability/observability-charts.tsx:52",
+        "desktop/src/react/settings/tabs/observability/ObservabilityHeatCalendar.tsx:46",
+        "desktop/src/react/settings/tabs/observability/ObservabilityModelTrendChart.tsx:43"
+      ],
+      "current_empty_or_uninitialized": "各图独立空态",
+      "current_failure_or_forbidden": "四图各自显示查询错误，与十卡的 overall 查询失败互不等同；单图失败不应清空其他图。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 64,
+      "action_id": "ui:settings:usage#06",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:219",
+        "desktop/src/react/settings/tabs/observability/ObservabilityLedgerPanel.tsx:29",
+        "desktop/src/react/settings/tabs/observability/ObservabilityCallLedger.tsx:133",
+        "desktop/src/react/settings/tabs/observability/ObservabilityCallLedger.tsx:333"
+      ],
+      "current_empty_or_uninitialized": "not-initialized 与 no-results 是不同 UI",
+      "current_failure_or_forbidden": "调用列表首次查询失败显示 role=alert；点击“更多”失败时全页 alert 会遮住已加载行，虽内部 state 仍保留，不可说页面继续显示旧行。；控制面读取失败设置 bootstrapError，整页提前渲染 role=alert，遮住当前子页结果；不可当作零用量。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 65,
+      "action_id": "ui:settings:usage#09",
+      "r7_decision": "SPECIFY",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:227",
+        "desktop/src/react/settings/tabs/observability/ObservabilityTracesPanel.tsx:21",
+        "desktop/src/react/settings/tabs/observability/ObservabilityTraceExplorer.tsx:124",
+        "desktop/src/react/settings/tabs/observability/ObservabilityTraceExplorer.tsx:241"
+      ],
+      "current_empty_or_uninitialized": "not-initialized 与 no-results 分开",
+      "current_failure_or_forbidden": "轨迹首次查询失败显示 role=alert；点击“更多”失败时全页 alert 会遮住已加载行，虽内部 state 仍保留。；控制面读取失败设置 bootstrapError，整页提前渲染 role=alert，遮住当前子页结果；不可当作零用量。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 66,
+      "action_id": "ui:settings:usage#13",
+      "r7_decision": "SPECIFY",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/observability/ModelObservabilitySection.tsx:162",
+        "desktop/src/react/settings/tabs/observability/ObservabilityExportDialog.tsx:247",
+        "desktop/src/react/settings/tabs/observability/model-observability-actions.ts:344",
+        "desktop/src/react/settings/tabs/observability/observability-export-save.ts:36"
+      ],
+      "current_empty_or_uninitialized": "匹配调用为零时仍保存仅含 manifest(totalCalls:0) 的 JSONL，并显示已保存；存储未初始化才返回 404 错误。",
+      "current_failure_or_forbidden": "本机 owner 限制单独判断；FSA 写入回退路径中断可留部分文件，Electron IPC abort 会清理目标文件，两条保存通道分别验证。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    },
+    {
+      "no": 67,
+      "action_id": "ui:settings:work#01",
+      "r7_decision": "FIX",
+      "source_refs": [
+        "desktop/src/react/settings/tabs/WorkTab.tsx:115",
+        "desktop/src/react/settings/tabs/WorkTab.tsx:265",
+        "desktop/src/react/settings/tabs/WorkTab.tsx:284",
+        "server/routes/agents.ts:557"
+      ],
+      "current_empty_or_uninitialized": "无助手禁用助手设置",
+      "current_failure_or_forbidden": "切助手后 desk 配置 GET 失败只 console.warn，agentDesk 保持 null，页面无专门错误提示；不可宣称读回成功。",
+      "page_summary_equal": true,
+      "nonhttp_review_contains_both": true,
+      "decision": "CLOSED"
+    }
+  ],
+  "followup_finding_count": 34,
+  "followup_findings": [
+    {
+      "id": "BM01",
+      "independent_evidence": "R00-T02_UI_BRIDGE_MODELS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:bridge#03",
+          "kind": "present",
+          "value": "5CB577",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:bridge#03",
+          "kind": "failure",
+          "value": "confirmed",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "BM02",
+      "independent_evidence": "R00-T02_UI_BRIDGE_MODELS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:bridge#07",
+          "kind": "success",
+          "value": "教程",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:models#05",
+          "kind": "success",
+          "value": "不追加独立 GET",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:bridge#06",
+          "kind": "empty",
+          "value": "无助手",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "BM03",
+      "independent_evidence": "R00-T02_UI_BRIDGE_MODELS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:bridge#01",
+          "kind": "absent",
+          "value": "A524D3",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:bridge#05",
+          "kind": "success",
+          "value": "loadSettingsConfig",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:bridge#05",
+          "kind": "success",
+          "value": "loadStatus",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "SU:SKILLS-02-BRANCH",
+      "independent_evidence": "R00-T02_UI_SKILLS_USAGE_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:skills#02",
+          "kind": "success",
+          "value": "base64 file",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "SU:SKILLS-07-FAILED-SAVE-READ",
+      "independent_evidence": "R00-T02_UI_SKILLS_USAGE_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:skills#07",
+          "kind": "failure",
+          "value": "保存失败后仍尝试 loadSettingsConfig",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "SU:SKILLS-10-VIEWER-CHAIN",
+      "independent_evidence": "R00-T02_UI_SKILLS_USAGE_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:skills#10",
+          "kind": "success",
+          "value": "listSkillFiles",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:skills#10",
+          "kind": "success",
+          "value": "readSkillFile",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "SU:USAGE-10-SESSION-READS",
+      "independent_evidence": "R00-T02_UI_SKILLS_USAGE_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:usage#10",
+          "kind": "present",
+          "value": "AA9EB3",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:usage#10",
+          "kind": "present",
+          "value": "FF4F06",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "SU:USAGE-REFRESH-ORDER",
+      "independent_evidence": "R00-T02_UI_SKILLS_USAGE_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:usage#03",
+          "kind": "success",
+          "value": "refreshToken",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:usage#06",
+          "kind": "success",
+          "value": "refreshToken",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:usage#09",
+          "kind": "success",
+          "value": "refreshToken",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:usage#11",
+          "kind": "success",
+          "value": "refreshToken",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "SU:USAGE-08-DEAD-ROUTE",
+      "independent_evidence": "R00-T02_UI_SKILLS_USAGE_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:usage#08",
+          "kind": "success",
+          "value": "折叠或展开 summary 只改变本地显示",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "SU:USAGE-12-STATS",
+      "independent_evidence": "R00-T02_UI_SKILLS_USAGE_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:usage#12",
+          "kind": "success",
+          "value": "不显示 deletedTraces",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "SU:USAGE-13-ZERO-EXPORT",
+      "independent_evidence": "R00-T02_UI_SKILLS_USAGE_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:usage#13",
+          "kind": "empty",
+          "value": "manifest(totalCalls:0)",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "SU:USAGE-11-12-AFTER-SAVE-READ",
+      "independent_evidence": "R00-T02_UI_SKILLS_USAGE_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:usage#11",
+          "kind": "failure",
+          "value": "四子页 refreshToken 不增加",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:usage#12",
+          "kind": "failure",
+          "value": "四子页不会因 refreshToken 增加",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "SH01",
+      "independent_evidence": "R00-T02_SHARED_SETTINGS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:security#01",
+          "kind": "scope_global",
+          "value": "sandbox",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:security#02",
+          "kind": "scope_global",
+          "value": "file_backup",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:security#03",
+          "kind": "scope_global",
+          "value": "network_proxy",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "SH02",
+      "independent_evidence": "R00-T02_SHARED_SETTINGS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:general#02",
+          "kind": "scope_global",
+          "value": "keep_awake",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:interface#03",
+          "kind": "scope_global",
+          "value": "editor",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:skills#07",
+          "kind": "scope_global",
+          "value": "capabilities.learn_skills",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:work#02",
+          "kind": "scope_global",
+          "value": "desk.heartbeat_master",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "SH03",
+      "independent_evidence": "R00-T02_SHARED_SETTINGS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#14",
+          "kind": "success",
+          "value": "不追加保存后 GET",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:agent#16",
+          "kind": "success",
+          "value": "refreshSettingsConfigSnapshot",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "SH04",
+      "independent_evidence": "R00-T02_SHARED_SETTINGS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:interface#02",
+          "kind": "success",
+          "value": "不调用 autoSaveConfig",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "SH05",
+      "independent_evidence": "R00-T02_SHARED_SETTINGS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:bridge#05",
+          "kind": "failure",
+          "value": "吞读取异常",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:me#02",
+          "kind": "failure",
+          "value": "吞读取异常",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:providers#08",
+          "kind": "failure",
+          "value": "设置 store 标 error",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "AP-R01",
+      "independent_evidence": "R00-T02_UI_AGENT_PROVIDERS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#01",
+          "kind": "absent",
+          "value": "F62357",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:agent#01",
+          "kind": "present",
+          "value": "BC675C",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:agent#01",
+          "kind": "failure",
+          "value": "切换助手失败",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "AP-R02",
+      "independent_evidence": "R00-T02_UI_AGENT_PROVIDERS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#05",
+          "kind": "empty",
+          "value": "关闭时经验区显示暂停",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "AP-R03",
+      "independent_evidence": "R00-T02_UI_AGENT_PROVIDERS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#14",
+          "kind": "failure",
+          "value": "setCurrent(original)",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "AP-R04",
+      "independent_evidence": "R00-T02_UI_AGENT_PROVIDERS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#11",
+          "kind": "failure",
+          "value": "HTTP 非 2xx",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:providers#11",
+          "kind": "failure",
+          "value": "HTTP 非 2xx",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "AP-R05",
+      "independent_evidence": "R00-T02_UI_AGENT_PROVIDERS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#03",
+          "kind": "empty",
+          "value": "/api/agents/null",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "AP-C01",
+      "independent_evidence": "R00-T02_UI_AGENT_PROVIDERS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:providers#04",
+          "kind": "variant",
+          "value": "Base URL 失焦",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:providers#04",
+          "kind": "variant",
+          "value": "API Format 选择",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "AP-C02",
+      "independent_evidence": "R00-T02_UI_AGENT_PROVIDERS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#01",
+          "kind": "present",
+          "value": "53C843",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:agent#06",
+          "kind": "present",
+          "value": "3CCABB",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "AP-C03",
+      "independent_evidence": "R00-T02_UI_AGENT_PROVIDERS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#01",
+          "kind": "present",
+          "value": "CCDCE8",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:agent#11",
+          "kind": "present",
+          "value": "CCDCE8",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "AP-C04",
+      "independent_evidence": "R00-T02_UI_AGENT_PROVIDERS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:providers#05",
+          "kind": "present",
+          "value": "51DD4E",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "AP-C05",
+      "independent_evidence": "R00-T02_UI_AGENT_PROVIDERS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#14",
+          "kind": "present",
+          "value": "7EC5F0",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:agent#14",
+          "kind": "present",
+          "value": "BC675C",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "AP-C06",
+      "independent_evidence": "R00-T02_UI_AGENT_PROVIDERS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#02",
+          "kind": "present",
+          "value": "A9B0BB",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:agent#03",
+          "kind": "present",
+          "value": "A9B0BB",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:agent#05",
+          "kind": "present",
+          "value": "A9B0BB",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": "定向审阅后续消息确认的设置 fanout；初版辅助报告仍按冻结快照保留。"
+    },
+    {
+      "id": "AP-C07",
+      "independent_evidence": "R00-T02_UI_AGENT_PROVIDERS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:providers#02",
+          "kind": "present",
+          "value": "A9B0BB",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:providers#03",
+          "kind": "present",
+          "value": "A9B0BB",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:providers#06",
+          "kind": "present",
+          "value": "A9B0BB",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": "定向审阅后续消息确认的供应商设置 fanout。"
+    },
+    {
+      "id": "AP-FIXED-01",
+      "independent_evidence": "R00-T02_UI_AGENT_PROVIDERS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:providers#02",
+          "kind": "success",
+          "value": "只执行一次 loadSettingsConfig",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "AP-FIXED-02",
+      "independent_evidence": "R00-T02_UI_AGENT_PROVIDERS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#06",
+          "kind": "variant",
+          "value": "导出预览时 POST",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "AP-FIXED-03",
+      "independent_evidence": "R00-T02_UI_AGENT_PROVIDERS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:providers#03",
+          "kind": "variant",
+          "value": "临时草稿的删除按钮直接 onRemoveDraft",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "AP-FIXED-04",
+      "independent_evidence": "R00-T02_UI_AGENT_PROVIDERS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:providers#10",
+          "kind": "failure",
+          "value": "先显示成功 toast 后又显示失败 toast",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:providers#11",
+          "kind": "failure",
+          "value": "先有成功 toast 再有失败 toast",
+          "passed": true
+        },
+        {
+          "action_id": "ui:settings:providers#12",
+          "kind": "failure",
+          "value": "先成功 toast 后失败 toast",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    },
+    {
+      "id": "AP-FIXED-05",
+      "independent_evidence": "R00-T02_UI_AGENT_PROVIDERS_AUDIT.json",
+      "candidate_checks": [
+        {
+          "action_id": "ui:settings:agent#15",
+          "kind": "failure",
+          "value": "写入已成功而 refresh GET 失败",
+          "passed": true
+        }
+      ],
+      "decision": "CLOSED",
+      "note": ""
+    }
+  ],
+  "open_findings": []
+}

@@ -1,0 +1,13 @@
+
+running 5 tests
+test real_http_reload_revalidates_replaced_local_token_after_actual_mutation_queue ... ok
+test real_http_web_session_save_revalidates_logout_after_actual_mutation_queue ... ok
+test real_http_device_model_save_revalidates_again_at_filesafety_atomic_authorization ... ok
+test real_http_device_model_save_revalidates_revocation_after_actual_mutation_queue ... ok
+test real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.95s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.42s
+     Running tests/r07_t08_model_authority.rs (rust/target/debug/deps/r07_t08_model_authority-c1eee669129328cd)

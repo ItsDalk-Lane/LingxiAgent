@@ -1,0 +1,14 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_capability_audit",
+ "status": "FAIL",
+ "exitCode": 2,
+ "caseCount": 9,
+ "failedCases": [
+  "caps::no-dangerous-plugin-permissions-fallback",
+  "caps::policy-present"
+ ],
+ "audit": "capability-audit.json",
+ "policy": "absent",
+ "gapLedgerRemaining": null
+}

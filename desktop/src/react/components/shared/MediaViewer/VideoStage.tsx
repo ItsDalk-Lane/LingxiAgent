@@ -3,6 +3,7 @@ import type { FileRef } from '../../../types/file-ref';
 import { loadMediaSource } from './media-source';
 import { fileRefVersionToken } from '../../../services/resource-url';
 import styles from './MediaViewer.module.css';
+import { usePlatform } from '../../../hooks/use-platform';
 
 declare function t(key: string, vars?: Record<string, string | number>): string;
 
@@ -45,7 +46,7 @@ export function VideoStage({ file, viewport, onReady, onError }: Props) {
           <button
             type="button"
             className={styles.videoErrorAction}
-            onClick={() => { window.platform?.openFile?.(file.path); }}
+            onClick={() => { usePlatform()?.openFile?.(file.path); }}
           >
             {t('mediaViewer.openWithSystemPlayer')}
           </button>

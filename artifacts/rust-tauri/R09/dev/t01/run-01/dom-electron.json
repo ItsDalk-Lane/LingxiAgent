@@ -1,0 +1,24 @@
+{
+ "projection": {
+  "title": "Lingxi",
+  "platform": "darwin",
+  "reactRootMounted": true,
+  "rootChildCount": 1,
+  "rootPath": [
+   "DIV#.splash-container"
+  ],
+  "bodyTextHash": 126032829,
+  "bodyTextLength": 10,
+  "hasHana": true,
+  "hasTauri": false,
+  "tauriInvoke": false,
+  "location": "file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/dist-splash/splash.html"
+ },
+ "connectionInfo": {
+  "port": 62652,
+  "token": "01901933507d5bc02622585194edf4c3",
+  "serverNodeKind": "lingxi-service",
+  "serverNodeTransport": "http",
+  "host": null
+ }
+}

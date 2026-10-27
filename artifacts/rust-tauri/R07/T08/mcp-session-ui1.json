@@ -1,0 +1,21 @@
+{
+  "scope": "Vitest actual React component + mocked HTTP responses; 6/6; not real Rust/SDK acceptance",
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "desktop/src/react/__tests__/components/rust-mcp-session-permissions.test.tsx",
+    "--maxWorkers=1"
+  ],
+  "exitCode": 0,
+  "log": "artifacts/rust-tauri/R07/T08/mcp-session-ui1.log",
+  "logSha256": "fb36a2f4c546d042a0f594697d98cb81e21126a5a06d7ae827e9c29603eaf26a",
+  "recordedAt": "2026-10-18T10:42:16.663817+00:00",
+  "verifiedLogSha256": "fb36a2f4c546d042a0f594697d98cb81e21126a5a06d7ae827e9c29603eaf26a",
+  "fileHashesCapturedAfterRun": {
+    "desktop/src/react/services/mcp-session-permissions.ts": "2a11b5f14285d580b0db2e85000a6e7c86d97645e949fb3b3acf2e1593b34d84",
+    "desktop/src/react/components/session/RustSessionReviewPanel.tsx": "d57dc1e9b07122569c8eade345c30e9090468a39eb91b635101d838dedee4535",
+    "desktop/src/react/__tests__/components/rust-mcp-session-permissions.test.tsx": "52c098266d5352ab99e4cffc9e0aa955609c0eed926acbc0140c42b9257ebdf1"
+  },
+  "sourceUnchanged": "NOT_CAPTURED_BEFORE_RUN_NO_WHOLE_WORKSPACE_IMMUTABILITY_CLAIM"
+}

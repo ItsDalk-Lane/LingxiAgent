@@ -1,0 +1,4105 @@
+//! R06-T07 知识库存储：三库布局 + 快照/解析产物文件存储。
+//!
+//! 现役三文件布局（knowledge.db / knowledge-index.db / knowledge-vector.db，
+//! `lib/knowledge/knowledge-store.ts`、`knowledge-index-store.ts`、
+//! `vector-index-adapter.ts`）的 Rust 同构：
+//! - `knowledge.db`（事实库）：notebooks / sources / notebook_sources /
+//!   content_snapshots / parse_artifacts / knowledge_blocks /
+//!   knowledge_citations / ingestion_jobs / knowledge_turn_scopes(+sources)。
+//! - `knowledge_index.db`（FTS 缓存）：chunk_index_variants + knowledge_chunks
+//!   (+FTS5) + sections。确证且静止的损坏缓存隔离后重建；其它错误保留。
+//! - `knowledge_vector.db`（向量缓存）：vector_index_variants + chunk_vectors
+//!   （f32 LE BLOB，维度铁律）。损坏保留隔离原件，不自动重新付费嵌入。
+//! - 快照字节 `knowledge/snapshots/<id>`；解析产物 JSON
+//!   `knowledge/artifacts/<snapshotId>/<artifactId>.json`。
+//!   索引可重建 ≠ 源文件可删。
+//!
+//! 退役边界：不建 research_runs / analysis_* / coverage_* 等已退役研究引擎表
+//! （兼容残留叶 F-D08-C-RESEARCH-LEDGER）；runs.db v1–v9 冻结不动。
+
+use std::fs::{File, OpenOptions};
+use std::io::{Read, Write};
+use std::path::{Path, PathBuf};
+use std::sync::{Arc, LazyLock, Mutex, MutexGuard};
+use unicode_normalization::UnicodeNormalization;
+
+#[path = "knowledge_lifecycle.rs"]
+mod lifecycle;
+pub use lifecycle::{ArtifactRetention, VectorUsage};
+
+use lingxi_kernel::knowledge::KnowledgeError;
+use rusqlite::{params, Connection, OptionalExtension};
+
+pub use lingxi_kernel::knowledge::{
+    build_chunks, chunk_index_variant_id, chunker_config_id, embedding_model_key,
+    estimate_text_tokens, sha256_hex, vector_index_variant_id, ChunkDraft, ChunkSpan, ChunkerBlock,
+};
+
+// ── 行类型 ──────────────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct NotebookRow {
+    pub id: String,
+    pub studio_id: String,
+    pub name: String,
+    pub created_at: String,
+    pub updated_at: String,
+    pub deleted_at: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct SourceRow {
+    pub id: String,
+    pub studio_id: String,
+    pub source_type: String,
+    pub display_name: String,
+    pub origin_metadata: serde_json::Value,
+    pub created_at: String,
+    pub deleted_at: Option<String>,
+    pub orphaned_at: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct MembershipRow {
+    pub notebook_id: String,
+    pub source_id: String,
+    pub added_at: String,
+    pub removed_at: Option<String>,
+    pub relative_path: Option<String>,
+    pub folder_node: Option<String>,
+    pub display_order: Option<i64>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct SnapshotRow {
+    pub id: String,
+    pub source_id: String,
+    pub sha256: String,
+    pub mime_type: String,
+    pub byte_size: i64,
+    pub storage_path: String,
+    pub captured_at: String,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ProcessingArtifactRow {
+    pub id: String,
+    pub content_snapshot_id: String,
+    pub processor_id: String,
+    pub processor_version: String,
+    pub processor_config_hash: String,
+    pub status: String,
+    pub fidelity: Option<String>,
+    pub output_mime: Option<String>,
+    pub output_path: Option<String>,
+    pub output_sha256: Option<String>,
+    pub locator_map: serde_json::Value,
+    pub warnings: Vec<String>,
+    pub created_at: String,
+    pub completed_at: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ParseArtifactRow {
+    pub id: String,
+    pub content_snapshot_id: String,
+    pub parser_id: String,
+    pub parser_version: String,
+    pub parser_config_hash: String,
+    pub status: String,
+    pub warnings: Vec<String>,
+    pub fidelity: String,
+    pub processing_artifact_id: Option<String>,
+    pub created_at: String,
+    pub completed_at: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct BlockRow {
+    pub id: String,
+    pub parse_artifact_id: String,
+    pub ordinal: usize,
+    pub text: String,
+    pub text_sha256: String,
+    pub locator_type: String,
+    pub locator: serde_json::Value,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct CitationRow {
+    pub id: String,
+    pub parse_artifact_id: String,
+    pub block_id: String,
+    pub start_offset: usize,
+    pub end_offset: usize,
+    pub canonical_text: String,
+    pub canonical_text_sha256: String,
+    pub created_at: String,
+}
+
+pub struct ResolvedCitation {
+    pub citation: CitationRow,
+    pub block: BlockRow,
+    pub snapshot: SnapshotRow,
+    pub source: SourceRow,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct JobRow {
+    pub id: String,
+    pub notebook_id: String,
+    pub source_id: String,
+    pub artifact_id: Option<String>,
+    pub phase: String,
+    pub status: String,
+    pub attempt: i64,
+    pub error: Option<String>,
+    pub chunker_config_id: String,
+    pub cancelled_at: Option<String>,
+    pub progress_done: i64,
+    pub progress_total: Option<i64>,
+    pub embedding_stats: Option<serde_json::Value>,
+    pub created_at: String,
+    pub updated_at: String,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct ModelRef {
+    pub id: String,
+    pub provider: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Default)]
+pub struct NotebookConfigRow {
+    pub embedding_model_ref: Option<ModelRef>,
+    pub rerank_model_ref: Option<ModelRef>,
+    pub chunk_target_chars: Option<i64>,
+    pub retrieval_top_k: Option<i64>,
+    pub vector_retention_days: Option<i64>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct TurnScopeSourceRow {
+    pub scope_id: String,
+    pub source_id: String,
+    pub content_snapshot_id: String,
+    pub parse_artifact_id: Option<String>,
+    pub notebook_ids: Vec<String>,
+}
+
+/// 服务铸造的当前运行归属；选择内容不能由工具参数补充身份。
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RunScopeBinding {
+    pub principal_kind: String,
+    pub principal_subject: String,
+    pub agent_id: String,
+    pub session_id: String,
+    pub run_id: String,
+    pub attempt: String,
+    pub generation: u64,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct TurnScopeRow {
+    pub id: String,
+    pub turn_id: String,
+    pub session_id: String,
+    pub studio_id: String,
+    pub notebook_ids: Vec<String>,
+    pub status: String,
+    pub created_at: String,
+    pub sources: Vec<TurnScopeSourceRow>,
+    pub run_binding: Option<RunScopeBinding>,
+}
+
+pub struct NotebookSourceEntry {
+    pub source: SourceRow,
+    pub snapshot: SnapshotRow,
+    pub membership: MembershipRow,
+    pub parse_artifact: Option<ParseArtifactRow>,
+}
+
+// ── 工具 ────────────────────────────────────────────────────────────────────
+
+/// 不透明 id：`prefix_` + 12 随机字节 hex（TS newId 的等价承担——身份是不透明
+/// 字符串，具体形状不进任何契约；差异台账 D 项申报 uuid→CSPRNG hex）。
+pub fn new_id(prefix: &str) -> String {
+    let mut bytes = [0_u8; 12];
+    getrandom::getrandom(&mut bytes).expect("csprng id bytes");
+    let hex: String = bytes.iter().map(|byte| format!("{byte:02x}")).collect();
+    format!("{prefix}_{hex}")
+}
+
+/// ISO 8601 zulu 毫秒时间戳（TS new Date().toISOString() 同形）。
+fn now_iso(clock_ms: impl Fn() -> i64) -> String {
+    let ms = clock_ms();
+    let secs = ms.div_euclid(1000);
+    let millis = ms.rem_euclid(1000);
+    let days = secs.div_euclid(86_400);
+    let tod = secs.rem_euclid(86_400);
+    let (year, month, day) = civil_from_days(days);
+    format!(
+        "{year:04}-{month:02}-{day:02}T{:02}:{:02}:{:02}.{millis:03}Z",
+        tod / 3600,
+        (tod % 3600) / 60,
+        tod % 60
+    )
+}
+
+/// ISO 8601 zulu 格式的毫秒时钟（服务注入；测试可用固定闭包）。
+pub type ClockMs = Arc<dyn Fn() -> i64 + Send + Sync>;
+
+/// days-since-epoch → (y, m, d)（Howard Hinnant civil_from_days 算法）。
+fn civil_from_days(days: i64) -> (i64, u32, u32) {
+    let z = days + 719_468;
+    let era = z.div_euclid(146_097);
+    let doe = z.rem_euclid(146_097);
+    let yoe = (doe - doe / 1460 + doe / 36_524 - doe / 146_096) / 365;
+    let y = yoe + era * 400;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp = (5 * doy + 2) / 153;
+    let d = (doy - (153 * mp + 2) / 5 + 1) as u32;
+    let m = if mp < 10 { mp + 3 } else { mp - 9 } as u32;
+    (if m <= 2 { y + 1 } else { y }, m, d)
+}
+
+fn parse_json(raw: Option<String>) -> serde_json::Value {
+    raw.and_then(|raw| serde_json::from_str(&raw).ok())
+        .unwrap_or(serde_json::Value::Null)
+}
+
+fn storage_io(error: std::io::Error) -> KnowledgeError {
+    let code = match error.kind() {
+        std::io::ErrorKind::PermissionDenied => "KNOWLEDGE_STORAGE_PERMISSION",
+        std::io::ErrorKind::WouldBlock => "KNOWLEDGE_STORAGE_BUSY",
+        _ => "KNOWLEDGE_STORAGE_IO",
+    };
+    KnowledgeError::new(code, format!("knowledge storage I/O: {error}"))
+}
+
+fn storage_lock(error: std::fs::TryLockError) -> KnowledgeError {
+    match error {
+        std::fs::TryLockError::WouldBlock => KnowledgeError::new(
+            "KNOWLEDGE_STORAGE_BUSY",
+            "cache recovery lock is held by another instance",
+        ),
+        std::fs::TryLockError::Error(error) => storage_io(error),
+    }
+}
+
+fn storage_sqlite(error: rusqlite::Error) -> KnowledgeError {
+    let code = match error.sqlite_error_code() {
+        Some(rusqlite::ErrorCode::DatabaseBusy | rusqlite::ErrorCode::DatabaseLocked) => {
+            "KNOWLEDGE_STORAGE_BUSY"
+        }
+        Some(rusqlite::ErrorCode::PermissionDenied | rusqlite::ErrorCode::ReadOnly) => {
+            "KNOWLEDGE_STORAGE_PERMISSION"
+        }
+        Some(
+            rusqlite::ErrorCode::SystemIoFailure
+            | rusqlite::ErrorCode::DiskFull
+            | rusqlite::ErrorCode::CannotOpen,
+        ) => "KNOWLEDGE_STORAGE_IO",
+        Some(rusqlite::ErrorCode::DatabaseCorrupt | rusqlite::ErrorCode::NotADatabase) => {
+            "KNOWLEDGE_STORAGE_CORRUPT"
+        }
+        _ => "KNOWLEDGE_STORAGE_INVALID",
+    };
+    KnowledgeError::new(code, format!("knowledge SQLite: {error}"))
+}
+
+fn open_connection(path: &Path, supported: i64) -> Result<Connection, KnowledgeError> {
+    // /var、/tmp等系统目录别名可规范化；最终数据库文件仍必须NOFOLLOW。
+    let canonical_path = std::fs::canonicalize(
+        path.parent()
+            .ok_or_else(|| KnowledgeError::storage_invalid("knowledge db parent missing"))?,
+    )
+    .map_err(storage_io)?
+    .join(
+        path.file_name()
+            .ok_or_else(|| KnowledgeError::storage_invalid("knowledge db filename missing"))?,
+    );
+    let path = canonical_path.as_path();
+    if path.exists() {
+        let probe = Connection::open_with_flags(
+            path,
+            rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY | rusqlite::OpenFlags::SQLITE_OPEN_NOFOLLOW,
+        )
+        .map_err(storage_sqlite)?;
+        check_user_version(&probe, supported)?;
+    }
+    let conn = Connection::open_with_flags(
+        path,
+        rusqlite::OpenFlags::default() | rusqlite::OpenFlags::SQLITE_OPEN_NOFOLLOW,
+    )
+    .map_err(storage_sqlite)?;
+    // 同步存储争用立即失败，不占用取消监督的异步线程等锁。
+    conn.busy_timeout(std::time::Duration::ZERO)
+        .map_err(storage_sqlite)?;
+    // 关闭旧句柄不能把另一实例升级后的 WAL checkpoint 到未来格式原件。
+    conn.set_db_config(
+        rusqlite::config::DbConfig::SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE,
+        true,
+    )
+    .map_err(storage_sqlite)?;
+    let journal: String = conn
+        .query_row("PRAGMA journal_mode", [], |row| row.get(0))
+        .map_err(storage_sqlite)?;
+    if journal != "wal" {
+        conn.pragma_update(None, "locking_mode", "EXCLUSIVE")
+            .map_err(storage_sqlite)?;
+        let tx =
+            rusqlite::Transaction::new_unchecked(&conn, rusqlite::TransactionBehavior::Exclusive)
+                .map_err(storage_sqlite)?;
+        check_user_version(&tx, supported)?;
+        tx.commit().map_err(storage_sqlite)?;
+        // 提交后仍持排他文件锁；NORMAL 本身不释放，切 WAL 完成后才释放。
+        // 在进入 WAL 前恢复 NORMAL，避免永久占用、破坏普通并发读写。
+        conn.pragma_update(None, "locking_mode", "NORMAL")
+            .map_err(storage_sqlite)?;
+        let actual: String = conn
+            .query_row("PRAGMA journal_mode=WAL", [], |row| row.get(0))
+            .map_err(storage_sqlite)?;
+        if actual != "wal" {
+            return Err(KnowledgeError::storage_invalid(
+                "knowledge WAL initialization refused",
+            ));
+        }
+    }
+    conn.pragma_update(None, "synchronous", "NORMAL")
+        .map_err(storage_sqlite)?;
+    Ok(conn)
+}
+
+fn check_user_version(conn: &Connection, supported: i64) -> Result<(), KnowledgeError> {
+    let current: i64 = conn
+        .query_row("PRAGMA user_version", [], |row| row.get(0))
+        .map_err(storage_sqlite)?;
+    if current > supported {
+        return Err(KnowledgeError::new(
+            "KNOWLEDGE_SCHEMA_NEWER",
+            format!("knowledge schema version {current} is newer than supported {supported}"),
+        ));
+    }
+    Ok(())
+}
+
+// 正常关闭仍允许 SQLite 清理 WAL；必须先锁住并重验版本，不能牺牲静止缓存的受控恢复。
+// 未来版本、同行占用或检查失败时保留 NO_CKPT_ON_CLOSE，原件和必要 WAL 留在磁盘。
+fn prepare_supported_close(conn: &Connection, supported: i64) -> Result<(), KnowledgeError> {
+    check_user_version(conn, supported)?;
+    conn.busy_timeout(std::time::Duration::ZERO)
+        .map_err(storage_sqlite)?;
+    conn.pragma_update(None, "locking_mode", "EXCLUSIVE")
+        .map_err(storage_sqlite)?;
+    let tx = rusqlite::Transaction::new_unchecked(conn, rusqlite::TransactionBehavior::Exclusive)
+        .map_err(storage_sqlite)?;
+    check_user_version(&tx, supported)?;
+    tx.commit().map_err(storage_sqlite)?;
+    // 排他锁跨 COMMIT 保留至连接关闭，正常 checkpoint 与清理期间不允许另一实例升级。
+    conn.set_db_config(
+        rusqlite::config::DbConfig::SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE,
+        false,
+    )
+    .map_err(storage_sqlite)?;
+    Ok(())
+}
+
+fn sidecar(path: &Path, suffix: &str) -> PathBuf {
+    let mut name = path.as_os_str().to_os_string();
+    name.push(suffix);
+    PathBuf::from(name)
+}
+
+// 不跟随缓存/守卫/归属文件的链接；多链接文件也不能当作专属缓存恢复。
+fn regular_file(path: &Path) -> Result<Option<std::fs::Metadata>, KnowledgeError> {
+    match std::fs::symlink_metadata(path) {
+        Ok(meta) => {
+            if !meta.is_file() {
+                return Err(KnowledgeError::new(
+                    "KNOWLEDGE_STORAGE_UNSAFE",
+                    "knowledge cache must be a regular file",
+                ));
+            }
+            #[cfg(unix)]
+            {
+                use std::os::unix::fs::MetadataExt;
+                if meta.nlink() != 1 {
+                    return Err(KnowledgeError::new(
+                        "KNOWLEDGE_STORAGE_UNSAFE",
+                        "knowledge cache has multiple hard links",
+                    ));
+                }
+            }
+            Ok(Some(meta))
+        }
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(e) => Err(storage_io(e)),
+    }
+}
+
+fn cache_identity(path: &Path) -> Result<String, KnowledgeError> {
+    let meta =
+        regular_file(path)?.ok_or_else(|| KnowledgeError::storage_invalid("cache disappeared"))?;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt;
+        Ok(format!("{}:{}", meta.dev(), meta.ino()))
+    }
+    #[cfg(not(unix))]
+    {
+        let created = meta.created().map_err(storage_io)?;
+        Ok(format!("{:?}", created))
+    }
+}
+
+fn ownership_record(path: &Path) -> Result<String, KnowledgeError> {
+    Ok(format!(
+        "lingxi-cache-v1\n{}\n{}\n",
+        path.file_name().unwrap().to_string_lossy(),
+        cache_identity(path)?
+    ))
+}
+
+fn record_cache_owner(path: &Path) -> Result<(), KnowledgeError> {
+    let marker = sidecar(path, ".owner");
+    regular_file(&marker)?;
+    let temporary = sidecar(path, &format!(".owner-{}", new_id("tmp")));
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&temporary)
+        .map_err(storage_io)?;
+    file.write_all(ownership_record(path)?.as_bytes())
+        .map_err(storage_io)?;
+    file.sync_all().map_err(storage_io)?;
+    std::fs::rename(&temporary, marker).map_err(storage_io)
+}
+
+/// 可重建缓存代际，与权威parser/profile/civ/viv历史算法分离。
+pub const KNOWLEDGE_DERIVED_ALGORITHM: &str =
+    "lingxi.search-nfkc-jieba068-cjk23.reverse-overlap.v2";
+const LEGACY_DERIVED_ALGORITHM: &str = "lingxi.legacy-ascii-char-cjk-gap.forward-overlap.v1";
+const INDEX_APPLICATION_ID: i64 = 0x4c584931;
+const VECTOR_APPLICATION_ID: i64 = 0x4c585631;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DerivedAlgorithmStatus {
+    Current,
+    LegacyStale,
+}
+
+/// 只给派生缓存增加代际命名空间，不更改事实库的原始profile与历史金样。
+pub fn current_cache_profile_hash(original_profile: &str) -> String {
+    sha256_hex(
+        serde_json::json!([original_profile, KNOWLEDGE_DERIVED_ALGORITHM])
+            .to_string()
+            .as_bytes(),
+    )
+}
+fn derived_table(index: bool) -> &'static str {
+    if index {
+        "chunk_index_variants"
+    } else {
+        "vector_index_variants"
+    }
+}
+fn derived_metadata_header(conn: &Connection, index: bool) -> Result<bool, KnowledgeError> {
+    let application_id: i64 = conn
+        .pragma_query_value(None, "application_id", |r| r.get(0))
+        .map_err(storage_sqlite)?;
+    let exists: bool = conn.query_row("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name='knowledge_derived_algorithms')", [], |r|r.get(0)).map_err(storage_sqlite)?;
+    if application_id == 0 && !exists {
+        return Ok(false);
+    }
+    if application_id
+        != if index {
+            INDEX_APPLICATION_ID
+        } else {
+            VECTOR_APPLICATION_ID
+        }
+        || !exists
+    {
+        return Err(KnowledgeError::storage_invalid(
+            "derived algorithm metadata missing or unrecognized; preserve cache for inspection",
+        ));
+    }
+    Ok(true)
+}
+fn validate_derived_metadata(conn: &Connection, index: bool) -> Result<bool, KnowledgeError> {
+    if !derived_metadata_header(conn, index)? {
+        return Ok(false);
+    }
+    let sql=format!("SELECT v.id,m.algorithm FROM {} v LEFT JOIN knowledge_derived_algorithms m ON m.variant_id=v.id",derived_table(index));
+    let mut stmt = conn.prepare(&sql).map_err(storage_sqlite)?;
+    let rows = stmt
+        .query_map([], |r| {
+            Ok((r.get::<_, String>(0)?, r.get::<_, Option<String>>(1)?))
+        })
+        .map_err(storage_sqlite)?;
+    for row in rows {
+        let (_, algorithm) = row.map_err(storage_sqlite)?;
+        if !matches!(
+            algorithm.as_deref(),
+            Some(KNOWLEDGE_DERIVED_ALGORITHM | LEGACY_DERIVED_ALGORITHM)
+        ) {
+            return Err(KnowledgeError::storage_invalid(
+                "derived algorithm metadata missing or unknown; original preserved",
+            ));
+        }
+    }
+    let orphans:i64=conn.query_row(&format!("SELECT count(*) FROM knowledge_derived_algorithms m WHERE NOT EXISTS(SELECT 1 FROM {} v WHERE v.id=m.variant_id)",derived_table(index)),[],|r|r.get(0)).map_err(storage_sqlite)?;
+    if orphans != 0 {
+        return Err(KnowledgeError::storage_invalid(
+            "orphan derived algorithm metadata; original preserved",
+        ));
+    }
+    Ok(true)
+}
+/// 缺少代际标记不是“任何SQLite都算旧库”；旧表形状和负载也必须可确认。
+fn validate_legacy_derived_layout(conn: &Connection, index: bool) -> Result<(), KnowledgeError> {
+    if index {
+        conn.prepare("SELECT id,parse_artifact_id,chunk_profile_hash,block_fingerprint,status FROM chunk_index_variants LIMIT 0").map_err(storage_sqlite)?;
+        conn.prepare("SELECT id,parse_artifact_id,section_ordinal,heading_path_json,start_block_ordinal,end_block_ordinal FROM knowledge_sections LIMIT 0").map_err(storage_sqlite)?;
+        conn.prepare("SELECT rowid,text,search_text FROM knowledge_chunks_fts LIMIT 0")
+            .map_err(storage_sqlite)?;
+        let mut stmt=conn.prepare("SELECT v.id,c.ordinal,c.text,c.search_text,c.token_count,c.spans_json FROM knowledge_chunks c LEFT JOIN chunk_index_variants v ON v.id=c.variant_id").map_err(storage_sqlite)?;
+        let rows = stmt
+            .query_map([], |r| {
+                Ok((
+                    r.get::<_, Option<String>>(0)?,
+                    r.get::<_, i64>(1)?,
+                    r.get::<_, String>(2)?,
+                    r.get::<_, String>(3)?,
+                    r.get::<_, i64>(4)?,
+                    r.get::<_, String>(5)?,
+                ))
+            })
+            .map_err(storage_sqlite)?;
+        for row in rows {
+            let (id, ordinal, _, _, tokens, spans) = row.map_err(storage_sqlite)?;
+            if id.is_none()
+                || ordinal < 0
+                || tokens < 0
+                || !serde_json::from_str::<serde_json::Value>(&spans).is_ok_and(|s| s.is_array())
+            {
+                return Err(KnowledgeError::storage_invalid(
+                    "unrecognized legacy chunk payload; preserve original cache",
+                ));
+            }
+        }
+    } else {
+        conn.prepare("SELECT id,chunk_index_variant_id,parse_artifact_id,model_key,chunk_fingerprint,dimensions,status FROM vector_index_variants LIMIT 0").map_err(storage_sqlite)?;
+        let mut stmt=conn.prepare("SELECT v.id,v.dimensions,c.ordinal,c.vector FROM chunk_vectors c LEFT JOIN vector_index_variants v ON v.id=c.vector_index_variant_id").map_err(storage_sqlite)?;
+        let rows = stmt
+            .query_map([], |r| {
+                Ok((
+                    r.get::<_, Option<String>>(0)?,
+                    r.get::<_, Option<i64>>(1)?,
+                    r.get::<_, i64>(2)?,
+                    r.get::<_, Vec<u8>>(3)?,
+                ))
+            })
+            .map_err(storage_sqlite)?;
+        for row in rows {
+            let (id, dimensions, ordinal, bytes) = row.map_err(storage_sqlite)?;
+            let valid =
+                dimensions.is_some_and(|d| d > 0 && d <= 65536 && bytes.len() == d as usize * 4);
+            if id.is_none()
+                || ordinal < 0
+                || !valid
+                || bytes
+                    .as_chunks::<4>()
+                    .0
+                    .iter()
+                    .any(|b| !f32::from_le_bytes(*b).is_finite())
+            {
+                return Err(KnowledgeError::storage_invalid(
+                    "corrupt legacy vector payload; preserve original cache",
+                ));
+            }
+        }
+    }
+    Ok(())
+}
+
+fn install_derived_metadata(conn: &Connection, index: bool) -> Result<(), KnowledgeError> {
+    if validate_derived_metadata(conn, index)? {
+        return Ok(());
+    }
+    conn.execute_batch(&format!("CREATE TABLE knowledge_derived_algorithms(variant_id TEXT PRIMARY KEY REFERENCES {}(id) ON DELETE CASCADE, algorithm TEXT NOT NULL);",derived_table(index))).map_err(storage_sqlite)?;
+    // 只有已识别的旧schema、且没有本实现的application_id，才明确登记为旧算法。
+    conn.execute(
+        &format!(
+            "INSERT INTO knowledge_derived_algorithms SELECT id,?1 FROM {}",
+            derived_table(index)
+        ),
+        [LEGACY_DERIVED_ALGORITHM],
+    )
+    .map_err(storage_sqlite)?;
+    conn.pragma_update(
+        None,
+        "application_id",
+        if index {
+            INDEX_APPLICATION_ID
+        } else {
+            VECTOR_APPLICATION_ID
+        },
+    )
+    .map_err(storage_sqlite)?;
+    Ok(())
+}
+fn derived_algorithm(
+    conn: &Connection,
+    index: bool,
+    variant: &str,
+) -> Result<Option<DerivedAlgorithmStatus>, KnowledgeError> {
+    if !derived_metadata_header(conn, index)? {
+        return Err(KnowledgeError::storage_invalid(
+            "derived algorithm metadata disappeared; original preserved",
+        ));
+    }
+    let sql=format!("SELECT m.algorithm FROM {} v LEFT JOIN knowledge_derived_algorithms m ON m.variant_id=v.id WHERE v.id=?1",derived_table(index));
+    let value: Option<Option<String>> = conn
+        .query_row(&sql, [variant], |r| r.get(0))
+        .optional()
+        .map_err(storage_sqlite)?;
+    match value {
+        None => Ok(None),
+        Some(Some(s)) if s == KNOWLEDGE_DERIVED_ALGORITHM => {
+            Ok(Some(DerivedAlgorithmStatus::Current))
+        }
+        Some(Some(s)) if s == LEGACY_DERIVED_ALGORITHM => {
+            Ok(Some(DerivedAlgorithmStatus::LegacyStale))
+        }
+        _ => Err(KnowledgeError::storage_invalid(
+            "derived algorithm metadata missing or unknown; original preserved",
+        )),
+    }
+}
+fn require_current_algorithm(
+    conn: &Connection,
+    index: bool,
+    variant: &str,
+) -> Result<(), KnowledgeError> {
+    match derived_algorithm(conn,index,variant)? {
+        Some(DerivedAlgorithmStatus::Current)=>Ok(()),
+        Some(DerivedAlgorithmStatus::LegacyStale)=>Err(KnowledgeError::index_invalid("legacy derived cache is stale; explicitly rebuild from original source with the current cache profile")),
+        None=>Err(KnowledgeError::index_invalid("derived cache variant not found")),
+    }
+}
+fn write_current_algorithm(conn: &Connection, variant: &str) -> Result<(), KnowledgeError> {
+    conn.execute("INSERT INTO knowledge_derived_algorithms(variant_id,algorithm) VALUES(?1,?2) ON CONFLICT(variant_id) DO UPDATE SET algorithm=excluded.algorithm",params![variant,KNOWLEDGE_DERIVED_ALGORITHM]).map_err(storage_sqlite)?;
+    Ok(())
+}
+
+fn try_cache_connection(
+    path: &Path,
+    supported: i64,
+    schema: &str,
+) -> Result<Connection, KnowledgeError> {
+    if let Some(meta) = regular_file(path)? {
+        if meta.len() > 0 {
+            let mut header = [0_u8; 16];
+            let mut file = File::open(path).map_err(storage_io)?;
+            let bytes = file.read(&mut header).map_err(storage_io)?;
+            if bytes != 16 || &header != b"SQLite format 3\0" {
+                return Err(KnowledgeError::new(
+                    "KNOWLEDGE_STORAGE_CORRUPT",
+                    "invalid SQLite header; original and sidecars preserved",
+                ));
+            }
+        }
+    }
+    if path.exists() {
+        // 只读预检保护尚未checkpoint的未来版本WAL；可写句柄的Drop也可能checkpoint。
+        let probe = Connection::open_with_flags(
+            path,
+            rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY | rusqlite::OpenFlags::SQLITE_OPEN_NOFOLLOW,
+        )
+        .map_err(storage_sqlite)?;
+        check_user_version(&probe, supported)?;
+        let integrity: String = probe
+            .query_row("PRAGMA quick_check", [], |row| row.get(0))
+            .map_err(storage_sqlite)?;
+        if integrity != "ok" {
+            return Err(KnowledgeError::new(
+                "KNOWLEDGE_STORAGE_CORRUPT",
+                "SQLite quick_check failed; original preserved",
+            ));
+        }
+        validate_derived_metadata(&probe, schema == INDEX_SCHEMA_SQL)?;
+        let expected_table = if schema == INDEX_SCHEMA_SQL {
+            "chunk_index_variants"
+        } else {
+            "vector_index_variants"
+        };
+        let tables: i64 = probe
+            .query_row(
+                "SELECT count(*) FROM sqlite_master WHERE type='table'",
+                [],
+                |row| row.get(0),
+            )
+            .map_err(storage_sqlite)?;
+        let owned: i64 = probe
+            .query_row(
+                "SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?1",
+                [expected_table],
+                |row| row.get(0),
+            )
+            .map_err(storage_sqlite)?;
+        if tables > 0 && owned == 0 {
+            return Err(KnowledgeError::new(
+                "KNOWLEDGE_STORAGE_UNSAFE",
+                "existing SQLite file is not a recognized knowledge cache",
+            ));
+        }
+        if tables > 0 && !derived_metadata_header(&probe, schema == INDEX_SCHEMA_SQL)? {
+            validate_legacy_derived_layout(&probe, schema == INDEX_SCHEMA_SQL)?;
+        }
+    }
+    let conn = open_connection(path, supported)?;
+    let tx = rusqlite::Transaction::new_unchecked(&conn, rusqlite::TransactionBehavior::Immediate)
+        .map_err(storage_sqlite)?;
+    check_user_version(&tx, supported)?;
+    tx.execute_batch(schema).map_err(storage_sqlite)?;
+    install_derived_metadata(&tx, schema == INDEX_SCHEMA_SQL)?;
+    tx.pragma_update(None, "user_version", supported)
+        .map_err(storage_sqlite)?;
+    tx.commit().map_err(storage_sqlite)?;
+    Ok(conn)
+}
+
+/// 正常打开持有共享恢复锁；损坏隔离必须独占，且不能有任何 WAL/journal。
+/// 无法确认归属/静止点时保留原件并拒绝，绝不尝试删除 sidecar。
+fn open_cache(
+    path: &Path,
+    supported: i64,
+    schema: &str,
+) -> Result<(Connection, File), KnowledgeError> {
+    let canonical_path = std::fs::canonicalize(
+        path.parent()
+            .ok_or_else(|| KnowledgeError::storage_invalid("knowledge cache parent missing"))?,
+    )
+    .map_err(storage_io)?
+    .join(
+        path.file_name()
+            .ok_or_else(|| KnowledgeError::storage_invalid("knowledge cache filename missing"))?,
+    );
+    let path = canonical_path.as_path();
+    regular_file(path)?;
+    let guard_path = sidecar(path, ".guard");
+    regular_file(&guard_path)?;
+    let guard = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .truncate(false)
+        .open(&guard_path)
+        .map_err(storage_io)?;
+    guard.try_lock_shared().map_err(storage_lock)?;
+    let first = match try_cache_connection(path, supported, schema) {
+        Ok(conn) => {
+            record_cache_owner(path)?;
+            return Ok((conn, guard));
+        }
+        Err(error) => error,
+    };
+    if first.code != "KNOWLEDGE_STORAGE_CORRUPT" {
+        return Err(first);
+    }
+    guard.unlock().map_err(storage_io)?;
+    guard.try_lock().map_err(storage_lock)?;
+    // 锁升级后重新验证：另一个打开者可能已恢复，或版本已改变。
+    match try_cache_connection(path, supported, schema) {
+        Ok(conn) => {
+            record_cache_owner(path)?;
+            return Ok((conn, guard));
+        }
+        Err(error) if error.code == "KNOWLEDGE_STORAGE_CORRUPT" => {}
+        Err(error) => return Err(error),
+    }
+    for suffix in ["-wal", "-shm", "-journal"] {
+        if std::fs::symlink_metadata(sidecar(path, suffix)).is_ok() {
+            return Err(KnowledgeError::new(
+                "KNOWLEDGE_STORAGE_BUSY",
+                "corrupt cache has SQLite sidecars; preserve the complete database for offline recovery",
+            ));
+        }
+    }
+    let marker = sidecar(path, ".owner");
+    if regular_file(&marker)?.is_none() {
+        return Err(KnowledgeError::new(
+            "KNOWLEDGE_STORAGE_CORRUPT",
+            "cache ownership unknown; original preserved",
+        ));
+    }
+    let expected_owner = ownership_record(path)?;
+    if std::fs::read_to_string(&marker).map_err(storage_io)? != expected_owner {
+        return Err(KnowledgeError::new(
+            "KNOWLEDGE_STORAGE_CORRUPT",
+            "cache ownership changed; original preserved",
+        ));
+    }
+    // 无 sidecar 的只读检查避免把迁移 SQL 或权限错误当作可重建损坏。
+    let probe = Connection::open_with_flags(path, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)
+        .and_then(|conn| conn.query_row("PRAGMA quick_check", [], |row| row.get::<_, String>(0)));
+    let confirmed = match probe {
+        Ok(result) => result != "ok",
+        Err(error) => storage_sqlite(error).code == "KNOWLEDGE_STORAGE_CORRUPT",
+    };
+    if !confirmed {
+        return Err(first);
+    }
+    if ownership_record(path)? != expected_owner {
+        return Err(KnowledgeError::new(
+            "KNOWLEDGE_STORAGE_UNSAFE",
+            "cache identity changed before quarantine",
+        ));
+    }
+    let quarantine = sidecar(path, &format!(".quarantine-{}", new_id("cache")));
+    std::fs::create_dir(&quarantine).map_err(storage_io)?;
+    std::fs::copy(&marker, quarantine.join("owner")).map_err(storage_io)?;
+    std::fs::rename(path, quarantine.join("original.db")).map_err(storage_io)?;
+    #[cfg(unix)]
+    {
+        File::open(&quarantine)
+            .and_then(|dir| dir.sync_all())
+            .map_err(storage_io)?;
+        File::open(path.parent().unwrap())
+            .and_then(|dir| dir.sync_all())
+            .map_err(storage_io)?;
+    }
+    // 保留原始缓存以供人工恢复；此处不生成 embedding，不宣称恢复付费向量。
+    tracing::warn!(cache = %path.display(), quarantine = %quarantine.display(),
+        "confirmed corrupt cache quarantined; empty cache rebuilt, reindex required, embeddings not regenerated");
+    let conn = try_cache_connection(path, supported, schema)?;
+    record_cache_owner(path)?;
+    Ok((conn, guard))
+}
+
+fn cache_write(
+    conn: &mut Connection,
+    supported: i64,
+) -> Result<rusqlite::Transaction<'_>, KnowledgeError> {
+    let tx = conn
+        .transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)
+        .map_err(storage_sqlite)?;
+    check_user_version(&tx, supported)?;
+    let index: bool=tx.query_row("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name='chunk_index_variants')",[],|r|r.get(0)).map_err(storage_sqlite)?;
+    if !validate_derived_metadata(&tx, index)? {
+        return Err(KnowledgeError::storage_invalid(
+            "derived metadata disappeared on live writer; original preserved",
+        ));
+    }
+    Ok(tx)
+}
+
+fn lock_conn(conn: &Mutex<Connection>) -> MutexGuard<'_, Connection> {
+    conn.lock().unwrap_or_else(|poison| poison.into_inner())
+}
+
+pub const MIN_CHUNK: i64 = 100;
+pub const MAX_CHUNK: i64 = 100_000;
+
+/// 检索派生层：NFKC、Jieba搜索模式与CJK补充词共享现役TS口径。
+static JIEBA: LazyLock<jieba_rs::Jieba> = LazyLock::new(jieba_rs::Jieba::new);
+static ASCII_WORDS: LazyLock<regex::Regex> =
+    LazyLock::new(|| regex::Regex::new(r"[a-z0-9_][a-z0-9_.-]*").expect("固定ASCII分词式"));
+static CJK_RUNS: LazyLock<regex::Regex> = LazyLock::new(|| {
+    regex::Regex::new(r"[\p{sc=Han}\p{sc=Hiragana}\p{sc=Katakana}\p{sc=Hangul}]+")
+        .expect("固定CJK脚本分词式")
+});
+// ECMAScript的\s包含FEFF、不包含0085；不借用Rust不同的is_whitespace集合。
+static SEARCH_SPACES: LazyLock<regex::Regex> = LazyLock::new(|| {
+    regex::Regex::new(r"[\t\n\x0B\f\r \u{00A0}\u{1680}\u{2000}-\u{200A}\u{2028}\u{2029}\u{202F}\u{205F}\u{3000}\u{FEFF}]+")
+        .expect("固定搜索空白式")
+});
+static ONLY_PUNCTUATION: LazyLock<regex::Regex> = LazyLock::new(|| {
+    regex::Regex::new(r"^[\p{P}\p{S}\t\n\x0B\f\r \u{00A0}\u{1680}\u{2000}-\u{200A}\u{2028}\u{2029}\u{202F}\u{205F}\u{3000}\u{FEFF}]+$")
+        .expect("固定标点符号式")
+});
+pub const MAX_SEARCH_QUERY_TERMS: usize = 96;
+
+pub fn normalize_search_text(value: &str) -> String {
+    let lowered = value.nfkc().collect::<String>().to_lowercase();
+    SEARCH_SPACES
+        .replace_all(&lowered, " ")
+        .trim_matches(' ')
+        .to_string()
+}
+
+/// 只改写可重建search_text，不改变块正文、原文快照或引用偏移。
+pub fn build_search_document_text(value: &str) -> String {
+    let normalized = normalize_search_text(value);
+    if normalized.is_empty() {
+        return String::new();
+    }
+    let mut parts = vec![normalized.clone()];
+    parts.extend(tokenize_search_text(&normalized));
+    parts.join(" ")
+}
+
+pub fn tokenize_search_text(value: &str) -> Vec<String> {
+    let normalized = normalize_search_text(value);
+    if normalized.is_empty() {
+        return Vec::new();
+    }
+    let mut tokens = Vec::new();
+    let mut seen = std::collections::HashSet::new();
+    let mut push = |word: &str| {
+        let token = normalize_search_text(word);
+        if token.is_empty() || ONLY_PUNCTUATION.is_match(&token) {
+            return;
+        }
+        // 现役 JS 的 length 按 UTF-16 计数，扩展汉字不能当成单码元丢弃。
+        if token.encode_utf16().count() == 1 && CJK_RUNS.is_match(&token) {
+            return;
+        }
+        if seen.insert(token.clone()) {
+            tokens.push(token);
+        }
+    };
+    for found in ASCII_WORDS.find_iter(&normalized) {
+        push(found.as_str());
+    }
+    for token in JIEBA.cut_for_search(&normalized, true) {
+        push(token);
+    }
+    for found in CJK_RUNS.find_iter(&normalized) {
+        let chars = found.as_str().chars().collect::<Vec<_>>();
+        for size in [2, 3] {
+            for gram in chars.windows(size) {
+                push(&gram.iter().collect::<String>());
+            }
+        }
+    }
+    tokens
+}
+
+/// FTS5最多96个经过转义的字面词；调用者不能注入MATCH操作符。
+pub fn build_fts_literal_query(value: &str) -> String {
+    tokenize_search_text(value)
+        .into_iter()
+        .take(MAX_SEARCH_QUERY_TERMS)
+        .map(|term| format!("\"{}\"", term.replace('"', "\"\"")))
+        .collect::<Vec<_>>()
+        .join(" OR ")
+}
+
+/// ChunkSpan 的 JSON 序列化（kernel 类型无 serde derive——adapters 侧本地转换，
+/// 形状与 TS KnowledgeChunkSpanDraft 一致：blockId/blockStartOffset/blockEndOffset/
+/// chunkStartOffset/chunkEndOffset）。
+fn spans_to_json(spans: &[ChunkSpan]) -> String {
+    let entries: Vec<serde_json::Value> = spans
+        .iter()
+        .map(|span| {
+            serde_json::json!({
+                "blockId": span.block_id,
+                "blockStartOffset": span.block_start_offset,
+                "blockEndOffset": span.block_end_offset,
+                "chunkStartOffset": span.chunk_start_offset,
+                "chunkEndOffset": span.chunk_end_offset,
+            })
+        })
+        .collect();
+    serde_json::to_string(&entries).unwrap_or_else(|_| "[]".into())
+}
+
+fn spans_from_json(raw: &str) -> Vec<ChunkSpan> {
+    serde_json::from_str::<Vec<serde_json::Value>>(raw)
+        .unwrap_or_default()
+        .into_iter()
+        .map(|entry| ChunkSpan {
+            block_id: entry["blockId"].as_str().unwrap_or_default().to_string(),
+            block_start_offset: entry["blockStartOffset"].as_u64().unwrap_or(0) as usize,
+            block_end_offset: entry["blockEndOffset"].as_u64().unwrap_or(0) as usize,
+            chunk_start_offset: entry["chunkStartOffset"].as_u64().unwrap_or(0) as usize,
+            chunk_end_offset: entry["chunkEndOffset"].as_u64().unwrap_or(0) as usize,
+        })
+        .collect()
+}
+
+// ── 事实库 ──────────────────────────────────────────────────────────────────
+
+pub struct KnowledgeFactStore {
+    conn: Mutex<Connection>,
+    root: PathBuf,
+    clock: ClockMs,
+    root_guard: File,
+}
+
+const FACTS_SCHEMA_VERSION: i64 = 1;
+
+const FACTS_SCHEMA_SQL: &str = r#"
+CREATE TABLE IF NOT EXISTS notebooks (
+    id         TEXT PRIMARY KEY,
+    studio_id  TEXT NOT NULL,
+    name       TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    deleted_at TEXT
+);
+CREATE TABLE IF NOT EXISTS notebook_config (
+    notebook_id          TEXT PRIMARY KEY REFERENCES notebooks(id),
+    embedding_model_json TEXT,
+    rerank_model_json    TEXT,
+    chunk_target_chars   INTEGER,
+    retrieval_top_k      INTEGER,
+    vector_retention_days INTEGER,
+    updated_at           TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS sources (
+    id              TEXT PRIMARY KEY,
+    studio_id       TEXT NOT NULL,
+    source_type     TEXT NOT NULL CHECK(source_type IN ('file','pasted_text','web_snapshot')),
+    display_name    TEXT NOT NULL,
+    origin_metadata TEXT NOT NULL DEFAULT '{}',
+    created_at      TEXT NOT NULL,
+    deleted_at      TEXT,
+    orphaned_at     TEXT
+);
+CREATE TABLE IF NOT EXISTS notebook_sources (
+    notebook_id   TEXT NOT NULL REFERENCES notebooks(id),
+    source_id     TEXT NOT NULL REFERENCES sources(id),
+    added_at      TEXT NOT NULL,
+    removed_at    TEXT,
+    relative_path TEXT,
+    folder_node   TEXT,
+    display_order INTEGER,
+    PRIMARY KEY (notebook_id, source_id)
+);
+CREATE TABLE IF NOT EXISTS content_snapshots (
+    id           TEXT PRIMARY KEY,
+    source_id    TEXT NOT NULL REFERENCES sources(id),
+    sha256       TEXT NOT NULL,
+    mime_type    TEXT NOT NULL,
+    byte_size    INTEGER NOT NULL,
+    storage_path TEXT NOT NULL,
+    captured_at  TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_snapshots_source ON content_snapshots(source_id, captured_at);
+CREATE TABLE IF NOT EXISTS processing_artifacts (
+ id TEXT PRIMARY KEY,content_snapshot_id TEXT NOT NULL REFERENCES content_snapshots(id),
+ processor_id TEXT NOT NULL,processor_version TEXT NOT NULL,processor_config_hash TEXT NOT NULL,
+ status TEXT NOT NULL CHECK(status IN ('processing','ready','failed')),fidelity TEXT,
+ output_mime TEXT,output_path TEXT,output_sha256 TEXT,locator_map_json TEXT NOT NULL DEFAULT '{}',warnings_json TEXT NOT NULL DEFAULT '[]',
+ created_at TEXT NOT NULL,completed_at TEXT,
+ UNIQUE(content_snapshot_id,processor_id,processor_version,processor_config_hash)
+);
+CREATE TABLE IF NOT EXISTS parse_artifacts (
+    id                     TEXT PRIMARY KEY,
+    content_snapshot_id    TEXT NOT NULL REFERENCES content_snapshots(id),
+    parser_id              TEXT NOT NULL,
+    parser_version         TEXT NOT NULL,
+    parser_config_hash     TEXT NOT NULL,
+    status                 TEXT NOT NULL CHECK(status IN ('parsing','ready','needs_ocr','failed')),
+    warnings               TEXT NOT NULL DEFAULT '[]',
+    fidelity               TEXT NOT NULL DEFAULT 'citation_grade',
+    processing_artifact_id TEXT,
+    semantic_artifact_path TEXT,
+    created_at             TEXT NOT NULL,
+    completed_at           TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_artifacts_snapshot ON parse_artifacts(content_snapshot_id);
+CREATE TABLE IF NOT EXISTS knowledge_blocks (
+    id                TEXT PRIMARY KEY,
+    parse_artifact_id TEXT NOT NULL REFERENCES parse_artifacts(id),
+    ordinal           INTEGER NOT NULL,
+    text              TEXT NOT NULL,
+    text_sha256       TEXT NOT NULL,
+    locator_type      TEXT NOT NULL,
+    locator           TEXT NOT NULL DEFAULT '{}',
+    UNIQUE (parse_artifact_id, ordinal)
+);
+CREATE TABLE IF NOT EXISTS knowledge_citations (
+    id                    TEXT PRIMARY KEY,
+    parse_artifact_id     TEXT NOT NULL REFERENCES parse_artifacts(id),
+    block_id              TEXT NOT NULL REFERENCES knowledge_blocks(id),
+    start_offset          INTEGER NOT NULL,
+    end_offset            INTEGER NOT NULL,
+    canonical_text        TEXT NOT NULL,
+    canonical_text_sha256 TEXT NOT NULL,
+    created_at            TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS ingestion_jobs (
+    id                TEXT PRIMARY KEY,
+    notebook_id       TEXT NOT NULL,
+    source_id         TEXT NOT NULL,
+    artifact_id       TEXT,
+    phase             TEXT NOT NULL CHECK(phase IN ('parse','chunk','fts_index','embed','done')),
+    status            TEXT NOT NULL CHECK(status IN ('queued','running','pending_embedding','failed','done')),
+    attempt           INTEGER NOT NULL DEFAULT 0,
+    retry_after       TEXT,
+    error             TEXT,
+    chunker_config_id TEXT NOT NULL,
+    cancelled_at      TEXT,
+    progress_done     INTEGER NOT NULL DEFAULT 0,
+    progress_total    INTEGER,
+    embedding_stats   TEXT,
+    created_at        TEXT NOT NULL,
+    updated_at        TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_jobs_source ON ingestion_jobs(source_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_jobs_notebook ON ingestion_jobs(notebook_id, created_at);
+CREATE TABLE IF NOT EXISTS knowledge_turn_scopes (
+    id                TEXT PRIMARY KEY,
+    turn_id           TEXT NOT NULL,
+    session_id        TEXT NOT NULL,
+    studio_id         TEXT NOT NULL,
+    notebook_ids_json TEXT NOT NULL,
+    status            TEXT NOT NULL CHECK(status IN ('active','closed')),
+    created_at        TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_scopes_session ON knowledge_turn_scopes(session_id, status);
+CREATE TABLE IF NOT EXISTS knowledge_turn_scope_sources (
+    scope_id            TEXT NOT NULL REFERENCES knowledge_turn_scopes(id),
+    source_id           TEXT NOT NULL,
+    content_snapshot_id TEXT NOT NULL,
+    parse_artifact_id   TEXT,
+    notebook_ids_json   TEXT NOT NULL,
+    PRIMARY KEY (scope_id, source_id)
+);
+"#;
+
+impl Drop for KnowledgeFactStore {
+    fn drop(&mut self) {
+        if let Err(error) = prepare_supported_close(&lock_conn(&self.conn), FACTS_SCHEMA_VERSION) {
+            tracing::warn!(
+                code = error.code,
+                "knowledge close preserved WAL without checkpoint"
+            );
+        }
+    }
+}
+
+impl KnowledgeFactStore {
+    /// Opens (creating if needed) `knowledge.db` under `root` (schema v1).
+    pub fn open(root: &Path) -> Result<Self, KnowledgeError> {
+        Self::open_with_clock(
+            root,
+            Arc::new(|| {
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .map(|d| d.as_millis() as i64)
+                    .unwrap_or(0)
+            }),
+        )
+    }
+
+    pub fn open_with_clock(root: &Path, clock: ClockMs) -> Result<Self, KnowledgeError> {
+        std::fs::create_dir_all(root)
+            .map_err(|e| KnowledgeError::storage_invalid(format!("knowledge root: {e}")))?;
+        let conn = open_connection(&root.join("knowledge.db"), FACTS_SCHEMA_VERSION)?;
+        let tx =
+            rusqlite::Transaction::new_unchecked(&conn, rusqlite::TransactionBehavior::Immediate)
+                .map_err(storage_sqlite)?;
+        check_user_version(&tx, FACTS_SCHEMA_VERSION)?;
+        tx.execute_batch(FACTS_SCHEMA_SQL).map_err(storage_sqlite)?;
+        let has_output_hash = {
+            let mut columns = tx
+                .prepare("PRAGMA table_info(processing_artifacts)")
+                .map_err(storage_sqlite)?;
+            let names = columns
+                .query_map([], |row| row.get::<_, String>(1))
+                .map_err(storage_sqlite)?
+                .collect::<Result<Vec<_>, _>>()
+                .map_err(storage_sqlite)?;
+            names.iter().any(|name| name == "output_sha256")
+        };
+        if !has_output_hash {
+            tx.execute_batch("ALTER TABLE processing_artifacts ADD COLUMN output_sha256 TEXT")
+                .map_err(storage_sqlite)?;
+        }
+
+        tx.pragma_update(None, "user_version", FACTS_SCHEMA_VERSION)
+            .map_err(storage_sqlite)?;
+        tx.commit().map_err(storage_sqlite)?;
+        Ok(Self {
+            conn: Mutex::new(conn),
+            root: root.to_path_buf(),
+            clock,
+            root_guard: lifecycle::open_root_guard(root)?,
+        })
+    }
+
+    pub fn root(&self) -> &Path {
+        &self.root
+    }
+
+    pub fn has_table(&self, table: &str) -> bool {
+        let conn = lock_conn(&self.conn);
+        conn.query_row(
+            "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=?",
+            params![table],
+            |row| row.get::<_, i64>(0),
+        )
+        .map(|count| count > 0)
+        .unwrap_or(false)
+    }
+
+    // ── notebooks ───────────────────────────────────────────────────────────
+
+    pub fn create_notebook(
+        &self,
+        studio_id: &str,
+        name: &str,
+    ) -> Result<NotebookRow, KnowledgeError> {
+        let name = name.trim();
+        if name.is_empty() || name.chars().count() > 256 {
+            return Err(KnowledgeError::invalid_argument(
+                "Notebook name must be 1..=256 characters",
+            ));
+        }
+        let id = new_id("knb");
+        let now = now_iso(&*self.clock);
+        let conn = lock_conn(&self.conn);
+        conn.execute(
+            "INSERT INTO notebooks (id, studio_id, name, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?4)",
+            params![id, studio_id, name, now],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        drop(conn);
+        self.get_notebook(studio_id, &id)
+    }
+
+    pub fn list_notebooks(&self, studio_id: &str) -> Result<Vec<NotebookRow>, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, studio_id, name, created_at, updated_at, deleted_at FROM notebooks \
+                 WHERE studio_id=?1 AND deleted_at IS NULL ORDER BY created_at, id",
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let rows = stmt
+            .query_map(params![studio_id], Self::map_notebook)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        rows.collect::<Result<Vec<_>, _>>()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
+    }
+
+    pub fn get_notebook(
+        &self,
+        studio_id: &str,
+        notebook_id: &str,
+    ) -> Result<NotebookRow, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        conn.query_row(
+            "SELECT id, studio_id, name, created_at, updated_at, deleted_at FROM notebooks \
+             WHERE id=?1 AND studio_id=?2 AND deleted_at IS NULL",
+            params![notebook_id, studio_id],
+            Self::map_notebook,
+        )
+        .optional()
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+        .ok_or_else(|| KnowledgeError::not_found("Knowledge notebook was not found"))
+    }
+
+    fn map_notebook(row: &rusqlite::Row<'_>) -> rusqlite::Result<NotebookRow> {
+        Ok(NotebookRow {
+            id: row.get(0)?,
+            studio_id: row.get(1)?,
+            name: row.get(2)?,
+            created_at: row.get(3)?,
+            updated_at: row.get(4)?,
+            deleted_at: row.get(5)?,
+        })
+    }
+
+    pub fn rename_notebook(
+        &self,
+        studio_id: &str,
+        notebook_id: &str,
+        name: &str,
+    ) -> Result<NotebookRow, KnowledgeError> {
+        let name = name.trim();
+        if name.is_empty() || name.chars().count() > 256 {
+            return Err(KnowledgeError::invalid_argument(
+                "Notebook name must be 1..=256 characters",
+            ));
+        }
+        self.get_notebook(studio_id, notebook_id)?;
+        let now = now_iso(&*self.clock);
+        let conn = lock_conn(&self.conn);
+        conn.execute(
+            "UPDATE notebooks SET name=?1, updated_at=?2 WHERE id=?3",
+            params![name, now, notebook_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        drop(conn);
+        self.get_notebook(studio_id, notebook_id)
+    }
+
+    pub fn delete_notebook(
+        &self,
+        studio_id: &str,
+        notebook_id: &str,
+    ) -> Result<NotebookRow, KnowledgeError> {
+        self.delete_notebook_retained(studio_id, notebook_id)
+            .map(|result| result.0)
+    }
+
+    /// 笔记本当前活跃 membership 的来源 id（来源未删除；按加入顺序）。
+    pub fn list_active_member_source_ids(
+        &self,
+        notebook_id: &str,
+    ) -> Result<Vec<String>, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let mut stmt = conn
+            .prepare(
+                "SELECT ns.source_id FROM notebook_sources ns JOIN sources s ON s.id = ns.source_id
+                 WHERE ns.notebook_id=?1 AND ns.removed_at IS NULL AND s.deleted_at IS NULL
+                 ORDER BY ns.added_at, ns.source_id",
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let rows = stmt
+            .query_map(params![notebook_id], |row| row.get::<_, String>(0))
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        rows.collect::<Result<Vec<_>, _>>()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
+    }
+
+    /// 来源是否仍被其他未删除笔记本活跃挂靠（共享来源不随单个笔记本删除而清理）。
+    pub fn source_has_other_active_membership(
+        &self,
+        source_id: &str,
+        notebook_id: &str,
+    ) -> Result<bool, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let count: i64 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM notebook_sources ns JOIN notebooks n ON n.id = ns.notebook_id
+                 WHERE ns.source_id=?1 AND ns.notebook_id<>?2 AND ns.removed_at IS NULL AND n.deleted_at IS NULL",
+                params![source_id, notebook_id],
+                |row| row.get(0),
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        Ok(count > 0)
+    }
+
+    // ── notebook config ─────────────────────────────────────────────────────
+
+    pub fn get_notebook_config(
+        &self,
+        notebook_id: &str,
+    ) -> Result<NotebookConfigRow, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let row = conn
+            .query_row(
+                "SELECT embedding_model_json, rerank_model_json, chunk_target_chars, retrieval_top_k, vector_retention_days FROM notebook_config WHERE notebook_id=?1",
+                params![notebook_id],
+                |row| {
+                    Ok((
+                        row.get::<_, Option<String>>(0)?,
+                        row.get::<_, Option<String>>(1)?,
+                        row.get::<_, Option<i64>>(2)?,
+                        row.get::<_, Option<i64>>(3)?,
+                        row.get::<_, Option<i64>>(4)?,
+                    ))
+                },
+            )
+            .optional()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let map_ref = |raw: &Option<String>| -> Option<ModelRef> {
+            raw.as_deref()
+                .and_then(|raw| serde_json::from_str::<ModelRef>(raw).ok())
+        };
+        match row {
+            Some((embedding, rerank, chunk, top_k, retention)) => Ok(NotebookConfigRow {
+                embedding_model_ref: map_ref(&embedding),
+                rerank_model_ref: map_ref(&rerank),
+                chunk_target_chars: chunk,
+                retrieval_top_k: top_k,
+                vector_retention_days: retention,
+            }),
+            None => Ok(NotebookConfigRow::default()),
+        }
+    }
+
+    /// 配置更新（routes/knowledge.ts:302-318 的 PUT settings；数值范围与模型
+    /// 引用形状在此校验——返回更新前后快照供调用方判定重建）。
+    pub fn update_notebook_config(
+        &self,
+        notebook_id: &str,
+        embedding_model_ref: Option<Option<ModelRef>>,
+        rerank_model_ref: Option<Option<ModelRef>>,
+        chunk_target_chars: Option<Option<i64>>,
+        retrieval_top_k: Option<Option<i64>>,
+        vector_retention_days: Option<Option<i64>>,
+    ) -> Result<(NotebookConfigRow, NotebookConfigRow), KnowledgeError> {
+        let before = self.get_notebook_config(notebook_id)?;
+        let validate_ref = |model_ref: Option<&ModelRef>| -> Result<(), KnowledgeError> {
+            if let Some(model_ref) = model_ref {
+                if model_ref.id.trim().is_empty() || model_ref.provider.trim().is_empty() {
+                    return Err(KnowledgeError::invalid_argument(
+                        "Model refs are complete {id, provider} pairs",
+                    ));
+                }
+            }
+            Ok(())
+        };
+        validate_ref(
+            embedding_model_ref
+                .as_ref()
+                .and_then(|inner| inner.as_ref()),
+        )?;
+        validate_ref(rerank_model_ref.as_ref().and_then(|inner| inner.as_ref()))?;
+        if let Some(Some(value)) = chunk_target_chars {
+            if !(MIN_CHUNK..=MAX_CHUNK).contains(&value) {
+                return Err(KnowledgeError::invalid_argument(
+                    "chunkTargetChars must be between 100 and 100000",
+                ));
+            }
+        }
+        if let Some(Some(value)) = retrieval_top_k {
+            if !(0..=1000).contains(&value) {
+                return Err(KnowledgeError::invalid_argument(
+                    "retrievalTopK must be between 0 and 1000",
+                ));
+            }
+        }
+        if let Some(Some(value)) = vector_retention_days {
+            if value <= 0 {
+                return Err(KnowledgeError::invalid_argument(
+                    "vectorRetentionDays must be a positive number of days",
+                ));
+            }
+        }
+        let merged = NotebookConfigRow {
+            embedding_model_ref: embedding_model_ref.unwrap_or(before.embedding_model_ref.clone()),
+            rerank_model_ref: rerank_model_ref.unwrap_or(before.rerank_model_ref.clone()),
+            chunk_target_chars: chunk_target_chars.unwrap_or(before.chunk_target_chars),
+            retrieval_top_k: retrieval_top_k.unwrap_or(before.retrieval_top_k),
+            vector_retention_days: vector_retention_days.unwrap_or(before.vector_retention_days),
+        };
+        let conn = lock_conn(&self.conn);
+        conn.execute(
+            "INSERT INTO notebook_config (notebook_id, embedding_model_json, rerank_model_json, chunk_target_chars, retrieval_top_k, vector_retention_days, updated_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
+             ON CONFLICT(notebook_id) DO UPDATE SET embedding_model_json=?2, rerank_model_json=?3, chunk_target_chars=?4, retrieval_top_k=?5, vector_retention_days=?6, updated_at=?7",
+            params![
+                notebook_id,
+                merged.embedding_model_ref.as_ref().map(|m| serde_json::to_string(m).unwrap_or_default()),
+                merged.rerank_model_ref.as_ref().map(|m| serde_json::to_string(m).unwrap_or_default()),
+                merged.chunk_target_chars,
+                merged.retrieval_top_k,
+                merged.vector_retention_days,
+                now_iso(&*self.clock),
+            ],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        Ok((before, merged))
+    }
+
+    // ── sources / snapshots / membership ────────────────────────────────────
+
+    pub fn create_source_with_snapshot(
+        &self,
+        studio_id: &str,
+        source_type: &str,
+        display_name: &str,
+        origin_metadata: &serde_json::Value,
+        bytes: &[u8],
+        mime_type: &str,
+    ) -> Result<(SourceRow, SnapshotRow), KnowledgeError> {
+        let source_id = new_id("ksrc");
+        let snapshot_id = new_id("ksnap");
+        let now = now_iso(&*self.clock);
+        let sha = sha256_hex(bytes);
+        let snapshots_dir = self.root.join("snapshots");
+        std::fs::create_dir_all(&snapshots_dir)
+            .map_err(|e| KnowledgeError::storage_invalid(format!("snapshots dir: {e}")))?;
+        let storage_path = format!("snapshots/{snapshot_id}");
+        std::fs::write(snapshots_dir.join(&snapshot_id), bytes)
+            .map_err(|e| KnowledgeError::storage_invalid(format!("snapshot write: {e}")))?;
+        let conn = lock_conn(&self.conn);
+        conn.execute(
+            "INSERT INTO sources (id, studio_id, source_type, display_name, origin_metadata, created_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+            params![source_id, studio_id, source_type, display_name, origin_metadata.to_string(), now],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        conn.execute(
+            "INSERT INTO content_snapshots (id, source_id, sha256, mime_type, byte_size, storage_path, captured_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+            params![snapshot_id, source_id, sha, mime_type, bytes.len() as i64, storage_path, now],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        drop(conn);
+        let source = self.get_source(&source_id)?;
+        let snapshot = self.latest_snapshot_for_source(&source_id)?;
+        Ok((source, snapshot))
+    }
+
+    pub fn get_source(&self, source_id: &str) -> Result<SourceRow, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        conn.query_row(
+            "SELECT id, studio_id, source_type, display_name, origin_metadata, created_at, deleted_at, orphaned_at FROM sources WHERE id=?1 AND deleted_at IS NULL",
+            params![source_id],
+            Self::map_source,
+        )
+        .optional()
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+        .ok_or_else(|| KnowledgeError::not_found("Knowledge source was not found"))
+    }
+
+    /// 仅返回当前 studio 拥有的未删除来源；他 studio 来源与不存在一样 404，不泄露存在性。
+    pub fn get_source_in_studio(
+        &self,
+        studio_id: &str,
+        source_id: &str,
+    ) -> Result<SourceRow, KnowledgeError> {
+        let source = self.get_source(source_id)?;
+        if source.studio_id != studio_id {
+            return Err(KnowledgeError::not_found("Knowledge source was not found"));
+        }
+        Ok(source)
+    }
+
+    /// 来源必须属于该 studio 且在给定笔记本有活跃 membership，否则 404（入队/重试前置校验）。
+    pub fn require_member_source(
+        &self,
+        studio_id: &str,
+        notebook_id: &str,
+        source_id: &str,
+    ) -> Result<SourceRow, KnowledgeError> {
+        let source = self.get_source_in_studio(studio_id, source_id)?;
+        let member: i64 = {
+            let conn = lock_conn(&self.conn);
+            conn.query_row(
+                "SELECT COUNT(*) FROM notebook_sources WHERE notebook_id=?1 AND source_id=?2 AND removed_at IS NULL",
+                params![notebook_id, source_id],
+                |row| row.get(0),
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+        };
+        if member == 0 {
+            return Err(KnowledgeError::not_found(
+                "Knowledge source is not in this Notebook",
+            ));
+        }
+        Ok(source)
+    }
+
+    fn map_source(row: &rusqlite::Row<'_>) -> rusqlite::Result<SourceRow> {
+        Ok(SourceRow {
+            id: row.get(0)?,
+            studio_id: row.get(1)?,
+            source_type: row.get(2)?,
+            display_name: row.get(3)?,
+            origin_metadata: parse_json(row.get(4)?),
+            created_at: row.get(5)?,
+            deleted_at: row.get(6)?,
+            orphaned_at: row.get(7)?,
+        })
+    }
+
+    pub fn latest_snapshot_for_source(
+        &self,
+        source_id: &str,
+    ) -> Result<SnapshotRow, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        conn.query_row(
+            "SELECT id, source_id, sha256, mime_type, byte_size, storage_path, captured_at FROM content_snapshots WHERE source_id=?1 ORDER BY captured_at DESC, id DESC LIMIT 1",
+            params![source_id],
+            Self::map_snapshot,
+        )
+        .optional()
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+        .ok_or_else(|| KnowledgeError::not_found("Knowledge source has no content snapshot"))
+    }
+
+    pub fn get_snapshot(&self, snapshot_id: &str) -> Result<SnapshotRow, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        conn.query_row(
+            "SELECT id, source_id, sha256, mime_type, byte_size, storage_path, captured_at FROM content_snapshots WHERE id=?1",
+            params![snapshot_id],
+            Self::map_snapshot,
+        )
+        .optional()
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+        .ok_or_else(|| KnowledgeError::not_found("Knowledge snapshot was not found"))
+    }
+
+    fn map_snapshot(row: &rusqlite::Row<'_>) -> rusqlite::Result<SnapshotRow> {
+        Ok(SnapshotRow {
+            id: row.get(0)?,
+            source_id: row.get(1)?,
+            sha256: row.get(2)?,
+            mime_type: row.get(3)?,
+            byte_size: row.get(4)?,
+            storage_path: row.get(5)?,
+            captured_at: row.get(6)?,
+        })
+    }
+
+    pub fn read_snapshot_bytes(&self, snapshot: &SnapshotRow) -> Result<Vec<u8>, KnowledgeError> {
+        let expected = format!("snapshots/{}", snapshot.id);
+        if snapshot.storage_path != expected {
+            return Err(KnowledgeError::storage_invalid(
+                "snapshot storage identity mismatch",
+            ));
+        }
+        let bytes = self.read_managed_bytes(&expected, 50 * 1024 * 1024)?;
+        if snapshot.byte_size != bytes.len() as i64 || snapshot.sha256 != sha256_hex(&bytes) {
+            return Err(KnowledgeError::storage_invalid(
+                "snapshot content hash mismatch",
+            ));
+        }
+        Ok(bytes)
+    }
+
+    fn read_managed_bytes(&self, relative: &str, max: usize) -> Result<Vec<u8>, KnowledgeError> {
+        let path = self.root.join(relative);
+        let resolved = std::fs::canonicalize(&path)
+            .map_err(|e| KnowledgeError::storage_invalid(format!("managed content read: {e}")))?;
+        let root = std::fs::canonicalize(&self.root)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if resolved != root.join(relative) || !resolved.starts_with(&root) {
+            return Err(KnowledgeError::storage_invalid(
+                "managed content path redirected",
+            ));
+        }
+        let mut options = OpenOptions::new();
+        options.read(true);
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::OpenOptionsExt;
+            options.custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK);
+        }
+        let mut file = options
+            .open(&path)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let before = file
+            .metadata()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if !before.is_file() || before.len() > max as u64 {
+            return Err(KnowledgeError::storage_invalid(
+                "managed content is not a bounded regular file",
+            ));
+        }
+        let mut bytes = Vec::new();
+        (&mut file)
+            .take(max as u64 + 1)
+            .read_to_end(&mut bytes)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let after = file
+            .metadata()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let named = std::fs::symlink_metadata(&path)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if bytes.len() > max
+            || !named.is_file()
+            || before.len() != after.len()
+            || before.modified().ok() != after.modified().ok()
+        {
+            return Err(KnowledgeError::storage_invalid(
+                "managed content changed during read",
+            ));
+        }
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::MetadataExt;
+            if before.dev() != named.dev()
+                || before.ino() != named.ino()
+                || before.ctime() != after.ctime()
+                || before.ctime_nsec() != after.ctime_nsec()
+            {
+                return Err(KnowledgeError::storage_invalid(
+                    "managed content identity changed",
+                ));
+            }
+        }
+        if std::fs::canonicalize(&path).ok().as_deref() != Some(resolved.as_path()) {
+            return Err(KnowledgeError::storage_invalid(
+                "managed content parent redirected",
+            ));
+        }
+        Ok(bytes)
+    }
+
+    /// 解析产物 JSON 原子落盘（artifacts/<snapshotId>/<artifactId>.json）。
+    pub fn write_semantic_artifact(
+        &self,
+        snapshot_id: &str,
+        artifact_id: &str,
+        payload: &serde_json::Value,
+    ) -> Result<String, KnowledgeError> {
+        let directory = self.root.join("artifacts").join(snapshot_id);
+        std::fs::create_dir_all(&directory)
+            .map_err(|e| KnowledgeError::storage_invalid(format!("artifacts dir: {e}")))?;
+        let file = directory.join(format!("{artifact_id}.json"));
+        let temp = directory.join(format!(
+            ".{artifact_id}.{}.tmp",
+            new_id("tmp").trim_start_matches("tmp_")
+        ));
+        std::fs::write(&temp, payload.to_string())
+            .map_err(|e| KnowledgeError::storage_invalid(format!("artifact write: {e}")))?;
+        std::fs::rename(&temp, &file)
+            .map_err(|e| KnowledgeError::storage_invalid(format!("artifact publish: {e}")))?;
+        Ok(format!("artifacts/{snapshot_id}/{artifact_id}.json"))
+    }
+
+    pub fn add_membership(
+        &self,
+        notebook_id: &str,
+        source_id: &str,
+    ) -> Result<MembershipRow, KnowledgeError> {
+        let now = now_iso(&*self.clock);
+        let mut conn = lock_conn(&self.conn);
+        let tx = conn
+            .transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)
+            .map_err(storage_sqlite)?;
+        let allowed:bool=tx.query_row("SELECT EXISTS(SELECT 1 FROM notebooks n JOIN sources s ON s.studio_id=n.studio_id WHERE n.id=?1 AND s.id=?2 AND n.deleted_at IS NULL AND s.deleted_at IS NULL)",params![notebook_id,source_id],|r|r.get(0)).map_err(storage_sqlite)?;
+        if !allowed {
+            return Err(KnowledgeError::not_found(
+                "Knowledge source and notebook are not active in the same studio",
+            ));
+        }
+        tx.execute("INSERT INTO notebook_sources (notebook_id,source_id,added_at) VALUES (?1,?2,?3) ON CONFLICT(notebook_id,source_id) DO UPDATE SET removed_at=NULL",params![notebook_id,source_id,now]).map_err(storage_sqlite)?;
+        tx.execute(
+            "UPDATE sources SET orphaned_at=NULL WHERE id=?1",
+            params![source_id],
+        )
+        .map_err(storage_sqlite)?;
+        tx.commit().map_err(storage_sqlite)?;
+        drop(conn);
+        self.get_membership(notebook_id, source_id)
+    }
+
+    pub fn get_membership(
+        &self,
+        notebook_id: &str,
+        source_id: &str,
+    ) -> Result<MembershipRow, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        conn.query_row(
+            "SELECT notebook_id, source_id, added_at, removed_at, relative_path, folder_node, display_order FROM notebook_sources WHERE notebook_id=?1 AND source_id=?2",
+            params![notebook_id, source_id],
+            Self::map_membership,
+        )
+        .optional()
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+        .ok_or_else(|| KnowledgeError::not_found("Knowledge source membership was not found"))
+    }
+
+    fn map_membership(row: &rusqlite::Row<'_>) -> rusqlite::Result<MembershipRow> {
+        Ok(MembershipRow {
+            notebook_id: row.get(0)?,
+            source_id: row.get(1)?,
+            added_at: row.get(2)?,
+            removed_at: row.get(3)?,
+            relative_path: row.get(4)?,
+            folder_node: row.get(5)?,
+            display_order: row.get(6)?,
+        })
+    }
+
+    pub fn remove_source_from_notebook(
+        &self,
+        notebook_id: &str,
+        source_id: &str,
+    ) -> Result<MembershipRow, KnowledgeError> {
+        let membership = self.get_membership(notebook_id, source_id)?;
+        if membership.removed_at.is_some() {
+            return Ok(membership);
+        }
+        let now = now_iso(&*self.clock);
+        let conn = lock_conn(&self.conn);
+        conn.execute(
+            "UPDATE notebook_sources SET removed_at=?1 WHERE notebook_id=?2 AND source_id=?3",
+            params![now, notebook_id, source_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        // 零活跃 membership → orphan 标记，由显式或启动维护检查保留期限。
+        let active: i64 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM notebook_sources WHERE source_id=?1 AND removed_at IS NULL",
+                params![source_id],
+                |row| row.get(0),
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if active == 0 {
+            conn.execute(
+                "UPDATE sources SET orphaned_at=?1 WHERE id=?2",
+                params![now, source_id],
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        }
+        drop(conn);
+        self.get_membership(notebook_id, source_id)
+    }
+
+    pub fn list_notebook_sources(
+        &self,
+        notebook_id: &str,
+    ) -> Result<Vec<NotebookSourceEntry>, KnowledgeError> {
+        let sources: Vec<SourceRow> = {
+            let conn = lock_conn(&self.conn);
+            let mut stmt = conn
+                .prepare(
+                    "SELECT s.id, s.studio_id, s.source_type, s.display_name, s.origin_metadata, s.created_at, s.deleted_at, s.orphaned_at
+                     FROM notebook_sources ns JOIN sources s ON s.id = ns.source_id
+                     WHERE ns.notebook_id=?1 AND ns.removed_at IS NULL AND s.deleted_at IS NULL
+                     ORDER BY ns.added_at, s.id",
+                )
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+            let rows = stmt
+                .query_map(params![notebook_id], Self::map_source)
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+            rows.collect::<Result<Vec<_>, _>>()
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+        };
+        let mut entries = Vec::new();
+        for source in sources {
+            let snapshot = self.latest_snapshot_for_source(&source.id)?;
+            let membership = self.get_membership(notebook_id, &source.id)?;
+            let parse_artifact = self.latest_parse_artifact_for_snapshot(&snapshot.id)?;
+            entries.push(NotebookSourceEntry {
+                source,
+                snapshot,
+                membership,
+                parse_artifact,
+            });
+        }
+        Ok(entries)
+    }
+
+    /// delete wins：标记删除（后续 ensure/enqueue/refresh 显式失败）。
+    pub fn delete_source(&self, source_id: &str) -> Result<SourceRow, KnowledgeError> {
+        let source = self.get_source(source_id)?;
+        let now = now_iso(&*self.clock);
+        let conn = lock_conn(&self.conn);
+        conn.execute(
+            "UPDATE sources SET deleted_at=?1 WHERE id=?2",
+            params![now, source_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        Ok(SourceRow {
+            deleted_at: Some(now),
+            ..source
+        })
+    }
+
+    /// 物理清理（purge）：索引/向量变体由调用方经缓存库清除，这里清事实行 +
+    /// 快照/产物文件（引用与块随 artifact 级联删除）。
+    pub fn purge_source(&self, source_id: &str) -> Result<(), KnowledgeError> {
+        let snapshots: Vec<SnapshotRow> = {
+            let conn = lock_conn(&self.conn);
+            let mut stmt = conn
+                .prepare("SELECT id, source_id, sha256, mime_type, byte_size, storage_path, captured_at FROM content_snapshots WHERE source_id=?1")
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+            let rows = stmt
+                .query_map(params![source_id], Self::map_snapshot)
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+            rows.collect::<Result<Vec<_>, _>>()
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+        };
+        let mut conn = lock_conn(&self.conn);
+        let tx = conn
+            .transaction()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute(
+            "DELETE FROM knowledge_turn_scope_sources WHERE source_id=?1",
+            params![source_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute(
+            "DELETE FROM ingestion_jobs WHERE source_id=?1",
+            params![source_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute(
+            "DELETE FROM notebook_sources WHERE source_id=?1",
+            params![source_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute(
+            "DELETE FROM knowledge_citations WHERE parse_artifact_id IN (SELECT id FROM parse_artifacts WHERE content_snapshot_id IN (SELECT id FROM content_snapshots WHERE source_id=?1))",
+            params![source_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute(
+            "DELETE FROM knowledge_blocks WHERE parse_artifact_id IN (SELECT id FROM parse_artifacts WHERE content_snapshot_id IN (SELECT id FROM content_snapshots WHERE source_id=?1))",
+            params![source_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute(
+            "DELETE FROM parse_artifacts WHERE content_snapshot_id IN (SELECT id FROM content_snapshots WHERE source_id=?1)",
+            params![source_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute("DELETE FROM processing_artifacts WHERE content_snapshot_id IN (SELECT id FROM content_snapshots WHERE source_id=?1)",params![source_id])
+            .map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute(
+            "DELETE FROM content_snapshots WHERE source_id=?1",
+            params![source_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute("DELETE FROM sources WHERE id=?1", params![source_id])
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.commit()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        drop(conn);
+        for snapshot in snapshots {
+            let _ = std::fs::remove_file(self.root.join(&snapshot.storage_path));
+            let _ = std::fs::remove_dir_all(self.root.join("artifacts").join(&snapshot.id));
+        }
+        Ok(())
+    }
+
+    // ── parse artifacts / blocks / citations ────────────────────────────────
+
+    pub fn processing_artifact(
+        &self,
+        snapshot: &str,
+        processor: &str,
+        version: &str,
+        config: &str,
+    ) -> Result<Option<ProcessingArtifactRow>, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        conn.query_row("SELECT id,content_snapshot_id,processor_id,processor_version,processor_config_hash,status,fidelity,output_mime,output_path,output_sha256,locator_map_json,warnings_json,created_at,completed_at FROM processing_artifacts WHERE content_snapshot_id=?1 AND processor_id=?2 AND processor_version=?3 AND processor_config_hash=?4",params![snapshot,processor,version,config],|r|Ok(ProcessingArtifactRow{
+            id:r.get(0)?,content_snapshot_id:r.get(1)?,processor_id:r.get(2)?,processor_version:r.get(3)?,processor_config_hash:r.get(4)?,status:r.get(5)?,fidelity:r.get(6)?,output_mime:r.get(7)?,output_path:r.get(8)?,output_sha256:r.get(9)?,
+            locator_map:serde_json::from_str(&r.get::<_,String>(10)?).map_err(|e|rusqlite::Error::FromSqlConversionFailure(10,rusqlite::types::Type::Text,Box::new(e)))?,warnings:serde_json::from_str(&r.get::<_,String>(11)?).map_err(|e|rusqlite::Error::FromSqlConversionFailure(11,rusqlite::types::Type::Text,Box::new(e)))?,created_at:r.get(12)?,completed_at:r.get(13)?,
+        })).optional().map_err(|e|KnowledgeError::storage_invalid(e.to_string()))
+    }
+    pub fn begin_processing_artifact(
+        &self,
+        snapshot: &str,
+        processor: &str,
+        version: &str,
+        config: &str,
+    ) -> Result<ProcessingArtifactRow, KnowledgeError> {
+        let id = new_id("kproc");
+        let now = now_iso(&*self.clock);
+        let conn = lock_conn(&self.conn);
+        // 已完成产物绝不覆盖；失败/崩溃记录沿同一身份显式重试。
+        conn.execute("INSERT INTO processing_artifacts (id,content_snapshot_id,processor_id,processor_version,processor_config_hash,status,created_at) VALUES(?1,?2,?3,?4,?5,'processing',?6) ON CONFLICT(content_snapshot_id,processor_id,processor_version,processor_config_hash) DO UPDATE SET status='processing',completed_at=NULL,warnings_json='[]' WHERE status!='ready'",params![id,snapshot,processor,version,config,now]).map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
+        drop(conn);
+        self.processing_artifact(snapshot, processor, version, config)?
+            .ok_or_else(|| KnowledgeError::storage_invalid("processing artifact missing"))
+    }
+    pub fn complete_processing_artifact(
+        &self,
+        row: &ProcessingArtifactRow,
+        text: &str,
+        locator_map: &serde_json::Value,
+        warnings: &[String],
+    ) -> Result<(), KnowledgeError> {
+        let directory = self.root.join("artifacts").join(&row.content_snapshot_id);
+        std::fs::create_dir_all(&directory)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let path = format!("artifacts/{}/{}.txt", row.content_snapshot_id, row.id);
+        let temp = directory.join(format!(".{}.{}.tmp", row.id, new_id("write")));
+        let target = self.root.join(&path);
+        let write = (|| {
+            use std::io::Write;
+            let mut file = std::fs::OpenOptions::new()
+                .create_new(true)
+                .write(true)
+                .open(&temp)?;
+            file.write_all(text.as_bytes())?;
+            file.sync_all()?;
+            std::fs::rename(&temp, &target)
+        })();
+        if let Err(e) = write {
+            let _ = std::fs::remove_file(&temp);
+            return Err(KnowledgeError::storage_invalid(format!(
+                "processor output: {e}"
+            )));
+        }
+        let now = now_iso(&*self.clock);
+        let conn = lock_conn(&self.conn);
+        conn.execute("UPDATE processing_artifacts SET status='ready',fidelity='structural',output_mime='text/plain',output_path=?1,output_sha256=?2,locator_map_json=?3,warnings_json=?4,completed_at=?5 WHERE id=?6 AND status='processing'",params![path,sha256_hex(text.as_bytes()),locator_map.to_string(),serde_json::to_string(warnings).map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?,now,row.id]).map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
+        Ok(())
+    }
+    pub fn fail_processing_artifact(&self, id: &str, reason: &str) -> Result<(), KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        conn.execute("UPDATE processing_artifacts SET status='failed',warnings_json=?1,completed_at=?2 WHERE id=?3 AND status!='ready'",params![serde_json::json!([reason]).to_string(),now_iso(&*self.clock),id]).map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
+        Ok(())
+    }
+    pub fn read_processing_output(
+        &self,
+        row: &ProcessingArtifactRow,
+    ) -> Result<String, KnowledgeError> {
+        if row.status != "ready"
+            || row.fidelity.as_deref() != Some("structural")
+            || row.output_mime.as_deref() != Some("text/plain")
+        {
+            return Err(KnowledgeError::storage_invalid(
+                "processor output is not ready",
+            ));
+        }
+        let expected = format!("artifacts/{}/{}.txt", row.content_snapshot_id, row.id);
+        if row.output_path.as_deref() != Some(&expected) {
+            return Err(KnowledgeError::storage_invalid(
+                "processor output path does not match identity",
+            ));
+        }
+        let bytes = self.read_managed_bytes(&expected, 8 * 1024 * 1024)?;
+        if bytes.len() > 8 * 1024 * 1024
+            || row.output_sha256.as_deref() != Some(&sha256_hex(&bytes))
+        {
+            return Err(KnowledgeError::storage_invalid(
+                "processor output content hash mismatch",
+            ));
+        }
+        String::from_utf8(bytes)
+            .map_err(|_| KnowledgeError::storage_invalid("processor output is not UTF8"))
+    }
+    pub fn bind_processing_artifact(
+        &self,
+        artifact: &str,
+        processing: &str,
+    ) -> Result<(), KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let changed=conn.execute("UPDATE parse_artifacts SET processing_artifact_id=?1 WHERE id=?2 AND content_snapshot_id=(SELECT content_snapshot_id FROM processing_artifacts WHERE id=?1)",params![processing,artifact]).map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
+        if changed != 1 {
+            return Err(KnowledgeError::storage_invalid(
+                "processor and parser snapshots differ",
+            ));
+        }
+        Ok(())
+    }
+
+    pub fn begin_parse_artifact(
+        &self,
+        artifact_id: &str,
+        snapshot_id: &str,
+        parser_id: &str,
+        parser_version: &str,
+        parser_config_hash: &str,
+    ) -> Result<ParseArtifactRow, KnowledgeError> {
+        let now = now_iso(&*self.clock);
+        let conn = lock_conn(&self.conn);
+        conn.execute(
+            "INSERT INTO parse_artifacts (id, content_snapshot_id, parser_id, parser_version, parser_config_hash, status, created_at) VALUES (?1, ?2, ?3, ?4, ?5, 'parsing', ?6)",
+            params![artifact_id, snapshot_id, parser_id, parser_version, parser_config_hash, now],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        drop(conn);
+        self.get_parse_artifact(artifact_id)
+    }
+
+    pub fn complete_parse_artifact(
+        &self,
+        artifact_id: &str,
+        status: &str,
+        warnings: &[&str],
+        fidelity: &str,
+        semantic_artifact_path: Option<&str>,
+    ) -> Result<ParseArtifactRow, KnowledgeError> {
+        let now = now_iso(&*self.clock);
+        let warnings_json = serde_json::to_string(warnings).unwrap_or_else(|_| "[]".into());
+        let conn = lock_conn(&self.conn);
+        conn.execute(
+            "UPDATE parse_artifacts SET status=?1, warnings=?2, fidelity=?3, semantic_artifact_path=?4, completed_at=?5 WHERE id=?6",
+            params![status, warnings_json, fidelity, semantic_artifact_path, now, artifact_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        drop(conn);
+        self.get_parse_artifact(artifact_id)
+    }
+
+    pub fn fail_parse_artifact(
+        &self,
+        artifact_id: &str,
+        reason: &str,
+    ) -> Result<(), KnowledgeError> {
+        let now = now_iso(&*self.clock);
+        let warnings = serde_json::to_string(&[reason]).unwrap_or_else(|_| "[]".into());
+        let conn = lock_conn(&self.conn);
+        conn.execute(
+            "UPDATE parse_artifacts SET status='failed', warnings=?1, completed_at=?2 WHERE id=?3",
+            params![warnings, now, artifact_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        Ok(())
+    }
+
+    pub fn get_parse_artifact(
+        &self,
+        artifact_id: &str,
+    ) -> Result<ParseArtifactRow, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        conn.query_row(
+            "SELECT id, content_snapshot_id, parser_id, parser_version, parser_config_hash, status, warnings, fidelity, processing_artifact_id, created_at, completed_at FROM parse_artifacts WHERE id=?1",
+            params![artifact_id],
+            Self::map_artifact,
+        )
+        .optional()
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+        .ok_or_else(|| KnowledgeError::not_found("Knowledge parse artifact was not found"))
+    }
+
+    fn map_artifact(row: &rusqlite::Row<'_>) -> rusqlite::Result<ParseArtifactRow> {
+        Ok(ParseArtifactRow {
+            id: row.get(0)?,
+            content_snapshot_id: row.get(1)?,
+            parser_id: row.get(2)?,
+            parser_version: row.get(3)?,
+            parser_config_hash: row.get(4)?,
+            status: row.get(5)?,
+            warnings: serde_json::from_str(&row.get::<_, String>(6)?).unwrap_or_default(),
+            fidelity: row.get(7)?,
+            processing_artifact_id: row.get(8)?,
+            created_at: row.get(9)?,
+            completed_at: row.get(10)?,
+        })
+    }
+
+    /// 删除来源时覆盖它的所有解析版本，而非只清最新版本。
+    pub fn list_source_parse_artifacts(
+        &self,
+        source_id: &str,
+    ) -> Result<Vec<(String, String)>, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let mut stmt = conn.prepare("SELECT p.id, p.content_snapshot_id FROM parse_artifacts p JOIN content_snapshots s ON s.id=p.content_snapshot_id WHERE s.source_id=?1").map_err(storage_sqlite)?;
+        let rows = stmt
+            .query_map(params![source_id], |row| Ok((row.get(0)?, row.get(1)?)))
+            .map_err(storage_sqlite)?;
+        rows.collect::<Result<Vec<_>, _>>().map_err(storage_sqlite)
+    }
+
+    pub fn latest_parse_artifact_for_snapshot(
+        &self,
+        snapshot_id: &str,
+    ) -> Result<Option<ParseArtifactRow>, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        conn.query_row(
+            "SELECT id, content_snapshot_id, parser_id, parser_version, parser_config_hash, status, warnings, fidelity, processing_artifact_id, created_at, completed_at FROM parse_artifacts WHERE content_snapshot_id=?1 ORDER BY created_at DESC, id DESC LIMIT 1",
+            params![snapshot_id],
+            Self::map_artifact,
+        )
+        .optional()
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
+    }
+
+    pub fn insert_blocks(&self, blocks: &[BlockRow]) -> Result<(), KnowledgeError> {
+        let mut conn = lock_conn(&self.conn);
+        let tx = conn
+            .transaction()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        for block in blocks {
+            tx.execute(
+                "INSERT INTO knowledge_blocks (id, parse_artifact_id, ordinal, text, text_sha256, locator_type, locator) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+                params![block.id, block.parse_artifact_id, block.ordinal as i64, block.text, block.text_sha256, block.locator_type, block.locator.to_string()],
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        }
+        tx.commit()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
+    }
+
+    fn map_block(row: &rusqlite::Row<'_>) -> rusqlite::Result<BlockRow> {
+        Ok(BlockRow {
+            id: row.get(0)?,
+            parse_artifact_id: row.get(1)?,
+            ordinal: row.get::<_, i64>(2)? as usize,
+            text: row.get(3)?,
+            text_sha256: row.get(4)?,
+            locator_type: row.get(5)?,
+            locator: parse_json(row.get(6)?),
+        })
+    }
+
+    pub fn list_artifact_blocks(&self, artifact_id: &str) -> Result<Vec<BlockRow>, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, parse_artifact_id, ordinal, text, text_sha256, locator_type, locator FROM knowledge_blocks WHERE parse_artifact_id=?1 ORDER BY ordinal",
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let rows = stmt
+            .query_map(params![artifact_id], Self::map_block)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        rows.collect::<Result<Vec<_>, _>>()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
+    }
+
+    pub fn get_blocks_by_ids(&self, block_ids: &[String]) -> Result<Vec<BlockRow>, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let mut blocks = Vec::new();
+        for block_id in block_ids {
+            if let Some(block) = conn
+                .query_row(
+                    "SELECT id, parse_artifact_id, ordinal, text, text_sha256, locator_type, locator FROM knowledge_blocks WHERE id=?1",
+                    params![block_id],
+                    Self::map_block,
+                )
+                .optional()
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+            {
+                blocks.push(block);
+            }
+        }
+        Ok(blocks)
+    }
+
+    /// 创建引用：偏移锚定块文本（Unicode scalar 口径——差异台账 D 项），canonical
+    /// text 即切片。
+    pub fn create_citation(
+        &self,
+        artifact_id: &str,
+        block_id: &str,
+        start_offset: usize,
+        end_offset: usize,
+    ) -> Result<CitationRow, KnowledgeError> {
+        let block = self
+            .list_artifact_blocks(artifact_id)?
+            .into_iter()
+            .find(|block| block.id == block_id)
+            .ok_or_else(|| {
+                KnowledgeError::index_invalid("Read range is outside its frozen raw block")
+            })?;
+        let chars: Vec<char> = block.text.chars().collect();
+        if end_offset > chars.len() || start_offset > end_offset {
+            return Err(KnowledgeError::index_invalid(
+                "Read range is outside its frozen raw block",
+            ));
+        }
+        let canonical: String = chars[start_offset..end_offset].iter().collect();
+        let canonical_sha = sha256_hex(canonical.as_bytes());
+        let id = new_id("kcit");
+        let now = now_iso(&*self.clock);
+        let conn = lock_conn(&self.conn);
+        conn.execute(
+            "INSERT INTO knowledge_citations (id, parse_artifact_id, block_id, start_offset, end_offset, canonical_text, canonical_text_sha256, created_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+            params![id, artifact_id, block_id, start_offset as i64, end_offset as i64, canonical, canonical_sha, now],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        Ok(CitationRow {
+            id,
+            parse_artifact_id: artifact_id.to_string(),
+            block_id: block_id.to_string(),
+            start_offset,
+            end_offset,
+            canonical_text: canonical,
+            canonical_text_sha256: canonical_sha,
+            created_at: now,
+        })
+    }
+
+    pub fn resolve_citation(&self, citation_id: &str) -> Result<ResolvedCitation, KnowledgeError> {
+        let citation = {
+            let conn = lock_conn(&self.conn);
+            conn.query_row(
+                "SELECT id, parse_artifact_id, block_id, start_offset, end_offset, canonical_text, canonical_text_sha256, created_at FROM knowledge_citations WHERE id=?1",
+                params![citation_id],
+                |row| {
+                    Ok(CitationRow {
+                        id: row.get(0)?,
+                        parse_artifact_id: row.get(1)?,
+                        block_id: row.get(2)?,
+                        start_offset: row.get::<_, i64>(3)? as usize,
+                        end_offset: row.get::<_, i64>(4)? as usize,
+                        canonical_text: row.get(5)?,
+                        canonical_text_sha256: row.get(6)?,
+                        created_at: row.get(7)?,
+                    })
+                },
+            )
+            .optional()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+            .ok_or_else(|| KnowledgeError::not_found("Knowledge citation was not found"))?
+        };
+        let block = self
+            .get_blocks_by_ids(std::slice::from_ref(&citation.block_id))?
+            .into_iter()
+            .next()
+            .ok_or_else(|| KnowledgeError::not_found("Knowledge citation block was not found"))?;
+        let artifact = self.get_parse_artifact(&citation.parse_artifact_id)?;
+        let snapshot = self.get_snapshot(&artifact.content_snapshot_id)?;
+        let source = self.get_source(&snapshot.source_id)?;
+        Ok(ResolvedCitation {
+            citation,
+            block,
+            snapshot,
+            source,
+        })
+    }
+
+    // ── ingestion jobs ──────────────────────────────────────────────────────
+
+    pub fn enqueue_source_ingestion(
+        &self,
+        notebook_id: &str,
+        source_id: &str,
+        artifact_id: Option<&str>,
+        chunker_config_id: &str,
+    ) -> Result<JobRow, KnowledgeError> {
+        // delete wins：已删源显式失败，绝不静默入队。
+        self.get_source(source_id)?;
+        let id = new_id("kjob");
+        let now = now_iso(&*self.clock);
+        let conn = lock_conn(&self.conn);
+        conn.execute(
+            "INSERT INTO ingestion_jobs (id, notebook_id, source_id, artifact_id, phase, status, chunker_config_id, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, 'parse', 'queued', ?5, ?6, ?6)",
+            params![id, notebook_id, source_id, artifact_id, chunker_config_id, now],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        drop(conn);
+        self.get_job(&id)
+    }
+
+    pub fn get_job(&self, job_id: &str) -> Result<JobRow, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        conn.query_row(JOB_SELECT, params![job_id], Self::map_job)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
+    }
+
+    const JOB_COLUMNS: &'static str = "id, notebook_id, source_id, artifact_id, phase, status, attempt, error, chunker_config_id, cancelled_at, progress_done, progress_total, embedding_stats, created_at, updated_at";
+
+    fn map_job(row: &rusqlite::Row<'_>) -> rusqlite::Result<JobRow> {
+        Ok(JobRow {
+            id: row.get(0)?,
+            notebook_id: row.get(1)?,
+            source_id: row.get(2)?,
+            artifact_id: row.get(3)?,
+            phase: row.get(4)?,
+            status: row.get(5)?,
+            attempt: row.get(6)?,
+            error: row.get(7)?,
+            chunker_config_id: row.get(8)?,
+            cancelled_at: row.get(9)?,
+            progress_done: row.get(10)?,
+            progress_total: row.get(11)?,
+            embedding_stats: row
+                .get::<_, Option<String>>(12)?
+                .and_then(|raw| serde_json::from_str(&raw).ok()),
+            created_at: row.get(13)?,
+            updated_at: row.get(14)?,
+        })
+    }
+
+    /// studio 限定的 job 列表（knowledge-store.ts listIngestionJobs：JOIN notebooks
+    /// 取 studio；外部 studio 的 notebook/source 只会得到空结果，不披露存在性）。
+    pub fn list_ingestion_jobs_for_studio(
+        &self,
+        studio_id: &str,
+        notebook_id: Option<&str>,
+        source_id: Option<&str>,
+        limit: usize,
+    ) -> Result<Vec<JobRow>, KnowledgeError> {
+        let columns = Self::JOB_COLUMNS
+            .split(',')
+            .map(|column| format!("j.{}", column.trim()))
+            .collect::<Vec<_>>()
+            .join(", ");
+        let mut sql = format!(
+            "SELECT {columns} FROM ingestion_jobs j JOIN notebooks nb ON nb.id = j.notebook_id WHERE nb.studio_id = ?1"
+        );
+        let mut bound: Vec<rusqlite::types::Value> =
+            vec![rusqlite::types::Value::Text(studio_id.to_string())];
+        if let Some(notebook_id) = notebook_id {
+            bound.push(rusqlite::types::Value::Text(notebook_id.to_string()));
+            sql.push_str(&format!(" AND j.notebook_id = ?{}", bound.len()));
+        }
+        if let Some(source_id) = source_id {
+            bound.push(rusqlite::types::Value::Text(source_id.to_string()));
+            sql.push_str(&format!(" AND j.source_id = ?{}", bound.len()));
+        }
+        bound.push(rusqlite::types::Value::Integer(limit as i64));
+        sql.push_str(&format!(
+            " ORDER BY j.created_at DESC, j.id DESC LIMIT ?{}",
+            bound.len()
+        ));
+        let conn = lock_conn(&self.conn);
+        let mut stmt = conn
+            .prepare(&sql)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let rows = stmt
+            .query_map(rusqlite::params_from_iter(bound), Self::map_job)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        Ok(rows)
+    }
+
+    /// studio 限定的状态计数（countIngestionJobsByStatus：同样 JOIN notebooks）。
+    pub fn count_jobs_by_status_for_studio(
+        &self,
+        studio_id: &str,
+        notebook_id: Option<&str>,
+    ) -> Result<serde_json::Value, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let mut counts = serde_json::json!({
+            "queued": 0, "running": 0, "pending_embedding": 0, "failed": 0, "done": 0
+        });
+        let mut stmt = conn
+            .prepare(
+                "SELECT j.status, COUNT(*) FROM ingestion_jobs j JOIN notebooks nb ON nb.id = j.notebook_id \
+                 WHERE nb.studio_id = ?1 AND (?2 IS NULL OR j.notebook_id = ?2) GROUP BY j.status",
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let rows = stmt
+            .query_map(params![studio_id, notebook_id], |row| {
+                Ok((row.get::<_, String>(0)?, row.get::<_, i64>(1)?))
+            })
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        for row in rows {
+            let (status, count) =
+                row.map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+            counts[status.as_str()] = serde_json::json!(count);
+        }
+        Ok(counts)
+    }
+
+    pub fn list_ingestion_jobs(
+        &self,
+        notebook_id: Option<&str>,
+        source_id: Option<&str>,
+        limit: usize,
+    ) -> Result<Vec<JobRow>, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let mut sql = format!("SELECT {} FROM ingestion_jobs WHERE 1=1", Self::JOB_COLUMNS);
+        if notebook_id.is_some() {
+            sql.push_str(" AND notebook_id=?1");
+        }
+        if source_id.is_some() {
+            let index = if notebook_id.is_some() { 2 } else { 1 };
+            sql.push_str(&format!(" AND source_id=?{index}"));
+        }
+        sql.push_str(&format!(" ORDER BY created_at DESC, id DESC LIMIT {limit}"));
+        let mut stmt = conn
+            .prepare(&sql)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let rows = match (notebook_id, source_id) {
+            (Some(nb), Some(src)) => stmt
+                .query_map(params![nb, src], Self::map_job)
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+                .collect::<Result<Vec<_>, _>>()
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?,
+            (Some(nb), None) => stmt
+                .query_map(params![nb], Self::map_job)
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+                .collect::<Result<Vec<_>, _>>()
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?,
+            (None, Some(src)) => stmt
+                .query_map(params![src], Self::map_job)
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+                .collect::<Result<Vec<_>, _>>()
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?,
+            (None, None) => stmt
+                .query_map([], Self::map_job)
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+                .collect::<Result<Vec<_>, _>>()
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?,
+        };
+        Ok(rows)
+    }
+
+    pub fn count_jobs_by_status(
+        &self,
+        notebook_id: Option<&str>,
+    ) -> Result<serde_json::Value, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let mut counts = serde_json::json!({
+            "queued": 0, "running": 0, "pending_embedding": 0, "failed": 0, "done": 0
+        });
+        let mut stmt = conn
+            .prepare("SELECT status, COUNT(*) FROM ingestion_jobs WHERE (?1 IS NULL OR notebook_id=?1) GROUP BY status")
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let rows = stmt
+            .query_map(params![notebook_id], |row| {
+                Ok((row.get::<_, String>(0)?, row.get::<_, i64>(1)?))
+            })
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        for row in rows {
+            let (status, count) =
+                row.map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+            counts[status.as_str()] = serde_json::json!(count);
+        }
+        Ok(counts)
+    }
+
+    pub fn latest_job_for_source(
+        &self,
+        notebook_id: &str,
+        source_id: &str,
+    ) -> Result<Option<JobRow>, KnowledgeError> {
+        Ok(self
+            .list_ingestion_jobs(Some(notebook_id), Some(source_id), 1)?
+            .into_iter()
+            .next())
+    }
+
+    /// 取下一个可执行 job（queued；cancel 检查在服务编排内）。
+    pub fn claim_next_job(&self) -> Result<Option<JobRow>, KnowledgeError> {
+        let mut conn = lock_conn(&self.conn);
+        let tx = conn
+            .transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let next: Option<String> = tx.query_row(
+            "SELECT j.id FROM ingestion_jobs j JOIN sources s ON s.id=j.source_id WHERE j.status='queued' AND j.cancelled_at IS NULL AND s.deleted_at IS NULL ORDER BY j.created_at,j.id LIMIT 1", [], |r|r.get(0))
+            .optional().map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
+        let Some(id) = next else { return Ok(None) };
+        tx.execute("UPDATE ingestion_jobs SET status='running',attempt=attempt+1,updated_at=?1 WHERE id=?2 AND status='queued' AND cancelled_at IS NULL",params![now_iso(&*self.clock),id])
+            .map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.commit()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        drop(conn);
+        self.get_job(&id).map(Some)
+    }
+
+    /// 调用方必须持有知识 worker 的操作系统排他锁；活跃进程不得接管。
+    pub fn recover_interrupted_jobs(&self) -> Result<usize, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        conn.execute("UPDATE ingestion_jobs SET status='queued',error='KNOWLEDGE_EMBEDDING_INTERRUPTED: confirmed checkpoints retained; inflight settlement unknown',updated_at=?1 WHERE status='running' AND cancelled_at IS NULL AND source_id IN (SELECT id FROM sources WHERE deleted_at IS NULL)",params![now_iso(&*self.clock)])
+            .map_err(|e|KnowledgeError::storage_invalid(e.to_string()))
+    }
+
+    /// 请求前即保存发送意图；中断时待确认请求保持未知，不能冒认零成本。
+    pub fn set_job_embedding_stats(
+        &self,
+        job_id: &str,
+        stats: &serde_json::Value,
+    ) -> Result<(), KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let changed=conn.execute("UPDATE ingestion_jobs SET embedding_stats=?1,updated_at=?2 WHERE id=?3 AND status='running' AND cancelled_at IS NULL",params![stats.to_string(),now_iso(&*self.clock),job_id])
+            .map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
+        if changed != 1 {
+            return Err(KnowledgeError::conflict("ingestion no longer running"));
+        }
+        Ok(())
+    }
+
+    pub fn set_job_phase(&self, job_id: &str, phase: &str) -> Result<(), KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let changed = conn.execute(
+            "UPDATE ingestion_jobs SET phase=?1, updated_at=?2 WHERE id=?3 AND status='running' AND cancelled_at IS NULL",
+            params![phase, now_iso(&*self.clock), job_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if changed != 1 {
+            return Err(KnowledgeError::conflict(
+                "ingestion status changed before write",
+            ));
+        }
+        Ok(())
+    }
+
+    pub fn set_job_progress(
+        &self,
+        job_id: &str,
+        done: i64,
+        total: Option<i64>,
+    ) -> Result<(), KnowledgeError> {
+        if done < 0 || total.is_some_and(|total| total < done || total < 0) {
+            return Err(KnowledgeError::invalid_argument(
+                "progress exceeds the planned chunks",
+            ));
+        }
+        let conn = lock_conn(&self.conn);
+        let changed = conn.execute(
+            "UPDATE ingestion_jobs SET progress_done=?1, progress_total=?2, updated_at=?3 WHERE id=?4 AND status='running' AND cancelled_at IS NULL",
+            params![done, total, now_iso(&*self.clock), job_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if changed != 1 {
+            return Err(KnowledgeError::conflict(
+                "ingestion status changed before write",
+            ));
+        }
+        Ok(())
+    }
+
+    pub fn complete_job(
+        &self,
+        job_id: &str,
+        embedding_stats: &serde_json::Value,
+    ) -> Result<(), KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let changed = conn.execute(
+            "UPDATE ingestion_jobs SET phase='done', status='done', error=NULL, embedding_stats=?1, updated_at=?2 WHERE id=?3 AND status='running' AND cancelled_at IS NULL",
+            params![embedding_stats.to_string(), now_iso(&*self.clock), job_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if changed != 1 {
+            return Err(KnowledgeError::conflict(
+                "ingestion status changed before write",
+            ));
+        }
+        Ok(())
+    }
+
+    pub fn fail_job(&self, job_id: &str, error: &str) -> Result<(), KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let changed = conn.execute(
+            "UPDATE ingestion_jobs SET status='failed', error=?1, updated_at=?2 WHERE id=?3 AND status='running' AND cancelled_at IS NULL",
+            params![error, now_iso(&*self.clock), job_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if changed != 1 {
+            return Err(KnowledgeError::conflict(
+                "ingestion status changed before write",
+            ));
+        }
+        Ok(())
+    }
+
+    /// pending_embedding 显式终态：FTS 已可查、嵌入模型未配置（禁静默降级）。
+    pub fn mark_job_pending_embedding(&self, job_id: &str) -> Result<(), KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let changed = conn.execute(
+            "UPDATE ingestion_jobs SET phase='embed', status='pending_embedding', updated_at=?1 WHERE id=?2 AND status='running' AND cancelled_at IS NULL",
+            params![now_iso(&*self.clock), job_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if changed != 1 {
+            return Err(KnowledgeError::conflict(
+                "ingestion status changed before write",
+            ));
+        }
+        Ok(())
+    }
+
+    /// pending_embedding 的补跑重排（模型就绪信号 / 启动恢复）。
+    pub fn requeue_pending_embedding_jobs(&self) -> Result<usize, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let count = conn
+            .execute(
+                "UPDATE ingestion_jobs SET status='queued', updated_at=?1 WHERE status='pending_embedding' AND cancelled_at IS NULL",
+                params![now_iso(&*self.clock)],
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        Ok(count)
+    }
+
+    /// failed 手动重试（requeue；attempt 保留、从失败 phase 续跑）。
+    pub fn requeue_job(&self, job_id: &str) -> Result<JobRow, KnowledgeError> {
+        let job = self.get_job(job_id)?;
+        if job.status != "failed" {
+            return Err(KnowledgeError::conflict(
+                "Only failed ingestion jobs can be retried",
+            ));
+        }
+        // 取消留痕的 job 不可重试（被删源永不复活；types.ts:521-525 同语义）。
+        if job.cancelled_at.is_some() {
+            return Err(KnowledgeError::conflict(
+                "Cancelled ingestion jobs cannot be retried",
+            ));
+        }
+        // 只有可信手动重试入口发放下一次真实 claim 的授权；启动恢复不续用它。
+        let mut stats = job
+            .embedding_stats
+            .clone()
+            .unwrap_or_else(|| serde_json::json!({}));
+        if !stats.is_object() {
+            return Err(KnowledgeError::storage_invalid(
+                "job embedding stats invalid",
+            ));
+        }
+        let next_attempt = job
+            .attempt
+            .checked_add(1)
+            .ok_or_else(|| KnowledgeError::storage_invalid("job attempt overflow"))?;
+        stats["manualRetryAttempt"] = serde_json::json!(next_attempt);
+        let conn = lock_conn(&self.conn);
+        let changed = conn.execute(
+            "UPDATE ingestion_jobs SET status='queued', error=NULL, embedding_stats=?3, updated_at=?1 WHERE id=?2 AND status='failed' AND cancelled_at IS NULL AND attempt=?4",
+            params![now_iso(&*self.clock), job_id, stats.to_string(), job.attempt],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if changed != 1 {
+            return Err(KnowledgeError::conflict(
+                "ingestion status changed before write",
+            ));
+        }
+        drop(conn);
+        self.get_job(job_id)
+    }
+
+    /// delete wins：取消该源全部活跃 job（failed 终态 + cancelledAt 显式标注）。
+    pub fn cancel_jobs_for_source(&self, source_id: &str) -> Result<usize, KnowledgeError> {
+        let now = now_iso(&*self.clock);
+        let conn = lock_conn(&self.conn);
+        let count = conn
+            .execute(
+                "UPDATE ingestion_jobs SET status='failed', cancelled_at=?1, error='cancelled: source deleted', updated_at=?1 WHERE source_id=?2 AND status IN ('queued','running','pending_embedding')",
+                params![now, source_id],
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        Ok(count)
+    }
+
+    // ── turn scopes ─────────────────────────────────────────────────────────
+
+    /// 创建轮 scope：同会话旧 active 关闭（supersede）；逐选中笔记本取活跃
+    /// membership 并冻结每源最新 snapshot/artifact（knowledge-store.ts:3281-3344）。
+    pub fn create_turn_scope(
+        &self,
+        studio_id: &str,
+        session_id: &str,
+        turn_id: &str,
+        notebook_ids: &[String],
+    ) -> Result<TurnScopeRow, KnowledgeError> {
+        self.create_turn_scope_selection(studio_id, session_id, turn_id, notebook_ids, None, None)
+    }
+
+    /// 原表兼容字段存归属，冻结与用户选择过滤在同一事务完成。
+    pub fn freeze_run_scope(
+        &self,
+        studio_id: &str,
+        binding: &RunScopeBinding,
+        notebook_ids: &[String],
+        source_ids: &[String],
+    ) -> Result<TurnScopeRow, KnowledgeError> {
+        self.create_turn_scope_selection(
+            studio_id,
+            &binding.session_id,
+            &binding.run_id,
+            notebook_ids,
+            Some(binding),
+            Some(source_ids),
+        )
+    }
+
+    /// 合法重试只复制本轮冻结事实；关闭旧句柄与绑定下一 attempt 必须一起提交。
+    pub fn advance_run_scope_attempt(
+        &self,
+        studio_id: &str,
+        scope_id: &str,
+        expected: &RunScopeBinding,
+        next: &RunScopeBinding,
+    ) -> Result<TurnScopeRow, KnowledgeError> {
+        let prefix = format!("{}#a", expected.run_id);
+        let sequence = expected
+            .attempt
+            .strip_prefix(&prefix)
+            .and_then(|value| value.parse::<u32>().ok())
+            .filter(|sequence| *sequence > 0 && expected.attempt == format!("{prefix}{sequence}"))
+            .and_then(|sequence| sequence.checked_add(1))
+            .ok_or_else(|| KnowledgeError::scope_violation("Invalid knowledge retry attempt"))?;
+        let mut allowed = expected.clone();
+        allowed.attempt = format!("{prefix}{sequence}");
+        if &allowed != next {
+            return Err(KnowledgeError::scope_violation(
+                "Knowledge retry must keep the same owner, agent, session, run and generation",
+            ));
+        }
+        let id = new_id("kts");
+        let mut conn = lock_conn(&self.conn);
+        let tx = conn
+            .transaction()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let selection: Option<String> = tx.query_row(
+            "SELECT notebook_ids_json FROM knowledge_turn_scopes WHERE id=?1 AND studio_id=?2 AND session_id=?3 AND turn_id=?4 AND status='active'",
+            params![scope_id, studio_id, expected.session_id, expected.run_id],
+            |row| row.get(0),
+        ).optional().map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let mut selection: serde_json::Value =
+            serde_json::from_str(&selection.ok_or_else(|| {
+                KnowledgeError::scope_violation("Knowledge retry scope is closed or missing")
+            })?)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let binding: RunScopeBinding = serde_json::from_value(selection["binding"].clone())
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if selection["schema"] != "lingxi.run-knowledge-scope.v1" || &binding != expected {
+            return Err(KnowledgeError::scope_violation(
+                "Knowledge retry scope binding changed",
+            ));
+        }
+        selection["binding"] = serde_json::to_value(next)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute(
+            "UPDATE knowledge_turn_scopes SET status='closed' WHERE id=?1",
+            params![scope_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute(
+            "INSERT INTO knowledge_turn_scopes (id, turn_id, session_id, studio_id, notebook_ids_json, status, created_at) VALUES (?1, ?2, ?3, ?4, ?5, 'active', ?6)",
+            params![id, next.run_id, next.session_id, studio_id, selection.to_string(), now_iso(&*self.clock)],
+        ).map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        // 不重新查询来源或最新快照，避免供应商失败变相改变本轮已授权内容。
+        tx.execute(
+            "INSERT INTO knowledge_turn_scope_sources (scope_id, source_id, content_snapshot_id, parse_artifact_id, notebook_ids_json) SELECT ?1, source_id, content_snapshot_id, parse_artifact_id, notebook_ids_json FROM knowledge_turn_scope_sources WHERE scope_id=?2",
+            params![id, scope_id],
+        ).map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.commit()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        drop(conn);
+        self.get_turn_scope(&id)?
+            .ok_or_else(|| KnowledgeError::storage_invalid("retry scope vanished"))
+    }
+
+    fn create_turn_scope_selection(
+        &self,
+        studio_id: &str,
+        session_id: &str,
+        turn_id: &str,
+        notebook_ids: &[String],
+        run_binding: Option<&RunScopeBinding>,
+        selected_sources: Option<&[String]>,
+    ) -> Result<TurnScopeRow, KnowledgeError> {
+        if notebook_ids.is_empty() {
+            return Err(KnowledgeError::invalid_argument(
+                "notebookIds must be a non-empty array",
+            ));
+        }
+        let mut unique_ids: Vec<String> = Vec::new();
+        for notebook_id in notebook_ids {
+            if !unique_ids.contains(notebook_id) {
+                unique_ids.push(notebook_id.clone());
+            }
+        }
+        for notebook_id in &unique_ids {
+            self.get_notebook(studio_id, notebook_id)?;
+        }
+        let selection = match run_binding {
+            Some(binding) => serde_json::json!({
+                "schema": "lingxi.run-knowledge-scope.v1",
+                "notebookIds": unique_ids,
+                "binding": binding,
+            }),
+            None => serde_json::json!(unique_ids),
+        };
+        let id = new_id("kts");
+        let now = now_iso(&*self.clock);
+        let mut conn = lock_conn(&self.conn);
+        let tx = conn
+            .transaction()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute(
+            "UPDATE knowledge_turn_scopes SET status='closed' WHERE session_id=?1 AND status='active'",
+            params![session_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute(
+            "INSERT INTO knowledge_turn_scopes (id, turn_id, session_id, studio_id, notebook_ids_json, status, created_at) VALUES (?1, ?2, ?3, ?4, ?5, 'active', ?6)",
+            params![id, turn_id, session_id, studio_id, selection.to_string(), now],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let mut frozen: Vec<TurnScopeSourceRow> = Vec::new();
+        for notebook_id in &unique_ids {
+            let mut stmt = tx
+                .prepare(
+                    "SELECT s.id FROM notebook_sources ns JOIN sources s ON s.id = ns.source_id
+                     WHERE ns.notebook_id=?1 AND ns.removed_at IS NULL AND s.deleted_at IS NULL
+                     ORDER BY ns.added_at, s.id",
+                )
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+            let source_ids = stmt
+                .query_map(params![notebook_id], |row| row.get::<_, String>(0))
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+                .collect::<Result<Vec<_>, _>>()
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+            for source_id in source_ids {
+                if selected_sources
+                    .is_some_and(|selected| !selected.is_empty() && !selected.contains(&source_id))
+                {
+                    continue;
+                }
+                if let Some(existing) = frozen.iter_mut().find(|row| row.source_id == source_id) {
+                    existing.notebook_ids.push(notebook_id.clone());
+                    // 同一源被多个选中笔记本引用时合并为一行——冻结行的
+                    // notebook_ids 同步回写（合并语义对读取侧可见）。
+                    tx.execute(
+                        "UPDATE knowledge_turn_scope_sources SET notebook_ids_json=?1 WHERE scope_id=?2 AND source_id=?3",
+                        params![serde_json::to_string(&existing.notebook_ids).unwrap_or_default(), id, source_id],
+                    )
+                    .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+                    continue;
+                }
+                let snapshot_id: String = tx
+                    .query_row(
+                        "SELECT id FROM content_snapshots WHERE source_id=?1 ORDER BY captured_at DESC, id DESC LIMIT 1",
+                        params![source_id],
+                        |row| row.get(0),
+                    )
+                    .optional()
+                    .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+                    .ok_or_else(|| {
+                        KnowledgeError::not_found("Knowledge source has no content snapshot")
+                    })?;
+                let artifact_id: Option<String> = tx
+                    .query_row(
+                        "SELECT id FROM parse_artifacts WHERE content_snapshot_id=?1 AND status IN ('ready','needs_ocr') ORDER BY created_at DESC, id DESC LIMIT 1",
+                        params![snapshot_id],
+                        |row| row.get(0),
+                    )
+                    .optional()
+                    .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+                tx.execute(
+                    "INSERT INTO knowledge_turn_scope_sources (scope_id, source_id, content_snapshot_id, parse_artifact_id, notebook_ids_json) VALUES (?1, ?2, ?3, ?4, ?5)",
+                    params![id, source_id, snapshot_id, artifact_id, serde_json::to_string(&[notebook_id]).unwrap_or_default()],
+                )
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+                frozen.push(TurnScopeSourceRow {
+                    scope_id: id.clone(),
+                    source_id,
+                    content_snapshot_id: snapshot_id,
+                    parse_artifact_id: artifact_id,
+                    notebook_ids: vec![notebook_id.clone()],
+                });
+            }
+        }
+        if selected_sources.is_some_and(|selected| {
+            selected
+                .iter()
+                .any(|source| !frozen.iter().any(|row| &row.source_id == source))
+        }) {
+            return Err(KnowledgeError::scope_violation(
+                "Selected knowledge source does not belong to the selected notebooks",
+            ));
+        }
+        tx.commit()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        drop(conn);
+        self.get_turn_scope(&id)?
+            .ok_or_else(|| KnowledgeError::storage_invalid("turn scope vanished"))
+    }
+
+    pub fn get_turn_scope(&self, scope_id: &str) -> Result<Option<TurnScopeRow>, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let scope = conn
+            .query_row(
+                "SELECT id, turn_id, session_id, studio_id, notebook_ids_json, status, created_at FROM knowledge_turn_scopes WHERE id=?1",
+                params![scope_id],
+                |row| {
+                    let selection: serde_json::Value = serde_json::from_str(&row.get::<_, String>(4)?)
+                        .map_err(|error| rusqlite::Error::FromSqlConversionFailure(
+                            4, rusqlite::types::Type::Text, Box::new(error),
+                        ))?;
+                    let (notebook_ids, run_binding) = if selection.is_array() {
+                        (serde_json::from_value(selection).map_err(|error| {
+                            rusqlite::Error::FromSqlConversionFailure(4, rusqlite::types::Type::Text, Box::new(error))
+                        })?, None)
+                    } else {
+                        if selection["schema"] != "lingxi.run-knowledge-scope.v1" {
+                            return Err(rusqlite::Error::InvalidQuery);
+                        }
+                        (
+                            serde_json::from_value(selection["notebookIds"].clone()).map_err(|error| {
+                                rusqlite::Error::FromSqlConversionFailure(4, rusqlite::types::Type::Text, Box::new(error))
+                            })?,
+                            Some(serde_json::from_value(selection["binding"].clone()).map_err(|error| {
+                                rusqlite::Error::FromSqlConversionFailure(4, rusqlite::types::Type::Text, Box::new(error))
+                            })?),
+                        )
+                    };
+                    Ok(TurnScopeRow {
+                        id: row.get(0)?,
+                        turn_id: row.get(1)?,
+                        session_id: row.get(2)?,
+                        studio_id: row.get(3)?,
+                        notebook_ids,
+                        status: row.get(5)?,
+                        created_at: row.get(6)?,
+                        sources: Vec::new(),
+                        run_binding,
+                    })
+                },
+            )
+            .optional()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let Some(mut scope) = scope else {
+            return Ok(None);
+        };
+        let mut stmt = conn
+            .prepare("SELECT scope_id, source_id, content_snapshot_id, parse_artifact_id, notebook_ids_json FROM knowledge_turn_scope_sources WHERE scope_id=?1 ORDER BY source_id")
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let sources = stmt
+            .query_map(params![scope_id], |row| {
+                Ok(TurnScopeSourceRow {
+                    scope_id: row.get(0)?,
+                    source_id: row.get(1)?,
+                    content_snapshot_id: row.get(2)?,
+                    parse_artifact_id: row.get(3)?,
+                    notebook_ids: serde_json::from_str(&row.get::<_, String>(4)?)
+                        .unwrap_or_default(),
+                })
+            })
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        scope.sources = sources;
+        Ok(Some(scope))
+    }
+
+    /// 活跃 scope 是否冻结引用该源（delete wins 的 409 依据）。
+    pub fn any_active_scope_freezes_source(&self, source_id: &str) -> Result<bool, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let count: i64 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM knowledge_turn_scope_sources s
+                 JOIN knowledge_turn_scopes t ON t.id = s.scope_id
+                 WHERE s.source_id=?1 AND t.status='active'",
+                params![source_id],
+                |row| row.get(0),
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        Ok(count > 0)
+    }
+}
+
+const JOB_SELECT: &str = "SELECT id, notebook_id, source_id, artifact_id, phase, status, attempt, error, chunker_config_id, cancelled_at, progress_done, progress_total, embedding_stats, created_at, updated_at FROM ingestion_jobs WHERE id=?1";
+
+// ── FTS 索引缓存库 ──────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct IndexVariantRow {
+    pub id: String,
+    pub parse_artifact_id: String,
+    pub chunk_profile_hash: String,
+    pub block_fingerprint: String,
+    pub status: String,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct StoredChunk {
+    pub chunk_id: String,
+    pub variant_id: String,
+    pub ordinal: usize,
+    pub section_id: Option<String>,
+    pub text: String,
+    pub token_count: usize,
+    pub spans: Vec<ChunkSpan>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct SectionMetaRow {
+    pub id: String,
+    pub section_ordinal: usize,
+    pub heading_path: Vec<String>,
+    pub start_block_ordinal: usize,
+    pub end_block_ordinal: usize,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct IndexHit {
+    pub variant_id: String,
+    pub chunk: StoredChunk,
+    pub score: f64,
+}
+
+pub struct KnowledgeIndexStore {
+    conn: Mutex<Connection>,
+    _recovery_guard: File,
+}
+
+const INDEX_SCHEMA_VERSION: i64 = 1;
+
+impl Drop for KnowledgeIndexStore {
+    fn drop(&mut self) {
+        if let Err(error) = prepare_supported_close(&lock_conn(&self.conn), INDEX_SCHEMA_VERSION) {
+            tracing::warn!(
+                code = error.code,
+                "knowledge close preserved WAL without checkpoint"
+            );
+        }
+    }
+}
+
+impl KnowledgeIndexStore {
+    /// 打开缓存；未来版本/权限/锁/I/O保留原件，只有确证损坏才隔离恢复。
+    pub fn open(root: &Path) -> Result<Self, KnowledgeError> {
+        std::fs::create_dir_all(root).map_err(storage_io)?;
+        let (conn, guard) = open_cache(
+            &root.join("knowledge_index.db"),
+            INDEX_SCHEMA_VERSION,
+            INDEX_SCHEMA_SQL,
+        )?;
+        Ok(Self {
+            conn: Mutex::new(conn),
+            _recovery_guard: guard,
+        })
+    }
+
+    pub fn ensure_chunk_index_variant(
+        &self,
+        parse_artifact_id: &str,
+        chunk_profile_hash: &str,
+        block_fingerprint: &str,
+    ) -> Result<IndexVariantRow, KnowledgeError> {
+        let id = chunk_index_variant_id(parse_artifact_id, chunk_profile_hash);
+        let mut connection = lock_conn(&self.conn);
+        let conn = cache_write(&mut connection, INDEX_SCHEMA_VERSION)?;
+        let inserted = conn.execute(
+            "INSERT INTO chunk_index_variants (id, parse_artifact_id, chunk_profile_hash, block_fingerprint, status) VALUES (?1, ?2, ?3, ?4, 'building')
+             ON CONFLICT(id) DO NOTHING",
+            params![id, parse_artifact_id, chunk_profile_hash, block_fingerprint],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if inserted != 0 {
+            write_current_algorithm(&conn, &id)?;
+        }
+        conn.commit().map_err(storage_sqlite)?;
+        drop(connection);
+        self.get_variant(&id)?
+            .ok_or_else(|| KnowledgeError::storage_invalid("chunk index variant vanished"))
+    }
+
+    pub fn derived_algorithm_status(
+        &self,
+        variant_id: &str,
+    ) -> Result<Option<DerivedAlgorithmStatus>, KnowledgeError> {
+        derived_algorithm(&lock_conn(&self.conn), true, variant_id)
+    }
+    pub fn artifact_has_stale_variants(&self, artifact_id: &str) -> Result<bool, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        validate_derived_metadata(&conn, true)?;
+        conn.query_row("SELECT EXISTS(SELECT 1 FROM chunk_index_variants v JOIN knowledge_derived_algorithms m ON m.variant_id=v.id WHERE v.parse_artifact_id=?1 AND m.algorithm=?2)",params![artifact_id,LEGACY_DERIVED_ALGORITHM],|r|r.get(0)).map_err(storage_sqlite)
+    }
+    pub fn get_variant(&self, variant_id: &str) -> Result<Option<IndexVariantRow>, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let mut row=conn.query_row("SELECT id, parse_artifact_id, chunk_profile_hash, block_fingerprint, status FROM chunk_index_variants WHERE id=?1",params![variant_id],Self::map_variant).optional().map_err(storage_sqlite)?;
+        if let Some(row) = row.as_mut() {
+            if derived_algorithm(&conn, true, variant_id)?
+                == Some(DerivedAlgorithmStatus::LegacyStale)
+            {
+                row.status = "stale".into();
+            }
+        }
+        Ok(row)
+    }
+
+    fn map_variant(row: &rusqlite::Row<'_>) -> rusqlite::Result<IndexVariantRow> {
+        Ok(IndexVariantRow {
+            id: row.get(0)?,
+            parse_artifact_id: row.get(1)?,
+            chunk_profile_hash: row.get(2)?,
+            block_fingerprint: row.get(3)?,
+            status: row.get(4)?,
+        })
+    }
+
+    pub fn set_variant_status(&self, variant_id: &str, status: &str) -> Result<(), KnowledgeError> {
+        let mut connection = lock_conn(&self.conn);
+        let conn = cache_write(&mut connection, INDEX_SCHEMA_VERSION)?;
+        require_current_algorithm(&conn, true, variant_id)?;
+        conn.execute(
+            "UPDATE chunk_index_variants SET status=?1 WHERE id=?2",
+            params![status, variant_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        conn.commit().map_err(storage_sqlite)?;
+        Ok(())
+    }
+
+    /// 指纹门：同 (artifact, profile) 变体 ready 且指纹一致才整体跳过重建。
+    pub fn has_artifact_fingerprint(
+        &self,
+        parse_artifact_id: &str,
+        chunk_profile_hash: &str,
+        block_fingerprint: &str,
+    ) -> Result<bool, KnowledgeError> {
+        let id = chunk_index_variant_id(parse_artifact_id, chunk_profile_hash);
+        Ok(self
+            .get_variant(&id)?
+            .is_some_and(|row| row.block_fingerprint == block_fingerprint && row.status == "ready"))
+    }
+
+    /// chunk+FTS 同事务幂等替换（查询只读 ready 变体，不读半写状态）。
+    pub fn replace_artifact_chunks(
+        &self,
+        parse_artifact_id: &str,
+        chunk_profile_hash: &str,
+        block_fingerprint: &str,
+        chunks: &[ChunkDraft],
+        sections: &[SectionMetaRow],
+    ) -> Result<String, KnowledgeError> {
+        let variant = self.ensure_chunk_index_variant(
+            parse_artifact_id,
+            chunk_profile_hash,
+            block_fingerprint,
+        )?;
+        if chunks.is_empty() {
+            return Err(KnowledgeError::index_invalid(
+                "Ready Knowledge source produced no searchable chunks",
+            ));
+        }
+        let mut conn = lock_conn(&self.conn);
+        let tx = cache_write(&mut conn, INDEX_SCHEMA_VERSION)?;
+        tx.execute(
+            "UPDATE chunk_index_variants SET block_fingerprint=?1, status='building' WHERE id=?2",
+            params![block_fingerprint, variant.id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute(
+            "DELETE FROM knowledge_chunks WHERE variant_id=?1",
+            params![variant.id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        for chunk in chunks {
+            tx.execute(
+                "INSERT INTO knowledge_chunks (variant_id, chunk_id, ordinal, section_id, text, search_text, token_count, spans_json) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+                params![variant.id, chunk.id, chunk.ordinal as i64, chunk.section_id, chunk.text, build_search_document_text(&chunk.text), chunk.token_count as i64, spans_to_json(&chunk.spans)],
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        }
+        tx.execute(
+            "INSERT INTO knowledge_chunks_fts(knowledge_chunks_fts) VALUES ('rebuild')",
+            [],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute(
+            "DELETE FROM knowledge_sections WHERE parse_artifact_id=?1",
+            params![parse_artifact_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        for section in sections {
+            tx.execute(
+                "INSERT INTO knowledge_sections (id, parse_artifact_id, section_ordinal, heading_path_json, start_block_ordinal, end_block_ordinal) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+                params![section.id, parse_artifact_id, section.section_ordinal as i64, serde_json::to_string(&section.heading_path).unwrap_or_default(), section.start_block_ordinal as i64, section.end_block_ordinal as i64],
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        }
+        write_current_algorithm(&tx, &variant.id)?;
+        tx.execute(
+            "UPDATE chunk_index_variants SET status='ready' WHERE id=?1",
+            params![variant.id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.commit()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        Ok(variant.id)
+    }
+
+    fn map_stored_chunk(
+        variant_id: &str,
+        row: &rusqlite::Row<'_>,
+    ) -> rusqlite::Result<StoredChunk> {
+        Ok(StoredChunk {
+            chunk_id: row.get(0)?,
+            variant_id: variant_id.to_string(),
+            ordinal: row.get::<_, i64>(1)? as usize,
+            section_id: row.get(2)?,
+            text: row.get(3)?,
+            token_count: row.get::<_, i64>(4)? as usize,
+            spans: spans_from_json(&row.get::<_, String>(5)?),
+        })
+    }
+
+    pub fn list_variant_chunks(
+        &self,
+        variant_id: &str,
+    ) -> Result<Vec<StoredChunk>, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        require_current_algorithm(&conn, true, variant_id)?;
+        let mut stmt = conn
+            .prepare(
+                "SELECT chunk_id, ordinal, section_id, text, token_count, spans_json FROM knowledge_chunks WHERE variant_id=?1 ORDER BY ordinal",
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let rows = stmt
+            .query_map(params![variant_id], |row| {
+                Self::map_stored_chunk(variant_id, row)
+            })
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        rows.collect::<Result<Vec<_>, _>>()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
+    }
+
+    /// FTS 检索：限定变体集合（scope 作用域的存储侧体现）。query 为 FTS5 MATCH
+    /// 词项（服务层构造）；无有效词项时不制造无关命中。
+    pub fn search_fts(
+        &self,
+        variant_ids: &[&str],
+        query: &str,
+        limit: usize,
+    ) -> Result<Vec<IndexHit>, KnowledgeError> {
+        self.search_fts_in_chunks(variant_ids, query, limit, None)
+    }
+
+    /// 章节范围先过滤再取前N；不能先截断再丢弃不在章节内的候选。
+    pub fn search_fts_in_chunks(
+        &self,
+        variant_ids: &[&str],
+        query: &str,
+        limit: usize,
+        allowed_chunks: Option<&std::collections::BTreeSet<String>>,
+    ) -> Result<Vec<IndexHit>, KnowledgeError> {
+        if variant_ids.is_empty() {
+            return Ok(Vec::new());
+        }
+        let placeholders = variant_ids
+            .iter()
+            .enumerate()
+            .map(|(index, _)| format!("?{}", index + 1))
+            .collect::<Vec<_>>()
+            .join(", ");
+        let trimmed = query.trim();
+        let match_index = variant_ids.len() + 1;
+        let filter_index = match_index + 1;
+        let chunk_filter = if allowed_chunks.is_some() {
+            format!("AND c.chunk_id IN (SELECT value FROM json_each(?{filter_index}))")
+        } else {
+            String::new()
+        };
+        let sql = format!(
+            "SELECT c.chunk_id, c.ordinal, c.section_id, c.text, c.token_count, c.spans_json, c.variant_id, bm25(knowledge_chunks_fts) AS score \
+             FROM knowledge_chunks_fts f JOIN knowledge_chunks c ON c.rowid = f.rowid \
+             WHERE knowledge_chunks_fts MATCH ?{match_index} AND c.variant_id IN ({placeholders}) \
+             {chunk_filter} ORDER BY score LIMIT {limit}"
+        );
+        let conn = lock_conn(&self.conn);
+        for variant_id in variant_ids {
+            require_current_algorithm(&conn, true, variant_id)?;
+        }
+        if trimmed.is_empty() {
+            return Ok(Vec::new());
+        }
+        let mut stmt = conn
+            .prepare(&sql)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let mut bound: Vec<rusqlite::types::Value> = variant_ids
+            .iter()
+            .map(|id| rusqlite::types::Value::Text((*id).to_string()))
+            .collect();
+        bound.push(rusqlite::types::Value::Text(trimmed.to_string()));
+        if let Some(allowed) = allowed_chunks {
+            bound.push(rusqlite::types::Value::Text(
+                serde_json::to_string(allowed)
+                    .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?,
+            ));
+        }
+        let rows = stmt
+            .query_map(rusqlite::params_from_iter(bound), move |row| {
+                let chunk = StoredChunk {
+                    chunk_id: row.get(0)?,
+                    variant_id: row.get(6)?,
+                    ordinal: row.get::<_, i64>(1)? as usize,
+                    section_id: row.get(2)?,
+                    text: row.get(3)?,
+                    token_count: row.get::<_, i64>(4)? as usize,
+                    spans: spans_from_json(&row.get::<_, String>(5)?),
+                };
+                let score: f64 = row.get(7)?;
+                Ok(IndexHit {
+                    score,
+                    variant_id: chunk.variant_id.clone(),
+                    chunk,
+                })
+            })
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        rows.collect::<Result<Vec<_>, _>>()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
+    }
+
+    pub fn get_ready_variant_metadata(
+        &self,
+        parse_artifact_id: &str,
+        chunk_profile_hash: &str,
+    ) -> Result<Option<(String, usize)>, KnowledgeError> {
+        let id = chunk_index_variant_id(parse_artifact_id, chunk_profile_hash);
+        let row = self.get_variant(&id)?;
+        match row {
+            Some(variant) if variant.status == "ready" => {
+                let conn = lock_conn(&self.conn);
+                let count: i64 = conn
+                    .query_row(
+                        "SELECT COUNT(*) FROM knowledge_chunks WHERE variant_id=?1",
+                        params![id],
+                        |row| row.get(0),
+                    )
+                    .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+                Ok(Some((id, count as usize)))
+            }
+            _ => Ok(None),
+        }
+    }
+
+    pub fn list_ready_variant_metadata(
+        &self,
+        parse_artifact_id: &str,
+    ) -> Result<Vec<(String, usize)>, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let mut stmt = conn
+            .prepare(
+                "SELECT id FROM chunk_index_variants WHERE parse_artifact_id=?1 AND status='ready'",
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let ids = stmt
+            .query_map(params![parse_artifact_id], |row| row.get::<_, String>(0))
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let mut out = Vec::new();
+        for id in ids {
+            if derived_algorithm(&conn, true, &id)? != Some(DerivedAlgorithmStatus::Current) {
+                continue;
+            }
+            let count: i64 = conn
+                .query_row(
+                    "SELECT COUNT(*) FROM knowledge_chunks WHERE variant_id=?1",
+                    params![id],
+                    |row| row.get(0),
+                )
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+            out.push((id, count as usize));
+        }
+        Ok(out)
+    }
+
+    pub fn list_artifact_section_metadata(
+        &self,
+        parse_artifact_id: &str,
+    ) -> Result<Vec<SectionMetaRow>, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, section_ordinal, heading_path_json, start_block_ordinal, end_block_ordinal FROM knowledge_sections WHERE parse_artifact_id=?1 ORDER BY section_ordinal",
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let rows = stmt
+            .query_map(params![parse_artifact_id], |row| {
+                Ok(SectionMetaRow {
+                    id: row.get(0)?,
+                    section_ordinal: row.get::<_, i64>(1)? as usize,
+                    heading_path: serde_json::from_str(&row.get::<_, String>(2)?)
+                        .unwrap_or_default(),
+                    start_block_ordinal: row.get::<_, i64>(3)? as usize,
+                    end_block_ordinal: row.get::<_, i64>(4)? as usize,
+                })
+            })
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        rows.collect::<Result<Vec<_>, _>>()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
+    }
+
+    /// 显式失效只清同一SQLite事务中的派生行，不unlink活跃数据库。
+    pub fn reset(&self) -> Result<(), KnowledgeError> {
+        let mut conn = lock_conn(&self.conn);
+        let tx = cache_write(&mut conn, INDEX_SCHEMA_VERSION)?;
+        tx.execute_batch("DELETE FROM knowledge_derived_algorithms; DELETE FROM knowledge_chunks; DELETE FROM chunk_index_variants; DELETE FROM knowledge_sections;").map_err(storage_sqlite)?;
+        tx.commit().map_err(storage_sqlite)
+    }
+
+    /// 显式删源仅清该解析产物的派生索引，其它来源不受影响。
+    pub fn remove_artifact(&self, artifact: &str) -> Result<(), KnowledgeError> {
+        let mut conn = lock_conn(&self.conn);
+        let tx = cache_write(&mut conn, INDEX_SCHEMA_VERSION)?;
+        tx.execute("DELETE FROM knowledge_chunks WHERE variant_id IN (SELECT id FROM chunk_index_variants WHERE parse_artifact_id=?1)", params![artifact]).map_err(storage_sqlite)?;
+        tx.execute("DELETE FROM knowledge_derived_algorithms WHERE variant_id IN (SELECT id FROM chunk_index_variants WHERE parse_artifact_id=?1)",params![artifact]).map_err(storage_sqlite)?;
+        tx.execute(
+            "DELETE FROM chunk_index_variants WHERE parse_artifact_id=?1",
+            params![artifact],
+        )
+        .map_err(storage_sqlite)?;
+        tx.execute(
+            "DELETE FROM knowledge_sections WHERE parse_artifact_id=?1",
+            params![artifact],
+        )
+        .map_err(storage_sqlite)?;
+        tx.commit().map_err(storage_sqlite)
+    }
+}
+
+const INDEX_SCHEMA_SQL: &str = r#"
+CREATE TABLE IF NOT EXISTS chunk_index_variants (
+    id                 TEXT PRIMARY KEY,
+    parse_artifact_id  TEXT NOT NULL,
+    chunk_profile_hash TEXT NOT NULL,
+    block_fingerprint  TEXT NOT NULL,
+    status             TEXT NOT NULL CHECK(status IN ('building','ready','failed')),
+    UNIQUE (parse_artifact_id, chunk_profile_hash)
+);
+CREATE TABLE IF NOT EXISTS knowledge_chunks (
+    variant_id   TEXT NOT NULL REFERENCES chunk_index_variants(id),
+    chunk_id     TEXT NOT NULL,
+    ordinal      INTEGER NOT NULL,
+    section_id   TEXT,
+    text         TEXT NOT NULL,
+    search_text  TEXT NOT NULL DEFAULT '',
+    token_count  INTEGER NOT NULL,
+    spans_json   TEXT NOT NULL DEFAULT '[]',
+    PRIMARY KEY (variant_id, ordinal)
+);
+CREATE VIRTUAL TABLE IF NOT EXISTS knowledge_chunks_fts USING fts5(
+    text,
+    search_text,
+    content='knowledge_chunks',
+    content_rowid='rowid',
+    tokenize='unicode61'
+);
+CREATE TRIGGER IF NOT EXISTS chunks_fts_ai AFTER INSERT ON knowledge_chunks BEGIN
+    INSERT INTO knowledge_chunks_fts(rowid, text, search_text) VALUES (new.rowid, new.text, new.search_text);
+END;
+CREATE TRIGGER IF NOT EXISTS chunks_fts_ad AFTER DELETE ON knowledge_chunks BEGIN
+    INSERT INTO knowledge_chunks_fts(knowledge_chunks_fts, rowid, text, search_text) VALUES ('delete', old.rowid, old.text, old.search_text);
+END;
+CREATE TABLE IF NOT EXISTS knowledge_sections (
+    id                  TEXT NOT NULL,
+    parse_artifact_id   TEXT NOT NULL,
+    section_ordinal     INTEGER NOT NULL,
+    heading_path_json   TEXT NOT NULL DEFAULT '[]',
+    start_block_ordinal INTEGER NOT NULL,
+    end_block_ordinal   INTEGER NOT NULL,
+    PRIMARY KEY (parse_artifact_id, section_ordinal)
+);
+"#;
+
+// ── 向量缓存库 ──────────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct VectorVariantRecord {
+    pub variant_id: String,
+    pub chunk_index_variant_id: String,
+    pub parse_artifact_id: String,
+    pub model_key: String,
+    pub chunk_fingerprint: String,
+    pub dimensions: u32,
+    pub status: String,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct VectorEntry {
+    pub chunk_id: String,
+    pub ordinal: usize,
+    pub vector: Vec<f32>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct VectorHit {
+    pub variant_id: String,
+    pub chunk_id: String,
+    pub parse_artifact_id: String,
+    pub score: f32,
+}
+
+pub struct BuildBegin {
+    pub variant_id: String,
+    pub reset_stale: bool,
+}
+
+pub struct KnowledgeVectorStore {
+    conn: Mutex<Connection>,
+    _recovery_guard: File,
+    clock: ClockMs,
+}
+
+const VECTOR_SCHEMA_VERSION: i64 = 1;
+
+const VECTOR_SCHEMA_SQL: &str = r#"
+CREATE TABLE IF NOT EXISTS vector_index_variants (
+    id                     TEXT PRIMARY KEY,
+    chunk_index_variant_id TEXT NOT NULL,
+    parse_artifact_id      TEXT NOT NULL,
+    model_key              TEXT NOT NULL,
+    chunk_fingerprint      TEXT NOT NULL,
+    dimensions             INTEGER NOT NULL CHECK(dimensions > 0),
+    status                 TEXT NOT NULL CHECK(status IN ('building','ready','failed')),
+    UNIQUE (chunk_index_variant_id, model_key)
+);
+CREATE INDEX IF NOT EXISTS idx_vector_variants_artifact ON vector_index_variants(parse_artifact_id);
+CREATE TABLE IF NOT EXISTS chunk_vectors (
+    vector_index_variant_id TEXT NOT NULL REFERENCES vector_index_variants(id),
+    chunk_id     TEXT NOT NULL,
+    ordinal      INTEGER NOT NULL,
+    vector       BLOB NOT NULL,
+    PRIMARY KEY (vector_index_variant_id, chunk_id)
+);
+"#;
+
+impl Drop for KnowledgeVectorStore {
+    fn drop(&mut self) {
+        if let Err(error) = prepare_supported_close(&lock_conn(&self.conn), VECTOR_SCHEMA_VERSION) {
+            tracing::warn!(
+                code = error.code,
+                "knowledge close preserved WAL without checkpoint"
+            );
+        }
+    }
+}
+
+impl KnowledgeVectorStore {
+    pub fn open(root: &Path) -> Result<Self, KnowledgeError> {
+        Self::open_with_clock(
+            root,
+            Arc::new(|| {
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .map(|d| d.as_millis() as i64)
+                    .unwrap_or(0)
+            }),
+        )
+    }
+
+    pub fn open_with_clock(root: &Path, clock: ClockMs) -> Result<Self, KnowledgeError> {
+        std::fs::create_dir_all(root).map_err(storage_io)?;
+        let (conn, guard) = open_cache(
+            &root.join("knowledge_vector.db"),
+            VECTOR_SCHEMA_VERSION,
+            VECTOR_SCHEMA_SQL,
+        )?;
+        lifecycle::initialize_vector_usage(&conn, clock())?;
+        Ok(Self {
+            conn: Mutex::new(conn),
+            _recovery_guard: guard,
+            clock,
+        })
+    }
+
+    /// begin：已有身份的指纹或维度冲突明确拒绝并保留旧付费结果；
+    /// 一致 → 保留已落库向量（断点续嵌锚）。维度 1..=65536。
+    pub fn begin_variant_build(
+        &self,
+        chunk_index_variant_id: &str,
+        parse_artifact_id: &str,
+        model_key: &str,
+        chunk_fingerprint: &str,
+        dimensions: u32,
+    ) -> Result<BuildBegin, KnowledgeError> {
+        if dimensions == 0 || dimensions > 65_536 {
+            return Err(KnowledgeError::invalid_argument(
+                "Vector dimensions are invalid",
+            ));
+        }
+        let variant_id = vector_index_variant_id(chunk_index_variant_id, model_key);
+        let mut connection = lock_conn(&self.conn);
+        let conn = cache_write(&mut connection, VECTOR_SCHEMA_VERSION)?;
+        let existing = conn
+            .query_row(
+                "SELECT id, chunk_index_variant_id, parse_artifact_id, model_key, chunk_fingerprint, dimensions, status FROM vector_index_variants WHERE id=?1",
+                params![variant_id],
+                Self::map_variant,
+            )
+            .optional()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if existing.is_some()
+            && derived_algorithm(&conn, false, &variant_id)?
+                == Some(DerivedAlgorithmStatus::LegacyStale)
+        {
+            return Err(KnowledgeError::conflict("legacy paid vectors are stale; preserve them and explicitly build a current cache-profile variant"));
+        }
+        if existing
+            .as_ref()
+            .is_some_and(|r| r.chunk_fingerprint != chunk_fingerprint || r.dimensions != dimensions)
+        {
+            return Err(KnowledgeError::conflict("existing paid vector identity is incompatible; preserve it and build a distinct variant"));
+        }
+        let reset_stale = false;
+        conn.execute(
+            "INSERT INTO vector_index_variants (id, chunk_index_variant_id, parse_artifact_id, model_key, chunk_fingerprint, dimensions, status) VALUES (?1, ?2, ?3, ?4, ?5, ?6, 'building')
+             ON CONFLICT(id) DO UPDATE SET status='building', chunk_fingerprint=?5, dimensions=?6",
+            params![variant_id, chunk_index_variant_id, parse_artifact_id, model_key, chunk_fingerprint, dimensions],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        write_current_algorithm(&conn, &variant_id)?;
+        lifecycle::record_vector_use(&conn, &variant_id, (self.clock)())?;
+        conn.commit().map_err(storage_sqlite)?;
+        Ok(BuildBegin {
+            variant_id,
+            reset_stale,
+        })
+    }
+
+    /// 每批幂等 upsert；维度与 variant 记录不符 → 拒绝混写（KNOWLEDGE_CONFLICT）。
+    pub fn upsert_batch(
+        &self,
+        variant_id: &str,
+        entries: &[VectorEntry],
+    ) -> Result<(), KnowledgeError> {
+        let mut conn = lock_conn(&self.conn);
+        let tx = cache_write(&mut conn, VECTOR_SCHEMA_VERSION)?;
+        require_current_algorithm(&tx, false, variant_id)?;
+        let variant = tx
+            .query_row(
+                "SELECT id, chunk_index_variant_id, parse_artifact_id, model_key, chunk_fingerprint, dimensions, status FROM vector_index_variants WHERE id=?1",
+                params![variant_id],
+                Self::map_variant,
+            )
+            .optional()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+            .ok_or_else(|| KnowledgeError::conflict("vector variant does not exist"))?;
+        let mut ids = std::collections::HashSet::new();
+        let mut ordinals = std::collections::HashSet::new();
+        if entries.iter().any(|e| {
+            e.chunk_id.is_empty()
+                || !ids.insert(&e.chunk_id)
+                || !ordinals.insert(e.ordinal)
+                || e.vector.iter().any(|v| !v.is_finite())
+        }) {
+            return Err(KnowledgeError::index_invalid(
+                "invalid or duplicate vector batch",
+            ));
+        }
+        for entry in entries {
+            if entry.vector.len() != variant.dimensions as usize {
+                return Err(KnowledgeError::conflict(
+                    "vector dimension does not match the variant identity",
+                ));
+            }
+        }
+        for entry in entries {
+            let mut blob = Vec::with_capacity(entry.vector.len() * 4);
+            for value in &entry.vector {
+                blob.extend_from_slice(&value.to_le_bytes());
+            }
+            tx.execute(
+                "INSERT INTO chunk_vectors (vector_index_variant_id, chunk_id, ordinal, vector) VALUES (?1, ?2, ?3, ?4)
+                 ON CONFLICT(vector_index_variant_id, chunk_id) DO UPDATE SET ordinal=?3, vector=?4",
+                params![variant_id, entry.chunk_id, entry.ordinal as i64, blob],
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        }
+        tx.commit()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
+    }
+
+    /// 断点读取同时验证实际字节，损坏或非有限向量不视作可复用。
+    pub fn checkpoint_entries(&self, variant_id: &str) -> Result<Vec<VectorEntry>, KnowledgeError> {
+        let variant = self
+            .get_variant(variant_id)?
+            .ok_or_else(|| KnowledgeError::index_invalid("missing vector variant"))?;
+        let conn = lock_conn(&self.conn);
+        require_current_algorithm(&conn, false, variant_id)?;
+        let mut stmt=conn.prepare("SELECT chunk_id,ordinal,vector FROM chunk_vectors WHERE vector_index_variant_id=?1 ORDER BY ordinal")
+            .map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
+        let rows = stmt
+            .query_map(params![variant_id], |r| {
+                Ok((
+                    r.get::<_, String>(0)?,
+                    r.get::<_, i64>(1)?,
+                    r.get::<_, Vec<u8>>(2)?,
+                ))
+            })
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let mut entries = Vec::new();
+        for row in rows {
+            let (chunk_id, ordinal, bytes) =
+                row.map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+            if ordinal < 0 || bytes.len() != variant.dimensions as usize * 4 {
+                return Err(KnowledgeError::index_invalid(
+                    "invalid checkpoint vector bytes",
+                ));
+            }
+            let vector = bytes
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .map(|b| f32::from_le_bytes(*b))
+                .collect::<Vec<_>>();
+            if vector.iter().any(|v| !v.is_finite()) {
+                return Err(KnowledgeError::index_invalid(
+                    "non-finite checkpoint vector",
+                ));
+            }
+            entries.push(VectorEntry {
+                chunk_id,
+                ordinal: ordinal as usize,
+                vector,
+            });
+        }
+        Ok(entries)
+    }
+
+    /// 完成条件绑定真实计划的 ID/ordinal 全集，条数相同的错集合也拒绝。
+    pub fn complete_build_plan(
+        &self,
+        variant_id: &str,
+        plan: &[(String, usize)],
+    ) -> Result<(), KnowledgeError> {
+        let expected = plan
+            .iter()
+            .cloned()
+            .collect::<std::collections::BTreeSet<_>>();
+        if plan.is_empty()
+            || expected.len() != plan.len()
+            || plan
+                .iter()
+                .map(|(_, ordinal)| ordinal)
+                .collect::<std::collections::BTreeSet<_>>()
+                .len()
+                != plan.len()
+        {
+            return Err(KnowledgeError::index_invalid("invalid exact build plan"));
+        }
+        // 校验与 ready 在同一个排他事务；其它连接不能在校验后替换计划集合。
+        let mut conn = lock_conn(&self.conn);
+        let tx = cache_write(&mut conn, VECTOR_SCHEMA_VERSION)?;
+        require_current_algorithm(&tx, false, variant_id)?;
+        let dimensions: i64 = tx
+            .query_row(
+                "SELECT dimensions FROM vector_index_variants WHERE id=?1",
+                params![variant_id],
+                |r| r.get(0),
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let mut actual = std::collections::BTreeSet::new();
+        {
+            let mut stmt=tx.prepare("SELECT chunk_id,ordinal,vector FROM chunk_vectors WHERE vector_index_variant_id=?1").map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
+            let rows = stmt
+                .query_map(params![variant_id], |r| {
+                    Ok((
+                        r.get::<_, String>(0)?,
+                        r.get::<_, i64>(1)?,
+                        r.get::<_, Vec<u8>>(2)?,
+                    ))
+                })
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+            for row in rows {
+                let (id, ordinal, bytes) =
+                    row.map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+                if id.is_empty()
+                    || ordinal < 0
+                    || dimensions <= 0
+                    || bytes.len() != dimensions as usize * 4
+                    || bytes
+                        .as_chunks::<4>()
+                        .0
+                        .iter()
+                        .any(|v| !f32::from_le_bytes(*v).is_finite())
+                    || !actual.insert((id, ordinal as usize))
+                {
+                    return Err(KnowledgeError::index_invalid(
+                        "invalid checkpoint in exact plan",
+                    ));
+                }
+            }
+        }
+        if actual != expected {
+            return Err(KnowledgeError::index_invalid(
+                "vector build does not match the exact planned chunk set",
+            ));
+        }
+        let changed = tx
+            .execute(
+                "UPDATE vector_index_variants SET status='ready' WHERE id=?1",
+                params![variant_id],
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if changed != 1 {
+            return Err(KnowledgeError::index_invalid(
+                "variant disappeared during completion",
+            ));
+        }
+        tx.commit()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
+    }
+
+    /// 完整性校验（条数 + ordinal 去重计数一致且非空）后置 ready。
+    pub fn complete_build(
+        &self,
+        variant_id: &str,
+        expected_count: usize,
+    ) -> Result<(), KnowledgeError> {
+        // F12：这是写入路径，schema 过新的分类必须先于语义校验——
+        // checkpoint_entries 对缺失 variant 报 KNOWLEDGE_INDEX_INVALID，
+        // 会把“旧句柄不得写 future 库”伪装成索引语义错误。
+        // 后续 cache_write 在事务内重验，这里的预检只决定分类顺序。
+        {
+            let conn = lock_conn(&self.conn);
+            check_user_version(&conn, VECTOR_SCHEMA_VERSION)?;
+        }
+        self.checkpoint_entries(variant_id)?;
+        let mut connection = lock_conn(&self.conn);
+        let conn = cache_write(&mut connection, VECTOR_SCHEMA_VERSION)?;
+        let count: i64 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM chunk_vectors WHERE vector_index_variant_id=?1",
+                params![variant_id],
+                |row| row.get(0),
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let distinct_ordinals: i64 = conn
+            .query_row(
+                "SELECT COUNT(DISTINCT ordinal) FROM chunk_vectors WHERE vector_index_variant_id=?1",
+                params![variant_id],
+                |row| row.get(0),
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if count != expected_count as i64
+            || distinct_ordinals != expected_count as i64
+            || count == 0
+        {
+            return Err(KnowledgeError::index_invalid(
+                "vector build completeness check failed; variant stays building",
+            ));
+        }
+        conn.execute(
+            "UPDATE vector_index_variants SET status='ready' WHERE id=?1",
+            params![variant_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        conn.commit().map_err(storage_sqlite)
+    }
+
+    pub fn fail_build(&self, variant_id: &str) -> Result<(), KnowledgeError> {
+        let mut connection = lock_conn(&self.conn);
+        let conn = cache_write(&mut connection, VECTOR_SCHEMA_VERSION)?;
+        conn.execute(
+            "UPDATE vector_index_variants SET status='failed' WHERE id=?1",
+            params![variant_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        conn.commit().map_err(storage_sqlite)
+    }
+
+    fn map_variant(row: &rusqlite::Row<'_>) -> rusqlite::Result<VectorVariantRecord> {
+        Ok(VectorVariantRecord {
+            variant_id: row.get(0)?,
+            chunk_index_variant_id: row.get(1)?,
+            parse_artifact_id: row.get(2)?,
+            model_key: row.get(3)?,
+            chunk_fingerprint: row.get(4)?,
+            dimensions: row.get::<_, i64>(5)? as u32,
+            status: row.get(6)?,
+        })
+    }
+
+    pub fn derived_algorithm_status(
+        &self,
+        variant_id: &str,
+    ) -> Result<Option<DerivedAlgorithmStatus>, KnowledgeError> {
+        derived_algorithm(&lock_conn(&self.conn), false, variant_id)
+    }
+    pub fn get_variant(
+        &self,
+        variant_id: &str,
+    ) -> Result<Option<VectorVariantRecord>, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let mut row=conn.query_row("SELECT id, chunk_index_variant_id, parse_artifact_id, model_key, chunk_fingerprint, dimensions, status FROM vector_index_variants WHERE id=?1",params![variant_id],Self::map_variant).optional().map_err(storage_sqlite)?;
+        if let Some(row) = row.as_mut() {
+            if derived_algorithm(&conn, false, variant_id)?
+                == Some(DerivedAlgorithmStatus::LegacyStale)
+            {
+                row.status = "stale".into();
+            }
+        }
+        Ok(row)
+    }
+    pub fn list_variants_by_artifact(
+        &self,
+        parse_artifact_id: &str,
+    ) -> Result<Vec<VectorVariantRecord>, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let mut stmt=conn.prepare("SELECT id, chunk_index_variant_id, parse_artifact_id, model_key, chunk_fingerprint, dimensions, status FROM vector_index_variants WHERE parse_artifact_id=?1 ORDER BY id").map_err(storage_sqlite)?;
+        let mut rows = stmt
+            .query_map(params![parse_artifact_id], Self::map_variant)
+            .map_err(storage_sqlite)?
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(storage_sqlite)?;
+        for row in &mut rows {
+            if derived_algorithm(&conn, false, &row.variant_id)?
+                == Some(DerivedAlgorithmStatus::LegacyStale)
+            {
+                row.status = "stale".into();
+            }
+        }
+        Ok(rows)
+    }
+
+    /// 检索：限定变体集合（viv 身份即来源/分块/模型三维身份）；查询向量维度
+    /// 与变体不一致 → 显式拒绝（绝不跨维度余弦，绝不返回貌似正常的结果）。
+    pub fn search(
+        &self,
+        variant_ids: &[String],
+        query: &[f32],
+        limit: usize,
+    ) -> Result<Vec<VectorHit>, KnowledgeError> {
+        self.search_in_chunks(variant_ids, query, limit, None)
+    }
+
+    /// 向量候选与FTS使用同一已授权章节集合，在排序截断之前限缩。
+    pub fn search_in_chunks(
+        &self,
+        variant_ids: &[String],
+        query: &[f32],
+        limit: usize,
+        allowed_chunks: Option<&std::collections::BTreeSet<String>>,
+    ) -> Result<Vec<VectorHit>, KnowledgeError> {
+        if variant_ids.is_empty() {
+            return Ok(Vec::new());
+        }
+        let mut hits: Vec<VectorHit> = Vec::new();
+        for variant_id in variant_ids {
+            let Some(variant) = self.get_variant(variant_id)? else {
+                continue;
+            };
+            if variant.status == "stale" {
+                return Err(KnowledgeError::retrieval_unavailable("legacy vector cache is stale; explicitly rebuild the current cache-profile variant"));
+            }
+            if variant.status != "ready" {
+                continue;
+            }
+            if variant.dimensions as usize != query.len() {
+                return Err(KnowledgeError::retrieval_unavailable(
+                    "query embedding dimensions do not match the indexed variant",
+                ));
+            }
+            let conn = lock_conn(&self.conn);
+            let mut stmt = conn
+                .prepare(
+                    "SELECT chunk_id, vector FROM chunk_vectors WHERE vector_index_variant_id=?1",
+                )
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+            let rows = stmt
+                .query_map(params![variant_id], |row| {
+                    Ok((row.get::<_, String>(0)?, row.get::<_, Vec<u8>>(1)?))
+                })
+                .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+            for row in rows {
+                let (chunk_id, blob) =
+                    row.map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+                if blob.len() != variant.dimensions as usize * 4 {
+                    return Err(KnowledgeError::index_invalid(
+                        "stored vector has a corrupted length",
+                    ));
+                }
+                let mut vector = Vec::with_capacity(variant.dimensions as usize);
+                for chunk in blob.as_chunks::<4>().0 {
+                    vector.push(f32::from_le_bytes(*chunk));
+                }
+                let score = lingxi_kernel::knowledge::cosine(query, &vector)?;
+                if allowed_chunks.is_some_and(|allowed| !allowed.contains(&chunk_id)) {
+                    continue;
+                }
+                hits.push(VectorHit {
+                    variant_id: variant_id.clone(),
+                    chunk_id,
+                    parse_artifact_id: variant.parse_artifact_id.clone(),
+                    score,
+                });
+            }
+        }
+        hits.sort_by(|left, right| {
+            right
+                .score
+                .partial_cmp(&left.score)
+                .unwrap_or(std::cmp::Ordering::Equal)
+                .then_with(|| left.chunk_id.cmp(&right.chunk_id))
+        });
+        hits.truncate(limit);
+        let mut connection = lock_conn(&self.conn);
+        let tx = cache_write(&mut connection, VECTOR_SCHEMA_VERSION)?;
+        for variant_id in variant_ids {
+            lifecycle::record_vector_use(&tx, variant_id, (self.clock)())?;
+        }
+        tx.commit().map_err(storage_sqlite)?;
+        Ok(hits)
+    }
+
+    /// delete wins / GC：清 artifact 的全部向量变体。
+    pub fn remove_artifact(&self, parse_artifact_id: &str) -> Result<usize, KnowledgeError> {
+        let variants = self.list_variants_by_artifact(parse_artifact_id)?;
+        let mut conn = lock_conn(&self.conn);
+        let tx = cache_write(&mut conn, VECTOR_SCHEMA_VERSION)?;
+        let mut removed = 0;
+        for variant in &variants {
+            tx.execute(
+                "DELETE FROM knowledge_vector_usage WHERE variant_id=?1",
+                params![variant.variant_id],
+            )
+            .map_err(storage_sqlite)?;
+            tx.execute(
+                "DELETE FROM chunk_vectors WHERE vector_index_variant_id=?1",
+                params![variant.variant_id],
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+            tx.execute(
+                "DELETE FROM knowledge_derived_algorithms WHERE variant_id=?1",
+                params![variant.variant_id],
+            )
+            .map_err(storage_sqlite)?;
+            tx.execute(
+                "DELETE FROM vector_index_variants WHERE id=?1",
+                params![variant.variant_id],
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+            removed += 1;
+        }
+        tx.commit()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        Ok(removed)
+    }
+}

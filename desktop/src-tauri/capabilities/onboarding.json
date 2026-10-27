@@ -1,0 +1,18 @@
+{
+  "identifier": "onboarding",
+  "description": "R09-T06 收口：引导窗口。首设完成/资料/头像/本地服务连接；debug 命令只在 capabilities-test/r09-test-hooks（release 不存在）。",
+  "windows": [
+    "onboarding"
+  ],
+  "permissions": [
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    "allow-get-avatar-path",
+    "allow-get-platform",
+    "allow-get-server-connection-info",
+    "allow-get-server-port",
+    "allow-get-server-token",
+    "allow-get-splash-info",
+    "allow-onboarding-complete"
+  ]
+}

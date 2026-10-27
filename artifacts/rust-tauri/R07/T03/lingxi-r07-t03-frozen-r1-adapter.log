@@ -1,0 +1,86 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.33s
+     Running tests/r06_ar_f14_migration_receipts.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f14_migration_receipts-fe46dcb901f1aa80)
+
+running 3 tests
+test c01_fresh_database_receipts_equal_registry_and_inspector ... ok
+test c01_v8_upgrade_preserves_receipts_and_restarts_are_idempotent ... ok
+test c01_v7_upgrade_preserves_receipts_and_restarts_are_idempotent ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.54s
+
+     Running tests/r07_activity_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_activity_store-526b91227c4168bd)
+
+running 6 tests
+test busy_wrong_target_and_revoked_owner_cannot_promote ... ok
+test internal_registration_hides_pre_dispatch_and_verified_heartbeat_scope_only ... ok
+test legitimate_session_deletion_cleans_new_foreign_keys_and_preserves_job_history ... ok
+test receipt_failure_rolls_back_without_changing_trigger_or_session ... ok
+test real_activity_hidden_until_promotion_and_user_named_prefixes_stay_visible ... ok
+test parallel_promotion_is_one_fact_and_heartbeat_resource_scope_cannot_be_promoted ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+     Running tests/r07_automation_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_store-b26ebe760eb2497c)
+
+running 12 tests
+test daily_concurrent_claim_has_one_attempt_and_unknown_never_retries ... ok
+test ordinary_user_notification_uses_real_run_without_fabricated_trigger ... ok
+test one_shot_terminal_states_disable_same_revision_but_skip_does_not_advance ... ok
+test notification_claim_is_unique_and_unacknowledged_delivery_never_requeues ... ok
+test one_shot_old_revision_cannot_disable_edited_configuration ... ok
+test stale_trigger_cannot_overwrite_edited_or_deleted_job_and_history_survives ... ok
+test malformed_configuration_and_owner_changes_leave_original_job_untouched ... ok
+test crash_before_binding_recovers_only_unique_durable_causal_run ... ok
+test concurrent_claims_and_configuration_updates_have_one_winner ... ok
+test reopen_preserves_raw_configuration_trigger_and_confirmed_delivery ... ok
+test cursor_write_failure_rolls_back_trigger_settlement_as_one_transaction ... ok
+test daily_known_failure_retries_after_one_hour_but_started_and_success_survive_restart ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+
+     Running tests/r07_automation_suggestions.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_suggestions-1fb2363d8d18ec1f)
+
+running 10 tests
+test forged_suggestion_cannot_change_frozen_target_actor_source_or_operation ... ok
+test malformed_or_nonlocal_proposals_cannot_persist_and_duplicate_id_cannot_overwrite ... ok
+test prepared_job_cannot_replace_frozen_identity_source_or_unknown_fields ... ok
+test pending_expiry_and_every_identity_dimension_are_enforced_at_get_and_apply ... ok
+test session_revocation_or_archival_blocks_even_a_previously_loaded_suggestion ... ok
+test concurrent_apply_and_late_replay_create_one_job_and_one_receipt ... ok
+test stale_update_cannot_forge_new_revision_or_turn_into_creation ... ok
+test two_distinct_update_suggestions_cannot_overwrite_each_others_version ... ok
+test proposal_creates_no_job_and_explicit_application_preserves_source_and_unknown_fields ... ok
+test receipt_failure_rolls_back_both_new_job_and_existing_job_update ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+
+     Running tests/r07_bridge_effect_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_effect_store-433f0ce7588e767b)
+
+running 8 tests
+test one_connector_exit_does_not_abandon_other_live_workers_and_receipt_unknown_allows_batch_final ... ok
+test concurrent_claims_have_one_external_lease_and_revisions_can_return_to_prior_text ... ok
+test native_update_unknown_blocks_new_content_and_plain_mode_downgrade_but_allows_frozen_cleanup ... ok
+test restart_marks_confirmed_but_open_native_stream_unknown_without_recreating_it ... ok
+test receipt_refresh_keys_and_sequence_survive_restart_and_cleanup_remains_scoped_after_revoke ... ok
+test native_finish_and_actual_outbox_receipt_commit_atomically_or_both_roll_back ... ok
+test independent_typing_unknown_does_not_poison_native_content_but_text_receipts_remain_conservative ... ok
+test v17_candidate_upgrade_keeps_all_old_receipts_and_defaults_typing_independence_to_false ... FAILED
+
+failures:
+
+---- v17_candidate_upgrade_keeps_all_old_receipts_and_defaults_typing_independence_to_false stdout ----
+
+thread 'v17_candidate_upgrade_keeps_all_old_receipts_and_defaults_typing_independence_to_false' (681864) panicked at crates/lingxi-adapters/tests/r07_bridge_effect_store.rs:1016:5:
+assertion `left == right` failed
+  left: 19
+ right: 18
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    v17_candidate_upgrade_keeps_all_old_receipts_and_defaults_typing_independence_to_false
+
+test result: FAILED. 7 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+
+error: test failed, to rerun pass `-p lingxi-adapters --test r07_bridge_effect_store`

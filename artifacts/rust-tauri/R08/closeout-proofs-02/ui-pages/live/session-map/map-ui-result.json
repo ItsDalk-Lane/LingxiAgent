@@ -1,0 +1,6025 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "group": 0,
+      "name": "production-map-loads-real-layout-and-turn-cards"
+    },
+    {
+      "group": 0,
+      "name": "actual-other-service-empty-map-clears-old-owner-with-zero-put"
+    },
+    {
+      "group": 1,
+      "name": "workspace-selector-real-focus-with-no-cwd-zero-files-read"
+    },
+    {
+      "group": 2,
+      "name": "zoom-locate-only-change-real-camera"
+    },
+    {
+      "group": 1,
+      "name": "card-selects-real-session-files-models-and-same-session-zero-fetch"
+    },
+    {
+      "group": 1,
+      "name": "same-revision-cache-zero-history-and-changed-revision-real-history-refresh"
+    },
+    {
+      "group": 4,
+      "name": "collapse-reload-and-external-current-reveal-replace-list"
+    },
+    {
+      "group": 4,
+      "name": "real-collapse-write-failure-keeps-local-collapse-and-old-disk-until-reload"
+    },
+    {
+      "group": 3,
+      "name": "real-pointer-drag-persists-card-position"
+    },
+    {
+      "group": 3,
+      "name": "real-write-failure-keeps-local-drag-but-disk-unchanged"
+    },
+    {
+      "group": 5,
+      "name": "real-reset-write-failure-keeps-local-reset-but-old-disk"
+    },
+    {
+      "group": 5,
+      "name": "reset-replaces-all-positions-on-disk"
+    },
+    {
+      "group": 2,
+      "name": "invalid-local-coordinates-send-zero-put"
+    },
+    {
+      "group": 0,
+      "name": "actual-read-failure-explicit-warning-without-success-or-disk-rewrite"
+    },
+    {
+      "group": 1,
+      "name": "archive-refusal-retains-current-session-but-selected-card-already-changes"
+    },
+    {
+      "group": 6,
+      "name": "empty-whitespace-zero-send-and-continue-real-prompt-without-fork-or-switch"
+    },
+    {
+      "group": 6,
+      "name": "real-fork-IO-error-and-missing-anchor-preserve-draft-then-actual-branch-prompt-focus"
+    },
+    {
+      "group": 6,
+      "name": "actual-running-provider-busy-queues-input-with-zero-extra-prompt"
+    },
+    {
+      "group": 6,
+      "name": "real-paused-service-unknown-delivery-preserves-draft-and-zero-duplicate-submit"
+    }
+  ],
+  "requests": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-6de088a52ee2b6540c6e91b776ae6bc3"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-6de088a52ee2b6540c6e91b776ae6bc3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/themes/fonts/inter-bec94a4daf06.woff2"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/conversation-map/layout"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/conversation-map/turns"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/conversation-map/turns"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-child/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/conversation-map/layout"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-child/conversation-map/turns"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/media/jobs"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/resource-io/events?since=0"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/app-events?since=0"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/media/jobs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/resource-io/events?since=0"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/app-events?since=0"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/agent-activities"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/activities"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/browser/workspaces"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/browser/workspaces"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63180/lingxi/v1/conversation-map/layout"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63180/lingxi/v1/conversation-map/layout"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63180/lingxi/v1/sessions/studio-list"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63180/lingxi/v1/sessions/studio-list"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63180/lingxi/v1/sessions/switch"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:63180/lingxi/v1/sessions/switch",
+      "body": "{\"sessionId\":\"sess_local_beta\"}"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63180/lingxi/v1/sessions/sess_local_beta/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63180/lingxi/v1/sessions/sess_local_beta/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63180/lingxi/v1/sessions/sess_local_beta/history"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63180/lingxi/v1/sessions/sess_local_beta/history"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63180/lingxi/v1/sessions/sess_local_beta/media/jobs"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63180/lingxi/v1/sessions/sess_local_beta/media/jobs"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63180/lingxi/v1/chat/models?agentId=lingxi&sessionId=sess_local_beta"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63180/lingxi/v1/chat/models?agentId=lingxi&sessionId=sess_local_beta"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/conversation-map/layout"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/studio-list"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/switch"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-default-source/conversation-map/turns"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-default-child/conversation-map/turns"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-no-workspace/conversation-map/turns"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/switch",
+      "body": "{\"sessionId\":\"map-no-workspace\"}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-default-source/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-default-child/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-no-workspace/conversation-map/turns"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-no-workspace/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-no-workspace/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-no-workspace/history"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-no-workspace/history"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-no-workspace/media/jobs"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-no-workspace/media/jobs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=map-no-workspace"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=map-no-workspace"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/switch",
+      "body": "{\"sessionId\":\"session-6de088a52ee2b6540c6e91b776ae6bc3\"}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/history"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/history"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/media/jobs"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/preferences/workspace-ui-state?workspace=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected&surface=electron"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/preferences/workspace-ui-state?workspace=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected&surface=electron"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-child/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/files?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/files?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/jian?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/jian?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-6de088a52ee2b6540c6e91b776ae6bc3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/media/jobs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/resource-io/events?since=0"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/app-events?since=0"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/browser/workspaces"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/switch",
+      "body": "{\"sessionId\":\"map-no-workspace\"}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-no-workspace/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=map-no-workspace"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/switch",
+      "body": "{\"sessionId\":\"map-child\"}"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-child/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-child/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-child/history"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-child/history"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-child/media/jobs"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-child/media/jobs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/files?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=map-child"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/jian?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=map-child"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/switch",
+      "body": "{\"sessionId\":\"session-8e3b40451f204b8ca4c8c2a7cd2fb6f7\"}"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/history"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/history"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/media/jobs"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/media/jobs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/files?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-8e3b40451f204b8ca4c8c2a7cd2fb6f7"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/jian?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-8e3b40451f204b8ca4c8c2a7cd2fb6f7"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/switch",
+      "body": "{\"sessionId\":\"session-6de088a52ee2b6540c6e91b776ae6bc3\"}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/files?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/jian?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-6de088a52ee2b6540c6e91b776ae6bc3"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/switch",
+      "body": "{\"sessionId\":\"session-8e3b40451f204b8ca4c8c2a7cd2fb6f7\"}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/files?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/jian?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-8e3b40451f204b8ca4c8c2a7cd2fb6f7"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/switch",
+      "body": "{\"sessionId\":\"session-6de088a52ee2b6540c6e91b776ae6bc3\"}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/files?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/jian?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-6de088a52ee2b6540c6e91b776ae6bc3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/studio-list"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/conversation-map/turns"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/switch",
+      "body": "{\"sessionId\":\"session-8e3b40451f204b8ca4c8c2a7cd2fb6f7\"}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/history"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/media/jobs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/files?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/jian?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-8e3b40451f204b8ca4c8c2a7cd2fb6f7"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/switch",
+      "body": "{\"sessionId\":\"session-6de088a52ee2b6540c6e91b776ae6bc3\"}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/files?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/jian?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-6de088a52ee2b6540c6e91b776ae6bc3"
+    },
+    {
+      "method": "PUT",
+      "url": "http://127.0.0.1:63042/lingxi/v1/conversation-map/layout",
+      "body": "{\"collapsed\":[\"session-8e3b40451f204b8ca4c8c2a7cd2fb6f7:user:run_000001a177f548e6_000001\"]}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/settings.html"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@vite/client"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/modules/connection-csp.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/styles.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/themes/warm-paper.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/lib/i18n.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/shared/theme.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/modules/platform.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/__tests__/session-map-live/surface.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/vite/dist/client/env.mjs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/shared/theme-registry.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/shared/appearance-preferences.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/react_jsx-dev-runtime.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/react-dom_client.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapPage.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/ToastContainer.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/index.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/server-connection.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/websocket.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/session-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/ui-helpers.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/composer-send-coordinator.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/conversation-map-projection.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/conversation-map-send.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/host/desktop-host.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/chunk-DCDRPVTX.js?v=0697c126"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/chunk-PR4QN5HX.js?v=0697c126"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/chunk-3GFXDE4W.js?v=0697c126"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/shared/theme-registry-data.json?import"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/react.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/session-connection-owner.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/service-client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-i18n.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/session-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/conversation-map-layout.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapCanvas.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapInspector.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMap.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/zustand.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/connection-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/session-project-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/streaming-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/ui-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/agent-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/channel-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/desk-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/model-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/input-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/knowledge-reference-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/chat-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/chat-find-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/toast-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/preview-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/browser-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/context-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/automation-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/activity-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/agent-activity-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/terminal-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/bridge-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/selection-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/subagent-preview-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/computer-overlay-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/screenshot-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/sidebar-ui-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/file-history-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/side-chat-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/conversation-map-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/message-live-version.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/live-turn-store.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/error-bus.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/errors.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/ws-message-handler.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/stream-resume.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/resource-events.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-automation.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-media.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-workbench.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-agent-activities.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/app-event-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/package.json?import"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/terminal-client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/background-process-control.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/studio-access.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/contract-versions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/session-projects.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/message-turn-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/host/electron-desktop-host.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/host/web-desktop-host.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/input/composer-send.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-chat-history.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/loop-runtime-error.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-hana-fetch.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/history-protocol-client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/last-project-identity.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/input-draft-persistence.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/input-drafts.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/workspace-history.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/history-builder.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/todo-compat.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/agent-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/desk-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/stream-invalidator.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/errors/error-presenter.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/error-user-messages.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/agent-workspace.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/input/composer-memory-mode.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-bridge.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-browser.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-knowledge.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-observability.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-settings.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/chat-client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapDraftCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapPendingCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/MarkdownContent.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/markdown.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/input-draft-sync.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/selectors/file-refs.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/chat-performance.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/content-semantics.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/turn-outcome.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/turn-projector.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/history-run-merge.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/sidebar-ui-state.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/log-redactor.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/stream-admission.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-stream-buffer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-platform.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/browser-events.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/tenet-store.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/channel-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/chat/layout.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/editor/typography.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/bridge-response.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/conversation-events.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/studio-access-contract.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/contract-versions.json?import"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/stream-key-dispatcher.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/create-keyed-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/session-refresh-scheduler.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/preview-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/settings-modal-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/preview-document-refresh.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/todo-constants.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/message-parser.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/terminal-output-stream.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/ui-context.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/workspace-ui-state-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/format.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/file-kind.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/chat-image-send-preflight.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/model-settings-navigation.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/quoted-selection.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/input/quote-refresh.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/video-mime.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/conversation-suggestion.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/session-scope-context.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/conversation-request-scope.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/assistant-block-builder.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/history-segment-sanitizer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/platform-runtime.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-mermaid-diagrams.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/grapheme.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/link-open.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/shared/LinkContextMenu.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/Chat.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/KnowledgeCitationDialog.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/KnowledgeCitationPreview.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/knowledge-citation-scope.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/window-surface.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/KnowledgeCitation.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/markdown-it.js?v=74a273f9"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/@traptitech_markdown-it-katex.js?v=0e99f169"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/markdown-it-task-lists.js?v=68b5f0e9"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/katex/dist/katex.min.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/markdown-html-sanitizer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/markdown-document.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/tool-call-identity.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/tool-label.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/editor-typography.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/font-presets.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/SidebarLayout.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/preview-reading-position.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/preview-file-refresh.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/remote-file-preview.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/yuan-visuals.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/internal-mood-block.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/reserved-tag-stream.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/terminal-ui-contract.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/preview-file-content.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/settings/store.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/model-capabilities.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/tool-outcome.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/mermaid-renderer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/index.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/file-preview.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/knowledge/KnowledgePage.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/react-dom.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/knowledge/knowledge-api.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/window-surface.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/js-yaml.js?v=1642bbba"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/layout-constants.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/resource-access.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/resource-url.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/open-media-viewer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/settings/resource-state.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Overlay.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ConfirmDialog.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/NoticeDialog.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Button.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Toggle.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/SelectWidget.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ProviderIcon.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/AnchoredPortal.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ContextMenu.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Tooltip.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-animate-presence.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/motion.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/AnimationPrimitives.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ClassicFindBox.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/tool-presentation.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ConfirmDialog.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Overlay.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/NoticeDialog.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Button.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Toggle.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/SelectWidget.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/provider-icons.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ProviderIcon.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Tooltip.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/motion_react.js?v=b930c234"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ClassicFindBox.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/chunk-IV6PWKIX.js?v=0697c126"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/secret-custody.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/studio-list"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-6de088a52ee2b6540c6e91b776ae6bc3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/themes/fonts/inter-bec94a4daf06.woff2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/conversation-map/layout"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-child/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/conversation-map/turns"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/switch",
+      "body": "{\"sessionId\":\"session-8e3b40451f204b8ca4c8c2a7cd2fb6f7\"}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/history"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/media/jobs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/preferences/workspace-ui-state?workspace=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected&surface=electron"
+    },
+    {
+      "method": "PUT",
+      "url": "http://127.0.0.1:63042/lingxi/v1/conversation-map/layout",
+      "body": "{\"collapsed\":[]}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/files?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/jian?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-8e3b40451f204b8ca4c8c2a7cd2fb6f7"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/switch",
+      "body": "{\"sessionId\":\"session-6de088a52ee2b6540c6e91b776ae6bc3\"}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/history"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/media/jobs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/files?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/jian?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-6de088a52ee2b6540c6e91b776ae6bc3"
+    },
+    {
+      "method": "PUT",
+      "url": "http://127.0.0.1:63042/lingxi/v1/conversation-map/layout",
+      "body": "{\"collapsed\":[\"session-8e3b40451f204b8ca4c8c2a7cd2fb6f7:user:run_000001a177f548e6_000001\"]}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/settings.html"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@vite/client"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/modules/connection-csp.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/styles.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/themes/warm-paper.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/lib/i18n.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/shared/theme.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/modules/platform.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/__tests__/session-map-live/surface.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/vite/dist/client/env.mjs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/shared/theme-registry.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/shared/appearance-preferences.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/react_jsx-dev-runtime.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/react-dom_client.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapPage.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/ToastContainer.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/index.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/server-connection.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/websocket.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/session-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/ui-helpers.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/composer-send-coordinator.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/conversation-map-projection.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/conversation-map-send.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/host/desktop-host.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/themes/fonts/inter-bec94a4daf06.woff2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/chunk-DCDRPVTX.js?v=0697c126"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/chunk-PR4QN5HX.js?v=0697c126"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/chunk-3GFXDE4W.js?v=0697c126"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/shared/theme-registry-data.json?import"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/react.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/session-connection-owner.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/service-client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-i18n.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/session-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/conversation-map-layout.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapCanvas.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapInspector.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMap.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/zustand.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/connection-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/session-project-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/streaming-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/ui-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/agent-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/channel-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/desk-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/model-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/input-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/knowledge-reference-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/chat-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/chat-find-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/toast-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/preview-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/browser-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/context-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/automation-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/activity-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/agent-activity-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/terminal-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/bridge-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/selection-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/subagent-preview-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/computer-overlay-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/screenshot-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/sidebar-ui-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/file-history-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/side-chat-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/conversation-map-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/message-live-version.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/live-turn-store.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/studio-access.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/contract-versions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/ws-message-handler.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/stream-resume.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/resource-events.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-automation.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-media.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-workbench.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-agent-activities.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/app-event-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/errors.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/error-bus.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/package.json?import"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/terminal-client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/background-process-control.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-chat-history.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/loop-runtime-error.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-hana-fetch.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/history-protocol-client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/last-project-identity.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/input-draft-persistence.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/input-drafts.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/workspace-history.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/history-builder.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/todo-compat.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/agent-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/desk-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/stream-invalidator.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/errors/error-presenter.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/error-user-messages.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/agent-workspace.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/input/composer-send.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/session-projects.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/message-turn-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/host/electron-desktop-host.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/host/web-desktop-host.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/input/composer-memory-mode.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-bridge.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-browser.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-knowledge.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-observability.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-settings.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/chat-client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/MarkdownContent.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/markdown.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapDraftCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapPendingCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/input-draft-sync.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/selectors/file-refs.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/chat-performance.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/content-semantics.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/turn-outcome.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/turn-projector.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/history-run-merge.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/sidebar-ui-state.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/studio-access-contract.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/contract-versions.json?import"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/browser-events.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-stream-buffer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/stream-key-dispatcher.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/create-keyed-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/session-refresh-scheduler.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/preview-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/conversation-events.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/settings-modal-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/preview-document-refresh.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/todo-constants.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/message-parser.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/terminal-output-stream.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-platform.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/stream-admission.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/tenet-store.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/channel-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/chat/layout.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/editor/typography.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/bridge-response.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/log-redactor.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/conversation-suggestion.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/workspace-ui-state-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/file-kind.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/assistant-block-builder.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/history-segment-sanitizer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/platform-runtime.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/format.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/chat-image-send-preflight.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/model-settings-navigation.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/quoted-selection.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/input/quote-refresh.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/video-mime.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/ui-context.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/session-scope-context.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/conversation-request-scope.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-mermaid-diagrams.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/grapheme.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/link-open.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/shared/LinkContextMenu.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/Chat.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/KnowledgeCitationDialog.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/KnowledgeCitationPreview.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/knowledge-citation-scope.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/window-surface.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/KnowledgeCitation.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/markdown-it.js?v=74a273f9"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/@traptitech_markdown-it-katex.js?v=0e99f169"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/markdown-it-task-lists.js?v=68b5f0e9"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/katex/dist/katex.min.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/markdown-html-sanitizer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/markdown-document.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/tool-call-identity.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/tool-label.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/SidebarLayout.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/preview-reading-position.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/preview-file-refresh.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/remote-file-preview.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/yuan-visuals.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/internal-mood-block.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/reserved-tag-stream.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/terminal-ui-contract.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/editor-typography.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/font-presets.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/preview-file-content.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/tool-outcome.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/model-capabilities.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/settings/store.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/mermaid-renderer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/file-preview.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/index.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/knowledge/KnowledgePage.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/react-dom.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/knowledge/knowledge-api.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/window-surface.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/js-yaml.js?v=1642bbba"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/layout-constants.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/resource-access.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/resource-url.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/open-media-viewer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/tool-presentation.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/settings/resource-state.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Overlay.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ConfirmDialog.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/NoticeDialog.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Button.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Toggle.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/SelectWidget.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ProviderIcon.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/AnchoredPortal.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ContextMenu.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Tooltip.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-animate-presence.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/motion.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/AnimationPrimitives.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ClassicFindBox.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/secret-custody.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Overlay.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ConfirmDialog.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/NoticeDialog.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Button.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Toggle.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/SelectWidget.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/provider-icons.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ProviderIcon.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Tooltip.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/motion_react.js?v=b930c234"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/chunk-IV6PWKIX.js?v=0697c126"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ClassicFindBox.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/studio-list"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-6de088a52ee2b6540c6e91b776ae6bc3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/conversation-map/layout"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-child/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/conversation-map/turns"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/switch",
+      "body": "{\"sessionId\":\"session-8e3b40451f204b8ca4c8c2a7cd2fb6f7\"}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/history"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/media/jobs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/preferences/workspace-ui-state?workspace=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected&surface=electron"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/files?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/jian?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-8e3b40451f204b8ca4c8c2a7cd2fb6f7"
+    },
+    {
+      "method": "PUT",
+      "url": "http://127.0.0.1:63042/lingxi/v1/conversation-map/layout",
+      "body": "{\"positions\":{\"session-8e3b40451f204b8ca4c8c2a7cd2fb6f7:user:run_000001a177f5491f_000002\":{\"x\":516,\"y\":435}}}"
+    },
+    {
+      "method": "PUT",
+      "url": "http://127.0.0.1:63042/lingxi/v1/conversation-map/layout",
+      "body": "{\"positions\":{\"session-8e3b40451f204b8ca4c8c2a7cd2fb6f7:user:run_000001a177f5491f_000002\":{\"x\":546,\"y\":455}}}"
+    },
+    {
+      "method": "PUT",
+      "url": "http://127.0.0.1:63042/lingxi/v1/conversation-map/layout",
+      "body": "{\"positions\":{},\"replacePositions\":true}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/settings.html"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@vite/client"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/modules/connection-csp.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/styles.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/themes/warm-paper.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/lib/i18n.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/shared/theme.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/modules/platform.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/__tests__/session-map-live/surface.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/vite/dist/client/env.mjs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/shared/theme-registry.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/shared/appearance-preferences.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/react_jsx-dev-runtime.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/react-dom_client.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapPage.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/ToastContainer.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/index.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/server-connection.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/websocket.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/session-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/ui-helpers.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/composer-send-coordinator.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/conversation-map-projection.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/conversation-map-send.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/host/desktop-host.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/chunk-DCDRPVTX.js?v=0697c126"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/chunk-PR4QN5HX.js?v=0697c126"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/chunk-3GFXDE4W.js?v=0697c126"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/shared/theme-registry-data.json?import"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/themes/fonts/inter-bec94a4daf06.woff2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/react.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/session-connection-owner.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/service-client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-i18n.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/session-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/conversation-map-layout.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapCanvas.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapInspector.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMap.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/zustand.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/connection-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/session-project-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/streaming-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/ui-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/agent-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/channel-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/desk-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/model-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/input-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/knowledge-reference-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/chat-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/chat-find-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/toast-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/preview-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/browser-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/context-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/automation-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/activity-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/agent-activity-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/terminal-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/bridge-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/selection-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/subagent-preview-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/computer-overlay-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/screenshot-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/sidebar-ui-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/file-history-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/side-chat-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/conversation-map-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/message-live-version.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/live-turn-store.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/studio-access.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/contract-versions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/ws-message-handler.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/stream-resume.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/resource-events.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-automation.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-media.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-workbench.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-agent-activities.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/app-event-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/errors.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/error-bus.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/package.json?import"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/terminal-client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/background-process-control.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-chat-history.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/loop-runtime-error.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-hana-fetch.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/history-protocol-client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/last-project-identity.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/input-draft-persistence.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/input-drafts.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/workspace-history.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/history-builder.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/todo-compat.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/agent-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/desk-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/stream-invalidator.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/errors/error-presenter.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/error-user-messages.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/agent-workspace.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/input/composer-send.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/session-projects.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/message-turn-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/host/electron-desktop-host.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/host/web-desktop-host.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/input/composer-memory-mode.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-bridge.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-browser.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-knowledge.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-observability.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-settings.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/chat-client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapDraftCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapPendingCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/MarkdownContent.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/markdown.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/input-draft-sync.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/selectors/file-refs.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/chat-performance.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/content-semantics.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/turn-outcome.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/turn-projector.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/history-run-merge.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/sidebar-ui-state.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/studio-access-contract.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/contract-versions.json?import"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/browser-events.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-stream-buffer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/stream-key-dispatcher.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/create-keyed-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/session-refresh-scheduler.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/preview-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/conversation-events.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/settings-modal-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/preview-document-refresh.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/todo-constants.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/message-parser.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/terminal-output-stream.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-platform.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/stream-admission.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/tenet-store.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/channel-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/chat/layout.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/editor/typography.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/bridge-response.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/log-redactor.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/conversation-suggestion.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/workspace-ui-state-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/file-kind.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/assistant-block-builder.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/history-segment-sanitizer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/platform-runtime.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/format.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/chat-image-send-preflight.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/model-settings-navigation.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/quoted-selection.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/input/quote-refresh.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/video-mime.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/ui-context.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/session-scope-context.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/conversation-request-scope.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-mermaid-diagrams.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/grapheme.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/link-open.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/shared/LinkContextMenu.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/Chat.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/KnowledgeCitationDialog.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/KnowledgeCitationPreview.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/knowledge-citation-scope.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/window-surface.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/KnowledgeCitation.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/markdown-it.js?v=74a273f9"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/@traptitech_markdown-it-katex.js?v=0e99f169"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/markdown-it-task-lists.js?v=68b5f0e9"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/katex/dist/katex.min.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/markdown-html-sanitizer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/markdown-document.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/tool-call-identity.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/tool-label.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/SidebarLayout.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/preview-reading-position.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/preview-file-refresh.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/remote-file-preview.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/yuan-visuals.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/internal-mood-block.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/reserved-tag-stream.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/terminal-ui-contract.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/editor-typography.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/font-presets.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/preview-file-content.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/tool-outcome.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/model-capabilities.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/settings/store.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/mermaid-renderer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/file-preview.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/index.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/knowledge/KnowledgePage.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/react-dom.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/knowledge/knowledge-api.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/window-surface.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/js-yaml.js?v=1642bbba"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/layout-constants.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/resource-access.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/resource-url.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/open-media-viewer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/tool-presentation.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/settings/resource-state.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Overlay.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ConfirmDialog.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/NoticeDialog.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Button.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Toggle.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/SelectWidget.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ProviderIcon.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/AnchoredPortal.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ContextMenu.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Tooltip.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-animate-presence.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/motion.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/AnimationPrimitives.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ClassicFindBox.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/secret-custody.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Overlay.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ConfirmDialog.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/NoticeDialog.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Button.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Toggle.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/SelectWidget.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/provider-icons.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ProviderIcon.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Tooltip.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/motion_react.js?v=b930c234"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/chunk-IV6PWKIX.js?v=0697c126"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ClassicFindBox.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/studio-list"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-6de088a52ee2b6540c6e91b776ae6bc3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/conversation-map/layout"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-child/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/conversation-map/turns"
+    },
+    {
+      "method": "PUT",
+      "url": "http://127.0.0.1:63042/lingxi/v1/conversation-map/layout",
+      "body": "{\"positions\":{},\"replacePositions\":true}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/settings.html"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@vite/client"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/modules/connection-csp.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/styles.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/themes/warm-paper.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/lib/i18n.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/shared/theme.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/modules/platform.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/__tests__/session-map-live/surface.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/vite/dist/client/env.mjs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/shared/theme-registry.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/shared/appearance-preferences.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/react_jsx-dev-runtime.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/react-dom_client.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapPage.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/ToastContainer.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/index.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/server-connection.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/websocket.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/session-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/ui-helpers.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/composer-send-coordinator.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/conversation-map-projection.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/conversation-map-send.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/host/desktop-host.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/chunk-DCDRPVTX.js?v=0697c126"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/chunk-PR4QN5HX.js?v=0697c126"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/chunk-3GFXDE4W.js?v=0697c126"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/shared/theme-registry-data.json?import"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/themes/fonts/inter-bec94a4daf06.woff2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/react.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/session-connection-owner.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/service-client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-i18n.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/session-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/conversation-map-layout.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapCanvas.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapInspector.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMap.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/zustand.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/connection-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/session-project-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/streaming-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/ui-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/agent-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/channel-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/desk-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/model-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/input-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/knowledge-reference-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/chat-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/chat-find-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/toast-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/preview-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/browser-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/context-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/automation-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/activity-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/agent-activity-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/terminal-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/bridge-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/selection-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/subagent-preview-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/computer-overlay-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/screenshot-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/sidebar-ui-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/file-history-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/side-chat-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/conversation-map-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/message-live-version.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/live-turn-store.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/studio-access.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/contract-versions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/ws-message-handler.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/stream-resume.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/resource-events.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-automation.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-media.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-workbench.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-agent-activities.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/app-event-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/errors.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/error-bus.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/package.json?import"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/terminal-client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/background-process-control.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-chat-history.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/loop-runtime-error.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-hana-fetch.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/history-protocol-client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/last-project-identity.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/input-draft-persistence.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/input-drafts.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/workspace-history.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/history-builder.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/todo-compat.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/agent-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/desk-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/stream-invalidator.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/errors/error-presenter.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/error-user-messages.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/agent-workspace.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/input/composer-send.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/session-projects.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/message-turn-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/host/electron-desktop-host.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/host/web-desktop-host.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/input/composer-memory-mode.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-bridge.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-browser.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-knowledge.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-observability.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-settings.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/chat-client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapDraftCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapPendingCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/MarkdownContent.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/markdown.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/input-draft-sync.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/selectors/file-refs.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/chat-performance.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/content-semantics.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/turn-outcome.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/turn-projector.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/history-run-merge.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/sidebar-ui-state.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/studio-access-contract.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/contract-versions.json?import"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/browser-events.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-stream-buffer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/stream-key-dispatcher.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/create-keyed-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/session-refresh-scheduler.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/preview-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/conversation-events.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/settings-modal-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/preview-document-refresh.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/todo-constants.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/message-parser.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/terminal-output-stream.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-platform.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/stream-admission.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/tenet-store.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/channel-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/chat/layout.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/editor/typography.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/bridge-response.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/log-redactor.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/conversation-suggestion.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/workspace-ui-state-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/file-kind.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/assistant-block-builder.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/history-segment-sanitizer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/platform-runtime.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/format.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/chat-image-send-preflight.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/model-settings-navigation.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/quoted-selection.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/input/quote-refresh.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/video-mime.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/ui-context.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/session-scope-context.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/conversation-request-scope.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-mermaid-diagrams.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/grapheme.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/link-open.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/shared/LinkContextMenu.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/Chat.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/KnowledgeCitationDialog.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/KnowledgeCitationPreview.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/knowledge-citation-scope.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/window-surface.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/KnowledgeCitation.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/markdown-it.js?v=74a273f9"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/@traptitech_markdown-it-katex.js?v=0e99f169"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/markdown-it-task-lists.js?v=68b5f0e9"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/katex/dist/katex.min.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/markdown-html-sanitizer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/markdown-document.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/tool-call-identity.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/tool-label.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/SidebarLayout.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/preview-reading-position.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/preview-file-refresh.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/remote-file-preview.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/yuan-visuals.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/internal-mood-block.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/reserved-tag-stream.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/terminal-ui-contract.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/editor-typography.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/font-presets.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/preview-file-content.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/tool-outcome.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/model-capabilities.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/settings/store.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/mermaid-renderer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/file-preview.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/index.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/knowledge/KnowledgePage.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/react-dom.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/knowledge/knowledge-api.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/window-surface.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/js-yaml.js?v=1642bbba"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/layout-constants.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/resource-access.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/resource-url.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/open-media-viewer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/tool-presentation.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/settings/resource-state.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Overlay.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ConfirmDialog.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/NoticeDialog.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Button.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Toggle.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/SelectWidget.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ProviderIcon.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/AnchoredPortal.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ContextMenu.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Tooltip.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-animate-presence.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/motion.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/AnimationPrimitives.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ClassicFindBox.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/secret-custody.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Overlay.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ConfirmDialog.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/NoticeDialog.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Button.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Toggle.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/SelectWidget.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/provider-icons.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ProviderIcon.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Tooltip.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/motion_react.js?v=b930c234"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/chunk-IV6PWKIX.js?v=0697c126"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ClassicFindBox.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/studio-list"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-6de088a52ee2b6540c6e91b776ae6bc3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/conversation-map/layout"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-child/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/settings.html"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@vite/client"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/modules/connection-csp.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/styles.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/themes/warm-paper.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/lib/i18n.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/shared/theme.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/modules/platform.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/__tests__/session-map-live/surface.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/vite/dist/client/env.mjs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/shared/theme-registry.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/shared/appearance-preferences.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/react_jsx-dev-runtime.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/react-dom_client.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapPage.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/ToastContainer.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/index.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/server-connection.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/websocket.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/session-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/ui-helpers.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/composer-send-coordinator.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/conversation-map-projection.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/conversation-map-send.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/host/desktop-host.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/chunk-DCDRPVTX.js?v=0697c126"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/chunk-PR4QN5HX.js?v=0697c126"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/chunk-3GFXDE4W.js?v=0697c126"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/shared/theme-registry-data.json?import"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/themes/fonts/inter-bec94a4daf06.woff2"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/react.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/session-connection-owner.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/service-client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-i18n.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/session-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/conversation-map-layout.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapCanvas.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapInspector.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMap.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/zustand.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/connection-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/session-project-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/streaming-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/ui-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/agent-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/channel-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/desk-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/model-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/input-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/knowledge-reference-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/chat-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/chat-find-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/toast-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/preview-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/browser-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/context-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/automation-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/activity-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/agent-activity-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/terminal-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/bridge-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/selection-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/subagent-preview-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/computer-overlay-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/screenshot-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/sidebar-ui-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/file-history-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/side-chat-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/conversation-map-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/message-live-version.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/live-turn-store.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/studio-access.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/contract-versions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/ws-message-handler.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/stream-resume.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/resource-events.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-automation.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-media.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-workbench.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-agent-activities.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/app-event-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/errors.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/error-bus.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/package.json?import"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/terminal-client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/background-process-control.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-chat-history.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/loop-runtime-error.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-hana-fetch.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/history-protocol-client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/last-project-identity.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/input-draft-persistence.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/input-drafts.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/workspace-history.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/history-builder.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/todo-compat.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/agent-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/desk-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/stream-invalidator.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/errors/error-presenter.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/error-user-messages.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/agent-workspace.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/session-projects.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/message-turn-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/input/composer-send.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/host/electron-desktop-host.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/host/web-desktop-host.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/input/composer-memory-mode.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-bridge.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-browser.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-knowledge.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-observability.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/rust-settings.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/chat-client.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapDraftCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/conversation-map/ConversationMapPendingCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/MarkdownContent.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/markdown.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/input-draft-sync.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/selectors/file-refs.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/chat-performance.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/content-semantics.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/turn-outcome.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/turn-projector.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/history-run-merge.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/sidebar-ui-state.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/studio-access-contract.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/contract-versions.json?import"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/browser-events.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-stream-buffer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/stream-key-dispatcher.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/create-keyed-slice.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/session-refresh-scheduler.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/preview-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/conversation-events.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/settings-modal-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/preview-document-refresh.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/todo-constants.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/message-parser.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/terminal-output-stream.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-platform.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/stream-admission.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/tenet-store.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/channel-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/chat/layout.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/editor/typography.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/bridge-response.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/log-redactor.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/conversation-suggestion.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/stores/workspace-ui-state-actions.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/file-kind.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/assistant-block-builder.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/history-segment-sanitizer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/platform-runtime.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/ui-context.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/format.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/chat-image-send-preflight.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/model-settings-navigation.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/quoted-selection.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/input/quote-refresh.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/video-mime.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/session-scope-context.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/conversation-request-scope.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-mermaid-diagrams.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/grapheme.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/link-open.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/shared/LinkContextMenu.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/Chat.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/KnowledgeCitationDialog.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/KnowledgeCitationPreview.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/knowledge-citation-scope.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/window-surface.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/chat/KnowledgeCitation.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/markdown-it.js?v=74a273f9"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/@traptitech_markdown-it-katex.js?v=0e99f169"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/markdown-it-task-lists.js?v=68b5f0e9"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/katex/dist/katex.min.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/markdown-html-sanitizer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/markdown-document.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/tool-call-identity.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/tool-label.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/SidebarLayout.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/preview-reading-position.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/preview-file-refresh.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/remote-file-preview.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/yuan-visuals.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/internal-mood-block.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/reserved-tag-stream.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/terminal-ui-contract.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/editor-typography.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/font-presets.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/preview-file-content.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/tool-outcome.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/model-capabilities.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/settings/store.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/mermaid-renderer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/file-preview.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/index.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/knowledge/KnowledgePage.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/react-dom.js?v=812be605"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/components/knowledge/knowledge-api.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/window-surface.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/js-yaml.js?v=1642bbba"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/layout-constants.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/resource-access.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/services/resource-url.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/utils/open-media-viewer.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/tool-presentation.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/settings/resource-state.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Overlay.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ConfirmDialog.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/NoticeDialog.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Button.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Toggle.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/SelectWidget.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ProviderIcon.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/AnchoredPortal.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ContextMenu.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Tooltip.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/hooks/use-animate-presence.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/motion.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/AnimationPrimitives.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ClassicFindBox.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/shared/secret-custody.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Overlay.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ConfirmDialog.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/NoticeDialog.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Button.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Toggle.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/SelectWidget.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/provider-icons.ts"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ProviderIcon.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/Tooltip.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/motion_react.js?v=b930c234"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/@fs/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/.session-map-vite-cache/deps/chunk-IV6PWKIX.js?v=0697c126"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63181/react/ui/ClassicFindBox.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/studio-list"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-6de088a52ee2b6540c6e91b776ae6bc3"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/conversation-map/layout"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-6de088a52ee2b6540c6e91b776ae6bc3/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/map-child/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/conversation-map/turns"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/switch",
+      "body": "{\"sessionId\":\"session-8e3b40451f204b8ca4c8c2a7cd2fb6f7\"}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/history"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/media/jobs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/preferences/workspace-ui-state?workspace=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected&surface=electron"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/files?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/jian?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-8e3b40451f204b8ca4c8c2a7cd2fb6f7"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/switch",
+      "body": "{\"sessionId\":\"session-6de088a52ee2b6540c6e91b776ae6bc3\"}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/media/jobs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/resource-io/events?since=0"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/app-events?since=0"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/browser/workspaces"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/studio-list"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/history"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/media/jobs"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/fork"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/fork",
+      "body": "{\"newSessionId\":\"session-befe90bb-56f7-491f-bc00-a68e9707eec4\",\"boundaryMessageId\":\"run_000001a177f548e6_000001-final\"}"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-8e3b40451f204b8ca4c8c2a7cd2fb6f7/fork",
+      "body": "{\"newSessionId\":\"session-af721d2a-504a-4bdb-87a1-6de71235cb1f\",\"boundaryMessageId\":\"run_000001a177f548e6_000001-final\"}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-af721d2a-504a-4bdb-87a1-6de71235cb1f"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-af721d2a-504a-4bdb-87a1-6de71235cb1f"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/studio-list"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-af721d2a-504a-4bdb-87a1-6de71235cb1f/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-af721d2a-504a-4bdb-87a1-6de71235cb1f/conversation-map/turns"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/switch",
+      "body": "{\"sessionId\":\"session-af721d2a-504a-4bdb-87a1-6de71235cb1f\"}"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-af721d2a-504a-4bdb-87a1-6de71235cb1f/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-af721d2a-504a-4bdb-87a1-6de71235cb1f/agent-activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-af721d2a-504a-4bdb-87a1-6de71235cb1f/history"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-af721d2a-504a-4bdb-87a1-6de71235cb1f/history"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/files?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-af721d2a-504a-4bdb-87a1-6de71235cb1f"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/jian?dir=%2FUsers%2Fstudy_superior%2FDesktop%2FCode%2FLingxiAgent%2Fartifacts%2Frust-tauri%2FR08%2Fcloseout-proofs-02%2Fui-pages%2Flive%2Fsession-map%2Fselected"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/chat/models?agentId=focus-b&sessionId=session-af721d2a-504a-4bdb-87a1-6de71235cb1f"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/studio-list"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-af721d2a-504a-4bdb-87a1-6de71235cb1f/history"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-af721d2a-504a-4bdb-87a1-6de71235cb1f/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-af721d2a-504a-4bdb-87a1-6de71235cb1f/media/jobs"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-af721d2a-504a-4bdb-87a1-6de71235cb1f/media/jobs"
+    },
+    {
+      "method": "PUT",
+      "url": "http://127.0.0.1:63042/lingxi/v1/preferences/workspace-ui-state",
+      "body": "{\"workspace\":\"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/closeout-proofs-02/ui-pages/live/session-map/selected\",\"surface\":\"electron\",\"state\":{\"deskExpandedPaths\":[],\"deskSelectedPath\":\"\",\"rightWorkspaceTab\":\"workspace\",\"jianView\":\"desk\",\"jianDrawerOpen\":false,\"previewOpen\":false,\"openTabs\":[],\"activeTabId\":null,\"previewTabs\":[]}}"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/preferences/workspace-ui-state"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/resource-io/events?since=0"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/studio-list"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-af721d2a-504a-4bdb-87a1-6de71235cb1f/history"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-af721d2a-504a-4bdb-87a1-6de71235cb1f/conversation-map/turns"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-af721d2a-504a-4bdb-87a1-6de71235cb1f/media/jobs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/resource-io/events?since=0"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-af721d2a-504a-4bdb-87a1-6de71235cb1f/media/jobs"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/app-events?since=0"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/app-events?since=0"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-af721d2a-504a-4bdb-87a1-6de71235cb1f/history?all=1&reconciliation=1"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/sessions/session-af721d2a-504a-4bdb-87a1-6de71235cb1f/history?all=1&reconciliation=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/activities"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/desk/activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:63042/lingxi/v1/browser/workspaces"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:63042/lingxi/v1/browser/workspaces"
+    }
+  ],
+  "frames": [
+    {
+      "protocol": "lingxi.wire",
+      "clientKind": "desktop",
+      "clientVersion": "0.1.43",
+      "protocolMin": 1,
+      "protocolMax": 1,
+      "caps": []
+    },
+    {
+      "protocol": "lingxi.wire",
+      "clientKind": "desktop",
+      "clientVersion": "0.1.43",
+      "protocolMin": 1,
+      "protocolMax": 1,
+      "caps": []
+    },
+    {
+      "protocol": "lingxi.wire",
+      "clientKind": "desktop",
+      "clientVersion": "0.1.43",
+      "protocolMin": 1,
+      "protocolMax": 1,
+      "caps": []
+    },
+    {
+      "type": "prompt",
+      "clientMessageId": "client-user-7074aa1f-3d89-4b65-b1fc-d831e83c0c04",
+      "snapshotVersion": 1,
+      "text": "MAP-CONTINUE",
+      "sessionId": "session-8e3b40451f204b8ca4c8c2a7cd2fb6f7",
+      "sessionPath": "native:session-8e3b40451f204b8ca4c8c2a7cd2fb6f7",
+      "uiContext": null,
+      "displayMessage": {
+        "text": "MAP-CONTINUE"
+      },
+      "clientAttemptId": "client-attempt-9c9c823d-2583-4650-8180-aff3650edeec"
+    },
+    {
+      "type": "prompt",
+      "clientMessageId": "client-user-66e58aa2-a98a-41bb-bd02-fa4ffcb29d99",
+      "snapshotVersion": 1,
+      "text": "MAP-BRANCH",
+      "sessionId": "session-af721d2a-504a-4bdb-87a1-6de71235cb1f",
+      "sessionPath": "native:session-af721d2a-504a-4bdb-87a1-6de71235cb1f",
+      "uiContext": null,
+      "displayMessage": {
+        "text": "MAP-BRANCH"
+      },
+      "clientAttemptId": "client-attempt-65e5650c-febb-451e-9626-3a8729fa691c"
+    },
+    {
+      "type": "resume_stream",
+      "sessionPath": "native:session-af721d2a-504a-4bdb-87a1-6de71235cb1f",
+      "sessionId": "session-af721d2a-504a-4bdb-87a1-6de71235cb1f",
+      "streamId": "run_000001a177f57b1a_00000a",
+      "sinceSeq": 6,
+      "resumeToken": "rrg-mvp67dq6-1-gipvpd"
+    },
+    {
+      "type": "prompt",
+      "clientMessageId": "client-user-8918748e-c993-49e1-ba82-3be33b1e3b52",
+      "snapshotVersion": 1,
+      "text": "MAP-HOLD",
+      "sessionId": "session-af721d2a-504a-4bdb-87a1-6de71235cb1f",
+      "sessionPath": "native:session-af721d2a-504a-4bdb-87a1-6de71235cb1f",
+      "uiContext": null,
+      "displayMessage": {
+        "text": "MAP-HOLD"
+      },
+      "clientAttemptId": "client-attempt-424debf9-6910-4cab-bc6d-5bcb06731bd5"
+    },
+    {
+      "type": "prompt",
+      "clientMessageId": "client-user-11557553-0fc4-4b1c-9f56-b51ed1ab931c",
+      "snapshotVersion": 1,
+      "text": "MAP-DELIVERY-UNKNOWN",
+      "sessionId": "session-af721d2a-504a-4bdb-87a1-6de71235cb1f",
+      "sessionPath": "native:session-af721d2a-504a-4bdb-87a1-6de71235cb1f",
+      "uiContext": null,
+      "displayMessage": {
+        "text": "MAP-DELIVERY-UNKNOWN"
+      },
+      "clientAttemptId": "client-attempt-293ad0d0-28ba-47da-9bee-08cc8fbf94e8"
+    }
+  ],
+  "logs": [
+    "[vite] connecting...",
+    "[vite] connected.",
+    "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+    "[has-dbg] called sessionPath= native:sess_local_beta sessionId= sess_local_beta",
+    "[has-dbg] recordsSize= 0 limit= 50",
+    "[has-dbg] called sessionPath= native:map-no-workspace sessionId= map-no-workspace",
+    "[has-dbg] recordsSize= 0 limit= 50",
+    "[ErrorBus][WS_DISCONNECTED][c99921b3] WS_DISCONNECTED [object Object]",
+    "[has-dbg] called sessionPath= native:map-no-workspace sessionId= map-no-workspace",
+    "[has-dbg] recordsSize= 0 limit= 50",
+    "[has-dbg] called sessionPath= native:session-6de088a52ee2b6540c6e91b776ae6bc3 sessionId= session-6de088a52ee2b6540c6e91b776ae6bc3",
+    "[has-dbg] recordsSize= 0 limit= 50",
+    "[has-dbg] called sessionPath= native:session-8e3b40451f204b8ca4c8c2a7cd2fb6f7 sessionId= session-8e3b40451f204b8ca4c8c2a7cd2fb6f7",
+    "[has-dbg] recordsSize= 0 limit= 50",
+    "[has-dbg] called sessionPath= native:session-6de088a52ee2b6540c6e91b776ae6bc3 sessionId= session-6de088a52ee2b6540c6e91b776ae6bc3",
+    "[has-dbg] recordsSize= 0 limit= 50",
+    "[has-dbg] called sessionPath= native:session-6de088a52ee2b6540c6e91b776ae6bc3 sessionId= session-6de088a52ee2b6540c6e91b776ae6bc3",
+    "[has-dbg] recordsSize= 0 limit= 50",
+    "[has-dbg] called sessionPath= native:session-8e3b40451f204b8ca4c8c2a7cd2fb6f7 sessionId= session-8e3b40451f204b8ca4c8c2a7cd2fb6f7",
+    "[has-dbg] recordsSize= 0 limit= 50",
+    "[has-dbg] called sessionPath= native:session-6de088a52ee2b6540c6e91b776ae6bc3 sessionId= session-6de088a52ee2b6540c6e91b776ae6bc3",
+    "[has-dbg] recordsSize= 0 limit= 50",
+    "[vite] connecting...",
+    "[vite] connected.",
+    "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+    "[conversation-map] persist layout failed Error: layout write failed: Operation not permitted (os error 1)",
+    "[vite] connecting...",
+    "[vite] connected.",
+    "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+    "[conversation-map] persist layout failed Error: layout write failed: Operation not permitted (os error 1)",
+    "[conversation-map] persist layout failed Error: layout write failed: Operation not permitted (os error 1)",
+    "[vite] connecting...",
+    "[vite] connected.",
+    "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+    "[conversation-map] persist layout failed Error: 地图坐标无效",
+    "[vite] connecting...",
+    "[vite] connected.",
+    "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+    "[conversation-map] load layout failed Error: 地图布局读取失败：file_changed_or_not_authorized",
+    "[vite] connecting...",
+    "[vite] connected.",
+    "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+    "[session] switch failed: Error: archived session must be restored before switch",
+    "[rust-automation] 后台活动事件读取失败，保留现有列表并在下次重试",
+    "[has-dbg] called sessionPath= native:session-8e3b40451f204b8ca4c8c2a7cd2fb6f7 sessionId= session-8e3b40451f204b8ca4c8c2a7cd2fb6f7",
+    "[has-dbg] recordsSize= 0 limit= 50",
+    "[rust-automation] 后台活动事件读取失败，保留现有列表并在下次重试"
+  ],
+  "observations": [
+    {
+      "kind": "other-service-mutations",
+      "requests": [
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:63180/lingxi/v1/sessions/switch",
+          "body": "{\"sessionId\":\"sess_local_beta\"}"
+        }
+      ]
+    },
+    {
+      "kind": "actual-busy-queue",
+      "heldClientMessageId": "client-user-8918748e-c993-49e1-ba82-3be33b1e3b52",
+      "queued": {
+        "id": "map-1793013939379-ypbnyb",
+        "sessionPath": "native:session-af721d2a-504a-4bdb-87a1-6de71235cb1f",
+        "text": "MAP-QUEUED",
+        "createdAt": 1793013939379,
+        "snapshotVersion": 1,
+        "status": "ready",
+        "bundle": {
+          "type": "prompt",
+          "sessionRef": {
+            "sessionId": "session-af721d2a-504a-4bdb-87a1-6de71235cb1f",
+            "sessionPath": "native:session-af721d2a-504a-4bdb-87a1-6de71235cb1f",
+            "agentId": "focus-b"
+          },
+          "text": "MAP-QUEUED",
+          "skills": [],
+          "fileRefs": [],
+          "sessionRefs": [],
+          "agentMentions": [],
+          "inputFiles": [],
+          "knowledgeRefs": null,
+          "docContextAttached": false,
+          "doc": null,
+          "quotes": [],
+          "uiContext": null
+        }
+      }
+    },
+    {
+      "kind": "real-watchdog-unknown",
+      "phase": "delivery_unknown",
+      "draft": "MAP-DELIVERY-UNKNOWN"
+    }
+  ]
+}

@@ -1,0 +1,154 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t02_supervisor_ready",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 46.196,
+ "caseCount": 31,
+ "casesSha256": "148436cabde99c955dc5331feb17ab8fe9433acf701c03248e4050e0436712e4",
+ "commands": [
+  {
+   "id": "cargo-supervisor-tests",
+   "argv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "test",
+    "--manifest-path",
+    "desktop/src-tauri/Cargo.toml",
+    "--locked",
+    "--features",
+    "r09-host",
+    "--test",
+    "service_supervisor",
+    "--",
+    "--nocapture"
+   ],
+   "exitCode": 0,
+   "durationSecs": 17.606,
+   "logSha256": "be0085064bdb9656a28367829618b4d7199be4b40aa9297739c64084cb292607"
+  },
+  {
+   "id": "strings-hana-server",
+   "argv": [
+    "/bin/sh",
+    "-c",
+    "strings -a /private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E \"hana-server\" || true"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.183,
+   "logSha256": "d0185c2073d2829a7d6024116342acb22567d132676458ed6e3181198a472d03"
+  },
+  {
+   "id": "strings-server-bootstrap",
+   "argv": [
+    "/bin/sh",
+    "-c",
+    "strings -a /private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E \"server/bootstrap\" || true"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.181,
+   "logSha256": "cd04a54c9450e9f9e11afc4e22eb18d75e928302cd42119ee6519a1382fb8873"
+  },
+  {
+   "id": "strings-bundle-index",
+   "argv": [
+    "/bin/sh",
+    "-c",
+    "strings -a /private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E \"bundle/index.js\" || true"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.18,
+   "logSha256": "7df9baa0ee02c5997bc65508c09af4ab03a45ba8e229540cf35f52df426f01ae"
+  },
+  {
+   "id": "strings-bridge-worker",
+   "argv": [
+    "/bin/sh",
+    "-c",
+    "strings -a /private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop | grep -c -E \"bridge-sdk-worker\" || true"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.18,
+   "logSha256": "d5b676bb3d2e395b91acd44a4478d33b45401cabeae03f1378f79c4c25d424d7"
+  }
+ ],
+ "logSha256": "b88563dd432420c3a6ed215e1b2810af9b0ba451c3d092e10f488813ce99e855",
+ "finishedAtUnixMs": 1793031004905,
+ "failures": {
+  "protocolMismatch": {
+   "actual": "lingxi-service wire 1..=2 data-epoch 2",
+   "appVersion": "0.1.43",
+   "atUnixMs": 1793030965997,
+   "debugBuild": false,
+   "detail": null,
+   "expected": "lingxi-service wire 1..=1 data-epoch 2",
+   "fallbackAttempts": 0,
+   "home": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-60442-1793030958709/home-protocol-mismatch",
+   "message": "bundled Rust service protocol/data epoch is incompatible with this host",
+   "nodeFallback": "none",
+   "packaged": true,
+   "reason": "RUST_SERVICE_PROTOCOL_INCOMPATIBLE",
+   "schema": "lingxi.r09.service-launch-failure.v1"
+  },
+  "digestMismatch": {
+   "actual": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+   "appVersion": "0.1.43",
+   "atUnixMs": 1793030967993,
+   "debugBuild": false,
+   "detail": {
+    "binarySha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+    "codesign": "codesign --verify --deep --strict failed: /private/tmp/lingxi-r09-injected-60442/DigestMismatch.app: a sealed resource is missing or invalid",
+    "contentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+    "manifestContentSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "manifestSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+   },
+   "expected": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "fallbackAttempts": 0,
+   "home": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-60442-1793030958709/home-digest-mismatch",
+   "message": "bundled Rust service bytes do not match the build manifest",
+   "nodeFallback": "none",
+   "packaged": true,
+   "reason": "RUST_SERVICE_DIGEST_MISMATCH",
+   "schema": "lingxi.r09.service-launch-failure.v1"
+  },
+  "runtimeIdentityMismatch": {
+   "actual": "wire 1..=3 epoch 2",
+   "appVersion": "0.1.43",
+   "atUnixMs": 1793030969563,
+   "debugBuild": true,
+   "detail": {
+    "instanceId": "0123456789abcdef0123456789abcdef"
+   },
+   "expected": "wire 1..=1 epoch 2",
+   "fallbackAttempts": 0,
+   "home": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-60442-1793030958709/home-runtime-mismatch",
+   "message": "runtime instance record announces an incompatible protocol/data epoch",
+   "nodeFallback": "none",
+   "packaged": false,
+   "reason": "RUNTIME_IDENTITY_MISMATCH",
+   "schema": "lingxi.r09.service-launch-failure.v1"
+  }
+ },
+ "releaseManifest": {
+  "stage": "/Users/study_superior/Desktop/Code/LingxiAgent/dist-rust-service/mac-arm64",
+  "sidecar": "desktop/src-tauri/binaries/lingxi-service-aarch64-apple-darwin",
+  "sidecarSha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+  "resourcesManifest": "desktop/src-tauri/resources/rust-service/build.json",
+  "manifestSha256": "372c2b88748dcd96e9a74956c13554fb8d0e764638c28bc52b524c3a506473f9",
+  "protocol": {
+   "serverKind": "lingxi-service",
+   "wireProtocolMin": 1,
+   "wireProtocolMax": 1,
+   "dataEpoch": 2
+  },
+  "binarySha256": "852912ef6339126f565e98ae57a552420946ba898fbc290803de558bd31eee60",
+  "contentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0"
+ },
+ "platform": "macos-arm64",
+ "injectedRoot": "/private/tmp/lingxi-r09-injected-60442",
+ "failedCases": [
+  "t02::failure-dialog-suppressed-all"
+ ]
+}

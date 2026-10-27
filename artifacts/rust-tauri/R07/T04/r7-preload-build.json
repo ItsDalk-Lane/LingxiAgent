@@ -1,0 +1,27 @@
+{
+  "candidate": "r7",
+  "name": "preload-build",
+  "command": [
+    "./node_modules/.bin/vite",
+    "build",
+    "--config",
+    "vite.config.preload.js",
+    "--outDir",
+    "/private/tmp/lingxi-r07-t04-r7-preload"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-15T23:22:10.472029+00:00",
+  "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+  "log": "r7-preload-build.log",
+  "endedAt": "2026-10-15T23:22:10.661243+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+  "logSha256": "b402e7ea64e0ce387308df3b7c60dbf1a1022b9a8f5246c5c11ca68e6dc03afb",
+  "sourceUnchanged": true
+}

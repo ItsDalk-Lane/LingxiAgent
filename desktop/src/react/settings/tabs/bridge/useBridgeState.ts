@@ -7,6 +7,7 @@ import { lingxiFetch } from '../../api';
 import { loadSettingsConfig, updateSettingsSnapshot } from '../../actions';
 import { t } from '../../helpers';
 import type { BridgePermissionMode, KnownUser } from './BridgeWidgets';
+import { bridgeConnectionKey, bridgePublicConnectionKey, readBridgeResponse } from '../../../services/bridge-response';
 import {
   useBridgeCredentialDrafts,
   type BridgeCredentialFieldValues,
@@ -95,6 +96,7 @@ function normalizeFeishuRegion(value: unknown): FeishuRegion {
 function normalizeBridgeStatus(data: unknown): BridgeStatus | null {
   if (!data || typeof data !== 'object') return null;
   const value = data as Partial<BridgeStatus>;
+  if (!(['telegram', 'feishu', 'dingtalk', 'qq', 'wechat'] as const).some(key => value[key] && typeof value[key] === 'object')) return null;
   return {
     agentId: value.agentId || null,
     telegram: value.telegram || {},
@@ -141,6 +143,8 @@ export function useBridgeState() {
   // Atomic selectors: only re-render when these specific fields change
   const showToast = useSettingsStore(s => s.showToast);
   const currentAgentId = useSettingsStore(s => s.currentAgentId);
+  const connectionKey = useSettingsStore(s => bridgeConnectionKey(s));
+  const [statusError, setStatusError] = useState('');
   const settingsSnapshot = useSettingsStore(s => s.settingsSnapshot.data);
   const snapshotBridgeStatus = settingsSnapshot?.agentId === currentAgentId
     ? normalizeBridgeStatus(settingsSnapshot.bridgeStatus)
@@ -154,11 +158,13 @@ export function useBridgeState() {
   const [statusState, setStatusState] = useState<{
     ownerId: string | null;
     value: BridgeStatus | null;
+    connectionKey: string;
   } | null>(() => snapshotBridgeStatus ? {
     ownerId: currentAgentId,
     value: snapshotBridgeStatus,
+    connectionKey,
   } : null);
-  const status = statusState?.ownerId === selectedAgentId ? statusState.value : null;
+  const status = statusState?.ownerId === selectedAgentId && statusState.connectionKey === connectionKey ? statusState.value : null;
   const [testingState, setTestingState] = useState<{
     ownerId: string | null;
     platform: BridgePlatform;
@@ -213,13 +219,14 @@ export function useBridgeState() {
   );
 
   const applyStatus = useCallback((nextStatus: BridgeStatus | null, statusOwnerId: string | null) => {
-    setStatusState({ ownerId: statusOwnerId, value: nextStatus });
+    setStatusState({ ownerId: statusOwnerId, value: nextStatus, connectionKey: bridgeConnectionKey(useSettingsStore.getState()) });
     syncCredentialFields(statusOwnerId, bridgeEditableFields(nextStatus));
     syncStoredSecrets(statusOwnerId, storedBridgeSecrets(nextStatus));
   }, [syncCredentialFields, syncStoredSecrets]);
 
   useEffect(() => {
     if (!selectedAgentId) return;
+    setStatusError('');
     if (settingsSnapshot?.agentId !== selectedAgentId) return;
     if (liveStatusOwnersRef.current.has(selectedAgentId)) return;
     const nextStatus = normalizeBridgeStatus(settingsSnapshot.bridgeStatus);
@@ -246,19 +253,23 @@ export function useBridgeState() {
 
   const savePublicAgentsMd = async () => {
     const agentId = selectedAgentId;
+    const sourceKey = bridgeConnectionKey(useSettingsStore.getState());
     if (!agentId || publicAgentsMd === publicAgentsMdOriginal) return;
     try {
-      await lingxiFetch(`/api/agents/${agentId}/public-agents-md`, {
+      const response = await lingxiFetch(`/api/agents/${agentId}/public-agents-md`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: publicAgentsMd }),
       });
+      await readBridgeResponse(response);
+      if (sourceKey !== bridgeConnectionKey(useSettingsStore.getState())) return;
       updateSettingsSnapshot(snapshot => (
         snapshot.agentId === agentId ? { ...snapshot, publicAgents: publicAgentsMd } : snapshot
       ));
       setPublicAgentsMdOriginal(publicAgentsMd);
-      showToast(t('settings.saved'), 'success');
+      if (selectedAgentIdRef.current === agentId) showToast(t('settings.saved'), 'success');
     } catch (err: unknown) {
+      if (sourceKey !== bridgeConnectionKey(useSettingsStore.getState())) return;
       showToast(t('settings.saveFailed') + ': ' + (err instanceof Error ? err.message : String(err)), 'error');
     }
   };
@@ -272,28 +283,34 @@ export function useBridgeState() {
     // would be resolved on the server's terms.
     if (!agentId) return null;
     const requestId = ++statusRequestIdRef.current;
+    const sourceKey = bridgeConnectionKey(useSettingsStore.getState());
     try {
       const res = await lingxiFetch(`/api/bridge/status?agentId=${encodeURIComponent(agentId)}`, signal ? { signal } : undefined);
-      const data = await res.json();
+      const data = await readBridgeResponse(res);
       if (
         signal?.aborted
         || requestId !== statusRequestIdRef.current
         || selectedAgentIdRef.current !== agentId
+        || sourceKey !== bridgeConnectionKey(useSettingsStore.getState())
       ) return null;
       const nextStatus = normalizeBridgeStatus(data);
+      if (!nextStatus) throw new Error('消息平台状态返回内容无效');
       if (agentId && nextStatus?.agentId && nextStatus.agentId !== agentId) {
         console.warn('[bridge] ignored status owned by another agent:', nextStatus.agentId);
         return null;
       }
       if (agentId) liveStatusOwnersRef.current.add(agentId);
       applyStatus(nextStatus, agentId);
+      setStatusError('');
       return nextStatus;
     } catch (err) {
       if (
         (err as Error)?.name === 'AbortError'
         || requestId !== statusRequestIdRef.current
+        || sourceKey !== bridgeConnectionKey(useSettingsStore.getState())
       ) return null;
       console.error('[bridge] load status failed:', err);
+      setStatusError(err instanceof Error ? err.message : '消息平台状态读取失败');
       return null;
     }
   }, [applyStatus]); // explicit agentId keeps request ownership stable across selection changes
@@ -328,7 +345,7 @@ export function useBridgeState() {
     const ac = new AbortController();
     loadStatus(ac.signal);
     return () => ac.abort();
-  }, [applyStatus, selectedAgentId, loadStatus, settingsSnapshot?.agentId]);
+  }, [applyStatus, selectedAgentId, loadStatus, settingsSnapshot?.agentId, connectionKey]);
 
   // Reconciliation belongs to the selected Agent. Switching Agent or unmounting
   // cancels both the wait timer and any in-flight request.
@@ -338,9 +355,12 @@ export function useBridgeState() {
   }, [selectedAgentId]);
 
   useEffect(() => {
-    const handler = () => {
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent).detail;
+      if (detail?.connectionKey && detail.connectionKey !== bridgePublicConnectionKey(useSettingsStore.getState())) return;
       const agentId = selectedAgentIdRef.current;
       if (!agentId) return;
+      if (detail?.agentId && detail.agentId !== agentId) return;
 
       wechatStatusReconcileAbortRef.current?.abort();
       const ac = new AbortController();
@@ -358,21 +378,25 @@ export function useBridgeState() {
   const saveBridgeConfig = async (plat: string, credentials: Record<string, string> | null, enabled?: boolean) => {
     // Snapshot agentId at call time to avoid stale closure
     const agentId = selectedAgentId;
+    const sourceKey = bridgeConnectionKey(useSettingsStore.getState());
     const secretSubmission = captureSubmission(plat, credentials);
     const fieldSubmissions = captureFieldSubmissions(plat, credentials);
     try {
       const agentQuery = agentId ? `?agentId=${encodeURIComponent(agentId)}` : '';
-      await lingxiFetch(`/api/bridge/config${agentQuery}`, {
+      const response = await lingxiFetch(`/api/bridge/config${agentQuery}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ platform: plat, credentials, enabled }),
       });
+      await readBridgeResponse(response);
+      if (sourceKey !== bridgeConnectionKey(useSettingsStore.getState())) return;
       markSubmissionSaved(secretSubmission);
       markFieldSubmissionsSaved(fieldSubmissions);
-      showToast(t('settings.saved'), 'success');
+      if (selectedAgentIdRef.current === agentId) showToast(t('settings.saved'), 'success');
       // Only reload if user hasn't switched agent during the save (read latest from ref)
       if (selectedAgentIdRef.current === agentId) await loadStatus();
     } catch (err: unknown) {
+      if (sourceKey !== bridgeConnectionKey(useSettingsStore.getState())) return;
       showToast(t('settings.saveFailed') + ': ' + (err instanceof Error ? err.message : String(err)), 'error');
     }
   };
@@ -383,11 +407,13 @@ export function useBridgeState() {
     useSavedCredentials = false,
   ) => {
     const agentId = selectedAgentId;
+    const sourceKey = bridgeConnectionKey(useSettingsStore.getState());
     const requestId = ++testRequestIdRef.current;
     setTestingState({ ownerId: agentId, platform: plat, requestId });
     const isCurrentTest = () => (
       testRequestIdRef.current === requestId
       && selectedAgentIdRef.current === agentId
+      && sourceKey === bridgeConnectionKey(useSettingsStore.getState())
     );
     try {
       const agentQuery = agentId ? `?agentId=${encodeURIComponent(agentId)}` : '';
@@ -396,11 +422,11 @@ export function useBridgeState() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ platform: plat, credentials, useSavedCredentials }),
       });
-      const data = await res.json();
+      const data = await readBridgeResponse(res);
       if (!isCurrentTest()) return;
       if (data.ok) {
         const info = plat === 'telegram' ? ` @${data.info?.username || ''}` : '';
-        const successText = plat === 'dingtalk' && data.info?.stream?.status === 'not_tested'
+        const successText = plat === 'dingtalk' && (data.info?.stream?.status === 'not_tested' || data.info?.credentialOk === true)
           ? t('settings.bridge.dingtalkCredentialTestOk')
           : t('settings.bridge.testOk') + info;
         showToast(successText, 'success');
@@ -422,6 +448,7 @@ export function useBridgeState() {
 
   const setOwner = async (plat: string, userId: string) => {
     const agentId = selectedAgentId;
+    const sourceKey = bridgeConnectionKey(useSettingsStore.getState());
     try {
       const agentQuery = agentId ? `?agentId=${encodeURIComponent(agentId)}` : '';
       const res = await lingxiFetch(`/api/bridge/owner${agentQuery}`, {
@@ -429,7 +456,8 @@ export function useBridgeState() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ platform: plat, userId: userId || null }),
       });
-      const data = await res.json().catch(() => null);
+      const data = await readBridgeResponse(res);
+      if (sourceKey !== bridgeConnectionKey(useSettingsStore.getState())) return;
       if (selectedAgentIdRef.current === agentId) {
         const nextStatus = normalizeBridgeStatus(data?.status);
         if (nextStatus) {
@@ -438,13 +466,15 @@ export function useBridgeState() {
         }
         else await loadStatus();
       }
-      showToast(t('settings.bridge.ownerSaved'), 'success');
-    } catch {
-      showToast(t('settings.saveFailed'), 'error');
+      if (selectedAgentIdRef.current === agentId) showToast(t('settings.bridge.ownerSaved'), 'success');
+    } catch (error) {
+      if (sourceKey !== bridgeConnectionKey(useSettingsStore.getState())) return;
+      showToast(t('settings.saveFailed') + ': ' + (error instanceof Error ? error.message : String(error)), 'error');
     }
   };
 
   const saveGlobalSettings = async (partial: { permissionMode?: BridgePermissionMode; readOnly?: boolean; receiptEnabled?: boolean; richStreamingEnabled?: boolean }) => {
+    const sourceKey = bridgeConnectionKey(useSettingsStore.getState());
     setGlobalSettingsSaving(true);
     try {
       const res = await lingxiFetch('/api/bridge/settings', {
@@ -452,11 +482,14 @@ export function useBridgeState() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(partial),
       });
-      const saved = await res.json();
+      const saved = await readBridgeResponse(res);
+      if (sourceKey !== bridgeConnectionKey(useSettingsStore.getState())) return;
+      if (!['auto', 'operate', 'read_only'].includes(saved.permissionMode) || typeof saved.readOnly !== 'boolean' || typeof saved.receiptEnabled !== 'boolean' || typeof saved.richStreamingEnabled !== 'boolean') throw new Error('消息平台设置返回内容无效');
       if (saved.error) throw new Error(saved.error);
       if (typeof saved.permissionMode === 'string' && typeof saved.readOnly === 'boolean' && typeof saved.receiptEnabled === 'boolean' && typeof saved.richStreamingEnabled === 'boolean') {
         setStatusState(prev => prev?.ownerId === selectedAgentId && prev.value ? {
           ownerId: prev.ownerId,
+          connectionKey: prev.connectionKey,
           value: {
             ...prev.value,
             permissionMode: saved.permissionMode,
@@ -472,6 +505,7 @@ export function useBridgeState() {
         loadSettingsConfig(),
       ]);
     } catch (err: unknown) {
+      if (sourceKey !== bridgeConnectionKey(useSettingsStore.getState())) return;
       showToast(t('settings.saveFailed') + ': ' + (err instanceof Error ? err.message : String(err)), 'error');
     } finally {
       setGlobalSettingsSaving(false);
@@ -479,7 +513,7 @@ export function useBridgeState() {
   };
 
   return {
-    status, testingPlatform, globalSettingsSaving, showToast, loadStatus,
+    status, statusError, testingPlatform, globalSettingsSaving, showToast, loadStatus,
     selectedAgentId, setSelectedAgentId,
     publicAgentsMd, setPublicAgentsMd, savePublicAgentsMd,
     tgToken: secretDrafts.telegramToken.value,

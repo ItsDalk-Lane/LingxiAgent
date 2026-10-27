@@ -1,0 +1,18 @@
+PASS v3 anchor 80a8d2c2…feaa preserved (gen-a) :: 80a8d2c2640e2b2974b299a10f36679bc19daf0911e51f82f0c43399cb32feaa
+PASS v3 anchor 80a8d2c2…feaa preserved (gen-b) :: 80a8d2c2640e2b2974b299a10f36679bc19daf0911e51f82f0c43399cb32feaa
+PASS v3 base fixture file sets identical :: 32 files
+PASS v3 base fixture contains no models-store.json (zero-hit)
+PASS base run-a status complete :: complete
+PASS base run-b status complete :: complete
+PASS base runs outcome counts identical :: 35/35/5 vs 35/35/5
+PASS base runs source_root_sha256 identical :: c09ba009d9b69893bb415bd6bed664f5cdac4e59ff7da5f8ca645ab54756cf24
+PASS base receipts normalized deep-equal
+PASS bulk source contains no models-store.json (zero-hit) :: 433 files
+PASS bulk run-a sealed counts 435/435 + issues 5206 :: 435/435/5206
+PASS bulk run-a v2 anchor 40f42dc1 preserved :: 40f42dc1fdb7dc026ee1ce6444914a02a085c12c53b7598e70fc453fdb388c9e
+PASS bulk run-b sealed counts 435/435 + issues 5206 :: 435/435/5206
+PASS bulk run-b v2 anchor 40f42dc1 preserved :: 40f42dc1fdb7dc026ee1ce6444914a02a085c12c53b7598e70fc453fdb388c9e
+PASS bulk runs source_root_sha256 identical
+PASS bulk receipts normalized deep-equal
+REGISTRY_AMEND_RESULT v3Anchor=80a8d2c2640e2b29 baseCounts=35/35/5 bulkCounts=435/435/5206 bulkAnchor=40f42dc1 doubleRunIdentical=true zeroHit=true
+REGISTRY AMEND OK

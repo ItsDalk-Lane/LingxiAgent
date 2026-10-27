@@ -1,0 +1,92 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 30.54s
+     Running tests/r07_browser_routes.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_browser_routes-ffe21ff7d2412bfb)
+
+running 10 tests
+test concurrent_and_repeated_shutdown_waiters_preserve_failure_and_panic_results ... ok
+test partial_external_configuration_is_rolled_back_and_unconfirmed_rollback_is_explicit_unknown ... ok
+test partial_preferences_preserve_unknown_fields_and_external_cookie_failure_is_not_success ... ok
+test unknown_external_revoke_receipt_never_repeats_the_stop_or_reopens_content ... ok
+test actual_http_command_replay_changed_input_and_emergency_receipt_never_repeat_external_actions ... ok
+test screenshot_registers_a_real_png_session_file_and_http_content_preserves_its_type_and_bytes ... ok
+test repeated_download_after_unknown_ack_reuses_actual_delivered_file_and_receipt ... ok
+test archive_and_permanent_delete_reclaim_only_the_actual_session_browser_before_success ... ok
+test restart_restores_cold_metadata_and_confirmed_receipt_without_automatically_opening_a_page ... ok
+test chat_device_reads_state_but_only_explicit_remote_admin_controls_the_actual_service_node ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 12.11s
+
+     Running tests/r07_browser_tools.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_browser_tools-28077d3f0b24fb2f)
+
+running 13 tests
+test undeclared_materialize_is_refused_without_dispatch_and_actual_run_finishes ... ok
+test external_unknown_effect_is_persisted_and_never_reported_as_success ... ok
+test actual_run_cancellation_reaches_external_cleanup_and_settles_both_records ... ok
+test actual_navigation_waits_for_approval_and_dispatches_exact_reviewed_url ... ok
+test page_change_and_foreign_tab_invalidate_approval_before_external_dispatch ... ok
+test actual_readonly_snapshot_persists_receipt_but_write_never_dispatches ... ok
+test new_actual_user_submission_releases_emergency_stop_with_a_new_epoch ... ok
+test actual_model_and_tool_echo_foreign_file_marker_without_pinning_or_blocking_fork ... ok
+test screenshot_owned_file_materializes_into_exact_read_pixels_without_granting_other_sessions ... ok
+test unconfirmed_http_emergency_keeps_last_page_and_live_process_explicitly_unknown ... ok
+test actual_service_interleaving_keeps_new_http_emergency_over_earlier_accepted_steer ... ok
+test confirmed_http_emergency_persists_empty_cold_state_across_restart_and_new_user_start ... ok
+test accepted_real_websocket_steer_reauthorizes_only_current_run_and_old_request_never_lifts_later_stop ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.80s
+
+     Running tests/r07_media_admin.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_media_admin-03277e4bffb0903b)
+
+running 10 tests
+test r07_media_admin::read_only_session_generate_is_forbidden_without_dispatch ... ok
+test r07_media_admin::asr_transcribe_roundtrip_events_and_failure_honesty ... ok
+test r07_media_admin::unified_generate_dispatch_accepts_kind_vocabulary_and_rejects_unknown ... ok
+test r07_media_admin::http_image_generate_acceptance_then_gallery_done_and_real_bytes_served ... ok
+test r07_media_admin::ask_mode_waits_for_real_decision_and_blocks_concurrent_admission ... ok
+test r07_media_admin::http_video_generate_acceptance_then_gallery_done_and_real_bytes_served ... ok
+test r07_media_admin::speech_response_delivery_waits_for_terminal_and_returns_real_files ... ok
+test r07_media_admin::failed_image_task_retries_into_new_task_with_attempt_continuity ... ok
+test r07_media_admin::admin_models_config_and_asr_preferences_roundtrip ... ok
+test r07_media_admin::direct_media_action_waiting_for_approval_honors_cancel_and_live_plugin_revocation ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.98s
+
+     Running tests/r07_office_tools.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_office_tools-c889a61e7e4c5582)
+
+running 15 tests
+test office::pdf_private_asset_is_refused_before_any_external_renderer_call ... ok
+test office::cancelled_pdf_waits_for_actual_external_cleanup_and_never_registers_a_file ... ok
+test office::apply_cover_candidate_target_applies_existing_image_through_real_approval ... ok
+test office::cover_requires_confirmation_and_preserves_markdown_and_actual_image ... ok
+test office::capabilities_and_cover_style_guide_deliver_real_catalog_content ... ok
+test office::guide_state_is_owned_by_the_actual_session_and_plugin_toggle_is_effective ... ok
+test office::read_only_and_live_toggle_revocation_prevent_cover_writes ... ok
+test office::real_document_worker_reads_docx_xlsx_and_paged_pdf_without_changing_inputs ... ok
+test office::pdf_collects_authorized_assets_and_three_bundled_fonts_then_registers_real_file ... ok
+test office::actual_http_apply_preserves_old_shape_and_refuses_self_reported_identity ... ok
+test office::bundled_preset_apply_uses_real_gallery_bytes_and_rejects_unknown_presets ... ok
+test office::background_cover_job_refuses_to_apply_after_document_changed ... ok
+test office::background_cover_job_completes_with_real_media_and_applies_frozen_write ... ok
+test office::background_cover_fixed_actions_honor_live_revocation_and_cancel_before_apply ... ok
+test office::remote_cover_clients_cannot_turn_absolute_paths_into_local_owner_authority ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.04s
+
+     Running tests/r07_t05_media.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t05_media-6811cc17b97d0298)
+
+running 11 tests
+test r07_media::untrusted_media_arguments_cannot_choose_credentials_or_paths_or_drop_wrong_typed_overrides ... ok
+test r07_media::describe_options_uses_actual_config_and_existing_provider_modes_without_submitting ... ok
+test r07_media::speech_delivers_real_audio_bytes_and_keeps_the_media_job_causal_run ... ok
+test r07_media::confirmed_supplier_failure_remains_failed_and_finishes_the_actual_execution_run ... ok
+test r07_media::duplicate_user_request_reuses_real_run_and_does_not_create_another_generation ... ok
+test r07_media::image_approval_starts_a_distinct_real_run_and_delivers_owned_session_file ... ok
+test r07_media::disabling_the_plugin_after_parent_completion_cancels_real_background_and_blocks_delivery ... ok
+test r07_media::restart_reopens_real_storage_and_queries_known_remote_without_resubmitting ... ok
+test r07_media::stopping_a_submitted_job_does_not_claim_remote_cancellation_or_deliver_late_bytes ... ok
+test r07_media::video_uses_real_submit_query_download_and_session_delivery_stages ... ok
+test r07_media::jimeng_image_and_video_use_real_supervised_cli_and_current_sdk_with_owned_delivery ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.93s
+

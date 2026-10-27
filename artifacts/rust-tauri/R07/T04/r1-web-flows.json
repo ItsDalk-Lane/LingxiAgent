@@ -1,0 +1,30 @@
+{
+  "candidate": "r1",
+  "name": "web-flows",
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r07_web_tools"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-15T22:35:26.199841+00:00",
+  "sourceFingerprint": "36cba78e63aa9268dd13356127696b5f099869394139998ea6bda437938e85e9",
+  "log": "r1-web-flows.log",
+  "endedAt": "2026-10-15T22:35:29.077896+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "36cba78e63aa9268dd13356127696b5f099869394139998ea6bda437938e85e9",
+  "logSha256": "af149cced1feac9aeac1c6e4c6271feb3670f9f3dc6dcf9b798f660438e47464",
+  "sourceUnchanged": true
+}

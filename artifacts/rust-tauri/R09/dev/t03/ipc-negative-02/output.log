@@ -1,0 +1,57 @@
+$ /Users/study_superior/.cargo/bin/rustup run 1.98.1 rustc --test --edition 2021 --cfg r09_standalone_test --crate-name native_host_harness /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t03/ipc-negative-02/harness/lib.rs -o /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t03/ipc-negative-02/harness/native_host_harness
+--- exit=0 duration=0.62s ---
+
+$ /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t03/ipc-negative-02/harness/native_host_harness --test-threads 1 --nocapture native::ipc_negative_matrix::tests::negative_matrix_emits_evidence
+--- exit=0 duration=0.11s ---
+
+running 1 test
+test native::ipc_negative_matrix::tests::negative_matrix_emits_evidence ... NEGATIVE_CASE ipc::open_external.javascript-scheme open_external URL_SCHEME_DENIED URL_SCHEME_DENIED OK
+NEGATIVE_CASE ipc::open_external.file-scheme open_external URL_SCHEME_DENIED URL_SCHEME_DENIED OK
+NEGATIVE_CASE ipc::open_external.control-char open_external URL_INVALID URL_INVALID OK
+NEGATIVE_CASE ipc::open_file.relative-path open_file PATH_NOT_ABSOLUTE PATH_NOT_ABSOLUTE OK
+NEGATIVE_CASE ipc::open_folder.relative-path open_folder PATH_NOT_ABSOLUTE PATH_NOT_ABSOLUTE OK
+NEGATIVE_CASE ipc::show_in_finder.nul-path show_in_finder PATH_NOT_ABSOLUTE PATH_NOT_ABSOLUTE OK
+NEGATIVE_CASE ipc::argument_guard.overlong-path read_file PATH_NOT_ABSOLUTE PATH_NOT_ABSOLUTE OK
+NEGATIVE_CASE ipc::trash.relative-path trash_item PATH_NOT_ABSOLUTE PATH_NOT_ABSOLUTE OK
+NEGATIVE_CASE ipc::dialog.relative-result-path select_files PATH_NOT_ABSOLUTE PATH_NOT_ABSOLUTE OK
+NEGATIVE_CASE ipc::drag.relative-path start_drag PATH_NOT_ABSOLUTE PATH_NOT_ABSOLUTE OK
+NEGATIVE_CASE ipc::drag.nul-path start_drag INVALID_ARGUMENT INVALID_ARGUMENT OK
+NEGATIVE_CASE ipc::drop.file-uri file_drop INVALID_ARGUMENT INVALID_ARGUMENT OK
+NEGATIVE_CASE ipc::drop.relative-path file_drop PATH_NOT_ABSOLUTE PATH_NOT_ABSOLUTE OK
+NEGATIVE_CASE ipc::run_edit_command.shell-style run_edit_command INVALID_ARGUMENT INVALID_ARGUMENT OK
+NEGATIVE_CASE ipc::run_edit_command.devtools run_edit_command INVALID_ARGUMENT INVALID_ARGUMENT OK
+NEGATIVE_CASE ipc::global_shortcut.injection keybindings_test_register ENUM_INVALID ENUM_INVALID OK
+NEGATIVE_CASE ipc::global_shortcut.unknown-key keybindings_test_register ENUM_INVALID ENUM_INVALID OK
+NEGATIVE_CASE ipc::quick_chat.resize.unknown-mode quick_chat_resize WINDOW_LABEL_INVALID WINDOW_LABEL_INVALID OK
+NEGATIVE_CASE ipc::settings_changed.unknown-event settings_changed ENUM_INVALID ENUM_INVALID OK
+NEGATIVE_CASE ipc::settings_changed.missing-theme settings_changed INVALID_ARGUMENT INVALID_ARGUMENT OK
+NEGATIVE_CASE ipc::open_settings.tab-injection open_settings ENUM_INVALID ENUM_INVALID OK
+NEGATIVE_CASE ipc::theme.control-char sync_window_theme ENUM_INVALID ENUM_INVALID OK
+NEGATIVE_CASE ipc::screenshot.unknown-theme screenshot_render INVALID_ARGUMENT INVALID_ARGUMENT OK
+NEGATIVE_CASE ipc::screenshot.segment-oob screenshot_render INVALID_ARGUMENT INVALID_ARGUMENT OK
+NEGATIVE_CASE ipc::screenshot.outside-home-dir screenshot_render URL_SCHEME_DENIED URL_SCHEME_DENIED OK
+NEGATIVE_CASE ipc::splash.evil-origin get_splash_info WINDOW_NOT_ALLOWED WINDOW_NOT_ALLOWED OK
+NEGATIVE_CASE ipc::splash.query-injection get_avatar_path INVALID_ARGUMENT INVALID_ARGUMENT OK
+NEGATIVE_CASE ipc::window_control.renderer-window-id window_minimize WINDOW_NOT_ALLOWED WINDOW_NOT_ALLOWED OK
+NEGATIVE_CASE ipc::window_control.viewer-caller window_close WINDOW_NOT_ALLOWED WINDOW_NOT_ALLOWED OK
+NEGATIVE_CASE ipc::show_notification.settings-caller show_notification WINDOW_NOT_ALLOWED WINDOW_NOT_ALLOWED OK
+NEGATIVE_CASE ipc::app_ready.splash-caller app_ready WINDOW_NOT_ALLOWED WINDOW_NOT_ALLOWED OK
+NEGATIVE_CASE ipc::window_labels.viewer-label-glob spawn_viewer WINDOW_LABEL_INVALID WINDOW_LABEL_INVALID OK
+NEGATIVE_CASE ipc::window_labels.unknown-role get_platform WINDOW_NOT_ALLOWED WINDOW_NOT_ALLOWED OK
+NEGATIVE_CASE ipc::single_instance.home-override app_start INVALID_ARGUMENT INVALID_ARGUMENT OK
+NEGATIVE_CASE ipc::restart.argv-injection restart_app WINDOW_NOT_ALLOWED WINDOW_NOT_ALLOWED OK
+NEGATIVE_CASE ipc::onboarding.main-caller onboarding_complete WINDOW_NOT_ALLOWED WINDOW_NOT_ALLOWED OK
+NEGATIVE_CASE ipc::onboarding.rust-runtime onboarding_complete NOT_IMPLEMENTED NOT_IMPLEMENTED OK
+NEGATIVE_CASE ipc::debug-onboarding.release debug_open_onboarding RELEASE_DISABLED RELEASE_DISABLED OK
+NEGATIVE_CASE ipc::speech.settings-caller speech_permission_status WINDOW_NOT_ALLOWED WINDOW_NOT_ALLOWED OK
+NEGATIVE_CASE ipc::speech.linux-platform speech_permission_request PLATFORM_UNSUPPORTED PLATFORM_UNSUPPORTED OK
+NEGATIVE_CASE ipc::computer_use.remote-lease computer_use_start REMOTE_DEVICE_DENIED REMOTE_DEVICE_DENIED OK
+NEGATIVE_CASE ipc::computer_use.expired-lease computer_use_action COMPUTER_USE_LEASE_EXPIRED COMPUTER_USE_LEASE_EXPIRED OK
+NEGATIVE_CASE ipc::computer_use.stale-controls computer_use_action COMPUTER_USE_STALE_CONTROLS COMPUTER_USE_STALE_CONTROLS OK
+NEGATIVE_CASE ipc::remote_boundary.self-grant device_grant REMOTE_DEVICE_DENIED REMOTE_DEVICE_DENIED OK
+NEGATIVE_CASE ipc::remote_boundary.ungranted-device device_read REMOTE_DEVICE_DENIED REMOTE_DEVICE_DENIED OK
+NEGATIVE_CASE ipc::computer_use.wrong-lease-id computer_use_stop TOKEN_INVALID TOKEN_INVALID OK
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 178 filtered out; finished in 0.00s
+

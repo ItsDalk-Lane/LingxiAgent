@@ -1,0 +1,10 @@
+$ node tests/migration/r01-t05/run_old_chain.mjs --job /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-01/SUITES/r09_t05_browser_pdf/old-chain/job-s1.json --log /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-01/SUITES/r09_t05_browser_pdf/old-chain/run.log
+--- exit=0 duration=0.94s ---
+{"job":"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-01/SUITES/r09_t05_browser_pdf/old-chain/job-s1.json","exit_code":0,"signal":null,"spawn_error":null,"wall_ms":910,"timed_out":false,"output_exists":true,"output_size":994832}
+
+$ /usr/bin/swiftc -O -o /private/tmp/lingxi-r09-runtime/r09_t05_browser_pdf-61800-1793031122736/bin/pdf_probe /Users/study_superior/Desktop/Code/LingxiAgent/tests/migration/r01-t05/pdf_probe.swift
+--- exit=0 duration=0.94s ---
+
+$ /private/tmp/lingxi-r09-runtime/r09_t05_browser_pdf-61800-1793031122736/bin/pdf_probe /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-01/SUITES/r09_t05_browser_pdf/old-chain/s1-long-zh.pdf /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/verify-r09-final-01/SUITES/r09_t05_browser_pdf/old-chain/probe 2
+--- exit=0 duration=4.77s ---
+{"pageCount":74,"allTextSha256":"3071523347e0bf9fd55e2c42806a3f1a555ce7d4e539b9a80840acda35328151"}

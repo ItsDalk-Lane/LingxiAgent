@@ -1,0 +1,62 @@
+[package]
+name = "lingxi-resource-desktop"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+# 桌面宿主独立构建，不把原生窗口依赖带入无界面的服务工作区。
+[workspace]
+
+[lib]
+name = "lingxi_resource_desktop"
+
+[build-dependencies]
+tauri-build = { version = "=2.7.2", features = [] }
+
+[dependencies]
+tauri = { version = "=2.12.1", features = ["protocol-asset", "image-png", "tray-icon"] }
+tauri-plugin-dialog = "=2.7.3"
+tauri-plugin-single-instance = "=2.5.4"
+tauri-plugin-global-shortcut = "=2.4.1"
+tauri-plugin-notification = "=2.7.0"
+tauri-plugin-autostart = "=2.7.0"
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.151"
+base64 = "=0.23.1"
+sha2 = "=0.11.0"
+tokio = { version = "=1.53.1", features = ["sync", "time", "rt", "macros"] }
+# R10：About 更新链访问固定 GitHub HTTPS 端点。统一用 rustls + ring provider
+# （ring provider 在 update_about.rs 显式安装），避免 aws-lc-sys 的 cmake 构建依赖。
+reqwest = { version = "=0.13.5", default-features = false, features = ["json", "rustls-no-provider"] }
+ring = "=0.17.14"
+rustls = { version = "=0.23.45", default-features = false, features = ["std", "tls12", "ring"] }
+# R10：可观测导出的不透明 capability token（跨窗口不可猜测）。
+uuid = { version = "=1.29.0", features = ["v4"] }
+open = "=5.4.4"
+lingxi-protocol = { path = "../../rust/crates/lingxi-protocol" }
+trash = "=5.2.9"
+tauri-plugin-wdio-webdriver = { version = "=1.4.0", optional = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "=0.6.4"
+objc2-foundation = "=0.3.2"
+objc2-user-notifications = "=0.3.2"
+block2 = "=0.6.2"
+
+[target.'cfg(unix)'.dependencies]
+libc = "=0.2.190"
+
+[lints.rust]
+unexpected_cfgs = { level = "allow", check-cfg = ['cfg(r09_standalone_test)'] }
+
+[features]
+# R09-T01/T02：产品宿主（服务 supervisor + 产品 React 窗口）的编译门。
+# 未启用时保持 R06 文件资源宿主行为不变（R06 desktop_host E2E 可复跑）。
+r09-host = []
+# R09-T06 D11：测试注入点（隐藏窗口/抑制弹窗/自动化 env sink/debug 命令/
+# DOM 投影）只在此 feature 下编译。交付 release 构建**不得**启用。
+r09-test-hooks = []
+e2e-test = ["dep:tauri-plugin-wdio-webdriver"]
+
+[dev-dependencies]
+tokio = { version = "=1.53.1", features = ["macros", "rt-multi-thread", "time"] }

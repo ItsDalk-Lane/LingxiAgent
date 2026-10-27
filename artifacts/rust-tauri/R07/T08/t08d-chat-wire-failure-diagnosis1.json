@@ -1,0 +1,163 @@
+{
+  "artifactKind": "R07_T08_T08D_TWO_CHAT_FAILURES_READONLY_DIAGNOSIS",
+  "recordedAt": "2026-10-18T08:54:14.767385+00:00",
+  "candidate": "t08d",
+  "candidateSourceFingerprint": "ce4642863c79eaa2d15dedff7c579b56649a9bc2c4cf133e6647faa70879664b",
+  "candidateGatePlanSha256": "664d776e5491c40762d84ed3f6c38a613820d3406f01b44272120588a56497a8",
+  "actualResult": "r06_chat_wire15/17, two actual failures preserved; other d gates still running",
+  "preservationManifest": {
+    "path": "artifacts/rust-tauri/R07/T08/t08d-chat-wire-failure-preserved1/manifest.json",
+    "sha256": "c2ab3061854eaac1982486ccf58a39a9fb66d470bd99e480bc0ce5d01b65d416"
+  },
+  "sourceEvidence": [
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+      "sha256": "36cf91b67aba632b8792db6568588fba43760714be02abc5644a139038adaccc",
+      "frozenSha256": null,
+      "matchesFrozen": false
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/chat_wire.rs",
+      "sha256": "e62b40a6d1ca126ff50f1ff7228be999f6435eda2a2e46a27008672f81a6c001",
+      "frozenSha256": "e62b40a6d1ca126ff50f1ff7228be999f6435eda2a2e46a27008672f81a6c001",
+      "matchesFrozen": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/runs.rs",
+      "sha256": "d9cd4faa5e67b0958e5cf03b294d3ae5ede8bfd76c18280ebad27a67bd1a3072",
+      "frozenSha256": "d9cd4faa5e67b0958e5cf03b294d3ae5ede8bfd76c18280ebad27a67bd1a3072",
+      "matchesFrozen": true
+    },
+    {
+      "path": "desktop/src/react/__tests__/chat-app-live/main.cjs",
+      "sha256": "d3bcab6344e62cc926a721582229460c61e4c8ac01b378580d7f9d3bbccaf0a1",
+      "frozenSha256": null,
+      "matchesFrozen": false
+    },
+    {
+      "path": "desktop/src/react/components/app/ChatPage.tsx",
+      "sha256": "f454e462c67a10c92f7b46db2bb73c7719d2e3c19410f1335a4cb802ed096383",
+      "frozenSha256": null,
+      "matchesFrozen": false
+    },
+    {
+      "path": "desktop/src/react/components/runtime/RuntimeInfoCapsule.tsx",
+      "sha256": "243b4634766c15752975cf93229d9f63abdd1c61f3410a3786a834ac10fb54d3",
+      "frozenSha256": null,
+      "matchesFrozen": false
+    }
+  ],
+  "resumeFailure": {
+    "case": "real_ws_resume_recovers_exact_missing_events_and_marks_stale_or_empty",
+    "actualFailedLocation": "r06_chat_wire.rs:771",
+    "actualFailedAssertion": "events.last().event.isStreaming == false",
+    "observed": "Null vs false; preceding reset=false,truncated=false,runtimeIsStreaming=false,resumeToken,same contiguous seq and expected -FINAL assertions had passed",
+    "persistedFacts": [
+      {
+        "runId": "run_000001a14e346352_000001",
+        "sessionId": "resume",
+        "status": "completed",
+        "terminalReason": "completed.with_final",
+        "lastEventSeq": 12
+      }
+    ],
+    "confirmedTestPreconditionGap": "After external platform release, fixture waits only storage.list_active_runs()==empty, then immediately asks an independently published in-memory replay cache for its terminal event. This does not await observe_run transport projection.",
+    "implementationEvidence": [
+      {
+        "path": "rust/crates/lingxi-service/src/chat_wire.rs",
+        "line": 1165,
+        "point": "observe_run独立异步任务从storage读slice并逐条chat_wire.project；未到head则5ms轮询"
+      },
+      {
+        "path": "rust/crates/lingxi-service/src/chat_wire.rs",
+        "line": 313,
+        "point": "final_message_committed调用两次publish，先assistant_run_end再status false；每次各取streams锁，resume可在这两次之间读取"
+      },
+      {
+        "path": "rust/crates/lingxi-service/src/chat_wire.rs",
+        "line": 1395,
+        "point": "resume同时读真实active和已有内存frames，不承诺terminal DB与frames原子快照"
+      },
+      {
+        "path": "rust/crates/lingxi-service/src/runs.rs",
+        "line": 5937,
+        "point": "commit_run_outcome持久终态后再发布committed events，持久事实先于投影完成"
+      }
+    ],
+    "certainty": "缺少真实传输终态屏障可由源码确认；本次内存replay未逐字落盘，无法精确断言最后一帧是哪一种或哪次锁间隙命中。未发现需改产品合同证据。",
+    "minimalProposedFix": "新WS在remote.release之前已连接；释放后在原等待预算内等待同sessionId+streamId实际status/isStreaming=false，再发resume_stream；仍逐条验证missing events、连续seq、-FINAL、末尾idle、stale/empty。",
+    "deadlineConstraint": "用单一外层截止时间（对应原1000×5ms约5秒预算）包围谓词循环；不能每帧重新开始10秒造成无限延长，不加任意sleep。",
+    "notRun": "尚未实施或重跑；不以c旧17通过忽略d失败"
+  },
+  "nativeFailure": {
+    "case": "native_current_app_pages_side_preview_attachment_and_model_response_generation",
+    "failedLocation": "chat-app-live/main.cjs:18",
+    "actualFailedCheck": "app-main-current-and-runtime",
+    "actualNullPredicate": "document.querySelector('#welcome.hidden')&&document.querySelector('[data-runtime-capsule]')",
+    "checksBeforeFailure": [
+      "app-empty-preview-and-side",
+      "app-automatic-current-thinking-get"
+    ],
+    "visibleContainsSyntheticPromptAndReply": true,
+    "sameRunTail": [
+      {
+        "type": "assistant_segment_delta",
+        "seq": 6,
+        "isStreaming": null,
+        "sessionId": "desktop",
+        "streamId": "run_000001a14e346d6b_000002"
+      },
+      {
+        "type": "assistant_segment_end",
+        "seq": 7,
+        "isStreaming": null,
+        "sessionId": "desktop",
+        "streamId": "run_000001a14e346d6b_000002"
+      },
+      {
+        "type": "assistant_run_end",
+        "seq": 8,
+        "isStreaming": null,
+        "sessionId": "desktop",
+        "streamId": "run_000001a14e346d6b_000002"
+      },
+      {
+        "type": "status",
+        "seq": 9,
+        "isStreaming": false,
+        "sessionId": "desktop",
+        "streamId": "run_000001a14e346d6b_000002"
+      }
+    ],
+    "runtimeErrorsObserved": [],
+    "confirmedTestPreconditionGap": "ChatPage的RuntimeInfoCapsule通过React.lazy单独导入，Suspense fallback=null；helper只等CHAT-FINAL与流停止便同步要求独立懒模块DOM已挂载。聊天结束不等待模块加载。",
+    "implementationEvidence": [
+      {
+        "path": "desktop/src/react/components/app/ChatPage.tsx",
+        "line": 12,
+        "point": "lazy import RuntimeInfoCapsule"
+      },
+      {
+        "path": "desktop/src/react/components/app/ChatPage.tsx",
+        "line": 40,
+        "point": "Suspense fallback=null，加载期间不产生runtime DOM"
+      },
+      {
+        "path": "desktop/src/react/__tests__/chat-app-live/main.cjs",
+        "line": 18,
+        "point": "until只等待聊天文本/流停止，下一check立即同时要求welcome hidden/runtime DOM"
+      }
+    ],
+    "certainty": "懒模块就绪条件未等待已确认；原失败没有单独记录AND两操作数的DOM布尔，故不伪称该旧记录逐字证明了哪一个为null。截图/可见正文和无runtime错误支持初始化竞态解释，未见产品回归证据。",
+    "minimalProposedFix": "用现有until等待#welcome.hidden及[data-runtime-capsule]真实挂载后执行原check；保留原1000×20ms等待预算、原34动作及每个真实操作，不添加任意sleep或放宽。",
+    "notRun": "暂不实施、不重跑；d原失败保持"
+  },
+  "boundaries": {
+    "sourceEdited": false,
+    "cargoExecutedByThisAgent": false,
+    "frozenToolsOrPlanEdited": false,
+    "originalScenesModified": false,
+    "rootAuthorizedNextStep": "等待d20门完整结束后，根通知仅实施两处就绪屏障；届时另编号验证，不覆盖d失败。",
+    "lan": "d管理1/1通过不证明c LAN超时根因已修，原因继续未定。"
+  }
+}

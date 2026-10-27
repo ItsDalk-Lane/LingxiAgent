@@ -15,7 +15,9 @@
 import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useStore } from '../stores';
-import { lingxiFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../services/service-client';
+import { currentRustBrowserConnection, openRustBrowserViewer } from '../services/service-client';
+import { captureConversationRequestScope } from '../services/conversation-request-scope';
 import { useI18n } from '../hooks/use-i18n';
 import { formatSessionDate } from '../utils/format';
 import { switchSession, archiveSession, renameSession, pinSession, reorderPinnedSessions, disposeWorkspaceSessions } from '../stores/session-actions';
@@ -32,6 +34,7 @@ import { Overlay } from '../ui/Overlay';
 import { Button } from '../ui/Button';
 import { renderMarkdown } from '../utils/markdown';
 import styles from './SessionList.module.css';
+import { usePlatform } from '../hooks/use-platform';
 
 // 置顶区行拖拽 MIME：pinned 重排提交完整有序 sessionId 列表。
 const SESSION_DRAG_MIME = 'application/x-lingxi-session-path';
@@ -51,7 +54,7 @@ interface BrowserSessionState {
 }
 
 function normalizeBrowserSessionStates(data: unknown): Record<string, BrowserSessionState> {
-  if (!data || typeof data !== 'object' || Array.isArray(data)) return {};
+  if (!data || typeof data !== 'object' || Array.isArray(data) || 'error' in data) throw new Error('browser_session_states_invalid');
   const result: Record<string, BrowserSessionState> = {};
   for (const [sessionPath, rawState] of Object.entries(data as Record<string, unknown>)) {
     if (typeof rawState === 'string') {
@@ -63,7 +66,7 @@ function normalizeBrowserSessionStates(data: unknown): Record<string, BrowserSes
       };
       continue;
     }
-    if (!rawState || typeof rawState !== 'object' || Array.isArray(rawState)) continue;
+    if (!rawState || typeof rawState !== 'object' || Array.isArray(rawState)) throw new Error('browser_session_states_invalid');
     const state = rawState as Partial<BrowserSessionState>;
     result[sessionPath] = {
       url: typeof state.url === 'string' ? state.url : null,
@@ -152,10 +155,16 @@ function SessionListInner() {
       studios: studioWorkspaces,
       foldedParentIds,
       alwaysShowPaths: alwaysShowSessionPaths,
+      // Rust 原生会话没有目录身份（手机端全是这种），给兜底组标题让
+      // 它们归入「未归组」而不是整组消失；桌面端会话都有 cwd，不受影响。
+      ungroupedTitle: t('sidebar.ungroupedChats'),
     }),
-    [idleSessions, studioWorkspaces, foldedParentIds, alwaysShowSessionPaths],
+    [idleSessions, studioWorkspaces, foldedParentIds, alwaysShowSessionPaths, t],
   );
 
+  const browserConnection = useStore(s => s.activeServerConnection);
+  const [browserStateError, setBrowserStateError] = useState('');
+  const browserOwnerRef = useRef(browserConnection);
   const [browserSessions, setBrowserSessions] = useState<Record<string, BrowserSessionState>>({});
   const [dragState, setDragState] = useState<SidebarDragState>(null);
   const [pinnedDropTarget, setPinnedDropTarget] = useState<PinnedDropTarget>(null);
@@ -163,37 +172,34 @@ function SessionListInner() {
 
   const setVisibleBrowserSessions = useCallback((data: unknown) => {
     const states = normalizeBrowserSessionStates(data);
-    for (const sessionPath of closingBrowserSessionsRef.current) {
-      delete states[sessionPath];
-    }
     setBrowserSessions(states);
   }, []);
 
   // Fetch browser sessions (re-fetch when browser state changes)
   useEffect(() => {
     let cancelled = false;
+    const scope = captureConversationRequestScope();
+    const abort = new AbortController();
+    if (browserOwnerRef.current !== browserConnection) { browserOwnerRef.current = browserConnection; setBrowserSessions({}); setBrowserStateError(''); }
     if (sessions.length === 0) {
       setBrowserSessions({});
+      scope.dispose();
       return;
     }
-    lingxiFetch('/api/browser/session-states')
+    lingxiFetch('/api/browser/session-states', { signal: abort.signal })
       .then(r => r.json())
       .then(data => {
-        if (!cancelled) setVisibleBrowserSessions(data);
+        if (!cancelled && scope.isCurrent()) { setVisibleBrowserSessions(data); setBrowserStateError(''); }
       })
-      .catch(err => console.warn('[sessions] fetch browser sessions failed:', err));
+      .catch(err => { if (!cancelled && scope.isCurrent()) setBrowserStateError(err instanceof Error ? err.message : String(err)); });
     return () => {
-      cancelled = true;
+      cancelled = true; abort.abort(); scope.dispose();
     };
-  }, [sessions, browserBySession, setVisibleBrowserSessions]);
+  }, [sessions, browserBySession, browserConnection, setVisibleBrowserSessions]);
 
   const handleCloseBrowserSession = useCallback(async (sessionPath: string) => {
+    const scope = captureConversationRequestScope();
     closingBrowserSessionsRef.current.add(sessionPath);
-    setBrowserSessions(prev => {
-      const next = { ...prev };
-      delete next[sessionPath];
-      return next;
-    });
     try {
       const res = await lingxiFetch('/api/browser/close-session', {
         method: 'POST',
@@ -201,15 +207,18 @@ function SessionListInner() {
         body: JSON.stringify({ sessionPath }),
       });
       const data = await res.json();
-      setBrowserStateForPath(sessionPath, { running: false, url: null, thumbnail: null });
+      if (!scope.isCurrent()) return;
+      if (data?.error) throw new Error(String(data.error));
+      setBrowserStateForPath(sessionPath, { running: false, url: null, thumbnail: null, ...(currentRustBrowserConnection() ? { executionNode: currentRustBrowserConnection()!.serverId } : {}) });
       closingBrowserSessionsRef.current.delete(sessionPath);
       if (data?.sessions) {
         setBrowserSessions(normalizeBrowserSessionStates(data.sessions));
-      }
+      } else { setBrowserSessions(prev => { const next = { ...prev }; delete next[sessionPath]; return next; }); }
     } catch (err) {
       closingBrowserSessionsRef.current.delete(sessionPath);
+      if (scope.isCurrent()) useStore.getState().addToast(String(err), 'error');
       console.warn('[sessions] close browser session failed:', err);
-    }
+    } finally { scope.dispose(); closingBrowserSessionsRef.current.delete(sessionPath); }
   }, []);
 
   const clearDragState = useCallback(() => {
@@ -560,6 +569,7 @@ function SessionListInner() {
   return (
     <>
       <div className={styles.sessionListScroller}>
+        {browserStateError && <p role="alert">{t('browser.stateReadFailed')}: {browserStateError}</p>}
         {content}
       </div>
     </>
@@ -787,6 +797,13 @@ const SessionItem = memo(function SessionItem({ session: s, isActive, isPending,
   const handleBrowserOpen = useCallback(async (e: React.MouseEvent | React.KeyboardEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (currentRustBrowserConnection()) {
+      const scope = captureConversationRequestScope();
+      try { await openRustBrowserViewer(s.path, true); }
+      catch (err) { if (scope.isCurrent()) useStore.getState().addToast(String(err), 'error'); }
+      finally { scope.dispose(); }
+      return;
+    }
     try {
       await lingxiFetch('/api/browser/open-session', {
         method: 'POST',
@@ -796,7 +813,7 @@ const SessionItem = memo(function SessionItem({ session: s, isActive, isPending,
     } catch (err) {
       console.warn('[browser] open session failed:', err);
     }
-    window.platform?.openBrowserViewer?.({ sessionPath: s.path });
+    usePlatform()?.openBrowserViewer?.({ sessionPath: s.path });
   }, [s.path]);
 
   const handleBrowserKeyDown = useCallback((e: React.KeyboardEvent) => {

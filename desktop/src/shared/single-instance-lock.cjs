@@ -7,6 +7,32 @@
  * redirected to the first client.
  */
 const path = require("path");
+const fs = require("fs");
+
+function canonicalHome(home) {
+  let existing = path.resolve(home);
+  const missing = [];
+  while (!fs.existsSync(existing)) {
+    missing.unshift(path.basename(existing));
+    const parent = path.dirname(existing);
+    if (parent === existing) throw new Error("无法确认桌面数据目录的真实位置");
+    existing = parent;
+  }
+  return path.join(fs.realpathSync(existing), ...missing);
+}
+
+function getClientUserDataPath(lingxiHome, defaultHome, appData) {
+  const resolved = path.resolve(lingxiHome);
+  const parent = path.dirname(path.resolve(defaultHome));
+  const standardHomes = [defaultHome, ...[".lingxi", ".lingxi-dev", ".hanako-dev"].map(name => path.join(parent, name))];
+  const actualHome = canonicalHome(resolved);
+  const standardHome = standardHomes.find(home => normalizeForCompare(canonicalHome(home)) === normalizeForCompare(actualHome));
+  // 默认安装和默认开发目录延续原缓存位置；显式副本的缓存也留在副本内。
+  if (standardHome) {
+    return path.join(appData, getUserDataAppName(standardHome, defaultHome));
+  }
+  return path.join(actualHome, ".electron-user-data");
+}
 
 function normalizeForCompare(filePath) {
   const resolved = path.resolve(filePath);
@@ -40,10 +66,7 @@ function focusExistingWindow(win) {
 
 function configureClientSingleInstance(app, opts) {
   const { lingxiHome, defaultHome, onSecondInstance } = opts;
-  const appName = getUserDataAppName(lingxiHome, defaultHome);
-  if (appName) {
-    app.setPath("userData", path.join(app.getPath("appData"), appName));
-  }
+  app.setPath("userData", getClientUserDataPath(lingxiHome, defaultHome, app.getPath("appData")));
 
   const gotLock = app.requestSingleInstanceLock({ lingxiHome });
   if (!gotLock) {
@@ -61,4 +84,5 @@ module.exports = {
   configureClientSingleInstance,
   focusExistingWindow,
   getUserDataAppName,
+  getClientUserDataPath,
 };

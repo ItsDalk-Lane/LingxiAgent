@@ -1,0 +1,10 @@
+[package]
+name="r08-admission-review"
+version="0.0.0"
+edition="2021"
+[dependencies]
+lingxi-service = {"path" = "/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service"}
+lingxi-adapters = {"path" = "/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters"}
+lingxi-kernel = {"path" = "/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel"}
+serde_json = {"version" = "=1.0.151"}
+tokio = {"version" = "=1.53.1", "features" = ["macros", "rt-multi-thread", "net", "io-util", "time", "sync"]}

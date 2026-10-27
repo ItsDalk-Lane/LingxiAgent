@@ -1,0 +1,61 @@
+{
+  "reviewer": "independent-subagent-r07_t08_final_review",
+  "reviewedAt": "2026-10-18T08:04:30.430012+00:00",
+  "finalAcceptance": "pending",
+  "candidate": "t08b",
+  "candidateDisposition": "CANCELLED_NOT_ACCEPTED",
+  "priorReviewPreserved": "independent-final-review-t08b.json",
+  "cancellation": {
+    "receipt": "t08b-cancellation.json",
+    "sha256": "efa4b07156d86f8c144f9c20681f920823f9a59c7f28ca5973a407ef9ad7bc87",
+    "kernelRawExitCode": -2,
+    "meaning": "root cancelled current Cargo batch for actual media Source coverage gap; not a kernel business failure",
+    "kernelReceiptSha256Matches": true,
+    "completedPasses": [
+      "fmt",
+      "diff",
+      "clippy",
+      "protocol",
+      "protocol-roundtrip",
+      "protocol-tests",
+      "types"
+    ],
+    "remainingNotRun": [
+      "boundaries",
+      "adapter",
+      "service",
+      "model-regression",
+      "native-skills",
+      "skills-current",
+      "build",
+      "ui"
+    ]
+  },
+  "newMediaGap": {
+    "status": "STATIC_CONFIRMED_IN_T08B_FIX_IN_PROGRESS_NOT_ACCEPTED",
+    "path": "rust/crates/lingxi-service/src/media_admin.rs",
+    "finding": "T08b media catalog lists read old provider-catalog and add/edit/remove write overlay/Pi compatibility without publishing unique ModelConfiguration Source; apparent successful edits can leave runtime unchanged.",
+    "currentFixReadOnlyReview": "Current draft routes all four lists through publisher snapshot and mutations through save_at_generation; lock-internal generation check blocks stale edit revival, original principal is rechecked and only actual applied state emits change. No new blocker in draft; root is also fixing actual image/video dispatch static whitelist. Formal tests remain pending."
+  },
+  "nativeManualReuse": {
+    "disposition": "ACCEPTABLE_ONLY_AS_IDENTICAL_NATIVE_ARTIFACT_PRIOR_MANUAL_EVIDENCE",
+    "actualReceipt": "native-picker-ipc2.json",
+    "actualTestExitCode": 0,
+    "actualLogSha256": "c29defe7767dea26dc56f7a5f266efd6cb56bb83660046f607ef156f28df6462",
+    "scope": "Existing real CUA selection/cancel plus exact raw IPC values, non-install and read-only-window denial; not a later-candidate rerun",
+    "binarySha256": "dd7582b9b59de8f4b3739a97309f10b4790e5e3167932e5b6fd4d15d3a125281",
+    "currentBinarySha256Matches": true,
+    "recorded18SourceHashesAllMatchCurrent": true,
+    "all6EvidenceHashesMatch": true,
+    "mainReceiptHashMatches": true,
+    "limitations": [
+      "Whole development source changed during actual test; no whole-candidate pass inferred",
+      "18-source list excludes build.rs and capabilities/*.json; label exact scope, not all native sources",
+      "Native binary SHA constrains actual compiled program and embedded permissions/assets; later candidate must prove same exact binary plus relevant source/dependency closure",
+      "Later candidate still must run frozen native-skills gate; prior manual proof does not replace that gate",
+      "Application raw exit code remains NOT_CAPTURED; test exit0 and closed port do not imply app raw exit0",
+      "Do not claim later candidate repeated CUA steps"
+    ]
+  },
+  "mutations": "Only this new evidence file; no product/test/protocol/frozen file changes, no Cargo/GUI"
+}

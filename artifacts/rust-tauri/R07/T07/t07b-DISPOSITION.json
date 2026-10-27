@@ -1,0 +1,306 @@
+{
+  "schemaVersion": 1,
+  "candidate": "t07b",
+  "status": "SUPERSEDED_NOT_FINAL_ACCEPTANCE",
+  "recordedAt": "2026-10-18T03:08:57.201947+00:00",
+  "stageStatus": "IN_PROGRESS",
+  "sourceFingerprint": "7192fa54c9f314384b04f7b76453d3ae7917983801471fcb47db1dabe2d52a2b",
+  "coreGateSummary": {
+    "total": 11,
+    "exitZero": 10,
+    "failed": 1,
+    "servicePassed": 1073,
+    "serviceFailed": 2,
+    "allSourceUnchanged": true,
+    "allLogHashesMatch": true
+  },
+  "coreGates": [
+    {
+      "name": "fmt",
+      "record": "artifacts/rust-tauri/R07/T07/t07b-fmt.json",
+      "receiptSha256": "c11a113c1d585360673d6fe4683070cf59416ac0665edbcbabd73be8a8d2fbea",
+      "exitCode": 0,
+      "sourceFingerprint": "7192fa54c9f314384b04f7b76453d3ae7917983801471fcb47db1dabe2d52a2b",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07b-fmt.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logHashMatches": true,
+      "testCounts": null,
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    {
+      "name": "clippy",
+      "record": "artifacts/rust-tauri/R07/T07/t07b-clippy.json",
+      "receiptSha256": "2192b6d84ee5fc02d26bef7e14e9254ae944941fad68d8c4191077eef7382ad3",
+      "exitCode": 0,
+      "sourceFingerprint": "7192fa54c9f314384b04f7b76453d3ae7917983801471fcb47db1dabe2d52a2b",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07b-clippy.log",
+      "logSha256": "d4d93431f74d05b4838127b17e86c69fb7297ba77d802cf6f605cfc79fb0ab17",
+      "logHashMatches": true,
+      "testCounts": null,
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    {
+      "name": "service",
+      "record": "artifacts/rust-tauri/R07/T07/t07b-service.json",
+      "receiptSha256": "05c57027ea13991920e1ab148c4e92f4b775c891344d3fd79c0bb8884120712f",
+      "exitCode": 101,
+      "sourceFingerprint": "7192fa54c9f314384b04f7b76453d3ae7917983801471fcb47db1dabe2d52a2b",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07b-service.log",
+      "logSha256": "1c8eb272b82015b66c96b7e13ac55465a7562e2595887253e6af00b9bc5d6a7d",
+      "logHashMatches": true,
+      "testCounts": {
+        "passed": 1073,
+        "failed": 2,
+        "ignored": 0
+      },
+      "failedTests": [
+        "native_pending_reference_deletion_current_electron_shows_and_retries_truthfully",
+        "workflow::fanout_dispatch_events_journal_and_completion_delivery"
+      ],
+      "finalAcceptance": false
+    },
+    {
+      "name": "adapter",
+      "record": "artifacts/rust-tauri/R07/T07/t07b-adapter.json",
+      "receiptSha256": "f721409540cb32c4b2da2ab29398c7c3d3100875cad56f428201ff0f63fe3325",
+      "exitCode": 0,
+      "sourceFingerprint": "7192fa54c9f314384b04f7b76453d3ae7917983801471fcb47db1dabe2d52a2b",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07b-adapter.log",
+      "logSha256": "e6d846d383e3b9aac7df6b218bb34e947e1b6fa6e6d3a20ef073ca8114ef1371",
+      "logHashMatches": true,
+      "testCounts": {
+        "passed": 250,
+        "failed": 0,
+        "ignored": 13
+      },
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    {
+      "name": "kernel",
+      "record": "artifacts/rust-tauri/R07/T07/t07b-kernel.json",
+      "receiptSha256": "2eea5da31f43d30426164e6321b58655d2a694a387ea98b0f985b8faac4c103f",
+      "exitCode": 0,
+      "sourceFingerprint": "7192fa54c9f314384b04f7b76453d3ae7917983801471fcb47db1dabe2d52a2b",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07b-kernel.log",
+      "logSha256": "c38facba57279e8211726f1640e4d4f5b9b3c1a8f4a5cf1c1a7a231e979753fb",
+      "logHashMatches": true,
+      "testCounts": {
+        "passed": 193,
+        "failed": 0,
+        "ignored": 0
+      },
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    {
+      "name": "protocol",
+      "record": "artifacts/rust-tauri/R07/T07/t07b-protocol.json",
+      "receiptSha256": "1aa07c9c789e7dab851937c313f1e1e69fa38a7b773a9b4e04bcfa4ba3d06b88",
+      "exitCode": 0,
+      "sourceFingerprint": "7192fa54c9f314384b04f7b76453d3ae7917983801471fcb47db1dabe2d52a2b",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07b-protocol.log",
+      "logSha256": "41aa43acf572a22b07245f608695a7f66dbb8f1312b1fa2e3bff87ffeab261f0",
+      "logHashMatches": true,
+      "testCounts": null,
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    {
+      "name": "boundaries",
+      "record": "artifacts/rust-tauri/R07/T07/t07b-boundaries.json",
+      "receiptSha256": "d967da3dffcabbeea7e88dd0efbfac3aec981126b5b38a2a19f179a5906705a7",
+      "exitCode": 0,
+      "sourceFingerprint": "7192fa54c9f314384b04f7b76453d3ae7917983801471fcb47db1dabe2d52a2b",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07b-boundaries.log",
+      "logSha256": "639c14da4d4db5655ec2449ed7c401ab077a13e2a5255019489a41ea88a20dc6",
+      "logHashMatches": true,
+      "testCounts": null,
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    {
+      "name": "build",
+      "record": "artifacts/rust-tauri/R07/T07/t07b-build.json",
+      "receiptSha256": "4746ca6dbd551b27d8bd6e985e9b0460bfc46ab88236997bf5fbde88c93ce1c5",
+      "exitCode": 0,
+      "sourceFingerprint": "7192fa54c9f314384b04f7b76453d3ae7917983801471fcb47db1dabe2d52a2b",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07b-build.log",
+      "logSha256": "c67c3df6b4134ced85487c2f19133598a3b194b6f77a45d035d736d647ee310f",
+      "logHashMatches": true,
+      "testCounts": null,
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    {
+      "name": "ui",
+      "record": "artifacts/rust-tauri/R07/T07/t07b-ui.json",
+      "receiptSha256": "74de704af33dfea566efcfd80689e471f9c4e4ce4968dc95df122e7041f61c5d",
+      "exitCode": 0,
+      "sourceFingerprint": "7192fa54c9f314384b04f7b76453d3ae7917983801471fcb47db1dabe2d52a2b",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07b-ui.log",
+      "logSha256": "5df4d98a0b80e59f3a203dda0bf448b7b33cb92c5b217b739c94d673e7c7586b",
+      "logHashMatches": true,
+      "testCounts": {
+        "suitesPassed": 21,
+        "passed": 495,
+        "failed": 0
+      },
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    {
+      "name": "types",
+      "record": "artifacts/rust-tauri/R07/T07/t07b-types.json",
+      "receiptSha256": "491adc0ab841d99276ff8c71b9c16c0bd82a272b7afc1f0742e377c000eef317",
+      "exitCode": 0,
+      "sourceFingerprint": "7192fa54c9f314384b04f7b76453d3ae7917983801471fcb47db1dabe2d52a2b",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07b-types.log",
+      "logSha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "logHashMatches": true,
+      "testCounts": null,
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    {
+      "name": "protocol-tests",
+      "record": "artifacts/rust-tauri/R07/T07/t07b-protocol-tests.json",
+      "receiptSha256": "cb01fde05146ac15ebd5291feb7a718dfff171befad880a50855e0648035c321",
+      "exitCode": 0,
+      "sourceFingerprint": "7192fa54c9f314384b04f7b76453d3ae7917983801471fcb47db1dabe2d52a2b",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07b-protocol-tests.log",
+      "logSha256": "0f0fab5d36b979d4a0d9f0f122a93e4db50c4c170cf87912c4f30ec2e283c204",
+      "logHashMatches": true,
+      "testCounts": {
+        "passed": 41,
+        "failed": 0,
+        "ignored": 0
+      },
+      "failedTests": [],
+      "finalAcceptance": false
+    }
+  ],
+  "failedTests": [
+    {
+      "id": "native_pending_reference_deletion_current_electron_shows_and_retries_truthfully",
+      "classification": "SYNTHETIC_MULTI_HOME_FAULT_HOOK_COLLISION",
+      "actualFailure": "页面未出现预期pending，原现场提示至少保留一个助手。",
+      "cause": "独立审阅确认两个并行home共用单槽故障HOOK，后一个覆盖前一个；产品实际收到completed，页面不显示pending合理。仍保留原测试失败，不把原因定位写成重跑通过。",
+      "basis": "主任务转交的独立审阅结论，原现场UI/receipt/preferences可复核。",
+      "sceneManifest": "artifacts/rust-tauri/R07/T07/t07b-service-reference-pending-scene/SCENE_MANIFEST.json",
+      "next": "按home隔离正式测试故障设施并重新冻结候选验证。"
+    },
+    {
+      "id": "workflow::fanout_dispatch_events_journal_and_completion_delivery",
+      "classification": "DURABLE_RUNNING_THEN_PROVIDER_ERROR_UNDER_DIAGNOSIS",
+      "actualFailure": "r07_workflow/mod.rs:605，attempts实际2而预期1。",
+      "cause": "已排除本次由派发前session_busy造成：实际beta首轮Run已queued→running→failed.provider_error，model_call_started与usage均零；待查真实provider_error。 后续fanout30次未复现；独立真实并发atomic_write复现并修复，但未直接还原旧fanout唯一cause。",
+      "next": "保留原失败；新诊断与并发修复进入独立review，待t07c完整门禁。",
+      "sceneManifest": "artifacts/rust-tauri/R07/T07/t07b-workflow-fanout-scene/SCENE_MANIFEST.json",
+      "durableFacts": "artifacts/rust-tauri/R07/T07/t07b-workflow-fanout-scene/FACTS.json"
+    }
+  ],
+  "uiBinding": {
+    "record": "artifacts/rust-tauri/R07/T07/t07b-ui-binary-binding.json",
+    "receiptSha256": "a04628de233e863b0e81d53e1cc85b7f5e6c0f76b82926fa78238603f49b9ca1",
+    "binarySha256": "468ff0a0c99c023f1265e72a9a4866503eeee3af65b3ac01d05f5ff3fd60c243",
+    "beforeAfterMatch": true,
+    "buildReceiptHashMatches": true,
+    "uiReceiptHashMatches": true,
+    "sourceFingerprint": "7192fa54c9f314384b04f7b76453d3ae7917983801471fcb47db1dabe2d52a2b",
+    "note": "该次新构建实际子进程UI检查通过；不覆盖service两项失败。"
+  },
+  "supplementaryGates": [
+    {
+      "name": "browser-headless",
+      "record": "artifacts/rust-tauri/R07/T07/t07b-browser-headless.json",
+      "receiptSha256": "19ff990580f942c1b4267eff254d71a4bca6a65422fbb092fa3cd295361795b3",
+      "exitCode": 0,
+      "sourceFingerprint": "7192fa54c9f314384b04f7b76453d3ae7917983801471fcb47db1dabe2d52a2b",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07b-browser-headless.log",
+      "logSha256": "7ec1382d7fdca250a7f0408ec4486454a7a3102a62b76f3f5ca3995d8c06e774",
+      "logHashMatches": true,
+      "testCounts": {
+        "passed": 11,
+        "failed": 0,
+        "ignored": 0
+      },
+      "failedTests": [],
+      "finalAcceptance": false
+    }
+  ],
+  "manualBrowserChecks": [
+    {
+      "testId": "same_page_native_human_takeover_records_only_owned_target",
+      "status": "NOT_RUN_ON_T07B",
+      "historicalEvidenceRetained": true
+    },
+    {
+      "testId": "externally_restored_suspended_window_is_never_reaped_or_evicted",
+      "status": "NOT_RUN_ON_T07B",
+      "historicalEvidenceRetained": true
+    }
+  ],
+  "leafDisposition": {
+    "currentT07Leaves": 65,
+    "currentT07Status": "NOT_RUN",
+    "inheritedT03Leaves": 22,
+    "inheritedStatus": "PASS_LOCAL_T03",
+    "A14ImportExport": "T08正式导入联验保留，不把快照读写或开发649当候选证据。"
+  },
+  "next": "clippy及独立review后冻结t07c，重新运行适用固定候选完整门禁；不复用旧候选或开发检查为新源码领通过。",
+  "retain": "原始回执、实际退出、日志及失败现场不改写；未提交或推送。",
+  "updatedAt": "2026-10-18T03:18:31.677325+00:00",
+  "postDispositionDevelopment": {
+    "status": "DEVELOPMENT_CORRECTIONS_NOT_FROZEN_CANDIDATE",
+    "records": [
+      {
+        "record": "artifacts/rust-tauri/R07/T07/dev-integrated16.json",
+        "exitCode": 0,
+        "logSha256": "50d444f9e092739af860a2a99d46358eed84bf4ef3d417e5eea891690988ff21",
+        "sourceUnchanged": true,
+        "sourceFingerprint": "880e9abcb0ba38fb085748d03e11eb4c04e5a6b7f2493978319bcfe68574264f"
+      },
+      {
+        "record": "artifacts/rust-tauri/R07/T07/dev-fanout-diagnosis1.json",
+        "exitCode": 0,
+        "logSha256": "d75fe79cac406675f9318283a8c2dfd6c504d5cb01bc64f687a15bba56ea23cd",
+        "sourceUnchanged": true,
+        "sourceFingerprint": "880e9abcb0ba38fb085748d03e11eb4c04e5a6b7f2493978319bcfe68574264f"
+      },
+      {
+        "record": "artifacts/rust-tauri/R07/T07/dev-prompt-race1.json",
+        "exitCode": 101,
+        "logSha256": "61bf7f9df486d6c261a21b8a4f5035335125e842a38f4dcccfaa32c55adbe841",
+        "sourceUnchanged": true,
+        "sourceFingerprint": "c49f653ea4d66a57387f15bc06ccbf5616f2b67a5ddae3212248072557b65a96"
+      },
+      {
+        "record": "artifacts/rust-tauri/R07/T07/dev-prompt-race2.json",
+        "exitCode": 0,
+        "logSha256": "691b076a21cc652dec7d8c93f7c7a7f019d3ea28ed2022526d649e8aa692213f",
+        "sourceUnchanged": true,
+        "sourceFingerprint": "1f11ff61da4007af79668d1aaea7eb63a1eeb79aaa3967c73a780ded30b810b4"
+      }
+    ],
+    "integrated16": "623lib/14native/19workflow通过，同源码开发结果。",
+    "fanoutDiagnosis": "原fanout单跑30次皆0，仅未复现，原t07b失败保留。",
+    "atomicWriteReproduction": "真实现役函数16线程×128写入，2048中287次ENOENT，prompt-race1 exit101。",
+    "atomicWriteCorrection": "PID+时间+计数唯一temp/create_new/失败清理；prompt-race2完整workflow20通过，含原fanout和2048真实并发完整JSON/无tmp。",
+    "epistemicLimit": "已证实并发文件写bug及其修复；没有直接还原原t07b fanout唯一cause。暂无新固定候选通过。"
+  }
+}

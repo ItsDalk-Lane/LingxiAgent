@@ -1,0 +1,12 @@
+{
+  "name": "lingxi-tauri-shell-spike",
+  "private": true,
+  "version": "0.1.0",
+  "description": "R01-T06 isolated Tauri v2 shell spike. Not a production entrypoint.",
+  "scripts": {
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

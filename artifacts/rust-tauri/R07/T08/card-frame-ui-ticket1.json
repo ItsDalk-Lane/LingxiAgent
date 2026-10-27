@@ -1,0 +1,26 @@
+{
+  "status": "DEVELOPMENT_ONLY",
+  "exitCode": 0,
+  "log": "artifacts/rust-tauri/R07/T08/card-frame-ui-ticket1.log",
+  "logSha256": "f7b05923b0ae1e47a84918fdfe3a9ce00a6698e4a56c9af62c70860175e0250b",
+  "command": "npx vitest run desktop/src/react/__tests__/components/InteractiveCard.test.tsx desktop/src/react/__tests__/components/card-frame-navigation.test.ts --maxWorkers=1",
+  "bindingNote": "运行时未保存源码快照；所列仅后续核对时源码，禁止用来声称本次运行绑定最终候选。",
+  "laterInspectionSourceHashes": [
+    {
+      "path": "desktop/src/shared/card-frame-navigation.cjs",
+      "sha256": "8dbff1a6b7459f3f1f488eab0c05cdb5c8cf676a6b10c88a643d0c124e4a05cd"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/card-frame-navigation.test.ts",
+      "sha256": "31130621547850e64b1661bff6ad77984bd84dbd536d68aa47898f6c2d16551b"
+    },
+    {
+      "path": "desktop/src/react/components/chat/InteractiveCard.tsx",
+      "sha256": "87071669a03054d52ca6493f606b49b0c122de815fd57ff94d1682f1df1dd385"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/InteractiveCard.test.tsx",
+      "sha256": "7014f4a9a621d4afbc3ad5dc4f753df053df759127306f23db465f46e810bb10"
+    }
+  ]
+}

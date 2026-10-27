@@ -1,0 +1,334 @@
+{
+ "schema": "lingxi.r09.shell-parity.v1",
+ "stage": "R09",
+ "status": "DRAFT_T08_PARTIAL",
+ "generatedAt": "2026-10-26T23:26:46+0800",
+ "note": "T08 生产者草稿：由 r09_t08_shell_parity 聚合既有证据生成；pending/blocked 未完成前不得引用为对照成立。Lead 汇总后覆盖 docs/rust-tauri/R09/SHELL_PARITY_RESULTS.json。",
+ "methodology": {
+  "variableUnderTest": "desktop host only (Electron host vs Tauri host)",
+  "heldConstant": [
+   "same Rust service (sidecar sha256 + build.json protocol/dataEpoch; T01 两壳注入同一 LINGXI_SERVICE_BIN)",
+   "same React renderer build (build-once-bind-once rendererDigest/themeBundleSha256)",
+   "same deterministic fixtures (R08 v3Base anchor; T07 实测 case)",
+   "same protocol/data epoch (wire 1..=1, data epoch 2)"
+  ],
+  "aSide": "R08 verified Electron host + Rust service (verify-r08-closeout-08, overall PASS)",
+  "bSide": "R09 frozen Tauri candidate + same Rust service/renderer",
+  "harness": "scripts/rust-tauri/r09_t08.py --suite r09_t08_shell_parity",
+  "recordedApprovalsRule": "Any host difference must be registered with a documented basis; unapproved differences fail A15"
+ },
+ "fixedHashes": {
+  "rustServiceSha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+  "rustServiceContentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+  "rendererDigest": "c0a5719f9e9ddd79b71eb0a440a78479aac3489a2679898121b2db633adf150b",
+  "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+  "fixturesManifestSha256": "80a8d2c2640e2b2974b299a10f36679bc19daf0911e51f82f0c43399cb32feaa",
+  "electronBaselineReceipt": {
+   "path": "artifacts/rust-tauri/R08/verify-r08-closeout-08/verify-stage-result.json",
+   "testedSha": "aa99d2ec1dae7f0aef5971bab049734f22fcf7d8",
+   "candidateSourceDigest": "0f07f2f7a0cf9e8d5660237be6a26666ba314dc04e840a02b9b573d990050dc6",
+   "ab": {
+    "tasks": 71,
+    "parity": 68,
+    "recorded": 3,
+    "differs": 0
+   }
+  },
+  "tauriCandidateReceipt": {
+   "deliveryAppTreeSha256": "d01ece202a42c0a70a292d384d5ceb938982f414ce1cc00e369cad579149ecdc",
+   "hostExeSha256": "63250ddb00c92536424ecefc07b55079d7ee4d3a1c3445ac9336105678a7a278",
+   "evidenceBuildSha256": "f69a8100b5bd35aa0d91cac33ff7cce0624bdd5f841aed8bca868dee388c48cb",
+   "featuresDelivery": [
+    "r09-host"
+   ],
+   "featuresEvidence": [
+    "e2e-test",
+    "r09-host",
+    "r09-test-hooks"
+   ]
+  }
+ },
+ "tasks": [
+  {
+   "taskId": "R09-A15",
+   "aSide": "R08 Electron host baseline (closeout-08 PASS, 71 A/B tasks = 68 parity + 3 recorded)",
+   "bSide": "R09 Tauri frozen candidate",
+   "verdict": "PARTIAL",
+   "measuredParityRows": 13,
+   "capabilityParity": 5,
+   "capabilityRecorded": 8,
+   "capabilityPending": 34,
+   "capabilityBlocked": 3,
+   "leafParity": 0,
+   "leafExcludedNonHost": 16,
+   "leafPending": 26,
+   "leafBlocked": 4
+  }
+ ],
+ "summary": {
+  "totalCapabilities": 50,
+  "parity": 5,
+  "recorded": 8,
+  "differs": 0,
+  "pending": 60,
+  "blocked": 7,
+  "hostPlaceholders": "由 r09_t08_host_completeness 产出",
+  "leafCoverage": {
+   "total": 74,
+   "bound": 15,
+   "pending": 59
+  }
+ },
+ "leafParity": [
+  {
+   "leafId": "R00-T02-LA-0DEEE4813B0A",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-1120B2AA320D",
+   "status": "blocked",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-1329EA46F72C",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-15DFB1AED8F2",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-15E163FBFBE8",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-1629CDD9EA4F",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-173C6332527D",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-18FE3FDFF9A5",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-1C41525D379C",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-1D4C7E9C713C",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-1E6EDB731186",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-322E02C7F2F9",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-37E6C3B9A7B8",
+   "status": "blocked",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-394DD07D2968",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-429D86C4F952",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-57728C0A6D0A",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-58822B6B138B",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-59987671E5AD",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-5D5938D61A00",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-6006FD0BF07D",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-6774E79F6714",
+   "status": "blocked",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-70B07E378F42",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-713E908B7B2F",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-8FE26C132D8B",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-9350C3E12165",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-98B458390B7E",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-9C679D21A188",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-A14D3027C881",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-A2E507EBDEF2",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-AC5B6EDA3FBD",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-ACA2C4C1158D",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-B6A97A19F2CB",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-B72A6D3886B7",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-BEC2074CC33C",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-C5AAF360D10F",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-CD873C715D96",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-D15E0ADC0608",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-D29DE479076C",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-DF4B5168ABB5",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-E6FB08FBBFAA",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-E84F01456B6C",
+   "status": "blocked",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-F5DBF2A80E28",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-F6235778F816",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-F9786414DD11",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-FB5C78308878",
+   "status": "excluded_non_host",
+   "plannedSuite": "r09_t03_native_matrix"
+  },
+  {
+   "leafId": "R00-T02-LA-FF1B331F1019",
+   "status": "pending",
+   "plannedSuite": "r09_t03_native_matrix"
+  }
+ ],
+ "unapprovedDifferences": [],
+ "evidence": "artifacts/rust-tauri/R09/dev/t08/<run>/ (shell-parity-cases.json / parity-matrix.json)",
+ "provenance": {
+  "r09_t01_react_parity": "dev-fallback",
+  "r09_t02_supervisor_ready": "dev-fallback",
+  "r09_t02_process_ownership": "dev-fallback",
+  "r09_t05_browser_pdf": "dev-fallback",
+  "r09_t05_untrusted_preview": "dev-fallback",
+  "r09_t07_native_e2e": "dev-fallback",
+  "r09_t01_release_offline": "dev-fallback",
+  "r09_t03_native_matrix": "dev-fallback",
+  "r09_t03_ipc_negative": "dev-fallback",
+  "r09_t04_permission_matrix": "dev-fallback",
+  "r09_t04_remote_boundary": "dev-fallback",
+  "r09_t06_capability_matrix": "dev-fallback",
+  "r09_t06_release_attack_surface": "dev-fallback",
+  "r09_t07_release_smoke": "dev-fallback",
+  "audit_capability": "dev-fallback",
+  "release_scan": "dev-fallback"
+ }
+}

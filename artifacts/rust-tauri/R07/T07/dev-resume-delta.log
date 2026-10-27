@@ -1,0 +1,44 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0283]: type annotations needed
+    --> crates/lingxi-service/src/workflow.rs:1261:175
+     |
+1261 | ...rn NodeFailure::coded("WRITE_FOLDERS_CONFLICT_WITH_READ", "workflow agent() writeFolders declares a write scope and cannot be combined with access:\"read\".".into())...
+     |       ------------------ required by a bound introduced by this call                                                                                             ^^^^
+     |
+     = note: the type must implement `Into<std::string::String>`
+note: required by a bound in `NodeFailure::coded`
+    --> crates/lingxi-service/src/workflow.rs:591:48
+     |
+ 591 |     fn coded(code: &'static str, message: impl Into<String>) -> Self {
+     |                                                ^^^^^^^^^^^^ required by this bound in `NodeFailure::coded`
+help: try using a fully qualified path to specify the expected types
+     |
+1261 -             return NodeFailure::coded("WRITE_FOLDERS_CONFLICT_WITH_READ", "workflow agent() writeFolders declares a write scope and cannot be combined with access:\"read\".".into()).envelope();
+1261 +             return NodeFailure::coded("WRITE_FOLDERS_CONFLICT_WITH_READ", <&str as Into<T>>::into("workflow agent() writeFolders declares a write scope and cannot be combined with access:\"read\".")).envelope();
+     |
+help: consider removing this method call, as the receiver has type `&'static str` and `&'static str: Into<std::string::String>` trivially holds
+     |
+1261 -             return NodeFailure::coded("WRITE_FOLDERS_CONFLICT_WITH_READ", "workflow agent() writeFolders declares a write scope and cannot be combined with access:\"read\".".into()).envelope();
+1261 +             return NodeFailure::coded("WRITE_FOLDERS_CONFLICT_WITH_READ", "workflow agent() writeFolders declares a write scope and cannot be combined with access:\"read\".").envelope();
+     |
+
+error[E0283]: type annotations needed
+    --> crates/lingxi-service/src/workflow.rs:1261:175
+     |
+1261 | ... a write scope and cannot be combined with access:\"read\".".into()).envelope();
+     |                                                                 ^^^^
+     |
+     = note: multiple `impl`s satisfying `_: From<&str>` found in the following crates: `axum_core`, `bytes`, `reqwest`:
+             - impl From<&'static str> for axum::body::Body;
+             - impl From<&'static str> for axum::body::Bytes;
+             - impl From<&'static str> for reqwest::Body;
+     = note: required for `&str` to implement `Into<_>`
+help: try using a fully qualified path to specify the expected types
+     |
+1261 -             return NodeFailure::coded("WRITE_FOLDERS_CONFLICT_WITH_READ", "workflow agent() writeFolders declares a write scope and cannot be combined with access:\"read\".".into()).envelope();
+1261 +             return NodeFailure::coded("WRITE_FOLDERS_CONFLICT_WITH_READ", <&str as Into<T>>::into("workflow agent() writeFolders declares a write scope and cannot be combined with access:\"read\".")).envelope();
+     |
+
+For more information about this error, try `rustc --explain E0283`.
+error: could not compile `lingxi-service` (lib) due to 2 previous errors

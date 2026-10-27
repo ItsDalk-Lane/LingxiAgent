@@ -1,0 +1,12 @@
+
+running 5 tests
+test mixed_models_search_validation_failure_reads_both_sections_and_unchanged_runtime ... ok
+test mixed_models_search_projection_failure_keeps_applied_model_and_unapplied_search_after_restart ... ok
+test legacy_search_api_key_empty_and_null_clear_only_the_selected_provider_and_survive_restart ... ok
+test per_provider_search_clear_of_inactive_key_preserves_active_key_and_never_borrows_it_after_switch ... ok
+test per_provider_search_clear_empty_and_null_remove_the_selected_key_without_legacy_resurrection ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.82s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.18s
+     Running tests/r07_t08_search_clear.rs (rust/target/debug/deps/r07_t08_search_clear-65b249e8730ec817)

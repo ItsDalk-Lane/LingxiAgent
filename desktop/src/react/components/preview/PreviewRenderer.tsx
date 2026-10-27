@@ -35,7 +35,7 @@ import { fileIconSvg } from '../../utils/icons';
 import { openFilePreview } from '../../utils/file-preview';
 import { openInternalLink, resolveLinkTarget, type LinkOpenContext } from '../../utils/link-open';
 import { showError } from '../../utils/ui-helpers';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../services/service-client';
 import { useStore } from '../../stores';
 import { upsertPreviewItem } from '../../stores/preview-actions';
 import { isRemoteWorkbenchContentRef, normalizeWorkbenchContentRef, saveRemoteWorkbenchContent } from '../../utils/remote-file-preview';
@@ -44,6 +44,7 @@ import { LinkContextMenu, type LinkContextMenuState } from '../shared/LinkContex
 import { DocumentReferencesBlock, MarkdownPropertiesBlock } from './MarkdownChrome';
 import type { PreviewItem } from '../../types';
 import previewStyles from '../Preview.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 declare function t(key: string, vars?: Record<string, string | number>): string;
 
@@ -216,8 +217,10 @@ async function writeMarkdownPreviewContent(previewItem: PreviewItem, content: st
     const result = await saveRemoteWorkbenchContent(previewItem.remoteContentRef, content, previewItem.fileVersion ?? null);
     return { result, nextVersion: result.version ?? null };
   }
-  if (!previewItem.filePath || !window.platform?.writeFileIfUnchanged) return null;
-  const result = await window.platform.writeFileIfUnchanged(previewItem.filePath, content, previewItem.fileVersion || null);
+  if (!previewItem.filePath) return null;
+  const writePlatform = usePlatform();
+  if (!writePlatform?.writeFileIfUnchanged) return null;
+  const result = await writePlatform.writeFileIfUnchanged(previewItem.filePath, content, previewItem.fileVersion || null);
   return { result, nextVersion: result?.version ?? null };
 }
 
@@ -251,7 +254,7 @@ function MarkdownCoverView({ previewItem, cover }: { previewItem: PreviewItem; c
   const imagePath = remoteImageUrl ? null : resolveMarkdownCoverImagePath(previewItem.filePath, cover.image);
   const imageUrl = remoteImageUrl || (imagePath && isExternalCoverImagePath(imagePath)
     ? imagePath
-    : imagePath ? window.platform?.getFileUrl?.(imagePath) || imagePath : null);
+    : imagePath ? usePlatform()?.getFileUrl?.(imagePath) || imagePath : null);
   const coverTarget = useMemo(() => markdownCoverTargetForPreviewItem(previewItem), [previewItem]);
 
   const persistLayout = useCallback(async (nextLayout: Required<MarkdownCoverLayoutPatch>) => {
@@ -262,8 +265,9 @@ function MarkdownCoverView({ previewItem, cover }: { previewItem: PreviewItem; c
     };
 
     let { result, nextContent, nextVersion } = await writeNext(previewItem.content, previewItem.fileVersion);
-    if (!result?.ok && result?.conflict && previewItem.filePath && window.platform?.readFileSnapshot) {
-      const snapshot = await window.platform.readFileSnapshot(previewItem.filePath);
+    const snapshotPlatform = usePlatform();
+    if (!result?.ok && result?.conflict && previewItem.filePath && snapshotPlatform?.readFileSnapshot) {
+      const snapshot = await snapshotPlatform.readFileSnapshot(previewItem.filePath);
       if (snapshot?.content != null) {
         ({ result, nextContent, nextVersion } = await writeNext(snapshot.content, snapshot.version));
       }
@@ -289,8 +293,9 @@ function MarkdownCoverView({ previewItem, cover }: { previewItem: PreviewItem; c
     };
 
     let { result, nextContent, nextVersion } = await writeNext(previewItem.content, previewItem.fileVersion);
-    if (!result?.ok && result?.conflict && previewItem.filePath && window.platform?.readFileSnapshot) {
-      const snapshot = await window.platform.readFileSnapshot(previewItem.filePath);
+    const removeSnapshotPlatform = usePlatform();
+    if (!result?.ok && result?.conflict && previewItem.filePath && removeSnapshotPlatform?.readFileSnapshot) {
+      const snapshot = await removeSnapshotPlatform.readFileSnapshot(previewItem.filePath);
       if (snapshot?.content != null) {
         ({ result, nextContent, nextVersion } = await writeNext(snapshot.content, snapshot.version));
       }
@@ -525,8 +530,9 @@ function MarkdownPreview({ previewItem }: { previewItem: PreviewItem }) {
     event.preventDefault();
     event.stopPropagation();
     void (async () => {
-      if (target.kind === 'file' && /\.(md|markdown|mdx|txt|csv|json|ya?ml)$/i.test(target.filePath) && window.platform?.readFileSnapshot) {
-        const snapshot = await window.platform.readFileSnapshot(target.filePath).catch(() => null);
+      const linkPlatform = usePlatform();
+      if (target.kind === 'file' && /\.(md|markdown|mdx|txt|csv|json|ya?ml)$/i.test(target.filePath) && linkPlatform?.readFileSnapshot) {
+        const snapshot = await linkPlatform.readFileSnapshot(target.filePath).catch(() => null);
         if (!snapshot) {
           showError(`Link target not found: ${target.filePath}`);
           return;
@@ -574,7 +580,7 @@ function MarkdownPreview({ previewItem }: { previewItem: PreviewItem }) {
               dangerouslySetInnerHTML={{
                 __html: renderMarkdownPreview(body, {
                   filePath: previewItem.filePath,
-                  getFileUrl: window.platform?.getFileUrl,
+                  getFileUrl: usePlatform()?.getFileUrl,
                 }),
               }}
             />
@@ -591,7 +597,7 @@ function MarkdownPreview({ previewItem }: { previewItem: PreviewItem }) {
               dangerouslySetInnerHTML={{
                 __html: renderMarkdownPreview(body, {
                   filePath: previewItem.filePath,
-                  getFileUrl: window.platform?.getFileUrl,
+                  getFileUrl: usePlatform()?.getFileUrl,
                 }),
               }}
             />
@@ -702,7 +708,7 @@ function FileInfoPreview({ previewItem }: { previewItem: PreviewItem }) {
       <button
         className="preview-file-open-btn"
         onClick={() => {
-          if (previewItem.filePath) window.platform?.openFile?.(previewItem.filePath);
+          if (previewItem.filePath) usePlatform()?.openFile?.(previewItem.filePath);
         }}
       >
         {t('desk.openWithDefault')}

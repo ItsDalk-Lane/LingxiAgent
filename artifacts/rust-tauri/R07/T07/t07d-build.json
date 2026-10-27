@@ -1,0 +1,31 @@
+{
+  "candidate": "t07d",
+  "name": "build",
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "build",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-service",
+    "--bin",
+    "lingxi-service"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-18T03:40:45.978191+00:00",
+  "sourceFingerprint": "634e0efbe15e772f31be34b61d79bfbefa2957b1b3572af1b63e28a10f95c804",
+  "log": "t07d-build.log",
+  "endedAt": "2026-10-18T03:41:18.530903+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "634e0efbe15e772f31be34b61d79bfbefa2957b1b3572af1b63e28a10f95c804",
+  "logSha256": "2c7435ea3b4477a1f0f4e5ed2af932dec5c23e49bb5833ba9b70ddee2c7e205b",
+  "baseCommitAfter": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceUnchanged": true
+}

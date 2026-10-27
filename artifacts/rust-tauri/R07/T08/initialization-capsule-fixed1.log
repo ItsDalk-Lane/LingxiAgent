@@ -1,0 +1,33 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/r06_agent_delete_skills_live.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_agent_delete_skills_live-afcf2ac8af2cef1f)
+
+running 2 tests
+test agent_delete_orphan_skills_current_desktop_rust_api_and_ui ... ok
+test agent_delete_connection_changes_preserve_both_real_service_roots has been running for over 60 seconds
+test agent_delete_connection_changes_preserve_both_real_service_roots ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 61.53s
+
+     Running tests/r06_chat_wire.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_chat_wire-f73bf56901f8b5c8)
+
+running 17 tests
+test model_switch_uses_real_session_admission_and_rejections_preserve_choice ... ok
+test actual_attachment_preparation_abort_is_immediately_idle_zero_run_and_no_late_submit ... ok
+test real_ws_delta_is_visible_before_provider_terminal_and_abort_stale_guard ... ok
+test ws_interject_interrupts_only_target_and_preserves_real_user_receipt ... ok
+test real_ws_resume_recovers_exact_missing_events_and_marks_stale_or_empty ... ok
+test deleted_agent_steer_is_rejected_without_cancelling_neighbour_session ... ok
+test file_refs_real_owner_snapshots_office_bytes_transaction_and_negative_zero_run ... ok
+test real_ws_prompt_enters_run_tools_and_live_final_with_typed_input_refusals ... ok
+test ws_compaction_refusals_then_real_local_checkpoint_zero_fee_and_next_run ... ok
+test actual_model_switch_default_thinking_and_image_survive_restart_into_provider ... ok
+test ws_compaction_real_accepted_success_noop_failure_and_streaming_negative ... ok
+test real_provider_many_deltas_resume_reports_truncation_and_retains_contiguous_tail ... ok
+test referenced_images_real_20mib_limit_owned_bytes_and_no_run_on_refusal ... ok
+test ws_real_steering_tool_continuation_idle_prompt_and_foreign_controls_do_not_mutate ... ok
+test native_current_chat_page_inputarea_tiptap_true_network_and_queue_interject ... ok
+test session_id_references_are_authorized_preserved_and_never_read_source_body_implicitly ... ok
+test native_current_app_pages_side_preview_attachment_and_model_response_generation ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.26s
+

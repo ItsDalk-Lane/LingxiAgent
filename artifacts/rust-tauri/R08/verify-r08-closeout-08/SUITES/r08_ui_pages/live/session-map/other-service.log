@@ -1,0 +1,27 @@
+2026-10-26T12:01:56.312833Z  INFO lingxi_service: data root resolved [token] source=env ignored_sources=config-file=/private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out/live/session-map/other-config.json
+2026-10-26T12:01:56.313156Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) [token] [token]
+2026-10-26T12:01:56.313381Z  INFO lingxi_service: model plane resolved (credentials never logged) model_plane_source=Some("/private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out/live/session-map/other-config.json") providers=1
+2026-10-26T12:01:56.313955Z  INFO lingxi_service: single-writer lock acquired [token] start_nonce=699a9d122696dbd4 pid=61698 entropy="os-random-device" lock=/private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out/live/session-map/other-home/lingxi-service/instance.lock network_mode=loopback
+2026-10-26T12:01:56.322925Z  INFO lingxi_service: data-epoch gate passed [token] decision=ProceedStampedNew(EpochStamp { format: V2, minimum_reader_epoch: 2, committed_data_epoch: 2, last_version: Some("0.0.0") })
+2026-10-26T12:01:56.388381Z  INFO lingxi_adapters::storage::run_store: run database migrated db=/private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out/live/session-map/other-home/lingxi-service/data/runs.db applied=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28] version=28
+2026-10-26T12:01:56.410971Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded local_token_file=/private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out/live/session-map/other-home/lingxi-service/local-token.json run_database=/private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out/live/session-map/other-home/lingxi-service/data/runs.db
+2026-10-26T12:01:56.420917Z  INFO lingxi_service: instance record published (atomic write) record=/private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out/live/session-map/other-home/lingxi-service/instance.json bind_addr=127.0.0.1:52550
+LINGXI_SERVICE_READY addr=127.0.0.1:52550 home=/private/tmp/lingxi-r08-verify/r08_ui_pages-61448-1793016086838/ui-pages-out/live/session-map/other-home source=env
+2026-10-26T12:01:57.890290Z  INFO lingxi_service: request handled request_id="req-4f60d1ec96d1a5a4f74a1d2494493ab6" method=OPTIONS path=/lingxi/v1/conversation-map/layout status=204
+2026-10-26T12:01:57.890752Z  INFO lingxi_service: request handled request_id="req-0500eb453bb31b949cd655a13d42a486" method=OPTIONS path=/lingxi/v1/sessions/studio-list status=204
+2026-10-26T12:01:57.891052Z  INFO lingxi_service: request handled request_id="req-356ad582694ab2059d869eebcb3cbff4" method=GET path=/lingxi/v1/conversation-map/layout status=200
+2026-10-26T12:01:57.892901Z  INFO lingxi_service: request handled request_id="req-568aaf508c023c873f39355b51fff55f" method=GET path=/lingxi/v1/sessions/studio-list status=200
+2026-10-26T12:01:57.894516Z  INFO lingxi_service: request handled request_id="req-566bdb96285be27ad67143b8de89fd30" method=OPTIONS path=/lingxi/v1/sessions/switch status=204
+2026-10-26T12:01:57.896756Z  INFO lingxi_service: request handled request_id="req-ff524cc2416e79c430b4dad64b71b22e" method=POST path=/lingxi/v1/sessions/switch status=200
+2026-10-26T12:01:57.897922Z  INFO lingxi_service: request handled request_id="req-a9f32083849d02c6ec48ff0534289175" method=OPTIONS [token] status=204
+2026-10-26T12:01:57.898760Z  INFO lingxi_service: request handled request_id="req-d363fe7561de2fc935d67abf180c4407" method=OPTIONS [token] status=204
+2026-10-26T12:01:57.898925Z  INFO lingxi_service: request handled request_id="req-0cde1b829c90ba393223a44050cc7c95" method=GET [token] status=200
+2026-10-26T12:01:57.900066Z  INFO lingxi_service: request handled request_id="req-537d484d200c3dafcc91ab4c3978666e" method=GET [token] status=200
+2026-10-26T12:01:57.901333Z  INFO lingxi_service: request handled request_id="req-13421a066cd449343e3fa736957190f8" method=OPTIONS [token] status=204
+2026-10-26T12:01:57.902273Z  INFO lingxi_service: request handled request_id="req-25aad6c3d6af7c79c65b42c2ea471c41" method=GET [token] status=200
+2026-10-26T12:01:57.904637Z  INFO lingxi_service: request handled request_id="req-b00e52103ec50e05d217f86b62ae2cb4" method=OPTIONS path=/lingxi/v1/chat/models status=204
+2026-10-26T12:01:57.905740Z  INFO lingxi_service: request handled request_id="req-f95f9841005166e150ead0508b0530c8" method=GET path=/lingxi/v1/chat/models status=200
+2026-10-26T12:02:17.206020Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-10-26T12:02:17.210441Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-10-26T12:02:17.210740Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-10-26T12:02:17.210804Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

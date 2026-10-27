@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AssistantMessage } from '../../components/chat/AssistantMessage';
 import { UserMessage } from '../../components/chat/UserMessage';
 import { useStore } from '../../stores';
+import { getDesktopHost, resetDesktopHostForTests } from '../../host/desktop-host';
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
   lingxiFetch: vi.fn(async () => new Response('{}', { status: 200 })),
@@ -48,6 +49,7 @@ describe('expired session file presentation', () => {
     cleanup();
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
+    document.documentElement.removeAttribute('data-platform');
   });
 
   it('renders an expired assistant file block as a disabled file card', () => {
@@ -82,7 +84,7 @@ describe('expired session file presentation', () => {
     expect(screen.queryByTitle('desk.openWithDefault')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByText('old.pdf'));
-    expect(window.platform?.openFile).not.toHaveBeenCalled();
+    expect(getDesktopHost().api?.openFile).not.toHaveBeenCalled();
   });
 
   it('does not load image previews for expired user attachments', () => {
@@ -115,7 +117,7 @@ describe('expired session file presentation', () => {
 
     expect(screen.queryByRole('img', { name: 'old.png' })).not.toBeInTheDocument();
     expect(screen.getByText('old.png · 文件已过期')).toBeInTheDocument();
-    expect(window.platform?.getFileUrl).not.toHaveBeenCalled();
+    expect(getDesktopHost().api?.getFileUrl).not.toHaveBeenCalled();
   });
 
   it('renders attachment-only user messages without an empty text bubble', () => {
@@ -424,11 +426,11 @@ describe('expired session file presentation', () => {
     );
 
     fireEvent.click(screen.getByRole('button', { name: '用默认应用打开 demo.pdf' }));
-    expect(window.platform?.openFile).toHaveBeenCalledWith('/cache/demo.pdf');
+    expect(getDesktopHost().api?.openFile).toHaveBeenCalledWith('/cache/demo.pdf');
 
     fireEvent.click(screen.getByRole('button', { name: '更多文件操作 demo.pdf' }));
     fireEvent.click(screen.getByRole('menuitem', { name: '打开文件夹' }));
-    expect(window.platform?.showInFinder).toHaveBeenCalledWith('/cache/demo.pdf');
+    expect(getDesktopHost().api?.showInFinder).toHaveBeenCalledWith('/cache/demo.pdf');
 
     fireEvent.click(screen.getByRole('button', { name: '更多文件操作 demo.pdf' }));
     fireEvent.click(screen.getByRole('menuitem', { name: '复制文件路径' }));
@@ -436,7 +438,7 @@ describe('expired session file presentation', () => {
   });
 
   it('renders assistant image previews through resource content URL when desktop file URL is unavailable', () => {
-    delete (window as any).platform;
+    resetDesktopHostForTests();
     useStore.setState({
       activeServerConnection: {
         kind: 'custom_remote',
@@ -512,7 +514,12 @@ describe('expired session file presentation', () => {
   });
 
   it('renders a phone-download action for staged file cards backed by a resource URL', () => {
-    delete (window as any).platform;
+    resetDesktopHostForTests();
+    // R08-T02 批次 D4a：组件改经宿主边界读取能力后，Web 宿主的 openFile 是
+    // 可解释的显式 no-op 成员，仅靠删除 window.platform 不再等价于「Web 运行时」。
+    // 生产 Web 运行时由 platform.js 写 data-platform="web"，这里按生产契约模拟，
+    // 断言（渲染下载链接且不调用 openFile）逐字保留。
+    document.documentElement.setAttribute('data-platform', 'web');
     useStore.setState({
       activeServerConnection: {
         kind: 'lan',

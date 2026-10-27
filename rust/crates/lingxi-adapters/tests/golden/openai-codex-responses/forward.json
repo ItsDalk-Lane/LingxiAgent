@@ -1,0 +1,36 @@
+{
+  "family": "openai-codex-responses",
+  "case": "forward",
+  "route": {"provider": "codex-golden", "model": "gpt-codex-golden"},
+  "input": {
+    "submission": "ping codex",
+    "tools": [],
+    "prior": []
+  },
+  "wire_mode": "sse",
+  "expected_request": {
+    "model": "gpt-codex-golden",
+    "store": false,
+    "stream": true,
+    "instructions": "You are Hana's utility model.\nFollow the user request exactly and return only the requested content.",
+    "input": [
+      {"type": "message", "role": "user", "content": [{"type": "input_text", "text": "ping codex"}]}
+    ]
+  },
+  "response_wire": {
+    "sse_frames": [
+      "{\"type\":\"response.created\",\"response\":{\"id\":\"resp_codex1\",\"status\":\"in_progress\"}}",
+      "{\"type\":\"response.output_text.delta\",\"delta\":\"pong\"}",
+      "{\"type\":\"response.completed\",\"response\":{\"id\":\"resp_codex1\",\"status\":\"completed\",\"output\":[{\"type\":\"reasoning\",\"id\":\"rs_c1\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"直接回复\"}],\"encrypted_content\":\"enc-codex-1\"},{\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"output_text\",\"text\":\"pong 回应\"}]}],\"usage\":{\"input_tokens\":33,\"output_tokens\":5}}}"
+    ]
+  },
+  "expected_turn": {
+    "kind": "final",
+    "content": [
+      {"reasoning": "直接回复"},
+      {"opaque": {"provider": "openai-codex-responses", "data": {"type": "reasoning", "id": "rs_c1", "summary": [{"type": "summary_text", "text": "直接回复"}], "encrypted_content": "enc-codex-1"}}},
+      {"text": "pong 回应"}
+    ],
+    "usage": {"input_tokens": 33, "output_tokens": 5}
+  }
+}

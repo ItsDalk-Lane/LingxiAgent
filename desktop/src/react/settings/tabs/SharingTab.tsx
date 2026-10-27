@@ -55,12 +55,13 @@ export function SharingTab() {
 
   const handleSegmentLimitChange = (value: number) => {
     const next = Math.max(1_000, Math.min(100_000, Math.round(value)));
-    setSegmentLimit(next);
     if (next === SCREENSHOT_SEGMENT_VISIBLE_CHAR_LIMIT) {
       localStorage.removeItem(SCREENSHOT_SEGMENT_VISIBLE_CHAR_LIMIT_STORAGE_KEY);
     } else {
       localStorage.setItem(SCREENSHOT_SEGMENT_VISIBLE_CHAR_LIMIT_STORAGE_KEY, String(next));
     }
+    // 写失败会同步抛错；只有持久化成功才更新页面投影。
+    setSegmentLimit(next);
   };
 
   const handleScreenshotFontChange = (value: string) => {
@@ -68,12 +69,12 @@ export function SharingTab() {
       allowFollow: true,
       fallback: FOLLOW_READING_FONT_ID,
     });
-    setScreenshotFont(next);
     if (next === FOLLOW_READING_FONT_ID) {
       localStorage.removeItem(SCREENSHOT_FONT_STORAGE_KEY);
     } else {
       localStorage.setItem(SCREENSHOT_FONT_STORAGE_KEY, next);
     }
+    setScreenshotFont(next);
   };
 
   return (
@@ -89,7 +90,7 @@ export function SharingTab() {
               key={key}
               className={`${styles['theme-card']}${screenshotColor === key ? ' ' + styles['active'] : ''}`}
               style={{ background: bg }}
-              onClick={() => { setScreenshotColor(key); localStorage.setItem('hana-screenshot-color', key); }}
+              onClick={() => { localStorage.setItem('hana-screenshot-color', key); setScreenshotColor(key); }}
             >
               <div className={styles['theme-card-name']} style={{ color }}>{t(`settings.screenshot.${key}`)}</div>
               <div className={styles['theme-card-mode']} style={{ color: accent }}>{t('settings.screenshot.title')}</div>
@@ -110,7 +111,7 @@ export function SharingTab() {
               <button
                 key={width}
                 className={`${styles['ss-layout-card']}${screenshotWidth === width ? ' ' + styles['active'] : ''}`}
-                onClick={() => { setScreenshotWidth(width); localStorage.setItem('hana-screenshot-width', width); }}
+                onClick={() => { localStorage.setItem('hana-screenshot-width', width); setScreenshotWidth(width); }}
               >
                 <div className={styles['ss-layout-preview']}>
                   {src ? (

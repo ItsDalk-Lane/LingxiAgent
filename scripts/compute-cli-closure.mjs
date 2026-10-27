@@ -516,6 +516,22 @@ export const DYNAMIC_CALL_ALLOWLIST = Object.freeze([
       + "a probed binary's absolute path, never an import target. Same bounded-timeout "
       + "probe contract as the sibling entry above.",
   },
+  {
+    file: "cli/rust-service.ts",
+    callee: "execFileSync",
+    argText: "reader",
+    reason:
+      "Windows Rust runtime record read: execFileSync(reader, ['--read-private-runtime-json', ...]) "
+      + "invokes the packaged Rust reader binary (lingxi-service.exe) so instance.json / "
+      + "local-token.json are read through the verified helper's private handle instead of "
+      + "raw fs on win32 (readPrivateJson). reader is resolved at runtime by "
+      + "resolveWindowsRustReader() -- a full verification chain (build.json manifest fields, "
+      + "PE header machine check, sha256 digest, toolchain + rust source digest) over "
+      + "dist-rust-service/win-<arch>/ or the activated server artifacts tree, so the path "
+      + "is genuinely runtime-computed and layout-dependent. The target is a packaged "
+      + "native artifact, not repo source, so it never enters the module closure by design "
+      + "(same pattern as the system-speech-adapter helper spawn entry above).",
+  },
 ]);
 
 const SPAWN_FAMILY_NAMES = new Set([
@@ -950,6 +966,13 @@ const PLATFORM_VARIANT_SUFFIX_RE =
 
 const PLATFORM_VARIANT_PLACEHOLDER = "<platform>";
 
+// Host-absolute paths: posix-absolute or Windows drive-qualified. nft's static
+// analysis resolves hardcoded spawn targets (e.g. the "/bin/bash" literals in
+// lib/sandbox/*) and emits whatever file exists at that path on the TRACING
+// machine -- an environmental artifact describing the build host, not the
+// shippable closure.
+const HOST_ABSOLUTE_PATH_RE = /^(?:\/|[A-Za-z]:[\\/])/;
+
 // Splits a traced path at its innermost `node_modules/<pkg>` boundary.
 // Returns null for paths that are not inside a package (repo sources) or that
 // stop at the package directory itself.
@@ -973,6 +996,11 @@ export function normalizeNftTraceFiles({ fileList, scratchRel }) {
     .map(toPosix)
     .filter((relPath) => {
       if (relPath === scratchRel || relPath === "package.json" || relPath === "node_modules") return false;
+      // Host-absolute and root-escaping entries never describe the closure:
+      // the committed baseline lists worktree-relative and node_modules-logical
+      // paths only. Dropping the whole class keeps generation deterministic
+      // across machines instead of re-baselining per-host trace artifacts.
+      if (HOST_ABSOLUTE_PATH_RE.test(relPath) || relPath === ".." || relPath.startsWith("../")) return false;
       // Native addon bytes are produced for a specific OS, architecture, and
       // Node ABI. The packaged server installs them with its target runtime;
       // including a locally rebuilt copy here would make this source closure

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Protocol version triplet mirrored from the incumbent\n`shared/contract-versions.json` (R00 baseline: PRELOAD_API_VERSION 1,\nSERVER_PROTOCOL_VERSION 1, DATA_EPOCH 1).\n\nThese are the *legacy* axes. The new wire protocol version negotiated by\n[`handshake`] is a separate axis (`lingxi.wire` v1); see\n`docs/rust-tauri/R01/PROTOCOL_SPEC.md` §2 for the relationship.",
+  "properties": {
+    "data_epoch": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "preload_api": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "server_protocol": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "preload_api",
+    "server_protocol",
+    "data_epoch"
+  ],
+  "title": "ContractVersions",
+  "type": "object"
+}

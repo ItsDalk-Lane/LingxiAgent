@@ -8,13 +8,15 @@
  */
 
 import { useStore } from './stores';
-import { lingxiFetch } from './hooks/use-hana-fetch';
+import { openQuickChatSession } from './services/quick-chat-session-handoff';
+import { lingxiFetch } from './services/service-client';
 import { applyAgentIdentity, loadAgents, loadAvatars } from './stores/agent-actions';
 import { loadPendingNewSessionPermissionDefault, loadSessions, pendingNewSessionIdentityPatch, sweepOrphanedWorkspaceSessions, switchSession } from './stores/session-actions';
 import { initSessionProjectCatalog } from './stores/session-project-actions';
 import { loadSidebarUiPrefs } from './stores/sidebar-ui-slice';
-import { connectWebSocket, getWebSocket } from './services/websocket';
-import { setStatus, loadModels } from './utils/ui-helpers';
+import { connectWebSocket, disconnectWebSocketForRestart, getWebSocket } from './services/websocket';
+import { resolveServerConnection } from './services/server-connection';
+import { setStatus, showError, loadModels } from './utils/ui-helpers';
 import { initJian, loadStudioWorkspaces } from './stores/desk-actions';
 import { initViewerEvents } from './stores/preview-actions';
 import { updateLayout } from './components/SidebarLayout';
@@ -39,12 +41,14 @@ import {
   readPersistedServerConnectionState,
   refreshLocalServerConnectionState,
   upsertServerConnection,
+  validateRestartTransport,
   warnIfServerProtocolMismatch,
   type ServerConnection,
-} from './services/server-connection';
+} from './services/service-client';
 import { persistAppearancePreferences } from './services/appearance-sync';
 import { errorBus as _errorBus } from '../../../shared/error-bus.ts';
 import { AppError as _AppError } from '../../../shared/errors.ts';
+import { usePlatform } from './hooks/use-platform';
 
 declare const i18n: {
   locale: string;
@@ -86,11 +90,14 @@ window.addEventListener('unhandledrejection', (e) => {
 // ── 主初始化流程 ──
 
 export async function initApp(): Promise<void> {
-  const platform = window.platform;
+  const platform = usePlatform();
   initQuotedSelectionLifecycle();
   initInputDraftPersistence();
 
   const requestContextUsage = (sessionPath: string) => {
+    // R08 收尾（D01）：context_usage 是旧内核 wire 帧，Rust 不认（close 1008）。
+    // Rust 连接的 ContextRing 由 websocket.ts rust 分支的资源事件维护，不经此帧。
+    if (resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service') return;
     const ws = getWebSocket();
     if (ws?.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ type: 'context_usage', sessionPath }));
@@ -99,32 +106,89 @@ export async function initApp(): Promise<void> {
   configureAppEventActions({ requestContextUsage });
   configureWsMessageHandler({ requestContextUsage });
 
-  platform.onServerRestarted?.((data: { port: number; token?: string | null }) => {
+  let lastLocalIdentity: ServerConnection | null = null;
+  platform.onServerRestarted?.((data: { port: number; token?: string | null; serverNodeKind?: string | null; serverNodeTransport?: string | null; host?: string | null }) => {
     const storeState = useStore.getState();
-    const serverPort = String(data.port);
-    const serverToken = data.token ?? storeState.serverToken ?? null;
+    const priorToken = storeState.serverToken;
+    const fromEvent = validateRestartTransport(data?.port, data?.token);
+    if (fromEvent && fromEvent.port === storeState.serverPort && fromEvent.token === priorToken
+      && (data.serverNodeKind === 'lingxi-service') === (storeState.activeServerConnection?.serverNodeKind === 'lingxi-service')
+      && (data.serverNodeTransport || 'http') === (storeState.activeServerConnection?.serverNodeTransport || 'http')) {
+      return;
+    }
     const activeBeforeRestart = storeState.activeServerConnection;
-    const nextConnectionState = refreshLocalServerConnectionState({
+    const localBeforeRestart = storeState.serverConnections[LOCAL_CONNECTION_ID]
+      ?? (activeBeforeRestart?.connectionId === LOCAL_CONNECTION_ID ? activeBeforeRestart : null)
+      ?? lastLocalIdentity;
+    if (localBeforeRestart) lastLocalIdentity = { ...localBeforeRestart, token: null };
+    const activeWasLocal = !activeBeforeRestart || activeBeforeRestart.connectionId === LOCAL_CONNECTION_ID;
+    const expectedRust = localBeforeRestart?.serverNodeKind === 'lingxi-service';
+    if (activeWasLocal) disconnectWebSocketForRestart();
+    const cleared = refreshLocalServerConnectionState({
       serverConnections: storeState.serverConnections,
       activeServerConnectionId: storeState.activeServerConnectionId,
-      activeServerConnection: storeState.activeServerConnection,
-      serverPort,
-      serverToken,
+      activeServerConnection: activeBeforeRestart,
+      serverPort: null,
+      serverToken: null,
     });
     useStore.setState({
-      serverPort,
-      serverToken,
-      ...nextConnectionState,
+      serverPort: null,
+      serverToken: null,
+      ...cleared,
     });
-    if (!activeBeforeRestart || activeBeforeRestart.connectionId === LOCAL_CONNECTION_ID) {
-      connectWebSocket();
+
+    const applyFreshTransport = (transport: { port: string; token: string }) => {
+      const verified = createLocalServerConnection({
+        serverPort: transport.port,
+        serverToken: transport.token,
+        serverNodeKind: data.serverNodeKind,
+        serverNodeTransport: data.serverNodeTransport,
+        serverHost: data.host ?? null,
+      });
+      if (!verified) throw new Error('invalid restarted local server connection');
+      const current = useStore.getState();
+      const serverConnections = localBeforeRestart
+        ? { ...current.serverConnections, [LOCAL_CONNECTION_ID]: localBeforeRestart }
+        : current.serverConnections;
+      const next = refreshLocalServerConnectionState({
+        serverConnections,
+        activeServerConnectionId: activeWasLocal ? LOCAL_CONNECTION_ID : current.activeServerConnectionId,
+        activeServerConnection: activeWasLocal ? localBeforeRestart : current.activeServerConnection,
+        serverPort: transport.port,
+        serverToken: transport.token,
+        serverNodeKind: verified.serverNodeKind,
+        serverNodeTransport: verified.serverNodeTransport,
+      });
+      useStore.setState({ serverPort: transport.port, serverToken: transport.token, ...next });
+      if (activeWasLocal) connectWebSocket();
+    };
+    if (fromEvent && fromEvent.token !== priorToken
+      && (!expectedRust || data.serverNodeKind === 'lingxi-service')) {
+      try {
+        applyFreshTransport(fromEvent);
+        return;
+      } catch { /* 坏协议字段不得恢复旧连接 */ }
     }
+    if (activeWasLocal) useStore.setState({ wsFailureReasonKey: 'status.serverRestartInvalid' });
+    // 桥事件缺字段或仍给旧令牌时保持断开，等待下一次有效重启事件。
   });
 
   // 1. 获取 server 连接信息并存入 Zustand
-  const serverPort = await platform.getServerPort();
-  const serverToken = await platform.getServerToken();
-  const localServerConnection = createLocalServerConnection({ serverPort, serverToken });
+  const boot = platform.getServerConnectionInfo
+    ? await platform.getServerConnectionInfo()
+    : { port: await platform.getServerPort(), token: await platform.getServerToken(), serverNodeKind: null, serverNodeTransport: 'http', host: null };
+  const serverPort = boot.port == null ? null : String(boot.port);
+  const serverToken = boot.token;
+  const localServerConnection = createLocalServerConnection({
+    serverPort, serverToken,
+    serverNodeKind: boot.serverNodeKind,
+    serverNodeTransport: boot.serverNodeTransport,
+    serverHost: boot.host ?? null,
+  });
+  // R08-T03：rust 预览模式窗口标题可见；远端形态按 host 区分（主进程窗口期标题见 main.cjs）。
+  if (boot.serverNodeKind === 'lingxi-service' && typeof document !== 'undefined') {
+    document.title = boot.host ? 'Lingxi · Rust 预览（远端）' : 'Lingxi · Rust 预览';
+  }
   const persistedConnections = readPersistedServerConnectionState();
   const initialRegistry = localServerConnection
     ? upsertServerConnection(persistedConnections.serverConnections, localServerConnection)
@@ -157,34 +221,30 @@ export async function initApp(): Promise<void> {
       activeServerConnection: mergedConnection,
     });
   } catch (err) {
-    if (activeServerConnection.connectionId !== LOCAL_CONNECTION_ID && localServerConnection) {
-      console.warn('[init] remote server identity failed, returning to local server:', err);
-      useStore.setState({
-        activeServerConnectionId: localServerConnection.connectionId,
-        activeServerConnection: localServerConnection,
-      });
-      try {
-        await refreshDeviceWebSession(localServerConnection);
-        const mergedConnection = await loadIdentityForActiveConnection(localServerConnection);
-        useStore.setState({
-          serverConnections: upsertServerConnection(useStore.getState().serverConnections, mergedConnection),
-          activeServerConnectionId: mergedConnection.connectionId,
-          activeServerConnection: mergedConnection,
-        });
-      } catch (localErr) {
-        console.error('[init] server identity failed:', localErr);
-        setStatus('status.serverNotReady', false);
-        markRendererLaunch('app-ready', JSON.stringify({ reason: 'local-server-identity-failed' }));
-        platform.appReady();
-        return;
-      }
-    } else {
-      console.error('[init] server identity failed:', err);
-      setStatus('status.serverNotReady', false);
-      markRendererLaunch('app-ready', JSON.stringify({ reason: 'server-identity-failed' }));
-      platform.appReady();
-      return;
+    const rawDetail = err instanceof Error ? err.message : String(err);
+    const detail = activeServerConnection.token
+      ? rawDetail.replaceAll(activeServerConnection.token, '[redacted]')
+      : rawDetail;
+    console.error('[init] server identity failed:', detail);
+    setStatus('status.serverNotReady', false);
+    if (activeServerConnection.connectionId !== LOCAL_CONNECTION_ID) {
+      showError(`${t('status.serverNotReady')}: ${detail}`);
     }
+    markRendererLaunch('app-ready', JSON.stringify({ reason: 'server-identity-failed' }));
+    platform.appReady();
+    return;
+  }
+
+  if (useStore.getState().activeServerConnection?.serverNodeKind === 'lingxi-service') {
+    // Rust 现阶段只有业务连接与会话底座；旧 /api/* 初始化和聊天帧无等价入口。
+    // 显示真实不可用状态，保留连接握手以便诊断，不制造空列表或假聊天成功。
+    await i18n.load('zh-CN');
+    useStore.setState({ locale: i18n.locale });
+    connectWebSocket();
+    setStatus('status.rustCoreUnavailable', false);
+    markRendererLaunch('app-ready', JSON.stringify({ reason: 'rust-core-unavailable' }));
+    platform.appReady();
+    return;
   }
 
   persistAppearancePreferences().catch((err) => {
@@ -316,7 +376,7 @@ export async function initApp(): Promise<void> {
     'app.open-settings': () => openSettingsModal(),
     'app.new-session': () => createNewSession(),
     'app.toggle-sidebar': () => toggleSidebar(),
-    'app.restart': () => { void window.hana?.restartApp?.(); },
+    'app.restart': () => { void usePlatform()?.restartApp?.(); },
   });
 
   // 19. 设置变更监听
@@ -349,15 +409,10 @@ export async function initApp(): Promise<void> {
   });
 
   // 21. Quick Chat 请求打开后台会话：复用主窗口既有 session 切换路径
-  platform.onQuickChatOpenSession?.((payload: { sessionPath?: string }) => {
-    if (payload?.sessionPath) {
-      void switchSession(payload.sessionPath);
-      loadSessions();
-    }
-  });
+  platform.onQuickChatOpenSession?.(openQuickChatSession);
 
   // 21. Skill Viewer overlay（主进程 / 设置窗口 → 渲染进程）
-  window.hana?.onShowSkillViewer?.((data: any) => {
+  usePlatform()?.onShowSkillViewer?.((data: any) => {
     useStore.setState({ skillViewerData: data });
   });
 
@@ -367,15 +422,27 @@ export async function initApp(): Promise<void> {
 }
 
 async function loadIdentityForActiveConnection(connection: ServerConnection): Promise<ServerConnection> {
-  const identityRes = await lingxiFetch('/api/server/identity');
+  const identityPath = connection.serverNodeKind === 'lingxi-service'
+    ? '/lingxi/v1/server/identity'
+    : '/api/server/identity';
+  const identityRes = await lingxiFetch(identityPath);
   const identityData = await identityRes.json();
+  if (connection.serverNodeKind === 'lingxi-service' && (
+    identityData?.serverNodeKind !== 'lingxi-service'
+    || identityData?.serverNodeTransport !== connection.serverNodeTransport
+  )) {
+    throw new Error('Rust local server identity or transport mismatch');
+  }
   warnIfServerProtocolMismatch(identityData);
   return mergeServerIdentity(connection, identityData);
 }
 
 async function refreshDeviceWebSession(connection: ServerConnection): Promise<void> {
   if (connection.credentialKind !== 'device_credential' || !connection.token) return;
-  await lingxiFetch('/api/web-auth/login', {
+  const loginPath = connection.serverNodeKind === 'lingxi-service'
+    ? '/lingxi/v1/web-auth/login'
+    : '/api/web-auth/login';
+  await lingxiFetch(loginPath, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',

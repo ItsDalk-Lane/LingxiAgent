@@ -1,0 +1,141 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol/src/bin/lingxi-protocol-gen.rs:67:
+         ("BridgeReplyContext", root_schema::<BridgeReplyContext>()),
+         ("BridgeTargetType", root_schema::<BridgeTargetType>()),
+         ("BridgeReceiptStatus", root_schema::<BridgeReceiptStatus>()),
+-        ("BridgeConnectionStatus", root_schema::<BridgeConnectionStatus>()),
++        (
++            "BridgeConnectionStatus",
++            root_schema::<BridgeConnectionStatus>(),
++        ),
+         ("BridgeWorkerCommand", root_schema::<BridgeWorkerCommand>()),
+         ("BridgeWorkerEvent", root_schema::<BridgeWorkerEvent>()),
+         ("BridgeTakeoverScope", root_schema::<BridgeTakeoverScope>()),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol/src/bin/lingxi-protocol-gen.rs:773:
+             vec![],
+         );
+     }
+-    push(&mut out, "bridge-connection-status.json", "BridgeConnectionStatus", &BridgeConnectionStatus::Disconnected, vec![]);
++    push(
++        &mut out,
++        "bridge-connection-status.json",
++        "BridgeConnectionStatus",
++        &BridgeConnectionStatus::Disconnected,
++        vec![],
++    );
+     for (file, status) in [
+-        ("bridge-worker-connecting.json", BridgeConnectionStatus::Connecting),
+-        ("bridge-worker-connected.json", BridgeConnectionStatus::Connected),
+-        ("bridge-worker-disconnected.json", BridgeConnectionStatus::Disconnected),
++        (
++            "bridge-worker-connecting.json",
++            BridgeConnectionStatus::Connecting,
++        ),
++        (
++            "bridge-worker-connected.json",
++            BridgeConnectionStatus::Connected,
++        ),
++        (
++            "bridge-worker-disconnected.json",
++            BridgeConnectionStatus::Disconnected,
++        ),
+     ] {
+-        push(&mut out, file, "BridgeWorkerEvent", &BridgeWorkerEvent::ConnectionStatus {
+-            connector_id: "connector-1".into(), generation: 7, status,
+-            error: (status == BridgeConnectionStatus::Disconnected).then(|| "platform_connection_unavailable".into()),
+-        }, vec![]);
++        push(
++            &mut out,
++            file,
++            "BridgeWorkerEvent",
++            &BridgeWorkerEvent::ConnectionStatus {
++                connector_id: "connector-1".into(),
++                generation: 7,
++                status,
++                error: (status == BridgeConnectionStatus::Disconnected)
++                    .then(|| "platform_connection_unavailable".into()),
++            },
++            vec![],
++        );
+     }
+     push(
+         &mut out,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_bridge_sdk_platforms.rs:477:
+     std::fs::write(
+         h.home.join("platform-fixture.json"),
+         json!({"platform":"dingtalk","transientDrop":true}).to_string(),
+-    ).unwrap();
++    )
++    .unwrap();
+     h.enable().await;
+-    let original_generation = h.scalar("SELECT CAST(generation AS TEXT) FROM bridge_connectors_v1").await;
++    let original_generation = h
++        .scalar("SELECT CAST(generation AS TEXT) FROM bridge_connectors_v1")
++        .await;
+     tokio::time::timeout(Duration::from_secs(3), async {
+         loop {
+-            let status = h.request("GET", "/lingxi/v1/bridge/status?agentId=lingxi", None).await;
+-            if matches!(status["dingtalk"]["status"].as_str(), Some("connecting" | "disconnected"))
+-                && h.operations().iter().any(|item| item["kind"] == "network_disconnected") { break; }
++            let status = h
++                .request("GET", "/lingxi/v1/bridge/status?agentId=lingxi", None)
++                .await;
++            if matches!(
++                status["dingtalk"]["status"].as_str(),
++                Some("connecting" | "disconnected")
++            ) && h
++                .operations()
++                .iter()
++                .any(|item| item["kind"] == "network_disconnected")
++            {
++                break;
++            }
+             tokio::time::sleep(Duration::from_millis(20)).await;
+         }
+-    }).await.expect("短暂掉线必须在管理页面明确可见");
+-    h.wait("SELECT CAST(COUNT(*) AS TEXT) FROM bridge_outbox_v1 WHERE status='confirmed'", "1").await;
+-    assert_eq!(h.scalar("SELECT CAST(generation AS TEXT) FROM bridge_connectors_v1").await, original_generation);
++    })
++    .await
++    .expect("短暂掉线必须在管理页面明确可见");
++    h.wait(
++        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_outbox_v1 WHERE status='confirmed'",
++        "1",
++    )
++    .await;
++    assert_eq!(
++        h.scalar("SELECT CAST(generation AS TEXT) FROM bridge_connectors_v1")
++            .await,
++        original_generation
++    );
+     assert_eq!(h.provider.calls.load(Ordering::SeqCst), 1);
+     let operations = h.operations();
+-    assert_eq!(operations.iter().filter(|item| item["kind"] == "network_disconnected").count(), 1);
+-    assert_eq!(operations.iter().filter(|item| item["kind"] == "connect").count(), 2);
+-    let sends: Vec<_> = operations.iter().filter(|item| item["kind"] == "send").collect();
++    assert_eq!(
++        operations
++            .iter()
++            .filter(|item| item["kind"] == "network_disconnected")
++            .count(),
++        1
++    );
++    assert_eq!(
++        operations
++            .iter()
++            .filter(|item| item["kind"] == "connect")
++            .count(),
++        2
++    );
++    let sends: Vec<_> = operations
++        .iter()
++        .filter(|item| item["kind"] == "send")
++        .collect();
+     assert_eq!(sends.len(), 1);
+     assert!(sends[0]["text"].as_str().unwrap().contains(REPLY));
+-    let status = h.request("GET", "/lingxi/v1/bridge/status?agentId=lingxi", None).await;
++    let status = h
++        .request("GET", "/lingxi/v1/bridge/status?agentId=lingxi", None)
++        .await;
+     assert_eq!(status["dingtalk"]["status"], "connected");
+     let home = h.close().await;
+     std::fs::remove_dir_all(home).unwrap();

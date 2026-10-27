@@ -1,0 +1,22 @@
+
+running 8 tests
+test auto_records_each_real_http_attempt_then_all_three_browser_page_diagnostics ... ok
+test public_fetch_proxy_pin_limitation_is_explicit_without_sending_any_request ... ok
+test verification_real_http_masks_same_provider_and_only_persists_after_success ... ok
+test actual_search_cancel_waits_for_auxiliary_cleanup_and_stops_fallback_chain ... ok
+test provider_auth_redirect_and_rate_limit_keep_real_error_diagnostics ... ok
+test auto_all_failed_is_explicit_and_fixed_provider_never_silently_falls_back ... ok
+test all_five_http_providers_use_real_gateway_and_distinct_authentication ... ok
+test public_fetch_keeps_five_hop_guard_and_registers_readable_full_session_file ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.40s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r07_web_tools") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.62s
+     Running tests/r07_web_tools.rs (rust/target/debug/deps/r07_web_tools-f1fb2b365c0a9e17)

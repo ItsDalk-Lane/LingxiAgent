@@ -1,0 +1,27 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/r07-t09-mobile-browser.test.mjs (1 test | 1 failed) 35365ms
+     × 手机端登录→列表→历史→刷新恢复且不重发 30217ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/r07-t09-mobile-browser.test.mjs > R07-T09 窄视口手机端真实浏览器验收 > 手机端登录→列表→历史→刷新恢复且不重发
+Error: 等待超时: 登录表单出现
+ ❯ Cdp.until tests/r07-t09-mobile-browser.test.mjs:165:46
+    163|     for (;;) {
+    164|       if (await this.eval(expression)) return;
+    165|       if (Date.now() - t0 > timeoutMs) throw new Error(`等待超时: ${label}…
+       |                                              ^
+    166|       await wait(200);
+    167|     }
+ ❯ tests/r07-t09-mobile-browser.test.mjs:275:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  23:46:22
+   Duration  35.47s (transform 25ms, setup 18ms, import 21ms, tests 35.36s, environment 0ms)
+

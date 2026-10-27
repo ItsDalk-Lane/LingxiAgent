@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AssistantMessage } from '../../components/chat/AssistantMessage';
 import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { useStore } from '../../stores';
+import { resetDesktopHostForTests } from '../../host/desktop-host';
 
 vi.mock('../../hooks/use-hana-fetch', () => ({
   lingxiFetch: vi.fn(async () => new Response('{}', { status: 200 })),
@@ -43,7 +44,7 @@ describe('AssistantMessage media generation placeholder', () => {
 
   afterEach(() => {
     cleanup();
-    delete (window as any).platform;
+    resetDesktopHostForTests();
     useStore.setState({ serverPort: null, serverToken: null, serverConnections: {}, activeServerConnectionId: null, activeServerConnection: null, chatSessions: {}, sessionRegistryFilesByPath: {} } as never);
     vi.restoreAllMocks();
   });

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useStore } from '../../stores';
 import { resourceWatchKey, retainResourceWatch } from '../../services/resource-events';
+import { resolveServerConnection } from '../../services/service-client';
 import {
   PREVIEW_DOCUMENT_CATCH_UP_REFRESH_OPTIONS,
   openPreviewDocumentWatchResources,
@@ -14,15 +15,17 @@ export function OpenPreviewDocumentWatchBridge() {
   const deskWorkspaceMountId = useStore(s => s.deskWorkspaceMountId);
   const deskWorkspaceNativeRoot = useStore(s => s.deskWorkspaceNativeRoot);
   const studioWorkspaces = useStore(s => s.studioWorkspaces);
+  const connectionKey = useStore(s => JSON.stringify(resolveServerConnection(s)));
   const subscriptionsRef = useRef<Map<string, () => void>>(new Map());
   const watchResources = useMemo(
     () => openPreviewDocumentWatchResources(),
     [previewItems, openTabs, deskBasePath, deskWorkspaceMountId, deskWorkspaceNativeRoot, studioWorkspaces],
   );
-  const watchResourcesKey = watchResources.map(item => resourceWatchKey(item.ref)).join('\n');
+  const scopedKey = (ref: Parameters<typeof resourceWatchKey>[0]) => `${connectionKey}\n${resourceWatchKey(ref)}`;
+  const watchResourcesKey = `${connectionKey}\n${watchResources.map(item => resourceWatchKey(item.ref)).join('\n')}`;
 
   useEffect(() => {
-    const nextKeys = new Set(watchResources.map(item => resourceWatchKey(item.ref)));
+    const nextKeys = new Set(watchResources.map(item => scopedKey(item.ref)));
     for (const [key, unsubscribe] of subscriptionsRef.current) {
       if (nextKeys.has(key)) continue;
       unsubscribe();
@@ -30,7 +33,7 @@ export function OpenPreviewDocumentWatchBridge() {
     }
 
     for (const item of watchResources) {
-      const key = resourceWatchKey(item.ref);
+      const key = scopedKey(item.ref);
       if (!subscriptionsRef.current.has(key)) {
         subscriptionsRef.current.set(key, retainResourceWatch(item.ref));
       }

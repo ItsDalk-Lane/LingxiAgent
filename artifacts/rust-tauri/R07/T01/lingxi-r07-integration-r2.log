@@ -1,0 +1,11 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0432]: unresolved import `lingxi_kernel::recovery::ToolRecoveryCapability`
+ --> crates/lingxi-service/src/automation_tools.rs:5:5
+  |
+5 | use lingxi_kernel::recovery::ToolRecoveryCapability;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^----------------------
+  |                              |
+  |                              no `ToolRecoveryCapability` in `recovery`
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `lingxi-service` (lib) due to 1 previous error

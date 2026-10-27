@@ -1,0 +1,22 @@
+{
+  "authType": "api-key",
+  "defaultApi": "anthropic-messages",
+  "defaultBaseUrl": "http://127.0.0.1:63782/v1",
+  "displayName": "fixture-anthropic",
+  "id": "fixture-anthropic",
+  "models": [
+    {
+      "capabilities": {
+        "imageInput": false,
+        "tools": null
+      },
+      "id": "claude-fixture",
+      "input": [
+        "text"
+      ],
+      "inputs": [
+        "text"
+      ]
+    }
+  ]
+}

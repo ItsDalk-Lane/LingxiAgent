@@ -1,0 +1,10 @@
+{
+  "status": "DEVELOPMENT_ONLY",
+  "exitCode": 0,
+  "command": "npx vitest run desktop/src/react/__tests__/components/InteractiveCard.test.tsx desktop/src/react/__tests__/components/card-frame-navigation.test.ts --maxWorkers=1",
+  "log": "artifacts/rust-tauri/R07/T08/card-frame-ui-ticket4.log",
+  "logSha256": "382b41686d625b6a2fd941f4e1f703115b65b6112476537c20dc390d486cf14a",
+  "suites": 2,
+  "testsPassed": 8,
+  "binding": "开发检查，运行未保存完整前后候选；禁止替代固定候选门禁。"
+}

@@ -1,0 +1,17 @@
+
+running 3 tests
+test session_assignment_assigns_clears_and_rejects_unknown ... ok
+test session_permission_mode_defaults_session_write_and_rejections ... ok
+test project_folder_catalog_roundtrip_and_rejections ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r06_session_project_catalog") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.58s
+     Running tests/r06_session_project_catalog.rs (rust/target/debug/deps/r06_session_project_catalog-db5246014f5ac80f)

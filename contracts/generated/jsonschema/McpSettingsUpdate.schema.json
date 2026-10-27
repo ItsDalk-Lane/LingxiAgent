@@ -1,0 +1,118 @@
+{
+  "$defs": {
+    "McpSettingsChange": {
+      "additionalProperties": false,
+      "properties": {
+        "after": {
+          "type": "string"
+        },
+        "before": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "label",
+        "before",
+        "after"
+      ],
+      "type": "object"
+    },
+    "McpSettingsFailure": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "type": "object"
+    },
+    "McpSettingsStatus": {
+      "enum": [
+        "applied",
+        "failed",
+        "cancelled"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "saved 与 runtimeApplied 分开记录；失败或取消不抹去已保存的用户决定。",
+  "properties": {
+    "action": {
+      "type": "string"
+    },
+    "agentId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "changes": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/McpSettingsChange"
+      },
+      "type": "array"
+    },
+    "connectorId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "error": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/McpSettingsFailure"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "key": {
+      "type": "string"
+    },
+    "runtimeApplied": {
+      "type": "boolean"
+    },
+    "saved": {
+      "type": "boolean"
+    },
+    "status": {
+      "$ref": "#/$defs/McpSettingsStatus"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "status",
+    "action",
+    "key",
+    "title",
+    "summary",
+    "saved",
+    "runtimeApplied"
+  ],
+  "title": "McpSettingsUpdate",
+  "type": "object"
+}

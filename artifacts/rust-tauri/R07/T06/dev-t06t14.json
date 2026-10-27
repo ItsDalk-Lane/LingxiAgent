@@ -1,0 +1,19 @@
+{
+  "stage": "R07-T06",
+  "purpose": "development_not_final_acceptance",
+  "label": "dev-t06t14",
+  "command": "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r07_media_admin -- --nocapture",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "85cdc8e8d7b38c23c39de55c2ab658c6f9c6635292c765ef515d795015283cf7",
+  "sourceFingerprintAfter": "85cdc8e8d7b38c23c39de55c2ab658c6f9c6635292c765ef515d795015283cf7",
+  "sourceUnchanged": true,
+  "exitCode": 101,
+  "durationSec": 29.9,
+  "logSha256": "4c151b6d2fa6817b451adfac268abc6839c2dd1c0d62b62e55dc31121dcc5a71"
+}

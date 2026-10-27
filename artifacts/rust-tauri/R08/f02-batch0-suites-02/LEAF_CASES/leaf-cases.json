@@ -1,0 +1,843 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "generatedBy": "scripts/rust-tauri/r07_leaf_cases.py",
+ "stage": "R07",
+ "suites": {
+  "r06_skills_completion": {
+   "exitCode": 0,
+   "testsSeen": 6,
+   "testsPassed": 6,
+   "logPresent": true
+  },
+  "r07_bridge_diagnostic": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_bridge_flow": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_bridge_guest_context": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_bridge_native_flow": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_bridge_notice": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_bridge_permission": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_bridge_sdk_platforms": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_bridge_session_routes": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_bridge_worker": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_browser_routes": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_browser_tools": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_conversation_tools": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_daily_fresh_compact": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_desk_files": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_diary": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_git_panel": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_goal_loop": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_heartbeat_plan": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_heartbeat_runtime": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_media_admin": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_office_tools": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_phone_runtime": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_probe_access": {
+   "exitCode": 0,
+   "testsSeen": 21,
+   "testsPassed": 21,
+   "logPresent": true
+  },
+  "r07_probe_skills": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_scheduler": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_session_collab": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t05_media": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_agent_target": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_card_previews": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_interface_preferences": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_mcp_process": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_mcp_remote": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_mcp_session_permissions": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_mcp_settings": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_media_source": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_metadata_redaction": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_model_authority": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_model_configuration": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_oauth_alias": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_provider_capabilities": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_provider_http": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_provider_matrix": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_search_clear": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_settings": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_skills_cards": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_speech_bindings": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t09_client_context": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t10_observability": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t11_dev_entry_and_unload": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t12_closure": {
+   "exitCode": 0,
+   "testsSeen": 3,
+   "testsPassed": 3,
+   "logPresent": true
+  },
+  "r07_web_tools": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_workbench": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_workflow": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r08_admission_ast_lsp": {
+   "exitCode": 0,
+   "testsSeen": 4,
+   "testsPassed": 4,
+   "logPresent": true
+  },
+  "r08_admission_ptc": {
+   "exitCode": 0,
+   "testsSeen": 8,
+   "testsPassed": 8,
+   "logPresent": true
+  },
+  "r08_admission_ptc_authority": {
+   "exitCode": 0,
+   "testsSeen": 5,
+   "testsPassed": 5,
+   "logPresent": true
+  },
+  "r08_admission_run_code": {
+   "exitCode": 0,
+   "testsSeen": 9,
+   "testsPassed": 9,
+   "logPresent": true
+  },
+  "r08_admission_security": {
+   "exitCode": 0,
+   "testsSeen": 4,
+   "testsPassed": 4,
+   "logPresent": true
+  }
+ },
+ "cases": [
+  {
+   "case": "r06_skills_completion::current_skills_pages_real_read_failures_and_partial_bundle_writes",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r06_skills_completion",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r06_skills_completion::original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r06_skills_completion",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r06_skills_completion::original_native_skill_viewer_current_tauri_window_and_read_boundaries",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r06_skills_completion",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r06_skills_completion::original_skill_packages_workspace_source_global_and_agent_install_rejections",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r06_skills_completion",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r06_skills_completion::original_skills_settings_and_panel_current_real_service_projection",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r06_skills_completion",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r06_skills_completion::original_translation_uses_real_title_model_protocol_accounts_and_refuses_cross_catalog",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r06_skills_completion",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::access_network_save_updates_summary_and_rejects_bad_mode",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::access_password_set_and_remove_with_validation",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::access_profile_save_and_validate",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::access_summary_returns_network_devices_and_account",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::bridge_settings_receipt_and_rich_streaming_toggles_persist",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::bridge_status_read_does_not_start_connectors",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::bridge_test_reports_concrete_error_without_polling",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::bridge_wechat_qrcode_create_reports_external_failure",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::channels_create_and_delete_roundtrip",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::desk_activities_and_logs_list_honestly",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::desk_activity_session_and_promote_reject_unknown_ids",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::desk_cron_lists_current_jobs",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::device_credentials_issue_honest_transport_handling",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::mobile_credentials_and_qr_honest_states",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::pairing_session_create_approve_and_device_revoke",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::server_identity_projects_capabilities_by_principal",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::session_permission_default_read_and_write",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::static_shells_serve_or_guide_without_fabricating",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::thinking_level_read_and_default_set_without_touching_sessions",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::thinking_level_session_scoped_write",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_probe_access::ws_ticket_issued_for_authenticated_principal_only",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_probe_access",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t12_closure::r07_t12_a23_runtime_route_matrix",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t12_closure",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t12_closure::r07_t12_a24_closed_loop_without_legacy_kernel",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t12_closure",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t12_closure::r07_t12_kernel_detector_catches_a_real_node_process",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t12_closure",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_ast_lsp::r08_ast_structure_pagination_no_match_and_errors_use_real_run",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_ast_lsp",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_ast_lsp::r08_lsp_missing_and_crashed_server_are_explicit_errors",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_ast_lsp",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_ast_lsp::r08_lsp_read_grant_rename_returns_preview_without_writing",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_ast_lsp",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_ast_lsp::r08_lsp_real_clangd_positions_preview_rename_and_rejections",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_ast_lsp",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_ptc::actual_vm_escape_cannot_read_write_connect_or_delegate_a_host_write",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_ptc",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_ptc::cancelling_actual_program_reaps_its_real_node_process",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_ptc",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_ptc::later_program_failure_keeps_real_completed_effect_and_exposes_it_in_receipts",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_ptc",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_ptc::real_child_approval_is_separate_from_outer_approval_and_denial_writes_nothing",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_ptc",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_ptc::real_default_ten_minute_timeout_keeps_completed_action_and_reaps_worker",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_ptc",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_ptc::real_file_child_receipts_bound_arguments_and_outputs_without_losing_head_tail",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_ptc",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_ptc::real_parallel_children_only_return_selected_summary_and_keep_bounded_ui_receipts",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_ptc",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_ptc::unknown_recursive_and_sandbox_failures_are_explicit_and_catchable",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_ptc",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_ptc_authority::actual_registry_disable_while_child_waits_approval_refuses_old_approval",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_ptc_authority",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_ptc_authority::actual_registry_schema_generation_change_refuses_old_approval",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_ptc_authority",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_ptc_authority::actual_resource_grant_revoked_while_child_waits_approval_refuses_dispatch",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_ptc_authority",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_ptc_authority::real_tool_quota_one_releases_parent_and_serializes_each_child",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_ptc_authority",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_ptc_authority::same_explicit_request_replay_and_real_event_resume_never_repeat_children",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_ptc_authority",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_run_code::absent_real_interpreters_report_install_guidance_without_starting_kernel",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_run_code",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_run_code::actual_code_output_and_side_effect_reload_from_real_history_without_reexecution",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_run_code",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_run_code::cancelling_real_run_stops_persistent_python_kernel_and_its_actual_grandchild",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_run_code",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_run_code::missing_language_child",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_run_code",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_run_code::output_is_real_bounded_head_tail_utf8_and_dead_kernel_requires_explicit_restart",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_run_code",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_run_code::python_and_node_real_kernels_preserve_variables_functions_imports_and_isolate_agent_sessions",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_run_code",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_run_code::real_gateway_status_remains_read_only_and_code_never_inherits_service_secrets",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_run_code",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_run_code::real_thirty_second_cap_reports_timeout_keeps_busy_state_and_restart_ends_it_without_replay",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_run_code",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_run_code::real_workflow_write_roots_cannot_be_bypassed_by_persistent_interpreter_run_or_restart",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_run_code",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_security::r08_security_changes_git_readonly_and_subdirectory_never_enumerates_parent",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_security",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_security::r08_security_external_scanner_cannot_read_or_write_outside_snapshots_and_leaves_no_child",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_security",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_security::r08_security_outside_root_and_symlink_refused_and_sources_unchanged",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_security",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r08_admission_security::r08_security_real_baseline_never_returns_secret_and_audits_counts",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r08_admission_security",
+   "suiteExitCode": 0
+  }
+ ]
+}

@@ -13,7 +13,9 @@ UPSTREAM_BASE_SHA     = cc19cb49b0786d61ed723764e0a83baf87887270  (openhanako v0
 UPSTREAM_TARGET_SHA   = c6d0405294be67cb134c2758f6472748ee73e2be  (openhanako v0.447.4)
 LINGXI_BASE_SHA       = 97595264ead8735a04559507ddaade25db8a4e15  (v0.444.1 同步完成点, PR #2)
 LINGXI_START_SHA      = ca0b417e36a6a1f80947458aaed328a25718e41b  (main HEAD @ 2026-08-20)
-VERIFIED_SOURCE_SHA   = adca95ca3947bcada920e66caabfbd059d9993e6  (2026-09-21 v0.1.42 发布树：6a9106552 发布元数据 + adca95ca3 证据刷新，分支 fix/git-history-stats；坐标后全量复验 14690 通过 / 0 失败)
+VERIFIED_SOURCE_SHA   = ab4f228155dd4246734e6c4c45d7288072361f3c  (2026-09-26 R01 完整阶段独立第11轮 PASS 后的真实源码/证据树；p2 正式提交后复验待本次六审计提交执行，不用预演SHA)
+历史 VERIFIED_SOURCE_SHA = 46f12ab1c5bc00f02a685346a3efc1b473590393  (2026-09-22 v0.1.43 发布树：e7e991669 refactor-2026 候选 + 228123462 发布元数据 + 8cb7b77c6 证据刷新与补丁 gzip 化 + 46f12ab1c 纯审计收官)
+历史 VERIFIED_SOURCE_SHA = adca95ca3947bcada920e66caabfbd059d9993e6  (2026-09-21 v0.1.42 发布树：6a9106552 发布元数据 + adca95ca3 证据刷新，分支 fix/git-history-stats；坐标后全量复验 14690 通过 / 0 失败)
 历史 VERIFIED_SOURCE_SHA = 4c5a119a3e1766bf8c26b6aa11e658f4971e6cba  (2026-09-21 0.1.42 候选树：Git 入口迁移 + 会话谱系深度上限，分支 fix/git-history-stats)
 历史 VERIFIED_SOURCE_SHA = 83fd6b632ad596eab62c039b55f4a17af00c04b1  (2026-09-21 v0.1.41 发布树：7a61d4b43 发布元数据 + 证据刷新，分支 feat/pending-sep17)
 历史 VERIFIED_SOURCE_SHA = 2ec4bfb88ac3cfc36c2cd314e4559ef1d64fb304  (2026-09-21 0.1.41 候选批次收口：侧栏项目分组 + Git 图谱 + 会话地图 + 快捷键 + 压缩双阈值，分支 feat/pending-sep17)
@@ -2037,3 +2039,32 @@ M  desktop/src/react/__tests__/components/TodoPanel.test.tsx
 
 - 缘由如实登记：C5' 后首次全量复验 2 红（R10-03/round3 manifest）——v043g/h 门禁运行时工作区封印文件尚为过渡态字节（指旧候选），与 C5' 提交后终态字节错位，fallback 对照 C4' blob 失配。按 v0.1.42 收官定式处置：在封印终态工作区重跑双门禁并重绑定（46f12ab1c：round2 v043i caa20e90… / round3 v043k f11a4773… 双绿，v043j 为 delete-wins 计时既有抖动单跑复绿后收绿；round3 补丁记录终态重登记 VERIFIED）。
 - 坐标 `8cb7b77c69162d2e7addda489cce6301f0afb9e6` → `46f12ab1c5bc00f02a685346a3efc1b473590393`（纯审计收官提交）。坐标推进后全量 `npm test`（含全部自指门禁）终态复验：结果 0 失败为通过标准，数字以本轮命令日志为准。v0.1.43 标签自本树打出。
+
+## 2026-09-25 R00 阶段收官树审计封印 C4 坐标准备（rust-tauri 迁移 R00 收口；候选待独立验收与正式提交）
+
+- 真实 C3（总控已正式提交，本轮只读复算）：`f2b8c687ae7bb5511edbaf5f6e0945affb0c80b8`（parent=C1 `15e1fe3528a848b72c8ba1572732ffb1c37dd5be`，`git cat-file -t`=commit）。C3 经全新 Codex 独立验收 R3 判 PASS——**仅 C3 source/evidence 候选**（仓库外报告 `/tmp/r00-seal-c3-review-r3.md`，SHA-256 `75a0f9a824b8188f3702b1bb338a82c5d40a385c311a0b4c45a7d9b70007fb02`；修复终报 `/tmp/r00-seal-c3-repair-r3.md`）。C1..C3 恰 53 路径（R00 审计脚本、round2/round3 交付证据、对应测试/夹具与执行文档），生产运行面（desktop/ server/ core/ lib/ shared/ cli/ hub/ plugins/ skills2set/ package.json package-lock.json）与 R01 零差异。
+- C3 只读复算（本轮 /tmp 副本实测）：C3 全树 keep() 范围恰 6072 条，与两份已提交冻结 SOURCE_MANIFEST（round2 `47dbddc1…` / round3 `6a48c01e…`）逐路径/字节数/SHA-256 全等 ×2；两份已提交交付 gzip（round2 `23613a85…` 29,581,472 B / round3 `aa059926…` 89,457,199 B）从各自真实 BASE（89bc0b64…/67dee5d2…）独立重放，与 C3 同范围全树 6072/6072 全等 ×2；gzip 确定性（compresslevel=6, mtime=0 再压缩字节全等）成立。
+- C4 候选（本条所在六文件，**本任务只准备工作区、未提交**）：坐标 `46f12ab1c5bc00f02a685346a3efc1b473590393` → `f2b8c687ae7bb5511edbaf5f6e0945affb0c80b8`，恰六个审计文件（`.sync-audit/verified-source-sha.txt`、`.sync-audit/build-sync-matrix.mjs` 仅 VERIFIED_SOURCE_SHA 常量、`.sync-audit/upstream-sync-matrix.json`、`UPSTREAM_SYNC_MATRIX.md`、`PROGRESS.md`、`UPSTREAM_SYNC_AUDIT.md`）；矩阵 JSON/MD 由 `build-sync-matrix.mjs` 重生成（133 paths，projection sha256 `8bf6c07a…` 不变——投影哈希只覆盖 summary+records），`--check` exit 0；两份 allowlist 逐项零改动。**C4 尚待另一全新 Codex 子代理独立验收与总控正式提交；本条目不宣布封印 PASS。**
+- C4' 预演（`/tmp` 隔离副本对象库，预演 SHA 非正式 SHA、不登记为封印通过）：parent=真实 C3、C3..C4' 恰六审计文件、六文件与主仓候选逐字节全等；独立 guard、矩阵 `--check`、round2/round3 补丁脚本现场运行（seal 态 VERIFIED、`verifiedSourceObjectType="commit"`）、四文件证据门禁、全量 `npm test` 均 exit 0 / 0 失败；直跑补丁脚本再生的交付 gzip 已独立分析（C4' 树较冻结树多六审计文件，属预期差异）并恢复交付字节，复算零漂移。逐命令 exit 码、计数与日志 SHA-256 见仓库外终报 `/tmp/r00-seal-c4-preparation-r1.md`。
+- 限制：仅 macOS 27.0 arm64 实测；未执行 commit/push/PR/tag/release、`npm run pack`、正式签名/公证、真实供应商与远端核对；正式 C4 提交后须按 R00_AUDIT_SEAL_EXECUTION.md §9「C4 提交后（现行）」步骤以真实提交 SHA 完整复验（guard / 矩阵 / 四文件门禁 / 全量 0 失败 / 交付补丁与工作区零漂移 / 推送后远端核对）。
+
+## 2026-09-26 R01 真实阶段封印 p1
+
+- 第11轮完整阶段独立 PASS，报告 docs/rust-tauri/R01/STAGE_HISTORY/R01_STAGE_REVIEW_R11.md；126件冻结候选指纹1917800317b41362c2c330b3f5c096c3c2891d2356481bee0b3803bc780f6be7。
+- 真实源码提交 cdc170d7ce8e8742cc269c59347c20d75835d871；真实证据提交/本次 VERIFIED_SOURCE_SHA `fe394bbbef22c7879338b9bee8fc7ee5a80d22b0`。绿色 typecheck/core-contracts/lint:boundary/lint/build:renderer 全 exit0、执行期间源码零漂移；round2/round3 source态真实重放 VERIFIED、分片逐片和总hash复核。命令记录见各家族 COMMAND_RESULTS.json 的 r01-formal-p1-* 标签。
+- 本次仅同步既有六审计坐标；完整正式终态四文件74/74与全量0失败尚待真实审计提交后执行，未提前记绿、未放行后续阶段。结果将追加于本台账。
+
+## 2026-09-26 R01 真实阶段封印 p2
+
+- 第11轮完整阶段独立 PASS，报告 docs/rust-tauri/R01/STAGE_HISTORY/R01_STAGE_REVIEW_R11.md；126件冻结候选指纹1917800317b41362c2c330b3f5c096c3c2891d2356481bee0b3803bc780f6be7。
+- 真实源码提交 0ed84e0b5e9821d217457e7013b4b579002ae095；真实证据提交/本次 VERIFIED_SOURCE_SHA `ab4f228155dd4246734e6c4c45d7288072361f3c`。绿色 typecheck/core-contracts/lint:boundary/lint/build:renderer 全 exit0、执行期间源码零漂移；round2/round3 source态真实重放 VERIFIED、分片逐片和总hash复核。命令记录见各家族 COMMAND_RESULTS.json 的 r01-formal-p2-* 标签。
+- 本次仅同步既有六审计坐标；完整正式终态四文件74/74与全量0失败尚待真实审计提交后执行，未提前记绿、未放行后续阶段。结果将追加于本台账。
+
+## 2026-10-23 R08-T03 批次 F 全量 vitest 意外收获登记（两条待办，Lead 指令落账）
+
+背景：R08-T03 批次 F 裸跑全量 `npx vitest run`（回执 `artifacts/rust-tauri/R08/t03-batchf-vitest-01`，1545 文件/15689 测试，22 文件 123 红）与 T02 时代 scoped 基线（`t02-batch-e-vitest-01`，argv `npx vitest run desktop/src/react/__tests__ --exclude **/r08-a04-*`，399 文件 2 红）口径不同；逐文件定性表见 `docs/rust-tauri/R08/PROGRESS-t03.md` 批次 F 节。其中两条登记为待办：
+
+1. **T04 开工前必查**：`tests/migration/network-guard-negative.test.ts`「blocks http.request through http.Agent -> net.createConnection (bypass class ②)」60s 超时红，**隔离复测仍红** = migration 域真红（非并行负载 flake）；T04 导入/T06 回滚必撞此面。
+2. **task-5 重绑时复验**：persistence 三件套红（persistence-schema-tripwire(4)/persistence-store-registry(5)/persistence-startup-receipt(1)，dangling persistence rule for store knowledge-indexes → `lib/knowledge/vector-search-backend-factory.ts`）——用 r07_stage_inputs 正装在册环境复验：staged 下绿 = 裸跑环境红（销账）；staged 下仍红 = R07 在途真漂移（升级裁决）。
+
+附：`desktop/src/react/__tests__/services/rust-conversation-events-http.test.ts` 全量运行下 ECONNRESET 红、隔离单跑 613ms 绿 = 并行负载 flake，记录在案不立项。

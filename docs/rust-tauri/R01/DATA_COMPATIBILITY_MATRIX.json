@@ -1,0 +1,1794 @@
+{
+ "schema_version": "1.0",
+ "task_id": "R01-T07",
+ "stage_id": "R01",
+ "generated_by": "ZCode:R01-T07-exec-r1 (2026-09-25), generator: docs/rust-tauri/R01/r01_t07_build_matrix.py; revised by ZCode:R01-T07-repair-r1 (2026-09-25) per REVIEW_R1 F1/F3 (epoch-boundary + shell-local notes only; strategy/counts unchanged)",
+ "deterministic": true,
+ "source_inputs": {
+  "stores": "docs/rust-tauri/R00/STORES.json@HEAD",
+  "owners": "docs/rust-tauri/R01/OWNERSHIP_TARGET.json@HEAD",
+  "epoch_probes": "artifacts/rust-tauri/R01/T07/a13/ + snapshots/ (probes A1-A9); artifacts/rust-tauri/R01/T07/repair-r1/ (probes R7/R9/R10/R11 + C1 control, rounds 1-2)",
+  "rollback_drill": "artifacts/rust-tauri/R01/T07/a14/ (ROLLBACK-DRILL-PASSED)"
+ },
+ "old_binary_basis": {
+  "choice": "current-HEAD production server/CLI (node server/main-full.ts; node cli/entry.ts)",
+  "justification": [
+   "repo ItsDalk-Lane/LingxiAgent is the release single source of truth; HEAD=82870879 is the released code lineage",
+   "the epoch gate (shared/data-epoch.cjs stamp schema v2 + core/data-epoch-coordinator.ts + server/index.ts gate + desktop stderr-marker dialog) predates baseline commit d5275e568, i.e. present in all current releases",
+   "epoch behavior of the HEAD build is therefore byte-representative of the fielded old binary"
+  ],
+  "limitations": [
+   "not a downloaded release DMG; installer-level behavior not re-probed",
+   "Electron GUI shell not launched (headless env); desktop stores classified by source audit"
+  ]
+ },
+ "counts": {
+  "stores": 69,
+  "by_cutover_strategy": {
+   "preserve-format": 35,
+   "regenerable": 13,
+   "switch-to-new-authority": 11,
+   "epoch-mechanism": 4,
+   "shell-local": 6
+  },
+  "by_epoch_protection": {
+   "protected-if-stamp-intact": 58,
+   "self": 4,
+   "not-gated-by-construction": 6,
+   "not-protected-pre-gate": 1
+  }
+ },
+ "stores": [
+  {
+   "store_id": "agent-authored-records",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "markdown",
+   "path_patterns": [
+    "user/user.md",
+    "agents/{agentId}/dm/{peerId}.md",
+    "agents/{agentId}/experience.md",
+    "agents/{agentId}/experience/{category}.md",
+    "agents/{agentId}/diary/{date}.md"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.run-supervisor",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "agent-facts-sqlite",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "sqlite",
+   "path_patterns": [
+    "agents/{agentId}/memory/facts.db"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.memory",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "agent-memory",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "agents/{agentId}/memory/memory.md",
+    "agents/{agentId}/memory/navigation.md",
+    "agents/{agentId}/memory/tenets.json",
+    "agents/{agentId}/memory/pinned-tenets-migration.receipt.json",
+    "agents/{agentId}/memory/pinned-recovery-operations/{operationId}.json",
+    "agents/{agentId}/memory/pinned-migration-backup/{backupFile}",
+    "agents/{agentId}/memory/pinned-migration-backup/{operationId}/{backupFile}",
+    "agents/{agentId}/memory/facts.md",
+    "agents/{agentId}/memory/today.md",
+    "agents/{agentId}/memory/week.md",
+    "agents/{agentId}/memory/longterm.md",
+    "agents/{agentId}/memory/editable-facts-state.json",
+    "agents/{agentId}/memory/today-state.json",
+    "agents/{agentId}/memory/daily-state.json",
+    "agents/{agentId}/memory/summaries/{sessionId}.json",
+    "agents/{agentId}/memory/daily/{date}.md",
+    "agents/{agentId}/memory/dream/state.json",
+    "agents/{agentId}/memory/dream/pending-apply.json",
+    "agents/{agentId}/memory/dream/revisions/{revisionId}.json",
+    "agents/{agentId}/memory/memories.db",
+    "agents/{agentId}/memory/.v2-migrated"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.memory",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "agent-phone",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "agents/{agentId}/phone/conversations/{conversationId}.md",
+    "agents/{agentId}/phone/session-runtime/{conversationId}.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.run-supervisor",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "agent-profile",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "agents/{agentId}/config.yaml",
+    "agents/{agentId}/identity.md",
+    "agents/{agentId}/AGENTS.md",
+    "agents/{agentId}/AGENTS.public.md",
+    "agents/{agentId}/appearance-summary.json",
+    "agents/{agentId}/avatars/{fileName}",
+    "agents/{agentId}/channels.md",
+    "user/avatars/{fileName}"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.context",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "channels",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "yaml",
+   "path_patterns": [
+    "channels/{channelId}.yaml"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.run-supervisor",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "character-card-staging",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    ".ephemeral/character-card-uploads/{fileName}",
+    ".ephemeral/character-card-imports/{token}",
+    ".ephemeral/character-card-exports/{token}"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.skill",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "regenerable",
+   "migration": "drop-and-rebuild: never migrated; rebuilt on demand in the new world",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "no rollback action; dropped and rebuilt by whichever world is active"
+  },
+  {
+   "store_id": "conversation-map-layout",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "json",
+   "path_patterns": [
+    "conversation-map.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.session",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "switch-to-new-authority",
+   "migration": "read-only-import: old records stay untouched; converted copy written to the new isolated store; per-session receipt + integrity check; authority flips per session/import-batch only after validation; no dual-write",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "pre-rollback export to rollback archive (messages->JSONL, manifest + sha256) BEFORE any restore; old backup restores only its own point-in-time; post-cutover content is NOT editable in the old version; re-import on next forward roll is idempotent (drill step7)"
+  },
+  {
+   "store_id": "cron-automation",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "agents/{agentId}/desk/cron-jobs.json",
+    "agents/{agentId}/desk/cron-runs/{runId}.json",
+    "studios/{studioId}/desk/cron-jobs.json",
+    "studios/{studioId}/desk/cron-runs/{runId}.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.scheduler",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "data-epoch-checkpoints",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "epoch_meta"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "data-epoch-checkpoints/{transitionId}/**"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "service.composition",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "epoch-mechanism",
+   "migration": "owned by the epoch coordinator; carried forward by the transition itself",
+   "epoch_protection": {
+    "status": "self",
+    "evidence": "source: core/data-epoch-coordinator.ts",
+    "note": "gate metadata itself; written only by coordinator/maintenance"
+   },
+   "rollback": "restored only by the coordinated epoch transition/maintenance flow"
+  },
+  {
+   "store_id": "data-epoch-restore-quarantine",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "logs_diagnostics"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "data-epoch-restore-quarantine/{restoreId}/**",
+    "data-epoch-restores.log"
+   ],
+   "current_writers": [
+    "cli(data)"
+   ],
+   "target_owner": "service.composition",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "epoch-mechanism",
+   "migration": "owned by the epoch coordinator; carried forward by the transition itself",
+   "epoch_protection": {
+    "status": "self",
+    "evidence": "source: core/data-epoch-coordinator.ts",
+    "note": "gate metadata itself; written only by coordinator/maintenance"
+   },
+   "rollback": "restored only by the coordinated epoch transition/maintenance flow"
+  },
+  {
+   "store_id": "data-epoch-stamp",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "epoch_meta"
+   },
+   "format": "json",
+   "path_patterns": [
+    "data-epoch.json"
+   ],
+   "current_writers": [
+    "server",
+    "cli(data)"
+   ],
+   "target_owner": "service.composition",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "epoch-mechanism",
+   "migration": "owned by the epoch coordinator; carried forward by the transition itself",
+   "epoch_protection": {
+    "status": "self",
+    "evidence": "source: core/data-epoch-coordinator.ts",
+    "note": "gate metadata itself; written only by coordinator/maintenance"
+   },
+   "rollback": "restored only by the coordinated epoch transition/maintenance flow"
+  },
+  {
+   "store_id": "data-epoch-transition-journal",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "epoch_meta"
+   },
+   "format": "json",
+   "path_patterns": [
+    "data-epoch-transition.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "service.composition",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "epoch-mechanism",
+   "migration": "owned by the epoch coordinator; carried forward by the transition itself",
+   "epoch_protection": {
+    "status": "self",
+    "evidence": "source: core/data-epoch-coordinator.ts",
+    "note": "gate metadata itself; written only by coordinator/maintenance"
+   },
+   "rollback": "restored only by the coordinated epoch transition/maintenance flow"
+  },
+  {
+   "store_id": "deferred-result-state",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "runtime_state"
+   },
+   "format": "json",
+   "path_patterns": [
+    ".ephemeral/deferred-tasks.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.tool-gateway",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "switch-to-new-authority",
+   "migration": "read-only-import: old records stay untouched; converted copy written to the new isolated store; per-session receipt + integrity check; authority flips per session/import-batch only after validation; no dual-write",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "pre-rollback export to rollback archive (messages->JSONL, manifest + sha256) BEFORE any restore; old backup restores only its own point-in-time; post-cutover content is NOT editable in the old version; re-import on next forward roll is idempotent (drill step7)"
+  },
+  {
+   "store_id": "desk-activity",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "agents/{agentId}/desk/activities.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.run-supervisor",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "desk-cover-upload-staging",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "format": "directory-tree",
+   "path_patterns": [
+    "tmp/markdown-cover-uploads/{token}"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.resource",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "regenerable",
+   "migration": "drop-and-rebuild: never migrated; rebuilt on demand in the new world",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "no rollback action; dropped and rebuilt by whichever world is active"
+  },
+  {
+   "store_id": "desktop-diagnostics",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "logs_diagnostics"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "diagnostics/desktop-launch",
+    "crash.log",
+    "browser-cmd.log"
+   ],
+   "current_writers": [
+    "desktop"
+   ],
+   "target_owner": "tauri-host.desktop-host",
+   "target_writer_process": "tauri-host (仅写自身壳自态)",
+   "cutover_strategy": "shell-local",
+   "migration": "not-migrated: each shell keeps its own local state",
+   "epoch_protection": {
+    "status": "not-gated-by-construction",
+    "evidence": "source: desktop/main.cjs has no coordinator call",
+    "note": "desktop shell never runs the epoch coordinator; it only reacts to the server's stderr marker with a dialog. Shell-local non-authoritative state; isolation comes from separated data roots, not from the gate. Probe-testing the GUI shell was out of scope (headless env); status by source audit. RISK (REVIEW_R1 F3, owner R09): these shell-local paths live INSIDE the shared data root, so under the separated-roots + pointer model the old and new shells would race on the same paths inside the pointer-target root. R09 must place new-shell shell-state outside the shared root (or per-shell isolated paths) and make 'never launch the old shell while the pointer targets epoch-2' an install-chain acceptance gate."
+   },
+   "rollback": "per-shell state; old shell keeps its own copy; nothing to restore"
+  },
+  {
+   "store_id": "desktop-gpu-startup-state",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "shell_state"
+   },
+   "format": "json",
+   "path_patterns": [
+    "user/gpu-startup.json"
+   ],
+   "current_writers": [
+    "desktop"
+   ],
+   "target_owner": "tauri-host.desktop-host",
+   "target_writer_process": "tauri-host (仅写自身壳自态)",
+   "cutover_strategy": "shell-local",
+   "migration": "not-migrated: each shell keeps its own local state",
+   "epoch_protection": {
+    "status": "not-gated-by-construction",
+    "evidence": "source: desktop/main.cjs has no coordinator call",
+    "note": "desktop shell never runs the epoch coordinator; it only reacts to the server's stderr marker with a dialog. Shell-local non-authoritative state; isolation comes from separated data roots, not from the gate. Probe-testing the GUI shell was out of scope (headless env); status by source audit. RISK (REVIEW_R1 F3, owner R09): these shell-local paths live INSIDE the shared data root, so under the separated-roots + pointer model the old and new shells would race on the same paths inside the pointer-target root. R09 must place new-shell shell-state outside the shared root (or per-shell isolated paths) and make 'never launch the old shell while the pointer targets epoch-2' an install-chain acceptance gate."
+   },
+   "rollback": "per-shell state; old shell keeps its own copy; nothing to restore"
+  },
+  {
+   "store_id": "desktop-update-channel",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "shell_state"
+   },
+   "format": "json",
+   "path_patterns": [
+    "update-channel.json"
+   ],
+   "current_writers": [
+    "desktop"
+   ],
+   "target_owner": "tauri-host.desktop-host",
+   "target_writer_process": "tauri-host (仅写自身壳自态)",
+   "cutover_strategy": "shell-local",
+   "migration": "not-migrated: each shell keeps its own local state",
+   "epoch_protection": {
+    "status": "not-gated-by-construction",
+    "evidence": "source: desktop/main.cjs has no coordinator call",
+    "note": "desktop shell never runs the epoch coordinator; it only reacts to the server's stderr marker with a dialog. Shell-local non-authoritative state; isolation comes from separated data roots, not from the gate. Probe-testing the GUI shell was out of scope (headless env); status by source audit. RISK (REVIEW_R1 F3, owner R09): these shell-local paths live INSIDE the shared data root, so under the separated-roots + pointer model the old and new shells would race on the same paths inside the pointer-target root. R09 must place new-shell shell-state outside the shared root (or per-shell isolated paths) and make 'never launch the old shell while the pointer targets epoch-2' an install-chain acceptance gate."
+   },
+   "rollback": "per-shell state; old shell keeps its own copy; nothing to restore"
+  },
+  {
+   "store_id": "desktop-win32-install-acl-heal-state",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "shell_state"
+   },
+   "format": "json",
+   "path_patterns": [
+    "user/win32-install-acl-heal.json"
+   ],
+   "current_writers": [
+    "desktop"
+   ],
+   "target_owner": "tauri-host.desktop-host",
+   "target_writer_process": "tauri-host (仅写自身壳自态)",
+   "cutover_strategy": "shell-local",
+   "migration": "not-migrated: each shell keeps its own local state",
+   "epoch_protection": {
+    "status": "not-gated-by-construction",
+    "evidence": "source: desktop/main.cjs has no coordinator call",
+    "note": "desktop shell never runs the epoch coordinator; it only reacts to the server's stderr marker with a dialog. Shell-local non-authoritative state; isolation comes from separated data roots, not from the gate. Probe-testing the GUI shell was out of scope (headless env); status by source audit. RISK (REVIEW_R1 F3, owner R09): these shell-local paths live INSIDE the shared data root, so under the separated-roots + pointer model the old and new shells would race on the same paths inside the pointer-target root. R09 must place new-shell shell-state outside the shared root (or per-shell isolated paths) and make 'never launch the old shell while the pointer targets epoch-2' an install-chain acceptance gate."
+   },
+   "rollback": "per-shell state; old shell keeps its own copy; nothing to restore"
+  },
+  {
+   "store_id": "desktop-window-version-state",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "shell_state"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "user/window-state.json",
+    "user/quick-chat-window-state.json",
+    "user/last-seen-version.json",
+    "last-update-version"
+   ],
+   "current_writers": [
+    "desktop"
+   ],
+   "target_owner": "tauri-host.desktop-host",
+   "target_writer_process": "tauri-host (仅写自身壳自态)",
+   "cutover_strategy": "shell-local",
+   "migration": "not-migrated: each shell keeps its own local state",
+   "epoch_protection": {
+    "status": "not-gated-by-construction",
+    "evidence": "source: desktop/main.cjs has no coordinator call",
+    "note": "desktop shell never runs the epoch coordinator; it only reacts to the server's stderr marker with a dialog. Shell-local non-authoritative state; isolation comes from separated data roots, not from the gate. Probe-testing the GUI shell was out of scope (headless env); status by source audit. RISK (REVIEW_R1 F3, owner R09): these shell-local paths live INSIDE the shared data root, so under the separated-roots + pointer model the old and new shells would race on the same paths inside the pointer-target root. R09 must place new-shell shell-state outside the shared root (or per-shell isolated paths) and make 'never launch the old shell while the pointer targets epoch-2' an install-chain acceptance gate."
+   },
+   "rollback": "per-shell state; old shell keeps its own copy; nothing to restore"
+  },
+  {
+   "store_id": "device-access-registries",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "credentials"
+   },
+   "format": "json",
+   "path_patterns": [
+    "devices.json",
+    "device-credentials.json",
+    "pairing-sessions.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "service.auth",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "ephemeral-scanner-scratch",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "(os-tmpdir)/lingxi-*"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.policy",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "regenerable",
+   "migration": "drop-and-rebuild: never migrated; rebuilt on demand in the new world",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "no rollback action; dropped and rebuilt by whichever world is active"
+  },
+  {
+   "store_id": "execution-leases",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "runtime_state"
+   },
+   "format": "json",
+   "path_patterns": [
+    "security/execution-leases.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.policy",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "switch-to-new-authority",
+   "migration": "read-only-import: old records stay untouched; converted copy written to the new isolated store; per-session receipt + integrity check; authority flips per session/import-batch only after validation; no dual-write",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "pre-rollback export to rollback archive (messages->JSONL, manifest + sha256) BEFORE any restore; old backup restores only its own point-in-time; post-cutover content is NOT editable in the old version; re-import on next forward roll is idempotent (drill step7)"
+  },
+  {
+   "store_id": "file-history-sqlite",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "sqlite",
+   "path_patterns": [
+    "file-history/{workspaceHash}/history.sqlite",
+    "file-history/{workspaceHash}/history.sqlite-wal",
+    "file-history/{workspaceHash}/history.sqlite-shm"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.resource",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "knowledge-database",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "sqlite",
+   "path_patterns": [
+    "knowledge/knowledge.db",
+    "knowledge/knowledge.db-wal",
+    "knowledge/knowledge.db-shm"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.knowledge",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "knowledge-indexes",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "format": "binary-cache",
+   "path_patterns": [
+    "knowledge/indexes/**"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.knowledge",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "regenerable",
+   "migration": "drop-and-rebuild: never migrated; rebuilt on demand in the new world",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "no rollback action; dropped and rebuilt by whichever world is active"
+  },
+  {
+   "store_id": "knowledge-parse-artifacts",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "derived_data"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "knowledge/artifacts/**"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.knowledge",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "knowledge-processing-artifacts",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "derived_data"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "knowledge/processed/**"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.knowledge",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "knowledge-source-snapshots",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "knowledge/sources/**"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.knowledge",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "legacy-upload-cache",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "uploads/{uploadName}"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.resource",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "regenerable",
+   "migration": "drop-and-rebuild: never migrated; rebuilt on demand in the new world",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "no rollback action; dropped and rebuilt by whichever world is active"
+  },
+  {
+   "store_id": "local-user-auth",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "credentials"
+   },
+   "format": "json",
+   "path_patterns": [
+    "local-user-auth.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "service.auth",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "loop-state",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "runtime_state"
+   },
+   "format": "json",
+   "path_patterns": [
+    ".ephemeral/loop-state.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.scheduler",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "switch-to-new-authority",
+   "migration": "read-only-import: old records stay untouched; converted copy written to the new isolated store; per-session receipt + integrity check; authority flips per session/import-batch only after validation; no dual-write",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "pre-rollback export to rollback archive (messages->JSONL, manifest + sha256) BEFORE any restore; old backup restores only its own point-in-time; post-cutover content is NOT editable in the old version; re-import on next forward roll is idempotent (drill step7)"
+  },
+  {
+   "store_id": "managed-runtime-caches",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "format": "binary-cache",
+   "path_patterns": [
+    "runtime/pi-sdk/bin/{toolName}",
+    ".ephemeral/win32-sandbox-runtime/{fingerprint}"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "adapters.tools",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "regenerable",
+   "migration": "drop-and-rebuild: never migrated; rebuilt on demand in the new world",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "no rollback action; dropped and rebuilt by whichever world is active"
+  },
+  {
+   "store_id": "mcp-config",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "json",
+   "path_patterns": [
+    "plugin-data/mcp"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "adapters.integrations",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "model-observability-blobs",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "derived_data"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "model-observability/blobs/**"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.model-gateway",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "model-observability-db",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "user_data"
+   },
+   "format": "sqlite",
+   "path_patterns": [
+    "model-observability/observability.sqlite",
+    "model-observability/observability.sqlite-wal",
+    "model-observability/observability.sqlite-shm"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.model-gateway",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "office-render-jobs",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "plugin-data/office/jobs",
+    "plugin-data/office/generated"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.tool-gateway",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "regenerable",
+   "migration": "drop-and-rebuild: never migrated; rebuilt on demand in the new world",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "no rollback action; dropped and rebuilt by whichever world is active"
+  },
+  {
+   "store_id": "operational-checkpoints",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "runtime_state"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "checkpoints/{checkpointId}"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "service.composition",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "plugin-runtime-data",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "plugin-data/{pluginId}"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "adapters.integrations",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "plugin-task-registry",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "runtime_state"
+   },
+   "format": "json",
+   "path_patterns": [
+    ".ephemeral/plugin-tasks.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.tool-gateway",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "switch-to-new-authority",
+   "migration": "read-only-import: old records stay untouched; converted copy written to the new isolated store; per-session receipt + integrity check; authority flips per session/import-batch only after validation; no dual-write",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "pre-rollback export to rollback archive (messages->JSONL, manifest + sha256) BEFORE any restore; old backup restores only its own point-in-time; post-cutover content is NOT editable in the old version; re-import on next forward roll is idempotent (drill step7)"
+  },
+  {
+   "store_id": "provider-state",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "config_credentials"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "provider-catalog.json",
+    "added-models.yaml",
+    "models.json",
+    "auth.json",
+    "provider-plugins/{storageId}/manifest.json",
+    "provider-plugins/{storageId}/providers/{storageId}.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.model-gateway",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "runtime-diagnostics",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "logs_diagnostics"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "logs/{timestamp}.log",
+    "browser-worker.log",
+    "switch-error.log",
+    "user/browser-sessions.json",
+    "bridge/wechat/sync-{accountHash}.json",
+    "bridge/wechat/context-{accountHash}.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "service.composition",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "security-audit-log",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "logs_diagnostics"
+   },
+   "format": "append-only-log",
+   "path_patterns": [
+    "logs/security-audit.jsonl"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.policy",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "security-grants",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "credentials"
+   },
+   "format": "json",
+   "path_patterns": [
+    "security/grants.json",
+    "security/grants.json.corrupt-{timestamp}",
+    "security/grants.json.corrupt-{timestamp}.reason.txt"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.policy",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "security-key-material",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "credentials"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "security/resource-ticket-key"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "service.auth",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "server-network-config",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "json",
+   "path_patterns": [
+    "server-network.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "service.composition",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "server-node-identity",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "json",
+   "path_patterns": [
+    "server-node.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "service.auth",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "server-runtime-info",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "runtime_state"
+   },
+   "format": "json",
+   "path_patterns": [
+    "server-info.json"
+   ],
+   "current_writers": [
+    "server",
+    "desktop(unlink-only)"
+   ],
+   "target_owner": "service.composition",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "regenerable",
+   "migration": "drop-and-rebuild: never migrated; rebuilt on demand in the new world",
+   "epoch_protection": {
+    "status": "not-protected-pre-gate",
+    "evidence": "probe A6",
+    "note": "same-home mutex runs BEFORE the epoch gate: a stale server-info.json in a high-epoch home is unlinked pre-gate (measured, probe A6). Regenerable runtime state; the only pre-gate mutation found."
+   },
+   "rollback": "no rollback action; dropped and rebuilt by whichever world is active"
+  },
+  {
+   "store_id": "session-checkpoints",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "format": "json",
+   "path_patterns": [
+    "agents/{agentId}/sessions/{sessionId}.jsonl.checkpoints.json",
+    "agents/{agentId}/sessions/archived/{sessionId}.jsonl.checkpoints.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.session",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "regenerable",
+   "migration": "drop-and-rebuild: never migrated; rebuilt on demand in the new world",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "no rollback action; dropped and rebuilt by whichever world is active"
+  },
+  {
+   "store_id": "session-context-notes",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "format": "markdown",
+   "path_patterns": [
+    "agents/{agentId}/sessions/{sessionId}.jsonl.context-notes.md",
+    "agents/{agentId}/sessions/archived/{sessionId}.jsonl.context-notes.md"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.context",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "regenerable",
+   "migration": "drop-and-rebuild: never migrated; rebuilt on demand in the new world",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "no rollback action; dropped and rebuilt by whichever world is active"
+  },
+  {
+   "store_id": "session-drafts-and-projects",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "json",
+   "path_patterns": [
+    "input-drafts.v1.json",
+    "user/session-projects.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.session",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "session-files",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "session-files/{sessionHash}"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.resource",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "session-goal",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "format": "json",
+   "path_patterns": [
+    "agents/{agentId}/sessions/{sessionId}.jsonl.goal.json",
+    "agents/{agentId}/sessions/archived/{sessionId}.jsonl.goal.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.context",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "regenerable",
+   "migration": "drop-and-rebuild: never migrated; rebuilt on demand in the new world",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "no rollback action; dropped and rebuilt by whichever world is active"
+  },
+  {
+   "store_id": "session-jsonl",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "jsonl",
+   "path_patterns": [
+    "agents/{agentId}/sessions/{sessionId}.jsonl",
+    "agents/{agentId}/sessions/archived/{sessionId}.jsonl",
+    "agents/{agentId}/activity/{sessionId}.jsonl",
+    "agents/{agentId}/subagent-sessions/{sessionId}.jsonl",
+    "agents/{agentId}/.ephemeral/{sessionId}.jsonl"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.session",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "switch-to-new-authority",
+   "migration": "read-only-import: old records stay untouched; converted copy written to the new isolated store; per-session receipt + integrity check; authority flips per session/import-batch only after validation; no dual-write",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "pre-rollback export to rollback archive (messages->JSONL, manifest + sha256) BEFORE any restore; old backup restores only its own point-in-time; post-cutover content is NOT editable in the old version; re-import on next forward roll is idempotent (drill step7)"
+  },
+  {
+   "store_id": "session-manifest-sqlite",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "sqlite",
+   "path_patterns": [
+    "session-manifest.db",
+    "session-manifest.db-wal",
+    "session-manifest.db-shm"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.session",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "switch-to-new-authority",
+   "migration": "read-only-import: old records stay untouched; converted copy written to the new isolated store; per-session receipt + integrity check; authority flips per session/import-batch only after validation; no dual-write",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "pre-rollback export to rollback archive (messages->JSONL, manifest + sha256) BEFORE any restore; old backup restores only its own point-in-time; post-cutover content is NOT editable in the old version; re-import on next forward roll is idempotent (drill step7)"
+  },
+  {
+   "store_id": "session-sidecars",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "json",
+   "path_patterns": [
+    "agents/{agentId}/sessions/session-meta.json",
+    "agents/{agentId}/sessions/session-titles.json",
+    "agents/{agentId}/sessions/bridge/bridge-sessions.json",
+    "agents/{agentId}/sessions/session-vision-notes.json",
+    "agents/{agentId}/subagent-sessions/session-meta.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.session",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "switch-to-new-authority",
+   "migration": "read-only-import: old records stay untouched; converted copy written to the new isolated store; per-session receipt + integrity check; authority flips per session/import-batch only after validation; no dual-write",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "pre-rollback export to rollback archive (messages->JSONL, manifest + sha256) BEFORE any restore; old backup restores only its own point-in-time; post-cutover content is NOT editable in the old version; re-import on next forward roll is idempotent (drill step7)"
+  },
+  {
+   "store_id": "signed-artifacts",
+   "classification": {
+    "kind": "adjacent_compatible",
+    "subcategory": "shell_state"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "artifacts"
+   ],
+   "current_writers": [
+    "desktop",
+    "cli(bundle)"
+   ],
+   "target_owner": "build-release.tooling",
+   "target_writer_process": "build-release tooling (签名/列车应用，契约固定序列)",
+   "cutover_strategy": "shell-local",
+   "migration": "not-migrated: each shell keeps its own local state",
+   "epoch_protection": {
+    "status": "not-gated-by-construction",
+    "evidence": "source: desktop/main.cjs has no coordinator call",
+    "note": "desktop shell never runs the epoch coordinator; it only reacts to the server's stderr marker with a dialog. Shell-local non-authoritative state; isolation comes from separated data roots, not from the gate. Probe-testing the GUI shell was out of scope (headless env); status by source audit. RISK (REVIEW_R1 F3, owner R09): these shell-local paths live INSIDE the shared data root, so under the separated-roots + pointer model the old and new shells would race on the same paths inside the pointer-target root. R09 must place new-shell shell-state outside the shared root (or per-shell isolated paths) and make 'never launch the old shell while the pointer targets epoch-2' an install-chain acceptance gate."
+   },
+   "rollback": "per-shell state; old shell keeps its own copy; nothing to restore"
+  },
+  {
+   "store_id": "skill-state",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "skills/{skillName}",
+    "skill-bundles.json",
+    ".ephemeral/skill-bundle-exports/{token}"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.skill",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "skill-translation-cache",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "format": "json",
+   "path_patterns": [
+    ".ephemeral/skill-name-translations.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.skill",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "regenerable",
+   "migration": "drop-and-rebuild: never migrated; rebuilt on demand in the new world",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "no rollback action; dropped and rebuilt by whichever world is active"
+  },
+  {
+   "store_id": "studio-mount-registry",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "json",
+   "path_patterns": [
+    "studio-mounts.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.resource",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "subagent-state",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "runtime_state"
+   },
+   "format": "json",
+   "path_patterns": [
+    "subagent-runs.json",
+    "subagent-threads.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.run-supervisor",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "switch-to-new-authority",
+   "migration": "read-only-import: old records stay untouched; converted copy written to the new isolated store; per-session receipt + integrity check; authority flips per session/import-batch only after validation; no dual-write",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "pre-rollback export to rollback archive (messages->JSONL, manifest + sha256) BEFORE any restore; old backup restores only its own point-in-time; post-cutover content is NOT editable in the old version; re-import on next forward roll is idempotent (drill step7)"
+  },
+  {
+   "store_id": "terminal-session-state",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "runtime_state"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    ".ephemeral/terminal-sessions/{terminalId}.json",
+    ".ephemeral/terminal-sessions/{terminalId}.jsonl"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "adapters.tools",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "switch-to-new-authority",
+   "migration": "read-only-import: old records stay untouched; converted copy written to the new isolated store; per-session receipt + integrity check; authority flips per session/import-batch only after validation; no dual-write",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "pre-rollback export to rollback archive (messages->JSONL, manifest + sha256) BEFORE any restore; old backup restores only its own point-in-time; post-cutover content is NOT editable in the old version; re-import on next forward roll is idempotent (drill step7)"
+  },
+  {
+   "store_id": "usage-ledger",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "json",
+   "path_patterns": [
+    "usage-ledger.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.model-gateway",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "user-preferences",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "json",
+   "path_patterns": [
+    "user/preferences.json",
+    "user/preferences.json.corrupt-{timestamp}"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "service.composition",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "user-studio-registries",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "user_data"
+   },
+   "format": "json",
+   "path_patterns": [
+    "users.json",
+    "studios.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "service.auth",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "web-session-registry",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "credentials"
+   },
+   "format": "json",
+   "path_patterns": [
+    "web-sessions.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "service.auth",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "preserve-format",
+   "migration": "format-frozen: new kernel reads/writes the SAME on-disk format; any format evolution requires an epoch bump; no conversion at cutover",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "files remain valid for the old version (same format); restored backup supersedes only itself; post-cutover edits written by the new kernel in the frozen format remain readable; if the format ever diverges, that divergence is itself an epoch bump"
+  },
+  {
+   "store_id": "workflow-state",
+   "classification": {
+    "kind": "authoritative",
+    "subcategory": "runtime_state"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "agents/{agentId}/workflow-journals/{runId}.jsonl",
+    "agents/{agentId}/workflow-sessions/{runId}",
+    "workflow-activity.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.run-supervisor",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "switch-to-new-authority",
+   "migration": "read-only-import: old records stay untouched; converted copy written to the new isolated store; per-session receipt + integrity check; authority flips per session/import-batch only after validation; no dual-write",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "pre-rollback export to rollback archive (messages->JSONL, manifest + sha256) BEFORE any restore; old backup restores only its own point-in-time; post-cutover content is NOT editable in the old version; re-import on next forward roll is idempotent (drill step7)"
+  },
+  {
+   "store_id": "workspace-snapshots",
+   "classification": {
+    "kind": "rebuildable_cache",
+    "subcategory": "cache"
+   },
+   "format": "mixed-directory",
+   "path_patterns": [
+    "workspace-snapshots/{workspaceHash}/**",
+    "agents/{agentId}/sessions/{sessionId}.jsonl.snapshots.json",
+    "agents/{agentId}/sessions/archived/{sessionId}.jsonl.snapshots.json",
+    "agents/{agentId}/activity/{sessionId}.jsonl.snapshots.json",
+    "agents/{agentId}/subagent-sessions/{sessionId}.jsonl.snapshots.json",
+    "agents/{agentId}/.ephemeral/{sessionId}.jsonl.snapshots.json"
+   ],
+   "current_writers": [
+    "server"
+   ],
+   "target_owner": "kernel.resource",
+   "target_writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+   "cutover_strategy": "regenerable",
+   "migration": "drop-and-rebuild: never migrated; rebuilt on demand in the new world",
+   "epoch_protection": {
+    "status": "protected-if-stamp-intact",
+    "evidence": "probes A1/A2/A3b/R11 (zero fs diff)",
+    "note": "server/index.ts epoch gate runs before any store opens; an intact readable higher stamp blocks (A1/A2), and a higher-epoch transition journal blocks ONLY when the coordinator classifies it as incomplete-transition carrying toEpoch (A3b, R11). MEASURED BOUNDARY (repair-r1, per REVIEW_R1 F1): corrupt-class failures (corrupt-stamp/corrupt-journal/corrupt-transition) drop the journal toEpoch (core/data-epoch-coordinator.ts:547-550), so with a corrupt/missing stamp the gate fails OPEN under the DATA_EPOCH=1 baseline EVEN WHEN a readable journal targeting epoch 2 is present (A8, R7/R9/R10, 55 files written each); refusal without a stamp depends on journal phase (prepared -> blocked R11; barrier_raised -> corrupt-transition -> fail-open R10). LINGXI_ALLOW_DATA_DOWNGRADE=1 overrides (probe A5) and the stamp is tamperable (cooperative gate, ADV-B) -> physical separation (ADR-004 D2) is required, not optional. Production defect filed for R02: carry journal from/toEpoch on corrupt-class failures and fix the 'no higher-epoch evidence' warning text."
+   },
+   "rollback": "no rollback action; dropped and rebuilt by whichever world is active"
+  }
+ ]
+}

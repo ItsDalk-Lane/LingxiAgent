@@ -1,0 +1,775 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t06_runtime_acl",
+ "cases": [
+  {
+   "case": "acl::preflight::policy-valid",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "schema": "lingxi.r09.command-policy.v1",
+    "path": "docs/rust-tauri/R09/R09_COMMAND_POLICY.json"
+   }
+  },
+  {
+   "case": "acl::preflight::window-labels-match-policy",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "policy": [
+     "browser-viewer",
+     "main",
+     "onboarding",
+     "quick-chat",
+     "settings",
+     "skill-viewer-*",
+     "splash",
+     "viewer-*"
+    ],
+    "native": [
+     "browser-viewer",
+     "main",
+     "onboarding",
+     "quick-chat",
+     "settings",
+     "skill-viewer-*",
+     "splash",
+     "viewer-*"
+    ]
+   }
+  },
+  {
+   "case": "acl::preflight::matrix-plan-generated",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "allowCases": 142,
+    "denyCases": 466,
+    "perWindow": {
+     "main": 8,
+     "settings": 47,
+     "quick-chat": 66,
+     "splash": 73,
+     "onboarding": 66,
+     "browser-viewer": 70,
+     "viewer-*": 64,
+     "skill-viewer-*": 72
+    }
+   }
+  },
+  {
+   "case": "acl::preflight::candidate-handoff-present",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "path": "artifacts/rust-tauri/R09/dev/t06/candidate-handoff-02/candidate-handoff.json"
+   }
+  },
+  {
+   "case": "acl::preflight::g1-evidence-features",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "features": [
+     "e2e-test",
+     "r09-host",
+     "r09-test-hooks"
+    ],
+    "evidenceBuild": true,
+    "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/debug/lingxi-resource-desktop"
+   }
+  },
+  {
+   "case": "acl::preflight::delivery-release-not-evidence",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "features": [
+     "r09-host"
+    ],
+    "evidenceBuild": false
+   }
+  },
+  {
+   "case": "acl::preflight::renderer-binding-equal",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "delivery": "d09359bd5bc87071c7e4cfc7fffb99553bc39b1345dd83946dcd14c51f244f31",
+    "g1": "d09359bd5bc87071c7e4cfc7fffb99553bc39b1345dd83946dcd14c51f244f31",
+    "note": "同一 renderer 候选（digest 相同），两个生成实例"
+   }
+  },
+  {
+   "case": "acl::preflight::delivery-scan-pass",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": "PASS",
+    "failedCases": []
+   }
+  },
+  {
+   "case": "acl::preflight::release-no-canary-debug-command",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "binary": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+    "hits": {},
+    "note": "A12：release 不得含 test canary/debug 命令名"
+   }
+  },
+  {
+   "case": "acl::preflight::gui-clearance",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "env": "LINGXI_R09_T06_RUNTIME_ACL_CLEARED",
+    "value": "1",
+    "note": "运行期矩阵未 cleared：不会启动 app（无 GUI 自检模式）"
+   }
+  },
+  {
+   "case": "acl::preflight::hidden-only-clearance",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "env": "LINGXI_R09_T06_RUNTIME_ACL_HIDDEN_ONLY",
+    "value": "1",
+    "visibleRiskWindows": {
+     "quick-chat": "quick_chat_show → install::show_quick_chat → window.show()/set_focus（可见）",
+     "onboarding": "debug_open_onboarding: builder visible(false) 后立即 window.show()（可见）",
+     "viewer-*": "spawn_viewer: WebviewWindowBuilder 默认 visible=true（创建即可见）",
+     "browser-viewer": "open_browser_viewer: 创建控制面板窗口后 show（可见）",
+     "skill-viewer-*": "open_skill_viewer: WebviewWindowBuilder 默认 visible=true（创建即可见）"
+    },
+    "note": "hidden-only 批次只启动 hidden 主窗；可见风险窗口记 blocked，避免任何可见窗口"
+   }
+  },
+  {
+   "case": "acl::runtime::app-bundle-ready",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "sourceExe": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/debug/lingxi-resource-desktop",
+    "bundle": {
+     "wrapped": true,
+     "bundle": "/private/tmp/lingxi-r09-t06-acl-53257-1793030150/LingxiRuntimeAcl.app",
+     "sourceExe": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/debug/lingxi-resource-desktop",
+     "sourceSha256": "030607eebfa2e7d65eedd4de3daf8a19d2958258b1b2d9b3cc68a5750d85888e",
+     "launchExe": "/private/tmp/lingxi-r09-t06-acl-53257-1793030150/LingxiRuntimeAcl.app/Contents/MacOS/lingxi-resource-desktop",
+     "launchSha256": "030607eebfa2e7d65eedd4de3daf8a19d2958258b1b2d9b3cc68a5750d85888e"
+    },
+    "note": "debug 裸二进制包最小 .app 以满足 macOS NSBundle API；候选 sha 未改"
+   }
+  },
+  {
+   "case": "acl::runtime::wdio-available",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "port": 19491
+   }
+  },
+  {
+   "case": "acl::runtime::wdio-session-created",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "port": 19491,
+    "session": true
+   }
+  },
+  {
+   "case": "acl::runtime::main-window",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "handle": "main",
+    "label": "main"
+   }
+  },
+  {
+   "case": "acl::runtime::hidden-safe-window-subset",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "attempted": [
+     "main"
+    ],
+    "blockedByPolicy": [
+     "browser-viewer",
+     "onboarding",
+     "quick-chat",
+     "settings",
+     "skill-viewer-*",
+     "splash",
+     "viewer-*"
+    ],
+    "note": "hidden-only 批次只对 main 执行矩阵；其余窗口不尝试打开（避免 window.show() 产生可见窗口/挂起）"
+   }
+  },
+  {
+   "case": "acl::window-available::main",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "handle": "main",
+    "note": "startup",
+    "attempts": []
+   }
+  },
+  {
+   "case": "acl::main::app_ready::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::close_browser_viewer::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::copy_file",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::debug_asset_probe::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::debug_open_onboarding",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::debug_open_onboarding_preview",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::file_info::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::get_app_version::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::get_auto_launch_status::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::get_keep_awake_status::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::get_platform::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::get_server_connection_info::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::get_server_port::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::get_server_token::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::get_service_status::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::keybindings_reload_global::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::keybindings_test_register::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::list_skill_files::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::open_browser_viewer",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::open_external::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::open_file",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::open_folder",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::open_settings::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::open_skill_viewer",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::quick_chat_hide::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::quick_chat_open_session::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::quick_chat_open_session_ack::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::quick_chat_reload_shortcut::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::quick_chat_resize::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::quick_chat_shortcut_status::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::quick_chat_show",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::read_file::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::read_file_base64::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::read_file_snapshot::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::read_skill_file::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::reload_main_window",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::resource_events::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::resource_subscribe::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::resource_unsubscribe::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::restart_app",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::run_edit_command::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::rust_browser_request::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::select_files",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::select_folder",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::select_skill",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::set_auto_launch_enabled",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::set_browser_connection::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::set_keep_awake_enabled",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::settings_changed::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::show_in_finder",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::show_notification",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::spawn_viewer",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::speech_permission_request",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::speech_permission_status::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::start_drag",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "blocked::allow-side-effect::main::trash_item",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "blocked": true,
+    "reason": "hidden-only 批次禁止执行：会创建可见窗口/弹窗、重启、写文件、系统状态变更或 TCC",
+    "requires": "visible clearance 批次或 host automation 抑制 patch"
+   }
+  },
+  {
+   "case": "acl::main::unwatch_file::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::main::unwatch_workspace::allow",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "result": "domain-error-not-acl",
+    "error": "probe-timeout"
+   }
+  },
+  {
+   "case": "acl::runtime::overall-deadline",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "limitSecs": 300.0,
+    "error": "overall deadline exceeded at allow:main:watch_file"
+   }
+  }
+ ]
+}

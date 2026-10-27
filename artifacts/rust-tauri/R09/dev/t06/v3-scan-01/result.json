@@ -1,0 +1,10 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_release_attack_surface",
+ "status": "PASS",
+ "exitCode": 0,
+ "caseCount": 45,
+ "failedCases": [],
+ "artifactChangedDuringScan": false,
+ "details": "scan-details.json"
+}

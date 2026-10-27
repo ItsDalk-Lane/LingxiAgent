@@ -14,6 +14,7 @@
  */
 import type { ModelObservabilityExportRequest } from '../../../../../../shared/model-observability-api-contract.ts';
 import { fetchObservabilityExportStream, isObservabilityAbortError } from './model-observability-actions';
+import { usePlatform } from '../../../hooks/use-platform';
 
 /* ── File System Access API 的最小类型（TS lib 未含）─────────────────── */
 
@@ -34,7 +35,7 @@ export type ObservabilityExportCapability = 'electron' | 'file-system-access';
 
 /** 导出可用通道；null = 不可用（UI 禁用导出并给原因）。 */
 export function observabilityExportCapability(): ObservabilityExportCapability | null {
-  const platform = window.hana;
+  const platform = usePlatform();
   if (platform?.observabilityExportBegin && platform.observabilityExportWrite
     && platform.observabilityExportEnd && platform.observabilityExportAbort) {
     return 'electron';
@@ -65,7 +66,7 @@ export async function runObservabilityExport(opts: {
   const { request, capability, defaultFileName, signal, onProgress } = opts;
 
   if (capability === 'electron') {
-    const platform = window.hana!;
+    const platform = usePlatform()!;
     const begin = await platform.observabilityExportBegin!({ defaultFileName });
     if (begin.canceled) return { outcome: 'canceled' };
     const exportId = begin.exportId;

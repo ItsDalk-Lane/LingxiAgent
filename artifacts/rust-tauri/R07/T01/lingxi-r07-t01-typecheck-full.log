@@ -1,0 +1,5 @@
+
+> lingxi@0.1.43 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+desktop/src/react/services/rust-automation.ts(109,42): error TS2556: A spread argument must either have a tuple type or be passed to a rest parameter.

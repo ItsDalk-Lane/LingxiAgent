@@ -20,6 +20,7 @@ import type {
   RefObject,
 } from 'react';
 import { useStore } from '../../stores';
+import { ownsSessionConnection, type SessionConnectionOwner } from '../../services/session-connection-owner';
 import { switchSession } from '../../stores/session-actions';
 import { useI18n } from '../../hooks/use-i18n';
 import { persistMapLayout, type MapWorkspace } from './conversation-map-projection';
@@ -60,6 +61,7 @@ export interface ConversationMapCanvasHandle {
 }
 
 interface Props {
+  owner?: SessionConnectionOwner | null;
   workspace: MapWorkspace;
   /** 已套用折叠态的可见卡片/连线（由页面层计算，供详情面板复用）。 */
   cards: MapCard[];
@@ -81,7 +83,7 @@ interface FollowUpState {
   y: number;
 }
 
-export function ConversationMapCanvas({ workspace, cards, edges, hiddenCountByCardId, ref }: Props) {
+export function ConversationMapCanvas({ workspace, cards, edges, hiddenCountByCardId, ref, owner = null }: Props) {
   const { t } = useI18n();
   const currentSessionId = useStore((s) => s.currentSessionId);
   const mapSelectedCardId = useStore((s) => s.mapSelectedCardId);
@@ -155,8 +157,9 @@ export function ConversationMapCanvas({ workspace, cards, edges, hiddenCountByCa
   }, [edges]);
 
   const applyCamera = useCallback((next: { x: number; y: number; zoom: number }) => {
+    if (owner && !ownsSessionConnection(owner)) return;
     setMapCamera(workspace.key, next);
-  }, [setMapCamera, workspace.key]);
+  }, [setMapCamera, workspace.key, owner]);
 
   const zoomAtPoint = useCallback((delta: number, point: { x: number; y: number }) => {
     const cam = useStore.getState().mapCameraByWorkspace[workspace.key] ?? DEFAULT_CAMERA;
@@ -288,6 +291,7 @@ export function ConversationMapCanvas({ workspace, cards, edges, hiddenCountByCa
   }, []);
 
   const onHeaderPointerDown = useCallback((card: MapCard, event: ReactPointerEvent<HTMLElement>) => {
+    if (owner && !ownsSessionConnection(owner)) return;
     if (event.button !== 0) return;
     event.stopPropagation();
     event.preventDefault();
@@ -325,6 +329,7 @@ export function ConversationMapCanvas({ workspace, cards, edges, hiddenCountByCa
       flushDrag();
       // flushDrag 后 drag state 尚未提交到本闭包，直接按 pending 结算。
       const session = dragSession.current;
+      if (owner && !ownsSessionConnection(owner)) { dragSession.current = null; pendingDrag.current = null; setDrag(null); return; }
       if (session?.moved) {
         const zoom = (useStore.getState().mapCameraByWorkspace[workspace.key] ?? DEFAULT_CAMERA).zoom;
         const dx = (upEvent.clientX - session.startX) / zoom;
@@ -343,11 +348,12 @@ export function ConversationMapCanvas({ workspace, cards, edges, hiddenCountByCa
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointercancel', onUp);
-  }, [flushDrag, mergeMapCardPosition, workspace.key]);
+  }, [flushDrag, mergeMapCardPosition, workspace.key, owner]);
 
   // ── 折叠 / 展开 ──
 
   const onToggleCollapse = useCallback((card: MapCard) => {
+    if (owner && !ownsSessionConnection(owner)) return;
     const collapsed = useStore.getState().mapCollapsedCardIds;
     if (collapsed.includes(card.id)) {
       const next = collapsed.filter((id) => id !== card.id);
@@ -367,7 +373,7 @@ export function ConversationMapCanvas({ workspace, cards, edges, hiddenCountByCa
     const next = [...collapsed, card.id];
     setMapCollapsedCardIds(next);
     persistMapLayout({ collapsed: next });
-  }, [addToast, cardById, cards, currentSessionId, edges, setMapCollapsedCardIds, t]);
+  }, [addToast, cardById, cards, currentSessionId, edges, setMapCollapsedCardIds, t, owner]);
 
   // ── 选区追问 ──
 
@@ -378,8 +384,11 @@ export function ConversationMapCanvas({ workspace, cards, edges, hiddenCountByCa
   }, [cards]);
 
   const openDraftForCard = useCallback((card: MapCard, prefill: string) => {
+    if (owner && !ownsSessionConnection(owner)) return;
     setMapDraft({
       kind: isLastVisibleInThread(card) ? 'continue' : 'branch',
+      ...(owner ? {nativeOwner:{key:owner.key,revision:owner.revision}} : {}),
+      draftId: crypto.randomUUID(),
       anchorCardId: card.id,
       sessionId: card.sessionId,
       sessionPath: card.sessionPath,
@@ -387,7 +396,7 @@ export function ConversationMapCanvas({ workspace, cards, edges, hiddenCountByCa
       text: prefill,
       sending: false,
     });
-  }, [isLastVisibleInThread, setMapDraft]);
+  }, [isLastVisibleInThread, setMapDraft, owner]);
 
   const onAnswerMouseUp = useCallback((card: MapCard, _event: ReactMouseEvent<HTMLDivElement>) => {
     // 等浏览器完成选区更新后再读取。
@@ -438,11 +447,12 @@ export function ConversationMapCanvas({ workspace, cards, edges, hiddenCountByCa
   // ── 点选卡片 ──
 
   const onSelectCard = useCallback((card: MapCard) => {
+    if (owner && !ownsSessionConnection(owner)) return;
     if (suppressClick.current) return;
     setMapSelectedCard(card.id);
     noteMapInitiatedSwitch(card.sessionId);
     void switchSession(card.sessionPath);
-  }, [setMapSelectedCard]);
+  }, [setMapSelectedCard, owner]);
 
   // 卡片右缘「+」：末位卡片继续追问，其余创建分支（与选区追问共用草稿入口）。
   const onOpenCardDraft = useCallback((card: MapCard) => {
@@ -490,8 +500,9 @@ export function ConversationMapCanvas({ workspace, cards, edges, hiddenCountByCa
 
   // 锚点被折叠隐藏时丢弃草稿，避免悬空输入。
   useEffect(() => {
+    if (owner && !ownsSessionConnection(owner)) return;
     if (mapDraft && !draftAnchor) setMapDraft(null);
-  }, [mapDraft, draftAnchor, setMapDraft]);
+  }, [mapDraft, draftAnchor, setMapDraft, owner]);
 
   // ── 待回复卡片（已发送未落盘的轮次） ──
   // 只投影当前工作区里已存在 thread 的 pending 条目；branch 新车道在

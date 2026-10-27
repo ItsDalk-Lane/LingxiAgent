@@ -1,0 +1,46 @@
+{
+  "home": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-e457c6aef3712b90",
+  "db": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-e457c6aef3712b90/lingxi-service/data/runs.db",
+  "columns": [
+    "journal_id",
+    "session_id",
+    "run_id",
+    "attempt",
+    "generation",
+    "owner_kind",
+    "owner_subject",
+    "target",
+    "args_digest",
+    "args_summary",
+    "idempotency_key",
+    "phase",
+    "receipt_outcome",
+    "receipt_detail",
+    "dedup_id",
+    "dispatched",
+    "prepared_at_unix_ms",
+    "updated_at_unix_ms"
+  ],
+  "rows": [
+    [
+      "run_000001a14dccf91c_000001-tc0001",
+      "mcp-init-cancel",
+      "run_000001a14dccf91c_000001",
+      "run_000001a14dccf91c_000001#a1",
+      1,
+      "local_user",
+      "user_local",
+      "tool:first-party:update_settings",
+      "509994accc9d013f7bac7ba43190ee41a2165878d468a8262ccdb3322a71f632",
+      null,
+      "run_000001a14dccf91c_000001-tc0001",
+      "failed",
+      "failed",
+      "not dispatched: gateway refused the preparation (gateway_resource_scope_denied: tool resource scope refused: review_summary_unavailable: 工具没有提供可核对的操作摘要，无法请求确认)",
+      null,
+      0,
+      1792306641180,
+      1792306641180
+    ]
+  ]
+}

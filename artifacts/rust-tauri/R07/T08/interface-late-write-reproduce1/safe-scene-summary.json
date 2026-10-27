@@ -1,0 +1,171 @@
+{
+  "onlyNonSecretFixturePreferences": true,
+  "scenes": [
+    {
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r07-interface-late-write-uUhBsx",
+      "services": {
+        "server-a": {
+          "fileSha256": "d037ad8a7a298d8733afbbe80bb6897ba63560c7323cada6eeefe48e1b42ee18",
+          "selectedPreferences": {
+            "keybindings": {
+              "quick-chat.toggle": [
+                "F10"
+              ]
+            },
+            "sidebar_ui": {
+              "sessionList": {
+                "rowMode": "two-line"
+              }
+            },
+            "future": {
+              "owner": "server-a"
+            }
+          }
+        },
+        "server-b": {
+          "fileSha256": "14d5dabf6d836abbb03fab20cc9364d582c69d54f62436ee17322eafd957a5e2",
+          "selectedPreferences": {
+            "keybindings": {
+              "quick-chat.toggle": [
+                "F8"
+              ]
+            },
+            "sidebar_ui": {
+              "sessionList": {
+                "rowMode": "two-line"
+              }
+            },
+            "future": {
+              "owner": "server-b"
+            }
+          }
+        }
+      }
+    },
+    {
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r07-interface-late-write-RpSr9r",
+      "services": {
+        "server-a": {
+          "fileSha256": "26e1ba2e20a32879922479a7a4148390e6be29e537d1f3e92baa7fb6d6c7aaea",
+          "selectedPreferences": {
+            "keybindings": {},
+            "sidebar_ui": {
+              "sessionList": {
+                "rowMode": "two-line"
+              }
+            },
+            "future": {
+              "owner": "server-a"
+            }
+          }
+        },
+        "server-b": {
+          "fileSha256": "14d5dabf6d836abbb03fab20cc9364d582c69d54f62436ee17322eafd957a5e2",
+          "selectedPreferences": {
+            "keybindings": {
+              "quick-chat.toggle": [
+                "F8"
+              ]
+            },
+            "sidebar_ui": {
+              "sessionList": {
+                "rowMode": "two-line"
+              }
+            },
+            "future": {
+              "owner": "server-b"
+            }
+          }
+        }
+      }
+    },
+    {
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r07-interface-late-write-3Ke3sZ",
+      "services": {
+        "server-a": {
+          "fileSha256": "d96ceab2dd6d9767734422b1cd316a4e9fce8702bf358fa644623d2b6af9dea4",
+          "selectedPreferences": {
+            "keybindings": {
+              "quick-chat.toggle": [
+                "F9"
+              ]
+            },
+            "sidebar_ui": {
+              "projectView": {
+                "collapsedFolderIds": [],
+                "collapsedProjectIds": [],
+                "showAllProjectIds": []
+              },
+              "sessionList": {
+                "rowMode": "single-line"
+              }
+            },
+            "future": {
+              "owner": "server-a"
+            }
+          }
+        },
+        "server-b": {
+          "fileSha256": "14d5dabf6d836abbb03fab20cc9364d582c69d54f62436ee17322eafd957a5e2",
+          "selectedPreferences": {
+            "keybindings": {
+              "quick-chat.toggle": [
+                "F8"
+              ]
+            },
+            "sidebar_ui": {
+              "sessionList": {
+                "rowMode": "two-line"
+              }
+            },
+            "future": {
+              "owner": "server-b"
+            }
+          }
+        }
+      }
+    },
+    {
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r07-interface-late-write-KO5WRo",
+      "services": {
+        "server-a": {
+          "fileSha256": "b1c40dc01ebcfd7d2e4e1ab4981d2d2cb7b9eec86cdd6c6fabbaa535870949f6",
+          "selectedPreferences": {
+            "keybindings": {
+              "quick-chat.toggle": [
+                "F9"
+              ]
+            },
+            "sidebar_ui": {
+              "sessionList": {
+                "rowMode": "two-line"
+              }
+            },
+            "future": {
+              "owner": "server-a"
+            },
+            "locale": "ko"
+          }
+        },
+        "server-b": {
+          "fileSha256": "14d5dabf6d836abbb03fab20cc9364d582c69d54f62436ee17322eafd957a5e2",
+          "selectedPreferences": {
+            "keybindings": {
+              "quick-chat.toggle": [
+                "F8"
+              ]
+            },
+            "sidebar_ui": {
+              "sessionList": {
+                "rowMode": "two-line"
+              }
+            },
+            "future": {
+              "owner": "server-b"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

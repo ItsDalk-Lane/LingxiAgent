@@ -1,0 +1,135 @@
+{
+  "stage": "R07-T08",
+  "candidate": "t08h",
+  "acceptedAt": "2026-10-18T13:08:17.794275+00:00",
+  "status": "LOCAL_VERIFIED_FINAL_R07_PENDING",
+  "scope": "仅T08本地实现与适用20门份额接受；非原343条全部通过、非整个R07接受",
+  "sourceFingerprint": "f0dd4aa5092b31eb121c3977da8e65cbe2035ab3f4581b6c5898cf73f8da354e",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "evidence": {
+    "results": {
+      "path": "RESULTS_t08h.json",
+      "sha256": "ca6866e8c7f8a4fcb39ed9da093e7117b463e5f33778665872bec03a63645b33"
+    },
+    "independentReview": {
+      "path": "independent-final-review-t08h.json",
+      "sha256": "1bf0970a953b2a6e733f50cfcdacc8566f915c5291d11390ce97c1139a58d3b2"
+    },
+    "perLeafResults": {
+      "path": "t08h-per-leaf-results-actual1.json",
+      "sha256": "cbd9c99bbafbfb17302f97756e084d40e43ddae3968911dba335ca1f291a3884"
+    },
+    "finalReconciliationFollowup": {
+      "path": "t08h-t12-clause-followup-actual1.json",
+      "sha256": "2c2fa9fe38bca59d1d730530eb5c7b448bb697167185bb6e77abb254a1c45611"
+    },
+    "preservedBuild": {
+      "path": "t08h-preserved-build1.json",
+      "sha256": "b4e968854f21549eb33bae69b1912573df9565447050d107568633aff3dfc77e"
+    }
+  },
+  "gatesPassed": 20,
+  "service": {
+    "passed": 948,
+    "failed": 0,
+    "ignored": 0
+  },
+  "ui": {
+    "passed": 718,
+    "failed": 0,
+    "pending": 0
+  },
+  "adapter": {
+    "passed": 223,
+    "failed": 0,
+    "ignored": 13,
+    "ignoredCases": [
+      {
+        "name": "browser::host::manual_capture::externally_restored_suspended_window_is_never_reaped_or_evicted",
+        "reason": "需要可见Chrome窗口，单独执行原生恢复与回收检查",
+        "status": "NOT_RUN_IN_T08H"
+      },
+      {
+        "name": "browser::host::manual_capture::same_page_native_human_takeover_records_only_owned_target",
+        "reason": "需要显式提供证据目录，并在原生Chrome测试表单中手动输入",
+        "status": "NOT_RUN_IN_T08H"
+      },
+      {
+        "name": "browser::host::pdf_lifecycle_tests::browser_revoke_cancels_matching_pdf_without_conflating_run_and_workspace_epochs",
+        "reason": "需要真实Chromium；R07门禁显式运行",
+        "status": "NOT_RUN_IN_T08H"
+      },
+      {
+        "name": "browser::host::pdf_lifecycle_tests::invalid_pdf_or_wrong_node_never_spawns_or_reserves_a_lease",
+        "reason": "需要真实Chromium；R07门禁显式运行",
+        "status": "NOT_RUN_IN_T08H"
+      },
+      {
+        "name": "browser::host::pdf_lifecycle_tests::pdf_cancel_startup_gap_unknown_keeps_late_owner_and_wrong_owner_cannot_clear_it",
+        "reason": "需要真实Chromium；R07门禁显式运行",
+        "status": "NOT_RUN_IN_T08H"
+      },
+      {
+        "name": "browser::host::pdf_lifecycle_tests::pdf_initialization_unknown_retains_scope_process_and_profile_until_retry",
+        "reason": "需要真实Chromium；R07门禁显式运行",
+        "status": "NOT_RUN_IN_T08H"
+      },
+      {
+        "name": "browser::host::startup_tests::auxiliary_initialization_unknown_preserves_profile_and_owner_until_retry",
+        "reason": "需要真实Chromium；R07门禁显式运行",
+        "status": "NOT_RUN_IN_T08H"
+      },
+      {
+        "name": "browser::host::startup_tests::cdp_preparation_failure_happens_before_any_real_spawn",
+        "reason": "需要真实Chromium；R07门禁显式运行",
+        "status": "NOT_RUN_IN_T08H"
+      },
+      {
+        "name": "browser::host::startup_tests::first_target_failure_keeps_actual_process_and_target_until_cleanup_retry",
+        "reason": "需要真实Chromium；R07门禁显式运行",
+        "status": "NOT_RUN_IN_T08H"
+      },
+      {
+        "name": "browser::host::startup_tests::forget_rechecks_late_startup_unknown_before_purging_profile",
+        "reason": "需要真实Chromium；R07门禁显式运行",
+        "status": "NOT_RUN_IN_T08H"
+      },
+      {
+        "name": "browser::host::startup_tests::live_initialization_failure_keeps_real_owner_until_cleanup_retry_confirms",
+        "reason": "需要真实Chromium；R07门禁显式运行",
+        "status": "NOT_RUN_IN_T08H"
+      },
+      {
+        "name": "browser::host::startup_tests::revoke_startup_timeout_preserves_late_unknown_live_until_same_epoch_retry",
+        "reason": "需要真实Chromium；R07门禁显式运行",
+        "status": "NOT_RUN_IN_T08H"
+      },
+      {
+        "name": "browser::host::startup_tests::revoke_waits_for_real_spawn_owner_registration_and_confirmed_reap",
+        "reason": "需要真实Chromium；R07门禁显式运行",
+        "status": "NOT_RUN_IN_T08H"
+      }
+    ]
+  },
+  "originalScope": {
+    "leaves": 109,
+    "assertions": 343,
+    "inheritedSelectedLeaves": 7,
+    "inheritedSelectedAssertions": 14,
+    "caseRefs": 202,
+    "originalAssertionsFullPassClaimed": 0
+  },
+  "finalR07Reconciliation": {
+    "directUiBranches": 17,
+    "narrowNegativeScopes": 4,
+    "originalSpecConflicts": 1,
+    "followup": "t08h-t12-clause-followup-actual1.json",
+    "notAutomaticDeferralOrProductFailure": true
+  },
+  "oldFailuresRetained": true,
+  "lanRootCauseProven": false,
+  "projectCommitted": false,
+  "pushed": false,
+  "fullR07PassClaimed": false,
+  "nextTask": "R07-T09"
+}

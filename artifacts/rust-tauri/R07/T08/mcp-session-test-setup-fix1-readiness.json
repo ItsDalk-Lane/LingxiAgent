@@ -1,0 +1,34 @@
+{
+  "recordedAt": "2026-10-18T11:02:49.511503+00:00",
+  "status": "TEST_SETUP_FIX_ONLY_WAITING_ROOT_RETEST",
+  "originalFailure": {
+    "log": "artifacts/rust-tauri/R07/T08/mcp-session-permission-reproduce1.log",
+    "logSha256Verified": "be098f78a9329a2852aab51a2fb494b07c1c06619d4e13ce89c02534ad8f4152",
+    "exitCode": 101,
+    "counts": "0 passed; 4 failed; all before grant/WS at ready GET429; duration2.62s"
+  },
+  "cause": [
+    "fixture连接器add未提供startIfEnabled:true；真实manager仅该字段true才queue_start，四个实际合成home enabled/autoStart已存但PID文件均未出现。",
+    "ready和pending只yield_now，无实际时间间隔，ready循环在真实240请求/10秒额度耗尽后失败。不是ManualClock，也不是已证实SDK错误。"
+  ],
+  "changed": [
+    "fixture显式要求startIfEnabled:true，通过原正常管理入口排队启动。",
+    "仅connecting以500ms继续；failed/stopped/未知状态立即携真实public state及自有home报错；running严格核真实2工具目录。",
+    "ready仍原5秒、pending仍原5秒，未改限流或延长预算；审批读取按500ms节奏。"
+  ],
+  "productUnchanged": [
+    "WS前台flag",
+    "在途授权lifecycle epoch",
+    "所有业务限流/SDK实现"
+  ],
+  "sourceHash": {
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_session_permissions.rs": "bf422f1f6561b24f64082b32f725b9288aedf4634d22a6ac6122ba41b24d4a95"
+  },
+  "checks": [
+    {
+      "command": "rustfmt --edition 2024 --config skip_children=true r07_t08_mcp_session_permissions.rs",
+      "exitCode": 0
+    }
+  ],
+  "cargo": "NOT_RUN"
+}

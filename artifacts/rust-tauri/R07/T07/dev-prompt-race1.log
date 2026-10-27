@@ -1,0 +1,19 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.72s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+
+thread 'workflow::real_atomic_prompt_snapshot_writes_do_not_collide_under_os_thread_barrier' (1600523) panicked at crates/lingxi-service/tests/r07_workflow/mod.rs:713:5:
+现役函数 2048 次并发写发生 287 次真实 IO 错误；样例=["writer=0, round=11: Os { code: 2, kind: NotFound, message: \"No such file or directory\" }", "writer=0, round=13: Os { code: 2, kind: NotFound, message: \"No such file or directory\" }", "writer=0, round=17: Os { code: 2, kind: NotFound, message: \"No such file or directory\" }", "writer=0, round=22: Os { code: 2, kind: NotFound, message: \"No such file or directory\" }", "writer=0, round=24: Os { code: 2, kind: NotFound, message: \"No such file or directory\" }", "writer=0, round=35: Os { code: 2, kind: NotFound, message: \"No such file or directory\" }", "writer=0, round=45: Os { code: 2, kind: NotFound, message: \"No such file or directory\" }", "writer=0, round=62: Os { code: 2, kind: NotFound, message: \"No such file or directory\" }", "writer=0, round=68: Os { code: 2, kind: NotFound, message: \"No such file or directory\" }", "writer=0, round=84: Os { code: 2, kind: NotFound, message: \"No such file or directory\" }", "writer=0, round=86: Os { code: 2, kind: NotFound, message: \"No such file or directory\" }", "writer=0, round=90: Os { code: 2, kind: NotFound, message: \"No such file or directory\" }"]；最终JSON=Ok((Number(14), Number(127)))；临时文件=[]；保留home=/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-workflow-52129b456482caff
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test workflow::real_atomic_prompt_snapshot_writes_do_not_collide_under_os_thread_barrier ... FAILED
+
+failures:
+
+failures:
+    workflow::real_atomic_prompt_snapshot_writes_do_not_collide_under_os_thread_barrier
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 19 filtered out; finished in 0.93s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_workflow`

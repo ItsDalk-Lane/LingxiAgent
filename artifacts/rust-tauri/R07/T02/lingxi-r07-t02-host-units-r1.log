@@ -1,0 +1,18 @@
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0603]: struct `ToolSchemaDocument` is private
+  --> crates/lingxi-service/src/bridge_revoke_tests.rs:16:49
+   |
+16 |         ToolManifest, ToolOrigin, ToolRegistry, ToolSchemaDocument, ToolTargetId,
+   |                                                 ^^^^^^^^^^^^^^^^^^ private struct
+   |
+note: the struct `ToolSchemaDocument` is defined here
+  --> crates/lingxi-kernel/src/toolcatalog.rs:63:57
+   |
+63 | use lingxi_protocol::{check_schema_dialect, ArgsDigest, ToolSchemaDocument};
+   |                                                         ^^^^^^^^^^^^^^^^^^
+
+For more information about this error, try `rustc --explain E0603`.
+error: could not compile `lingxi-service` (lib test) due to 1 previous error

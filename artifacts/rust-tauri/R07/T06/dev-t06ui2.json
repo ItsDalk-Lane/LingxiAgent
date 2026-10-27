@@ -1,0 +1,19 @@
+{
+  "stage": "R07-T06",
+  "purpose": "development_not_final_acceptance",
+  "label": "dev-t06ui2",
+  "command": "npx vitest run desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts desktop/src/react/__tests__/services/app-event-actions.test.ts desktop/src/react/__tests__/services/rust-automation.test.ts desktop/src/react/__tests__/services/rust-media-http.test.tsx desktop/src/react/__tests__/services/rust-conversation-events-http.test.ts desktop/src/react/__tests__/services/rust-browser-events-http.test.ts tests/r07-media-sdk-worker.test.ts",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "a1d0b3e49fe3302d64a31ed5680fb54f5b7689b1c4b98d3651921e88876ca029",
+  "sourceFingerprintAfter": "a1d0b3e49fe3302d64a31ed5680fb54f5b7689b1c4b98d3651921e88876ca029",
+  "sourceUnchanged": true,
+  "exitCode": 0,
+  "durationSec": 6.7,
+  "logSha256": "c7749d3ee95ec40577c0682f03995a9694c1fe2a490fa36354e8adad59c70790"
+}

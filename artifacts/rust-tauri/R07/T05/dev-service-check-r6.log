@@ -1,0 +1,109 @@
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: unused import: `TaskExit`
+  --> crates/lingxi-service/src/beautify_generation.rs:16:36
+   |
+16 |     task_supervisor::{ChildHandle, TaskExit},
+   |                                    ^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `path::Path`
+  --> crates/lingxi-service/src/beautify_generation.rs:40:5
+   |
+40 |     path::Path,
+   |     ^^^^^^^^^^
+
+error[E0609]: no field `generation` on type `RunRecord`
+   --> crates/lingxi-service/src/beautify_generation.rs:172:23
+    |
+172 |             || actual.generation != ctx.generation
+    |                       ^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `run_id`, `session_id`, `status`, `last_event_seq`
+
+error[E0609]: no field `attempt` on type `RunRecord`
+   --> crates/lingxi-service/src/beautify_generation.rs:173:23
+    |
+173 |             || actual.attempt != ctx.attempt
+    |                       ^^^^^^^ unknown field
+    |
+    = note: available fields are: `run_id`, `session_id`, `status`, `last_event_seq`
+
+error[E0599]: `SessionAdminError` doesn't implement `std::fmt::Display`
+   --> crates/lingxi-service/src/beautify_generation.rs:423:28
+    |
+423 |             .map_err(|e| e.to_string())?;
+    |                            ^^^^^^^^^ method cannot be called on `SessionAdminError` due to unsatisfied trait bounds
+    |
+   ::: crates/lingxi-service/src/session_admin.rs:25:1
+    |
+ 25 | pub enum SessionAdminError {
+    | -------------------------- method `to_string` not found for this enum because it doesn't satisfy `SessionAdminError: ToString` or `SessionAdminError: std::fmt::Display`
+    |
+    = note: the following trait bounds were not satisfied:
+            `SessionAdminError: std::fmt::Display`
+            which is required by `SessionAdminError: ToString`
+note: the trait `std::fmt::Display` must be implemented
+   --> /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/fmt/mod.rs:1187:0
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `to_string`, perhaps you need to implement it:
+            candidate #1: `ToString`
+
+error[E0308]: mismatched types
+   --> crates/lingxi-service/src/beautify_generation.rs:453:109
+    |
+453 | ...ve_ctx=ctx.clone();let work_scope=root.child("cover_work",ScopeKind::ChildRun);let work_cancel=root.clone();
+    |                                           ----- ^^^^^^^^^^^^ expected `String`, found `&str`
+    |                                           |
+    |                                           arguments to this method are incorrect
+    |
+note: method defined here
+   --> crates/lingxi-service/src/cancel.rs:148:12
+    |
+148 |     pub fn child(&self, label: String, kind: ScopeKind) -> CancelScope {
+    |            ^^^^^        -------------
+help: try using a conversion method
+    |
+453 |    let this_work=this.clone();let drive_job=job.clone();let drive_ctx=ctx.clone();let work_scope=root.child("cover_work".to_string(),ScopeKind::ChildRun);let work_cancel=root.clone();
+    |                                                                                                                         ++++++++++++
+
+error[E0308]: mismatched types
+   --> crates/lingxi-service/src/beautify_generation.rs:713:21
+    |
+713 |             detail: Some(format!("{outcome:?}")),
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `String`, found `Option<String>`
+    |
+    = note: expected struct `std::string::String`
+                 found enum `std::option::Option<std::string::String>`
+
+error[E0382]: the type `Arc` does not implement `Copy`
+    --> crates/lingxi-service/src/lib.rs:2610:81
+     |
+2571 |         let office_api = office_tools::OfficeApi::from_state(&state);
+     |             ---------- this move could be avoided by cloning the original `Arc`, which is inexpensive
+...
+2582 |             office_tools::register(gateway, office_api, &budget).map_err(|detail| {
+     |                                             ---------- value moved here
+...
+2610 |         let beautify = beautify_generation::BeautifyService::from_state(&state, &office_api);
+     |                                                                                 ^^^^^^^^^^^ value borrowed here after move
+     |
+     = note: consider using `Arc::clone`
+note: consider changing this parameter type in function `register` to borrow instead if owning the value isn't necessary
+    --> crates/lingxi-service/src/office_tools.rs:1161:10
+     |
+1159 | pub fn register(
+     |        -------- in this function
+1160 |     gateway: &ToolInvocationGateway,
+1161 |     api: Arc<OfficeApi>,
+     |          ^^^^^^^^^^^^^^ this parameter takes ownership of the value
+help: clone the value to increment its reference count
+     |
+2582 |             office_tools::register(gateway, office_api.clone(), &budget).map_err(|detail| {
+     |                                                       ++++++++
+
+Some errors have detailed explanations: E0308, E0382, E0599, E0609.
+For more information about an error, try `rustc --explain E0308`.
+warning: `lingxi-service` (lib) generated 2 warnings
+error: could not compile `lingxi-service` (lib) due to 6 previous errors; 2 warnings emitted

@@ -1,0 +1,33 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx > SettingsContent title placement > pins the active tab title beside the settings title in the modal header 772ms
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx > SettingsContent title placement > keeps the tab title in the content area for the standalone settings window 11ms
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx > SettingsContent title placement > resets the main scroll position when switching tabs 12ms
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx > SettingsContent title placement > notifies the modal shell when the active settings tab changes 43ms
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx > SettingsContent title placement > does not echo the initially rendered tab back to the modal shell 59ms
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx > SettingsContent title placement > does not render a Computer Use tab and falls back to the agent tab for stale tab values 33ms
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx > SettingsContent title placement > keeps activeServerConnection in sync when the settings window hears server restart 59ms
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx > SettingsContent title placement > keeps the persisted remote Studio active instead of forcing settings back to local loopback 58ms
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx > SettingsContent title placement > opens settings against a persisted remote Studio when no local platform server APIs exist 58ms
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > renders experiment copy as a tab-level description 88ms
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > renders the built-in browser settings tab 17ms
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > lists Connectors as a static tab with no plugin-contributed tabs present 29ms
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > reloads the shared settings model catalog when models-changed arrives 17ms
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > reloads the shared settings model catalog from a same-window models event 17ms
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > passes tab ids through without aliasing 0ms
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > shows a models nav item and hides the legacy media nav item 21ms
+stderr | desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > clears foreign cached data before Rust settings and keeps unimplemented tabs unavailable
+[settings] init failed: Error: Rust settings server identity does not match
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/SettingsContent.tsx:456:15
+
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > loads the provider summary inside init, only after the server connection is ready 15ms
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > clears foreign cached data before Rust settings and keeps unimplemented tabs unavailable 71ms
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > loads the settings snapshot only after agents have resolved the agent id 18ms
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > reopens without the loading mask when cached config exists (silent background refresh) 59ms
+
+ Test Files  2 passed (2)
+      Tests  20 passed (20)
+   Start at  17:57:33
+   Duration  3.12s (transform 1.12s, setup 44ms, import 958ms, tests 1.46s, environment 524ms)
+

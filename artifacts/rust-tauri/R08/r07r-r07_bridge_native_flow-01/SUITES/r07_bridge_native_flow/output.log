@@ -1,0 +1,18 @@
+
+running 4 tests
+test disabling_connector_cancels_actual_run_and_cleans_the_original_native_draft ... ok
+test actual_platform_document_bytes_are_extracted_into_the_real_model_submission ... ok
+test actual_settings_disable_waiting_receipt_and_choose_plain_native_draft ... ok
+test actual_sdk_native_receipt_rich_draft_and_final_have_separate_durable_proofs ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.33s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r07_bridge_native_flow") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.37s
+     Running tests/r07_bridge_native_flow.rs (rust/target/debug/deps/r07_bridge_native_flow-397306f5f93d4d2b)

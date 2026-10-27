@@ -1,0 +1,34 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/host/r08-a03-web-desktop-host.test.tsx (5 tests | 1 failed) 46ms
+     ✓ 宿主惰性解析为 web，受限能力逐一可解释，且全程无 Electron 桥 24ms
+     ✓ 截图链：无 screenshotRender 能力时给出显式内联提示而非 TypeError 1ms
+     × 会话链：lingxiFetch 经 ServiceClient 路由到 /lingxi/v1 会话读端口，无需 Electron 桥 4ms
+     ✓ 设置链：GeneralTab 在无桥环境渲染，getAutoLaunchStatus 缺席显式可解释 16ms
+     ✓ 文件预览链：HTTP 读取 404→null 显式未找到，其余非 ok 抛带状态错误 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/host/r08-a03-web-desktop-host.test.tsx > R08-A03：无 Electron API 的 Web 宿主链 > 会话链：lingxiFetch 经 ServiceClient 路由到 /lingxi/v1 会话读端口，无需 Electron 桥
+AssertionError: expected 'http://127.0.0.1:3210/lingxi/v1/sessi…' to contain 'token=a03-token'
+
+Expected: "token=a03-token"
+Received: "http://127.0.0.1:3210/lingxi/v1/sessions/search"
+
+ ❯ desktop/src/react/__tests__/host/r08-a03-web-desktop-host.test.tsx:163:17
+    161|     const [url, init] = fetchMock.mock.calls[0] as [string, RequestIni…
+    162|     expect(url).toContain('/lingxi/v1/sessions/search');
+    163|     expect(url).toContain('token=a03-token');
+       |                 ^
+    164|     expect(String((init?.headers as Record<string, string>)?.Authoriza…
+    165|     expectNoElectronBridge();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  19:32:43
+   Duration  737ms (transform 256ms, setup 17ms, import 385ms, tests 46ms, environment 223ms)
+

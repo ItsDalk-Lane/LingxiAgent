@@ -1,0 +1,28 @@
+{
+  "started": "2026-10-18T04:14:43.998Z",
+  "finished": "2026-10-18T04:14:45.355Z",
+  "scratch": "/private/tmp/lingxi-card-nav-ryWnkM",
+  "binary": "/private/tmp/lingxi-r07-t08-card-baseline-service",
+  "binarySha256": "d1a18915be860f5a96c6251a5cb00a2facaa84a4a2977b6856155a69061e31a2",
+  "exitCode": 0,
+  "outcome": {
+    "count": 1,
+    "observed": [
+      {
+        "tokenReadableAndSent": true,
+        "hrefSha256": "8fa063195602795904455470dc3548f7005b94b4f1bb78ced64f9e0f6925f535",
+        "path": "/lingxi/v1/cards/navigation-probe"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "path": "rust/crates/lingxi-service/src/cards.rs",
+      "sha256": "116534a104c468e4056cdb2ba946a100ec83798e6cfc822e8b3eb1caaaec7649"
+    },
+    {
+      "path": "desktop/src/react/components/chat/InteractiveCard.tsx",
+      "sha256": "1835186579e5bc983ec41264552437c1c2c0909f7daf4f2b967a10ba26f88746"
+    }
+  ]
+}

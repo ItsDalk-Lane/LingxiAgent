@@ -1,0 +1,74 @@
+    Checking lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+    Checking lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error: method `apply_cover_frozen` is never used
+   --> crates/lingxi-service/src/office_tools.rs:408:25
+    |
+165 | impl OfficeApi {
+    | -------------- method in this implementation
+...
+408 |     pub(crate) async fn apply_cover_frozen(
+    |                         ^^^^^^^^^^^^^^^^^^
+    |
+    = note: `-D dead-code` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[expect(dead_code)]` or `#[allow(dead_code)]`
+
+error: the `Err`-variant returned from this function is very large
+  --> crates/lingxi-service/src/media_routes.rs:10:75
+   |
+10 | async fn owner(state: &ServiceState, principal: &Principal, sid: &str) -> Result<String, Response> {
+   |                                                                           ^^^^^^^^^^^^^^^^^^^^^^^^ the `Err`-variant is at least 128 bytes
+   |
+   = help: try reducing the size of `hyper::Response<axum::body::Body>`, for example by boxing large elements or replacing it with `Box<hyper::Response<axum::body::Body>>`
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#result_large_err
+   = note: `-D clippy::result-large-err` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::result_large_err)]`
+
+error: this function has too many arguments (8/7)
+   --> crates/lingxi-service/src/beautify_run.rs:164:5
+    |
+164 | /     pub(crate) async fn cover_prompt(
+165 | |         &self,
+166 | |         db: &Arc<RunDatabase>,
+167 | |         events: &Arc<EventService>,
+...   |
+172 | |         now: u64,
+173 | |     ) -> Result<String, String> {
+    | |_______________________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#too_many_arguments
+    = note: `-D clippy::too-many-arguments` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::too_many_arguments)]`
+
+error: this function has too many arguments (8/7)
+    --> crates/lingxi-service/src/toolgateway.rs:2852:5
+     |
+2852 | /     pub(crate) async fn authorize_cover_prepared(
+2853 | |         &self,
+2854 | |         db: &lingxi_adapters::storage::RunDatabase,
+2855 | |         job_id: &str,
+...    |
+2860 | |         management: &crate::management::ManagementState,
+2861 | |     ) -> Result<(), String> {
+     | |___________________________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#too_many_arguments
+
+error: could not compile `lingxi-service` (lib) due to 4 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: items after a test module
+    --> crates/lingxi-service/src/toolgateway.rs:2343:1
+     |
+2343 | mod tests {
+     | ^^^^^^^^^
+...
+2849 | impl ToolInvocationGateway {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#items_after_test_module
+     = note: `-D clippy::items-after-test-module` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::items_after_test_module)]`
+     = help: move the items to before the test module was defined
+
+error: could not compile `lingxi-service` (lib test) due to 5 previous errors

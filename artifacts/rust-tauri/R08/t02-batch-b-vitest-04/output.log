@@ -1,0 +1,1074 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stderr | desktop/src/react/__tests__/stores/channel-actions.test.ts > channel-actions > createChannel > reads backend JSON errors instead of losing them to the fetch wrapper
+[channels] create failed: Error: Agent not found: ghost
+    at createChannel (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/channel-actions.ts:735:24)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/channel-actions.test.ts:693:7
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/channel-actions.test.ts > channel-actions > 请求失败与切换保护 > 缺少真实活动身份的响应不能清掉已有动态
+[channels] load agent activities failed: Error: Invalid conversation activity
+    at loadConversationAgentActivities (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/channel-actions.ts:140:13)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/channel-actions.test.ts:890:7
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/channel-actions.test.ts > channel-actions > 用户动作重试身份 > 创建超时后同一输入重试复用requestId，成员变化则是新动作
+[channels] create failed: Error: create timeout
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/channel-actions.test.ts:954:35
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64
+
+stderr | desktop/src/react/__tests__/stores/channel-actions.test.ts > channel-actions > 用户动作重试身份 > 创建超时后同一输入重试复用requestId，成员变化则是新动作
+[channels] create failed: Error: create timeout
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/channel-actions.test.ts:954:35
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64
+
+stderr | desktop/src/react/__tests__/stores/channel-actions.test.ts > channel-actions > 用户动作重试身份 > 创建超时后同一输入重试复用requestId，成员变化则是新动作
+[channels] create failed: Error: create timeout
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/channel-actions.test.ts:954:35
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64
+
+ ✓ desktop/src/react/__tests__/stores/channel-actions.test.ts (40 tests) 271ms
+ ✓ desktop/src/react/__tests__/settings/resource-state.test.ts (5 tests) 234ms
+ ✓ desktop/src/react/__tests__/utils/markdown-rhythm.test.ts (5 tests) 310ms
+ ✓ desktop/src/react/__tests__/settings/helpers.test.ts (2 tests) 457ms
+     ✓ 保留 _identity/_agents/_publicAgents/_userProfile/_experience 下划线键  452ms
+ ✓ desktop/src/react/__tests__/stores/session-actions-archived.test.ts (8 tests) 1491ms
+     ✓ listArchivedSessions returns the body array  1487ms
+ ✓ desktop/src/react/__tests__/settings/AgentCardStack.test.ts (14 tests) 203ms
+ ✓ desktop/src/react/__tests__/utils/preview-file-refresh.test.ts (6 tests) 753ms
+     ✓ reloads matching preview items through their own preview type reader  745ms
+ ✓ desktop/src/react/__tests__/stores/r07-workbench-actions.test.ts (4 tests) 203ms
+ ✓ desktop/src/react/__tests__/settings/useBridgeState.snapshot.test.tsx (17 tests) 331ms
+ ✓ desktop/src/react/__tests__/settings/switch-agent-error-boundary.test.ts (5 tests) 899ms
+     ✓ 把服务端 409 带的错误码翻成本地化文案，而不是把英文原文糊到 toast 上  858ms
+ ✓ desktop/src/react/__tests__/settings/actions.test.ts (7 tests) 1004ms
+     ✓ 旧的 loadSettingsConfig 响应晚到时，不覆盖新的 settings pane  951ms
+stderr | desktop/src/react/__tests__/stores/desk-actions.test.ts > desk-actions workspace roots > keeps local workspace history on permission errors
+[jian-desk] load failed: Error: forbidden
+    at loadDeskFiles (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/desk-actions.ts:587:27)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/desk-actions.test.ts:159:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/desk-actions.test.ts > desk-actions workspace roots > does not prune local workspace history when a Studio mount load returns 404
+[jian-desk] load failed: Error: missing
+    at loadDeskFiles (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/desk-actions.ts:587:27)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/desk-actions.test.ts:240:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/desk-actions.test.ts > desk-actions workspace roots > keeps the visible mounted workspace files when a refresh fails
+[jian-desk] load failed: Error: workspace_not_found
+    at loadDeskFiles (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/desk-actions.ts:587:27)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/desk-actions.test.ts:281:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/desk-actions.test.ts > desk-actions workspace roots > keeps cached tree children when a background tree refresh fails
+[desk-tree] load failed: Error: workspace_not_found
+    at loadDeskTreeFiles (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/desk-actions.ts:748:27)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/desk-actions.test.ts:298:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/desk-actions.test.ts > desk-actions workspace roots > derives the default workspace display name from the configured agent home folder, not the server label
+[jian] load jian.md failed: Error: jian.md load failed: undefined
+    at loadJianContent (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/desk-actions.ts:881:26)
+
+stderr | desktop/src/react/__tests__/stores/desk-actions.test.ts > desk-actions workspace roots > falls back to "Default" only when no workspace directory is configured
+[jian] load jian.md failed: Error: jian.md load failed: undefined
+    at loadJianContent (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/desk-actions.ts:881:26)
+
+stderr | desktop/src/react/__tests__/stores/desk-actions.test.ts > desk-actions workspace roots > keeps the caller-provided label for non-default mounts
+[jian] load jian.md failed: Error: jian.md load failed: undefined
+    at loadJianContent (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/desk-actions.ts:881:26)
+
+ ✓ desktop/src/react/__tests__/stores/desk-actions.test.ts (48 tests) 215ms
+ ✓ desktop/src/react/__tests__/settings/AgentTab.test.tsx (7 tests) 740ms
+     ✓ rerenders when browsing a different settings agent  613ms
+ ✓ desktop/src/react/__tests__/settings/ModelWidget.test.tsx (8 tests) 208ms
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > opens deleted-agent sessions as read-only history without calling the runtime switch route
+[lm-entry] targetPath= leted/sessions/old.jsonl preloaded= false
+[cmf-entry] path= leted/sessions/old.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Ftmp%2Fagents%2Fdeleted%2Fsess
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > opens deleted-agent sessions as read-only history without calling the runtime switch route
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > clears unread output marker when switching into a normal session
+[lm-entry] targetPath= /session/next.jsonl preloaded= false
+[cmf-entry] path= /session/next.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnext.jsonl&sessionI
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > clears unread output marker when switching into a normal session
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > requests a terminal snapshot on the generic session-switch path (compact layout has no TerminalCard)
+[lm-entry] targetPath= /session/next.jsonl preloaded= false
+[cmf-entry] path= /session/next.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnext.jsonl&sessionI
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > requests a terminal snapshot on the generic session-switch path (compact layout has no TerminalCard)
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > clears unread output marker when switching into a deleted-agent history session
+[lm-entry] targetPath= ed/sessions/unread.jsonl preloaded= false
+[cmf-entry] path= ed/sessions/unread.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Ftmp%2Fagents%2Fdeleted%2Fsess
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > clears unread output marker when switching into a deleted-agent history session
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > continues a deleted-agent session by creating and switching to the returned primary-agent session
+[lm-entry] targetPath= /hana/sessions/new.jsonl preloaded= false
+[cmf-entry] path= /hana/sessions/new.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Ftmp%2Fagents%2Fhana%2Fsession
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > continues a deleted-agent session by creating and switching to the returned primary-agent session
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > warns when a deleted-agent continuation succeeds without fresh compaction
+[lm-entry] targetPath= /hana/sessions/new.jsonl preloaded= false
+[cmf-entry] path= /hana/sessions/new.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Ftmp%2Fagents%2Fhana%2Fsession
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > warns when a deleted-agent continuation succeeds without fresh compaction
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > sends extra workspace folders when creating a pending session
+[lm-entry] targetPath= /session/new.jsonl preloaded= false
+[cmf-entry] path= /session/new.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnew.jsonl&sessionId
+
+ ✓ desktop/src/react/__tests__/settings/ExperimentsTab.test.tsx (1 test) 1073ms
+     ✓ shows the memory section empty state when the API omits both retired experiments  1072ms
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > sends extra workspace folders when creating a pending session
+[loadMessages] error: TypeError: Cannot read properties of undefined (reading 'json')
+    at loadMessages (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:506:41)
+    at switchSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1317:7)
+    at Module.ensureSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1800:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:937:7
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > consumes home draft on activation without copying text into the new session draft
+[lm-entry] targetPath= ssion/home-consume.jsonl preloaded= false
+[cmf-entry] path= ssion/home-consume.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fhome-consume.jsonl&
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > consumes home draft on activation without copying text into the new session draft
+[loadMessages] error: TypeError: Cannot read properties of undefined (reading 'json')
+    at loadMessages (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:506:41)
+    at switchSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1317:7)
+    at Module.ensureSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1800:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:991:7
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > posts one new-session request at send time using the current pending draft
+[lm-entry] targetPath= /session/fresh.jsonl preloaded= false
+[cmf-entry] path= /session/fresh.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Ffresh.jsonl&session
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > posts one new-session request at send time using the current pending draft
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > sends workspaceMountId instead of cwd when the pending session selects a Studio workspace
+[lm-entry] targetPath= /session/new.jsonl preloaded= false
+[cmf-entry] path= /session/new.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnew.jsonl&sessionId
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > sends workspaceMountId instead of cwd when the pending session selects a Studio workspace
+[loadMessages] error: TypeError: Cannot read properties of undefined (reading 'json')
+    at loadMessages (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:506:41)
+    at switchSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1317:7)
+    at Module.ensureSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1800:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:1142:7
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/__tests__/utils/remote-file-preview.test.ts (9 tests) 430ms
+     ✓ saves remote workbench content by mountId instead of producing a legacy rootId-only request  371ms
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > carries the pending new-session thinking draft into session creation
+[lm-entry] targetPath= /session/new.jsonl preloaded= false
+[cmf-entry] path= /session/new.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnew.jsonl&sessionId
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > carries the pending new-session thinking draft into session creation
+[loadMessages] error: TypeError: Cannot read properties of undefined (reading 'json')
+    at loadMessages (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:506:41)
+    at switchSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1317:7)
+    at Module.ensureSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1800:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:1190:7
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > carries the pending new-session permission draft into session creation
+[lm-entry] targetPath= /session/new.jsonl preloaded= false
+[cmf-entry] path= /session/new.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnew.jsonl&sessionId
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > carries the pending new-session permission draft into session creation
+[loadMessages] error: TypeError: Cannot read properties of undefined (reading 'json')
+    at loadMessages (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:506:41)
+    at switchSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1317:7)
+    at Module.ensureSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1800:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:1236:7
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > carries an explicit project id from the new-session draft into session creation
+[lm-entry] targetPath= /session/new.jsonl preloaded= false
+[cmf-entry] path= /session/new.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnew.jsonl&sessionId
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > carries an explicit project id from the new-session draft into session creation
+[loadMessages] error: TypeError: Cannot read properties of undefined (reading 'json')
+    at loadMessages (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:506:41)
+    at switchSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1317:7)
+    at Module.ensureSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1800:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:1291:7
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > surfaces the server error when pending session creation fails
+[session] create failed: Error: session skill snapshot failed
+    at errorWithCode (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/errors/error-presenter.ts:38:17)
+    at Module.ensureSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1788:13)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:1324:7
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > 新建失败带错误码时说人话，原始英文留在详情区
+[session] create failed: Error: no available model
+    at errorWithCode (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/errors/error-presenter.ts:38:17)
+    at Module.ensureSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1788:13)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:1359:7
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
+  code: 'no_available_model'
+}
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > createNewSession cwd draft > 新建失败走顶层 onError 的嵌套形状时，仍读得出 code 和 message
+[session] create failed: Error: session index is rebuilding
+    at errorWithCode (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/errors/error-presenter.ts:38:17)
+    at Module.ensureSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:1788:13)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:1386:7
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
+  code: 'session_manifest_unavailable'
+}
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > stale 响应不覆盖新状态：v1 fetch 在飞，v2 bump 后到达时丢弃 v1
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > stale 响应不覆盖新状态：v1 fetch 在飞，v2 bump 后到达时丢弃 v1
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > 正常单次调用写入 initSession
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > 正常单次调用写入 initSession
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > 主 bug 回归（#2188）：mid-flight 收到 live message 更新时，跳过 messages hydrate 但仍写入 SessionFile registry
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stdout | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > 主 bug 回归（#2188）：mid-flight 收到 live message 更新时，跳过 messages hydrate 但仍写入 SessionFile registry
+[loadMessages] 跳过 session hydrate: mid-flight 收到 live message 更新 /a
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > mid-flight 期间收到 upsert：hydrate 后 registry 为快照与重放增量合并（重放后写胜）
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > mid-flight 期间收到 upsert：hydrate 后 registry 为快照与重放增量合并（重放后写胜）
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > mid-flight 期间收到 branch reset：hydrate 放弃旧快照，不覆盖 reset 后的权威 registry
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > mid-flight 期间收到 branch reset：hydrate 放弃旧快照，不覆盖 reset 后的权威 registry
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > stale 响应不会先把 todos 回滚到旧快照
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > stale 响应不会先把 todos 回滚到旧快照
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > mid-flight 收到 live todo 更新时，整次 hydrate 跳过，不只跳过 messages
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stdout | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 竞态护栏 > mid-flight 收到 live todo 更新时，整次 hydrate 跳过，不只跳过 messages
+[loadMessages] 跳过 session hydrate: mid-flight 收到 live todo 更新 /a
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 合并 in-flight snapshot > buf 有 in-flight 内容时，initSession 后 append 一条 assistant
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 合并 in-flight snapshot > buf 有 in-flight 内容时，initSession 后 append 一条 assistant
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 合并 in-flight snapshot > buf 为空（snapshot=null）时不 append 额外消息
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 合并 in-flight snapshot > buf 为空（snapshot=null）时不 append 额外消息
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 合并 in-flight snapshot > uses ordered snapshot blocks so a skill call stays between surrounding prose
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages 合并 in-flight snapshot > uses ordered snapshot blocks so a skill call stays between surrounding prose
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+ ✓ desktop/src/react/__tests__/settings/AgentMemory.test.tsx (5 tests) 968ms
+     ✓ shows a memory failure notice in the Agent memory section  827ms
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > surfaces the server error when switching to an old session fails
+[session] switch failed: Invalid session path 
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 切换失败带错误码时说人话，toast 带上错误码
+[session] switch failed: session locator is not active session_locator_not_active
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 切换失败走顶层 onError 的嵌套形状时，仍读得出 code 和 message
+[session] switch failed: session index is rebuilding session_manifest_unavailable
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 后端返回 currentModelId，uncached session 仍然触发 loadMessages
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 后端返回 currentModelId，uncached session 仍然触发 loadMessages
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > hydrates audio capability fields from the switch response into the per-session model snapshot
+[lm-entry] targetPath= /audio-session preloaded= false
+[cmf-entry] path= /audio-session records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Faudio-session
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > hydrates audio capability fields from the switch response into the per-session model snapshot
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > hydrates an unavailable historical model as blocked session-owned state
+[lm-entry] targetPath= /removed-model-session preloaded= false
+[cmf-entry] path= /removed-model-session records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fremoved-model-session
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > hydrates an unavailable historical model as blocked session-owned state
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 切换完成后仍在 chat surface 时恢复输入焦点
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 切换完成后仍在 chat surface 时恢复输入焦点
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 用户已离开 chat surface 时不抢回输入焦点
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 用户已离开 chat surface 时不抢回输入焦点
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 切 session 时激活目标 cwd 的工作台面板，不携带旧 deskCurrentPath
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 切 session 时激活目标 cwd 的工作台面板，不携带旧 deskCurrentPath
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > switching across agents synchronizes the active agent home while showing the session cwd
+[lm-entry] targetPath= /mio preloaded= false
+[cmf-entry] path= /mio records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fmio
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > switching across agents synchronizes the active agent home while showing the session cwd
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 切到同一 workspace 的 session 时保留当前 desk 子目录
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 切到同一 workspace 的 session 时保留当前 desk 子目录
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 恢复切回 workspace 时该 workspace 上次打开的 desk 子目录
+[lm-entry] targetPath= /b preloaded= false
+[cmf-entry] path= /b records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fb
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 恢复切回 workspace 时该 workspace 上次打开的 desk 子目录
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 恢复切回 workspace 时该 workspace 上次打开的 desk 子目录
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 恢复切回 workspace 时该 workspace 上次打开的 desk 子目录
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 目标 session 没有 cwd 时清空 desk state，不回落到旧 workspace
+[lm-entry] targetPath= /a preloaded= false
+[cmf-entry] path= /a records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fa
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 目标 session 没有 cwd 时清空 desk state，不回落到旧 workspace
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 当前 session 附件删空后，切走时仍显式写回空数组，避免旧附件复活
+[lm-entry] targetPath= /b preloaded= false
+[cmf-entry] path= /b records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fb
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession 的 hasData 语义（#405 直接回归） > 当前 session 附件删空后，切走时仍显式写回空数组，避免旧附件复活
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > pinSession > leaves sessions unchanged and shows a toast when pinning fails
+[session] pin failed: write failed
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages revision stamp > stamps the server revision into the hydrated session cache
+[lm-entry] targetPath= session/revisioned.jsonl preloaded= false
+[cmf-entry] path= session/revisioned.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Frevisioned.jsonl&se
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages revision stamp > stamps the server revision into the hydrated session cache
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages revision stamp > stamps a null revision when the server omits it
+[lm-entry] targetPath= ession/no-revision.jsonl preloaded= false
+[cmf-entry] path= ession/no-revision.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fno-revision.jsonl
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > loadMessages revision stamp > stamps a null revision when the server omits it
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > re-pulls the current session when the list revision drifts from the cached one
+[lm-entry] targetPath= /session/rc-target.jsonl preloaded= false
+[cmf-entry] path= /session/rc-target.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Frc-target.jsonl
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > re-pulls the current session when the list revision drifts from the cached one
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > skips the fetch when the cached revision matches the list revision
+[has-dbg] called sessionPath= /session/rc-target.jsonl sessionId= null
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > re-pulls once when the cached revision is unknown
+[lm-entry] targetPath= /session/rc-target.jsonl preloaded= false
+[cmf-entry] path= /session/rc-target.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Frc-target.jsonl
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > re-pulls once when the cached revision is unknown
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > deduplicates concurrent triggers into one in-flight fetch
+[lm-entry] targetPath= /session/rc-target.jsonl preloaded= false
+[cmf-entry] path= /session/rc-target.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Frc-target.jsonl
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > deduplicates concurrent triggers into one in-flight fetch
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > allows a follow-up reconcile after the previous one settles
+[lm-entry] targetPath= /session/rc-target.jsonl preloaded= false
+[cmf-entry] path= /session/rc-target.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Frc-target.jsonl
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > allows a follow-up reconcile after the previous one settles
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > allows a follow-up reconcile after the previous one settles
+[lm-entry] targetPath= /session/rc-target.jsonl preloaded= false
+[cmf-entry] path= /session/rc-target.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Frc-target.jsonl
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > reconcileCurrentSessionMessages > allows a follow-up reconcile after the previous one settles
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession revision reconcile > re-pulls a cached session whose list revision drifted while it was in the background
+[lm-entry] targetPath= ssion/cached-stale.jsonl preloaded= false
+[cmf-entry] path= ssion/cached-stale.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fcached-stale.jsonl
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession revision reconcile > re-pulls a cached session whose list revision drifted while it was in the background
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > switchSession revision reconcile > does not re-pull a cached session whose revision still matches the list
+[has-dbg] called sessionPath= /session/cached-fresh.jsonl sessionId= null
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > refreshSessionCapabilities > marks busy during refresh, reloads messages, and clears busy afterward
+[lm-entry] targetPath= /session/drift.jsonl preloaded= false
+[cmf-entry] path= /session/drift.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fdrift.jsonl
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > refreshSessionCapabilities > marks busy during refresh, reloads messages, and clears busy afterward
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > refreshSessionCapabilities > surfaces a refresh failure as an inline error and clears busy
+[session] capability refresh failed: Error: already compacting
+    at errorWithCode (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/errors/error-presenter.ts:38:17)
+    at Module.refreshSessionCapabilities (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:2252:13)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:2856:18
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > refreshSessionCapabilities > 嵌套形状不渲染 [object Object]，错误码照样透传
+[session] capability refresh failed: Error: session is busy
+    at errorWithCode (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/errors/error-presenter.ts:38:17)
+    at Module.refreshSessionCapabilities (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:2252:13)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions.test.ts:2875:18
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20 {
+  code: 'session_busy'
+}
+
+stderr | desktop/src/react/__tests__/stores/session-actions.test.ts > session-actions > continueDeletedAgentSession 的错误呈现 > 嵌套形状不渲染 [object Object]，toast 带上错误码
+[session] continue deleted-agent session failed: session is busy session_busy
+
+ ✓ desktop/src/react/__tests__/stores/session-actions.test.ts (91 tests) 240ms
+ ✓ desktop/src/react/__tests__/utils/markdown.test.ts (40 tests) 272ms
+ ✓ desktop/src/react/__tests__/settings/AgentDeleteOverlay.test.tsx (5 tests) 1009ms
+     ✓ uses the explicit event target instead of the selected settings agent  923ms
+ ✓ desktop/src/react/__tests__/utils/mermaid-renderer.test.ts (9 tests) 262ms
+ ✓ desktop/src/react/__tests__/settings/BridgeTab.credentials.test.tsx (9 tests) 266ms
+ ✓ desktop/src/react/__tests__/settings/R07BrowserRustUI.test.tsx (11 tests) 475ms
+ ✓ desktop/src/react/__tests__/settings/ApiKeyCredentials.test.tsx (15 tests) 642ms
+ ✓ desktop/src/react/__tests__/utils/screenshot.test.ts (12 tests) 144ms
+ ✓ desktop/src/react/__tests__/settings/AccessTab.test.tsx (10 tests) 1372ms
+     ✓ shows the stable mobile URL and saves LAN network settings  1046ms
+ ✓ desktop/src/react/__tests__/settings/WorkTab.test.tsx (15 tests) 1677ms
+     ✓ renders the current agent desk settings from settingsConfig on the first paint  1364ms
+ ✓ desktop/src/react/__tests__/stores/desk-new-session-capture.test.ts (1 test) 140ms
+ ✓ desktop/src/react/__tests__/settings/BridgeTab.permission-mode.test.tsx (5 tests) 269ms
+stderr | desktop/src/react/__tests__/stores/session-new-session-workspace.test.ts > v0.1.33 新建会话工作台继承（regression: FIXED） > regression: FIXED — reconcile 自愈链：发送后 loadSessions 发现列表 revision 前进，自动补拉 hydrate 新会话缓存
+[lm-entry] targetPath= ession/new-v033-ws.jsonl preloaded= false
+[cmf-entry] path= ession/new-v033-ws.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnew-v033-ws.jsonl&s
+
+stderr | desktop/src/react/__tests__/stores/session-new-session-workspace.test.ts > v0.1.33 新建会话工作台继承（regression: FIXED） > regression: FIXED — reconcile 自愈链：发送后 loadSessions 发现列表 revision 前进，自动补拉 hydrate 新会话缓存
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-new-session-workspace.test.ts > v0.1.33 新建会话工作台继承（regression: FIXED） > regression: FIXED — reconcile 自愈链：发送后 loadSessions 发现列表 revision 前进，自动补拉 hydrate 新会话缓存
+[lm-entry] targetPath= ession/new-v033-ws.jsonl preloaded= false
+[cmf-entry] path= ession/new-v033-ws.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnew-v033-ws.jsonl&s
+
+stderr | desktop/src/react/__tests__/stores/session-new-session-workspace.test.ts > v0.1.33 新建会话工作台继承（regression: FIXED） > regression: FIXED — reconcile 自愈链：发送后 loadSessions 发现列表 revision 前进，自动补拉 hydrate 新会话缓存
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+ ✓ desktop/src/react/__tests__/settings/ProvidersTab.test.tsx (12 tests) 654ms
+ ✓ desktop/src/react/__tests__/utils/history-builder.test.ts (30 tests) 115ms
+ ✓ desktop/src/react/__tests__/stores/session-new-session-workspace.test.ts (6 tests) 150ms
+ ✓ desktop/src/react/__tests__/settings/observability/observability-usage-charts.test.tsx (9 tests) 620ms
+ ✓ desktop/src/react/__tests__/settings/OAuthCredentials.test.tsx (1 test) 238ms
+ ✓ desktop/src/react/__tests__/utils/preview-document-refresh.test.ts (15 tests) 134ms
+ ✓ desktop/src/react/__tests__/utils/find-marks.test.ts (7 tests) 135ms
+ ✓ desktop/src/react/__tests__/utils/attach-workbench-item.test.ts (5 tests) 137ms
+ ✓ desktop/src/react/__tests__/settings/observability/observability-sub-tabs.test.tsx (3 tests) 430ms
+ ✓ desktop/src/react/__tests__/utils/format.test.ts (25 tests) 168ms
+ ✓ desktop/src/react/__tests__/utils/editor-trailing-content.round2.test.ts (8 tests) 206ms
+ ✓ desktop/src/react/__tests__/utils/message-text.test.ts (2 tests) 142ms
+ ✓ desktop/src/react/__tests__/utils/input-focus-policy.test.ts (5 tests) 152ms
+ ✓ desktop/src/react/__tests__/utils/paste-fidelity-editor.test.ts (10 tests) 214ms
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx (9 tests) 2205ms
+     ✓ pins the active tab title beside the settings title in the modal header  1837ms
+ ✓ desktop/src/react/__tests__/utils/running-status-label.test.ts (24 tests) 150ms
+ ✓ desktop/src/react/__tests__/utils/chat-image-send-preflight.test.ts (14 tests) 106ms
+ ✓ desktop/src/react/__tests__/settings/MemoryViewerLayout.test.ts (2 tests) 107ms
+ ✓ desktop/src/react/__tests__/settings/observability/model-observability-filter.test.ts (17 tests) 112ms
+ ✓ desktop/src/react/__tests__/stores/input-slice.test.ts (13 tests) 107ms
+stderr | desktop/src/react/__tests__/stores/chat-find-actions.test.ts > chat-find-actions > runChatFind 接口失败置 error 状态、不发定位
+[chat-find] find failed: boom
+
+stderr | desktop/src/react/__tests__/stores/chat-find-actions.test.ts > chat-find-actions > locateSearchHit：find 空命中时不开查找条不定位（console.warn 路径）
+[chat-find] search hit but find returned empty: /tmp/agents/hana/sessions/a.jsonl x
+
+ ✓ desktop/src/react/__tests__/stores/selection-actions.test.ts (22 tests) 179ms
+ ✓ desktop/src/react/__tests__/stores/chat-find-actions.test.ts (10 tests) 86ms
+ ✓ desktop/src/react/__tests__/settings/observability/ObservabilityDateLine.test.tsx (4 tests) 165ms
+ ✓ desktop/src/react/__tests__/utils/app-file-drag.test.ts (1 test) 92ms
+ ✓ desktop/src/react/__tests__/settings/observability/PayloadPlainText.test.ts (3 tests) 99ms
+ ✓ desktop/src/react/__tests__/utils/markdown-cover.test.ts (7 tests) 95ms
+ ✓ desktop/src/react/__tests__/stores/input-draft-persistence.test.ts (2 tests) 90ms
+ ✓ desktop/src/react/__tests__/settings/api-key-credentials.test.ts (3 tests) 87ms
+ ✓ desktop/src/react/__tests__/stores/session-slice.test.ts (9 tests) 93ms
+ ✓ desktop/src/react/__tests__/stores/chat-slice.test.ts (34 tests) 106ms
+ ✓ desktop/src/react/__tests__/utils/markdown-document.test.ts (1 test) 107ms
+ ✓ desktop/src/react/__tests__/utils/file-kind.test.ts (44 tests) 113ms
+ ✓ desktop/src/react/__tests__/stores/selectors/file-refs.test.ts (34 tests) 118ms
+ ✓ desktop/src/react/__tests__/stores/sidebar-ui-slice.test.ts (6 tests) 143ms
+ ✓ desktop/src/react/__tests__/stores/settings-modal-actions.test.ts (5 tests) 112ms
+ ✓ desktop/src/react/__tests__/utils/screenshot-segments.test.ts (4 tests) 120ms
+ ✓ desktop/src/react/__tests__/stores/message-live-version.test.ts (1 test) 114ms
+ ✓ desktop/src/react/__tests__/stores/message-turn-actions.test.ts (6 tests) 166ms
+stderr | desktop/src/react/__tests__/stores/session-new-session-crosstalk.test.ts > v0.1.33 新建会话串台（characterization） > characterization: KNOWN DEFECT — 无会话态下 loadSessions 把视图强切到 sessions[0]（主工作台会话）并加载其记录
+[lm-entry] targetPath= ion/main-workspace.jsonl preloaded= false
+[cmf-entry] path= ion/main-workspace.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fmain-workspace.json
+
+stderr | desktop/src/react/__tests__/stores/session-new-session-crosstalk.test.ts > v0.1.33 新建会话串台（characterization） > characterization: KNOWN DEFECT — 无会话态下 loadSessions 把视图强切到 sessions[0]（主工作台会话）并加载其记录
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/stores/session-new-session-crosstalk.test.ts > v0.1.33 新建会话串台（characterization） > characterization: KNOWN DEFECT — createNewSession/ensureSession 全程结束后 desk 内存（base/mountId/tree 缓存）仍指向旧（主）工作台（机制c半清空）
+[lm-entry] targetPath= /session/new-v033.jsonl preloaded= false
+[cmf-entry] path= /session/new-v033.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnew-v033.jsonl&sess
+
+stderr | desktop/src/react/__tests__/stores/session-new-session-crosstalk.test.ts > v0.1.33 新建会话串台（characterization） > characterization: KNOWN DEFECT — createNewSession/ensureSession 全程结束后 desk 内存（base/mountId/tree 缓存）仍指向旧（主）工作台（机制c半清空）
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+ ✓ desktop/src/react/__tests__/stores/session-new-session-crosstalk.test.ts (2 tests) 111ms
+ ❯ desktop/src/react/__tests__/settings/observability/TraceDetailOverlayRendering.test.tsx (3 tests | 2 failed) 1266ms
+     × 呈现 USER / ASSISTANT / TOOL 三类记录行 + SYSTEM 首记录 188ms
+     ✓ SYSTEM 首记录正文来自会话提示词快照（无需开载荷捕获） 33ms
+     × 观测载荷 tab：打开即直出 TXT 阅读式正文，超长截断可展开 1044ms
+ ✓ desktop/src/react/__tests__/utils/paste-upload-feedback.test.ts (2 tests) 176ms
+ ✓ desktop/src/react/__tests__/utils/git-graph.test.ts (4 tests) 160ms
+ ✓ desktop/src/react/__tests__/stores/knowledge-reference-slice.test.ts (10 tests) 106ms
+ ✓ desktop/src/react/__tests__/utils/message-parser.test.ts (58 tests) 110ms
+ ✓ desktop/src/react/__tests__/settings/observability/ObservabilityMetrics.test.tsx (8 tests) 207ms
+ ✓ desktop/src/react/__tests__/stores/connection-slice.test.ts (3 tests) 92ms
+ ✓ desktop/src/react/__tests__/utils/provider-presets.test.ts (1 test) 108ms
+ ✓ desktop/src/react/__tests__/utils/history-builder.origin.test.ts (3 tests) 99ms
+stderr | desktop/src/react/__tests__/stores/session-actions-reorder.test.ts > reorderPinnedSessions > restores the previous order and warns when the server rejects the reorder
+[session] pin reorder failed: Error: session_not_pinned
+    at Module.reorderPinnedSessions (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/session-actions.ts:2216:13)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions-reorder.test.ts:127:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/stores/session-actions-reorder.test.ts > reorderPinnedSessions > restores the previous order when the request throws
+[session] pin reorder failed: Error: offline
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/stores/session-actions-reorder.test.ts:138:39
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64
+
+ ✓ desktop/src/react/__tests__/stores/session-actions-reorder.test.ts (4 tests) 116ms
+ ✓ desktop/src/react/__tests__/utils/markdown-attachments.test.ts (5 tests) 76ms
+ ✓ desktop/src/react/__tests__/stores/terminal-slice.test.ts (4 tests) 83ms
+ ✓ desktop/src/react/__tests__/utils/plain-url-paste.test.ts (5 tests) 112ms
+ ✓ desktop/src/react/__tests__/utils/audio-waveform.test.ts (4 tests) 108ms
+ ✓ desktop/src/react/__tests__/utils/history-builder-mood.test.ts (4 tests) 98ms
+ ✓ desktop/src/react/__tests__/utils/file-mention-items.test.ts (4 tests) 103ms
+ ✓ desktop/src/react/__tests__/utils/line-diff.test.ts (4 tests) 108ms
+ ✓ desktop/src/react/__tests__/utils/grapheme.test.ts (4 tests) 119ms
+ ✓ desktop/src/react/__tests__/utils/history-builder.knowledge.test.ts (3 tests) 111ms
+ ✓ desktop/src/react/__tests__/stores/bridge-slice.test.ts (5 tests) 104ms
+ ✓ desktop/src/react/__tests__/utils/user-attachment-media.test.ts (2 tests) 113ms
+ ✓ desktop/src/react/__tests__/utils/agent-workspace.test.ts (3 tests) 111ms
+ ✓ desktop/src/react/__tests__/utils/model-thinking.test.ts (3 tests) 119ms
+ ✓ desktop/src/react/__tests__/settings/observability/model-observability-contract.test.ts (6 tests) 114ms
+ ✓ desktop/src/react/__tests__/utils/open-media-viewer.test.ts (9 tests) 171ms
+stderr | desktop/src/react/__tests__/stores/session-new-session-blank.test.ts > v0.1.33 新建会话首屏空白（regression: FIXED） > regression: FIXED — 新会话首条消息后历史被真实加载：不种空缓存，switchSession 走 loadMessages，无 WS 事件也有内容
+[lm-entry] targetPath= /session/new-v033.jsonl preloaded= false
+[cmf-entry] path= /session/new-v033.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fsession%2Fnew-v033.jsonl&sess
+
+stderr | desktop/src/react/__tests__/stores/session-new-session-blank.test.ts > v0.1.33 新建会话首屏空白（regression: FIXED） > regression: FIXED — 新会话首条消息后历史被真实加载：不种空缓存，switchSession 走 loadMessages，无 WS 事件也有内容
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+ ✓ desktop/src/react/__tests__/stores/session-new-session-blank.test.ts (1 test) 111ms
+ ✓ desktop/src/react/__tests__/settings/observability/TraceConversationModel.test.ts (24 tests) 109ms
+ ✓ desktop/src/react/__tests__/stores/side-chat-actions.test.ts (5 tests) 158ms
+ ✓ desktop/src/react/__tests__/settings/observability/observability-provenance-resolve.test.ts (10 tests) 109ms
+ ✓ desktop/src/react/__tests__/stores/preview-slice.test.ts (35 tests) 115ms
+ ✓ desktop/src/react/__tests__/utils/ui-context.test.ts (2 tests) 114ms
+ ✓ desktop/src/react/__tests__/stores/computer-overlay-slice.test.ts (3 tests) 105ms
+ ✓ desktop/src/react/__tests__/stores/session-selectors.test.ts (4 tests) 104ms
+ ✓ desktop/src/react/__tests__/utils/unified-diff.test.ts (4 tests) 162ms
+ ✓ desktop/src/react/__tests__/stores/streaming-slice.test.ts (35 tests) 101ms
+ ✓ desktop/src/react/__tests__/settings/observability/model-observability-vertical.test.tsx (2 tests) 240ms
+ ✓ desktop/src/react/__tests__/utils/font-presets.test.ts (4 tests) 111ms
+ ✓ desktop/src/react/__tests__/utils/quoted-selection.test.ts (5 tests) 91ms
+ ✓ desktop/src/react/__tests__/settings/observability/model-observability-format.test.ts (12 tests) 98ms
+ ✓ desktop/src/react/__tests__/stores/chat-find-slice.test.ts (6 tests) 102ms
+ ✓ desktop/src/react/__tests__/utils/mention-items.test.ts (3 tests) 104ms
+ ✓ desktop/src/react/__tests__/utils/editor-serializer.test.ts (3 tests) 112ms
+ ✓ desktop/src/react/__tests__/stores/chat-slice-settle-streaming.test.ts (5 tests) 103ms
+ ✓ desktop/src/react/__tests__/utils/markdown-cover-drop.test.ts (3 tests) 132ms
+ ✓ desktop/src/react/__tests__/stores/model-slice.test.ts (2 tests) 92ms
+ ✓ desktop/src/react/__tests__/utils/checkpoints.test.ts (1 test) 84ms
+ ✓ desktop/src/react/__tests__/stores/agent-avatar-actions.test.ts (3 tests) 85ms
+ ✓ desktop/src/react/__tests__/settings/observability/model-observability-actions.test.ts (8 tests) 85ms
+ ✓ desktop/src/react/__tests__/settings/observability/use-observability-facets.test.tsx (3 tests) 131ms
+ ✓ desktop/src/react/__tests__/settings/output-presets.test.ts (1 test) 70ms
+stderr | desktop/src/react/__tests__/settings/UsageTab.test.tsx > UsageTab settings page registration (Phase 9: Model Observatory) > renders the usage tab content through SettingsContent when usage is active
+[settings] init failed: Error: [vitest] No "loadProvidersSummary" export is defined on the "../../settings/actions" mock. Did you forget to return it from "vi.mock"?
+If you need to partially mock a module, you can use "importOriginal" helper inside:
+
+    at VitestMocker.createError (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/vitest/dist/chunks/startVitestModuleRunner.DB-7oCpn.js:62:17)
+    at Object.get (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/vitest/dist/chunks/startVitestModuleRunner.DB-7oCpn.js:327:16)
+    at initSettings (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/SettingsContent.tsx:599:10)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  codeFrame: 'vi.mock(import("../../settings/actions"), async (importOriginal) => {\n' +
+    '  const actual = await importOriginal()\n' +
+    '  return {\n' +
+    '    ...actual,\n' +
+    '    // your mocked methods\n' +
+    '  }\n' +
+    '})'
+}
+
+ ✓ desktop/src/react/__tests__/settings/UsageTab.test.tsx (3 tests) 233ms
+stderr | desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx > R07 原生消息平台页面，真实UI与HTTP协议边界 > 状态读取失败保留已有状态并显示原因，HTTP 200 error也不能覆盖成空状态
+[bridge] load status failed: Error: 平台暂时不可用
+    at readBridgeResponse (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/bridge-response.ts:19:46)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/bridge/useBridgeState.ts:289:20
+    at Object.loadStatus (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/bridge/useBridgeState.ts:319:5)
+
+ ✓ desktop/src/react/__tests__/utils/quote-origin-session-refs.test.ts (6 tests) 48ms
+ ✓ desktop/src/react/__tests__/settings/R07McpRustAPI.test.ts (8 tests) 49ms
+ ✓ desktop/src/react/__tests__/settings/MeTab.test.tsx (2 tests) 75ms
+stderr | desktop/src/react/__tests__/utils/file-preview.test.ts > file-preview IPC error handling > 预览读取异常时向用户报错，并且不再把 Promise 泄漏到全局
+[file-preview] open preview failed: Error: preview exploded
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/utils/file-preview.test.ts:44:57
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64
+
+ ✓ desktop/src/react/__tests__/utils/file-preview.test.ts (10 tests) 48ms
+stderr | desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx > R07 原生消息平台页面，真实UI与HTTP协议边界 > 令牌变化后丢弃同一助手的旧状态请求
+[bridge] fetch public-agents-md failed: Error: unmapped Rust UI route: /lingxi/v1/agents/hana/public-agents-md
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx:44:11
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/api.ts:65:23)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/bridge/useBridgeState.ts:247:5
+    at Object.react_stack_bottom_frame (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+    at runWithFiberInDEV (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+    at commitHookEffectListMount (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+    at commitHookPassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13336:11)
+    at commitPassiveMountOnFiber (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:15484:13)
+    at recursivelyTraversePassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:15439:11)
+
+ ✓ desktop/src/react/__tests__/settings/api.test.ts (2 tests) 38ms
+stderr | desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx > R07 原生消息平台页面，真实UI与HTTP协议边界 > 联系人刷新失败保留列表并明确显示错误
+[bridge] load platform data failed: Error: 会话读取失败
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx:88:33
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/__tests__/settings/observability/observability-export-save.test.ts (11 tests) 42ms
+ ✓ desktop/src/react/__tests__/settings/observability/model-observability-labels.test.ts (5 tests) 38ms
+ ✓ desktop/src/react/__tests__/utils/link-open.test.ts (9 tests) 41ms
+stderr | desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx > R07 原生消息平台页面，真实UI与HTTP协议边界 > 会话详情读取原生权威历史，重置失败保留已读内容和会话
+[bridge] reset session failed: Error: 正在运行，不能重置
+    at readBridgeResponse (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/bridge-response.ts:19:46)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/BridgePanel.tsx:267:7
+
+ ✓ desktop/src/react/__tests__/settings/observability/ObservabilityTraceForest.test.ts (6 tests) 31ms
+ ↓ desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts (1 test | 1 skipped)
+ ✓ desktop/src/react/__tests__/settings/observability/ObservabilityPayloadCard.test.tsx (1 test) 41ms
+ ✓ desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx (10 tests) 992ms
+     ✓ 真实文件菜单以fileId发原生请求，网络失败重试沿同一编号并查询平台回执  581ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/settings/observability/TraceDetailOverlayRendering.test.tsx > TraceDetailOverlay 渲染验收 > 呈现 USER / ASSISTANT / TOOL 三类记录行 + SYSTEM 首记录
+AssertionError: expected [ 'system', 'message', 'message' ] to include 'user'
+ ❯ desktop/src/react/__tests__/settings/observability/TraceDetailOverlayRendering.test.tsx:195:19
+    193|       .map(row => row.getAttribute('data-kind'));
+    194|     // 用户消息行 + 助手正文行 + 工具调用行都必须在场。
+    195|     expect(kinds).toContain('user');
+       |                   ^
+    196|     expect(kinds).toContain('message');
+    197|     expect(kinds).toContain('tool');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  desktop/src/react/__tests__/settings/observability/TraceDetailOverlayRendering.test.tsx > TraceDetailOverlay 渲染验收 > 观测载荷 tab：打开即直出 TXT 阅读式正文，超长截断可展开
+AssertionError: expected 'unknown · unknownmt_rendersettings.ob…' to contain '帮我总结这个项目'
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_backdrop_011719"[39m
+        [33mstyle[39m=[32m"z-index: 1000;"[39m
+        [33mtabindex[39m=[32m"-1"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_container_011719 _layer_7ee2d4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_header_7ee2d4"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"_headerTitle_7ee2d4"[39m
+            [36m>[39m
+              [0munknown[0m
+              [0m · unknown[0m
+              [36m<code[39m
+                [33mclass[39m=[32m"_headerId_7ee2d4"[39m
+                [33mtitle[39m=[32m"mt_render"[39m
+              [36m>[39m
+                [0mmt_render[0m
+              [36m</code>[39m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"_headerStat_7ee2d4"[39m
+            [36m>[39m
+              [0msettings.observability.traceDetail.header.calls[0m
+              [36m<span[39m
+                [33mclass[39m=[32m"_headerStatValue_7ee2d4"[39m
+              [36m>[39m
+                [0m2[0m
+              [36m</span>[39m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"_headerStat_7ee2d4"[39m
+            [36m>[39m
+              [0msettings.observability.traceDetail.header.ok[0m
+              [36m<span[39m
+                [33mclass[39m=[32m"_headerStatValue_7ee2d4"[39m
+              [36m>[39m
+                [0m2[0m
+              [36m</span>[39m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"_headerStat_7ee2d4"[39m
+            [36m>[39m
+              [0msettings.observability.traceDetail.header.usage[0m
+              [36m<span[39m
+                [33mclass[39m=[32m"_headerStatValue_7ee2d4"[39m
+              [36m>[39m
+                [0m—[0m
+              [36m</span>[39m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"_headerStat_7ee2d4"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"_headerStatValue_7ee2d4"[39m
+              [36m>[39m
+                [0msettings.observability.traceDetail.header.payloadPresent[0m
+              [36m</span>[39m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"_headerStat_7ee2d4"[39m
+            [36m>[39m
+              [0msettings.observability.traceDetail.header.session[0m
+              [36m<span[39m
+                [33mclass[39m=[32m"_headerStatValue_7ee2d4"[39m
+              [36m>[39m
+                [0msettings.observability.traceDetail.header.sessionNotJoined[0m
+              [36m</span>[39m
+            [36m</span>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m"settings.observability.traceDetail.header.close"[39m
+              [33mclass[39m=[32m"_headerClose_7ee2d4"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0m×[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_headerBody_7ee2d4"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_root_8fca25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33maria-label[39m=[32m"settings.observability.traceDetail.toolbar.aria"[39m
+                [33mclass[39m=[32m"_root_a142db"[39m
+                [33mrole[39m=[32m"toolbar"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_inner_a142db"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"_actions_a142db"[39m
+                  [36m>[39m
+                    [36m<button[39m
+                      [33maria-label[39m=[32m"settings.observability.traceDetail.toolbar.useActualDuration"[39m
+                      [33maria-pressed[39m=[32m"true"[39m
+                      [33mclass[39m=[32m"_toggle_a142db"[39m
+                      [33mtitle[39m=[32m"settings.observability.traceDetail.toolbar.useEqualWidth"[39m
+                      [33mtype[39m=[32m"button"[39m
+                    [36m>[39m
+                      [36m<svg[39m
+                        [33maria-hidden[39m=[32m"true"[39m
+                        [33mclass[39m=[32m"_toggleIcon_a142db"[39m
+                        [33mfill[39m=[32m"none"[39m
+                        [33mviewBox[39m=[32m"0 0 16 16"[39m
+                      [36m>[39m
+                        [36m<circle[39m
+                          [33mcx[39m=[32m"8"[39m
+                          [33mcy[39m=[32m"8"[39m
+                          [33mr[39m=[32m"5.25"[39m
+                        [36m/>[39m
+                        [36m<path[39m
+                          [33md[39m=[32m"M8 4.75V8l2.25 1.5"[39m
+                        [36m/>[39m
+                      [36m</svg>[39m
+                      [0msettings.observability.traceDetail.toolbar.duration[0m
+                    [36m</button>[39m
+                    [36m<button[39m
+                      [33maria-checked[39m=[32m"false"[39m
+                      [33mclass[39m=[32m"_control_a142db"[39m
+                      [33mhidden[39m=[32m""[39m
+                      [33mrole[39m=[32m"switch"[39m
+                      [33mtype[39m=[32m"button"[39m
+                    [36m>[39m
+                      [36m<span>[39m
+                        [0msettings.observability.traceDetail.toolbar.actualTime[0m
+                      [36m</span>[39m
+                      [36m<span[39m
+                        [33maria-hidden[39m=[32m"true"[39m
+                        [33mclass[39m=[32m"_controlTrack_a142db"[39m
+                      [36m>[39m
+                        [36m<span[39m
+                          [33mclass[39m=[32m"_controlThumb_a142db"[39m
+                        [36m/>[39m
+                      [36m</span>[39m
+                    [36m</button>[39m
+                    [36m<button[39m
+                      [33maria-label[39m=[32m"settings.observability.traceDetail.toolbar.collapseTurns"[39m
+                      [33maria-pressed[39m=[32m"false"[39m
+                      [33mclass[39m=[32m"_action_a142db"[39m
+                      [33mtitle[39m=[32m"settings.observability.traceDetail.toolbar.collapseTurns"[39m
+                      [33mtype[39m=[32m"button"[39m
+                    [36m>[39m
+                      [36m<span[39m
+                        [33maria-hidden[39m=[32m"true"[39m
+                        [33mclass[39m=[32m"_actionIcon_a142db"[39m
+                      [36m>[39m
+        ...
+
+- Expected
++ Received
+
+- 帮我总结这个项目
++ unknown · unknownmt_rendersettings.observability.traceDetail.header.calls2settings.observability.traceDetail.header.ok2settings.observability.traceDetail.header.usage—settings.observability.traceDetail.header.payloadPresentsettings.observability.traceDetail.header.sessionsettings.observability.traceDetail.header.sessionNotJoined×settings.observability.traceDetail.toolbar.durationsettings.observability.traceDetail.toolbar.actualTime⊟settings.observability.traceDetail.toolbar.turns⊟settings.observability.traceDetail.toolbar.callssettings.observability.traceDetail.lane.inputsettings.observability.traceDetail.lane.modelsettings.observability.traceDetail.lane.toolssettings.observability.traceDetail.kind.systemsettings.observability.traceDetail.systemPromptInitialsettings.observability.traceDetail.table.turn#1settings.observability.traceDetail.kind.messagechatsettings.observability.traceDetail.kind.messagetitlesettings.observability.traceDetail.kind.messagesettings.observability.traceDetail.table.turn · Step 1×settings.observability.traceDetail.tabs.summarysettings.observability.traceDetail.tabs.previewsettings.observability.traceDetail.tabs.rawsettings.observability.traceDetail.tabs.payloadssemantic_requestsettings.observability.traceDetail.payloadView.copysystemPrompt:
++   你是灵犀，有记忆的个人 AI 助手。
++   保持简洁。
++   
++   附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。附加行为准则段落。…settings.observability.traceDetail.payloadView.moresemantic_responsesettings.observability.traceDetail.payloadView.copycompleteness: complete
++
++ text:
++   这个项目分为三层。
++   
++   第二段正文。
++
++ finishReason: stop
+
+ ❯ desktop/src/react/__tests__/settings/observability/TraceDetailOverlayRendering.test.tsx:266:20
+    264|       const body = document.body.textContent ?? '';
+    265|       expect(body).toContain('你是灵犀，有记忆的个人 AI 助手。');
+    266|       expect(body).toContain('帮我总结这个项目');
+       |                    ^
+    267|       expect(body).toContain('这个项目分为三层。');
+    268|     });
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 129 passed | 1 skipped (131)
+      Tests  2 failed | 1245 passed | 1 skipped (1248)
+   Start at  17:10:46
+   Duration  6.28s (transform 21.36s, setup 1.95s, import 42.30s, tests 33.63s, environment 46.14s)
+

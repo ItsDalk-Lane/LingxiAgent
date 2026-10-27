@@ -1,0 +1,75 @@
+{
+  "success": true,
+  "scratch": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-oauth-ui-UGOhJ5",
+  "binary": "/private/tmp/lingxi-r07-build/debug/lingxi-service",
+  "binarySha256": "9a547938471b28701c2cbb8058fbe64639867d4bc17f741b33bf68609508cde0",
+  "checks": [
+    "pkce-manual-state-buttons-summary-private-store-real-gateway",
+    "openai-codex-logout-clears-real-credential-and-summary",
+    "device-pending-poll-buttons-summary-private-store-real-gateway",
+    "device-local-logout-clears-real-credential-and-summary",
+    "single-embedded-source-unchanged",
+    "real-service-exit-zero"
+  ],
+  "serviceExit": 0,
+  "finalChildExitCode": 0,
+  "finalChildSignal": null,
+  "externalClosed": true,
+  "openedUrlCount": 2,
+  "tokenRequests": [
+    {
+      "grant": "authorization_code",
+      "code": "synthetic-ui-manual-code",
+      "hasVerifier": true,
+      "redirectUri": "http://127.0.0.1:50268/callback",
+      "deviceCodeMatches": false
+    },
+    {
+      "grant": "urn:ietf:params:oauth:grant-type:device_code",
+      "code": null,
+      "hasVerifier": false,
+      "redirectUri": null,
+      "deviceCodeMatches": true
+    },
+    {
+      "grant": "urn:ietf:params:oauth:grant-type:device_code",
+      "code": null,
+      "hasVerifier": false,
+      "redirectUri": null,
+      "deviceCodeMatches": true
+    }
+  ],
+  "modelRequests": [
+    {
+      "model": "pkce-model",
+      "authorizationMatches": true
+    },
+    {
+      "model": "device-model",
+      "authorizationMatches": true
+    }
+  ],
+  "refreshed": [
+    {
+      "provider": "openai-codex-oauth",
+      "loggedIn": true
+    },
+    {
+      "provider": "openai-codex-oauth",
+      "loggedIn": false
+    },
+    {
+      "provider": "device-local",
+      "loggedIn": true
+    },
+    {
+      "provider": "device-local",
+      "loggedIn": false
+    }
+  ],
+  "notes": [
+    "Rust HTTP/存储/凭证/网关保持真实，仅替外部回环OAuth和模型响应。",
+    "openExternal以记录URL+真实GET自有授权页面代理，不证明原生浏览器启动。",
+    "本检查取消/迟到/连接切换边界由独立13项单测验证，不能据此称全部原生OAuth通过。"
+  ]
+}

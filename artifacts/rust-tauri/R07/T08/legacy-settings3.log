@@ -1,0 +1,106 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 39.55s
+     Running tests/r06_agent_config_readback.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_agent_config_readback-60d976346afd1df2)
+
+running 14 tests
+test get_config_provider_registry_failure_gives_empty_providers_not_an_error ... ok
+test get_config_unknown_or_invalid_agent_is_404_with_no_side_effects ... ok
+test get_config_experience_enabled_is_boolean_and_invalid_config_fails_loudly ... ok
+test experiments_read_and_write ... ok
+test current_status_list_get_and_readonly ... ok
+test get_config_without_catalog_reads_without_creating_it ... ok
+test get_config_reads_real_yaml_injects_globals_and_masks_every_secret ... ok
+test cache_snapshot_observation_read ... ok
+test put_config_validation_and_auth ... ok
+test get_config_gcs_gone_workspace_history_before_answering_only_for_that_agent ... ok
+test cache_snapshot_observation_delete ... ok
+test get_config_identity_is_keyed_by_path_not_focus_and_never_discloses_another_agent ... ok
+test put_config_inline_credential_transfer_readback ... ok
+test put_config_provider_save_readback ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.01s
+
+     Running tests/r06_agent_settings_live.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_agent_settings_live-49278c6a1fd55505)
+
+running 14 tests
+test native_character_card_duplicate_skill_source_and_sparse_path_refuse_without_public_mutation ... ok
+test native_character_card_application_and_http_delete_never_recreate_deleted_directory ... ok
+test native_character_card_zip_roundtrip_real_materials_and_memory_choice ... ok
+test native_character_card_real_zip_refuses_escape_links_and_expansion_without_agents ... ok
+test native_settings_reads_keep_real_failures_and_paid_dream_consumption ... ok
+test native_agent_settings_current_electron_entry_smoke ... ok
+test native_pending_receipt_owner_switch_two_real_services_never_posts_to_other_service ... ok
+test native_character_card_owner_two_real_services_and_delayed_import_response ... ok
+test native_remaining_tenet_health_and_order_real_failures_and_pointer_cancel ... ok
+test native_settings_current_electron_actual_read_permission_denied_is_error ... ok
+test native_settings_current_electron_real_io_failures_and_partial_writes ... FAILED
+test native_initialization_cache_summary_and_real_fifteen_second_timeout ... ok
+test native_settings_nineteen_actions_actual_electron_and_service ... FAILED
+test native_pending_reference_deletion_current_electron_shows_and_retries_truthfully ... FAILED
+
+failures:
+
+---- native_settings_current_electron_real_io_failures_and_partial_writes stdout ----
+SETTINGS-UI-CHILD[failures]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/settings-completion-failures-27618-1792304565487508000/home/ui-result.json
+
+thread 'native_settings_current_electron_real_io_failures_and_partial_writes' (2035221) panicked at crates/lingxi-service/tests/r06_agent_settings_live.rs:542:5:
+actual Electron UI failed
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- native_settings_nineteen_actions_actual_electron_and_service stdout ----
+SETTINGS-UI-CHILD[workflow]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/settings-completion-workflow-27618-1792304565487494000/home/ui-result.json
+
+thread 'native_settings_nineteen_actions_actual_electron_and_service' (2035222) panicked at crates/lingxi-service/tests/r06_agent_settings_live.rs:542:5:
+actual Electron UI failed
+
+---- native_pending_reference_deletion_current_electron_shows_and_retries_truthfully stdout ----
+SETTINGS-UI-CHILD[references-pending]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/settings-completion-references-pending-27618-1792304565487516000/home/ui-result.json
+
+thread 'native_pending_reference_deletion_current_electron_shows_and_retries_truthfully' (2035218) panicked at crates/lingxi-service/tests/r06_agent_settings_live.rs:542:5:
+actual Electron UI failed
+
+
+failures:
+    native_pending_reference_deletion_current_electron_shows_and_retries_truthfully
+    native_settings_current_electron_real_io_failures_and_partial_writes
+    native_settings_nineteen_actions_actual_electron_and_service
+
+test result: FAILED. 11 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 46.86s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_agent_settings_live`
+     Running tests/r06_b7b_config_scope_prefs.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_b7b_config_scope_prefs-eed788cc5ea0e39f)
+
+running 2 tests
+test global_agent_leaf_split_cross_agent_readback_and_immediate_refilter ... ok
+test mixed_patch_partial_success_and_memory_toggle_timestamps ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.50s
+
+     Running tests/r06_b7b_skills_events.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_b7b_skills_events-d000919b254f9e47)
+
+running 1 test
+test skills_faces_broadcast_and_bundle_boundaries ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+     Running tests/r06_settings_owner_current_source.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_settings_owner_current_source-4104e8cdb10af0ed)
+
+running 1 test
+test current_settings_owner_switch_cannot_edit_other_real_service_before_identity_ready ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.42s
+
+     Running tests/r06_t06_skills.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t06_skills-4ea5ce32f7d8ffcf)
+
+running 6 tests
+test a12_layer1_install_review_token_protocol_end_to_end ... ok
+test a12_layer1_guard_slot_absent_fails_closed_to_risk_confirmation ... ok
+test a12_layer1_safe_review_installs_directly_marked_not_default_enabled ... ok
+test a12_layer2_gateway_refuses_out_of_workspace_skill_action ... ok
+test a11_memory_tools_are_bound_to_one_agent_at_construction ... ok
+test skills_http_faces_whitelist_shadow_readonly_and_bundles ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+error: 1 target failed:
+    `-p lingxi-service --test r06_agent_settings_live`

@@ -1,0 +1,22 @@
+
+running 15 tests
+test office::cancelled_pdf_waits_for_actual_external_cleanup_and_never_registers_a_file ... ok
+test office::pdf_private_asset_is_refused_before_any_external_renderer_call ... ok
+test office::apply_cover_candidate_target_applies_existing_image_through_real_approval ... ok
+test office::cover_requires_confirmation_and_preserves_markdown_and_actual_image ... ok
+test office::capabilities_and_cover_style_guide_deliver_real_catalog_content ... ok
+test office::guide_state_is_owned_by_the_actual_session_and_plugin_toggle_is_effective ... ok
+test office::read_only_and_live_toggle_revocation_prevent_cover_writes ... ok
+test office::actual_http_apply_preserves_old_shape_and_refuses_self_reported_identity ... ok
+test office::background_cover_job_refuses_to_apply_after_document_changed ... ok
+test office::bundled_preset_apply_uses_real_gallery_bytes_and_rejects_unknown_presets ... ok
+test office::background_cover_job_completes_with_real_media_and_applies_frozen_write ... ok
+test office::background_cover_fixed_actions_honor_live_revocation_and_cancel_before_apply ... ok
+test office::pdf_collects_authorized_assets_and_three_bundled_fonts_then_registers_real_file ... ok
+test office::real_document_worker_reads_docx_xlsx_and_paged_pdf_without_changing_inputs ... ok
+test office::remote_cover_clients_cannot_turn_absolute_paths_into_local_owner_authority ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.36s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.15s
+     Running tests/r07_office_tools.rs (rust/target/debug/deps/r07_office_tools-86e92ab3ff1d0857)

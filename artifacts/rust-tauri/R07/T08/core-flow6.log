@@ -1,0 +1,35 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: function `effective_choice` is never used
+   --> crates/lingxi-service/src/chat_settings.rs:155:15
+    |
+155 | pub(crate) fn effective_choice(
+    |               ^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `effective_choice_with_model` is never used
+   --> crates/lingxi-service/src/chat_settings.rs:163:15
+    |
+163 | pub(crate) fn effective_choice_with_model(
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `lingxi-service` (lib) generated 2 warnings
+error[E0624]: method `read_preferences_root` is private
+   --> crates/lingxi-service/tests/r07_t08_settings.rs:485:30
+    |
+485 |             h.state.memory().read_preferences_root().unwrap()["locale"],
+    |                              ^^^^^^^^^^^^^^^^^^^^^ private method
+    |
+   ::: crates/lingxi-service/src/agents_admin.rs:107:5
+    |
+107 |     pub(crate) fn read_preferences_root(&self) -> Result<Value, String> {
+    |     ------------------------------------------------------------------- private method defined here
+
+For more information about this error, try `rustc --explain E0624`.
+error: could not compile `lingxi-service` (test "r07_t08_settings") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (lib test) generated 3 warnings (2 duplicates)

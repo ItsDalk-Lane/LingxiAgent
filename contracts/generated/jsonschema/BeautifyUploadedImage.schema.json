@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "contentBase64": {
+      "type": "string"
+    },
+    "filename": {
+      "default": null,
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "contentBase64"
+  ],
+  "title": "BeautifyUploadedImage",
+  "type": "object"
+}

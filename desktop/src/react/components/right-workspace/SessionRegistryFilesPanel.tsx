@@ -11,15 +11,18 @@ import {
   canUseFileRefNativePath,
   resolveFileRefNativePath,
 } from '../../services/resource-access';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 import { takeMarkdownFileScreenshot } from '../../utils/screenshot';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../services/service-client';
 import { FileKindIcon } from '../shared/FileKindIcon';
 import {
   clearAppFileDragPayload,
   writeAppFileDragPayload,
 } from '../../utils/app-file-drag';
 import styles from './RightWorkspacePanel.module.css';
+import { bridgeConnectionKey, bridgeSessions, readBridgeResponse } from '../../services/bridge-response';
+import { bridgeMediaRequestId, bridgeMediaOutcome, finishBridgeMediaAction } from '../../services/bridge-media-action';
+import { usePlatform } from '../../hooks/use-platform';
 
 const EMPTY_FILES: readonly FileRef[] = Object.freeze([]);
 const SESSION_FILE_SORT_KEY = 'hana-session-file-sort';
@@ -212,13 +215,13 @@ function previewFile(file: FileRef, sessionPath: string | null): void {
 function openFile(file: FileRef): void {
   const nativePath = nativePathForFile(file, { requireAvailable: true });
   if (!nativePath) return;
-  window.platform?.openFile?.(nativePath);
+  usePlatform()?.openFile?.(nativePath);
 }
 
 function revealFile(file: FileRef): void {
   const nativePath = nativePathForFile(file, { requireAvailable: true });
   if (!nativePath) return;
-  window.platform?.showInFinder?.(nativePath);
+  usePlatform()?.showInFinder?.(nativePath);
 }
 
 function SortIcon() {
@@ -429,6 +432,9 @@ export function SessionRegistryFilesPanel() {
   const rubberBandRef = useRef<{ startX: number; startY: number } | null>(null);
   const cleanupRef = useRef<(() => void) | null>(null);
   const bridgeLoadSeqRef = useRef(0);
+  const bridgeMountedRef = useRef(true);
+  const bridgeSendRequests = useRef(new Set<AbortController>());
+  const connectionKey = useStore(state => bridgeConnectionKey(state));
 
   const bridgeAgents = useMemo(() => {
     if (agents.length > 0) return agents.map(agent => ({ id: agent.id, name: agent.name || agent.id }));
@@ -442,12 +448,14 @@ export function SessionRegistryFilesPanel() {
   }, [currentSessionPath]);
 
   useEffect(() => {
+    bridgeSendRequests.current.forEach(controller => controller.abort());
+    bridgeSendRequests.current.clear();
     bridgeLoadSeqRef.current += 1;
     setBridgeTargets([]);
     setBridgeTargetsLoaded(false);
     setBridgeTargetsLoading(false);
     setBridgeTargetsError(null);
-  }, [bridgeAgents]);
+  }, [bridgeAgents, connectionKey]);
 
   useEffect(() => {
     const liveIds = new Set(sortedFiles.map(file => file.id));
@@ -460,7 +468,10 @@ export function SessionRegistryFilesPanel() {
     }
   }, [sortedFiles]);
 
-  useEffect(() => () => cleanupRef.current?.(), []);
+  useEffect(() => {
+    bridgeMountedRef.current = true;
+    return () => { bridgeMountedRef.current = false; bridgeSendRequests.current.forEach(controller => controller.abort()); bridgeSendRequests.current.clear(); cleanupRef.current?.(); };
+  }, []);
 
   const selectedFiles = useMemo(
     () => sortedFiles.filter(file => selectedIds.has(file.id)),
@@ -470,19 +481,19 @@ export function SessionRegistryFilesPanel() {
   const loadBridgeTargets = useCallback(async (force = false) => {
     if (bridgeTargetsLoading || (bridgeTargetsLoaded && !force)) return;
     const seq = ++bridgeLoadSeqRef.current;
+    const sourceKey = bridgeConnectionKey(useStore.getState());
+    const current = () => bridgeMountedRef.current && seq === bridgeLoadSeqRef.current && sourceKey === bridgeConnectionKey(useStore.getState());
     setBridgeTargetsLoading(true);
     setBridgeTargetsError(null);
-    if (force) {
-      setBridgeTargets([]);
-      setBridgeTargetsLoaded(false);
-    }
     try {
       const targets: BridgeSendTarget[] = [];
+      const platforms = resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service'
+        ? BRIDGE_PLATFORMS.filter(platform => platform !== 'whatsapp') : BRIDGE_PLATFORMS;
       await Promise.all(bridgeAgents.map(async agent => {
-        await Promise.all(BRIDGE_PLATFORMS.map(async platform => {
+        await Promise.all(platforms.map(async platform => {
           const res = await lingxiFetch(`/api/bridge/sessions?platform=${encodeURIComponent(platform)}&agentId=${encodeURIComponent(agent.id)}`);
-          const data = await res.json().catch(() => ({ sessions: [] }));
-          const sessions = Array.isArray(data.sessions) ? data.sessions as BridgeSessionSummary[] : [];
+          const data = await readBridgeResponse(res);
+          const sessions = bridgeSessions(data) as BridgeSessionSummary[];
           for (const session of sessions) {
             if (!session?.chatId) continue;
             targets.push({
@@ -497,14 +508,12 @@ export function SessionRegistryFilesPanel() {
           }
         }));
       }));
-      if (bridgeLoadSeqRef.current !== seq) return;
+      if (!current()) return;
       setBridgeTargets(targets);
       setBridgeTargetsLoaded(true);
     } catch (err) {
-      if (bridgeLoadSeqRef.current !== seq) return;
+      if (!current()) return;
       const message = errorMessage(err);
-      setBridgeTargets([]);
-      setBridgeTargetsLoaded(true);
       setBridgeTargetsError(message);
       useStore.getState().addToast(tr('rightWorkspace.sessionFiles.bridgeLoadFailed', { error: message }), 'error');
     } finally {
@@ -515,32 +524,62 @@ export function SessionRegistryFilesPanel() {
   }, [bridgeAgents, bridgeTargetsLoaded, bridgeTargetsLoading]);
 
   const sendFilesToBridge = useCallback(async (filesToSend: FileRef[], target: BridgeSendTarget) => {
-    const sendableFiles = pathBackedFiles(filesToSend, { requireAvailable: true });
-    if (sendableFiles.length === 0) return;
+    const sourceKey = bridgeConnectionKey(useStore.getState());
+    const current = () => bridgeMountedRef.current && sourceKey === bridgeConnectionKey(useStore.getState()) && currentSessionPath === useStore.getState().currentSessionPath;
+    const native = resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service';
+    const sendableFiles = native ? filesToSend.filter(file => (file.fileId || file.id).startsWith('sf_') && file.status !== 'expired') : pathBackedFiles(filesToSend, { requireAvailable: true });
+    if (sendableFiles.length === 0) { useStore.getState().addToast('所选文件没有可发送的有效登记记录', 'error'); return; }
     const targetLabel = bridgeTargetLabel(target);
+    const sessionId = currentSessionPath?.startsWith('native:') ? currentSessionPath.slice(7) : useStore.getState().sessions.find(session => session.path === currentSessionPath)?.sessionId;
+    const action = JSON.stringify([sourceKey, currentSessionPath, target.agentId, target.platform, target.sessionKey, sendableFiles.map(file => file.fileId || file.id).sort()]);
+    let pending = false;
     try {
       for (const file of sendableFiles) {
+        if (!current()) return;
+        if (native && !sessionId) throw new Error('缺少文件所属会话，尚未发送');
+        const fileId = file.fileId || file.id;
+        const requestId = bridgeMediaRequestId(action, fileId);
+        const controller = new AbortController(); bridgeSendRequests.current.add(controller);
+        let data: Record<string, any>;
+        try {
         const res = await lingxiFetch(`/api/bridge/send-media?agentId=${encodeURIComponent(target.agentId)}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
           body: JSON.stringify({
             platform: target.platform,
             chatId: target.chatId,
-            filePath: file.path,
+            sessionKey: target.sessionKey,
+            requestId,
+            ...(native ? { fileId, sessionId } : { filePath: file.path, sessionPath: currentSessionPath ?? undefined }),
             label: file.name,
-            sessionPath: currentSessionPath ?? undefined,
           }),
         });
-        const data = await res.json().catch(() => null);
-        if (data && data.ok === false) {
-          throw new Error(data.error || 'bridge media send failed');
+        data = await readBridgeResponse(res);
+        } finally { bridgeSendRequests.current.delete(controller); }
+        if (!current()) return;
+        let outcome = bridgeMediaOutcome(data, native);
+        // 查询既有发送事实，绝不再次调用发送入口或生成新的请求编号。
+        for (let attempt = 0; native && outcome === 'pending' && attempt < 20; attempt++) {
+          if (typeof data.deliveryId !== 'string' || !data.deliveryId) throw new Error('发送队列缺少可查询凭据');
+          await new Promise(resolve => setTimeout(resolve, 500));
+          if (!current()) return;
+          const receiptRequest = new AbortController(); bridgeSendRequests.current.add(receiptRequest);
+          try { data = await readBridgeResponse(await lingxiFetch(`/api/bridge/deliveries/${encodeURIComponent(data.deliveryId)}?agentId=${encodeURIComponent(target.agentId)}`, { signal: receiptRequest.signal })); }
+          finally { bridgeSendRequests.current.delete(receiptRequest); }
+          if (!current()) return;
+          outcome = bridgeMediaOutcome(data, true);
         }
+        pending = pending || outcome === 'pending';
       }
+      if (pending) { useStore.getState().addToast('文件已排队，正在等待平台确认；再次点击会查询同一请求', 'warning'); return; }
+      finishBridgeMediaAction(action);
       useStore.getState().addToast(
         tr('rightWorkspace.sessionFiles.sendSuccess', { target: targetLabel, n: sendableFiles.length }),
         'success',
       );
     } catch (err) {
+      if (!current()) return;
       useStore.getState().addToast(
         tr('rightWorkspace.sessionFiles.sendFailed', { target: targetLabel, error: errorMessage(err) }),
         'error',
@@ -622,22 +661,18 @@ export function SessionRegistryFilesPanel() {
   const buildFileMenuItems = useCallback((file: FileRef): ContextMenuItem[] => {
     const actionFiles = filesForAction(file);
     const pathFiles = nativePathBackedFiles(actionFiles);
-    const sendableFiles = pathBackedFiles(actionFiles, { requireAvailable: true });
+    const sendableFiles = resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service'
+      ? actionFiles.filter(item => !!item.fileId?.startsWith('sf_') && item.status !== 'expired') : pathBackedFiles(actionFiles, { requireAvailable: true });
     const screenshotFile = actionFiles.length === 1 && canScreenshotShareFile(actionFiles[0])
       ? actionFiles[0]
       : null;
     const screenshotPath = screenshotFile ? nativePathForFile(screenshotFile, { requireAvailable: true }) : null;
     const downloadUrl = fileRefDownloadUrl(file);
-    const sendTargetItems: ContextMenuItem[] = bridgeTargetsLoading && !bridgeTargetsLoaded
-      ? [{ label: tr('rightWorkspace.sessionFiles.actions.sendToBridgeLoading'), disabled: true }]
-      : bridgeTargetsError
-        ? [{ label: tr('rightWorkspace.sessionFiles.actions.sendToBridgeLoadFailed'), disabled: true }]
-        : bridgeTargets.length > 0
-          ? bridgeTargets.map(target => ({
-            label: bridgeTargetLabel(target),
-            action: () => sendFilesToBridge(sendableFiles, target),
-          }))
-          : [{ label: tr('rightWorkspace.sessionFiles.actions.sendToBridgeEmpty'), disabled: true }];
+    const sendTargetItems: ContextMenuItem[] = [
+      ...(bridgeTargetsError ? [{ label: tr('rightWorkspace.sessionFiles.actions.sendToBridgeLoadFailed'), disabled: true }] : []),
+      ...bridgeTargets.map(target => ({ label: bridgeTargetLabel(target), action: () => sendFilesToBridge(sendableFiles, target) })),
+      ...(!bridgeTargets.length && !bridgeTargetsError ? [{ label: tr(bridgeTargetsLoading ? 'rightWorkspace.sessionFiles.actions.sendToBridgeLoading' : 'rightWorkspace.sessionFiles.actions.sendToBridgeEmpty'), disabled: true }] : []),
+    ];
 
     return [
       { label: tr('rightWorkspace.sessionFiles.actions.preview'), disabled: !canPreviewFile(file), action: () => previewFile(file, currentSessionPath) },
@@ -710,7 +745,7 @@ export function SessionRegistryFilesPanel() {
       .filter((path): path is string => !!path);
     if (paths.length > 0) {
       event.preventDefault();
-      window.platform?.startDrag?.(paths.length === 1 ? paths[0] : paths);
+      usePlatform()?.startDrag?.(paths.length === 1 ? paths[0] : paths);
     }
   }, [filesForAction]);
 

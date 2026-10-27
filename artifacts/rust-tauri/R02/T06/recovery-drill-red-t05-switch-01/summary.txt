@@ -1,0 +1,9 @@
+== building lingxi-service + lingxi-storage-inspect (rustup 1.98.1, /private/tmp/t05sw.ezfTWO/rust-target-r02-t06, --locked) ==
+PASS build (locked, offline)
+== v1 (R02-A12/drill): torn stamp + readable higher-epoch journal ==
+PASS v1 exit=2 reason=corrupt-stamp evidence 1→2 named; files byte-identical; no auth state written
+== v2: valid stamp + torn transition journal ==
+PASS v2 exit=2 reason=corrupt-journal; files byte-identical
+== v3 (headline fail-open shape): missing stamp + readable higher-epoch journal ==
+PASS v3 exit=2 reason=corrupt-transition evidence 1→2 named; no stamp invented; files byte-identical
+== v4: healthy control (fresh home starts) ==

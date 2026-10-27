@@ -1,0 +1,148 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r07_t08_mcp_remote") generated 1 warning (1 duplicate)
+warning: `lingxi-service` (test "r07_t08_mcp_session_permissions") generated 1 warning (1 duplicate)
+warning: `lingxi-service` (test "r07_t08_mcp_settings") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 49.90s
+     Running tests/r07_t08_mcp_remote.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_mcp_remote-238415c6ba6a30d9)
+
+running 7 tests
+MCP远端隔离现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-b10865334d9cd057
+MCP远端隔离现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-06821899e14c6f98
+MCP远端隔离现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-bec29978136c830e
+MCP远端隔离现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-85060ffbf8fc5e61
+MCP远端隔离现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-a1d0f4dfc449c0ce
+MCP远端隔离现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-aaeac63c6c3adf81
+MCP远端隔离现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-96ddb77c2850fcd7
+自有官方SDK远端资源实际观测：{"deleteRequests":1,"handlerCancelNotifications":1,"handlerCtBranch":1,"handlerCtCancelled":true,"handlerDropCtCancelled":1,"protocolVersions":["2025-11-25"],"remoteActive":0,"remoteHandlerDropped":1,"wireCancelNotifications":1}
+MCP远端隔离现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-b275544711e60b37
+test cancelled_browser_flows_release_pending_capacity_without_erasing_saved_facts ... ok
+test actual_http_apps_visibility_launch_input_resources_and_generation_cancellation ... ok
+MCP远端隔离现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-bec29978136c830e
+test old_official_sdk_refresh_cannot_overwrite_a_new_browser_login_committed_to_source ... ok
+test actual_session_run_http_404_never_replays_the_posted_mcp_tool_call ... ok
+test oauth_cancel_changed_configuration_revoked_owner_and_shutdown_never_resurrect_credentials ... ok
+test actual_oauth_pkce_dcr_private_source_refresh_restart_resources_and_logout ... ok
+真实MCP设置消费退出：code=Some(0), success=true
+真实MCP设置消费stdout：
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  20:02:22
+   Duration  5.78s (transform 1.08s, setup 21ms, import 55ms, tests 5.38s, environment 250ms)
+
+
+真实MCP设置消费stderr：
+
+test settings_content_mcp_oauth_page_consumes_the_same_owned_sdk_and_private_source ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.37s
+
+     Running tests/r07_t08_mcp_session_permissions.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_mcp_session_permissions-02f840a290300758)
+
+running 5 tests
+实际grant读后归档恢复交错：HTTP=409 response={"error":"会话已改变，请重新确认"} home=/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-session-permission-ab8fec542bff3bad
+test in_flight_grant_cannot_land_after_real_archive_restore_completed ... ok
+LINGXI_AUTH_REJECTED request_id="req-5ba437528d45bd88a422f973c95fe029" method=POST path=/lingxi/v1/mcp/session-permissions status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:58634
+MCP批准观测：stage=ws-first-alpha session=mcp-ws-session readyMs=42 status=200 requestMs=1270 approvalId=approval:caa909805846c431b2dff5665bee8701
+MCP批准观测：stage=first-alpha session=mcp-session-a readyMs=1290 status=200 requestMs=1281 approvalId=approval:38d2664b73a2ed4a5f49a634529f7586
+LINGXI_AUTH_REJECTED request_id="req-8938b224dc29d125012c1aeaca5bcaf8" method=POST path=/lingxi/v1/mcp/session-permissions status=403 reason=insufficient_scope remote=127.0.0.1:58641
+WS第二轮真实帧：type="session_user_message" runId=null
+WS第二轮真实帧：type="status" runId=null
+WS第二轮真实帧：type="assistant_run_start" runId="run_000001a14ee49489_000002"
+WS第二轮真实帧：type="stage" runId=null
+WS第二轮真实帧：type="tool_start" runId=null
+WS第二轮真实帧：type="tool_end" runId=null
+WS第二轮真实帧：type="stage" runId=null
+WS第二轮真实帧：type="assistant_segment_start" runId=null
+WS第二轮真实帧：type="assistant_segment_delta" runId=null
+WS第二轮真实帧：type="assistant_segment_end" runId=null
+WS第二轮真实帧：type="assistant_run_end" runId="run_000001a14ee49489_000002"
+test actual_ws_prompt_reuses_session_capability_for_second_different_arguments_without_approval ... ok
+MCP批准观测：stage=fresh-credential-before-restart session=mcp-restart-check readyMs=1345 status=200 requestMs=1289 approvalId=approval:0aa06e687ceb1759cb98e3a7d27acafc
+MCP批准观测：stage=other-session-alpha session=mcp-session-b readyMs=1321 status=200 requestMs=1246 approvalId=approval:2411590261a4e97822bc2e08da56e073
+MCP批准观测：stage=same-home-after-restart session=mcp-restart-check readyMs=1281 status=200 requestMs=1246 approvalId=approval:996bba3d96aa7003d0fa3d8bb4c79fdc
+test credential_revocation_and_same_home_real_restart_do_not_restore_temporary_grants ... ok
+MCP批准观测：stage=other-capability-beta session=mcp-session-a readyMs=1269 status=200 requestMs=1205 approvalId=approval:c712f1f69aab7be8870dff7f84b358d2
+MCP批准观测：stage=restored-session-alpha session=mcp-scope-check readyMs=1218 status=200 requestMs=1203 approvalId=approval:643d988c354d09132456f890694d2175
+MCP显式后台未继承授权的实际处理：run=run_000001a14ee4c5a6_000005 status=waiting_approval
+MCP批准观测：stage=explicit-background-alpha session=mcp-session-a readyMs=0 status=200 requestMs=1205 approvalId=approval:de97ad268b5cb968c6f524402d200271
+test paired_scope_grants_same_session_exact_capability_across_arguments_without_persisting ... ok
+MCP批准观测：stage=restarted-connector-alpha session=mcp-scope-check readyMs=1205 status=200 requestMs=1187 approvalId=approval:1e5c3ce54cd01b9ae59783160633711b
+test missing_scope_foreign_session_and_damaged_payload_never_grant_and_connector_restart_invalidates ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 34.12s
+
+     Running tests/r07_t08_mcp_settings.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_mcp_settings-6822f03ddf4954f8)
+
+running 22 tests
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-4d20365c084189e7
+test an_unconfigured_mcp_read_and_restore_do_not_create_directories_or_block_the_service ... ok
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-3e4fa089d570e617
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-6a8075e6e648f34d
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-41df9904c8dd895a
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-f4f669b3a6297647
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-169cad0bc3aea384
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-60ac6382f0141431
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-3edb68677db1142d
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-050ba4a76a9ba637
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-ad0583876f2d078f
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-579f95d3ae3e83af
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-207bd268f7d4ae56
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-eb4e5c2de1d6c744
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-6abe0fdfb93089ea
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-0075c04eb9715e09
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-cc0890ce291fd0ff
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-f23bf5863bd6c906
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-61fdbafac0cef807
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-4702a6fed3b7fb01
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-7259bf98311c42f3
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-ee9f582f856ad33d
+test occupied_listen_port_cleans_restored_mcp_and_knowledge_while_external_state_is_retained ... ok
+test global_disable_rejects_new_queued_start_while_old_sdk_cleanup_is_draining ... ok
+test an_authenticated_http_request_waiting_for_the_real_media_lock_cannot_use_a_replaced_owner_credential ... ok
+test invalid_provided_connector_shapes_never_write_and_schema_corruption_blocks_restore ... ok
+test rejected_update_must_not_cancel_an_accepted_background_sdk_start ... ok
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-fc0de988f118c094
+test explicit_start_revalidates_original_owner_while_real_sdk_initialize_is_waiting ... ok
+test http_saved_start_is_immediate_and_duplicate_start_uses_one_actual_sdk_connection ... ok
+test http_bulk_preflights_all_rows_and_keeps_saved_partial_runtime_failures ... ok
+test restoring_lazy_lifecycle_keeps_saved_intent_without_starting_external_processes ... ok
+test concurrent_registration_never_exposes_a_bare_executor_to_disabled_agent ... ok
+test editing_a_queued_connector_cleans_old_generation_before_new_sdk_start ... ok
+test http_bulk_pending_start_does_not_block_other_saves_and_stop_disable_reap_real_groups ... ok
+test a_real_pending_settings_approval_does_not_survive_local_credential_replacement ... ok
+test actual_mcp_catalog_crosses_the_shared_defer_threshold_without_losing_other_sources ... ok
+test http_page_state_keeps_real_tools_agent_defaults_defer_and_private_edit_material ... ok
+test cancelling_a_real_settings_run_interrupts_initialization_and_preserves_saved_intent ... ok
+test stopping_an_actual_inflight_mcp_call_records_unknown_without_replay_and_reaps_group ... ok
+test queued_original_authority_revocation_and_shutdown_cancel_and_reap_owned_sdk_start ... ok
+LINGXI_AUTH_REJECTED request_id="req-4085114c798819178c344e7dbe0079ec" method=GET path=/lingxi/v1/mcp/state status=403 reason=local_owner_required remote=127.0.0.1:58991
+
+thread 'real_run_nine_mcp_settings_actions_persist_and_gate_actual_sdk_consumers' (3525028) panicked at crates/lingxi-service/tests/r07_t08_mcp_settings.rs:1159:5:
+assertion `left == right` failed
+  left: "mcp_connect_failed"
+ right: "mcp_endpoint_unsupported"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test real_run_nine_mcp_settings_actions_persist_and_gate_actual_sdk_consumers ... FAILED
+LINGXI_AUTH_REJECTED request_id="req-41b36a5a8810cdf3d268d702f6205e16" method=POST path=/lingxi/v1/mcp/settings-action status=403 reason=local_owner_required remote=127.0.0.1:59175
+test management_rejects_other_identities_corrupt_files_links_and_replaced_parent ... ok
+test a_real_web_login_cannot_gain_local_settings_authority_through_an_approved_model_tool ... ok
+
+failures:
+
+failures:
+    real_run_nine_mcp_settings_actions_persist_and_gate_actual_sdk_consumers
+
+test result: FAILED. 21 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.72s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t08_mcp_settings`
+error: 1 target failed:
+    `-p lingxi-service --test r07_t08_mcp_settings`

@@ -1,0 +1,82 @@
+{"binary": "/private/tmp/lingxi-r07-build/debug/deps/r07_browser_chromium-c876379d58688d69", "binarySha256Before": "f8b20807a4615578cd7e16210ee17a23d723606efb1fa23a85c6413e485f7ab5"}
+{"diagnosticIteration": 1, "command": ["/private/tmp/lingxi-r07-build/debug/deps/r07_browser_chromium-c876379d58688d69", "trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock", "--exact", "--nocapture"], "RUST_BACKTRACE": "1"}
+
+running 1 test
+test trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.93s
+
+{"diagnosticIteration": 1, "exitCode": 0}
+{"diagnosticIteration": 2, "command": ["/private/tmp/lingxi-r07-build/debug/deps/r07_browser_chromium-c876379d58688d69", "trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock", "--exact", "--nocapture"], "RUST_BACKTRACE": "1"}
+
+running 1 test
+test trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.92s
+
+{"diagnosticIteration": 2, "exitCode": 0}
+{"diagnosticIteration": 3, "command": ["/private/tmp/lingxi-r07-build/debug/deps/r07_browser_chromium-c876379d58688d69", "trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock", "--exact", "--nocapture"], "RUST_BACKTRACE": "1"}
+
+running 1 test
+test trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 1.06s
+
+{"diagnosticIteration": 3, "exitCode": 0}
+{"diagnosticIteration": 4, "command": ["/private/tmp/lingxi-r07-build/debug/deps/r07_browser_chromium-c876379d58688d69", "trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock", "--exact", "--nocapture"], "RUST_BACKTRACE": "1"}
+
+running 1 test
+test trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 1.12s
+
+{"diagnosticIteration": 4, "exitCode": 0}
+{"diagnosticIteration": 5, "command": ["/private/tmp/lingxi-r07-build/debug/deps/r07_browser_chromium-c876379d58688d69", "trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock", "--exact", "--nocapture"], "RUST_BACKTRACE": "1"}
+
+running 1 test
+test trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.84s
+
+{"diagnosticIteration": 5, "exitCode": 0}
+{"diagnosticIteration": 6, "command": ["/private/tmp/lingxi-r07-build/debug/deps/r07_browser_chromium-c876379d58688d69", "trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock", "--exact", "--nocapture"], "RUST_BACKTRACE": "1"}
+
+running 1 test
+test trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.82s
+
+{"diagnosticIteration": 6, "exitCode": 0}
+{"diagnosticIteration": 7, "command": ["/private/tmp/lingxi-r07-build/debug/deps/r07_browser_chromium-c876379d58688d69", "trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock", "--exact", "--nocapture"], "RUST_BACKTRACE": "1"}
+
+running 1 test
+test trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.85s
+
+{"diagnosticIteration": 7, "exitCode": 0}
+{"diagnosticIteration": 8, "command": ["/private/tmp/lingxi-r07-build/debug/deps/r07_browser_chromium-c876379d58688d69", "trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock", "--exact", "--nocapture"], "RUST_BACKTRACE": "1"}
+
+running 1 test
+test trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.85s
+
+{"diagnosticIteration": 8, "exitCode": 0}
+{"diagnosticIteration": 9, "command": ["/private/tmp/lingxi-r07-build/debug/deps/r07_browser_chromium-c876379d58688d69", "trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock", "--exact", "--nocapture"], "RUST_BACKTRACE": "1"}
+
+running 1 test
+test trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.85s
+
+{"diagnosticIteration": 9, "exitCode": 0}
+{"diagnosticIteration": 10, "command": ["/private/tmp/lingxi-r07-build/debug/deps/r07_browser_chromium-c876379d58688d69", "trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock", "--exact", "--nocapture"], "RUST_BACKTRACE": "1"}
+
+running 1 test
+test trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.80s
+
+{"diagnosticIteration": 10, "exitCode": 0}
+{"binarySha256After": "f8b20807a4615578cd7e16210ee17a23d723606efb1fa23a85c6413e485f7ab5", "binaryUnchanged": true, "diagnosticOnly": true}

@@ -1,0 +1,10 @@
+
+> lingxi@0.1.43 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+desktop/src/react/components/PreviewEditor.tsx(332,20): error TS2532: Object is possibly 'undefined'.
+desktop/src/react/components/PreviewEditor.tsx(332,20): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+desktop/src/react/components/PreviewEditor.tsx(343,20): error TS2532: Object is possibly 'undefined'.
+desktop/src/react/components/PreviewEditor.tsx(343,20): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+desktop/src/react/components/PreviewEditor.tsx(637,34): error TS2532: Object is possibly 'undefined'.
+desktop/src/react/components/PreviewEditor.tsx(637,34): error TS2722: Cannot invoke an object which is possibly 'undefined'.

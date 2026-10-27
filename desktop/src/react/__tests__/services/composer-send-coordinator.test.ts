@@ -13,6 +13,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
+import { resetDesktopHostForTests } from '../../host/desktop-host';
 
 const previewRefreshMocks = vi.hoisted(() => ({
   changeOptions: { retryMissing: true, retryUnchanged: true },
@@ -268,7 +269,7 @@ afterEach(() => {
   resetComposerSendCoordinatorForTests();
   vi.useRealTimers();
   vi.unstubAllGlobals();
-  delete (window as { platform?: unknown }).platform;
+  resetDesktopHostForTests();
 });
 
 describe('composer-send-coordinator（Q01–Q16）', () => {

@@ -1,0 +1,29 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: method `apply_cover_frozen` is never used
+   --> crates/lingxi-service/src/office_tools.rs:408:25
+    |
+165 | impl OfficeApi {
+    | -------------- method in this implementation
+...
+408 |     pub(crate) async fn apply_cover_frozen(
+    |                         ^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.56s
+     Running tests/r07_office_tools.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_office_tools-ca0717eb6a989f9e)
+
+running 9 tests
+test office::cancelled_pdf_waits_for_actual_external_cleanup_and_never_registers_a_file ... ok
+test office::pdf_private_asset_is_refused_before_any_external_renderer_call ... ok
+test office::cover_requires_confirmation_and_preserves_markdown_and_actual_image ... ok
+test office::read_only_and_live_toggle_revocation_prevent_cover_writes ... ok
+test office::guide_state_is_owned_by_the_actual_session_and_plugin_toggle_is_effective ... ok
+test office::real_document_worker_reads_docx_xlsx_and_paged_pdf_without_changing_inputs ... ok
+test office::pdf_collects_authorized_assets_and_three_bundled_fonts_then_registers_real_file ... ok
+test office::actual_http_apply_preserves_old_shape_and_refuses_self_reported_identity ... ok
+test office::remote_cover_clients_cannot_turn_absolute_paths_into_local_owner_authority ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.05s
+

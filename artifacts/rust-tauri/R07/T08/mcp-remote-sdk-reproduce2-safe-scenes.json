@@ -1,0 +1,153 @@
+{
+  "scope": "ACTUAL_DEVELOPMENT_REPRODUCTION_SAFE_FACTS_ONLY",
+  "createdAt": "2026-10-18T11:29:27.978876+00:00",
+  "log": "artifacts/rust-tauri/R07/T08/mcp-remote-sdk-reproduce2.log",
+  "logSha256": "a6028002299f07dfc2b631d13f68d9135060c8ad4a16f77f2c28cb079d4291e1",
+  "passed": [
+    "actual_oauth_pkce_dcr_private_source_refresh_restart_resources_and_logout",
+    "oauth_cancel_changed_configuration_revoked_owner_and_shutdown_never_resurrect_credentials"
+  ],
+  "failed": [
+    {
+      "case": "old_official_sdk_refresh_cannot_overwrite_a_new_browser_login_committed_to_source",
+      "classification": "REAL_PRODUCT_DEFECT",
+      "fact": "New interactive OAuth credentials were actually committed, then old real SDK refresh overwrote them."
+    },
+    {
+      "case": "cancelled_browser_flows_release_pending_capacity_without_erasing_saved_facts",
+      "classification": "REAL_PRODUCT_DEFECT",
+      "fact": "After32 real start/cancel, 33rd actual start returned429 mcp_oauth_busy."
+    },
+    {
+      "case": "actual_session_run_http_404_never_replays_the_posted_mcp_tool_call",
+      "classification": "FIXTURE_PRECONDITION_ERROR",
+      "fact": "Persisted full is not a valid SessionPermissionMode. Run failed before MCP tool dispatch; no404/no-replay proof yet."
+    },
+    {
+      "case": "actual_http_apps_visibility_launch_input_resources_and_generation_cancellation",
+      "classification": "REMOTE_HANDLER_OBSERVATION_FAILURE_REQUIRES_RECHECK",
+      "fact": "Local request stopped returning200 but real SDK handler ct cancellation was not observed in3 seconds. Official server fixture had no SSE keep-alive; SDK own disconnect regression documents need for keep-alives to observe closed response streams.",
+      "nextCheck": "Keep original3second assertion; enable official SDK100ms SSE keep-alive as in its own test, record protocol cancellation notification separately from handler ct."
+    }
+  ],
+  "scenes": [
+    {
+      "originalHome": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-1af4d2e047e2cbd7",
+      "sourceExistsAtObservation": true,
+      "sourceSha256": "85032ce9beddab86e4440c26fd327bf1292ea9bd06e617dd44fa4964c0827240",
+      "mode": "0o600",
+      "rootKeys": [
+        "agents",
+        "global",
+        "rootExtra",
+        "schemaVersion",
+        "sessions"
+      ],
+      "rootExtraKeep": 37,
+      "connectorFacts": [
+        {
+          "id": "owned",
+          "transport": "streamable-http",
+          "authType": "oauth",
+          "enabled": true,
+          "hasSdkCredentialRecord": true,
+          "accessIsNewLogin": false,
+          "accessIsLateOldRefresh": true,
+          "accessSha256": "5c0d6d465622532fc47f70131ccebbc2320c8ded006c944649451a830cf3fb9c"
+        }
+      ]
+    },
+    {
+      "originalHome": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-30afb2cd6d39c99c",
+      "sourceExistsAtObservation": false
+    },
+    {
+      "originalHome": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-2d10c638c912e6d6",
+      "sourceExistsAtObservation": true,
+      "sourceSha256": "40ad86b74e155dc24c0c5483a68a732512575f2a5079e31c9474ce3887e747ad",
+      "mode": "0o600",
+      "rootKeys": [
+        "agents",
+        "global",
+        "rootExtra",
+        "schemaVersion",
+        "sessions"
+      ],
+      "rootExtraKeep": 37,
+      "connectorFacts": [
+        {
+          "id": "owned",
+          "transport": "streamable-http",
+          "authType": "bearer",
+          "enabled": false,
+          "hasSdkCredentialRecord": false,
+          "accessIsNewLogin": false,
+          "accessIsLateOldRefresh": false,
+          "accessSha256": null
+        }
+      ]
+    },
+    {
+      "originalHome": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-f79495ae1f939e2c",
+      "sourceExistsAtObservation": false
+    },
+    {
+      "originalHome": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-bd5a7489413a2b45",
+      "sourceExistsAtObservation": true,
+      "sourceSha256": "95fc5ac19f103dd6458571f9c39524460331cab5d78d5124c07207f1bf309bd0",
+      "mode": "0o600",
+      "rootKeys": [
+        "agents",
+        "global",
+        "rootExtra",
+        "schemaVersion",
+        "sessions"
+      ],
+      "rootExtraKeep": 37,
+      "connectorFacts": [
+        {
+          "id": "owned",
+          "transport": "streamable-http",
+          "authType": "oauth",
+          "enabled": true,
+          "hasSdkCredentialRecord": false,
+          "accessIsNewLogin": false,
+          "accessIsLateOldRefresh": false,
+          "accessSha256": null
+        }
+      ]
+    },
+    {
+      "originalHome": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-e40442a2ad636c8c",
+      "sourceExistsAtObservation": true,
+      "sourceSha256": "d1ea66ab6f3616ae230393880827c376ef1dcce4f86d6cb228644de1c1658870",
+      "mode": "0o600",
+      "rootKeys": [
+        "agents",
+        "global",
+        "rootExtra",
+        "schemaVersion",
+        "sessions"
+      ],
+      "rootExtraKeep": 37,
+      "connectorFacts": [
+        {
+          "id": "owned",
+          "transport": "streamable-http",
+          "authType": "bearer",
+          "enabled": true,
+          "hasSdkCredentialRecord": false,
+          "accessIsNewLogin": false,
+          "accessIsLateOldRefresh": false,
+          "accessSha256": null
+        }
+      ]
+    },
+    {
+      "originalHome": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-e1df5c1cb519e675",
+      "sourceExistsAtObservation": false
+    }
+  ],
+  "custody": "Original receipt/log/homes retained. No credentials/config bodies/tokens/codes copied; only hashes and fixed-synthetic comparison facts.",
+  "acceptance": "NOT_FINAL; no bulk leaf PASS"
+}

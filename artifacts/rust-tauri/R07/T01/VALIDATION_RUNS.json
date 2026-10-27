@@ -1,0 +1,238 @@
+{
+  "note": "多轮结果分别记录；后续变更仅影响列出的补跑目标，R07整轮尚未执行。",
+  "runs": [
+    {
+      "name": "lib-automation",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "lingxi-service",
+        "--lib",
+        "automation_",
+        "--locked"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 26.571,
+      "log": "/private/tmp/lingxi-r07-t01-lib-automation-frozen.log"
+    },
+    {
+      "name": "protocol-tests",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "lingxi-protocol",
+        "--locked"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.605,
+      "log": "/private/tmp/lingxi-r07-t01-protocol-tests-frozen.log"
+    },
+    {
+      "name": "protocol-generated-check",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "run",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "lingxi-protocol",
+        "--bin",
+        "lingxi-protocol-gen",
+        "--locked",
+        "--",
+        "--check"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.411,
+      "log": "/private/tmp/lingxi-r07-t01-protocol-generated-check-frozen.log"
+    },
+    {
+      "name": "protocol-rust-roundtrip",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "run",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "lingxi-protocol",
+        "--bin",
+        "lingxi-protocol-verify",
+        "--locked",
+        "--",
+        "--ts",
+        "artifacts/rust-tauri/R07/T01/ts-roundtrip"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.414,
+      "log": "/private/tmp/lingxi-r07-t01-protocol-rust-roundtrip-frozen.log"
+    },
+    {
+      "name": "format",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "fmt",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.328,
+      "log": "/private/tmp/lingxi-r07-t01-format-frozen.log"
+    },
+    {
+      "name": "flow-delta",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r07_automation_flow",
+        "--locked"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 19.704,
+      "log": "/private/tmp/lingxi-r07-t01-flow-delta.log",
+      "sourceFingerprint": "6fd3fc2f563575f7daee7dc7b0ea2939ffca5fcae693e5da3680a3824bf1ef79"
+    },
+    {
+      "name": "lib-automation-complete",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "lingxi-service",
+        "--lib",
+        "automation",
+        "--locked"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 10.577,
+      "log": "/private/tmp/lingxi-r07-t01-lib-automation-complete.log",
+      "sourceFingerprint": "6fd3fc2f563575f7daee7dc7b0ea2939ffca5fcae693e5da3680a3824bf1ef79"
+    },
+    {
+      "name": "clippy-complete",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "clippy",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "lingxi-service",
+        "-p",
+        "lingxi-adapters",
+        "-p",
+        "lingxi-protocol",
+        "--lib",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 5.491,
+      "log": "/private/tmp/lingxi-r07-t01-clippy-complete.log",
+      "sourceFingerprint": "6fd3fc2f563575f7daee7dc7b0ea2939ffca5fcae693e5da3680a3824bf1ef79"
+    },
+    {
+      "name": "service-frozen",
+      "argv": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r07_automation_activity",
+        "--test",
+        "r07_automation_flow",
+        "--test",
+        "r07_automation_import",
+        "--test",
+        "r07_automation_permission",
+        "--test",
+        "r07_daily_fresh_compact",
+        "--test",
+        "r07_heartbeat_plan",
+        "--test",
+        "r07_heartbeat_runtime",
+        "--test",
+        "r07_scheduler",
+        "--test",
+        "r07_activity_promotion",
+        "--locked"
+      ],
+      "exitCode": 0,
+      "testsPassed": 71,
+      "log": "lingxi-r07-t01-service-frozen.log",
+      "sourceFingerprint": "5d25ff7b538602cfba2dce827b22b41f5184a6872c6eddfcf0e6c8cc14b9396c"
+    },
+    {
+      "name": "scheduler-overlap-delta",
+      "argv": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r07_scheduler",
+        "--locked"
+      ],
+      "exitCode": 0,
+      "testsPassed": 7,
+      "log": "lingxi-r07-t01-scheduler-overlap-final.log",
+      "sourceFingerprint": "f33ab49b1e8b638eb19d9c3d89c2fcf3f85dee22b7326b8f2ded665e65f78479"
+    },
+    {
+      "name": "adapters",
+      "argv": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "lingxi-adapters",
+        "--test",
+        "r07_automation_store",
+        "--test",
+        "r07_automation_suggestions",
+        "--test",
+        "r07_activity_store",
+        "--test",
+        "r06_ar_f14_migration_receipts",
+        "--locked"
+      ],
+      "exitCode": 0,
+      "testsPassed": 31,
+      "log": "lingxi-r07-t01-adapter-final.log",
+      "binding": "对应库、内核、协议与迁移登记在最终快照中未再变化；原运行时全仓指纹未捕获，不伪造。"
+    },
+    {
+      "name": "typecheck",
+      "argv": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "exitCode": 0,
+      "log": "lingxi-r07-t01-typecheck-frozen.log",
+      "sourceFingerprint": "5d25ff7b538602cfba2dce827b22b41f5184a6872c6eddfcf0e6c8cc14b9396c"
+    }
+  ]
+}

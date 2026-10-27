@@ -1,0 +1,33 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0432]: unresolved import `lingxi_kernel::ports::ToolRecoveryCapability`
+ --> crates/lingxi-service/src/automation_tools.rs:4:114
+  |
+4 | ...ionResult,ToolOutcome,ToolSuccess,ToolRecoveryCapability},toolcatalog::{ToolManifest,ToolOrigin,PermissionContract,PermissionKind,...
+  |                                      ^^^^^^^^^^^^^^^^^^^^^^ no `ToolRecoveryCapability` in `ports`
+
+error[E0609]: no field `provider` on type `ResolvedDispatch`
+   --> crates/lingxi-service/src/automation.rs:120:240
+    |
+120 | ...::model_exchange::ModelTurnOptions{model:Some((route.provider,route.model)),thinking_level:None}}))
+    |                                                         ^^^^^^^^ unknown field
+    |
+help: one of the expressions' fields has a field of the same name
+    |
+120 |     Ok(Some(crate::runs::ChatRunInput{images:vec![],files:vec![],client_message_id:None,snapshot_version:None,display_text:None,quoted_text:None,session_refs:vec![],options:lingxi_kernel::model_exchange::ModelTurnOptions{model:Some((route.route.provider,route.model)),thinking_level:None}}))
+    |                                                                                                                                                                                                                                                ++++++
+
+error[E0609]: no field `model` on type `ResolvedDispatch`
+   --> crates/lingxi-service/src/automation.rs:120:255
+    |
+120 | ...ge::ModelTurnOptions{model:Some((route.provider,route.model)),thinking_level:None}}))
+    |                                                          ^^^^^ unknown field
+    |
+help: one of the expressions' fields has a field of the same name
+    |
+120 |     Ok(Some(crate::runs::ChatRunInput{images:vec![],files:vec![],client_message_id:None,snapshot_version:None,display_text:None,quoted_text:None,session_refs:vec![],options:lingxi_kernel::model_exchange::ModelTurnOptions{model:Some((route.provider,route.route.model)),thinking_level:None}}))
+    |                                                                                                                                                                                                                                                               ++++++
+
+Some errors have detailed explanations: E0432, E0609.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `lingxi-service` (lib) due to 3 previous errors

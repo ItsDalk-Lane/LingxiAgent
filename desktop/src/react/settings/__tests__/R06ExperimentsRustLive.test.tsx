@@ -1,0 +1,36 @@
+// @vitest-environment jsdom
+import React from 'react';
+import fs from 'node:fs';
+import { it, expect, vi, afterEach } from 'vitest';
+import { render, cleanup, screen, waitFor, fireEvent, act } from '@testing-library/react';
+import { ExperimentsTab } from '../tabs/ExperimentsTab';
+import { useSettingsStore } from '../store';
+import { createLocalServerConnection } from '../../services/server-connection';
+import { installWindowTestT } from '../../__tests__/helpers/i18n-test-strings';
+afterEach(()=>{cleanup();vi.unstubAllGlobals();vi.restoreAllMocks();});
+it('current_experiments_and_computer_preferences_use_real_Rust_routes_and_readonly_denials',async()=>{
+ const base=process.env.R06_EXPERIMENT_URL!;const token=process.env.R06_EXPERIMENT_TOKEN!;const readonly=process.env.R06_EXPERIMENT_READONLY!;
+ expect(base).toMatch(/^http:\/\/127\.0\.0\.1:/);const original=globalThis.fetch;const requests:Array<{path:string;method:string;status:number}>=[];let deny=false;
+ vi.stubGlobal('fetch',async(input:RequestInfo|URL,init?:RequestInit)=>{const method=init?.method||'GET';const headers=new Headers(init?.headers);if(deny&&method!=='GET')headers.set('Authorization',`Bearer ${readonly}`);const res=await original(input,{...init,headers});requests.push({path:new URL(String(input)).pathname,method,status:res.status});return res;});
+ installWindowTestT({});window.i18n={locale:'en'} as never;const notifications:unknown[]=[];window.platform={settingsChanged:(...args:unknown[])=>notifications.push(args)} as never;
+ const connection=createLocalServerConnection({serverPort:new URL(base).port,serverToken:token,serverNodeKind:'lingxi-service',serverNodeTransport:'http'})!;
+ useSettingsStore.setState({serverConnections:{local:connection},activeServerConnectionId:'local',activeServerConnection:connection,platformName:'darwin',agents:[{id:'agentA',name:'测试助手',isPrimary:true}],currentAgentId:'agentA',settingsSnapshot:{key:null,status:'idle',data:null,error:null,requestId:0,updatedAt:null}} as never);
+ const checks:string[]=[];render(<ExperimentsTab/>);
+ await waitFor(()=>expect(screen.getByRole('switch',{name:'settings.experiments.proactiveSubagent.title'})).toBeTruthy());
+ const initialSnapshot=await original(base+'/lingxi/v1/settings/snapshot?agentId=agentA',{headers:{Authorization:`Bearer ${token}`}}).then(r=>r.json());
+ await act(async()=>{useSettingsStore.setState({settingsSnapshot:{...useSettingsStore.getState().settingsSnapshot,data:initialSnapshot,status:'ready'}} as never);});
+ const proactive=screen.getByRole('switch',{name:'settings.experiments.proactiveSubagent.title'});expect(proactive.getAttribute('aria-checked')).toBe('false');expect(screen.queryByRole('switch',{name:'settings.experiments.cacheSnapshot.title'})).toBeNull();
+ fireEvent.click(proactive);await waitFor(()=>expect(proactive.getAttribute('aria-checked')).toBe('true'));
+ expect(notifications.some((a:any)=>a[0]==='experiment-changed'&&a[1].id==='subagent.proactive_delegation')).toBe(true);
+ const snapshot=useSettingsStore.getState().settingsSnapshot.data!;expect((snapshot.preferences.experiments as any[]).find(e=>e.id==='subagent.proactive_delegation').value).toBe(true);checks.push('actual-catalog-default-off-unregistered-absent-patch-snapshot-and-notification');
+ const switchFor=(key:string)=>{let n:HTMLElement|null=screen.getByText(key);while(n&&!n.querySelector('button[role=switch]'))n=n.parentElement;return n!.querySelector('button[role=switch]') as HTMLButtonElement;};
+ await waitFor(()=>expect(switchFor('settings.computerUse.enabled').getAttribute('aria-checked')).toBe('false'));
+ const getCount=()=>requests.filter(r=>r.path==='/lingxi/v1/preferences/computer-use'&&r.method==='GET').length;
+ const before=getCount();fireEvent.click(switchFor('settings.computerUse.enabled'));await waitFor(()=>expect(switchFor('settings.computerUse.enabled').getAttribute('aria-checked')).toBe('true'));await waitFor(()=>expect(getCount()).toBeGreaterThan(before));checks.push('actual-preference-put-and-followup-get');
+ await waitFor(()=>expect(switchFor('settings.computerUse.enabled').disabled).toBe(false));
+ deny=true;fireEvent.click(switchFor('settings.computerUse.enabled'));await waitFor(()=>expect(useSettingsStore.getState().toastType).toBe('error'),{timeout:15000});expect(switchFor('settings.computerUse.enabled').getAttribute('aria-checked')).toBe('true');checks.push('actual-save-403-toast-without-false-write');
+ fireEvent.click(screen.getByText('settings.computerUse.requestPermissions'));await waitFor(()=>expect(requests.some(r=>r.path.endsWith('/request-permissions')&&r.status===403)).toBe(true),{timeout:15000});await waitFor(()=>expect(useSettingsStore.getState().toastMessage).toContain('settings.computerUse.requestPermissionsFailed'));checks.push('actual-request-403-corresponding-error');
+ deny=false;const refreshBefore=getCount();fireEvent.click(screen.getByText('settings.computerUse.refresh'));await waitFor(()=>expect(getCount()).toBeGreaterThan(refreshBefore));
+ expect(screen.getByText('已有批准应用')).toBeTruthy(); expect(requests.some(r=>r.path.startsWith('/api/'))).toBe(false);expect(requests.some(r=>r.path.endsWith('/approvals'))).toBe(false);expect(screen.queryByRole('button',{name:/approve|revoke/i})).toBeNull();checks.push('actual-refresh-get-and-approval-list-read-only');
+ await act(async()=>{await Promise.resolve();});fs.writeFileSync(process.env.R06_EXPERIMENT_RECEIPT!,JSON.stringify({checks,requests,notifications},null,2));
+});

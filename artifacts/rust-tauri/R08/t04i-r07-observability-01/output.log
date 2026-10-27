@@ -1,0 +1,6 @@
+test r07_t10_closeout_settings_traces_storage_and_maintenance ... FAILED
+test r07_t10_query_page_aggregate_detail_export_import ... FAILED
+thread 'r07_t10_closeout_settings_traces_storage_and_maintenance' (14375880) panicked at crates/lingxi-service/tests/r07_t10_observability.rs:17:58:
+thread 'r07_t10_query_page_aggregate_detail_export_import' (14375881) panicked at crates/lingxi-service/tests/r07_t10_observability.rs:17:58:
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+error: test failed, to rerun pass `-p lingxi-service --test r07_t10_observability`

@@ -1,0 +1,2952 @@
+{
+ "schema": "lingxi.r09.t06-runtime-acl-plan.v1",
+ "source": "docs/rust-tauri/R09/R09_COMMAND_POLICY.json",
+ "windowPatterns": [
+  "browser-viewer",
+  "main",
+  "onboarding",
+  "quick-chat",
+  "settings",
+  "skill-viewer-*",
+  "splash",
+  "viewer-*"
+ ],
+ "perWindow": {
+  "main": {
+   "label": "main",
+   "allowed": [
+    "app_ready",
+    "close_browser_viewer",
+    "copy_file",
+    "debug_open_onboarding",
+    "debug_open_onboarding_preview",
+    "file_info",
+    "get_app_version",
+    "get_auto_launch_status",
+    "get_keep_awake_status",
+    "get_platform",
+    "get_server_connection_info",
+    "get_server_port",
+    "get_server_token",
+    "get_service_status",
+    "keybindings_reload_global",
+    "keybindings_test_register",
+    "list_skill_files",
+    "open_browser_viewer",
+    "open_external",
+    "open_file",
+    "open_folder",
+    "open_settings",
+    "open_skill_viewer",
+    "quick_chat_hide",
+    "quick_chat_open_session_ack",
+    "quick_chat_reload_shortcut",
+    "quick_chat_resize",
+    "quick_chat_shortcut_status",
+    "quick_chat_show",
+    "read_file",
+    "read_file_base64",
+    "read_file_snapshot",
+    "read_skill_file",
+    "reload_main_window",
+    "resource_events",
+    "resource_subscribe",
+    "resource_unsubscribe",
+    "restart_app",
+    "run_edit_command",
+    "rust_browser_request",
+    "select_files",
+    "select_folder",
+    "select_skill",
+    "set_auto_launch_enabled",
+    "set_browser_connection",
+    "set_keep_awake_enabled",
+    "settings_changed",
+    "show_in_finder",
+    "show_notification",
+    "spawn_viewer",
+    "speech_permission_request",
+    "speech_permission_status",
+    "start_drag",
+    "trash_item",
+    "unwatch_file",
+    "watch_file",
+    "window_close",
+    "window_is_maximized",
+    "window_maximize",
+    "window_minimize",
+    "window_theme_changed",
+    "write_file",
+    "write_file_binary",
+    "write_file_if_unchanged"
+   ],
+   "denied": [
+    "get_avatar_path",
+    "get_browser_viewer_context",
+    "get_splash_info",
+    "onboarding_complete",
+    "quick_chat_open_session",
+    "skill_viewer_close",
+    "skill_viewer_load",
+    "viewer_close",
+    "viewer_request_load"
+   ],
+   "devOnlyGranted": true,
+   "negativeCount": 9
+  },
+  "settings": {
+   "label": "settings",
+   "allowed": [
+    "get_app_version",
+    "get_auto_launch_status",
+    "get_keep_awake_status",
+    "get_platform",
+    "get_server_connection_info",
+    "get_server_port",
+    "get_server_token",
+    "keybindings_reload_global",
+    "keybindings_test_register",
+    "open_external",
+    "open_file",
+    "open_folder",
+    "open_settings",
+    "quick_chat_reload_shortcut",
+    "quick_chat_shortcut_status",
+    "restart_app",
+    "run_edit_command",
+    "select_files",
+    "select_folder",
+    "select_skill",
+    "set_auto_launch_enabled",
+    "set_keep_awake_enabled",
+    "settings_changed",
+    "show_in_finder",
+    "window_close",
+    "window_is_maximized",
+    "window_maximize",
+    "window_minimize",
+    "window_theme_changed"
+   ],
+   "denied": [
+    "app_ready",
+    "close_browser_viewer",
+    "copy_file",
+    "debug_open_onboarding",
+    "debug_open_onboarding_preview",
+    "file_info",
+    "get_avatar_path",
+    "get_browser_viewer_context",
+    "get_service_status",
+    "get_splash_info",
+    "list_skill_files",
+    "onboarding_complete",
+    "open_browser_viewer",
+    "open_skill_viewer",
+    "quick_chat_hide",
+    "quick_chat_open_session",
+    "quick_chat_open_session_ack",
+    "quick_chat_resize",
+    "quick_chat_show",
+    "read_file",
+    "read_file_base64",
+    "read_file_snapshot",
+    "read_skill_file",
+    "reload_main_window",
+    "resource_events",
+    "resource_subscribe",
+    "resource_unsubscribe",
+    "rust_browser_request",
+    "set_browser_connection",
+    "show_notification",
+    "skill_viewer_close",
+    "skill_viewer_load",
+    "spawn_viewer",
+    "speech_permission_request",
+    "speech_permission_status",
+    "start_drag",
+    "trash_item",
+    "unwatch_file",
+    "viewer_close",
+    "viewer_request_load",
+    "watch_file",
+    "write_file",
+    "write_file_binary",
+    "write_file_if_unchanged"
+   ],
+   "devOnlyGranted": false,
+   "negativeCount": 44
+  },
+  "quick-chat": {
+   "label": "quick-chat",
+   "allowed": [
+    "get_platform",
+    "get_server_connection_info",
+    "get_server_port",
+    "get_server_token",
+    "open_external",
+    "quick_chat_hide",
+    "quick_chat_open_session",
+    "quick_chat_resize",
+    "quick_chat_show",
+    "window_theme_changed"
+   ],
+   "denied": [
+    "app_ready",
+    "close_browser_viewer",
+    "copy_file",
+    "debug_open_onboarding",
+    "debug_open_onboarding_preview",
+    "file_info",
+    "get_app_version",
+    "get_auto_launch_status",
+    "get_avatar_path",
+    "get_browser_viewer_context",
+    "get_keep_awake_status",
+    "get_service_status",
+    "get_splash_info",
+    "keybindings_reload_global",
+    "keybindings_test_register",
+    "list_skill_files",
+    "onboarding_complete",
+    "open_browser_viewer",
+    "open_file",
+    "open_folder",
+    "open_settings",
+    "open_skill_viewer",
+    "quick_chat_open_session_ack",
+    "quick_chat_reload_shortcut",
+    "quick_chat_shortcut_status",
+    "read_file",
+    "read_file_base64",
+    "read_file_snapshot",
+    "read_skill_file",
+    "reload_main_window",
+    "resource_events",
+    "resource_subscribe",
+    "resource_unsubscribe",
+    "restart_app",
+    "run_edit_command",
+    "rust_browser_request",
+    "select_files",
+    "select_folder",
+    "select_skill",
+    "set_auto_launch_enabled",
+    "set_browser_connection",
+    "set_keep_awake_enabled",
+    "settings_changed",
+    "show_in_finder",
+    "show_notification",
+    "skill_viewer_close",
+    "skill_viewer_load",
+    "spawn_viewer",
+    "speech_permission_request",
+    "speech_permission_status",
+    "start_drag",
+    "trash_item",
+    "unwatch_file",
+    "viewer_close",
+    "viewer_request_load",
+    "watch_file",
+    "window_close",
+    "window_is_maximized",
+    "window_maximize",
+    "window_minimize",
+    "write_file",
+    "write_file_binary",
+    "write_file_if_unchanged"
+   ],
+   "devOnlyGranted": false,
+   "negativeCount": 63
+  },
+  "splash": {
+   "label": "splash",
+   "allowed": [
+    "get_avatar_path",
+    "get_platform",
+    "get_splash_info"
+   ],
+   "denied": [
+    "app_ready",
+    "close_browser_viewer",
+    "copy_file",
+    "debug_open_onboarding",
+    "debug_open_onboarding_preview",
+    "file_info",
+    "get_app_version",
+    "get_auto_launch_status",
+    "get_browser_viewer_context",
+    "get_keep_awake_status",
+    "get_server_connection_info",
+    "get_server_port",
+    "get_server_token",
+    "get_service_status",
+    "keybindings_reload_global",
+    "keybindings_test_register",
+    "list_skill_files",
+    "onboarding_complete",
+    "open_browser_viewer",
+    "open_external",
+    "open_file",
+    "open_folder",
+    "open_settings",
+    "open_skill_viewer",
+    "quick_chat_hide",
+    "quick_chat_open_session",
+    "quick_chat_open_session_ack",
+    "quick_chat_reload_shortcut",
+    "quick_chat_resize",
+    "quick_chat_shortcut_status",
+    "quick_chat_show",
+    "read_file",
+    "read_file_base64",
+    "read_file_snapshot",
+    "read_skill_file",
+    "reload_main_window",
+    "resource_events",
+    "resource_subscribe",
+    "resource_unsubscribe",
+    "restart_app",
+    "run_edit_command",
+    "rust_browser_request",
+    "select_files",
+    "select_folder",
+    "select_skill",
+    "set_auto_launch_enabled",
+    "set_browser_connection",
+    "set_keep_awake_enabled",
+    "settings_changed",
+    "show_in_finder",
+    "show_notification",
+    "skill_viewer_close",
+    "skill_viewer_load",
+    "spawn_viewer",
+    "speech_permission_request",
+    "speech_permission_status",
+    "start_drag",
+    "trash_item",
+    "unwatch_file",
+    "viewer_close",
+    "viewer_request_load",
+    "watch_file",
+    "window_close",
+    "window_is_maximized",
+    "window_maximize",
+    "window_minimize",
+    "window_theme_changed",
+    "write_file",
+    "write_file_binary",
+    "write_file_if_unchanged"
+   ],
+   "devOnlyGranted": false,
+   "negativeCount": 70
+  },
+  "onboarding": {
+   "label": "onboarding",
+   "allowed": [
+    "debug_open_onboarding",
+    "debug_open_onboarding_preview",
+    "get_avatar_path",
+    "get_platform",
+    "get_server_connection_info",
+    "get_server_port",
+    "get_server_token",
+    "get_splash_info",
+    "onboarding_complete"
+   ],
+   "denied": [
+    "app_ready",
+    "close_browser_viewer",
+    "copy_file",
+    "file_info",
+    "get_app_version",
+    "get_auto_launch_status",
+    "get_browser_viewer_context",
+    "get_keep_awake_status",
+    "get_service_status",
+    "keybindings_reload_global",
+    "keybindings_test_register",
+    "list_skill_files",
+    "open_browser_viewer",
+    "open_external",
+    "open_file",
+    "open_folder",
+    "open_settings",
+    "open_skill_viewer",
+    "quick_chat_hide",
+    "quick_chat_open_session",
+    "quick_chat_open_session_ack",
+    "quick_chat_reload_shortcut",
+    "quick_chat_resize",
+    "quick_chat_shortcut_status",
+    "quick_chat_show",
+    "read_file",
+    "read_file_base64",
+    "read_file_snapshot",
+    "read_skill_file",
+    "reload_main_window",
+    "resource_events",
+    "resource_subscribe",
+    "resource_unsubscribe",
+    "restart_app",
+    "run_edit_command",
+    "rust_browser_request",
+    "select_files",
+    "select_folder",
+    "select_skill",
+    "set_auto_launch_enabled",
+    "set_browser_connection",
+    "set_keep_awake_enabled",
+    "settings_changed",
+    "show_in_finder",
+    "show_notification",
+    "skill_viewer_close",
+    "skill_viewer_load",
+    "spawn_viewer",
+    "speech_permission_request",
+    "speech_permission_status",
+    "start_drag",
+    "trash_item",
+    "unwatch_file",
+    "viewer_close",
+    "viewer_request_load",
+    "watch_file",
+    "window_close",
+    "window_is_maximized",
+    "window_maximize",
+    "window_minimize",
+    "window_theme_changed",
+    "write_file",
+    "write_file_binary",
+    "write_file_if_unchanged"
+   ],
+   "devOnlyGranted": true,
+   "negativeCount": 64
+  },
+  "browser-viewer": {
+   "label": "browser-viewer",
+   "allowed": [
+    "close_browser_viewer",
+    "get_browser_viewer_context",
+    "get_platform",
+    "rust_browser_request",
+    "settings_changed",
+    "window_theme_changed"
+   ],
+   "denied": [
+    "app_ready",
+    "copy_file",
+    "debug_open_onboarding",
+    "debug_open_onboarding_preview",
+    "file_info",
+    "get_app_version",
+    "get_auto_launch_status",
+    "get_avatar_path",
+    "get_keep_awake_status",
+    "get_server_connection_info",
+    "get_server_port",
+    "get_server_token",
+    "get_service_status",
+    "get_splash_info",
+    "keybindings_reload_global",
+    "keybindings_test_register",
+    "list_skill_files",
+    "onboarding_complete",
+    "open_browser_viewer",
+    "open_external",
+    "open_file",
+    "open_folder",
+    "open_settings",
+    "open_skill_viewer",
+    "quick_chat_hide",
+    "quick_chat_open_session",
+    "quick_chat_open_session_ack",
+    "quick_chat_reload_shortcut",
+    "quick_chat_resize",
+    "quick_chat_shortcut_status",
+    "quick_chat_show",
+    "read_file",
+    "read_file_base64",
+    "read_file_snapshot",
+    "read_skill_file",
+    "reload_main_window",
+    "resource_events",
+    "resource_subscribe",
+    "resource_unsubscribe",
+    "restart_app",
+    "run_edit_command",
+    "select_files",
+    "select_folder",
+    "select_skill",
+    "set_auto_launch_enabled",
+    "set_browser_connection",
+    "set_keep_awake_enabled",
+    "show_in_finder",
+    "show_notification",
+    "skill_viewer_close",
+    "skill_viewer_load",
+    "spawn_viewer",
+    "speech_permission_request",
+    "speech_permission_status",
+    "start_drag",
+    "trash_item",
+    "unwatch_file",
+    "viewer_close",
+    "viewer_request_load",
+    "watch_file",
+    "window_close",
+    "window_is_maximized",
+    "window_maximize",
+    "window_minimize",
+    "write_file",
+    "write_file_binary",
+    "write_file_if_unchanged"
+   ],
+   "devOnlyGranted": false,
+   "negativeCount": 67
+  },
+  "viewer-*": {
+   "label": "viewer-*",
+   "allowed": [
+    "file_info",
+    "get_server_connection_info",
+    "get_server_port",
+    "get_server_token",
+    "read_file",
+    "read_file_base64",
+    "read_file_snapshot",
+    "resource_events",
+    "resource_subscribe",
+    "resource_unsubscribe",
+    "viewer_close",
+    "viewer_request_load"
+   ],
+   "denied": [
+    "app_ready",
+    "close_browser_viewer",
+    "copy_file",
+    "debug_open_onboarding",
+    "debug_open_onboarding_preview",
+    "get_app_version",
+    "get_auto_launch_status",
+    "get_avatar_path",
+    "get_browser_viewer_context",
+    "get_keep_awake_status",
+    "get_platform",
+    "get_service_status",
+    "get_splash_info",
+    "keybindings_reload_global",
+    "keybindings_test_register",
+    "list_skill_files",
+    "onboarding_complete",
+    "open_browser_viewer",
+    "open_external",
+    "open_file",
+    "open_folder",
+    "open_settings",
+    "open_skill_viewer",
+    "quick_chat_hide",
+    "quick_chat_open_session",
+    "quick_chat_open_session_ack",
+    "quick_chat_reload_shortcut",
+    "quick_chat_resize",
+    "quick_chat_shortcut_status",
+    "quick_chat_show",
+    "read_skill_file",
+    "reload_main_window",
+    "restart_app",
+    "run_edit_command",
+    "rust_browser_request",
+    "select_files",
+    "select_folder",
+    "select_skill",
+    "set_auto_launch_enabled",
+    "set_browser_connection",
+    "set_keep_awake_enabled",
+    "settings_changed",
+    "show_in_finder",
+    "show_notification",
+    "skill_viewer_close",
+    "skill_viewer_load",
+    "spawn_viewer",
+    "speech_permission_request",
+    "speech_permission_status",
+    "start_drag",
+    "trash_item",
+    "unwatch_file",
+    "watch_file",
+    "window_close",
+    "window_is_maximized",
+    "window_maximize",
+    "window_minimize",
+    "window_theme_changed",
+    "write_file",
+    "write_file_binary",
+    "write_file_if_unchanged"
+   ],
+   "devOnlyGranted": false,
+   "negativeCount": 61
+  },
+  "skill-viewer-*": {
+   "label": "skill-viewer-*",
+   "allowed": [
+    "list_skill_files",
+    "read_skill_file",
+    "skill_viewer_close",
+    "skill_viewer_load"
+   ],
+   "denied": [
+    "app_ready",
+    "close_browser_viewer",
+    "copy_file",
+    "debug_open_onboarding",
+    "debug_open_onboarding_preview",
+    "file_info",
+    "get_app_version",
+    "get_auto_launch_status",
+    "get_avatar_path",
+    "get_browser_viewer_context",
+    "get_keep_awake_status",
+    "get_platform",
+    "get_server_connection_info",
+    "get_server_port",
+    "get_server_token",
+    "get_service_status",
+    "get_splash_info",
+    "keybindings_reload_global",
+    "keybindings_test_register",
+    "onboarding_complete",
+    "open_browser_viewer",
+    "open_external",
+    "open_file",
+    "open_folder",
+    "open_settings",
+    "open_skill_viewer",
+    "quick_chat_hide",
+    "quick_chat_open_session",
+    "quick_chat_open_session_ack",
+    "quick_chat_reload_shortcut",
+    "quick_chat_resize",
+    "quick_chat_shortcut_status",
+    "quick_chat_show",
+    "read_file",
+    "read_file_base64",
+    "read_file_snapshot",
+    "reload_main_window",
+    "resource_events",
+    "resource_subscribe",
+    "resource_unsubscribe",
+    "restart_app",
+    "run_edit_command",
+    "rust_browser_request",
+    "select_files",
+    "select_folder",
+    "select_skill",
+    "set_auto_launch_enabled",
+    "set_browser_connection",
+    "set_keep_awake_enabled",
+    "settings_changed",
+    "show_in_finder",
+    "show_notification",
+    "spawn_viewer",
+    "speech_permission_request",
+    "speech_permission_status",
+    "start_drag",
+    "trash_item",
+    "unwatch_file",
+    "viewer_close",
+    "viewer_request_load",
+    "watch_file",
+    "window_close",
+    "window_is_maximized",
+    "window_maximize",
+    "window_minimize",
+    "window_theme_changed",
+    "write_file",
+    "write_file_binary",
+    "write_file_if_unchanged"
+   ],
+   "devOnlyGranted": false,
+   "negativeCount": 69
+  }
+ },
+ "summary": {
+  "main": {
+   "allow": 64,
+   "deny": 9,
+   "devOnlyGranted": true
+  },
+  "settings": {
+   "allow": 29,
+   "deny": 44,
+   "devOnlyGranted": false
+  },
+  "quick-chat": {
+   "allow": 10,
+   "deny": 63,
+   "devOnlyGranted": false
+  },
+  "splash": {
+   "allow": 3,
+   "deny": 70,
+   "devOnlyGranted": false
+  },
+  "onboarding": {
+   "allow": 9,
+   "deny": 64,
+   "devOnlyGranted": true
+  },
+  "browser-viewer": {
+   "allow": 6,
+   "deny": 67,
+   "devOnlyGranted": false
+  },
+  "viewer-*": {
+   "allow": 12,
+   "deny": 61,
+   "devOnlyGranted": false
+  },
+  "skill-viewer-*": {
+   "allow": 4,
+   "deny": 69,
+   "devOnlyGranted": false
+  }
+ },
+ "negativeMatrix": [
+  {
+   "window": "main",
+   "command": "get_avatar_path",
+   "expect": "deny"
+  },
+  {
+   "window": "main",
+   "command": "get_browser_viewer_context",
+   "expect": "deny"
+  },
+  {
+   "window": "main",
+   "command": "get_splash_info",
+   "expect": "deny"
+  },
+  {
+   "window": "main",
+   "command": "onboarding_complete",
+   "expect": "deny"
+  },
+  {
+   "window": "main",
+   "command": "quick_chat_open_session",
+   "expect": "deny"
+  },
+  {
+   "window": "main",
+   "command": "skill_viewer_close",
+   "expect": "deny"
+  },
+  {
+   "window": "main",
+   "command": "skill_viewer_load",
+   "expect": "deny"
+  },
+  {
+   "window": "main",
+   "command": "viewer_close",
+   "expect": "deny"
+  },
+  {
+   "window": "main",
+   "command": "viewer_request_load",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "app_ready",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "close_browser_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "copy_file",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "debug_open_onboarding",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "debug_open_onboarding_preview",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "file_info",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "get_avatar_path",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "get_browser_viewer_context",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "get_service_status",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "get_splash_info",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "list_skill_files",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "onboarding_complete",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "open_browser_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "open_skill_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "quick_chat_hide",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "quick_chat_open_session",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "quick_chat_open_session_ack",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "quick_chat_resize",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "quick_chat_show",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "read_file",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "read_file_base64",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "read_file_snapshot",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "read_skill_file",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "reload_main_window",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "resource_events",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "resource_subscribe",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "resource_unsubscribe",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "rust_browser_request",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "set_browser_connection",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "show_notification",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "skill_viewer_close",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "skill_viewer_load",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "spawn_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "speech_permission_request",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "speech_permission_status",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "start_drag",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "trash_item",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "unwatch_file",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "viewer_close",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "viewer_request_load",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "watch_file",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "write_file",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "write_file_binary",
+   "expect": "deny"
+  },
+  {
+   "window": "settings",
+   "command": "write_file_if_unchanged",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "app_ready",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "close_browser_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "copy_file",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "debug_open_onboarding",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "debug_open_onboarding_preview",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "file_info",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "get_app_version",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "get_auto_launch_status",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "get_avatar_path",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "get_browser_viewer_context",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "get_keep_awake_status",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "get_service_status",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "get_splash_info",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "keybindings_reload_global",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "keybindings_test_register",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "list_skill_files",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "onboarding_complete",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "open_browser_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "open_file",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "open_folder",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "open_settings",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "open_skill_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "quick_chat_open_session_ack",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "quick_chat_reload_shortcut",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "quick_chat_shortcut_status",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "read_file",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "read_file_base64",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "read_file_snapshot",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "read_skill_file",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "reload_main_window",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "resource_events",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "resource_subscribe",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "resource_unsubscribe",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "restart_app",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "run_edit_command",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "rust_browser_request",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "select_files",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "select_folder",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "select_skill",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "set_auto_launch_enabled",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "set_browser_connection",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "set_keep_awake_enabled",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "settings_changed",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "show_in_finder",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "show_notification",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "skill_viewer_close",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "skill_viewer_load",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "spawn_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "speech_permission_request",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "speech_permission_status",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "start_drag",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "trash_item",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "unwatch_file",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "viewer_close",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "viewer_request_load",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "watch_file",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "window_close",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "window_is_maximized",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "window_maximize",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "window_minimize",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "write_file",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "write_file_binary",
+   "expect": "deny"
+  },
+  {
+   "window": "quick-chat",
+   "command": "write_file_if_unchanged",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "app_ready",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "close_browser_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "copy_file",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "debug_open_onboarding",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "debug_open_onboarding_preview",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "file_info",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "get_app_version",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "get_auto_launch_status",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "get_browser_viewer_context",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "get_keep_awake_status",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "get_server_connection_info",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "get_server_port",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "get_server_token",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "get_service_status",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "keybindings_reload_global",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "keybindings_test_register",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "list_skill_files",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "onboarding_complete",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "open_browser_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "open_external",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "open_file",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "open_folder",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "open_settings",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "open_skill_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "quick_chat_hide",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "quick_chat_open_session",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "quick_chat_open_session_ack",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "quick_chat_reload_shortcut",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "quick_chat_resize",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "quick_chat_shortcut_status",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "quick_chat_show",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "read_file",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "read_file_base64",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "read_file_snapshot",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "read_skill_file",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "reload_main_window",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "resource_events",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "resource_subscribe",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "resource_unsubscribe",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "restart_app",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "run_edit_command",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "rust_browser_request",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "select_files",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "select_folder",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "select_skill",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "set_auto_launch_enabled",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "set_browser_connection",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "set_keep_awake_enabled",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "settings_changed",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "show_in_finder",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "show_notification",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "skill_viewer_close",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "skill_viewer_load",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "spawn_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "speech_permission_request",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "speech_permission_status",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "start_drag",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "trash_item",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "unwatch_file",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "viewer_close",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "viewer_request_load",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "watch_file",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "window_close",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "window_is_maximized",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "window_maximize",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "window_minimize",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "window_theme_changed",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "write_file",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "write_file_binary",
+   "expect": "deny"
+  },
+  {
+   "window": "splash",
+   "command": "write_file_if_unchanged",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "app_ready",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "close_browser_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "copy_file",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "file_info",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "get_app_version",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "get_auto_launch_status",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "get_browser_viewer_context",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "get_keep_awake_status",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "get_service_status",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "keybindings_reload_global",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "keybindings_test_register",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "list_skill_files",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "open_browser_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "open_external",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "open_file",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "open_folder",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "open_settings",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "open_skill_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "quick_chat_hide",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "quick_chat_open_session",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "quick_chat_open_session_ack",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "quick_chat_reload_shortcut",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "quick_chat_resize",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "quick_chat_shortcut_status",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "quick_chat_show",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "read_file",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "read_file_base64",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "read_file_snapshot",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "read_skill_file",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "reload_main_window",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "resource_events",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "resource_subscribe",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "resource_unsubscribe",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "restart_app",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "run_edit_command",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "rust_browser_request",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "select_files",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "select_folder",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "select_skill",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "set_auto_launch_enabled",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "set_browser_connection",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "set_keep_awake_enabled",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "settings_changed",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "show_in_finder",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "show_notification",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "skill_viewer_close",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "skill_viewer_load",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "spawn_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "speech_permission_request",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "speech_permission_status",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "start_drag",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "trash_item",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "unwatch_file",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "viewer_close",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "viewer_request_load",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "watch_file",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "window_close",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "window_is_maximized",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "window_maximize",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "window_minimize",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "window_theme_changed",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "write_file",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "write_file_binary",
+   "expect": "deny"
+  },
+  {
+   "window": "onboarding",
+   "command": "write_file_if_unchanged",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "app_ready",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "copy_file",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "debug_open_onboarding",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "debug_open_onboarding_preview",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "file_info",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "get_app_version",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "get_auto_launch_status",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "get_avatar_path",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "get_keep_awake_status",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "get_server_connection_info",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "get_server_port",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "get_server_token",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "get_service_status",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "get_splash_info",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "keybindings_reload_global",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "keybindings_test_register",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "list_skill_files",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "onboarding_complete",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "open_browser_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "open_external",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "open_file",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "open_folder",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "open_settings",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "open_skill_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "quick_chat_hide",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "quick_chat_open_session",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "quick_chat_open_session_ack",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "quick_chat_reload_shortcut",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "quick_chat_resize",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "quick_chat_shortcut_status",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "quick_chat_show",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "read_file",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "read_file_base64",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "read_file_snapshot",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "read_skill_file",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "reload_main_window",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "resource_events",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "resource_subscribe",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "resource_unsubscribe",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "restart_app",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "run_edit_command",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "select_files",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "select_folder",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "select_skill",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "set_auto_launch_enabled",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "set_browser_connection",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "set_keep_awake_enabled",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "show_in_finder",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "show_notification",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "skill_viewer_close",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "skill_viewer_load",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "spawn_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "speech_permission_request",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "speech_permission_status",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "start_drag",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "trash_item",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "unwatch_file",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "viewer_close",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "viewer_request_load",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "watch_file",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "window_close",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "window_is_maximized",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "window_maximize",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "window_minimize",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "write_file",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "write_file_binary",
+   "expect": "deny"
+  },
+  {
+   "window": "browser-viewer",
+   "command": "write_file_if_unchanged",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "app_ready",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "close_browser_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "copy_file",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "debug_open_onboarding",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "debug_open_onboarding_preview",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "get_app_version",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "get_auto_launch_status",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "get_avatar_path",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "get_browser_viewer_context",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "get_keep_awake_status",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "get_platform",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "get_service_status",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "get_splash_info",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "keybindings_reload_global",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "keybindings_test_register",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "list_skill_files",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "onboarding_complete",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "open_browser_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "open_external",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "open_file",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "open_folder",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "open_settings",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "open_skill_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "quick_chat_hide",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "quick_chat_open_session",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "quick_chat_open_session_ack",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "quick_chat_reload_shortcut",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "quick_chat_resize",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "quick_chat_shortcut_status",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "quick_chat_show",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "read_skill_file",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "reload_main_window",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "restart_app",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "run_edit_command",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "rust_browser_request",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "select_files",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "select_folder",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "select_skill",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "set_auto_launch_enabled",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "set_browser_connection",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "set_keep_awake_enabled",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "settings_changed",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "show_in_finder",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "show_notification",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "skill_viewer_close",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "skill_viewer_load",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "spawn_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "speech_permission_request",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "speech_permission_status",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "start_drag",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "trash_item",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "unwatch_file",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "watch_file",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "window_close",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "window_is_maximized",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "window_maximize",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "window_minimize",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "window_theme_changed",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "write_file",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "write_file_binary",
+   "expect": "deny"
+  },
+  {
+   "window": "viewer-*",
+   "command": "write_file_if_unchanged",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "app_ready",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "close_browser_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "copy_file",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "debug_open_onboarding",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "debug_open_onboarding_preview",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "file_info",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "get_app_version",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "get_auto_launch_status",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "get_avatar_path",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "get_browser_viewer_context",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "get_keep_awake_status",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "get_platform",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "get_server_connection_info",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "get_server_port",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "get_server_token",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "get_service_status",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "get_splash_info",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "keybindings_reload_global",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "keybindings_test_register",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "onboarding_complete",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "open_browser_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "open_external",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "open_file",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "open_folder",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "open_settings",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "open_skill_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "quick_chat_hide",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "quick_chat_open_session",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "quick_chat_open_session_ack",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "quick_chat_reload_shortcut",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "quick_chat_resize",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "quick_chat_shortcut_status",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "quick_chat_show",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "read_file",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "read_file_base64",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "read_file_snapshot",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "reload_main_window",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "resource_events",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "resource_subscribe",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "resource_unsubscribe",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "restart_app",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "run_edit_command",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "rust_browser_request",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "select_files",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "select_folder",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "select_skill",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "set_auto_launch_enabled",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "set_browser_connection",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "set_keep_awake_enabled",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "settings_changed",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "show_in_finder",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "show_notification",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "spawn_viewer",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "speech_permission_request",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "speech_permission_status",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "start_drag",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "trash_item",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "unwatch_file",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "viewer_close",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "viewer_request_load",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "watch_file",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "window_close",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "window_is_maximized",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "window_maximize",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "window_minimize",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "window_theme_changed",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "write_file",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "write_file_binary",
+   "expect": "deny"
+  },
+  {
+   "window": "skill-viewer-*",
+   "command": "write_file_if_unchanged",
+   "expect": "deny"
+  }
+ ],
+ "assertion": "Tauri ACL 拒绝文案：`Command <cmd> not allowed by ACL`（tauri 2.12 webview/mod.rs:2107）"
+}

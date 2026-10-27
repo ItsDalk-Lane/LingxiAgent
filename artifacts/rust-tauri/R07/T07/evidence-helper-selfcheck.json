@@ -1,0 +1,8 @@
+{
+  "status": "PASS_TOOL_SELF_CHECK_NOT_PRODUCT_ACCEPTANCE",
+  "helperSha256": "c9129b001975a4b89d4904a2210d6b0426e23a95a7811479f097166a107da7d3",
+  "sourceBefore": "e0f559efca12888cb68f168c1162b480458e2aca959775475ca8bb1340081e6a",
+  "sourceWithNewFile": "71895ed17cebcd044023733aa2aa870c6175f82cf243fa103f5ef00a0176bb9f",
+  "sourceAfterOwnProbeRemoved": "e0f559efca12888cb68f168c1162b480458e2aca959775475ca8bb1340081e6a",
+  "proof": "manifest之外的shared新增文件被扫描；只移除本次唯一probe；未创建候选或执行产品验收"
+}

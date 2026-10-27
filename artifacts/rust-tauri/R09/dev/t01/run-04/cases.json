@@ -1,0 +1,14 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t01_react_parity",
+ "cases": [
+  {
+   "case": "r09_t01_react_parity::producer",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "error": "renderer artifact kept changing during Tauri build (concurrent writer): {'attempt': 3, 'before': 'b647fe90773e2d4269ecfc8de659c596270b73cd70e4ed7520e51074a16a5528', 'after': 'b647fe90773e2d4269ecfc8de659c596270b73cd70e4ed7520e51074a16a5528', 'recorded': '7cd1c3520cc5616e1cd93f28bd4e1f0f60f529a8838d86dafdba1ee5e9a989ca', 'fileCount': 642}"
+   }
+  }
+ ]
+}

@@ -9,6 +9,7 @@
 | 安装、功能与启动 | [README](../README.md) / [English](../README_EN.md) |
 | 开发环境、原生依赖与贡献 | [CONTRIBUTING](../CONTRIBUTING.md) |
 | 按改动选择验证 | [测试说明](../tests/README.md) |
+| Rust 测试守卫（默认内存/时间上限、环境变量、触发现象） | [R06 测试守卫](rust-tauri/R06/T06_TEST_GUARD.md) |
 | 安全报告与项目边界 | [SECURITY](../SECURITY.md) |
 
 ## 架构入口
@@ -34,6 +35,12 @@
 ## 待实施计划
 
 （当前没有待实施计划。）
+
+## 正在验收的迁移
+
+- [Rust + Tauri 迁移 R07 进度](rust-tauri/R07/R07_PROGRESS.json)：当前按已批准方案实施 T01—T12；R06 已由用户明确接受，原始失败证据继续保留。R07 尚未完成，不代表发布或其他平台已经验收。
+- [R06 接受与修复记录](rust-tauri/R06/repair-current/AR_PROGRESS.json)：查看接受依据及未改写的历史检查结果。
+- [R02 历史候选交接](rust-tauri/R02/R02_FULL_SCOPE_HANDOFF_R18.md)：记录 2026-09-28 候选的 **FAIL** 和当时的进入限制；不替代当前阶段状态。
 
 ## 历史任务与证据
 

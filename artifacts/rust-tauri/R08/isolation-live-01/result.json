@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "status": "FAIL",
+  "sourceSha": "86840d1700397d3dd620a41f2b884df4cddd5cc2",
+  "sandbox": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-8oeaWT",
+  "startedAt": "2026-10-21T13:44:44.102Z",
+  "tests": [],
+  "processes": [
+    {
+      "label": "a",
+      "launcherPid": 40689,
+      "requestedHome": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-8oeaWT/a/copy",
+      "exitCode": null
+    }
+  ],
+  "binarySha256": "d61c7165e41bfe17ed6af4ae56842389e74e97f430b37bc6371698a7bcba6d9c",
+  "inputs": {
+    "scripts/launch.js": "34762c7f688f45de36540fcca9e6d45237865ed7a08e7453fdd0d9a996bed35d",
+    "scripts/dev-env.js": "bdee2d81e2f4077044d85e20527d0c05f3969dadc2457246167f2003d6a70e78",
+    "desktop/bootstrap.cjs": "52cc65f701272c59cbd97bbfb8bd581d38144ab43525fddb8ae9faa625ecced9",
+    "desktop/main.cjs": "bc8afa8a2f0894863b264e6a950f0430afca4dc6cb44184646b98741f2feafcf",
+    "desktop/src/shared/single-instance-lock.cjs": "c63d2687dceb9ec1d81c4376449ace2bdb9ec7d1a226301283ebc28638942c54",
+    "rust/Cargo.lock": "ae9ac557310fcaba768ebc55973c97cfcf18bf57b20d78e665e8fc65aac1b4a3"
+  },
+  "error": "Error: {\"code\":-32000,\"message\":\"Promise was collected\"}\n    at socket.onmessage (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_isolation_probe.mjs:63:171)\n    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:843:20)\n    at WebSocket.dispatchEvent (node:internal/event_target:776:26)\n    at fireEvent (node:internal/deps/undici/undici:14186:14)\n    at #onMessage (node:internal/deps/undici/undici:15474:9)\n    at Object.onMessage (node:internal/deps/undici/undici:15187:76)\n    at websocketMessageReceived (node:internal/deps/undici/undici:14190:15)\n    at ByteParser.run (node:internal/deps/undici/undici:14879:19)\n    at ByteParser._write (node:internal/deps/undici/undici:14773:14)\n    at writeOrBuffer (node:internal/streams/writable:570:12)",
+  "finishedAt": "2026-10-21T13:44:44.712Z"
+}

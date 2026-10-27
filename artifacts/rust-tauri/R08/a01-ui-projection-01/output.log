@@ -1,0 +1,37 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/services/r08-a01-ui-projection.test.ts (5 tests | 1 failed) 51ms
+     ✓ 夹具是真实捕获的 canonical-history.v1 响应 47ms
+     ✓ 用户消息一条，原文逐字保留 1ms
+     ✓ 恰好一个助手回合，终态 completed、结局不是 missing_final_answer 0ms
+     × 四张工具卡片：命名目标、成功状态与顺序全部来自历史投影 2ms
+     ✓ 最终回复文本逐字来自 final_message，进入答案区 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/r08-a01-ui-projection.test.ts > R08-A01 真实历史投影：四工具链会话在旧界面的呈现完全由 Rust 单源决定 > 四张工具卡片：命名目标、成功状态与顺序全部来自历史投影
+AssertionError: expected undefined to be truthy
+
+- Expected:
+true
+
++ Received:
+undefined
+
+ ❯ desktop/src/react/__tests__/services/r08-a01-ui-projection.test.ts:68:34
+     66|       expect(tool.done).toBe(true);
+     67|       expect(tool.id).toMatch(/-tc000\d$/);
+     68|       expect(tool.args?.summary).toBeTruthy();
+       |                                  ^
+     69|     }
+     70|     // 无任何伪造终态/失败状态块。
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  15:50:53
+   Duration  434ms (transform 231ms, setup 20ms, import 288ms, tests 51ms, environment 0ms)
+

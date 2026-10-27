@@ -1,3 +1,4 @@
+import { chatFetch, captureChatUploadScope } from '../services/service-client';
 /**
  * InputArea — 聊天输入区域 React 组件
  *
@@ -17,6 +18,8 @@ import { getSessionCompactionMode, isSessionCompacting } from '../stores/context
 import { selectSessionFiles } from '../stores/selectors/file-refs';
 import { isImageFile, isVideoFile } from '../utils/format';
 import { isAudioFileName } from '../utils/file-kind';
+import { resolveServerConnection } from '../services/service-client';
+import type { AttachedFile } from '../stores/input-slice';
 import { useI18n } from '../hooks/use-i18n';
 import {
   SessionScopeProvider,
@@ -109,7 +112,8 @@ import {
 } from './input/slash-commands';
 import { attachFilesFromPaths } from '../MainContent';
 import { searchDeskFiles } from '../stores/desk-actions';
-import { lingxiFetch } from '../hooks/use-hana-fetch';
+import { registerFileTaskHandler } from '../stores/file-task-actions';
+import { lingxiFetch } from '../services/service-client';
 import { VOICE_RECORD_TOGGLE_EVENT } from '../keybindings/useKeybindings';
 import type { DeskSearchResult } from '../types';
 import styles from './input/InputArea.module.css';
@@ -121,6 +125,7 @@ import {
   isChatVideoBase64ContentCompatible,
   isChatVideoBase64WithinLimit,
 } from '../../../../shared/video-mime.ts';
+import { usePlatform } from '../hooks/use-platform';
 
 const EMPTY_FILE_REFS: readonly import('../types/file-ref').FileRef[] = Object.freeze([]);
 
@@ -646,14 +651,20 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
   }, [sessionConfirmationExiting]);
 
   // ── 全局 inline notice（截图等非斜杠命令的轻提示）──
+  const inlineNoticeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     const handler = (e: Event) => {
       const { text, type, deskDir, filePath } = (e as CustomEvent).detail;
+      if (inlineNoticeTimer.current !== null) clearTimeout(inlineNoticeTimer.current);
       setSlashResult({ text, type, deskDir, filePath });
-      setTimeout(() => setSlashResult(null), 3000);
+      // 连续命令的新收据拥有完整显示时段，旧提示定时器不能抹掉它。
+      inlineNoticeTimer.current = setTimeout(() => { inlineNoticeTimer.current = null; setSlashResult(null); }, 3000);
     };
     window.addEventListener('hana-inline-notice', handler);
-    return () => window.removeEventListener('hana-inline-notice', handler);
+    return () => {
+      window.removeEventListener('hana-inline-notice', handler);
+      if (inlineNoticeTimer.current !== null) clearTimeout(inlineNoticeTimer.current);
+    };
   }, []);
 
   // ── Welcome 模式 placeholder tip（mount、i18n ready、每次 welcome 重新激活时随机一条） ──
@@ -671,8 +682,20 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
   );
 
   // Zustand actions
-  const addAttachedFile = useStore(s => s.addAttachedFile);
-  const removeAttachedFile = useStore(s => s.removeAttachedFile);
+  const legacyAddAttachedFile = useStore(s => s.addAttachedFile);
+  const legacyRemoveAttachedFile = useStore(s => s.removeAttachedFile);
+  const addAttachedFile = useCallback((file: AttachedFile) => {
+    const state = useStore.getState();
+    if (resolveServerConnection(state)?.serverNodeKind !== 'lingxi-service' || !scopedSessionPath) { legacyAddAttachedFile(file); return; }
+    const files = sessionScopedValue(state, state.attachedFilesBySession, scopedSessionPath) ?? (state.currentSessionPath === scopedSessionPath ? state.attachedFiles : []);
+    state.setAttachedFilesForSession(scopedSessionPath, [...files, file]);
+  }, [legacyAddAttachedFile, scopedSessionPath]);
+  const removeAttachedFile = useCallback((index: number) => {
+    const state = useStore.getState();
+    if (resolveServerConnection(state)?.serverNodeKind !== 'lingxi-service' || !scopedSessionPath) { legacyRemoveAttachedFile(index); return; }
+    const files = sessionScopedValue(state, state.attachedFilesBySession, scopedSessionPath) ?? (state.currentSessionPath === scopedSessionPath ? state.attachedFiles : []);
+    state.setAttachedFilesForSession(scopedSessionPath, files.filter((_, i) => i !== index));
+  }, [legacyRemoveAttachedFile, scopedSessionPath]);
   const clearAttachedFiles = useStore(s => s.clearAttachedFiles);
   const clearAttachedFilesForSession = useStore(s => s.clearAttachedFilesForSession);
   const setDocContextAttachedForSession = useStore(s => s.setDocContextAttachedForSession);
@@ -774,9 +797,20 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
   }, []);
 
   useEffect(() => {
+    if (!editor || editor.isDestroyed) return;
     const surface = inputSurfaceRef.current;
     const card = inputCardRef.current;
-    const editorElement = editor?.view.dom;
+    // R09-T01：WKWebView 下 i18n 异步加载成功后 placeholder 会立刻变化，可能先于
+    // tiptap 的 EditorContent 挂载完成触发本 effect；`editor.view` getter 在
+    // view 就绪前会抛错并被区域 ErrorBoundary 兜底（首屏变成“此区域暂时无法
+    // 显示”）。这是宿主差异暴露的既有竞态：view 未就绪时跳过度量，等就绪后
+    // 的 ResizeObserver 路径再算，不改变布局语义。
+    let editorElement: HTMLElement;
+    try {
+      editorElement = editor.view.dom as HTMLElement;
+    } catch {
+      return;
+    }
     const parent = card?.closest('.main-content') as HTMLElement | null;
     if (!surface || !card || !editorElement || !parent) return;
 
@@ -826,7 +860,22 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
 
   useEffect(() => {
     if (!editor || editor.isDestroyed) return;
-    editor.view.dispatch(editor.state.tr.setMeta('input-placeholder-refresh', placeholder));
+    // R09-T01：同上的 Tauri/WKWebView 挂载竞态。view 未就绪时在下一帧重试一次，
+    // 而不是让异常冒泡到区域 ErrorBoundary；语义仍是“placeholder 变化后刷新
+    // 装饰”，只是把时序等待显式化。
+    const dispatchPlaceholderRefresh = (): boolean => {
+      try {
+        editor.view.dispatch(editor.state.tr.setMeta('input-placeholder-refresh', placeholder));
+        return true;
+      } catch {
+        return false;
+      }
+    };
+    if (dispatchPlaceholderRefresh()) return;
+    const frame = window.requestAnimationFrame(() => {
+      dispatchPlaceholderRefresh();
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, [editor, placeholder]);
 
   // Focus trigger from store
@@ -1053,12 +1102,17 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
       event.currentTarget.value = '';
       return;
     }
+    const currentFiles = () => {
+      const state = useStore.getState();
+      return scopedSessionPath ? sessionScopedValue(state, state.attachedFilesBySession, scopedSessionPath) ?? (state.currentSessionPath === scopedSessionPath ? state.attachedFiles : []) : state.attachedFiles;
+    };
+    const ownsUpload = captureChatUploadScope(scopedSessionPath);
     const files = Array.from(event.currentTarget.files || []);
     event.currentTarget.value = '';
     try {
       if (files.length === 0) return;
-      if (useStore.getState().attachedFiles.length >= 9) return;
-      const existingVideoCount = useStore.getState().attachedFiles.filter(file => isVideoFile(file.name)).length;
+      if (currentFiles().length >= 9) return;
+      const existingVideoCount = currentFiles().filter(file => isVideoFile(file.name)).length;
       const selectedVideoCount = files.filter(file => isVideoFile(file.name)).length;
       if (existingVideoCount + selectedVideoCount > 3) {
         useStore.getState().addToast(t('error.maxVideos', { max: 3 }), 'error', 6000);
@@ -1066,7 +1120,7 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
       }
 
       for (const file of files) {
-        if (useStore.getState().attachedFiles.length >= 9) break;
+        if (currentFiles().length >= 9) break;
         const mimeType = file.type || (
           isVideoFile(file.name)
             ? chatVideoMimeTypeForName(file.name)
@@ -1100,7 +1154,8 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
               return undefined;
             })
             : undefined;
-          const res = await lingxiFetch('/api/upload-blob', {
+          ownsUpload();
+          const res = await chatFetch('/api/upload-blob', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1112,6 +1167,7 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
             }),
           });
           const data = await res.json();
+          ownsUpload();
           const upload = data?.uploads?.[0];
           if (upload?.dest) {
             addAttachedFile({
@@ -1143,9 +1199,9 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
       browserFileInputRef.current?.click();
       return;
     }
-    if (typeof window.platform?.selectFiles === 'function') {
+    if (typeof usePlatform()?.selectFiles === 'function') {
       try {
-        const paths = await window.platform.selectFiles();
+        const paths = await usePlatform().selectFiles();
         if (paths && paths.length > 0) await attachFilesFromPaths(paths);
       } finally {
         restoreEditorFocus();
@@ -1155,6 +1211,35 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
     browserFileInputRef.current?.click();
     window.setTimeout(restoreEditorFocus, 0);
   }, [inputLocked, restoreEditorFocus, surface]);
+
+  // R10：Welcome 页的固定「文件任务」入口复用当前输入区的真实附件选择流程。
+  // 欢迎页还没有会话时先落一个草稿会话，再走同一套附件快照；否则只会提示
+  // “请先创建会话”，入口等于不可用。
+  const handleFileTask = useCallback(async () => {
+    if (inputLocked) return;
+    if (!scopedSessionPath && pendingNewSession) {
+      const sessionRef = await ensureSession(pendingDraftId);
+      if (!sessionRef) {
+        addToast(t('error.code.sessionCreateFailed'), 'error');
+        return;
+      }
+      loadSessions();
+    }
+    await handleAttach();
+  }, [
+    addToast,
+    ensureSession,
+    handleAttach,
+    inputLocked,
+    loadSessions,
+    pendingDraftId,
+    pendingNewSession,
+    scopedSessionPath,
+    t,
+  ]);
+
+  // 不依赖 Welcome → MainContent 的反向 import；InputArea 负责注册真实处理器。
+  useEffect(() => registerFileTaskHandler(handleFileTask), [handleFileTask]);
 
   const ensureVoiceSessionRef = useCallback(async (): Promise<Readonly<SessionRef>> => {
     const state = useStore.getState();
@@ -1285,7 +1370,7 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
       audioRecordingSeqRef.current = index;
       const name = t('input.recordedAudioName', { index });
       const sessionRef = await ensureVoiceSessionRef();
-      const res = await lingxiFetch('/api/upload-blob', {
+      const res = await chatFetch('/api/upload-blob', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1608,7 +1693,7 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
         if (item.kind && item.kind !== 'file') continue;
         const file = item.getAsFile();
         if (!file) continue;
-        const filePath = window.platform?.getFilePath?.(file);
+        const filePath = usePlatform()?.getFilePath?.(file);
         if (!filePath) continue;
         pathItems.push(filePath);
         nameMap[filePath] = file.name;
@@ -1626,6 +1711,7 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
         e.preventDefault();
         const file = item.getAsFile();
         if (!file) return true;
+        const ownsPasteUpload = captureChatUploadScope(scopedSessionPath);
         const reader = new FileReader();
         reader.onload = async () => {
           const dataUrl = reader.result as string;
@@ -1641,7 +1727,8 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
               base64Data,
               mimeType,
             });
-            const res = await lingxiFetch('/api/upload-blob', {
+            ownsPasteUpload();
+            const res = await chatFetch('/api/upload-blob', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -1652,6 +1739,7 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
               }),
             });
             const data = await res.json();
+            ownsPasteUpload();
             const upload = data?.uploads?.[0];
             if (upload?.dest) {
               addAttachedFile({ fileId: upload.fileId, path: upload.dest, name: upload.name || uploadPayload.name, isDirectory: false });
@@ -1699,13 +1787,13 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
   // ── Load thinking level once server port is ready + listen for plan mode sync ──
   const activeServerConnection = useStore(s => s.activeServerConnection);
   useEffect(() => {
-    if (activeServerConnection && surface !== 'mobile') {
+    if (activeServerConnection && connected && surface !== 'mobile') {
       const query = pendingNewSession
         ? '?pendingNewSession=1'
         : currentSessionPath
           ? `?sessionPath=${encodeURIComponent(currentSessionPath)}`
           : '';
-      lingxiFetch(`/api/session-thinking-level${query}`)
+      chatFetch(`/api/session-thinking-level${query}`)
         .then(r => r.json())
         .then(d => { if (d.thinkingLevel) setThinkingLevel(d.thinkingLevel as ThinkingLevel); })
         .catch((err: unknown) => console.warn('[InputArea] load thinking level failed', err));
@@ -1718,7 +1806,7 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
     };
     window.addEventListener('hana-plan-mode', handler);
     return () => window.removeEventListener('hana-plan-mode', handler);
-  }, [activeServerConnection, currentSessionPath, isSideChatScope, pendingNewSession, setPermissionMode, setThinkingLevel, surface]);
+  }, [activeServerConnection, connected, currentSessionPath, isSideChatScope, pendingNewSession, setPermissionMode, setThinkingLevel, surface]);
 
   // ── Handle slash selection (builtin vs skill) ──
   const handleSlashSelect = useCallback((item: SlashItem) => {
@@ -2339,11 +2427,11 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
 
   const handleSlashResultClick = useCallback(() => {
     if (slashResult?.filePath) {
-      window.platform?.showInFinder?.(slashResult.filePath);
+      usePlatform()?.showInFinder?.(slashResult.filePath);
       return;
     }
     if (!slashResult?.deskDir) return;
-    window.platform?.openFolder?.(slashResult.deskDir);
+    usePlatform()?.openFolder?.(slashResult.deskDir);
   }, [slashResult?.deskDir, slashResult?.filePath]);
 
   const handleContinueDeletedAgentSession = useCallback(async () => {
@@ -2371,6 +2459,12 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
         attachedFiles={attachedFiles}
         removeAttachedFile={removeAttachedFile}
         hasQuotedSelection={quotedSelections.length > 0}
+        quotedSelections={quotedSelections}
+        removeQuotedSelection={index => {
+          const state = useStore.getState();
+          if (scopedSessionPath) state.removeQuotedSelectionForSession(scopedSessionPath, index);
+          else state.removeQuotedSelection(index);
+        }}
         knowledgeRefSessionKey={knowledgeRefSessionKey}
       />
       <InputStatusBars

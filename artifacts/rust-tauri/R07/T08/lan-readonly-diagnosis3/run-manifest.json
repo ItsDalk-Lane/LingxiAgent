@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "scope": "LOCAL_READONLY_DIAGNOSIS_NOT_STAGE_ACCEPTANCE",
+  "recordedAt": "2026-10-18T08:41:07.782858+00:00",
+  "command": [
+    "python3",
+    "artifacts/rust-tauri/R07/T08/lan-readonly-diagnosis3/probe.py"
+  ],
+  "actualExitCode": 1,
+  "filesSha256": {
+    "stderr.log": "bb5650fc21427ceaafba83d4d2d6e14822e90f0592a76e665096f70b2565920c",
+    "stdout.log": "880e9a27a5885326b31c246e86a84a5c61692b2889f8dbcb8b08d0e96eb88789",
+    "probe.py": "c712cffa2ea799decc267ee79f5d0b2ca7c77067449cf4876a6ef2983cc7b8d3",
+    "receipt.json": "8eaabf8d0f5bff0fb4b6d8ed5d50ecb6f76e00797ffd897e75d62de8ce95072e"
+  },
+  "cargoRun": false,
+  "productOrExistingTestEdited": false,
+  "networkSettingsChanged": false
+}

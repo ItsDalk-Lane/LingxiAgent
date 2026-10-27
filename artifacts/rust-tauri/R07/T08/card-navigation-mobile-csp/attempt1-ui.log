@@ -1,0 +1,41 @@
+CARD_CLICK_STATE:{"hasHandler":true,"text":"实际点击","tokenReadable":true}
+
+▲ [WARNING] The "assert" keyword is not supported in the configured target environment ("node24.16.0") [assert-to-with]
+
+    vite.config.ts:7:33:
+      7 │ import pkg from './package.json' assert { type: 'json' };
+        │                                  ~~~~~~
+        ╵                                  with
+
+  Did you mean to use "with" instead of "assert"?
+
+(electron) 'console-message' arguments are deprecated and will be removed. Please use Event<WebContentsConsoleMessageEventParams> object instead.
+[6259:1018/121655.563318:INFO:CONSOLE:733] "[vite] connecting...", source: http://127.0.0.1:5173/@vite/client (733)
+[6259:1018/121655.584203:INFO:CONSOLE:827] "[vite] connected.", source: http://127.0.0.1:5173/@vite/client (827)
+[6259:1018/121656.043510:INFO:CONSOLE:20103] "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold", source: http://127.0.0.1:5173/@fs/private/tmp/lingxi-card-nav-un6PgF/home/.card-vite-cache/deps/react-dom_client.js?v=e1f80ffa (20103)
+[6259:1018/121656.119701:INFO:CONSOLE:0] "Unrecognized Content-Security-Policy directive 'navigate-to'.", source: http://127.0.0.1:5173/lingxi/v1/cards/navigation-probe?token=[REDACTED_SYNTHETIC_OWNER_TOKEN]&v=1 (0)
+(node:6259) electron: Failed to load URL: http://127.0.0.1:63163/leak?href=http%3A%2F%2F127.0.0.1%3A5173%2Flingxi%2Fv1%2Fcards%2Fnavigation-probe%3Ftoken%3D[REDACTED_SYNTHETIC_OWNER_TOKEN]%26v%3D1 with error: ERR_BLOCKED_BY_CSP
+(Use `Electron --trace-warnings ...` to show where the warning was created)
+[6259:1018/121656.146520:INFO:CONSOLE:55] "Framing 'http://127.0.0.1:63163/' violates the following Content Security Policy directive: "frame-src 'self' blob:". The request has been blocked.
+", source: http://127.0.0.1:5173/lingxi/v1/cards/navigation-probe?token=[REDACTED_SYNTHETIC_OWNER_TOKEN]&v=1 (55)
+AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert(await frame.executeJavaScript('document.querySelector("#actual-card")?.textContent==="done"'))
+
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/r07-t08-card-electron-main.cjs:40:7 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/r07-t08-card-electron-launch.mjs:29
+  if (result !== 0) throw new Error(`真实卡片窗口失败：${result}`);
+                          ^
+
+Error: 真实卡片窗口失败：1
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/r07-t08-card-electron-launch.mjs:29:27
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+Node.js v24.16.0

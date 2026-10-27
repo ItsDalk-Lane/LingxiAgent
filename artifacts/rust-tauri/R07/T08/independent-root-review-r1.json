@@ -1,0 +1,114 @@
+{
+  "reviewedAt": "2026-10-18T04:05:31.302283+00:00",
+  "status": "READONLY_FIRST_REVIEW_FINDINGS_OPEN_NOT_ACCEPTANCE",
+  "sourceNotFrozen": true,
+  "sourceBindings": [
+    {
+      "path": "rust/crates/lingxi-service/src/settings_configuration.rs",
+      "sha256": "585c798f51b85c8d564f846e6176be8e7361ac5de228e5ed1d57a23dd10a56ba"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/settings_ui.rs",
+      "sha256": "3228c33df02ac81b5eabf85c328bf9ccdc0d3886156f9d66e27fe35c2a5a12bd"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/agent_config_readback.rs",
+      "sha256": "ead13da7aaa683741d6d3292035af8685b471fa230bb55b9b72c10d3d6f901c3"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/chat_settings.rs",
+      "sha256": "9e5fad5552239b03bbd43cfcaf0fe237bfbfb8755b2449f400d4eafba6260166"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_focus.rs",
+      "sha256": "8d08997954ba578dcf1e538137f9fa5eea9c4ea49ab7f0bb4ff22993015de803"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/auth.rs",
+      "sha256": "78cfbe066aed40968dc4d4bf56dd00a9068cf1e6602cef7262dd0911e53d3d89"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/toolgateway.rs",
+      "sha256": "06adc5358f23b122666f7c0fc01628f1fa51e8f9d5e77ec7dcd0728e47e28839"
+    },
+    {
+      "path": "rust/crates/lingxi-protocol/src/settings.rs",
+      "sha256": "a80593188b2d408869874075932c91eb2ef11cad8565483e9620a0a04f1149da"
+    },
+    {
+      "path": "desktop/src/react/settings/components/SettingsTransferSection.tsx",
+      "sha256": "3666423d10ec6f51aa1a2e8ef5fccfaf6ed9799b98649837d9f791f81dc76394"
+    },
+    {
+      "path": "desktop/src/react/services/rust-settings.ts",
+      "sha256": "46c85b04e52db1a92c14c8d89c80a20ff0f557028c70dea436ae25863ecae6a3"
+    }
+  ],
+  "scope": "仅root已落地分工；core/provider/settings_tools仍在修改，不对未定稿细节作最终裁决。",
+  "findings": [
+    {
+      "id": "T08-ROOT-R1",
+      "priority": "P1",
+      "title": "代理URL内秘密进入设置读面和默认导出",
+      "source": "rust/crates/lingxi-service/src/agent_config_readback.rs:1835",
+      "related": [
+        "rust/crates/lingxi-service/src/agent_config_readback.rs:2610",
+        "rust/crates/lingxi-service/src/settings_configuration.rs:163",
+        "rust/crates/lingxi-service/src/settings_ui.rs:332"
+      ],
+      "reproduction": "保存network_proxy={mode:manual,httpProxy:http://fixture-user:synthetic-proxy-secret@127.0.0.1:8888}；GET settings/config、settings/snapshot或默认export可原样包含URL密码。现有legacy prefs也可能已有材料。",
+      "basis": "normalize_network_proxy没有排除userinfo；mask_object_secrets仅按秘密键名与headers/api_keys映射掩码，不处理httpProxy等字符串内userinfo。",
+      "minimalFix": "为读面/默认导出脱敏URL凭据，并明确导入mask保持；仅拒绝新写不能清洗已有prefs。",
+      "proofSuggested": "真实HTTP合成userinfo秘密，覆盖config/snapshot/export以及缺secrets.write的settings.read主体；导入掩码后原秘密不被清除或替换。"
+    },
+    {
+      "id": "T08-ROOT-R2",
+      "priority": "P2",
+      "title": "资料读写只检查最终文件，父目录链接可越出自有根",
+      "source": "rust/crates/lingxi-service/src/settings_configuration.rs:706",
+      "related": [
+        "rust/crates/lingxi-service/src/settings_ui.rs:178",
+        "rust/crates/lingxi-service/src/memory.rs:195"
+      ],
+      "reproduction": "fixture中把home/user改为指向另一个自有outside目录的symlink，outside/user.md为普通文件；PUT user-profile通过最终lstat并写outside/user.md，GET也可读它。",
+      "basis": "user_dir只是join，lstat最终文件不会拒绝父组件symlink，create_dir_all和atomic_write均按该父组件解析。",
+      "minimalFix": "使用现有固定根/目录组件不跟随链接的安全文件读写，拒绝父组件越界。",
+      "proofSuggested": "真实HTTP父user目录symlink（目标存在/缺失两种），GET/PUT拒绝且outside原字节/不存在状态不变。当前测试只覆盖最终user.md本身symlink。"
+    },
+    {
+      "id": "T08-ROOT-R3",
+      "priority": "P2",
+      "title": "助手配置纯校验晚于写盘，后续失败丢失部分成功事实",
+      "source": "rust/crates/lingxi-service/src/agent_config_readback.rs:2385",
+      "related": [
+        "rust/crates/lingxi-service/src/agent_config_readback.rs:2408",
+        "rust/crates/lingxi-service/src/agent_config_readback.rs:2460",
+        "rust/crates/lingxi-service/src/agent_config_readback.rs:2473"
+      ],
+      "reproduction": "PUT某有效助手config {locale:ja,providers:[]}，global prefs先保存，provider extraction随后400；响应无preferencesSaved且没有事件。另模型save成功后yuan校验或agent YAML写失败只返回普通错误，model_report丢失。",
+      "basis": "顺序明确为globals真实write→extract→模型publisher.save→assert_patch_yuan→YAML save；多个晚到return不附已完成状态。",
+      "minimalFix": "纯校验全部前置；真实多存储失败保留preferencesSaved/modelConfiguration/agentConfigSaved事实，已生效部分事件按事实发出。",
+      "proofSuggested": "坏providers/yuan输入零副作用；模型成功而助手落盘被真实权限/路径阻断时回执含原publish report；同理prefs保存后模型失败的已保存事实可见。"
+    },
+    {
+      "id": "T08-ROOT-R4",
+      "priority": "P2",
+      "title": "全局代理保存没有更新独立Rust服务共享出站策略",
+      "source": "rust/crates/lingxi-service/src/settings_configuration.rs:71",
+      "related": [
+        "rust/crates/lingxi-service/src/settings_configuration.rs:90",
+        "rust/crates/lingxi-service/src/model_configuration.rs:401",
+        "desktop/main.cjs:5926"
+      ],
+      "reproduction": "配置有既有模型共享NetworkPlane的服务，PUT settings/config network_proxy指向本地拒绝代理后再发实际模型请求；保存只写prefs/发事件，服务没有消费它更新Plane。",
+      "basis": "service/src全量搜索network_proxy只见投影/保存/事件；现有network.apply读取ModelPlaneConfig.network。network-proxy-changed在Electron壳只改变桌面会话代理，不能改变独立服务的HTTP客户端。",
+      "minimalFix": "明确全局代理保存与真实共享NetworkPlane唯一来源的接线及失败回执；避免runtime Source与preferences两个权威。",
+      "proofSuggested": "本地拒绝代理记录和下一真实本地模型调用验证即时生效；再编辑模型确认不把已保存代理悄然恢复旧值。"
+    }
+  ],
+  "cargoExecuted": false,
+  "sourceEdited": false,
+  "checksNotRun": "复现步骤为可执行真实HTTP验证建议，当前依据实际源码静态控制流，未执行新服务测试。",
+  "preservedFailures": "T07 C popup及D cookie恢复原失败仍保留，未以T08审阅关闭。",
+  "noPassClaim": "T08尚未完成，未宣称通过；修复后须对新源码逐项复核并真实验证。"
+}

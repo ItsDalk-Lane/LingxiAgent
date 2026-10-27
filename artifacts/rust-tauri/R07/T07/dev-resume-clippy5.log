@@ -1,0 +1,22 @@
+    Checking lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error: unneeded `return` statement
+    --> crates/lingxi-service/src/loopx.rs:1262:13
+     |
+1262 |             return;
+     |             ^^^^^^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_return
+     = note: `-D clippy::needless-return` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::needless_return)]`
+help: remove `return`
+     |
+1261 -                 .await;
+1262 -             return;
+1261 +                 .await;
+     |
+
+error: could not compile `lingxi-service` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `lingxi-service` (lib test) due to 1 previous error

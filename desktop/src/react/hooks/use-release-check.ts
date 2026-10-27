@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { ReleaseCheckResult } from '../types';
+import { usePlatform } from './use-platform';
 
 /**
  * GitHub Release 版本检查 hook——Settings > About「检查更新」主检测源。
@@ -37,7 +38,7 @@ export interface UseReleaseCheckResult {
 
 async function runCheck(): Promise<ReleaseCheckResult | null> {
   try {
-    return (await window.hana?.releaseCheckLatest?.()) ?? null;
+    return (await usePlatform()?.releaseCheckLatest?.()) ?? null;
   } catch {
     return null;
   }

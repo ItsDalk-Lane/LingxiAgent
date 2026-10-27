@@ -1,0 +1,151 @@
+{
+  "$defs": {
+    "MediaArtifact": {
+      "additionalProperties": false,
+      "properties": {
+        "fileId": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "mime": {
+          "type": "string"
+        },
+        "sizeBytes": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "fileId",
+        "filename",
+        "mime",
+        "sizeBytes"
+      ],
+      "type": "object"
+    },
+    "MediaJobPhase": {
+      "enum": [
+        "submitting",
+        "submitted",
+        "generating",
+        "downloading",
+        "completed",
+        "failed",
+        "cancelled",
+        "unknown"
+      ],
+      "type": "string"
+    },
+    "MediaKind": {
+      "enum": [
+        "image",
+        "video",
+        "speech"
+      ],
+      "type": "string"
+    },
+    "MediaRemoteCancel": {
+      "enum": [
+        "unsupported",
+        "confirmed",
+        "unknown"
+      ],
+      "type": "string"
+    },
+    "MediaRemoteOutcome": {
+      "enum": [
+        "failed",
+        "not_yet_confirmed",
+        "not_submitted",
+        "accepted",
+        "completed",
+        "unknown"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "createdAtMs": {
+      "type": "string"
+    },
+    "errorCode": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "executionRunId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "files": {
+      "items": {
+        "$ref": "#/$defs/MediaArtifact"
+      },
+      "type": "array"
+    },
+    "kind": {
+      "$ref": "#/$defs/MediaKind"
+    },
+    "localDeliveryStopped": {
+      "type": "boolean"
+    },
+    "message": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "provider": {
+      "type": "string"
+    },
+    "remoteCancel": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MediaRemoteCancel"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "remoteOutcome": {
+      "$ref": "#/$defs/MediaRemoteOutcome"
+    },
+    "revision": {
+      "type": "string"
+    },
+    "sourceRunId": {
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/MediaJobPhase"
+    },
+    "taskId": {
+      "type": "string"
+    },
+    "updatedAtMs": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "taskId",
+    "kind",
+    "provider",
+    "status",
+    "sourceRunId",
+    "revision",
+    "files",
+    "remoteOutcome",
+    "localDeliveryStopped",
+    "createdAtMs",
+    "updatedAtMs"
+  ],
+  "title": "MediaJobReceipt",
+  "type": "object"
+}

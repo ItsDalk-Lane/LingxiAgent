@@ -1,0 +1,451 @@
+{"diagnosticIteration": 1, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:34.153599+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:34.449642Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:34.454995Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:34.513517Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:34.565224Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:34.571728Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.22s
+
+{"diagnosticIteration": 1, "exitCode": 0}
+{"diagnosticIteration": 2, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:34.588746+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:34.876189Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:34.881480Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:34.940029Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:34.993964Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:35.000673Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.23s
+
+{"diagnosticIteration": 2, "exitCode": 0}
+{"diagnosticIteration": 3, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:35.017417+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:35.331408Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:35.342011Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:35.412657Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:35.473980Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:35.482105Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.28s
+
+{"diagnosticIteration": 3, "exitCode": 0}
+{"diagnosticIteration": 4, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:35.499861+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.31s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:35.941927Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:35.948345Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:36.011999Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:36.062558Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:36.069260Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.23s
+
+{"diagnosticIteration": 4, "exitCode": 0}
+{"diagnosticIteration": 5, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:36.085845+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:36.368004Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:36.373421Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:36.431866Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:36.482808Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:36.489384Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.22s
+
+{"diagnosticIteration": 5, "exitCode": 0}
+{"diagnosticIteration": 6, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:36.506214+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:36.799489Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:36.805250Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:36.866900Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:36.920469Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:36.927678Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.23s
+
+{"diagnosticIteration": 6, "exitCode": 0}
+{"diagnosticIteration": 7, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:36.944035+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:37.238360Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:37.244143Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:37.309109Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:37.357718Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:37.364443Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.23s
+
+{"diagnosticIteration": 7, "exitCode": 0}
+{"diagnosticIteration": 8, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:37.380887+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:37.668306Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:37.673605Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:37.734053Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:37.779986Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:37.786720Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.21s
+
+{"diagnosticIteration": 8, "exitCode": 0}
+{"diagnosticIteration": 9, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:37.802684+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:38.096770Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:38.102316Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:38.161414Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:38.208863Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:38.215769Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.22s
+
+{"diagnosticIteration": 9, "exitCode": 0}
+{"diagnosticIteration": 10, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:38.232539+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.18s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:38.549872Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:38.555463Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:38.614062Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:38.661533Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:38.668064Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.23s
+
+{"diagnosticIteration": 10, "exitCode": 0}
+{"diagnosticIteration": 11, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:38.682815+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:38.972421Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:38.977919Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:39.038331Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:39.089047Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:39.095542Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.22s
+
+{"diagnosticIteration": 11, "exitCode": 0}
+{"diagnosticIteration": 12, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:39.112862+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:39.395164Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:39.400391Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:39.459224Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:39.507900Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:39.514499Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.21s
+
+{"diagnosticIteration": 12, "exitCode": 0}
+{"diagnosticIteration": 13, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:39.531901+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:39.812605Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:39.817909Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:39.875517Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:39.928496Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:39.935117Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.22s
+
+{"diagnosticIteration": 13, "exitCode": 0}
+{"diagnosticIteration": 14, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:39.951838+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:40.237069Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:40.242333Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:40.301307Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:40.349985Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:40.356323Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.21s
+
+{"diagnosticIteration": 14, "exitCode": 0}
+{"diagnosticIteration": 15, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:40.373316+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:40.656659Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:40.662103Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:40.720598Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:40.773023Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:40.779810Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.22s
+
+{"diagnosticIteration": 15, "exitCode": 0}
+{"diagnosticIteration": 16, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:40.797771+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:41.083039Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:41.088423Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:41.148051Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:41.196812Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:41.203269Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.22s
+
+{"diagnosticIteration": 16, "exitCode": 0}
+{"diagnosticIteration": 17, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:41.220529+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:41.505843Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:41.511224Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:41.572097Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:41.622533Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:41.629118Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.22s
+
+{"diagnosticIteration": 17, "exitCode": 0}
+{"diagnosticIteration": 18, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:41.646243+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.83s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:43.687412Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:43.698538Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:43.781142Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:43.854492Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:43.862660Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.35s
+
+{"diagnosticIteration": 18, "exitCode": 0}
+{"diagnosticIteration": 19, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:43.879637+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:44.172630Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:44.178110Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:44.236634Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:44.287152Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:44.293809Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.22s
+
+{"diagnosticIteration": 19, "exitCode": 0}
+{"diagnosticIteration": 20, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:44.310871+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:44.593427Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:44.598822Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:44.658195Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:44.711039Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:44.717718Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.22s
+
+{"diagnosticIteration": 20, "exitCode": 0}
+{"diagnosticIteration": 21, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:44.733657+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:45.016515Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:45.022008Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:45.079336Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:45.130386Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:45.136925Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.22s
+
+{"diagnosticIteration": 21, "exitCode": 0}
+{"diagnosticIteration": 22, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:45.154551+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:45.437836Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:45.443250Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:45.505875Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:45.556578Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:45.562898Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.22s
+
+{"diagnosticIteration": 22, "exitCode": 0}
+{"diagnosticIteration": 23, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:45.580104+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:45.859595Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:45.864974Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:45.926185Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:45.976765Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:45.983227Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.22s
+
+{"diagnosticIteration": 23, "exitCode": 0}
+{"diagnosticIteration": 24, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:45.999542+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:46.280810Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:46.286246Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:46.345754Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:46.397507Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:46.403995Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.22s
+
+{"diagnosticIteration": 24, "exitCode": 0}
+{"diagnosticIteration": 25, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:46.421388+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:46.704276Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:46.709869Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:46.768310Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:46.819831Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:46.826420Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.22s
+
+{"diagnosticIteration": 25, "exitCode": 0}
+{"diagnosticIteration": 26, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:46.843751+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:47.130791Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:47.136296Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:47.196894Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:47.249653Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:47.256250Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.22s
+
+{"diagnosticIteration": 26, "exitCode": 0}
+{"diagnosticIteration": 27, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:47.272744+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:47.557528Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:47.562795Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:47.623620Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:47.677472Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:47.684059Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.22s
+
+{"diagnosticIteration": 27, "exitCode": 0}
+{"diagnosticIteration": 28, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:47.701235+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:47.984538Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:47.989774Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:48.051652Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:48.106507Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:48.113077Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.23s
+
+{"diagnosticIteration": 28, "exitCode": 0}
+{"diagnosticIteration": 29, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:48.130152+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:48.437480Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:48.443434Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:48.511105Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:48.568233Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:48.574946Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.24s
+
+{"diagnosticIteration": 29, "exitCode": 0}
+{"diagnosticIteration": 30, "command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "lingxi-service", "--test", "r07_workflow", "workflow::fanout_dispatch_events_journal_and_completion_delivery", "--", "--exact", "--nocapture"], "startedAt": "2026-10-18T03:12:48.590991+00:00"}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_workflow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workflow-35f89c8644057768)
+
+running 1 test
+2026-10-18T03:12:48.876144Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000001 session_id="wf-main"
+2026-10-18T03:12:48.881512Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:workflow entry="direct" permission_context="user_session" capability=workflow.run permission_kind="execute" target_generation=1 catalog_generation=39 prepared_at_unix_ms=1800000000000 binding_reason=JS 编排脚本的受控 fan-out（后台执行）
+2026-10-18T03:12:48.941126Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000001 outcome=completed.with_final
+2026-10-18T03:12:48.991801Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185c5000_000004 session_id="wf-main"
+2026-10-18T03:12:48.998220Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185c5000_000004 outcome=completed.with_final
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.22s
+
+{"diagnosticIteration": 30, "exitCode": 0}
+DIAGNOSTIC_ONLY: 30 repetitions did not reproduce the previous failure; previous failure is not closed by this result.

@@ -1,0 +1,20 @@
+
+running 8 tests
+test actual_vm_escape_cannot_read_write_connect_or_delegate_a_host_write ... ok
+test cancelling_actual_program_reaps_its_real_node_process ... ok
+test later_program_failure_keeps_real_completed_effect_and_exposes_it_in_receipts ... ok
+test real_child_approval_is_separate_from_outer_approval_and_denial_writes_nothing ... ok
+test real_default_ten_minute_timeout_keeps_completed_action_and_reaps_worker ... 
+=== LINGXI_TEST_GUARD: ABORTING TEST PROCESS TO PROTECT THE MACHINE ===
+  reason  : wall clock 600.04s exceeded the 600.00s limit (TEST_TIME_LIMIT_SEC)
+  process : r08_admission_ptc-5d41adb521f581e6 (pid 98384)
+  memory  : now 0.05 GiB (53395456 bytes) / limit 8.00 GiB (8589934592 bytes)
+  elapsed : 600.04s / time budget 600.00s
+  live test threads (libtest names each thread after its test function):
+    - lingxi-db-worker
+    - main
+    - real_default_ten_minute_timeout_keeps_completed_action_and_reap
+  next    : reproduce single-threaded (`cargo test <name> -- --test-threads=1 --nocapture`);
+            adjust or disable: TEST_MEM_LIMIT_MB=16384, TEST_MEM_LIMIT_MB=0,
+            TEST_TIME_LIMIT_SEC=0 (0 = off), LINGXI_TEST_GUARD=0 (off entirely)
+===========================================================================

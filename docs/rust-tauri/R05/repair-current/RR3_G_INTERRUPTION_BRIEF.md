@@ -1,0 +1,4 @@
+# RR3 G01中断历史归档与归因（全新独立只读审查）
+你是全新空历史审查者，仅收尾中断G01历史，不是G02，不修生产，不运行任何Cargo/负测/构建，不碰缓存/副本源，不派代理。全文读取RR1/RR2 MASTER、RR3_BRIEF/REVIEW_BRIEF、最新HANDOFF/矩阵、RR3_G_BRIEF、TASK0/interruption-recovery-20261007.json、G-REVIEW-01实际命令/日志/中断events、I-REVIEW-01及R02-TRIAGE-01完整报告。
+G01默认已确证FAIL：PRIMARY入口被并行修复，default exit2、15结果、N16reuse未运行；总控协调失误，历史不可抹掉或拼成16/16。后续补证有已完成实际结果，但整个代理约02:58Z中断，无最终报告且dispatch旧RUNNING失实，只可另写中断说明，不改历史request/manifest。你只写新RR3/G-INTERRUPTION-01/REPORT.md、I-MAPPING.md（未完成明确标待G02）、原始引用摘要/只读命令记录。核每个默认/补证实际结果完整性，不把无exit尾的在途记录判通过；完整的原始退出、绑定/计数可以如实索引但不冒称你亲跑。G默认FAIL及恢复补证各自边界分清。全部R02业务失败逐条归因（A01/A13已F47/F48新修待H新审；CLI缺Node依赖须真实证据支持，不能全归ALF）；识别有无尚未登记的必需缺口。若未能确认写UNKNOWN，不另做庞大重跑，交给冻结后的G02处理。
+逐项核I01–I11已有RR2/G-R2映射、各RR3新报告及相关输入依赖，I10普通同实例取消恢复与预算408重启消解不同；旧只有父PID不足，最新C/F46已独立新资源，H改动后等H02新签。不要检查无关上万重复输出；只验证能支撑每条判断的完整结果和摘要。保留raw npm红与directed/E5合法边界、原LIVE/平台延期、R06 false。无任何生产/currentdocs/总控Git系统改动。完成停止写。下一完整默认16由新G02亲跑，不能你的只读报告替代。

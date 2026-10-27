@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "R04_SCOPE_MATRIX",
+  "stage_id": "R04",
+  "generated_by": "R04 orchestrator (startup prep, one-shot)",
+  "generated_at": "2026-09-30",
+  "r04_start_sha": "bf6450bcd722668188d1a3091681bf285875ef11",
+  "baseline": {
+    "branch": "codex/rust-tauri-migration",
+    "r03_status": "ACCEPTED (re-accepted after RR2 fixed repair; R03_RR2_STAGE_REVIEW.md STAGE_VERDICT: PASS)",
+    "r03_rr2_code_candidate": "f4d4b16664827010516bc1f5ec6aee5e14b859d3 (verified ancestor of R04_START_SHA)",
+    "r03_handoff": "docs/rust-tauri/R03/R03_HANDOFF.json",
+    "remote_head_at_start": "bf6450bcd722668188d1a3091681bf285875ef11 (local == remote, worktree clean)",
+    "toolchain": "rustup 1.98.1 via rust-toolchain.toml (Cargo.lock sha256 90111c4b5988531d7… unchanged from R03 handoff)",
+    "user_modifications_at_start": "none (git status clean)"
+  },
+  "source_taskbook": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R04_统一工具网关、四基础工具与沙盒.md (gitignored, not committed)",
+  "tasks": [
+    { "id": "R04-T01", "name": "建立工具目录与参数契约", "acceptance_ids": ["R04-A01", "R04-A02"], "depends_on": [] },
+    { "id": "R04-T02", "name": "实现唯一工具执行网关", "acceptance_ids": ["R04-A03", "R04-A04"], "depends_on": ["R04-T01"] },
+    { "id": "R04-T03", "name": "批准、撤销与只读模式", "acceptance_ids": ["R04-A05", "R04-A06"], "depends_on": ["R04-T02"] },
+    { "id": "R04-T04", "name": "原生读写改文件与资源权限", "acceptance_ids": ["R04-A07", "R04-A08"], "depends_on": ["R04-T03"] },
+    { "id": "R04-T05", "name": "命令、PTY与真实进程树取消", "acceptance_ids": ["R04-A09", "R04-A10"], "depends_on": ["R04-T04"] },
+    { "id": "R04-T06", "name": "跨平台沙盒与逃逸防护", "acceptance_ids": ["R04-A11", "R04-A12"], "depends_on": ["R04-T05"] },
+    { "id": "R04-T07", "name": "MCP与插件worker接入", "acceptance_ids": ["R04-A13", "R04-A14"], "depends_on": ["R04-T06"] },
+    { "id": "R04-T08", "name": "工具结果、产物与全矩阵验收", "acceptance_ids": ["R04-A15", "R04-A16"], "depends_on": ["R04-T01","R04-T02","R04-T03","R04-T04","R04-T05","R04-T06","R04-T07"] }
+  ],
+  "acceptances": [
+    { "id": "R04-A01", "task": "R04-T01", "name": "目录与执行同源", "requirement": "REQUIRED" },
+    { "id": "R04-A02", "task": "R04-T01", "name": "陈旧目录拒绝错误目标", "requirement": "REQUIRED" },
+    { "id": "R04-A03", "task": "R04-T02", "name": "各入口权限不变", "requirement": "REQUIRED" },
+    { "id": "R04-A04", "task": "R04-T02", "name": "伪造执行凭证失败", "requirement": "REQUIRED" },
+    { "id": "R04-A05", "task": "R04-T03", "name": "批准后改参不能执行", "requirement": "REQUIRED" },
+    { "id": "R04-A06", "task": "R04-T03", "name": "等待审批期间禁用工具", "requirement": "REQUIRED" },
+    { "id": "R04-A07", "task": "R04-T04", "name": "并发编辑不覆盖用户修改", "requirement": "REQUIRED" },
+    { "id": "R04-A08", "task": "R04-T04", "name": "符号链接不能逃逸授权目录", "requirement": "REQUIRED" },
+    { "id": "R04-A09", "task": "R04-T05", "name": "真实孙进程被清理且哨兵存活", "requirement": "REQUIRED" },
+    { "id": "R04-A10", "task": "R04-T05", "name": "PTY交互不退化", "requirement": "REQUIRED" },
+    { "id": "R04-A11", "task": "R04-T06", "name": "缺沙盒不裸跑", "requirement": "REQUIRED" },
+    { "id": "R04-A12", "task": "R04-T06", "name": "隔离保证实际成立", "requirement": "REQUIRED" },
+    { "id": "R04-A13", "task": "R04-T07", "name": "MCP重连不重复执行副作用", "requirement": "REQUIRED" },
+    { "id": "R04-A14", "task": "R04-T07", "name": "worker无法绕过权限", "requirement": "REQUIRED" },
+    { "id": "R04-A15", "task": "R04-T08", "name": "空产物不算成功", "requirement": "REQUIRED" },
+    { "id": "R04-A16", "task": "R04-T08", "name": "禁用状态覆盖所有路线", "requirement": "REQUIRED" }
+  ],
+  "supplemental_duties": [
+    {
+      "id": "R04-SUP-01",
+      "origin_id": "R03_HANDOFF.json deferred_registrations[R03-T06-O1-ASK-TIER] / interfaces[0].r04_obligation_t06_o1",
+      "full_final_behavior": "ask 档审批策略面：父会话 ask 档下省略 access 或请求写权限的子代理，不允许折叠为 Operate 后放行写操作；按现役 approvalPolicy（deny_on_prompt）与 allowHumanApproval=false（subagent 固定）语义返回结构化拒绝 TOOL_APPROVAL_UNAVAILABLE；同时保护父 read_only 拒绝提权、显式 read 衰减与正常 Operate 合法写操作不被一刀切关闭。",
+      "origin_stage": "R03-T06 (finding O-1) → R04 绑定",
+      "r04_assertion": "R04-T03 完成 ApprovalService 生产策略面（R03-T03 ApprovalGate 生产默认 None 的状态被真实策略接线取代）时，ask 档继承语义随 approvalPolicy 面落地并被真实 Rust 授权链裁决（测试审批替身只扮演外部答复者）。",
+      "deferred_assertion": "无递延：本阶段到期（R04-T03）。",
+      "producer": "R04-T03",
+      "latest_stage": "R04"
+    },
+    {
+      "id": "R04-SUP-02",
+      "origin_id": "R03_HANDOFF.json interfaces[0] ToolExecutorPort（journal_contract + authorization_boundary）",
+      "full_final_behavior": "R04 网关不得另立授权面或第二收据：授权判定点=驱动在 T05 journal authorized 步应用（RunGrant::Full 直授 / RunGrant::Subagent{tier} 经 kernel authorize_child_tool 白名单/禁用面/衰减）；journal 写序=record_invocation_intent(prepared)→authorized→advance_invocation(started)→执行→record_invocation_receipt；意图写失败=响亮失败绝不无收据外发；回执写失败=unknown。",
+      "origin_stage": "R03-T05/T06",
+      "r04_assertion": "R04-T02 起所有工具执行经同一 journal 与授权判定点；PreparedInvocation 由服务端生成、不可由模型伪造；无『旧路径直接放行+新网关另判』双轨。",
+      "deferred_assertion": "无递延：全程硬契约。",
+      "producer": "R04-T02..T08",
+      "latest_stage": "R04（其后阶段继续消费）"
+    },
+    {
+      "id": "R04-SUP-03",
+      "origin_id": "R02/R01 RISK_REGISTER RR-T02-F1/F2/F3/F4（CARRIED, resolve_by_stage R04）",
+      "full_final_behavior": "R04 工具网关消费规范序列化之前解决：F1 canonical 键排序非 BMP 边界 Rust/TS 分叉统一；F2 TS canonical-json 浮点/>2^53 硬失败与 PROTOCOL_SPEC §8/§9 矛盾的裁定落地；F3 EventPayload 回退吞畸形已知事件+两信封不变量编码；F4 Rust Seq/u64 解析收紧（007/+5 不再宽松于 schema pattern）。",
+      "origin_stage": "R01-T02（登记）/R02（CARRIED 确认）",
+      "r04_assertion": "在 R04 消费 canonical 序列化做参数摘要/收据绑定的 Task（T01/T02）内，逐项给出关闭或以明确裁定口径登记的处理证据；不解决则以 OPEN 递延并阻塞该消费点。",
+      "deferred_assertion": "F5（WS close code 4409）归 R08；F2/F3 若裁定为『先于 R08 消费点』须写明依据。",
+      "producer": "R04-T01/T02",
+      "latest_stage": "R04（F2/F3 的 R08 消费点除外）"
+    },
+    {
+      "id": "R04-SUP-04",
+      "origin_id": "R03 stage map laterShare 指向 R04 的工具目录面（subagent list/launch 参数面、reply/close 参数面、current_status、notify 工具面、ask_user 工具本体、todo_write 注册、automation 工具）",
+      "full_final_behavior": "上述工具在 R04 工具目录/网关中以真实 target 身份、schema、权限分类可注册可发现；其完整业务行为（模型/文件/Bridge 呈现、CronStore、批量提问卡等）归 R06/R07/R08。",
+      "origin_stage": "R03（laterShare 登记）",
+      "r04_assertion": "R04 目录与网关的注册/授权/取消/收据机制对这些工具类型成立（可用最小/替身执行器验证机制）；未迁移的完整业务能力在目录中准确表达能力与可用性，不伪装 available。",
+      "deferred_assertion": "完整业务交互验收归 R06/R07/R08（保持 REQUIRED，不倒灌 R04）。",
+      "producer": "R04-T01（目录）/R04-T08（矩阵）",
+      "latest_stage": "R04（机制）/R06-R08（业务）"
+    },
+    {
+      "id": "R04-SUP-05",
+      "origin_id": "R03 修复轮冻结语义（F01–F08 + RR2-F05）",
+      "full_final_behavior": "R03 回归硬保护：父先取消后建子与树传播；当前进程内清理 busy/配额/监督/状态；取消/终态统一裁决迟到不复活；已派发无可信回执=Unknown 不盲重试；受理失败补偿/无幽灵 Replay/不同内容冲突；requestId 规范化贯穿内存/持久化/重启且历史歧义显式拒绝；前后台完整输入保真超限明确拒绝；后台 steering 只投正确运行并实际消费；子权限不超过父、退出后拒绝新任务。",
+      "origin_stage": "R03（RR1+RR2 接受链）",
+      "r04_assertion": "R04 各 Task 触碰 sessions/runs/journal/subagent 相关面时，上述 R03 Gate 场景与修复套件重跑不回归；公共接口演进时等价更新测试并证明断言不降级。",
+      "deferred_assertion": "无递延：阶段 Gate 必检。",
+      "producer": "R04-T02..T08 + 阶段 Gate",
+      "latest_stage": "R04（持续回归义务）"
+    }
+  ],
+  "governance_deferrals_carried": [
+    "R03-GOV-01（seal 坐标滞后）与 R03-GOV-02（round3 patch replay 规模耗尽）沿用现行分类，不宣称已解决、不套旧类别消新红",
+    "R03-WINDOWS-R09-R10：Windows 真机验证与正式签名/安装包保持递延；R04 沙盒的 Windows 真机份额按该登记口径处理（本地无法执行的记录 BLOCKED/递延，不伪造）"
+  ],
+  "explicit_non_goals": [
+    "R05 真实供应商协议/完整凭证/OAuth 体系；Provider port 仍可为测试替身",
+    "R06 全量上下文/记忆/知识库",
+    "R07 完整 CLI/Bridge/浏览器/Office 产品行为",
+    "R08 用户数据迁移；R09 Tauri 正式替壳；R10/R11 安装发布",
+    "恢复已撤回的强制子代理分发/专用子代理目录",
+    "新建完整产品审批/设置 UI（仅受认证最小批准交互接口）",
+    "不改变生产默认入口（Node/Electron 默认，Rust 显式选择）"
+  ],
+  "test_double_boundary": {
+    "allowed": "外部协议替身（MCP 合成 server、worker 恶意夹具、Provider 替身）只产生外部响应；测试审批替身只扮演外部答复者。",
+    "forbidden": "替身替代被测网关、权限决定、PreparedInvocation 生成、journal、存储、RunSupervisor、ProcessSupervisor 归属；测试按工具名伪造输出；为安全测试关闭全部工具或拒绝全部路径。",
+    "test_hooks": "测试 feature / 独立测试二进制 / 等价受控机制隔离，不进生产默认。"
+  }
+}

@@ -1,0 +1,50 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t03_native_matrix",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 3.393,
+ "caseCount": 112,
+ "casesSha256": "8c25865ef743a5ef5fdff5d92149c9df22a3421a79bbd09ddcb38651873afa38",
+ "commands": [
+  {
+   "id": "build::native-harness",
+   "argv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "rustc",
+    "--test",
+    "--edition",
+    "2021",
+    "--cfg",
+    "r09_standalone_test",
+    "--crate-name",
+    "native_host_harness",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t03/native-matrix-02/harness/lib.rs",
+    "-o",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t03/native-matrix-02/harness/native_host_harness"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.623,
+   "logSha256": "2d225df9e191ff3e432d537cd007fa2525a37df780c0d6b47efd25c8568e211f"
+  },
+  {
+   "id": "test::all",
+   "argv": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t03/native-matrix-02/harness/native_host_harness",
+    "--test-threads",
+    "1"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.121,
+   "logSha256": "c96cb09d2ca27dedc9f33164aa3a4a8def392b584fb4d2d2eb96c2135ab557b3"
+  }
+ ],
+ "logSha256": "7716dd2d83d40f1d100a74eac7bf8dd305cd979cf223ed44a74b5fb3f5b4d05d",
+ "finishedAtUnixMs": 1793026885854,
+ "blockedKind": "BLOCKED_PENDING_VISIBLE_GUI",
+ "blockedLeafCount": 30,
+ "leafCasePlan": "docs/rust-tauri/R09/T03_LEAF_CASE_PLAN.json",
+ "note": "纯逻辑/IPC 负向/计划完整性已真实通过；真实动作需 LINGXI_R09_GUI_CLEARED=1 批次"
+}

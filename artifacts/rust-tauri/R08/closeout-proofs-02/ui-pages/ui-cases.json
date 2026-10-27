@@ -1,0 +1,527 @@
+{
+  "schema": "lingxi.leaf-case-results.v1",
+  "cases": [
+    {
+      "case": "ui::chat.a0.welcome-input-exclusive-projection",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a0.mobile-disconnected-no-thinking-get",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a0.regional-failure-boundary",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a1.optimistic-user-message-client-id",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a1.slash-sent-via-ws",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a1.slash-result-inline-notice",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a1.blank-input-blocked",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a1.ws-unavailable-explicit-result",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a2.streaming-send-queues-then-interjects",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a2.stop-binds-current-stream",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a2.idle-vs-running-control",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a2.resume-keeps-streaming-state",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a3.side-chat-transcript-composer",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a3.side-chat-closed-empty",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a3.attachments-preview",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a3.runtime-capsule-pill",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a4.existing-session-model-switch",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a4.new-session-default-model-set",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a4.same-model-zero-request",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a4.switch-failure-explicit-toast",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a5.thinking-session-save",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a5.thinking-pending-default-only",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a5.thinking-save-failure-console-only",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::map.a0.loads-real-layout-and-turn-cards",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::map.a0.other-service-empty-map-zero-mutation",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::map.a0.read-failure-explicit-warning",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::map.a1.workspace-selector-no-cwd-zero-files-read",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::map.a1.card-selects-real-session-same-session-zero-fetch",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::map.a1.same-revision-cache-zero-history-changed-revision-refresh",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::map.a1.archive-refusal-retains-session-selected-card",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::map.a2.zoom-locate-only-change-real-camera",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::map.a2.invalid-coordinates-zero-put",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::map.a3.pointer-drag-persists-card-position",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::map.a3.drag-write-failure-keeps-local-disk-unchanged",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::map.a4.collapse-reload-and-external-reveal-replaces-list",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::map.a4.collapse-write-failure-keeps-local-old-disk",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::map.a5.reset-replaces-all-positions-on-disk",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::map.a5.reset-write-failure-keeps-local-old-disk",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::map.a6.empty-whitespace-zero-send-continue-no-fork",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::map.a6.fork-failure-missing-anchor-preserves-draft-then-branch",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::map.a6.running-busy-queues-input-zero-extra-prompt",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::map.a6.paused-unknown-delivery-preserves-draft",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a0.container-cold-start-mcp-page",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a0.cached-old-data-background-refresh",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a0.provider-summary-nonblocking",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a1.connector-list-status-tools",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a1.read-failure-keeps-old-state",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a2.global-toggle-save-reread",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a2.global-toggle-failure-restores",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a2.defer-threshold-save",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a2.no-agent-global-state-only",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a3.add-connector-with-start-intent",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a3.bulk-import-per-row-partial",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a4.remove-with-confirm",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a4.start-stop-refresh-actions-keep-credentials",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a5.agent-connector-tools-pinned",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a5.no-agent-refuses-detail",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a6.oauth-login-open-external-poll-refresh",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a6.oauth-cancel-post-only",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a6.oauth-logout-reread",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a6.oauth-start-failure-no-external",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::security.a0.container-cold-start-security-page",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::security.a0.init-error-ready-with-log",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::security.a0.fifteen-second-timeout-ready",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::security.a1.sandbox-switches-save-and-reread",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::security.a1.uninitialized-loading-not-off",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::security.a1.save-failure-restores-and-snapshot-failure",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::security.a2.retention-and-backup-list",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::security.a2.empty-and-read-failure-explicit",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::security.a3.manual-proxy-save-and-notify",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::security.a3.system-mode-and-save-failure-keeps-draft",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::quick-chat.a0.visible-compact-bounds",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::quick-chat.a0.resize-increases-window",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::quick-chat.a0.switch-acks-focus-main-then-hide",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::quick-chat.a0.same-path-requires-real-service-focus",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::quick-chat.a1.missing-session-refuses-keeps-floating",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::quick-chat.a1.destroyed-main-explicit-failure",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::quick-chat.a1.changed-owner-refuses-without-hide",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::quick-chat.a1.late-ack-cannot-hide-after-timeout",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a3.bulk-partial-http200-mixed",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::mcp-settings.a5.policy-save-failure-no-fake-grant",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::security.a2.no-agent-load-settings-zero-request",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::security.a3.experience-disabled-zero-request",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::security.a3.notify-failure-no-success",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::security.a1.no-connection-zero-network-request",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a1.ws-error-shown-in-page",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    },
+    {
+      "case": "ui::chat.a2.resume-status-drives-control",
+      "expect": 1,
+      "actual": 1,
+      "ok": true
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+
+running 9 tests
+test create_apply_is_single_target_and_survives_restart_without_replay ... ok
+test unconfirmed_started_create_recovers_existing_target_but_never_resends ... ok
+test registered_tool_only_cards_then_busy_queue_accepts_one_causal_run_and_records_edits ... ok
+test reject_expiry_readonly_and_spoofed_source_are_checked_by_real_records ... ok
+test disabling_channels_blocks_a_previously_confirmed_busy_collaboration_queue ... ok
+test current_phone_authority_still_allows_queued_collaboration_after_root_completed ... ok
+test narrowing_phone_mode_blocks_queued_collaboration_before_any_target_run_is_created ... ok
+test removing_phone_member_blocks_a_previously_confirmed_busy_collaboration_queue ... ok
+test phone_ticker_distinguishes_claims_actual_runs_and_the_persisted_reminder_slot ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.18s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r07_session_collab") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.76s
+     Running tests/r07_session_collab.rs (rust/target/debug/deps/r07_session_collab-967d2022936a385e)

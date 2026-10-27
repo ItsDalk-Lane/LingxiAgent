@@ -1,0 +1,16 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.71s
+     Running tests/service_health.rs (target/debug/deps/service_health-9035b5926b85c17d)
+
+running 7 tests
+test prepare_data_home_rejects_file_as_home ... ok
+test prepare_data_home_creates_and_is_idempotent ... ok
+test locked_instance_and_local_token_share_one_start_identity ... ok
+test health_check_over_real_loopback ... ok
+test unknown_route_is_not_found_for_owner_but_closed_for_strangers ... ok
+test browser_cors_preflight_and_response_keep_origin_boundary ... ok
+test help_and_version_do_not_hide_invalid_arguments ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.34s
+
+CARGO_EXIT=0

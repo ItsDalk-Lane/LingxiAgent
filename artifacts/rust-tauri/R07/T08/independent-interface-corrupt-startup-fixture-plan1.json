@@ -1,0 +1,63 @@
+{
+  "schema": "r07-t08-independent-interface-corrupt-startup-fixture-plan-v1",
+  "recordedAt": "2026-10-18T12:28:00.897270+00:00",
+  "scope": "READ_ONLY_TEST_PREPARATION_ANALYSIS_NOT_EXECUTED",
+  "finalAcceptance": "pending",
+  "sourceSha256": {
+    "rust/crates/lingxi-service/tests/r07_t08_interface_preferences.rs": "90c41b4d44cc99ddf148e215037b0284df425e075594c9ec484b94e99a57c977",
+    "rust/crates/lingxi-service/src/bridge.rs": "f641230694ab945f516a250e044640370f3e14c6246a0d15b7729bbfe15f81da",
+    "rust/crates/lingxi-service/src/bridge_routes.rs": "11474bb683cac25eba706cee02bc190e6a1fe96fd9efdbf6b9577ce7a85e335f",
+    "rust/crates/lingxi-service/src/agents_admin.rs": "a33980e1605c56134cf351446e270245e4e88ead02741b51fe7016755a5610ec",
+    "rust/crates/lingxi-service/src/lib.rs": "5cfb5da1c3c717908ef7784bf9095e7002d71b090c19366177038929ecb320b5",
+    "rust/crates/lingxi-adapters/src/storage/bridge.rs": "665607866e004bae3959909d3597dd04d4f22888ce429459b5d348d347e5b646",
+    "rust/crates/lingxi-adapters/src/storage/bridge_reads.rs": "857edaf9d253e7f181d58e560058b10939fc77f19562390fd5439244576df734",
+    "rust/crates/lingxi-adapters/src/storage/migrations.rs": "f4fd785acefc9ab38c375609bad7d02e91ed1db3bde479d9d893f6502068c3e3"
+  },
+  "currentFailure": {
+    "test": "r07_t08_interface_preferences::actual_http_corrupt_preferences_are_explicit_and_authorized_writer_refuses_revocation_at_commit",
+    "observed": "Current g target reports3passed/1failed. Existing HTTP corrupt-input and original atomic-write/revocation checks reached the final close. Close surfaced Bridge startup task failure reading preferences.json while test immediately wrote invalid JSON after listener on_ready.",
+    "classification": "Confirmed startup fixture interleaving; prior development passes do not establish deterministic readiness. Preserve g failure and do not weaken close."
+  },
+  "causalSource": [
+    "lib.rs run starts BridgeHost by spawning its task, then invokes listener on_ready without awaiting Bridge initialization.",
+    "BridgeHost.run unconditionally begins with bridge_routes::import_existing, which synchronously list_agent_summaries and reads preferences.json, before its recovery awaits.",
+    "An immediate post-ready corruption can therefore reach that startup reader; later restoring valid prefs cannot turn its stored task error back into success.",
+    "BridgeHost.wait_stopped propagates that task error at original service close; it is not evidence the preference endpoint silently saved damaged input."
+  ],
+  "existingMarkersRejected": [
+    "BridgeHost.started means task spawned, not initialization complete.",
+    "bridge_routes status bridgeReady=true/bridgeInitializing=false are static values; not a real barrier.",
+    "Listener on_ready, health200, a separate agents200, one database read, or a fixed sleep do not prove the Bridge startup task has passed the file read."
+  ],
+  "recommendedMinimalFixture": {
+    "where": "Only the corrupt-preferences case: seed after bootstrap has created actual storage, before spawning production run. Keep all service components and the actual HTTP listener active. Do not modify frozen g; any implementation is after its complete evidence closure.",
+    "apis": [
+      "lingxi_adapters::storage::bridge::put_connector",
+      "lingxi_adapters::storage::bridge::claim_inbox",
+      "lingxi_adapters::storage::bridge::claim_command",
+      "lingxi_adapters::storage::bridge::get_command"
+    ],
+    "steps": [
+      "Create one uniquely named synthetic connector using put_connector with valid platform, studio, actor label, user_local owner, explicit synthetic owner_sender_id, enabled=true, config_json={}. No platform secret or account.",
+      "Using returned generation, claim_inbox with same connector/platform and owner sender, Dm, unique message/conversation id, payload text=/rc, no attachments. Actual store freezes Owner from connector identity; do not forge role fields.",
+      "Call claim_command using same generation and rc. Assert claimed true, receipt Started and result None. This records a before-dispatch crash state; do not call any command dispatcher or settle helper.",
+      "Before run starts, put_connector with returned expected generation and identical identity but enabled=false. Assert connector disabled and get_command still Started. The generation update only marks status=claimed inbox unknown; this inbox is already status=command, so its Started command receipt stays intact.",
+      "Start the unchanged production run and obtain listener address as before. Within a bounded setup wait using an actual condition, poll get_command until status Unknown with exact error: command result unknown after restart; do not execute again. Fail if service task ends, timeout occurs, row is missing or any different terminal state is observed. Do not invoke recover_started_commands from the test.",
+      "Only after this observed recovery, write the original damaged preferences variants and retain every original actual HTTP500/unchanged bytes/atomic authorization/temp-file assertion. End via original close and keep outcome/drain assertions unchanged."
+    ],
+    "whyThisIsReal": "Service code has only one call to recover_started_commands, in BridgeHost.run after import_existing and prior recovery steps. Observing a known pre-run Started row transition to Unknown demonstrates the real startup task passed the preference-dependent import; the test does not return a fake ready flag.",
+    "whyNoExternalEffect": "Connector is disabled before the first host tick; command receipt is only Started, then Unknown, never Confirmed. list_pending_command_replies selects Confirmed only; recovery explicitly refuses re-execution. No Run, session creation, outbox send or SDK worker is needed. claim_inbox allocates a stable session identity string but does not create a sessions record.",
+    "additionalGuardFacts": [
+      "Assert initial Started survives the connector disable before run so recovery cannot be pre-satisfied.",
+      "Optionally assert no new run/outbox and disabled connector stays disabled after startup; these verify inert preparation, not new product coverage.",
+      "Keep original20s HTTP budget and actual service shutdown assertion; add only bounded condition-based setup wait, not a blind delay.",
+      "Retain Bridge host running throughout malformed HTTP checks; no new product/public ready API or host bypass."
+    ]
+  },
+  "alternativeNotChosen": "Existing bridge.stop followed by wait_stopped would also await unconditional import on valid prefs, but stops an unrelated component early. Prefer the inert real recovery sentinel to preserve full running-host scope.",
+  "limits": [
+    "Static API/control-flow analysis only; the recommended fixture has not been run by reviewer.",
+    "No source, test, product ready API, database, frozen plan/tool or failure record was edited.",
+    "The failed g result remains failed; subsequent fixture verification requires its own new source/version evidence and full successor candidate if used for acceptance."
+  ]
+}

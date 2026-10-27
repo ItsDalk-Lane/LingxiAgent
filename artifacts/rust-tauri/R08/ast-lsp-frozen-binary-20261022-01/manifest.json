@@ -1,0 +1,29 @@
+{
+  "purpose": "冻结旧二进制复跑，仅证明该产物仍通过；不覆盖后续公共driver/security修改，不作为当前阶段PASS",
+  "candidateStatus": "READY_FOR_REVIEW",
+  "independentReview": "NOT_EXECUTED",
+  "startedAtUtc": "2026-10-21T16:48:12.521719+00:00",
+  "elapsedSeconds": 8.739,
+  "command": [
+    "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r08_admission_ast_lsp-a93a248840f19715",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "exitCode": 0,
+  "binary": {
+    "path": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r08_admission_ast_lsp-a93a248840f19715",
+    "sha256": "530f9af5ea298f5f7e134718e65ce7b3de5f10b34a663e7144ea5f556ea5a3a5",
+    "mtimeUnix": 1792595283.889355
+  },
+  "frozenDomainSourceSha256": {
+    "rust/crates/lingxi-service/src/coding_ast_lsp.rs": "6d2f5c83c57624477800f133407e84c91082074cdd49a21a1fcc983b52d59188",
+    "rust/crates/lingxi-service/tests/r08_admission_ast_lsp.rs": "dbbb10e9fe196031b525891e67975fb6eb8b8a0f8e83bd429daf1c4edb4871ab",
+    "scripts/rust-tauri/r08-lsp-worker.mjs": "13b7a5ff9c6a024d5f59b0fd1193a1262a989c5fe600d45dbe4fcbb87b389c26"
+  },
+  "pathPrefix": "/private/tmp/lingxi-r08-ast-tools-0510/node_modules/.bin",
+  "logs": {
+    "stdout.log": "b1d44460abd4639bd794b56c0175fbe16610f0406ff78dcd3cdb161cc10f26bf",
+    "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

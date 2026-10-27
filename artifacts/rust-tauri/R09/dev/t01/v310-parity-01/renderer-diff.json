@@ -1,0 +1,28 @@
+{
+ "changed": [
+  "desktop/src/modules/connection-csp.js",
+  "desktop/src/modules/platform.js",
+  "desktop/src/react/App.tsx",
+  "desktop/src/react/components/InputArea.tsx",
+  "desktop/src/react/host/desktop-host.ts",
+  "desktop/src/react/stores/session-actions.ts",
+  "desktop/src/react/__tests__/host/r09-t01-tauri-desktop-host.test.tsx",
+  "desktop/src/react/components/SystemPermissionsCard.tsx",
+  "desktop/src/react/host/tauri-desktop-host.ts",
+  "desktop/src/react/host/tauri-host-capabilities.ts"
+ ],
+ "whitelist": [
+  "desktop/src/react/host/",
+  "desktop/src/react/__tests__/host/",
+  "desktop/src/react/stores/session-actions.ts",
+  "desktop/src/react/types.ts",
+  "desktop/src/modules/platform.js",
+  "desktop/src/modules/connection-csp.js",
+  "desktop/src/global.d.ts",
+  "desktop/src/react/components/InputArea.tsx",
+  "desktop/src/react/components/SystemPermissionsCard.tsx",
+  "desktop/src/react/App.tsx",
+  "desktop/src/locales/"
+ ],
+ "outsideWhitelist": []
+}

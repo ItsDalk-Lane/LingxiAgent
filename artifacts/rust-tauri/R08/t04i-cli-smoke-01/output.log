@@ -1,0 +1,33 @@
+== fresh run ==
+{"run_id":"import:0fba1f91:1792693704813","resumed":false,"source_root_sha256":"0fba1f91d031b24b260f20d4282daa5a84cf50d0a9fd15b346260c133bb9a57a","source_unchanged":true,"batches_total":31,"batches_done":13,"batches_pending_convert":18,"issues":1,"status":"partial","receipt_path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//t04i-smoke-tgt/legacy-import/migration-receipt.json"}
+run_id=import:0fba1f91:1792693704813
+== refuse: rerun without --resume (fail-closed) ==
+error: legacy-import: target already holds an import database; pass --resume <runId> (fail-closed, no silent new run): /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//t04i-smoke-tgt
+refuse_exit=2
+== refuse: unknown run id ==
+error: legacy-import: run import:nope:0 not found in target
+unknown_exit=2
+== resume x2 (idempotent) ==
+{"run_id":"import:0fba1f91:1792693704813","resumed":true,"source_root_sha256":"0fba1f91d031b24b260f20d4282daa5a84cf50d0a9fd15b346260c133bb9a57a","source_unchanged":true,"batches_total":31,"batches_done":13,"batches_pending_convert":18,"issues":1,"status":"partial","receipt_path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//t04i-smoke-tgt/legacy-import/migration-receipt.json"}
+{"run_id":"import:0fba1f91:1792693704813","resumed":true,"source_root_sha256":"0fba1f91d031b24b260f20d4282daa5a84cf50d0a9fd15b346260c133bb9a57a","source_unchanged":true,"batches_total":31,"batches_done":13,"batches_pending_convert":18,"issues":1,"status":"partial","receipt_path":"/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//t04i-smoke-tgt/legacy-import/migration-receipt.json"}
+== db state ==
+done|13
+planned|18
+1
+1
+== issues.jsonl ==
+{"batchKey":"unmapped","kind":"unmapped-class","message":"file matches no registry class (17 bytes, sha256 e205b8f1…)","refId":"mystery-unmapped.bin","seq":1,"severity":"warning"}
+== SUMMARY.md ==
+# Legacy import import:0fba1f91:1792693704813
+
+- status: **partial** (resumed=true)
+- sourceRootSha256: `0fba1f91d031b24b260f20d4282daa5a84cf50d0a9fd15b346260c133bb9a57a`
+- sourceUnchanged: true
+- batches: total=31 done=13 pendingConvert=18
+  - convert: planned=18 inProgress=0 done=0 failedOrSkipped=0
+  - out-of-scope: planned=0 inProgress=0 done=2 failedOrSkipped=0
+  - regenerable: planned=0 inProgress=0 done=1 failedOrSkipped=0
+  - register: planned=0 inProgress=0 done=10 failedOrSkipped=0
+- issues: 1 (see issues.jsonl)
+
+B1 骨架：register/regenerable/out-of-scope 即刻登记；convert 批次待 B2/B3 切片执行。

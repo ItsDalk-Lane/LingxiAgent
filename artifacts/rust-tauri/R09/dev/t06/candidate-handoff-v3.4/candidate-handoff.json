@@ -1,0 +1,102 @@
+{
+  "schema": "lingxi.r09.t06.candidate-handoff.v3.4",
+  "generatedAt": "2026-10-27T09:01:27+0800",
+  "gitHead": "aac8cb9fe6bb7bfa7a41d75528221136bfe55e50",
+  "supersedes": "candidate-handoff-v3.3（OWNER-04 main get_splash_info/get_avatar_path 授权 + T03/T08 工具修复冻结后）",
+  "policy": {
+    "path": "docs/rust-tauri/R09/R09_COMMAND_POLICY.json",
+    "sha256": "d8ad27d19b0963fee4f1f2422dd695f7d013192ffaae190bc0d667b0f0925132",
+    "commandCount": 73
+  },
+  "delivery": {
+    "app": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+    "appTreeSha256": "b094b15ac7c756a9e5d7a6e11451138785a144ea4a7a9d155a04e07111a4b9da",
+    "files": {
+      "Contents/Info.plist": "da9ebff0b848d9ff1e3e6e5ac545c7270904ceb2a65677095cbb3e400e01919a",
+      "Contents/MacOS/lingxi-resource-desktop": "41c32b1ab8528a337b702e91d52067c71e77c60f5d8cdcc5a126b33c4ef8658c",
+      "Contents/MacOS/lingxi-service": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+      "Contents/Resources/Lingxi.icns": "0951f493d51b3537f2b5826d45e117bba1ead1802c38658e2c0ebb1d7706b4d3",
+      "Contents/Resources/rust-service/build.json": "372c2b88748dcd96e9a74956c13554fb8d0e764638c28bc52b524c3a506473f9",
+      "Contents/_CodeSignature/CodeResources": "94feb01477569084da315e5fb2fa90ff5bd3d25c03861a54a75309a830095bcc"
+    },
+    "receipt": "desktop/src-tauri/.tauri-build/build-receipt-release.json",
+    "receiptSha256": "3a050cf91d2ab213742f9b461b25d276611e127a51244be90d62b76b4fef897d",
+    "featureList": [
+      "r09-host"
+    ],
+    "evidenceBuild": false,
+    "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+    "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+    "executable": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+    "executableSha256": "41c32b1ab8528a337b702e91d52067c71e77c60f5d8cdcc5a126b33c4ef8658c",
+    "codesign": {
+      "verify": {
+        "exitCode": 0
+      }
+    }
+  },
+  "g1Evidence": {
+    "executable": "desktop/src-tauri/target/debug/lingxi-resource-desktop",
+    "executableSha256": "0a9a072fff1d77d158c84c8eb3b8c4a0f6c13f21b037e09b18bbfe4573663ecc",
+    "receipt": "desktop/src-tauri/.tauri-build/build-receipt-debug.json",
+    "receiptSha256": "26389ac6236a35b970a059e7dcfe579ebff6da6b9aa5a40907506633b1474f4c",
+    "featureList": [
+      "e2e-test",
+      "r09-host",
+      "r09-test-hooks"
+    ],
+    "evidenceBuild": true,
+    "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+    "stableCopy": "/private/tmp/lingxi-r09-evidence/lingxi-resource-desktop-v34-0a9a072f"
+  },
+  "staticGates": {
+    "capabilityAudit": {
+      "evidence": "artifacts/rust-tauri/R09/dev/t06/v34-audit-01",
+      "status": "PASS",
+      "exitCode": 0,
+      "caseCount": 58,
+      "failedCases": []
+    },
+    "releaseAttackSurface": {
+      "evidence": "artifacts/rust-tauri/R09/dev/t06/v34-scan-01",
+      "status": "PASS",
+      "caseCount": 45,
+      "failedCases": []
+    },
+    "releaseAttackSuite": {
+      "evidence": "artifacts/rust-tauri/R09/dev/t06/v34-release-suite-01",
+      "status": "PASS",
+      "exitCode": 0,
+      "caseCount": 51
+    },
+    "capabilityMatrix": {
+      "evidence": "artifacts/rust-tauri/R09/dev/t06/v34-capability-matrix-01",
+      "status": "FAIL",
+      "exitCode": 2,
+      "caseCount": 91,
+      "note": "仅 21 blocked::runtime.* 运行期 GUI 项；静态全 PASS"
+    }
+  },
+  "renderer": {
+    "rendererDigest": "b0a20250b3d1dfb2e0112846d0e1365889c556002c206f9b7f1f90b47dea27f9",
+    "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+    "rebuild": false
+  },
+  "changes": [
+    "OWNER-04: main window allow get_splash_info/get_avatar_path（capability+policy）",
+    "T03 GUI 动作 execute/async/restart 恢复/stale 清理",
+    "T03 snapshot agent_id/窗口控制 R00 语义/通知探针 .app",
+    "T08 context-menu 模型与 debug-commands-gated 口径",
+    "T06 ACL harness 动态 handoff+诊断归档"
+  ],
+  "releaseEvidence": {
+    "note": "v3.4 未重建 release-evidence hooks bundle；T02 release 负向可沿用 v3.3 bundle（sidecar/build.json 未变），待最终门验证",
+    "v33BundlePath": "/private/tmp/lingxi-r09-t06-release-evidence-target/release/bundle/macos/Lingxi.app"
+  },
+  "freeze": {
+    "desktopTauriFrozen": true,
+    "frozenAt": "2026-10-27T09:01:27+0800",
+    "psResidual": 0,
+    "guiLaunched": false
+  }
+}

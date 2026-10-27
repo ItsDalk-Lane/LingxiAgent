@@ -1,0 +1,356 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/auth.rs:183:
+ }
+ 
+ impl Principal {
+-    pub(crate) fn scheduler_owner() -> Self { Self::local_owner(0) }
++    pub(crate) fn scheduler_owner() -> Self {
++        Self::local_owner(0)
++    }
+     /// Mirrors the incumbent `isLocalOwnerPrincipal`: loopback token over a
+     /// local connection — the on-machine owner, allowed on every route.
+     pub fn is_local_owner(&self) -> bool {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/auth.rs:537:
+     {
+         return RoutePolicy::Scope("chat");
+     }
+-    if path=="/lingxi/v1/desk/activities" || path.strip_prefix("/lingxi/v1/desk/activities/").is_some_and(|tail|tail.split_once('/').is_some_and(|(id,operation)|!id.is_empty() && matches!(operation,"session"|"promote"))) {
++    if path == "/lingxi/v1/desk/activities"
++        || path
++            .strip_prefix("/lingxi/v1/desk/activities/")
++            .is_some_and(|tail| {
++                tail.split_once('/').is_some_and(|(id, operation)| {
++                    !id.is_empty() && matches!(operation, "session" | "promote")
++                })
++            })
++    {
+         return RoutePolicy::LocalOnly;
+     }
+     // 与 Axum 的实际路由保持精确匹配；不能把未注册的 `/health/` 当作公开路由。
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/auth.rs:544:
+     let p = path;
+-    if matches!(p, "/lingxi/v1/desk/cron" | "/lingxi/v1/desk/cron/history" | "/lingxi/v1/desk/heartbeat" | "/lingxi/v1/automation/status" | "/lingxi/v1/preferences/notifications" | "/lingxi/v1/automation/notifications") {
++    if matches!(
++        p,
++        "/lingxi/v1/desk/cron"
++            | "/lingxi/v1/desk/cron/history"
++            | "/lingxi/v1/desk/heartbeat"
++            | "/lingxi/v1/automation/status"
++            | "/lingxi/v1/preferences/notifications"
++            | "/lingxi/v1/automation/notifications"
++    ) {
+         return RoutePolicy::LocalOnly;
+     }
+     if (p == "/lingxi/v1/sessions/interactions" && matches!(m.as_str(), "GET" | "HEAD"))
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/automation.rs:1471:
+     }
+ }
+ 
+-fn notification_mode(value:Option<&Value>)->Result<&str,String>{
+-    match value {None=>Ok("never"),Some(value)=>value.as_str().ok_or_else(||"notification preference mode must be string".into())}
++fn notification_mode(value: Option<&Value>) -> Result<&str, String> {
++    match value {
++        None => Ok("never"),
++        Some(value) => value
++            .as_str()
++            .ok_or_else(|| "notification preference mode must be string".into()),
++    }
+ }
+ fn notification_preferences(prefs: &Value) -> Result<Value, String> {
+     let source = prefs.get("notifications").unwrap_or(&Value::Null);
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:25:
+ pub mod appevents;
+ pub mod approval;
+ pub mod approval_service;
++pub mod artifactverify;
++pub mod auth;
+ pub mod automation;
+ pub mod automation_activity;
+ pub mod automation_daily;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:35:
+ pub mod automation_review;
+ pub mod automation_schedule;
+ pub mod automation_tools;
+-pub mod artifactverify;
+-pub mod auth;
+ pub mod background;
+ pub mod background_tasks;
+ pub mod bridgemedia;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:2383:
+             compaction: compaction_service,
+         };
+         let knowledge_owner = Arc::downgrade(state.knowledge());
+-        let import_report=automation_import::import_current_studio(&automation::JobApi::from_state(&state)).await;
+-        if import_report.blocked>0 {
+-            tracing::error!(blocked=import_report.blocked,"部分旧自动任务未迁移，需检查原始资料；这些任务不会执行");
++        let import_report =
++            automation_import::import_current_studio(&automation::JobApi::from_state(&state)).await;
++        if import_report.blocked > 0 {
++            tracing::error!(
++                blocked = import_report.blocked,
++                "部分旧自动任务未迁移，需检查原始资料；这些任务不会执行"
++            );
+         }
+-        state.automation().set_import_report(serde_json::to_value(import_report).expect("导入报告可序列化"));
+-        if let Some(gateway)=state.tool_gateway() {
+-            automation_patrol::register(gateway,state.automation().patrol(),&state).map_err(|detail|ServiceStartupError::Storage(StorageError::Internal{detail}))?;
+-            automation_tools::register(gateway,automation::JobApi::from_state(&state),&lingxi_kernel::toolcatalog::SchemaBudget::default())
+-                .map_err(|detail|ServiceStartupError::Storage(StorageError::InvalidRequest{detail}))?;
+-            if let (Some(models),Some(credentials))=(state.model_gateway(),state.credential_service()) {
+-                let executor=Arc::new(lingxi_adapters::models::auxiliary::AuxiliaryExecutor::new_with_network(
+-                    models.clone(),credentials.clone(),lingxi_kernel::toolcatalog::SchemaBudget::default(),state.network_plane().cloned().unwrap_or_else(lingxi_adapters::models::network::NetworkPlane::direct_isolated),
+-                ).map_err(|error|ServiceStartupError::Storage(StorageError::InvalidRequest{detail:format!("cannot construct automation approval model: {error}")}))?);
+-                gateway.set_automatic_reviewer(Arc::new(automation_review::ModelAutoReviewer::new(executor,state.storage().clone(),state.runs().quotas_shared(),state.clock().clone())));
++        state
++            .automation()
++            .set_import_report(serde_json::to_value(import_report).expect("导入报告可序列化"));
++        if let Some(gateway) = state.tool_gateway() {
++            automation_patrol::register(gateway, state.automation().patrol(), &state).map_err(
++                |detail| ServiceStartupError::Storage(StorageError::Internal { detail }),
++            )?;
++            automation_tools::register(
++                gateway,
++                automation::JobApi::from_state(&state),
++                &lingxi_kernel::toolcatalog::SchemaBudget::default(),
++            )
++            .map_err(|detail| {
++                ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
++            })?;
++            if let (Some(models), Some(credentials)) =
++                (state.model_gateway(), state.credential_service())
++            {
++                let executor = Arc::new(
++                    lingxi_adapters::models::auxiliary::AuxiliaryExecutor::new_with_network(
++                        models.clone(),
++                        credentials.clone(),
++                        lingxi_kernel::toolcatalog::SchemaBudget::default(),
++                        state.network_plane().cloned().unwrap_or_else(
++                            lingxi_adapters::models::network::NetworkPlane::direct_isolated,
++                        ),
++                    )
++                    .map_err(|error| {
++                        ServiceStartupError::Storage(StorageError::InvalidRequest {
++                            detail: format!("cannot construct automation approval model: {error}"),
++                        })
++                    })?,
++                );
++                gateway.set_automatic_reviewer(Arc::new(
++                    automation_review::ModelAutoReviewer::new(
++                        executor,
++                        state.storage().clone(),
++                        state.runs().quotas_shared(),
++                        state.clock().clone(),
++                    ),
++                ));
+             }
+         }
+-        let automation_owner=Arc::downgrade(state.automation());
+-        let automation_close_budget=std::time::Duration::from_millis(state.config().shutdown_timeout_ms);
++        let automation_owner = Arc::downgrade(state.automation());
++        let automation_close_budget =
++            std::time::Duration::from_millis(state.config().shutdown_timeout_ms);
+         state
+             .storage()
+             .register_before_close(Arc::new(move || {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:2407:
+                 let knowledge_owner = knowledge_owner.clone();
+-                let automation_owner=automation_owner.clone();
++                let automation_owner = automation_owner.clone();
+                 Box::pin(async move {
+-                    if let Some(host)=automation_owner.upgrade() {
++                    if let Some(host) = automation_owner.upgrade() {
+                         host.stop();
+-                        tokio::time::timeout(automation_close_budget,host.wait_stopped()).await
+-                            .map_err(|_|StorageError::Internal{detail:"automation cleanup unconfirmed before storage close".into()})?
+-                            .map_err(|detail|StorageError::Internal{detail})?;
++                        tokio::time::timeout(automation_close_budget, host.wait_stopped())
++                            .await
++                            .map_err(|_| StorageError::Internal {
++                                detail: "automation cleanup unconfirmed before storage close"
++                                    .into(),
++                            })?
++                            .map_err(|detail| StorageError::Internal { detail })?;
+                     }
+                     if let Some(knowledge) = knowledge_owner.upgrade() {
+                         knowledge.wait_worker_stopped().await.map_err(|error| {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:7246:
+         )
+         .route("/lingxi/v1/sessions/pin", post(pin_session_route))
+         .route("/lingxi/v1/sessions/pin-order", post(pin_order_route))
+-        .route("/lingxi/v1/desk/activities",get(automation_activity::list_route))
+-        .route("/lingxi/v1/desk/activities/{id}/session",get(automation_activity::session_route))
+-        .route("/lingxi/v1/desk/activities/{id}/promote",post(automation_activity::promote_route))
+-        .route("/lingxi/v1/desk/cron", get(automation::cron_get_route).post(automation::cron_post_route))
+-        .route("/lingxi/v1/desk/heartbeat", axum::routing::post(automation::heartbeat_route))
+-        .route("/lingxi/v1/desk/cron/history", get(automation::history_route))
+-        .route("/lingxi/v1/preferences/notifications", get(automation::notification_preferences_get_route).put(automation::notification_preferences_put_route))
+-        .route("/lingxi/v1/automation/status", get(automation::status_route))
+-        .route("/lingxi/v1/automation/notifications",get(automation::notifications_get_route).post(automation::notifications_post_route))
+         .route(
++            "/lingxi/v1/desk/activities",
++            get(automation_activity::list_route),
++        )
++        .route(
++            "/lingxi/v1/desk/activities/{id}/session",
++            get(automation_activity::session_route),
++        )
++        .route(
++            "/lingxi/v1/desk/activities/{id}/promote",
++            post(automation_activity::promote_route),
++        )
++        .route(
++            "/lingxi/v1/desk/cron",
++            get(automation::cron_get_route).post(automation::cron_post_route),
++        )
++        .route(
++            "/lingxi/v1/desk/heartbeat",
++            axum::routing::post(automation::heartbeat_route),
++        )
++        .route(
++            "/lingxi/v1/desk/cron/history",
++            get(automation::history_route),
++        )
++        .route(
++            "/lingxi/v1/preferences/notifications",
++            get(automation::notification_preferences_get_route)
++                .put(automation::notification_preferences_put_route),
++        )
++        .route(
++            "/lingxi/v1/automation/status",
++            get(automation::status_route),
++        )
++        .route(
++            "/lingxi/v1/automation/notifications",
++            get(automation::notifications_get_route).post(automation::notifications_post_route),
++        )
++        .route(
+             "/lingxi/v1/sessions/workspace-rollback",
+             get(workspace_rollback_get_route).put(workspace_rollback_put_route),
+         )
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:7796:
+             "/lingxi/v1/settings/snapshot",
+             get(settings_ui::snapshot_route),
+         )
+-        .route("/lingxi/v1/settings/config", get(settings_ui::config_route).put(automation::preferences_route))
+         .route(
++            "/lingxi/v1/settings/config",
++            get(settings_ui::config_route).put(automation::preferences_route),
++        )
++        .route(
+             "/lingxi/v1/preferences/computer-use",
+             get(computer_use_settings::get_route).put(computer_use_settings::put_route),
+         )
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:8240:
+         .unwrap_or(dream_budget);
+     match tokio::time::timeout(remaining, automation_host.wait_stopped()).await {
+         Ok(Ok(())) => {}
+-        Ok(Err(error)) => return Err(ServiceError::Serve { source: std::io::Error::other(error) }),
++        Ok(Err(error)) => {
++            return Err(ServiceError::Serve {
++                source: std::io::Error::other(error),
++            })
++        }
+         Err(_) => {
+             tracing::error!("自动化任务清理超时，未确认的任务保留恢复记录");
+-            return outcome.map(|_| ServeOutcome { drain_timed_out: true });
++            return outcome.map(|_| ServeOutcome {
++                drain_timed_out: true,
++            });
+         }
+     }
+-    let remaining=dream_stop_at.lock().unwrap().map(|at|dream_budget.saturating_sub(at.elapsed())).unwrap_or(dream_budget);
++    let remaining = dream_stop_at
++        .lock()
++        .unwrap()
++        .map(|at| dream_budget.saturating_sub(at.elapsed()))
++        .unwrap_or(dream_budget);
+     match tokio::time::timeout(remaining, dream_service.dream().wait_stopped_checked()).await {
+         Ok(Ok(())) => {}
+         Ok(Err(error)) => {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/sessions.rs:1165:
+         chat_input: Option<crate::runs::ChatRunInput>,
+         now_ms: u64,
+     ) -> Result<ExecuteAccepted, SessionExecuteError> {
+-        if !matches!(origin, lingxi_kernel::subagent::RunOrigin::Cron | lingxi_kernel::subagent::RunOrigin::Heartbeat)
+-            || trigger_id.is_empty()
++        if !matches!(
++            origin,
++            lingxi_kernel::subagent::RunOrigin::Cron
++                | lingxi_kernel::subagent::RunOrigin::Heartbeat
++        ) || trigger_id.is_empty()
+         {
+-            return Err(SessionExecuteError::InvalidRequestId { detail: "invalid scheduled submission identity".into() });
++            return Err(SessionExecuteError::InvalidRequestId {
++                detail: "invalid scheduled submission identity".into(),
++            });
+         }
+-        let submission = ExecuteSubmission { input, request_id: None, knowledge: None };
++        let submission = ExecuteSubmission {
++            input,
++            request_id: None,
++            knowledge: None,
++        };
+         let lineage = lingxi_kernel::subagent::RunLineage {
+             parent_run_id: None,
+             origin,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/sessions.rs:1178:
+             cause_id: Some(trigger_id.to_string()),
+         };
+         self.execute_background_authorized_for(
+-            storage, events, supervisor, background, principal, session_id, &submission, now_ms,
+-            chat_input, Some(lineage),
+-        ).await
++            storage,
++            events,
++            supervisor,
++            background,
++            principal,
++            session_id,
++            &submission,
++            now_ms,
++            chat_input,
++            Some(lineage),
++        )
++        .await
+     }
+ 
+     #[allow(clippy::too_many_arguments)]
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/slash.rs:405:
+     match command.as_str() {
+         "/apply" => {
+             if !principal.is_local_owner() {
+-                send(&tx,id,target,"error","应用定时任务建议需要本机所有者权限").await;
++                send(
++                    &tx,
++                    id,
++                    target,
++                    "error",
++                    "应用定时任务建议需要本机所有者权限",
++                )
++                .await;
+                 return;
+             }
+-            let reference=args.trim();
+-            if reference.is_empty() || reference.split_whitespace().count()!=1 {
+-                send(&tx,id,target,"error","用法：/apply 建议编号").await;
++            let reference = args.trim();
++            if reference.is_empty() || reference.split_whitespace().count() != 1 {
++                send(&tx, id, target, "error", "用法：/apply 建议编号").await;
+                 return;
+             }
+-            let result=crate::automation::manage(&crate::automation::JobApi::from_state(state),principal,&json!({"action":"apply_suggestion","suggestionId":reference,"sessionId":target})).await;
++            let result = crate::automation::manage(
++                &crate::automation::JobApi::from_state(state),
++                principal,
++                &json!({"action":"apply_suggestion","suggestionId":reference,"sessionId":target}),
++            )
++            .await;
+             match result {
+-                Ok(_)=>send(&tx,id,target,"success","定时任务建议已应用").await,
+-                Err(error)=>send(&tx,id,target,"error",format!("应用建议失败：{error}")).await,
++                Ok(_) => send(&tx, id, target, "success", "定时任务建议已应用").await,
++                Err(error) => {
++                    send(&tx, id, target, "error", format!("应用建议失败：{error}")).await
++                }
+             }
+         }
+ 

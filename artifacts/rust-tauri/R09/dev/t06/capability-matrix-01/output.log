@@ -1,0 +1,4 @@
+$ python3 -B scripts/rust-tauri/r09_capability_audit.py --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t06/capability-matrix-01/capability-audit
+--- exit=2 duration=0.49s ---
+registered=44 manifest=44 permissions=88 capabilities=5 windowPatterns=8 policy=yes
+r09_capability_audit: status=FAIL cases=52 failed=['caps::window-plugin-permissions::browser-viewer', 'caps::window-plugin-permissions::main', 'caps::window-plugin-permissions::skill-viewer-*', 'caps::window-plugin-permissions::viewer-*', 'caps::no-dangerous-plugin-permissions', 'caps::test-control-env-not-in-release-paths'] gaps=66

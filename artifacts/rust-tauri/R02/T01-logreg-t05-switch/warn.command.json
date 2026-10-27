@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "bash",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t01_service_smoke.sh",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/T01-logreg-t05-switch/warn"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "UTC_start": "2026-10-23T06:20:17.390702+00:00",
+  "UTC_end": "2026-10-23T06:20:20.833574+00:00",
+  "exit": 1,
+  "outerRUST_LOG": "warn",
+  "scriptBefore": "0388110a58ae90f17ed9e0f6bed0cf96aa10eca4c6d3276b439e258bda785639",
+  "scriptAfter": "0388110a58ae90f17ed9e0f6bed0cf96aa10eca4c6d3276b439e258bda785639"
+}

@@ -1,0 +1,156 @@
+{
+  "status": "IMPLEMENTED_LOCAL_CHECKS_NOT_STAGE_FREEZE",
+  "independentReview": false,
+  "sourceSnapshotNote": "仅本子任务交付时的17文件摘要，不是完整T05冻结；后续改动不能借此声明最终通过。",
+  "sources": [
+    {
+      "path": "desktop/src/react/services/rust-media.ts",
+      "sha256": "fde2ea30e50539a55e078d6aa77ef9cfa9124cbbede1305da0cbadce01837db1"
+    },
+    {
+      "path": "desktop/src/react/services/rust-automation.ts",
+      "sha256": "0a5f8871ce675103fde317f3a83235b3f477e22a30e37d2fe265b7c2aead5467"
+    },
+    {
+      "path": "desktop/src/react/services/app-event-actions.ts",
+      "sha256": "eb57a1477ab66e125b381789711c2d44a5ec1867638207ec33203d0d01737048"
+    },
+    {
+      "path": "desktop/src/react/services/rust-chat-history.ts",
+      "sha256": "068a4ec7484ed4e7ef991f5193101f0cba01e9487cd8b8f2342c310a1b8af052"
+    },
+    {
+      "path": "desktop/src/react/services/websocket.ts",
+      "sha256": "9434f37c3e45483f7cf20582e333a0f60b683b5d5f370ca0356e9c5aec61c2f4"
+    },
+    {
+      "path": "desktop/src/react/services/resource-url.ts",
+      "sha256": "9fff3f330fe75de3f9fdbe99590e01b665234bc20a820b4b0661bf4d3c951714"
+    },
+    {
+      "path": "desktop/src/react/stores/session-actions.ts",
+      "sha256": "ce5396a7b91b50b582832cdc3fede2e901a97bf6e9828d6e41c75e60c64043d3"
+    },
+    {
+      "path": "desktop/src/react/stores/chat-slice.ts",
+      "sha256": "0bcc9734eb12fdf19ec0aeb03c7bc0dcc858faca3b7629ef998e81464743af10"
+    },
+    {
+      "path": "desktop/src/react/stores/chat-types.ts",
+      "sha256": "2746ea6b5d6927cba132572151451ff785e5d9c8f02c2ccbca59e5bb7dddf35a"
+    },
+    {
+      "path": "desktop/src/react/components/chat/AssistantMessage.tsx",
+      "sha256": "208486db7f208e688212daf0e6c68576a0c0fff9ebf623bf667ec6ea2e7ba9e6"
+    },
+    {
+      "path": "desktop/src/react/__tests__/services/rust-media-http.test.tsx",
+      "sha256": "1ea4e8d824b43569a3a8d440f663c77fd4b41e9c3f6264a1745b1d037492492c"
+    },
+    {
+      "path": "desktop/src/react/__tests__/services/rust-automation.test.ts",
+      "sha256": "2d1929156cbd9957f0232ee689666796e5e8d27e5bdb0fffb535011cf3507175"
+    },
+    {
+      "path": "desktop/src/locales/zh.json",
+      "sha256": "36545a701aad7e03a63ae458b089f5071752f7ce93375c0944c188a1054f4e1b"
+    },
+    {
+      "path": "desktop/src/locales/en.json",
+      "sha256": "d5f5033bd851200b46f97603cfc8673cd5205c0e8bcf53d56a8e4cf0c14cf7c9"
+    },
+    {
+      "path": "desktop/src/locales/ja.json",
+      "sha256": "34173a4556be2ac24bda43a496dd9543a7d036ac9c14c4f6938d2d245ade53f3"
+    },
+    {
+      "path": "desktop/src/locales/ko.json",
+      "sha256": "04dd388987c460ab7d9d5189fa494adf326a41331ad3a8733ca30b10ef7d1d64"
+    },
+    {
+      "path": "desktop/src/locales/zh-TW.json",
+      "sha256": "ca309c4ebf05e6f20aa26b1f93de54690b29a69d708218c2e22f7a7e8b152c22"
+    }
+  ],
+  "runs": [
+    {
+      "run": "media-ui-r1",
+      "commandKind": "npx vitest run（精确文件列表由log和执行记录核对）",
+      "exitCode": 0,
+      "testFiles": 3,
+      "passed": 68,
+      "failed": 0,
+      "log": "/private/tmp/lingxi-r07-t05-media-ui-r1.log",
+      "logSha256": "3c1a7175dd805ed1567ba4d52774dd3a4191fd76ed17cf59aac6db733fd94958"
+    },
+    {
+      "run": "media-ui-r2",
+      "commandKind": "npx vitest run（精确文件列表由log和执行记录核对）",
+      "exitCode": 1,
+      "testFiles": 8,
+      "passed": 106,
+      "failed": 1,
+      "log": "/private/tmp/lingxi-r07-t05-media-ui-r2.log",
+      "logSha256": "f458263d76a018e307b1eb7d72fc8429298843ca1781cb88bb3768c402693106"
+    },
+    {
+      "run": "media-ui-r3",
+      "commandKind": "npx vitest run（精确文件列表由log和执行记录核对）",
+      "exitCode": 0,
+      "testFiles": 9,
+      "passed": 143,
+      "failed": 0,
+      "log": "/private/tmp/lingxi-r07-t05-media-ui-r3.log",
+      "logSha256": "a63a1ba628d2d99a57fef65e655625ca41232e3268082396d8d34dd84ca1fbff"
+    },
+    {
+      "run": "media-ui-regression-r1",
+      "commandKind": "npx vitest run（精确文件列表由log和执行记录核对）",
+      "exitCode": 0,
+      "testFiles": 8,
+      "passed": 119,
+      "failed": 0,
+      "log": "/private/tmp/lingxi-r07-t05-media-ui-regression-r1.log",
+      "logSha256": "4682b06566f56eb52a0ac7aa3c728351a9a48685ef6c1ba3d5a034b1a0705bca"
+    },
+    {
+      "run": "media-types-r1",
+      "commandKind": "npm run typecheck",
+      "exitCode": 0,
+      "testFiles": null,
+      "passed": null,
+      "failed": 0,
+      "log": "/private/tmp/lingxi-r07-t05-media-types-r1.log",
+      "logSha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8"
+    },
+    {
+      "run": "media-types-r2",
+      "commandKind": "npm run typecheck",
+      "exitCode": 0,
+      "testFiles": null,
+      "passed": null,
+      "failed": 0,
+      "log": "/private/tmp/lingxi-r07-t05-media-types-r2.log",
+      "logSha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8"
+    }
+  ],
+  "failureKept": "r2旧automation真实HTTP检查在尚未完成I/O时推进fakeTimers而错过下一轮；仅该真实HTTP项改真实时钟，原断言和10秒上限保留。",
+  "pngFixture": {
+    "bytes": 68,
+    "sha256": "431ced6916a2a21a156e38701afe55bbd7f88969fbbfc56d7fe099d47f265460",
+    "dimensions": [
+      1,
+      1
+    ],
+    "allChunkCrcVerified": true,
+    "zlibRasterVerified": true,
+    "browserImageDecodeVerified": false
+  },
+  "limitations": [
+    "只替外部HTTP响应，状态/历史/流式快照/渲染/文件打开用正式代码；不等于真实供应商已验证。",
+    "JSDOM不解码图片；核完整PNG bytes/hash并独立验证样本结构和像素行。",
+    "143与119包含同一10项媒体HTTP测试，不相加。",
+    "Mac锁屏，不进行原生界面操作；A07仍受阻。",
+    "无Cargo、正式包、真实账号、付费调用、外发、提交或推送。"
+  ]
+}

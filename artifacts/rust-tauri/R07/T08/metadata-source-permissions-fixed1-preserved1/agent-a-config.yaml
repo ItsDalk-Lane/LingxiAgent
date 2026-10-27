@@ -1,0 +1,48 @@
+agent:
+  name: a
+memory:
+  enabled: false
+values:
+  providers:
+    fixture:
+      models:
+      - capabilities: null
+        compat: null
+        extension:
+          access_token: "********"
+          access_tokenLabel: 普通显示字段
+          api_key: "********"
+          api_keys:
+            nested: "********"
+          headers:
+            X-Synthetic: "********"
+          ordinary:
+            keep: true
+            label: alpha
+          refresh_token: "********"
+          threshold: 19
+        groupId: null
+        id: alpha
+        inputs:
+        - text
+        protocol: null
+      - capabilities: null
+        compat: null
+        extension:
+          access_token: "********"
+          access_tokenLabel: 普通显示字段
+          api_key: "********"
+          api_keys:
+            nested: "********"
+          headers:
+            X-Synthetic: "********"
+          ordinary:
+            keep: true
+            label: beta
+          refresh_token: "********"
+          threshold: 19
+        groupId: null
+        id: beta
+        inputs:
+        - text
+        protocol: null

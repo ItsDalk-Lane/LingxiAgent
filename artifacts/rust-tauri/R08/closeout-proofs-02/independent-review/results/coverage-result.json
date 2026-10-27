@@ -1,0 +1,76 @@
+{
+ "stats": {
+  "leaf_counts": {
+   "R00_ACCEPTANCE_MAP": 126,
+   "R00_FEATURE_STAGE_ACCEPTANCE": 126,
+   "stage_map": 126,
+   "gate_result": 126,
+   "checklist": 126
+  },
+  "total_original_assertions": 281,
+  "total_case_instances": 487,
+  "distinct_pinned_cases": 449,
+  "producer_leaf_counts": {
+   "r08_cli_data_vitest": 3,
+   "r08_t07_ab": 118,
+   "r08_ui_pages": 5
+  },
+  "cases_shared_across_leaves": 21,
+  "evidence_file_cases": {
+   "r08_t07_ab": 350,
+   "r08_ui_pages": 87,
+   "r08_cli_data_vitest": 12
+  },
+  "cargo_side_case_ok": true,
+  "gate": {
+   "overall": "PASS",
+   "commands": 22,
+   "commandsPass": 22,
+   "scenarios": 16,
+   "scenariosPass": 16,
+   "testedSha": "aa99d2ec1dae7f0aef5971bab049734f22fcf7d8",
+   "worktreeDirty": true,
+   "toolchainChannel": "1.98.1"
+  },
+  "candidate_stable": true,
+  "before_after_filecount": [
+   21212,
+   21212
+  ],
+  "before_after_digest": [
+   "0f07f2f7a0cf9e8d5660237be6a26666ba314dc04e840a02b9b573d990050dc6",
+   "0f07f2f7a0cf9e8d5660237be6a26666ba314dc04e840a02b9b573d990050dc6"
+  ],
+  "runner_binding": "PASS",
+  "leaf_coverage": {
+   "pass": 126,
+   "blocked": 0,
+   "fail": 0,
+   "declaredInStageMap": 126,
+   "deferredToLaterStage": 0,
+   "deferredToR07": 0
+  },
+  "handoff_domain_counts": {
+   "D01": 23,
+   "D02": 66,
+   "D03": 19,
+   "D04": 12,
+   "D13": 3,
+   "D20": 3
+  },
+  "stage_map": {
+   "commands": 22,
+   "scenarios": 16,
+   "leaves": 126,
+   "inputDigestSha256": "70b7505462adda72ebd97b3e361ecc78e7e8509ea92187ef50db1706fce3cf3b"
+  },
+  "scenario_contracts": {
+   "R08-A13": 68,
+   "R08-A14": 7
+  },
+  "checklist_summary": {
+   "PASS": 126
+  }
+ },
+ "findings": []
+}

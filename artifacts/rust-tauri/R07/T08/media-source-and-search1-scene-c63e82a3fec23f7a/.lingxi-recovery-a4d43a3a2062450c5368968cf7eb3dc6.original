@@ -1,0 +1,90 @@
+{
+  "models": {
+    "chat": {
+      "model": "chat-only",
+      "provider": "fixture"
+    },
+    "speech": {
+      "model": "seed-speech",
+      "provider": "fixture"
+    }
+  },
+  "network": {
+    "proxy": {
+      "mode": "direct"
+    }
+  },
+  "providers": {
+    "fixture": {
+      "auth": {
+        "apiKey": "synthetic-media-key",
+        "kind": "apiKey"
+      },
+      "endpoint": "http://127.0.0.1:55052",
+      "models": [
+        {
+          "context": 8192,
+          "id": "chat-only",
+          "input": [
+            "text"
+          ]
+        },
+        {
+          "id": "seed-speech",
+          "outputs": [
+            "audio"
+          ],
+          "protocol": "openai-audio-speech",
+          "unknownKeep": {
+            "nested": true
+          }
+        },
+        {
+          "api": "openai-audio-speech",
+          "customField": {
+            "keep": true
+          },
+          "displayName": "speech改名",
+          "id": "new-speech",
+          "mediaCapability": "speech_generation",
+          "protocol": "openai-audio-speech",
+          "protocolId": "openai-audio-speech"
+        },
+        {
+          "api": "openai-images",
+          "customField": {
+            "keep": true
+          },
+          "displayName": "image改名",
+          "id": "new-image",
+          "mediaCapability": "image_generation",
+          "protocol": "openai-images",
+          "protocolId": "openai-images"
+        },
+        {
+          "api": "agnes-videos",
+          "customField": {
+            "keep": true
+          },
+          "displayName": "video改名",
+          "id": "new-video",
+          "mediaCapability": "video_generation",
+          "protocol": "agnes-videos",
+          "protocolId": "agnes-videos"
+        },
+        {
+          "api": "openai-audio-transcriptions",
+          "customField": {
+            "keep": true
+          },
+          "displayName": "asr改名",
+          "id": "new-asr",
+          "mediaCapability": "speech_recognition",
+          "protocol": "openai-audio-transcriptions",
+          "protocolId": "openai-audio-transcriptions"
+        }
+      ],
+      "protocol": "openai-completions"
+    }
+  }
+}

@@ -1,0 +1,263 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t07_release_smoke",
+ "cases": [
+  {
+   "case": "t07::platform.macos-arm64-recorded",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "os": "27.0.1",
+    "osBuild": "26A434",
+    "arch": "arm64",
+    "kernel": "27.0.0",
+    "hostPlatform": "macos-arm64",
+    "webkit": "22625.1.29.11.28",
+    "display": "Chipset Model: Apple M3 Ultra\n          Resolution: 2560 x 1440 (QHD/WQHD - Wide Quad High Definition)"
+   }
+  },
+  {
+   "case": "t07::platform.macos-arm64-recorded",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "os": "27.0.1",
+    "osBuild": "26A434",
+    "arch": "arm64",
+    "kernel": "27.0.0",
+    "hostPlatform": "macos-arm64",
+    "webkit": "22625.1.29.11.28",
+    "display": "Chipset Model: Apple M3 Ultra\n          Resolution: 2560 x 1440 (QHD/WQHD - Wide Quad High Definition)"
+   }
+  },
+  {
+   "case": "t07::release.candidate-consume-only",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "app": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+    "exe": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+    "receipt": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/.tauri-build/build-receipt-release.json",
+    "rule": "只读消费交付候选；不写/不构建 desktop/src-tauri"
+   }
+  },
+  {
+   "case": "t07::release.no-test-driver",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "features": [
+     "r09-host"
+    ]
+   }
+  },
+  {
+   "case": "t07::release.candidate-sha",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "executableSha256": "ddbd1fad42a8b172c85204cbba0e621fabd3bf52a0ced95dd0d2a1b06af40543",
+    "candidate": "T06/Lead 交付候选"
+   }
+  },
+  {
+   "case": "t07::release.bundle-and-executable",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "app": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+    "exe": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop",
+    "sha256": "ddbd1fad42a8b172c85204cbba0e621fabd3bf52a0ced95dd0d2a1b06af40543",
+    "candidateNote": "当前工作树候选（T06 可能同时修改）；sha 已记录，GUI 批次用同一候选"
+   }
+  },
+  {
+   "case": "t07::release.no-e2e-driver-strings",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "wdio": 0,
+    "devUrl": 0,
+    "localhost5173": 0
+   }
+  },
+  {
+   "case": "t07::release.codesign-verified",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "boundary": "ad-hoc only; BLOCKED-SIGNING-IDENTITY 不冒充正式签名/公证"
+   }
+  },
+  {
+   "case": "t07::gui-cleared",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "env": "LINGXI_R09_ALLOW_GUI",
+    "note": "GUI 批次必须由 Lead cleared 后设置；未 cleared 时本套件不得启动窗口"
+   }
+  },
+  {
+   "case": "t07::release.boots-and-connects",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "appReady": {
+     "alreadyReady": false,
+     "automation": false,
+     "event": "app-ready",
+     "label": "main",
+     "schema": "lingxi.r09.tauri-launch.v1",
+     "senderUrl": "tauri://localhost",
+     "title": "Lingxi · Rust 预览",
+     "unixMs": 1793035411618,
+     "windowVisible": true
+    },
+    "serviceReady": {
+     "event": "service-ready",
+     "instanceId": "aab345810699be1088b9067ca1cf14e7",
+     "mode": "local-owned",
+     "pid": 7164,
+     "port": 49326,
+     "protocol": "lingxi-service wire 1..=1 data-epoch 2",
+     "schema": "lingxi.r09.tauri-launch.v1",
+     "unixMs": 1793035411230
+    },
+    "mode": "local-owned"
+   }
+  },
+  {
+   "case": "t07::release.embedded-page",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "pageLoad": {
+     "event": "page-load",
+     "label": "main",
+     "phase": "Started",
+     "schema": "lingxi.r09.tauri-launch.v1",
+     "unixMs": 1793035411365,
+     "url": "tauri://localhost"
+    }
+   }
+  },
+  {
+   "case": "t07::release.graceful-exit",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "exit": 0,
+    "timedOut": false,
+    "serviceResidual": []
+   }
+  },
+  {
+   "case": "t07::release.file-task",
+   "ok": false,
+   "actual": 0,
+   "expect": 1,
+   "detail": {
+    "status": "PENDING_T06_COMMANDS",
+    "note": "文件任务（read_file/写入/预览）依赖 T06 收口的 host 命令面；命令注册后本 case 改为真实文件读写断言，在此之前不得用占位/空操作冒充 A14 通过"
+   }
+  },
+  {
+   "case": "isolation::no-residual-processes",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "killed": [],
+    "residual": [],
+    "marker": "/private/tmp/lingxi-r09-runtime/r09_t07_release_smoke-7129-1793035408294"
+   }
+  },
+  {
+   "case": "t07::release.no-process-residual",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": null
+  },
+  {
+   "case": "t07::release.dialog-sink-clean",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "sink": "/private/tmp/lingxi-r09-runtime/r09_t07_release_smoke-7129-1793035408294/raw/dialog-release-smoke.json",
+    "note": "正路径不应产生失败对话框 sink"
+   }
+  },
+  {
+   "case": "t07::platform.macos-arm64",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "note": "本机实测"
+   }
+  },
+  {
+   "case": "t07::platform.macos-x64.blocked",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "BLOCKED_PLATFORM",
+    "reason": "无可用真机/受控 VM；不用交叉编译或 Linux/macOS 截图替代原生验收（BLOCKED.md）"
+   }
+  },
+  {
+   "case": "t07::platform.windows-x64.blocked",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "BLOCKED_PLATFORM",
+    "reason": "无可用真机/受控 VM；不用交叉编译或 Linux/macOS 截图替代原生验收（BLOCKED.md）"
+   }
+  },
+  {
+   "case": "t07::platform.linux-x64.blocked",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "status": "BLOCKED_PLATFORM",
+    "reason": "无可用真机/受控 VM；不用交叉编译或 Linux/macOS 截图替代原生验收（BLOCKED.md）"
+   }
+  },
+  {
+   "case": "isolation::real-home-untouched",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "before": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    },
+    "after": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    }
+   }
+  }
+ ]
+}

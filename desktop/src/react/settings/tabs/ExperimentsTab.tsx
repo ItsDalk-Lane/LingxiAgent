@@ -15,6 +15,7 @@ import {
   normalizeCompactionMode,
 } from '../../../../../shared/compaction-mode.ts';
 import styles from '../Settings.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 const CACHE_SNAPSHOT_EXPERIMENT_ID = 'memory.cache_snapshot_reflection';
 const DEEPSEEK_ROLEPLAY_REASONING_PATCH_EXPERIMENT_ID = 'provider.deepseek_roleplay_reasoning_patch';
@@ -412,7 +413,7 @@ export function ExperimentsTab() {
     window.dispatchEvent(new CustomEvent('hana-settings', {
       detail: { type: 'experiment-changed', ...change },
     }));
-    window.platform?.settingsChanged?.('experiment-changed', change);
+    usePlatform()?.settingsChanged?.('experiment-changed', change);
     showToast(t('settings.autoSaved'), 'success');
   };
 

@@ -1,0 +1,8 @@
+
+running 3 tests
+test c01_fresh_database_receipts_equal_registry_and_inspector ... ok
+test c01_v7_upgrade_preserves_receipts_and_restarts_are_idempotent ... ok
+test c01_v8_upgrade_preserves_receipts_and_restarts_are_idempotent ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.67s
+

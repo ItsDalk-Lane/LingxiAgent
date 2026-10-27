@@ -1,0 +1,194 @@
+{
+  "cliStdout": "LingxiAgent · H\nSession session-b728e104fdebaced0dceafa65e2016eb · native:session-b728e104fdebaced0dceafa65e2016eb\n\n◇ tool:first-party:mcp_describe_tool\n◇ tool:first-party:mcp_describe_tool succeeded\n\n◇ tool:first-party:write\n◇ tool:first-party:write succeeded\n\n◇ tool:first-party:mcp_describe_tool\n◇ tool:first-party:mcp_describe_tool succeeded\n\n◇ tool:first-party:stage_files\n◇ tool:first-party:stage_files succeeded\nHIST-FINAL\nyou: HIST 采集\n\n\n",
+  "history": {
+    "headRevision": "10",
+    "items": [
+      {
+        "committedAtUnixMs": 1792337456284,
+        "kind": "user_message",
+        "legacyFields": {
+          "clientMessageId": "67a16a85-dac4-427a-abe9-1c1677807376",
+          "snapshotVersion": 1
+        },
+        "messageId": "user:run_000001a14fa32c9c_000001",
+        "run": {
+          "runId": "run_000001a14fa32c9c_000001",
+          "state": "known"
+        },
+        "seq": "1",
+        "text": "HIST 采集"
+      },
+      {
+        "argsDigest": {
+          "algorithm": "sha256",
+          "canonicalization": "lingxi-canonical-json-v1",
+          "hex": "2e2013f993e38029b14552ef1d520f3e0ab52508532dc8d5a5bfcdf84c8fdac0"
+        },
+        "firstSeq": "5",
+        "kind": "tool_call",
+        "result": {
+          "content": [
+            {
+              "text": "{\"availability\":\"available\",\"catalogGeneration\":84,\"description\":\"Native Rust write tool (R04-T04): the incumbent pi-coding-agent write semantics behind the unified gateway\",\"dialect\":\"json-schema/2020-12\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"content\":{\"type\":\"string\"},\"path\":{\"minLength\":1,\"type\":\"string\"}},\"required\":[\"path\",\"content\"],\"type\":\"object\"},\"server\":\"first-party\",\"targetGeneration\":1,\"targetId\":\"tool:first-party:write\",\"tool\":\"write\"}",
+              "type": "text"
+            }
+          ],
+          "status": "success",
+          "truncated": false
+        },
+        "run": {
+          "runId": "run_000001a14fa32c9c_000001",
+          "state": "known"
+        },
+        "status": "success",
+        "target": "tool:first-party:mcp_describe_tool",
+        "toolCallId": "run_000001a14fa32c9c_000001-tc0001"
+      },
+      {
+        "argsDigest": {
+          "algorithm": "sha256",
+          "canonicalization": "lingxi-canonical-json-v1",
+          "hex": "7ab708f43aac96e68a4ddf330bec6157db7797373275eaafe705be5295887f06"
+        },
+        "argsSummary": "{content:str,path:str}",
+        "firstSeq": "11",
+        "kind": "tool_call",
+        "result": {
+          "content": [
+            {
+              "text": "Successfully wrote to /private/tmp/lingxi-r07-tests/tmp/a17hist-rw3CK0/workspace/out.txt",
+              "type": "text"
+            }
+          ],
+          "resourceRefs": [
+            {
+              "digest": {
+                "algorithm": "sha256",
+                "canonicalization": "raw-bytes",
+                "hex": "fb835f9ebdd2d81a088594c477a92f6cf1d2b9d272567ee3015aced8a821ece2"
+              },
+              "displayName": "out.txt",
+              "kind": "artifact",
+              "resourceId": "file:/private/tmp/lingxi-r07-tests/tmp/a17hist-rw3CK0/workspace/out.txt",
+              "sizeBytes": "16",
+              "uri": "file:///private/tmp/lingxi-r07-tests/tmp/a17hist-rw3CK0/workspace/out.txt"
+            }
+          ],
+          "status": "success",
+          "truncated": false
+        },
+        "run": {
+          "runId": "run_000001a14fa32c9c_000001",
+          "state": "known"
+        },
+        "status": "success",
+        "target": "tool:first-party:write",
+        "toolCallId": "run_000001a14fa32c9c_000001-tc0002"
+      },
+      {
+        "argsDigest": {
+          "algorithm": "sha256",
+          "canonicalization": "lingxi-canonical-json-v1",
+          "hex": "b6e6fab9e3e4730b6b663756922e17e13016d657e827cb41e98dbb1c50bc7e21"
+        },
+        "firstSeq": "17",
+        "kind": "tool_call",
+        "result": {
+          "content": [
+            {
+              "text": "{\"availability\":\"available\",\"catalogGeneration\":84,\"description\":\"Deliver registered SessionFile ids or authorized absolute file paths to the user.\",\"dialect\":\"json-schema/2020-12\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"fileId\":{\"type\":\"string\"},\"fileIds\":{\"items\":{\"type\":\"string\"},\"minItems\":1,\"type\":\"array\"},\"filePath\":{\"type\":\"string\"},\"filepaths\":{\"items\":{\"type\":\"string\"},\"minItems\":1,\"type\":\"array\"},\"label\":{\"type\":\"string\"}},\"type\":\"object\"},\"server\":\"first-party\",\"targetGeneration\":1,\"targetId\":\"tool:first-party:stage_files\",\"tool\":\"stage_files\"}",
+              "type": "text"
+            }
+          ],
+          "status": "success",
+          "truncated": false
+        },
+        "run": {
+          "runId": "run_000001a14fa32c9c_000001",
+          "state": "known"
+        },
+        "status": "success",
+        "target": "tool:first-party:mcp_describe_tool",
+        "toolCallId": "run_000001a14fa32c9c_000001-tc0003"
+      },
+      {
+        "argsDigest": {
+          "algorithm": "sha256",
+          "canonicalization": "lingxi-canonical-json-v1",
+          "hex": "9a503a84ec4ca86e835f3c152783ebddbeb57d7bbe12a4947a23415d13e88dc0"
+        },
+        "argsSummary": "{filepaths:arr[1]}",
+        "firstSeq": "23",
+        "kind": "tool_call",
+        "result": {
+          "content": [
+            {
+              "text": "[SessionFile] {\"fileId\":\"sf_8af1397ae88e1c85\",\"filename\":\"out.txt\"}",
+              "type": "text"
+            }
+          ],
+          "status": "success",
+          "truncated": false
+        },
+        "run": {
+          "runId": "run_000001a14fa32c9c_000001",
+          "state": "known"
+        },
+        "status": "success",
+        "target": "tool:first-party:stage_files",
+        "toolCallId": "run_000001a14fa32c9c_000001-tc0004"
+      },
+      {
+        "complete": true,
+        "firstSeq": "28",
+        "kind": "assistant_segment",
+        "phase": "final_answer",
+        "run": {
+          "runId": "run_000001a14fa32c9c_000001",
+          "state": "known"
+        },
+        "segmentId": "assistant:5:text:default",
+        "segmentKind": "text",
+        "text": "HIST-FINAL"
+      },
+      {
+        "committedAtUnixMs": 1792337456403,
+        "content": [
+          {
+            "text": "HIST-FINAL",
+            "type": "text"
+          }
+        ],
+        "kind": "final_message",
+        "messageId": "run_000001a14fa32c9c_000001-final",
+        "modelCallId": "run_000001a14fa32c9c_000001-mc0005",
+        "run": {
+          "runId": "run_000001a14fa32c9c_000001",
+          "state": "known"
+        },
+        "seq": "11"
+      }
+    ],
+    "page": {
+      "hasMore": false,
+      "limit": 200
+    },
+    "reconciliation": {
+      "complete": true,
+      "runRevision": "10",
+      "runStatus": "reconciled_idle",
+      "sessionId": "session-b728e104fdebaced0dceafa65e2016eb",
+      "sessionPath": "native:session-b728e104fdebaced0dceafa65e2016eb",
+      "snapshotId": "618f1efd8f375930f5c655df2084f6e19dcbc9941faa47f7c61d692aa3f52274"
+    },
+    "revision": "\"r10-e34\"",
+    "schemaVersion": "lingxi.canonical-history.v1",
+    "sessionId": "session-b728e104fdebaced0dceafa65e2016eb",
+    "todoPanel": {
+      "dismissed": false,
+      "removed": true,
+      "todos": []
+    },
+    "todos": []
+  }
+}

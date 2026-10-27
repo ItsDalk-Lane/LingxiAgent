@@ -1,0 +1,14 @@
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 116 modules transformed.
+rendering chunks...
+computing gzip size...
+../../dist-tauri-resources/index.html                     0.36 kB │ gzip:   0.29 kB
+../../dist-tauri-resources/assets/index-DIS9Sc9v.css      1.73 kB │ gzip:   0.73 kB
+../../dist-tauri-resources/assets/index-C9M7LIzg.js   1,757.13 kB │ gzip: 509.27 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 2.73s

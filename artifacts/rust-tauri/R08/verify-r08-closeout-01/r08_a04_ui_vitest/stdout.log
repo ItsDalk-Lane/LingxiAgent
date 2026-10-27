@@ -1,0 +1,4 @@
+suite r08_a04_ui_vitest: exitCode=0 guardFailures=3
+GUARD_FAIL r08_a04_ui_vitest: a04 ui test not green: a04::expand-and-click-all-viewable
+GUARD_FAIL r08_a04_ui_vitest: a04 ui test not green: a04::fixture-is-honest-capture
+GUARD_FAIL r08_a04_ui_vitest: a04 ui test not green: a04::projection-real-blocks

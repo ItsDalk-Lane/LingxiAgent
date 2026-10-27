@@ -1,0 +1,53 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.29s
+     Running tests/r07_t08_mcp_settings.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_mcp_settings-5528f6df6edb0028)
+
+running 15 tests
+test an_unconfigured_mcp_read_and_restore_do_not_create_directories_or_block_the_service ... ok
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-02e75924d9675c5a
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-0d5e9c0cd19d1355
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-ffb3d6798bb791ff
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-13c1a2f50cbc87e9
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-8dfdf8f1ba45c36c
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-0f639665bb240c61
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-a01a9ab0a0b93fef
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-65d5cf0db9e0b131
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-57ca479496c5699f
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-965bc17fcfd09d48
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-9dea6633f69658ee
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-57bbad45a47899fb
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-a13c523af839b416
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-ab6fc5efdc4af898
+test occupied_listen_port_cleans_restored_mcp_and_knowledge_while_external_state_is_retained ... ok
+test an_authenticated_http_request_waiting_for_the_real_media_lock_cannot_use_a_replaced_owner_credential ... ok
+test invalid_provided_connector_shapes_never_write_and_schema_corruption_blocks_restore ... ok
+test http_bulk_preflights_all_rows_and_keeps_saved_partial_runtime_failures ... ok
+test restoring_lazy_lifecycle_keeps_saved_intent_without_starting_external_processes ... ok
+test concurrent_registration_never_exposes_a_bare_executor_to_disabled_agent ... ok
+test a_real_pending_settings_approval_does_not_survive_local_credential_replacement ... ok
+
+thread 'http_page_state_keeps_real_tools_agent_defaults_defer_and_private_edit_material' (3218501) panicked at crates/lingxi-service/tests/r07_t08_mcp_settings.rs:685:5:
+assertion `left == right` failed: 缺失明确助手不能回焦点：{"settingsUpdate":{"action":"mcp.state","agentId":null,"changes":[],"connectorId":null,"error":{"code":"invalid_mcp_settings","message":"目标助手不存在"},"key":"mcp.state","runtimeApplied":false,"saved":false,"status":"failed","summary":"目标助手不存在","title":"MCP 设置未全部完成"}}
+  left: 500
+ right: 400
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test cancelling_a_real_settings_run_interrupts_initialization_and_preserves_saved_intent ... ok
+test http_page_state_keeps_real_tools_agent_defaults_defer_and_private_edit_material ... FAILED
+test actual_mcp_catalog_crosses_the_shared_defer_threshold_without_losing_other_sources ... ok
+test stopping_an_actual_inflight_mcp_call_records_unknown_without_replay_and_reaps_group ... ok
+LINGXI_AUTH_REJECTED request_id="req-a674e153bca58efb68e24ce26028c0e8" method=GET path=/lingxi/v1/mcp/state status=403 reason=local_owner_required remote=127.0.0.1:53767
+test real_run_nine_mcp_settings_actions_persist_and_gate_actual_sdk_consumers ... ok
+LINGXI_AUTH_REJECTED request_id="req-5542161d276cf6dab6c5480e5e55e8f5" method=POST path=/lingxi/v1/mcp/settings-action status=403 reason=local_owner_required remote=127.0.0.1:53826
+test management_rejects_other_identities_corrupt_files_links_and_replaced_parent ... ok
+test a_real_web_login_cannot_gain_local_settings_authority_through_an_approved_model_tool ... ok
+
+failures:
+
+failures:
+    http_page_state_keeps_real_tools_agent_defaults_defer_and_private_edit_material
+
+test result: FAILED. 14 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.93s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t08_mcp_settings`
+error: 1 target failed:
+    `-p lingxi-service --test r07_t08_mcp_settings`

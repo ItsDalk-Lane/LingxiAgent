@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "enum": [
+        "success",
+        "failed",
+        "cancelled"
+      ],
+      "type": "string"
+    },
+    {
+      "const": "unknown",
+      "description": "Externally completed side effect with no local receipt; never\nsilently retried and never reported as success.",
+      "type": "string"
+    }
+  ],
+  "title": "ToolResultStatus"
+}

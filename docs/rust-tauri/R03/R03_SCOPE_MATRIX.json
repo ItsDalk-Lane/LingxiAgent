@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "R03_SCOPE_MATRIX",
+  "stage_id": "R03",
+  "generated_by": "R03 orchestrator (startup prep, one-shot)",
+  "generated_at": "2026-09-29",
+  "r03_start_sha": "526f7770f1eff6be289b8c34faeccc1b95e181fd",
+  "baseline": {
+    "branch": "codex/rust-tauri-migration",
+    "r02_status": "ACCEPTED",
+    "r02_stage_verdict": "PASS (R02_FINAL_STAGE_REVIEW_R1.md)",
+    "r02_acceptance_commit": "ac6ada32061cb91e3e675a29382eca569f6b69e0",
+    "r02_handoff": "docs/rust-tauri/R02/R02_HANDOFF.json",
+    "post_r02_new_commits": "none — remote HEAD == R03_START_SHA at dispatch time"
+  },
+  "source_taskbook": "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R03_运行状态机、并发、取消与恢复.md (gitignored, not committed)",
+  "tasks": [
+    { "id": "R03-T01", "name": "实现运行与尝试状态机", "acceptance_ids": ["R03-A01", "R03-A02"], "depends_on": [] },
+    { "id": "R03-T02", "name": "会话串行化和全局限流", "acceptance_ids": ["R03-A03", "R03-A04"], "depends_on": ["R03-T01"] },
+    { "id": "R03-T03", "name": "取消树和子任务监督", "acceptance_ids": ["R03-A05", "R03-A06"], "depends_on": ["R03-T02"] },
+    { "id": "R03-T04", "name": "attempt/stream 栅栏处理迟到结果", "acceptance_ids": ["R03-A07", "R03-A08"], "depends_on": ["R03-T03"] },
+    { "id": "R03-T05", "name": "运行日志与副作用收据", "acceptance_ids": ["R03-A09", "R03-A10"], "depends_on": ["R03-T01"] },
+    { "id": "R03-T06", "name": "子代理、后台运行与权限继承", "acceptance_ids": ["R03-A11", "R03-A12"], "depends_on": ["R03-T03"] },
+    { "id": "R03-T07", "name": "故障恢复与服务退出策略", "acceptance_ids": ["R03-A13", "R03-A14"], "depends_on": ["R03-T05"] },
+    { "id": "R03-T08", "name": "状态机验收与 R04 接口交接", "acceptance_ids": ["R03-A15", "R03-A16"], "depends_on": ["R03-T01","R03-T02","R03-T03","R03-T04","R03-T05","R03-T06","R03-T07"] }
+  ],
+  "acceptances": [
+    { "id": "R03-A01", "task": "R03-T01", "name": "多模型调用只有一个任务终态", "requirement": "REQUIRED" },
+    { "id": "R03-A02", "task": "R03-T01", "name": "重复终态不重复结算", "requirement": "REQUIRED" },
+    { "id": "R03-A03", "task": "R03-T02", "name": "同会话顺序可重复", "requirement": "REQUIRED" },
+    { "id": "R03-A04", "task": "R03-T02", "name": "跨会话不被全局锁阻塞", "requirement": "REQUIRED" },
+    { "id": "R03-A05", "task": "R03-T03", "name": "取消覆盖等待态", "requirement": "REQUIRED" },
+    { "id": "R03-A06", "task": "R03-T03", "name": "独立任务不被误杀", "requirement": "REQUIRED" },
+    { "id": "R03-A07", "task": "R03-T04", "name": "旧结果不能复活任务", "requirement": "REQUIRED" },
+    { "id": "R03-A08", "task": "R03-T04", "name": "相同 requestId 不同内容拒绝", "requirement": "REQUIRED" },
+    { "id": "R03-A09", "task": "R03-T05", "name": "副作用后崩溃不重复执行", "requirement": "REQUIRED" },
+    { "id": "R03-A10", "task": "R03-T05", "name": "可验证幂等恢复", "requirement": "REQUIRED" },
+    { "id": "R03-A11", "task": "R03-T06", "name": "子代理不能升级权限", "requirement": "REQUIRED" },
+    { "id": "R03-A12", "task": "R03-T06", "name": "断线不等于取消", "requirement": "REQUIRED" },
+    { "id": "R03-A13", "task": "R03-T07", "name": "运行中重启诚实呈现", "requirement": "REQUIRED" },
+    { "id": "R03-A14", "task": "R03-T07", "name": "退出不接收新任务", "requirement": "REQUIRED" },
+    { "id": "R03-A15", "task": "R03-T08", "name": "真实入口驱动状态", "requirement": "REQUIRED" },
+    { "id": "R03-A16", "task": "R03-T08", "name": "故障种子可重放", "requirement": "REQUIRED" }
+  ],
+  "supplemental_duties": [
+    {
+      "id": "R03-SUP-01",
+      "origin_id": "R02_IMPLEMENTATION_MAP.json handoff_to_r03.must_consume[0] / xtask interface",
+      "full_final_behavior": "verify-stage R03 可执行：rust/crates/xtask/src/stage_maps/R03.json 按 R02.json 同一 schema 建立，注册进 STAGE_MAPS，并同步 runner_identity 钉住文件；失败模式（未知阶段/空集/缺证据/超时/假成功）保持硬失败。",
+      "origin_stage": "R02-T08 (interface) / R03-T08 (execution)",
+      "r03_assertion": "R03-T08 交付 R03.json + STAGE_MAPS/runner_identity 注册，verify-stage R03 --evidence <全新目录> 真实退出 0，证据落盘。",
+      "deferred_assertion": "后续阶段各自新增 stage map，不改 R03 图语义。",
+      "producer": "R03-T08",
+      "latest_stage": "R03"
+    },
+    {
+      "id": "R03-SUP-02",
+      "origin_id": "R02_HANDOFF.json interfaces (8 项)",
+      "full_final_behavior": "lingxi-service 二进制/HTTP-WS 路由/EventService/StoragePort/注入面(Clock,RequestIdGen)/错误码/xtask/R00 盘点覆盖层按 R02 语义被 R03 消费，不另建第二套负责人。",
+      "origin_stage": "R02",
+      "r03_assertion": "R03 各 Task 复用上述接口（StoragePort 终态/取消恢复、ManualClock 确定性时钟、EventService 事件），不复制平行状态机/存储/事件面；R02 回归（认证隔离、单写者、事件快照、损坏库备份、关闭恢复、A15 真实重启链、默认入口）无未解释新增失败。",
+      "deferred_assertion": "R08 迁移、R09 打包面继续消费同一接口族。",
+      "producer": "R03-T01..T08（阶段回归在 R03-T08+阶段 Gate）",
+      "latest_stage": "R03（回归义务）；接口演进归各自阶段"
+    },
+    {
+      "id": "R03-SUP-03",
+      "origin_id": "R00-T02-LA-D3710D637C19（CLI 聊天叶，r02Share 提及 R03-R05 真实回复内容）",
+      "full_final_behavior": "选择或创建会话后通过 WS 提交消息，终端流式显示回复和工具进度；Ctrl+C 只取消当前 stream；连接/身份失败非零。",
+      "origin_stage": "R02（份额）+ R07（终端完整行为）",
+      "r03_assertion": "R03 运行层：经认证 WS 提交的运行可被按 stream/run 粒度取消且只取消目标运行（A05/A06/A07 语义），运行与取消状态可查询；不提前交付终端客户端。",
+      "deferred_assertion": "终端流式显示、Ctrl+C 绑定、非零退出码呈现 = R07-T09（保持 REQUIRED 递延）。",
+      "producer": "R03-T03/T04（取消与迟到栅栏测试）",
+      "latest_stage": "R07"
+    },
+    {
+      "id": "R03-SUP-04",
+      "origin_id": "R02 stage map 34 补充叶（25 r02_share_satisfied + 9 deferred_to_r07）",
+      "full_final_behavior": "九项 deferred_to_r07 完整叶与 Windows/打包登记项保持 REQUIRED 递延，不丢失、不降级。",
+      "origin_stage": "R02（登记）/ R07（履行）",
+      "r03_assertion": "R03 不删除/不改写这些递延登记；R03 为其提供运行、取消、身份基础的断言并入 R03-A05/A06/A11/A12 证据；阶段图 supplementalLeafScenarios 与 R00 账本相等性检查在 R03 图中同样成立。",
+      "deferred_assertion": "完整用户界面与真实模型行为 = R07。",
+      "producer": "R03-T08（阶段图登记时保留）",
+      "latest_stage": "R07"
+    }
+  ],
+  "explicit_non_goals": [
+    "R04 完整工具目录/网关/原生工具；仅最小 ToolExecutor 调用上下文接口交接",
+    "R05 真实供应商适配与凭证迁移；仅 Provider port 交接",
+    "R06 全量上下文/记忆/知识库",
+    "R07 完整 CLI/Bridge/UI；九项递延叶不倒灌",
+    "R08+ 数据迁移、Tauri 替壳、安装发布",
+    "不改变生产默认入口（Node/Electron 默认，Rust 显式选择）；不把 Rust 任务交回 Pi 执行"
+  ],
+  "test_double_boundary": {
+    "allowed": "确定性 Provider/Tool 替身（可暂停/分片/迟到/报错/panic/不响应取消）；隔离本地进程承载外部计数器与幂等收据。",
+    "forbidden": "替身替代认证授权、RunSupervisor、会话队列、持久化、事件发布、取消与恢复；测试代理直写终态；正式服务无认证后门；无 Provider 配置时假回复冒充真实模型。",
+    "test_hooks": "测试 feature / 独立测试二进制 / 等价受控机制隔离，不进生产默认。"
+  }
+}

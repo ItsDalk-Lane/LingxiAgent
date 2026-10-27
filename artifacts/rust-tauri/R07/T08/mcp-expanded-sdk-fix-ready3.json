@@ -1,0 +1,44 @@
+{
+  "scope": "DEVELOPMENT_FIX_READY_NOT_EXECUTED",
+  "createdAt": "2026-10-18T11:31:29.826028+00:00",
+  "sourceStopped": true,
+  "sourceSha256": {
+    "rust/crates/lingxi-service/src/mcp_oauth.rs": "4be0b1fe5ee1a1b327a95e41beff3a8af7c15b816055332ddf405431986a0709",
+    "rust/crates/lingxi-service/src/mcpbridge.rs": "e938c313cfd12cc6da34e60e685d23afbc17ff34f43993e184c55f7c79323bd3",
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_remote.rs": "aa4d5ecd9bb1ea3c643131003c4d962fb8a5fafe906897427dd2c689a8ef0c1e"
+  },
+  "originalRemoteResult": {
+    "passed": 2,
+    "failed": 4,
+    "log": "artifacts/rust-tauri/R07/T08/mcp-remote-sdk-reproduce2.log",
+    "sha256": "a6028002299f07dfc2b631d13f68d9135060c8ad4a16f77f2c28cb079d4291e1",
+    "safeScenes": "artifacts/rust-tauri/R07/T08/mcp-remote-sdk-reproduce2-safe-scenes.json"
+  },
+  "productFixes": [
+    "Interactive OAuth credential commit or unknown write atomically advances credential epoch under the common Source write lock. Only committing store updates its expected epoch; old SDK refresh/clear cannot publish afterward.",
+    "A newly accepted browser flow invalidates older waiting flow identities, while valid original credentials remain until a new commit.",
+    "Pending/exchanging and active flows count towards32 waiting cap; terminal receipts have separate32 history bound; old completed/cancelled persistence facts stay terminal.",
+    "macOS EPERM cleanup awaits the owned child within the existing2second budget then requires exact group-empty verification; no getpgid-only success, no group signal after reap."
+  ],
+  "fixtureCorrections": [
+    "Actual persisted SessionPermissionMode::Operate.wire_name replaces invalid full.",
+    "Owned official SDK server enables100ms SSE keep-alive exactly as SDK disconnect regression; original3second handler cancellation requirement stays. Separate protocol cancel notification and handler ct counters are printed."
+  ],
+  "newTests": {
+    "target": "r07_t08_mcp_remote",
+    "cases": 7,
+    "uiParent": "settings_content_mcp_oauth_page_consumes_the_same_owned_sdk_and_private_source",
+    "uiCommand": "npx vitest run desktop/src/react/__tests__/services/r07-mcp-oauth-real-service.test.tsx --maxWorkers=1",
+    "uiTimeoutSeconds": 60,
+    "uiEnv": "base/token/external only via env; token never printed",
+    "macosRegression": "mcpbridge::tests::macos_natural_exit_stop_reaps_real_children_within_original_cleanup_budget",
+    "macosChildren": 64,
+    "status": "NOT_RUN"
+  },
+  "limits": [
+    "No new Cargo execution by this agent.",
+    "Original failed records are unchanged.",
+    "New7th UI target is actual component→real RustHTTP→official SDK evidence, not a native browser launch proof.",
+    "SDK JSON body preparse bound remains recorded, not fixed by copying the MCP protocol."
+  ]
+}

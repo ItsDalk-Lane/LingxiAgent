@@ -1,0 +1,55 @@
+{
+  "started": "2026-10-18T04:22:12.700Z",
+  "finished": "2026-10-18T04:22:14.098Z",
+  "scratch": "/private/tmp/lingxi-card-nav-woH8Mh",
+  "binary": "/private/tmp/lingxi-r07-t08-card-baseline-service",
+  "binarySha256": "d1a18915be860f5a96c6251a5cb00a2facaa84a4a2977b6856155a69061e31a2",
+  "exitCode": 0,
+  "outcome": {
+    "count": 1,
+    "observed": [
+      {
+        "tokenReadableAndSent": true,
+        "hrefSha256": "1bce5b88df8ae676c93d1c94f56a90ae25b5214d8569cfd9b4998f52c706b894",
+        "path": "/lingxi/v1/cards/navigation-probe"
+      }
+    ]
+  },
+  "sourceOverride": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R07/T08/card-navigation-baseline/source/InteractiveCard.tsx",
+  "diagnosticSources": [
+    {
+      "path": "desktop/src/react/__tests__/components/r07-t08-card-navigation-probe.mjs",
+      "sha256": "a9c57860ed7518108bbb0ffb2162d3b6af7266d9c3c3625e3ee5c49829d9de41"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/r07-t08-card-electron-launch.mjs",
+      "sha256": "e3ca4ef24ba7feef64addeb63a739a90e505d5e23abe3f937f81a12a88a80f33"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/r07-t08-card-electron-main.cjs",
+      "sha256": "3c0638dd3d25917abb40f2e3447b2469eb93d4c7f9fcdae1e22d2c4fb58b4268"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/r07-t08-card-electron-preload.cjs",
+      "sha256": "1fffd00b6f4d5357a3d7472cb46315291254562fac4e229040121a8b56f1fc0f"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/r07-t08-card-fixture.tsx",
+      "sha256": "ddb8d00801bbbdee1cf5533c66c743299d89a5265e95f51a42e54b088c1b8c00"
+    },
+    {
+      "path": "desktop/src/shared/card-frame-navigation.cjs",
+      "sha256": "8dbff1a6b7459f3f1f488eab0c05cdb5c8cf676a6b10c88a643d0c124e4a05cd"
+    }
+  ],
+  "sources": [
+    {
+      "path": "rust/crates/lingxi-service/src/cards.rs",
+      "sha256": "72aef1270d8d921a858a694581fdb3cc6417399cb0ef92f73ed1102ab8d0dcc2"
+    },
+    {
+      "path": "desktop/src/react/components/chat/InteractiveCard.tsx",
+      "sha256": "6bff4e0d927d8f15df1f59043e7593b13dbae6f0fe75ae4482bcf802fe56bac3"
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+[PASS] freshness: 构建产物新鲜（main/preload/src 均无新于 dist-renderer 的改动；实测 main=0 preload=0 src=0）
+[journal] svc-home {"svcHome":"/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-svc-17PcXM"}
+[journal] stub {"pid":24278,"port":63414}
+[journal] stamp {"stamp":{"committedDataEpoch":2,"epoch":2,"lastVersion":"0.0.0","minimumReaderEpoch":2,"schemaVersion":2,"updatedAt":"2026-10-25T19:06:45.936Z"}}
+[PASS] stamp: 服务自盖章 data-epoch.json schemaVersion===2（实测 2）
+[journal] service-spawn {"pid":24280}
+[journal] rust-service {"pid":24280,"port":63416,"baseUrl":"http://127.0.0.1:63416"}
+[PASS] rust-service: rust service pid 24280 alive
+[journal] electron-A {"pid":24281,"cdpPort":9500,"home":"/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliA-1iaofb"}
+[journal] conn-info-A {"connInfo":{"port":63416,"token":"<redacted>","serverNodeKind":"lingxi-service","serverNodeTransport":"http","host":"127.0.0.1"}}
+[PASS] remote-mode-A: 客户端 A GSCI 确证 remote 分支（host/port/kind/transport；实测 {"port":63416,"token":"<redacted>","serverNodeKind":"lingxi-service","serverNodeTransport":"http","host":"127.0.0.1"}）
+[PASS] zero-touch-instance-A: 客户端 A HOME 下无 lingxi-service/instance.json（remote 零接触）
+[journal] electron-B {"pid":24509,"cdpPort":10000,"home":"/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliB-jfX6Y8"}
+[journal] conn-info-B {"connInfo":{"port":63416,"token":"<redacted>","serverNodeKind":"lingxi-service","serverNodeTransport":"http","host":"127.0.0.1"}}
+[PASS] remote-mode-B: 客户端 B GSCI 确证 remote 分支（host/port/kind/transport；实测 {"port":63416,"token":"<redacted>","serverNodeKind":"lingxi-service","serverNodeTransport":"http","host":"127.0.0.1"}）
+[PASS] zero-touch-instance-B: 客户端 B HOME 下无 lingxi-service/instance.json（remote 零接触）
+[PASS] tree-s1: harness 子树 node-kernel count 0 !== 0（硬断言）
+[PASS] tree-s1: harness 子树 rust-kernel count 1 !== 1
+[PASS] tree-s1: harness 子树 Electron 主进程 count 2 !== 2
+[PASS] tree-s1-rust-pid: 子树内唯一 rust-kernel = harness 服务 pid 24280（实测 24280）
+[journal] leg-a1 {"sessionId":"a06-clientA-leg1","frameCount":10,"runEnded":true,"runEndReason":null,"sawFinal":true,"sawMarker":true}
+[PASS] leg-a1-run-end: leg-a1 assistant_run_end 到达且 reason 为空（成功语义；实测 {"runEnded":true,"reason":null}）
+[PASS] leg-a1-final: leg-a1 帧含 A06-CHAT-FINAL leg-a1（任务真实完成）
+[PASS] history-leg-a1: leg-a1 服务侧历史含终结回答（status=200）
+[journal] quit-b-raise-1 {"status":0,"stdout":"","stderr":""}
+[journal] quit-b-focus-1 {"verified":false,"state":{"target":false,"others":{"A":false}}}
+[journal] quit-b-raise-2 {"status":0,"stdout":"","stderr":""}
+[journal] quit-b-focus-2 {"verified":false,"state":{"target":false,"others":{"A":false}}}
+[journal] quit-b-sigterm {"pid":24509,"reason":"keyboard-path-exhausted-or-focus-unverified"}
+[journal] electron-B-exit {"code":0,"signal":null}
+[PASS] quit-b-exit: 客户端 B 主进程退出（mechanism=sigterm-graceful）
+[PASS] client-a-alive-after-b: 退 B 未误伤 A（A pid 24281 存活；collateral=[]）
+[PASS] service-alive-after-b: 退 B 后服务 pid 24280 存活（对客户端退出零接触）
+[PASS] service-continuity: 服务实例连续（pid/instanceId 不变；实测 pid=24280）
+[PASS] health-after-b: 退 B 后 /lingxi/v1/health → 200（实测 200）
+[PASS] client-a-still-remote: 退 B 后客户端 A 连接面不变（remote；实测 host=127.0.0.1 port=63416）
+[PASS] tree-s2: harness 子树 node-kernel count 0 !== 0（硬断言）
+[PASS] tree-s2: harness 子树 rust-kernel count 1 !== 1
+[PASS] tree-s2: harness 子树 Electron 主进程 count 1 !== 1
+[journal] leg-a2 {"sessionId":"a06-clientA-leg2","frameCount":10,"runEnded":true,"runEndReason":null,"sawFinal":true,"sawMarker":true}
+[PASS] leg-a2-run-end: leg-a2 assistant_run_end 到达且 reason 为空（成功语义；实测 {"runEnded":true,"reason":null}）
+[PASS] leg-a2-final: leg-a2 帧含 A06-CHAT-FINAL leg-a2（退 B 后任务仍真实完成）
+[PASS] history-leg-a2: leg-a2 服务侧历史含终结回答（status=200）
+[journal] quit-a-raise-1 {"status":0,"stdout":"","stderr":""}
+[journal] quit-a-focus-1 {"verified":false,"state":{"target":false,"others":{}}}
+[journal] quit-a-raise-2 {"status":0,"stdout":"","stderr":""}
+[journal] quit-a-focus-2 {"verified":false,"state":{"target":false,"others":{}}}
+[journal] quit-a-sigterm {"pid":24281,"reason":"keyboard-path-exhausted-or-focus-unverified"}
+[journal] electron-A-exit {"code":0,"signal":null}
+[PASS] quit-a-exit: 客户端 A 主进程退出（mechanism=sigterm-graceful）
+[PASS] service-alive-after-all: 双端全退后服务 pid 24280 仍存活（零接触终态硬断言）
+[PASS] health-final: 终态 /lingxi/v1/health → 200（实测 200）
+[PASS] tree-s3: harness 子树 node-kernel count 0 !== 0（硬断言）
+[PASS] tree-s3: harness 子树 rust-kernel count 1 !== 1
+[PASS] tree-s3: harness 子树 Electron 主进程 count 0 !== 0
+[PASS] stub-chat-requests: 桩记录 A06 chat 请求 === 2（双腿各一；实测 2）
+[PASS] stub-zero-tool: A06 双腿零工具接触（不撞 PPG 面；实测工具调用 0）
+[journal] reap-service {"pid":24280,"aliveAtReap":true}
+[journal] service-exit {"code":0,"signal":null}
+[journal] reap-service-result {"exited":{"code":0,"signal":null}}
+[PASS] reap-service: harness 回收服务（SIGTERM 收敛；实测 {"code":0,"signal":null}）
+[journal] cleanup {"homes":["/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-svc-17PcXM","/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliA-1iaofb","/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliB-jfX6Y8"]}
+[r08-t03-a06] verdict=two-client-remote-pass__zero-touch-quit-verified failures=0 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-svc-17PcXM out=/private/tmp/lingxi-r08-verify/r08_t03_a06_drill-24276-1792955205663
+[a06-dbg] finally tail reached
+[a06-dbg] after-finally reached
+[a06-dbg] finish entered
+[a06-dbg] main body resolved

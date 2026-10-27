@@ -1,0 +1,15 @@
+
+running 8 tests
+test actual_search_cancel_waits_for_auxiliary_cleanup_and_stops_fallback_chain ... ok
+test public_fetch_proxy_pin_limitation_is_explicit_without_sending_any_request ... ok
+test auto_records_each_real_http_attempt_then_all_three_browser_page_diagnostics ... ok
+test provider_auth_redirect_and_rate_limit_keep_real_error_diagnostics ... ok
+test auto_all_failed_is_explicit_and_fixed_provider_never_silently_falls_back ... ok
+test all_five_http_providers_use_real_gateway_and_distinct_authentication ... ok
+test verification_real_http_masks_same_provider_and_only_persists_after_success ... ok
+test public_fetch_keeps_five_hop_guard_and_registers_readable_full_session_file ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.85s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/r07_web_tools.rs (rust/target/debug/deps/r07_web_tools-3b88c525f7aa1e13)

@@ -1,0 +1,64 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/r07-a17-a18-cross-entry.test.mjs (2 tests | 2 skipped) 483ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/r07-a17-a18-cross-entry.test.mjs > R07-T09 A17/A18 跨入口真实验收
+Error: write 落盘缺失: /private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/workspace/a17-xentry-output.txt
+base 下全部文件:
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/agents/a17agent/.lingxi-recovery-54801ad2e975e63564933c8d3388110d.original
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/agents/a17agent/config.yaml
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/chat-input-settings.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/data-epoch.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/file-recovery-records/54801ad2e975e63564933c8d3388110d.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/file-write-witnesses/00e81f1f7315c95e8299e6cbdaa6a33f25c6faffde73d4c50377f53b2f9f3220.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/file-write-witnesses/93435eaf66311dda7038aee1a2812d7635a2f7917c7b09a4ce0ed2bb536e2625.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/knowledge/ingestion-worker.lock
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/knowledge/knowledge.db
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/knowledge/knowledge.db-shm
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/knowledge/knowledge.db-wal
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/knowledge/knowledge_index.db
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/knowledge/knowledge_index.db-shm
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/knowledge/knowledge_index.db-wal
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/knowledge/knowledge_index.db.guard
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/knowledge/knowledge_index.db.owner
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/knowledge/knowledge_vector.db
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/knowledge/knowledge_vector.db-shm
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/knowledge/knowledge_vector.db-wal
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/knowledge/knowledge_vector.db.guard
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/knowledge/knowledge_vector.db.owner
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/lingxi-service/data/runs.db
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/lingxi-service/data/runs.db-shm
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/lingxi-service/data/runs.db-wal
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/lingxi-service/data/session-prompt-snapshots/7143fb3806cd3e44746fbe3f075292c0b71a568d101a51b9f0f362bf4ed28462.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/lingxi-service/data/session-ui/7143fb3806cd3e44746fbe3f075292c0b71a568d101a51b9f0f362bf4ed28462.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/lingxi-service/device-credentials.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/lingxi-service/devices.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/lingxi-service/instance.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/lingxi-service/instance.lock
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/lingxi-service/local-token.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/lingxi-service/logs/service-000001.log
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/lingxi-service/management.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/logs/security-audit.jsonl
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/home/user/preferences.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/product/yuan/lingxi.md
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-rlvtbd/service-config.json
+stubSeen: [{"model":"chat","stream":true,"messages":2},{"model":"chat","stream":true,"messages":4},{"model":"chat","stream":true,"messages":6}]
+== security-audit ==
+
+== witnesses ==
+{"ctime":[1792336684,279506134],"dev":16777229,"ino":328881533,"modified":"SystemTime { tv_sec: 1792336684, tv_nsec: 275505605 }","sha256":"ca26aa9175941886d9c15b9a484d1045d948144fb4d8fb5728148a06f4d546fe","size":124}
+{"ctime":[1792336684,254448120],"dev":16777229,"ino":328881523,"modified":"SystemTime { tv_sec: 1792336684, tv_nsec: 245168678 }","sha256":"137f811aa1affac59315873e65f74d5f296d328542b80a71c69c2aa2cee72c37","size":116}
+ ❯ tests/r07-a17-a18-cross-entry.test.mjs:206:13
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 skipped (2)
+   Start at  23:18:03
+   Duration  596ms (transform 22ms, setup 20ms, import 21ms, tests 483ms, environment 0ms)
+

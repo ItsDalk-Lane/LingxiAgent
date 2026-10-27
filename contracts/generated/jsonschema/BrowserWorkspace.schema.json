@@ -1,0 +1,117 @@
+{
+  "$defs": {
+    "BrowserTab": {
+      "additionalProperties": false,
+      "properties": {
+        "canGoBack": {
+          "type": "boolean"
+        },
+        "canGoForward": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "tabId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "tabId",
+        "title",
+        "canGoBack",
+        "canGoForward",
+        "createdAt",
+        "updatedAt"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "activeTabId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "executionNode": {
+      "type": "string"
+    },
+    "resumable": {
+      "type": "boolean"
+    },
+    "revoked": {
+      "type": "boolean"
+    },
+    "running": {
+      "type": "boolean"
+    },
+    "sessionId": {
+      "type": "string"
+    },
+    "sessionPath": {
+      "type": "string"
+    },
+    "suspended": {
+      "type": "boolean"
+    },
+    "tabs": {
+      "items": {
+        "$ref": "#/$defs/BrowserTab"
+      },
+      "type": "array"
+    },
+    "title": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "unavailableReason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "url": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "userTakeover": {
+      "type": "boolean"
+    },
+    "visibleCapable": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "sessionId",
+    "sessionPath",
+    "executionNode",
+    "running",
+    "resumable",
+    "tabs",
+    "suspended",
+    "userTakeover",
+    "revoked",
+    "visibleCapable"
+  ],
+  "title": "BrowserWorkspace",
+  "type": "object"
+}

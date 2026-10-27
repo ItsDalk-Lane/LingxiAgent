@@ -1,0 +1,12 @@
+
+running 4 tests
+test unguarded_seed_still_inserts_into_a_non_empty_database ... ok
+test empty_database_is_seeded ... ok
+test non_empty_database_without_seed_ids_is_not_seeded ... ok
+test non_empty_database_with_seed_ids_is_a_no_op ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.00s
+     Running tests/r08_t05_seed_guard.rs (rust/target/debug/deps/r08_t05_seed_guard-e8e170dd6a875457)

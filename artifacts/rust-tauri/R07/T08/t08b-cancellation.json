@@ -1,0 +1,31 @@
+{
+  "candidate": "t08b",
+  "status": "CANCELLED_FOR_CONFIRMED_COVERAGE_AND_RUNTIME_GAPS",
+  "reason": "独立逐叶核查确认media_admin模型目录读写仍以旧compat/provider-catalog为权威，未发布唯一ModelConfiguration Source；并有搜索密钥清除等本地直接检查缺口。根端在kernel运行时向本批Cargo PID39864发送SIGINT，停止此候选，先修实际接线再冻结后继候选。不是kernel业务失败，不改写原始退出结果。",
+  "cancelledAt": "2026-10-18T07:57:48.429919+00:00",
+  "originalKernelReceipt": "t08b-kernel.json",
+  "originalKernelExitCode": -2,
+  "originalKernelReceiptSha256": "0605ec032289ee96c570db9bbf6aa58da74f1937228f6cee593816dea076b5d6",
+  "sourceFingerprint": "2b35cc84f1f48edfdb26bde1053e91d6254dbc59fe252fe92a31f1dbfd40f443",
+  "kernelSourceUnchanged": true,
+  "completedPasses": [
+    "fmt",
+    "diff",
+    "clippy",
+    "protocol",
+    "protocol-roundtrip",
+    "protocol-tests",
+    "types"
+  ],
+  "notRunAfterCancellation": [
+    "boundaries",
+    "adapter",
+    "service",
+    "model-regression",
+    "native-skills",
+    "skills-current",
+    "build",
+    "ui"
+  ],
+  "fullStagePassClaimed": false
+}

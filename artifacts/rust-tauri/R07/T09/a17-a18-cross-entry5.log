@@ -1,0 +1,35 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/r07-a17-a18-cross-entry.test.mjs (2 tests | 2 skipped) 585ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/r07-a17-a18-cross-entry.test.mjs > R07-T09 A17/A18 跨入口真实验收
+AssertionError: {"sessions":[{"sessionId":"session-00c6bb32137f7e27ae0deaf060e3b0ec","agentId":"a17agent","ownerUserId":"user_local","title":"新会话","runCount":1,"lastRuns":[{"runId":"run_000001a14f9897d5_000001","principalId":"principal_local","startedAtUnixMs":1792336762837}]},{"sessionId":"sess_local_beta","agentId":"lingxi","ownerUserId":"user_local","title":"Synthetic session beta","runCount":0,"lastRuns":[]},{"sessionId":"sess_local_alpha","agentId":"lingxi","ownerUserId":"user_local","title":"Synthetic session alpha","runCount":0,"lastRuns":[]}]}
+
+3 !== 1
+
+
+- Expected
++ Received
+
+- 1
++ 3
+
+ ❯ tests/r07-a17-a18-cross-entry.test.mjs:222:12
+    220|     // 会话与资源身份（服务内此家只有一个会话）。
+    221|     const sessions = await (await owner('GET', '/lingxi/v1/sessions'))…
+    222|     assert.equal(sessions.sessions.length, 1, JSON.stringify(sessions)…
+       |            ^
+    223|     ctx.sessionId = sessions.sessions[0].sessionId;
+    224|     const files = await (await owner('GET', `/lingxi/v1/sessions/${ctx…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 skipped (2)
+   Start at  23:19:22
+   Duration  679ms (transform 19ms, setup 17ms, import 17ms, tests 585ms, environment 0ms)
+

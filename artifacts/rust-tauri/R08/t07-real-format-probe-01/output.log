@@ -1,0 +1,6 @@
+PASS fixture gen
+FAIL A: old stack ready
+PASS B: legacy-import exit 0
+PASS B: real-format messages imported (EXPECTED RED if F-T07-1 holds) :: {"sessions":2,"messages":5,"probeSessionIds":["real-format-probe"],"issues":14}
+REAL_FORMAT_PROBE_RESULT listedByOldStack=0 importedSessions=2 importedMessages=5 failures=1
+REAL FORMAT PROBE: DIVERGENCE CONFIRMED (F-T07-1)

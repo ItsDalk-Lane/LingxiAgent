@@ -1,0 +1,34 @@
+{
+  "label": "t09-mobile-browser1",
+  "stage": "R07-T09",
+  "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+  "command": [
+    "env",
+    "TMPDIR=/private/tmp/lingxi-r07-tests/tmp",
+    "LINGXI_HOME=/private/tmp/lingxi-r07-tests/home",
+    "CARGO_TARGET_DIR=/private/tmp/lingxi-r07-build",
+    "npx",
+    "vitest",
+    "run",
+    "tests/r07-t09-mobile-browser.test.mjs"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "PATH": "/Users/study_superior/.cargo/bin:/Users/study_superior/Desktop/Code/LingxiAgent/.venv/bin:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/share/dotnet:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/Users/study_superior/.lmstudio/bin:/Users/study_superior/.lmstudio/bin",
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp",
+    "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib"
+  },
+  "startedAt": "2026-10-18T15:46:20.500871+00:00",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "46c292487b5ab60f0a987c0363025c83c0336fe37600a96aa42cf008bf7b535b",
+  "finalAcceptance": false,
+  "exitCode": 1,
+  "endedAt": "2026-10-18T15:46:58.204358+00:00",
+  "sourceFingerprintAfter": "46c292487b5ab60f0a987c0363025c83c0336fe37600a96aa42cf008bf7b535b",
+  "log": "artifacts/rust-tauri/R07/T09/t09-mobile-browser1.log",
+  "logSha256": "99480db76d241d664399534ee79db066e1536471c104e9a967f8ccbeff06afff",
+  "sourceUnchanged": true
+}

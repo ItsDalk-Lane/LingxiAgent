@@ -1,0 +1,36 @@
+{
+  "source": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-failures-25294-1792304314278199000/home",
+  "scope": "synthetic fixture original failure, preserved before further fix",
+  "files": [
+    {
+      "path": "ui-result.json",
+      "bytes": 3562,
+      "sha256": "8ec6de870bec0b0190118577c74d00d4adf603fc2a0ffa3522808c58945d2318"
+    },
+    {
+      "path": "electron-failure-trace.json",
+      "bytes": 12974,
+      "sha256": "1817a16906ddebdab1e7de5f77922fcfe7ae7a7cabdc28daf754cf3fe1f108ae"
+    },
+    {
+      "path": "agents/agentA/config.yaml",
+      "bytes": 135,
+      "sha256": "cc5c69b0d6d6b9d61bf2245f2a177c54affb3f0cf41232a14d09cf95573fa8a4"
+    },
+    {
+      "path": "agents/agentB/config.yaml",
+      "bytes": 90,
+      "sha256": "3f02ec4b4009cecee9fbee239e23d8ec6d2fcd72851bcbbf5c487edb4cfdfe12"
+    },
+    {
+      "path": "agents/agentA/identity.md",
+      "bytes": 24,
+      "sha256": "47a747475fadfd000fae534f4532cfdb337e15815be7aaa04b9b60e17a6c7acd"
+    },
+    {
+      "path": "agents/agentA/AGENTS.md",
+      "bytes": 21,
+      "sha256": "2743e1040c5e3110e714ec86779e337d1138f08561c1f21ffe98ffb80e009bca"
+    }
+  ]
+}

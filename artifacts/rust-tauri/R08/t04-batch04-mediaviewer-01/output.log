@@ -1,0 +1,14 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/components/shared/MediaViewer/use-media-transform.test.ts (11 tests) 35ms
+ ✓ desktop/src/react/__tests__/components/shared/MediaViewer/media-source.test.ts (11 tests) 45ms
+ ✓ desktop/src/react/__tests__/components/shared/MediaViewer/VideoStage.test.tsx (2 tests) 62ms
+ ✓ desktop/src/react/__tests__/components/shared/MediaViewer/ImageStage.test.tsx (6 tests) 77ms
+ ✓ desktop/src/react/__tests__/components/shared/MediaViewer/MediaViewer.test.tsx (18 tests) 90ms
+
+ Test Files  5 passed (5)
+      Tests  48 passed (48)
+   Start at  01:04:59
+   Duration  847ms (transform 905ms, setup 52ms, import 1.37s, tests 308ms, environment 1.14s)
+

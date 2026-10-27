@@ -1,0 +1,50 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stderr | desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > drops a websocket event whose sessionId is already bound to a different known path (#2078)
+[ws] session locator mismatch; dropping non-authoritative event {
+  sessionId: 'sess_a',
+  sessionPath: '/session/b.jsonl',
+  knownLocatorPath: '/session/a.jsonl'
+}
+
+stderr | desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > drops an ordinary stream event that tries to move a known sessionId to an unknown new path
+[ws] session locator mismatch; dropping non-authoritative event {
+  sessionId: 'sess_ws_moved',
+  sessionPath: '/session/new-a.jsonl',
+  knownLocatorPath: '/session/old-a.jsonl'
+}
+
+stderr | desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler session-scoped desktop events > session_branch_reset 携带 fileRollbackReport 时写入会话作用域报告，无报告则不写
+[ws] session_branch_reset target message not found: /session/a.jsonl [ 'u1' ]
+
+stderr | desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler turn_end side effects > rejected abort_result leaves local stream state untouched
+[ws] abort refused: stale_stream
+
+stderr | desktop/src/react/__tests__/services/ws-message-handler.test.ts > ws-message-handler knowledge_retrieval_started（知识检索中状态） > 缺少 sessionPath 的 knowledge_retrieval_started 不写 store
+[ws] knowledge_retrieval_started missing sessionPath, skipping
+
+ ✓ desktop/src/react/__tests__/services/ws-message-handler.test.ts (86 tests) 112ms
+ ✓ desktop/src/react/__tests__/components/PreviewEditor.cover-drop.test.tsx (4 tests) 187ms
+Not implemented: Window's scrollTo() method
+stderr | desktop/src/react/__tests__/components/ActivityPanel.test.tsx > ActivityPanel > keeps the previous activity list and reports malformed or failed reads
+[activity] fetch activities failed: Error: activity request failed
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/ActivityPanel.tsx:134:42
+
+stderr | desktop/src/react/__tests__/components/ActivityPanel.test.tsx > ActivityPanel > keeps the previous activity list and reports malformed or failed reads
+[activity] fetch activities failed: Error: invalid activity list
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/ActivityPanel.tsx:136:52
+
+ ✓ desktop/src/react/__tests__/components/ActivityPanel.test.tsx (6 tests) 172ms
+ ✓ desktop/src/react/__tests__/components/PreviewRenderer.html.test.tsx (9 tests) 176ms
+ ✓ desktop/src/react/__tests__/services/rust-media-http.test.tsx (10 tests) 206ms
+ ✓ desktop/src/react/__tests__/components/FloatingActions.cover-gallery.test.tsx (11 tests) 892ms
+     ✓ does not start Agent generation when the generation menu item is disabled  521ms
+ ✓ desktop/src/react/__tests__/services/rust-automation.test.ts (51 tests) 5095ms
+     ✓ 通过真实本机HTTP读取事件与快照，不以伪事件直接写页面  5029ms
+
+ Test Files  7 passed (7)
+      Tests  177 passed (177)
+   Start at  12:27:06
+   Duration  5.31s (transform 2.42s, setup 99ms, import 4.13s, tests 6.84s, environment 2.04s)
+

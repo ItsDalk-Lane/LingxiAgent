@@ -1,0 +1,285 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t08_shell_parity",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 3.041,
+ "caseCount": 340,
+ "casesSha256": "4df4ddf034a20d449766a04ee25a14c9023bd19e20e12a543d608318f80dd488",
+ "commands": [],
+ "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+ "finishedAtUnixMs": 1793028407648,
+ "outputs": {
+  "matrix": "parity-matrix.json",
+  "shellParityResultsDraft": "SHELL_PARITY_RESULTS.r09_t08_shell_parity.json",
+  "casesCopy": "shell-parity-cases.json"
+ },
+ "fixedHashes": {
+  "rustServiceSha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+  "rustServiceContentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+  "rendererDigest": "c0a5719f9e9ddd79b71eb0a440a78479aac3489a2679898121b2db633adf150b",
+  "themeBundleSha256": "455d963912bbca2aea3137660ed771657c68cf629d5b13ff50712b37efbbae73",
+  "fixturesManifestSha256": "80a8d2c2640e2b2974b299a10f36679bc19daf0911e51f82f0c43399cb32feaa",
+  "electronBaselineReceipt": {
+   "path": "artifacts/rust-tauri/R08/verify-r08-closeout-08/verify-stage-result.json",
+   "testedSha": "aa99d2ec1dae7f0aef5971bab049734f22fcf7d8",
+   "candidateSourceDigest": "0f07f2f7a0cf9e8d5660237be6a26666ba314dc04e840a02b9b573d990050dc6",
+   "ab": {
+    "tasks": 71,
+    "parity": 68,
+    "recorded": 3,
+    "differs": 0
+   }
+  },
+  "tauriCandidateReceipt": {
+   "deliveryAppTreeSha256": "d01ece202a42c0a70a292d384d5ceb938982f414ce1cc00e369cad579149ecdc",
+   "hostExeSha256": "63250ddb00c92536424ecefc07b55079d7ee4d3a1c3445ac9336105678a7a278",
+   "evidenceBuildSha256": "f69a8100b5bd35aa0d91cac33ff7cce0624bdd5f841aed8bca868dee388c48cb",
+   "featuresDelivery": [
+    "r09-host"
+   ],
+   "featuresEvidence": [
+    "e2e-test",
+    "r09-host",
+    "r09-test-hooks"
+   ]
+  }
+ },
+ "paritySummary": {
+  "measured": {
+   "parity": 13
+  },
+  "capabilities": {
+   "parity": 5,
+   "pending": 34,
+   "blocked": 3,
+   "recorded": 8
+  },
+  "leaves": {
+   "pending": 26,
+   "blocked": 4,
+   "excluded_non_host": 16
+  },
+  "pendingCount": 60,
+  "blockedCount": 7,
+  "unapprovedDifferences": []
+ },
+ "evidenceProvenance": {
+  "r09_t01_react_parity": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t01/run-08",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t02_supervisor_ready": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t02/phase2-supervisor-03",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t02_process_ownership": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t02/phase2-ownership-02",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t05_browser_pdf": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t05/01-a09-per-assertion-final2",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t05_untrusted_preview": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t05/02-a10-preview-final",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t07_native_e2e": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t07/g1-hidden-04",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t01_release_offline": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t01/run-release-03",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t03_native_matrix": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-02/r09_t03_native_matrix",
+   "status": "FAIL",
+   "exitCode": 2
+  },
+  "r09_t03_ipc_negative": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-02/r09_t03_ipc_negative",
+   "status": "FAIL",
+   "exitCode": 2
+  },
+  "r09_t04_permission_matrix": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-02/r09_t04_permission_matrix",
+   "status": "FAIL",
+   "exitCode": 2
+  },
+  "r09_t04_remote_boundary": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t06/t03t04-rerun-02/r09_t04_remote_boundary",
+   "status": "FAIL",
+   "exitCode": 2
+  },
+  "r09_t06_capability_matrix": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t06/v2-capability-matrix-01",
+   "status": "FAIL",
+   "exitCode": 2
+  },
+  "r09_t06_release_attack_surface": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t06/v2-release-suite-01",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "r09_t07_release_smoke": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t07/static-03-release_smoke",
+   "status": "FAIL",
+   "exitCode": 2
+  },
+  "audit_capability": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t06/v2-audit-01",
+   "status": "PASS",
+   "exitCode": 0
+  },
+  "release_scan": {
+   "sourceKind": "dev-fallback",
+   "dir": "artifacts/rust-tauri/R09/dev/t06/v2-scan-01",
+   "status": "PASS",
+   "exitCode": 0
+  }
+ },
+ "candidate": {
+  "candidateVersion": "v2",
+  "source": "docs/rust-tauri/R09/R09_HANDOFF.json",
+  "handoff": "docs/rust-tauri/R09/R09_HANDOFF.json",
+  "gitHead": "TBD (final candidate commit/sha; local worktree uncommitted, no push authorized)",
+  "rendererDigest": "c0a5719f9e9ddd79b71eb0a440a78479aac3489a2679898121b2db633adf150b",
+  "serviceContentSha256": "73471fbf2f561e9c8003dbe4b9fdd8aea1a2e953624ae716a4a058ec5383eaa0",
+  "frozenAt": "2026-10-26 23:2x (v2 rebuild after A16 integration fix; supersedes v1 2dc38bc3…)",
+  "deliveryAppTreeSha256": "d01ece202a42c0a70a292d384d5ceb938982f414ce1cc00e369cad579149ecdc",
+  "evidenceBuildSha256": "f69a8100b5bd35aa0d91cac33ff7cce0624bdd5f841aed8bca868dee388c48cb"
+ },
+ "sourceDrift": {
+  "crateSource": {
+   "sourceFileCount": 88,
+   "sourceFingerprint": "7dd9cc6876ac423239b1529bd8317e47e47dcd163abcce63728ae8cdfe11e835",
+   "generatedFileCount": 77,
+   "release": {
+    "sourceFingerprint": "7dd9cc6876ac423239b1529bd8317e47e47dcd163abcce63728ae8cdfe11e835",
+    "receipt": "desktop/src-tauri/.tauri-build/build-receipt-release.json",
+    "builtAtUnixMs": 1793028141943,
+    "receiptCrateDigest": "97a96a68f4f59ab8becaef957c8b2a31f26759c5ccbdb1bc773be9d0d8d4189e",
+    "receiptCrateFileCount": 165,
+    "filesNewerThanReceipt": []
+   },
+   "evidence": {
+    "sourceFingerprint": "7dd9cc6876ac423239b1529bd8317e47e47dcd163abcce63728ae8cdfe11e835",
+    "receipt": "desktop/src-tauri/.tauri-build/build-receipt-debug.json",
+    "builtAtUnixMs": 1793028179078,
+    "receiptCrateDigest": "534d44fe6035781fd6aab39e5625c8cc074add76a0dc4f7ad1e16a82245c3c88",
+    "receiptCrateFileCount": 163,
+    "filesNewerThanReceipt": []
+   }
+  },
+  "renderer": {
+   "distNewestMtime": 1793028112.814718,
+   "sourcesNewerThanDist": []
+  },
+  "freezeEpochMs": 1793028244000,
+  "artifactsTouchedAfterFreeze": []
+ },
+ "note": "A15 在 pending/blocked 清零前不得宣称对照成立；本回执如实红。",
+ "failedCases": [
+  "evidence::candidate-binding::r09_t01_react_parity",
+  "evidence::candidate-binding::r09_t02_supervisor_ready",
+  "evidence::candidate-binding::r09_t02_process_ownership",
+  "evidence::candidate-binding::r09_t05_browser_pdf",
+  "evidence::candidate-binding::r09_t05_untrusted_preview",
+  "evidence::candidate-binding::r09_t07_native_e2e",
+  "evidence::candidate-binding::r09_t01_release_offline",
+  "evidence::candidate-binding::r09_t03_native_matrix",
+  "evidence::candidate-binding::r09_t03_ipc_negative",
+  "evidence::candidate-binding::r09_t04_permission_matrix",
+  "evidence::candidate-binding::r09_t04_remote_boundary",
+  "evidence::candidate-binding::r09_t06_capability_matrix",
+  "evidence::candidate-binding::r09_t06_release_attack_surface",
+  "evidence::candidate-binding::r09_t07_release_smoke",
+  "evidence::capability::host:file-url-asset",
+  "evidence::capability::host:context-menu-policy",
+  "parity::capability::host:app-lifecycle-quit",
+  "parity::capability::host:browser-viewer",
+  "parity::capability::host:clipboard-edit-command",
+  "parity::capability::host:context-menu-policy",
+  "parity::capability::host:detached-viewer",
+  "parity::capability::host:drag-out",
+  "parity::capability::host:external-open",
+  "parity::capability::host:file-dialogs",
+  "parity::capability::host:file-drop-paths",
+  "parity::capability::host:file-text-io",
+  "parity::capability::host:file-url-asset",
+  "parity::capability::host:file-watch",
+  "parity::capability::host:global-shortcut",
+  "parity::capability::host:i18n-main",
+  "parity::capability::host:keep-awake",
+  "parity::capability::host:quick-chat-session-handoff",
+  "parity::capability::host:quick-chat-window",
+  "parity::capability::host:reload-restart",
+  "parity::capability::host:settings-broadcast",
+  "parity::capability::host:settings-window",
+  "parity::capability::host:single-instance",
+  "parity::capability::host:skill-viewer",
+  "parity::capability::host:splash",
+  "parity::capability::host:theme-sync",
+  "parity::capability::host:trash",
+  "parity::capability::host:tray",
+  "parity::capability::host:window-controls",
+  "parity::capability::host:window-state",
+  "parity::capability::security:capability-sets",
+  "parity::capability::security:command-acl",
+  "parity::capability::security:csp",
+  "parity::capability::security:no-arbitrary-shell",
+  "parity::capability::security:remote-content-isolation",
+  "parity::capability::security:token-exposure",
+  "parity::leaf::R00-T02-LA-0DEEE4813B0A",
+  "parity::leaf::R00-T02-LA-15DFB1AED8F2",
+  "parity::leaf::R00-T02-LA-15E163FBFBE8",
+  "parity::leaf::R00-T02-LA-18FE3FDFF9A5",
+  "parity::leaf::R00-T02-LA-1C41525D379C",
+  "parity::leaf::R00-T02-LA-1E6EDB731186",
+  "parity::leaf::R00-T02-LA-322E02C7F2F9",
+  "parity::leaf::R00-T02-LA-394DD07D2968",
+  "parity::leaf::R00-T02-LA-57728C0A6D0A",
+  "parity::leaf::R00-T02-LA-58822B6B138B",
+  "parity::leaf::R00-T02-LA-5D5938D61A00",
+  "parity::leaf::R00-T02-LA-9350C3E12165",
+  "parity::leaf::R00-T02-LA-98B458390B7E",
+  "parity::leaf::R00-T02-LA-A2E507EBDEF2",
+  "parity::leaf::R00-T02-LA-AC5B6EDA3FBD",
+  "parity::leaf::R00-T02-LA-ACA2C4C1158D",
+  "parity::leaf::R00-T02-LA-B6A97A19F2CB",
+  "parity::leaf::R00-T02-LA-B72A6D3886B7",
+  "parity::leaf::R00-T02-LA-BEC2074CC33C",
+  "parity::leaf::R00-T02-LA-D15E0ADC0608",
+  "parity::leaf::R00-T02-LA-D29DE479076C",
+  "parity::leaf::R00-T02-LA-DF4B5168ABB5",
+  "parity::leaf::R00-T02-LA-E6FB08FBBFAA",
+  "parity::leaf::R00-T02-LA-F5DBF2A80E28",
+  "parity::leaf::R00-T02-LA-F9786414DD11",
+  "parity::leaf::R00-T02-LA-FF1B331F1019",
+  "a15::parity-not-yet-complete"
+ ]
+}

@@ -1,0 +1,38 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t06_release_attack_surface",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 3.402,
+ "caseCount": 52,
+ "casesSha256": "d0951ad9c246e0d0290b3a584a3f484333b68220f019c8341ccf749affb1ba2d",
+ "commands": [
+  {
+   "id": "release::attack-surface-scan",
+   "argv": [
+    "python3",
+    "-B",
+    "scripts/rust-tauri/r09_release_attack_surface.py",
+    "--evidence",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t06/release-surface-02/release-scan"
+   ],
+   "exitCode": 2,
+   "durationSecs": 1.049,
+   "logSha256": "f33aa262a656a88917b040eda415b11356d6bbbb88a031e1d88c3ab511869717"
+  }
+ ],
+ "logSha256": "f33aa262a656a88917b040eda415b11356d6bbbb88a031e1d88c3ab511869717",
+ "finishedAtUnixMs": 1793025806791,
+ "scannerExitCode": 2,
+ "scannerStatus": "FAIL",
+ "failedCases": [
+  "release::csp-no-forbidden-tokens",
+  "release::csp-directives-hardened",
+  "release::acl-no-devtools-permission-grant",
+  "release::acl-no-tray-menu-renderer-grants",
+  "release::no-test-control-env-in-artifacts"
+ ],
+ "artifactChangedDuringScan": false,
+ "releaseScanReceipt": "release-scan/result.json",
+ "note": "只读扫描产物字节；未启动 app/GUI/安装包"
+}

@@ -1,0 +1,55 @@
+{
+  "scope": "FAILED_FIXTURE_EXACT_RECEIPT_LOG_AND_SAFE_CONFIGURATION_WHITELIST",
+  "createdAt": "2026-10-18T08:42:57.089516+00:00",
+  "originalScene": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-metadata-redaction-b5e1d1ae42a6fe57",
+  "originalSceneUnmodified": true,
+  "files": [
+    {
+      "original": "artifacts/rust-tauri/R07/T08/metadata-source-permissions-fixed1.json",
+      "originalSha256": "f98881c2c33fa905a921a2580d423167eee018128db4e044f5ffea447d2017c0",
+      "preserved": "artifacts/rust-tauri/R07/T08/metadata-source-permissions-fixed1-preserved1/metadata-source-permissions-fixed1.json",
+      "preservedSha256": "f98881c2c33fa905a921a2580d423167eee018128db4e044f5ffea447d2017c0",
+      "byteExact": true
+    },
+    {
+      "original": "artifacts/rust-tauri/R07/T08/metadata-source-permissions-fixed1.log",
+      "originalSha256": "02bbe8879133e138be786acac9dcbc607c3c142f49df90cfda9a7df0bd953036",
+      "preserved": "artifacts/rust-tauri/R07/T08/metadata-source-permissions-fixed1-preserved1/metadata-source-permissions-fixed1.log",
+      "preservedSha256": "02bbe8879133e138be786acac9dcbc607c3c142f49df90cfda9a7df0bd953036",
+      "byteExact": true
+    },
+    {
+      "original": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-metadata-redaction-b5e1d1ae42a6fe57/model-plane.json",
+      "originalSha256": "de69ad5aa0e38ba84566cf5986af2de07e07a6062ed565c9a197e9c6f19f04b1",
+      "preserved": "artifacts/rust-tauri/R07/T08/metadata-source-permissions-fixed1-preserved1/model-plane.json.redacted.json",
+      "preservedSha256": "7dad66168fef3678550bdc4d665eb8c4d607d7bebc5167bd677d734e4061aeb0",
+      "byteExact": false,
+      "transformation": "仅已知秘密精确字段及headers/api_keys容器值遮盖；原始文件保留原scene不动"
+    },
+    {
+      "original": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-metadata-redaction-b5e1d1ae42a6fe57/user/preferences.json",
+      "originalSha256": "ec01dee3bebaf734bee10f740d8b0042c737f9aaae54bf17190a2ce9e47c56a6",
+      "preserved": "artifacts/rust-tauri/R07/T08/metadata-source-permissions-fixed1-preserved1/user--preferences.json.redacted.json",
+      "preservedSha256": "9b60e63decb0055a5b779a291aace80dd9149dc7ff697bc3c0988cefe0e16529",
+      "byteExact": false,
+      "transformation": "仅已知秘密精确字段及headers/api_keys容器值遮盖；原始文件保留原scene不动"
+    },
+    {
+      "original": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-metadata-redaction-b5e1d1ae42a6fe57/agents/a/config.yaml",
+      "originalSha256": "f51629e6a0b45cf5892f1dfad5076cd3ec0fe2ca0953eb00a7326c14a155c6aa",
+      "preserved": "artifacts/rust-tauri/R07/T08/metadata-source-permissions-fixed1-preserved1/agent-a-config.yaml",
+      "preservedSha256": "f51629e6a0b45cf5892f1dfad5076cd3ec0fe2ca0953eb00a7326c14a155c6aa",
+      "byteExact": true,
+      "safety": "仅该独立合成夹具配置，确认原10项合成秘密均未出现在误包values配置中"
+    }
+  ],
+  "excluded": [
+    "local-token/credentials等身份秘密",
+    "数据库/WAL/SHM",
+    "浏览器profile/cache",
+    "其它用户或服务目录"
+  ],
+  "diagnosis": "agent config写入口不拆values；错误envelope被作为unknown agent字段保存，modelConfiguration:null，未请求模型保存。原读面遮盖断言在此之前已通过，另两case通过，但整批exit101保留。",
+  "testFix": "仅去掉正/负HTTP两处values包，仍严格要求modelConfiguration.saved/applied及真实Source重排/清空，不修改产品。",
+  "rustRunByThisAgent": false
+}

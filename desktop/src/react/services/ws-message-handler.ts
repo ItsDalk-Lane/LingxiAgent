@@ -1,3 +1,4 @@
+import { applyBrowserStatus } from './browser-events';
 /**
  * ws-message-handler.ts — WebSocket 消息分发（从 app-ws-shim.ts 迁移）
  *
@@ -9,22 +10,18 @@
 import { streamBufferManager } from '../hooks/use-stream-buffer';
 import { dispatchStreamKey } from './stream-key-dispatcher';
 import { getWebSocket } from './websocket';
+import { resolveServerConnection } from './server-connection';
 import { useStore } from '../stores';
 import { updateKeyed } from '../stores/create-keyed-slice';
 import { sessionScopedKey, sessionScopedListIncludes, sessionScopedValue } from '../stores/session-slice';
 import { browserStateForPath, setBrowserStateForPath } from '../stores/browser-slice';
 import { scheduleSessionsRefresh } from './session-refresh-scheduler';
 import { handleLegacyArtifactBlock } from '../stores/preview-actions';
-import {
-  appendChannelMessage as appendChannelMessageAction,
-  loadChannels as loadChannelsAction,
-  markChannelMessagesDirty as markChannelMessagesDirtyAction,
-  openChannel as openChannelAction,
-  upsertConversationAgentActivity as upsertConversationAgentActivityAction,
-} from '../stores/channel-actions';
+import { handleConversationEvent } from './conversation-events';
 import { showError } from '../utils/ui-helpers';
 import { errorWithCode, presentError } from '../errors/error-presenter';
 import { handleAppEvent } from './app-event-actions';
+import { readLoopRuntimeError, warnLoopRuntimeError } from './loop-runtime-error';
 import { openSettingsModal } from '../stores/settings-modal-actions';
 import {
   PREVIEW_DOCUMENT_CHANGE_REFRESH_OPTIONS,
@@ -37,7 +34,7 @@ import {
   isStreamScopedMessage,
   updateSessionStreamMeta,
 } from './stream-resume';
-import { TODO_TOOL_NAMES, type TodoToolName } from '../utils/todo-constants';
+import { isTodoToolResult } from '../utils/todo-constants';
 import { migrateLegacyTodos, panelSnapshotFromToolDetails } from '../utils/todo-compat';
 import { extractLeadingSkillNotes } from '../utils/message-parser';
 import { renderMarkdown } from '../utils/markdown';
@@ -45,6 +42,7 @@ import { bumpMessageLiveVersion } from '../stores/message-live-version';
 import { terminalOutputStream } from './terminal-output-stream';
 import { handleBackgroundProcessControlResult } from './background-process-control';
 import { noteComposerServerAck, noteComposerRunEvent, noteComposerInputRejected, noteComposerUserAbort, extendComposerAckWindow, composerOriginConnectionKey, findSendRecordByClientMessageId } from './composer-send-coordinator';
+import { usePlatform } from '../hooks/use-platform';
 
 declare function t(key: string, vars?: Record<string, string>): any;
 
@@ -252,33 +250,11 @@ function hasOptimisticCurrentSession(): boolean {
   return !!state.sessions.find((s: any) => s.path === sessionPath && s._optimistic);
 }
 
-function resolvePrimaryAgentId(state: any): string | null {
-  const primary = Array.isArray(state.agents)
-    ? state.agents.find((agent: any) => agent?.isPrimary === true)
-    : null;
-  return typeof primary?.id === 'string' && primary.id ? primary.id : null;
-}
-
-function resolveDmPeerIdForEvent(state: any, msg: any): string | null {
-  const channels = Array.isArray(state.channels) ? state.channels : [];
-  const known = channels.find((channel: any) => {
-    if (!channel?.isDM || !channel.dmOwnerId || !channel.peerId) return false;
-    return (
-      (msg.from === channel.dmOwnerId && msg.to === channel.peerId)
-      || (msg.to === channel.dmOwnerId && msg.from === channel.peerId)
-    );
-  });
-  if (known?.peerId) return known.peerId;
-
-  const ownerId = resolvePrimaryAgentId(state) || state.currentAgentId || null;
-  if (!ownerId) return typeof msg.from === 'string' ? msg.from : null;
-  if (msg.from === ownerId && typeof msg.to === 'string') return msg.to;
-  if (msg.to === ownerId && typeof msg.from === 'string') return msg.from;
-  return null;
-}
 
 function applyTodoToolEnd(msg: any): void {
-  if (msg.type !== 'tool_end' || !TODO_TOOL_NAMES.includes(msg.name as TodoToolName)) return;
+  // 按名（todo/todo_write）或 mcp_call 桥接的版本化 todo 载荷形状识别；Rust 内核
+  // 以目标 id（tool:first-party:<name>）报名，谓词内剥前缀。
+  if (msg.type !== 'tool_end' || !isTodoToolResult(msg.name, msg.details)) return;
   const sp = msg.sessionPath;
   if (!sp) {
     console.warn('[ws] tool_end(todo) missing sessionPath, skipping');
@@ -322,6 +298,16 @@ function requestInputFocusForCurrentSession(sessionPath: string | null): void {
 function applyRunEndSideEffects(msg: any): void {
   scheduleSessionsRefresh('assistant_run_end');
   const runSp = msg.sessionPath;
+  // R08 收尾（D01）：context_usage 是旧内核 wire 帧；Rust wire 不认该变体，
+  // 收到即 close 1008 invalid_message——回复结束后无条件补发会把 Rust 连接
+  // 打断（t07 ab run-14 实证：round 后续任务 wsOpen=false）。Rust 连接的
+  // ContextRing 由 rust 分支自己的资源事件轮询维护，不经此帧。
+  const rustWire = (resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service');
+  if (rustWire) {
+    // Rust wire 不收 context_usage；压缩帧（compact）两内核同形，照常调度。
+    if (runSp && !msg.runSplit) maybeRunPendingAutoCompact(runSp);
+    return;
+  }
   if (runSp) {
     requestContextUsage(runSp);
     // 插话切分（runSplit）只是 Run 语义边界，会话仍在流式：
@@ -869,33 +855,10 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
       scheduleSessionsRefresh('session_created');
       break;
 
-    case 'browser_status': {
-      const bsp = msg.sessionPath;
-      if (!bsp) { console.warn('[ws] event missing sessionPath:', msg.type); break; }
-      const bRunning = !!msg.running;
-      const bUrl = msg.url || null;
-      const prev = browserStateForPath(state, bsp);
-      const hasFreshThumbnail = bRunning && typeof msg.thumbnail === 'string' && msg.thumbnail.length > 0;
-      const bThumbnail = bRunning ? (hasFreshThumbnail ? msg.thumbnail : prev?.thumbnail ?? null) : null;
-      const thumbnailCapturedAt = bRunning
-        ? hasFreshThumbnail
-          ? (typeof msg.thumbnailCapturedAt === 'number' ? msg.thumbnailCapturedAt : Date.now())
-          : prev?.thumbnailCapturedAt ?? null
-        : null;
-      const thumbnailUrl = bRunning
-        ? hasFreshThumbnail
-          ? (typeof msg.thumbnailUrl === 'string' ? msg.thumbnailUrl : bUrl)
-          : prev?.thumbnailUrl ?? null
-        : null;
-      const thumbnailFresh = bRunning && hasFreshThumbnail;
-      // 卡片的"收起"是用户意图，状态更新不该把它抹掉；只有浏览器重新启用（running false→true）
-      // 才算新一轮会话，卡片回归。
-      const collapsed = bRunning && !prev?.running ? false : (prev?.collapsed ?? false);
-      // 记录最近活跃时间：切到其他会话时，聊天区卡片接力显示「最近在用」的浏览器
-      const lastActiveAt = bRunning ? Date.now() : (prev?.lastActiveAt ?? null);
-      setBrowserStateForPath(bsp, { running: bRunning, url: bUrl, thumbnail: bThumbnail, thumbnailCapturedAt, thumbnailUrl, thumbnailFresh, collapsed, lastActiveAt });
+    case 'browser_status':
+    case 'browser_update':
+      applyBrowserStatus(msg);
       break;
-    }
 
     case 'todo_update': {
       const sp = msg.sessionPath;
@@ -1017,15 +980,17 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
       terminalOutputStream.handleChunks(msg);
       break;
 
-    case 'notification':
-      if (window.hana?.showNotification) {
+    case 'notification': {
+      const platform = usePlatform();
+      if (platform.showNotification) {
         // agentId 标识触发通知的助手，主进程据此读取该 agent 头像作为通知 icon。
         // 缺失时透传 null，主进程退回无 icon，禁止从当前焦点 agent 兜底。
-        window.hana.showNotification(msg.title, msg.body, msg.agentId ?? null, {
+        platform.showNotification(msg.title, msg.body, msg.agentId ?? null, {
           desktopFocusPolicy: resolveNotificationDesktopFocusPolicy(msg),
         });
       }
       break;
+    }
 
     case 'bridge_status':
       useStore.getState().triggerBridgeReload();
@@ -1169,13 +1134,16 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
       // 循环状态机变更（start/stop/pause/resume/complete/轮次刷新）。按 sessionId 写 store，
       // 驱动会话列表徽章与 interlude 控制按钮态。stopped/completed 经 setLoopStatus 自动清除。
       if (msg.sessionId) {
+        const runtimeError = readLoopRuntimeError(msg.runtimeError);
         useStore.getState().setLoopStatus(msg.sessionId, {
           status: msg.status,
           turnCount: msg.turnCount ?? 0,
           maxTurns: msg.maxTurns ?? null,
           pausedReason: msg.pausedReason ?? null,
           prompt: msg.prompt ?? null,
+          ...(runtimeError ? { runtimeError } : {}),
         });
+        warnLoopRuntimeError(msg.sessionId, runtimeError);
       }
       break;
     }
@@ -1284,54 +1252,12 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
       break;
     }
 
-    case 'channel_new_message': {
-      const store = useStore.getState();
-      const knownChannel = store.channels.some((channel) => channel.id === msg.channelName);
-      const isVisibleCurrentChannel =
-        store.currentTab === 'channels'
-        && store.currentChannel === msg.channelName
-        && document.visibilityState === 'visible';
-      if (msg.channelName && msg.message) {
-        if (!knownChannel) loadChannelsAction();
-        appendChannelMessageAction(msg.channelName, msg.message, { markRead: isVisibleCurrentChannel });
-      } else if (msg.channelName && isVisibleCurrentChannel) {
-        markChannelMessagesDirtyAction(msg.channelName);
-        openChannelAction(msg.channelName);
-      } else if (msg.channelName) {
-        markChannelMessagesDirtyAction(msg.channelName);
-        loadChannelsAction();
-      }
+    case 'channel_new_message':
+    case 'channel_created':
+    case 'dm_new_message':
+    case 'conversation_agent_activity':
+      handleConversationEvent(msg);
       break;
-    }
-
-    case 'channel_created': {
-      loadChannelsAction();
-      break;
-    }
-
-    case 'dm_new_message': {
-      const store2 = useStore.getState();
-      const peerId = resolveDmPeerIdForEvent(store2, msg);
-      if (!peerId) {
-        loadChannelsAction();
-        break;
-      }
-      const dmId = `dm:${peerId}`;
-      const isViewingDM = store2.currentTab === 'channels' && store2.currentChannel === dmId && document.visibilityState === 'visible';
-      if (isViewingDM) {
-        openChannelAction(dmId, true);
-      } else {
-        loadChannelsAction();
-      }
-      break;
-    }
-
-    case 'conversation_agent_activity': {
-      if (msg.activity) {
-        upsertConversationAgentActivityAction(msg.activity);
-      }
-      break;
-    }
 
     case 'compaction_auto': {
       // 80% 强制压缩完成通知：告知用户上下文已被自动压缩。
@@ -1491,12 +1417,16 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
       if (msg.key === 'theme') {
         window.applyTheme?.(msg.value);
         // 通知其他窗口（设置窗口等）同步主题
-        window.platform?.settingsChanged?.('theme-changed', { theme: msg.value });
+        usePlatform()?.settingsChanged?.('theme-changed', { theme: msg.value });
       }
       break;
     }
 
     case 'abort_result': {
+      if (msg.status !== 'accepted' && msg.status !== 'already_stopped') {
+        if (msg.status === 'rejected') console.warn('[ws] abort refused:', msg.reason);
+        break;
+      }
       const spAbort = msg.sessionPath || null;
       // 停止是用户显式终局：无论本次是否命中活跃 run（already_stopped 同样成立），
       // 都结算该会话账本（盖终局章 + 触发对账），不能只清忙闲状态。

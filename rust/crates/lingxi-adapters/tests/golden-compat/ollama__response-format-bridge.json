@@ -1,0 +1,50 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "ollama",
+  "case": "response-format-bridge",
+  "model": {
+    "provider": "ollama",
+    "id": "qwen3",
+    "baseUrl": "http://127.0.0.1:11434/v1",
+    "api": "openai-completions"
+  },
+  "payload": {
+    "model": "qwen3",
+    "messages": []
+  },
+  "options": {
+    "mode": "chat",
+    "responseSchema": {
+      "type": "object",
+      "properties": {
+        "a": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "expected": {
+    "thinkingFormat": null,
+    "reasoningProfile": null,
+    "matched": "ollama",
+    "result": {
+      "model": "qwen3",
+      "messages": [],
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "structured_output",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "a": {
+                "type": "string"
+              }
+            }
+          },
+          "strict": true
+        }
+      }
+    }
+  }
+}

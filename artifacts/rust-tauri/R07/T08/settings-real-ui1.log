@@ -1,0 +1,32 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/services/r07-settings-real-service.test.tsx (1 test | 1 failed) 174ms
+     × 实际导出隐藏密钥，修改导出文件后从按钮导入并保留其他设置（无服务二进制时明确跳过） 174ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/r07-settings-real-service.test.tsx > 设置页按钮连接真实 Rust 子进程 > 实际导出隐藏密钥，修改导出文件后从按钮导入并保留其他设置（无服务二进制时明确跳过）
+Error: 服务提前退出 2：LINGXI_DATA_EPOCH_BLOCKED reason=unstamped-home-with-data
+[data-epoch] The data safety gate refused startup (unstamped-home-with-data): unrecognized existing data found: user; this data home carries no epoch stamp, and adopting existing data is an explicit cutover action (R08), never an automatic startup decision
+[data-epoch] 数据安全闸拒绝启动（unstamped-home-with-data）：unrecognized existing data found: user; this data home carries no epoch stamp, and adopting existing data is an explicit cutover action (R08), never an automatic startup decision
+[data-epoch] 请保留现场文件，使用维护/恢复流程处理；不要删除未知状态后强行启动。
+
+2026-10-18T05:41:36.889338Z ERROR lingxi_service: data-epoch gate refused startup (exit 2) reason="unstamped-home-with-data" [token]
+
+ ❯ ChildProcess.<anonymous> desktop/src/react/__tests__/services/r07-settings-real-service.test.tsx:37:67
+     35|         const timer = setTimeout(() => reject(new Error(`服务启动超时：${stde…
+     36|         child!.once('error', error => { clearTimeout(timer); reject(er…
+     37|         child!.once('exit', code => { clearTimeout(timer); reject(new …
+       |                                                                   ^
+     38|         child!.stdout!.on('data', data => { stdout += String(data); co…
+     39|       });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  13:41:35
+   Duration  1.13s (transform 352ms, setup 23ms, import 485ms, tests 174ms, environment 352ms)
+

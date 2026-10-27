@@ -1,0 +1,7 @@
+[tauri-diag] {"appVersion":"0.1.43","currentExe":"/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/debug/lingxi-resource-desktop","debugBuild":true,"event":"host-start","home":"/private/tmp/lingxi-r09-phase1-automation/home","packaged":false,"pid":89267,"platform":"darwin","schema":"lingxi.r09.tauri-launch.v1","unixMs":1793024808651}
+[tauri-diag] {"appVersion":"0.1.43","debugBuild":true,"event":"resolve","home":"/private/tmp/lingxi-r09-phase1-automation/home","packaged":false,"platform":"darwin","schema":"lingxi.r09.tauri-launch.v1","unixMs":1793024808653}
+[tauri-diag] {"binary":"/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service","event":"binary","packaged":false,"schema":"lingxi.r09.tauri-launch.v1","unixMs":1793024808653}
+[tauri-diag] {"args":["--home","/private/tmp/lingxi-r09-phase1-automation/home"],"binary":"/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service","event":"spawn","pgid":89277,"pid":89277,"schema":"lingxi.r09.tauri-launch.v1","spawnedAtUnixMs":1793024808653,"unixMs":1793024808655}
+[tauri-diagnostics] failure record: /private/tmp/lingxi-r09-phase1-automation/home/diagnostics/tauri-launch/failure.json
+[tauri-diagnostics] crash log: /private/tmp/lingxi-r09-phase1-automation/home/diagnostics/tauri-launch/tauri-crash.log
+[tauri-host] automation dialog suppressed; sink: /private/tmp/lingxi-r09-phase1-automation/sink/failure-dialog.json

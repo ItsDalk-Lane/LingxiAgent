@@ -1,0 +1,167 @@
+AssertionError: expected false to be true // Object.is equality
+
+Ignored nodes: comments, script, style
+<html>
+  <head />
+  <body>
+    <div>
+      <div
+        class="_settings-content-root_4045f0"
+        data-input-ctx-zone="settings"
+      >
+        <div
+          class="settings-panel _settings-panel-modal_4045f0"
+          id="settingsPanel"
+        >
+          <div
+            class="settings-header _settings-header-modal_4045f0"
+          >
+            <div
+              class="_settings-title-group_4045f0"
+            >
+              <button
+                aria-label="返回"
+                class="_settings-return-btn_4045f0"
+                data-settings-return="true"
+                type="button"
+              >
+                <svg
+                  fill="none"
+                  height="22"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.7"
+                  viewBox="0 0 24 24"
+                  width="22"
+                >
+                  <path
+                    d="M15 18l-6-6 6-6"
+                  />
+                </svg>
+              </button>
+              <h1
+                class="_settings-title_4045f0"
+              >
+                设置
+              </h1>
+            </div>
+            <h1
+              class="_settings-header-tab-title_4045f0"
+            >
+              技能
+            </h1>
+          </div>
+          <div
+            class="_settings-body_4045f0"
+          >
+            <nav
+              class="_settings-nav_4045f0"
+            >
+              <div
+                class="_settings-search-shell_4045f0"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="_settings-search-icon_4045f0"
+                  fill="none"
+                  height="15"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.8"
+                  viewBox="0 0 24 24"
+                  width="15"
+                >
+                  <circle
+                    cx="11"
+                    cy="11"
+                    r="7"
+                  />
+                  <path
+                    d="m20 20-3.5-3.5"
+                  />
+                </svg>
+                <input
+                  class="_settings-search-input_4045f0"
+                  placeholder="搜索设置"
+                  type="search"
+                  value=""
+                />
+              </div>
+              <button
+                class="_settings-nav-item_4045f0"
+                data-tab="agent"
+              >
+                <svg
+                  fill="none"
+                  height="16"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  viewBox="0 0 24 24"
+                  width="16"
+                >
+                  <path
+                    d="M12 2a5 5 0 0 1 5 5c0 2.76-2.24 5-5 5s-5-2.24-5-5a5 5 0 0 1 5-5z"
+                  />
+                  <path
+                    d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+                  />
+                </svg>
+                <span>
+                  助手
+                </span>
+              </button>
+              <button
+                class="_settings-nav-item_4045f0"
+                data-tab="me"
+              >
+                <svg
+                  fill="none"
+                  height="16"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  viewBox="0 0 24 24"
+                  width="16"
+                >
+                  <path
+                    d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+                  />
+                  <circle
+                    cx="12"
+                    cy="7"
+                    r="4"
+                  />
+                </svg>
+                <span>
+                  我
+                </span>
+              </button>
+              <button
+                class="_settings-nav-item_4045f0"
+                data-tab="interface"
+              >
+                <svg
+                  fill="none"
+                  height="16"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  viewBox="0 0 24 24"
+                  width="16"
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="3...
+    at timeout (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/__tests__/R06AgentDeleteRustLive.test.tsx:152:162)
+    at runWithExpensiveErrorDiagnosticsDisabled (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@testing-library/dom/dist/config.js:47:12)
+    at checkCallback (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@testing-library/dom/dist/wait-for.js:124:77)
+    at Timeout.checkRealTimersCallback (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@testing-library/dom/dist/wait-for.js:118:16)
+    at listOnTimeout (node:internal/timers:605:17)
+    at processTimers (node:internal/timers:541:7)

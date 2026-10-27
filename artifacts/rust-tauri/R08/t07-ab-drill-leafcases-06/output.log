@@ -1,0 +1,31 @@
+PASS fixture gen
+PASS root-a prepared (knowledge integrity ok) :: ok
+PASS root-b migrated (T05 path)
+PASS kernel A (node) ready :: port=54222
+PASS kernel B (rust) ready :: 127.0.0.1:54227
+PASS suite ran on A (observations present) :: vitest exit=0
+PASS suite ran on B (observations present) :: vitest exit=0
+PASS [identity] parity
+PASS [sessions.list] parity
+RECORD [sessions.switch] recorded :: {"A":{"focused":false,"messages":null},"B":{"focused":true,"messages":null}}
+PASS [sessions.rename] parity
+PASS [sessions.pin] parity
+RECORD [sessions.create] recorded :: {"A":{"created":false,"delta":0},"B":{"created":false,"delta":0}}
+FAIL [sessions.archive] differs :: {"A":{"inArchive":true,"goneFromVisible":true,"restored":true,"backVisible":true,"deleted":"skipped-not-restorable","stillArchived":true},"B":{"inArchive":false,"goneFromVisible":false,"restored":false,"backVisible":false,"deleted":"skipped-no-target","stillAr
+PASS [sessions.maintenance] parity
+PASS [sessions.capabilities] parity
+PASS [sessions.todos] parity
+FAIL [permissions.default] A-failed :: {}
+PASS [preferences.appearance] parity
+PASS [error-path.unauthorized] parity
+PASS [error-path.not-found] parity
+FAIL [drift-guard] differs :: {"A":{"count":2,"titles":["T07-AB-renamed",null]},"B":{"count":1,"titles":["ab-real-alpha"]}}
+PASS [leaf.rename.negative] parity
+PASS [leaf.pin.negative] parity
+PASS [leaf.todos.negative] parity
+FAIL [leaf.cleanup.boundary] differs :: {"A":{"keptDeletedIsNumber":true,"freshKept":true,"purgedOk":false,"expiringGone":false},"B":{"keptDeletedIsNumber":true,"freshKept":false,"purgedOk":true,"expiringGone":true}}
+PASS [leaf.list.fields] parity
+PASS [leaf.permissions.read-idempotent] parity
+PASS harness integrity: both suites produced observations
+AB_RESULT tasks=21 parity=15 differs=3 recorded=2 failedA=1 failedB=0 out=/private/tmp/t07-ab-leafcases-06/out
+T07 AB OK

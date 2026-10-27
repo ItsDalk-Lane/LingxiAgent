@@ -1,0 +1,380 @@
+{
+  "etag": "<etag>",
+  "events": [
+    {
+      "clientMessageId": null,
+      "message": {
+        "attachments": [],
+        "clientMessageId": null,
+        "hasImages": false,
+        "id": "<id>",
+        "quotedText": null,
+        "sessionRefs": null,
+        "snapshotVersion": null,
+        "sourceEntryId": "<sourceEntryId>",
+        "text": "R08-A04-NO-FINAL",
+        "timestamp": "<timestamp>"
+      },
+      "seq": 1,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "snapshotVersion": null,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "session_user_message"
+    },
+    {
+      "isStreaming": true,
+      "seq": 2,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "status"
+    },
+    {
+      "runId": "<runId>",
+      "seq": 3,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "turnInputEntryId": "<turnInputEntryId>",
+      "type": "assistant_run_start"
+    },
+    {
+      "modelCallId": "<modelCallId>",
+      "phase": "model",
+      "seq": 4,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "stage"
+    },
+    {
+      "kind": "reasoning",
+      "segmentId": "<segmentId>",
+      "semanticPhase": "reasoning",
+      "seq": 5,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "assistant_segment_start"
+    },
+    {
+      "delta": "A04-THINKING-ALOUD",
+      "segmentId": "<segmentId>",
+      "semanticPhase": "reasoning",
+      "seq": 6,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "assistant_segment_delta"
+    },
+    {
+      "kind": "text",
+      "segmentId": "<segmentId>",
+      "semanticPhase": "unresolved",
+      "seq": 7,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "assistant_segment_start"
+    },
+    {
+      "delta": "A04-READING-SEED",
+      "segmentId": "<segmentId>",
+      "semanticPhase": "unresolved",
+      "seq": 8,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "assistant_segment_delta"
+    },
+    {
+      "segmentId": "<segmentId>",
+      "semanticPhase": "reasoning",
+      "seq": 9,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "assistant_segment_end"
+    },
+    {
+      "segmentId": "<segmentId>",
+      "semanticPhase": "unresolved",
+      "seq": 10,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "assistant_segment_end"
+    },
+    {
+      "args": {
+        "summary": null
+      },
+      "id": "<id>",
+      "name": "tool:first-party:read",
+      "seq": 11,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "tool_start"
+    },
+    {
+      "content": [
+        {
+          "text": "A04-SEED-CONTENT\n",
+          "type": "text"
+        }
+      ],
+      "details": {
+        "format": "text-or-binary",
+        "source": {
+          "path": "a04-seed.txt",
+          "sha256": "88df02de4f85a3c0f5d74ad86a029565fe9e1f0cd4654eefe238f6e2090753ca",
+          "sizeBytes": 17
+        }
+      },
+      "error": null,
+      "id": "<id>",
+      "name": "tool:first-party:read",
+      "seq": 12,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "status": "succeeded",
+      "streamId": "<streamId>",
+      "success": true,
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "tool_end"
+    },
+    {
+      "modelCallId": "<modelCallId>",
+      "phase": "model",
+      "seq": 13,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "stage"
+    },
+    {
+      "args": {
+        "summary": null
+      },
+      "id": "<id>",
+      "name": "tool:first-party:read",
+      "seq": 14,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "tool_start"
+    },
+    {
+      "content": null,
+      "details": null,
+      "error": "Could not read file: a04-missing.txt. Error code: ENOENT.",
+      "id": "<id>",
+      "name": "tool:first-party:read",
+      "seq": 15,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "status": "failed",
+      "streamId": "<streamId>",
+      "success": false,
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "tool_end"
+    },
+    {
+      "modelCallId": "<modelCallId>",
+      "phase": "model",
+      "seq": 16,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "stage"
+    },
+    {
+      "runId": "<runId>",
+      "seq": 17,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "turnInputEntryId": "<turnInputEntryId>",
+      "type": "assistant_run_end"
+    },
+    {
+      "isStreaming": false,
+      "seq": 18,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "status"
+    }
+  ],
+  "files": {
+    "a04-seed.txt": "A04-SEED-CONTENT\n"
+  },
+  "history": {
+    "headRevision": "4",
+    "items": [
+      {
+        "committedAtUnixMs": "<committedAtUnixMs>",
+        "kind": "user_message",
+        "messageId": "<messageId>",
+        "run": {
+          "runId": "<runId>",
+          "state": "known"
+        },
+        "seq": "1",
+        "text": "R08-A04-NO-FINAL"
+      },
+      {
+        "complete": true,
+        "firstSeq": "4",
+        "kind": "assistant_segment",
+        "phase": "reasoning",
+        "run": {
+          "runId": "<runId>",
+          "state": "known"
+        },
+        "segmentId": "<segmentId>",
+        "segmentKind": "reasoning",
+        "text": "A04-THINKING-ALOUD"
+      },
+      {
+        "complete": true,
+        "firstSeq": "7",
+        "kind": "assistant_segment",
+        "phase": "unresolved",
+        "run": {
+          "runId": "<runId>",
+          "state": "known"
+        },
+        "segmentId": "<segmentId>",
+        "segmentKind": "text",
+        "text": "A04-READING-SEED"
+      },
+      {
+        "argsDigest": "<argsDigest>",
+        "firstSeq": "13",
+        "kind": "tool_call",
+        "result": {
+          "content": [
+            {
+              "text": "A04-SEED-CONTENT\n",
+              "type": "text"
+            }
+          ],
+          "details": {
+            "format": "text-or-binary",
+            "source": {
+              "path": "a04-seed.txt",
+              "sha256": "88df02de4f85a3c0f5d74ad86a029565fe9e1f0cd4654eefe238f6e2090753ca",
+              "sizeBytes": 17
+            }
+          },
+          "status": "success",
+          "truncated": false
+        },
+        "run": {
+          "runId": "<runId>",
+          "state": "known"
+        },
+        "status": "success",
+        "target": "tool:first-party:read",
+        "toolCallId": "<toolCallId>"
+      },
+      {
+        "argsDigest": "<argsDigest>",
+        "firstSeq": "19",
+        "kind": "tool_call",
+        "result": {
+          "error": {
+            "code": "not_found",
+            "message": "Could not read file: a04-missing.txt. Error code: ENOENT.",
+            "retryable": false
+          },
+          "status": "failed",
+          "truncated": false
+        },
+        "run": {
+          "runId": "<runId>",
+          "state": "known"
+        },
+        "status": "failed",
+        "target": "tool:first-party:read",
+        "toolCallId": "<toolCallId>"
+      },
+      {
+        "eventSeq": "25",
+        "kind": "run_terminal",
+        "runId": "<runId>",
+        "status": "completed",
+        "terminalReason": "completed.no_final.tool_partial_failure"
+      }
+    ],
+    "page": {
+      "hasMore": false,
+      "limit": 200
+    },
+    "revision": "<revision>",
+    "schemaVersion": "lingxi.canonical-history.v1",
+    "sessionId": "a04",
+    "todoPanel": {
+      "dismissed": false,
+      "removed": true,
+      "todos": []
+    },
+    "todos": []
+  },
+  "providerChatRequests": 3
+}

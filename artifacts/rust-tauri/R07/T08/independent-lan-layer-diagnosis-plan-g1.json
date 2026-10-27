@@ -1,0 +1,151 @@
+{
+  "schema": "r07-t08-independent-lan-layer-diagnosis-plan-v1",
+  "recordedAt": "2026-10-18T12:21:28.535581+00:00",
+  "scope": "READ_ONLY_DIAGNOSTIC_DESIGN_NOT_GATE_PASS",
+  "finalAcceptance": "pending",
+  "newProductSourceChangeRequested": false,
+  "sourceReadSha256": {
+    "rust/crates/lingxi-service/tests/r00_management_leaves.rs": "3e72c2a2d16287549a2727a355642ec279c09595d42d6ec42d9c5585c8d2f453",
+    "rust/crates/lingxi-service/src/serve.rs": "95faa3f52bb1c1a33738501b33038bda41e0e29eca6eee541fadb84b202847b8",
+    "rust/crates/lingxi-service/src/lib.rs": "5cfb5da1c3c717908ef7784bf9095e7002d71b090c19366177038929ecb320b5",
+    "rust/crates/lingxi-service/src/transport.rs": "d4a5fe9ac17e2f0e2e666bc04658008002fa48d1f661875fa41121f5ff012c95",
+    "rust/crates/lingxi-service/src/management.rs": "8b1acbed4fdccc54bf36dcdadb1795fd73c44b19351f6d52945dcff932d12875",
+    "rust/crates/lingxi-service/src/auth.rs": "75c155dab6067b47e88cd3d9afcfdb3f1bcbf08b63c15a176f609b15f65ab9e4",
+    "rust/crates/lingxi-service/src/limits.rs": "93d7bbd0a1bc22417cfb800d75601c61e8ee396ff8801218382738938d6767c5",
+    "rust/crates/lingxi-service/src/inject.rs": "c440a0c38f5710500b3aa3c557ca33d9503db485d13fc1555416a7efb4c560e4"
+  },
+  "historicalEvidence": {
+    "investigation": "artifacts/rust-tauri/R07/T08/lan-readonly-diagnosis3/INVESTIGATION.json",
+    "sha256": "f76002e76dde1124b9fc0cddae0f456fb4f03aa6aa3e5b9f1e455a5a85b04e46",
+    "receipt": "artifacts/rust-tauri/R07/T08/lan-readonly-diagnosis3/receipt.json",
+    "receiptSha256": "8eaabf8d0f5bff0fb4b6d8ed5d50ecb6f76e00797ffd897e75d62de8ce95072e",
+    "meaning": "Owned same-SHA Rust binary/no ManualClock reproduced LAN first foreign-login and no-Origin health zero-byte stalls, while loopback worked; Python LAN TCP control worked. Only a 0.2-second service lsof LISTEN snapshot was taken, not continuous accept tracing. The precise cause was not established."
+  },
+  "currentFrozenFailure": {
+    "log": "artifacts/rust-tauri/R07/T08/t08g-service.log",
+    "logIsStillGrowing": true,
+    "wholeLogFinalHashNotClaimed": true,
+    "observedLines": "723-758",
+    "test": "r00_management_positive_and_negative_branches_on_real_service",
+    "observed": "Real LAN 192.168.3.96:61584 first foreign-Origin POST /lingxi/v1/web-auth/login stalled in write/read exchange with zero response bytes and failed after original twenty-second request budget. Test one target was 0 passed/1 failed; --no-fail-fast continues other targets.",
+    "doNotTreatPanicMessageAsDiagnosis": "Existing panic text mentions firewall/TUN as possibility; that text is not causal evidence and cannot establish an environment root cause."
+  },
+  "staticFindings": [
+    {
+      "path": "serve.rs",
+      "finding": "Listener accept does not branch on peer being LAN versus loopback. Connection hard-cap exhaustion logs and drops socket immediately. Header-read timeout is Tokio wall time. No explicit twenty-second LAN wait path found."
+    },
+    {
+      "path": "lib.rs transport_guard",
+      "finding": "With foreign Origin, origin-policy rejection is reached before connection classification, rate, auth and login handler. Interface enumeration is synchronous but the prior same-service loopback foreign-Origin control also completed; no evidence identifies it as this stall cause."
+    },
+    {
+      "path": "lib.rs http_admission",
+      "finding": "Default thirty-second request budget wraps downstream transport/auth/handler. A twenty-second zero-byte client timeout alone cannot prove the request never entered HTTP admission; it ends before the service default budget."
+    },
+    {
+      "path": "management.rs web_login",
+      "finding": "The failed first foreign-Origin request should not reach login. Credential auth is synchronous and password spawn_blocking is on a different branch; no evidence identifies either as the stall cause."
+    },
+    {
+      "path": "inject.rs/limits.rs",
+      "finding": "ManualClock is atomic timestamp input; fixed-window rate rejection is synchronous response, not waiting for the next window. Prior non-ManualClock reproduction already excludes freezing that clock as a necessary condition."
+    }
+  ],
+  "newReadOnlyObservations": [
+    {
+      "command": [
+        "/sbin/route",
+        "-n",
+        "get",
+        "192.168.3.96"
+      ],
+      "exitCode": 0,
+      "result": "Current route is interface lo0 with LOCAL/HOST flags. This is expected for this machine own address and does not show which program receives an accepted socket; self-address traffic is not a second-device/en0 path proof."
+    },
+    {
+      "command": [
+        "/usr/sbin/netstat",
+        "-h"
+      ],
+      "exitCode": 64,
+      "result": "Help option rejected but usage explicitly supports -L/-a/-n and -p protocol. This was syntax/tool discovery, not a product/network test."
+    }
+  ],
+  "proposedSingleIsolation": {
+    "preconditions": [
+      "Finish independent g receipts first and retain service failure unchanged.",
+      "Use the formally built g binary copied once to a dedicated isolated diagnostic directory; verify copy/build SHA match, source manifest and before/after bytes. No Cargo or product/test/tool edits.",
+      "Fresh empty home, production wall clock, LAN mode 0.0.0.0:0; only owned local sockets, no user account, secret credential or network configuration change.",
+      "Record exact own interface address and current route rather than assuming interface order; the diagnosis remains self-address, not actual mobile acceptance."
+    ],
+    "coreProcedure": [
+      "Start one same-SHA owned service and capture stdout/stderr/READY, PID and actual bound port.",
+      "Make one raw no-Origin GET /lingxi/v1/health to its actual LAN self-address. Keep the original client deadlines: ten-second connect and twenty-second exchange. Record separate connect/write completion, client local/peer tuple, response-byte count and EOF/error. Do not add health credential.",
+      "While that exact socket remains open, collect a bounded timeline around 0.2/1/5/15 seconds: service-PID TCP FDs, client-PID TCP FDs, all sockets with this unique destination port, and listener qlen/incqlen/maxqlen. Record raw command output+timestamps, not only a conclusion.",
+      "During the same pending LAN request, perform one loopback no-Origin health control to the same PID/port with its exact socket tuple and HTTP bytes. This distinguishes a whole service stall from that path; it does not replace LAN acceptance.",
+      "If LAN health succeeds immediately, do one bounded foreign-Origin POST/login with a nonsecret dummy JSON value using the same monitoring. Expected403 is transport-only before auth, so no real credential is required. If health stalls, stop after its one window rather than repeat old login permutations.",
+      "Shut down the owned service through the existing signal, await the bounded shutdown, record exit/forced-cleanup fact and listener/PID gone; hash binary and raw evidence after run."
+    ],
+    "observerCommandsAsArgvTemplates": [
+      [
+        "/usr/sbin/lsof",
+        "-nP",
+        "-a",
+        "-p",
+        "SERVICE_PID",
+        "-iTCP"
+      ],
+      [
+        "/usr/sbin/lsof",
+        "-nP",
+        "-a",
+        "-p",
+        "CLIENT_PID",
+        "-iTCP"
+      ],
+      [
+        "/usr/sbin/lsof",
+        "-nP",
+        "-iTCP:ACTUAL_PORT"
+      ],
+      [
+        "/usr/sbin/netstat",
+        "-Lan",
+        "-p",
+        "tcp"
+      ],
+      [
+        "/usr/sbin/netstat",
+        "-anv",
+        "-p",
+        "tcp"
+      ]
+    ],
+    "outputHandling": "Filter netstat snapshots to the one owned port and retain their headers. Never capture request bodies, user credentials or unrelated socket payload. Use subprocess argv, per-observer timeout, and keep the client deadline independent of observer runtime.",
+    "decisionTable": [
+      {
+        "observed": "Client connect/write complete; no matching server accepted FD; listener completed/incomplete queue rises",
+        "newInformation": "Kernel-level listener queue contains this flow while application acceptance is not observed. Focus next on accept scheduling/readiness/ownership, not login/auth."
+      },
+      {
+        "observed": "Matching server accepted FD exists but HTTP has no response; loopback still works",
+        "newInformation": "Accepted socket reaches service. Focus next on Hyper request dispatch, body/header state or synchronous middleware rather than assuming preaccept filtering. A one-second read-only sample of the owned process may help locate a blocked worker; an async stack sample is diagnostic, not proof by itself."
+      },
+      {
+        "observed": "Client reports established/written; neither matching accepted FD nor listener queue entry appears across the window",
+        "newInformation": "The client-established endpoint is not observed in this server listener timeline. Investigate endpoint redirection/filtering/kernel route delivery with OS-level evidence; do not name a specific firewall/TUN yet."
+      },
+      {
+        "observed": "All now pass without changes",
+        "newInformation": "Intermittency reproduced as current success only. Historical g and c failures remain failed and root cause unresolved; cannot relabel them pass."
+      }
+    ],
+    "optionalFurtherMechanismOnlyIfNeeded": "If socket timeline isolates an accepted HTTP-path question, a single owned Python TCP forwarder on actual LAN IP -> unchanged service loopback, preserving Host and foreign Origin, can test the actual same transport rejection code under another acceptor. Its peer address differs and it is not original LAN acceptance; do not substitute it for the failed gate."
+  },
+  "limitations": [
+    "No new service/probe/raw TCP listener or network test was executed by this reviewer. Only current route and netstat syntax were read.",
+    "No positive source-level cause is established. LISTEN-only lsof snapshot, zero bytes, panic wording, or an independent Python success cannot individually prove firewall/TUN or a Rust source defect.",
+    "No frozen source, test, runner, protocol, original failed record or network setting changed. This artifact is an independent design/causal-boundary record, not an executed diagnostic receipt."
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "schema": "lingxi.r09.tauri-build.v1",
+  "mode": "debug",
+  "builtAtUnixMs": 1793023383280,
+  "cacheHit": false,
+  "command": [
+    "tauri",
+    "build",
+    "--config",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/tauri.debug.generated.conf.json",
+    "--features",
+    "r09-host",
+    "--debug",
+    "--no-bundle"
+  ],
+  "inputs": {
+    "mode": "debug",
+    "crateSourceDigest": "359c1284d515076f73ac8f55d7e6bf4e25c906498ebc32f769e5ce6c4096e53a",
+    "crateSourceFileCount": 125,
+    "rendererDigest": "b647fe90773e2d4269ecfc8de659c596270b73cd70e4ed7520e51074a16a5528",
+    "rendererFileCount": 642,
+    "configTemplateSha256": "46ebf32f7f49055ea9374819ba59fe891fa4715980224a1e877b66c573f30a5d",
+    "packageVersion": "0.1.43",
+    "tauriCli": "tauri-cli 2.12.4",
+    "toolchain": "1.98.1",
+    "target": "aarch64-apple-darwin",
+    "serviceManifestSha256": null,
+    "serviceBuildJsonSha256": null,
+    "features": [
+      "r09-host"
+    ],
+    "hostFeature": "r09-host",
+    "hostFeatureEffects": [
+      "service-supervisor",
+      "product-react-window",
+      "host-boot-commands"
+    ]
+  },
+  "config": {
+    "file": "desktop/src-tauri/tauri.debug.generated.conf.json",
+    "generatedSha256": "b0c6282909bb43aafdbfa16bf53db182428532420cf254ebfe799f0daacefa6a"
+  },
+  "artifacts": {
+    "executable": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/debug/lingxi-resource-desktop",
+    "executableSha256": "f6675831a341e9f3e79d320dfe71fd87252a4b0161b1e627baabbdce33bf6eb7",
+    "appBundle": null,
+    "appBundleExists": false
+  },
+  "service": null,
+  "codesign": null
+}

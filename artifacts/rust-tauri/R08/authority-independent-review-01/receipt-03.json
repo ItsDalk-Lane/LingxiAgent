@@ -1,0 +1,12 @@
+{
+  "status": "FAIL_NOT_CLOSED",
+  "updatedAt": "2026-10-21T19:38:21.988729+00:00",
+  "newEvidence": "artifacts/rust-tauri/R08/default-composition-independent-01/run-02/receipt.json",
+  "independentScope": "PASS_LOCAL_DEFAULT_COMPOSITION_ONLY",
+  "files": {
+    "docs/rust-tauri/R08/ADMISSION_AUTHORITY_INDEPENDENT_REVIEW.md": "b2b2d20316e4eb831d1e9b1f598367df53eb7d0968ced7e0554d1ec6eed4795a",
+    "docs/rust-tauri/R08/ADMISSION_AUTHORITY_INDEPENDENT_REVIEW.json": "0881481c8db1a2f0bb4cef2e0fa293646a3933c51d50872ab89ba29d9f2cd9a6",
+    "artifacts/rust-tauri/R08/authority-independent-review-01/authority-review-before-default-execution.md": "43a3c543a2214fb7f6b6a189cbc9cf0e0f0c46875e0fea3baf6ec1d03a106f74",
+    "artifacts/rust-tauri/R08/authority-independent-review-01/authority-review-before-default-execution.json": "45b10b5f14712bd060b0cfc15f976f9f23c932ae313151f4f6a608e5fc105d77"
+  }
+}

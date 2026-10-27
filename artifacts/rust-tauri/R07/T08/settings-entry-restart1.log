@@ -1,0 +1,72 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面（configured）
+R07_SETTINGS_ENTRY_RESULT {"blocked":[],"requests":[{"path":"/lingxi/v1/access/summary","method":"GET","status":200},{"path":"/lingxi/v1/server/identity","method":"GET","status":200},{"path":"/lingxi/v1/settings/config","method":"GET","status":200},{"path":"/lingxi/v1/agents","method":"GET","status":200},{"path":"/lingxi/v1/models","method":"GET","status":200},{"path":"/lingxi/v1/settings/snapshot","method":"GET","status":200},{"path":"/lingxi/v1/settings/avatar-health","method":"GET","status":200},{"path":"/lingxi/v1/providers/summary","method":"GET","status":200},{"path":"/lingxi/v1/preferences/quick-chat","method":"GET","status":200},{"path":"/lingxi/v1/preferences/notifications","method":"GET","status":200},{"path":"/lingxi/v1/preferences/goal","method":"GET","status":200},{"path":"/lingxi/v1/preferences/autolearn","method":"GET","status":200},{"path":"/lingxi/v1/skills","method":"GET","status":200},{"path":"/lingxi/v1/skills/bundles","method":"GET","status":200},{"path":"/lingxi/v1/skills/external-paths","method":"GET","status":200}]}
+
+ ✓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面（configured） 3296ms
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面（without-model）
+[settings] models load failed: Error: model plane unavailable
+    at errorWithCode (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/errors/error-presenter.ts:38:17)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/api.ts:78:27)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at lingxiFetchJson (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/api.ts:95:15)
+    at loadSettingsModels (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/actions.ts:113:18)
+    at async Promise.all (index 3)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/SettingsContent.tsx:472:7
+
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面（without-model）
+R07_SETTINGS_ENTRY_RESULT {"blocked":[],"requests":[{"path":"/lingxi/v1/access/summary","method":"GET","status":200},{"path":"/lingxi/v1/server/identity","method":"GET","status":200},{"path":"/lingxi/v1/settings/config","method":"GET","status":200},{"path":"/lingxi/v1/agents","method":"GET","status":200},{"path":"/lingxi/v1/models","method":"GET","status":500},{"path":"/lingxi/v1/settings/snapshot","method":"GET","status":200},{"path":"/lingxi/v1/settings/avatar-health","method":"GET","status":200},{"path":"/lingxi/v1/providers/summary","method":"GET","status":200},{"path":"/lingxi/v1/preferences/quick-chat","method":"GET","status":200},{"path":"/lingxi/v1/preferences/notifications","method":"GET","status":200},{"path":"/lingxi/v1/preferences/goal","method":"GET","status":200},{"path":"/lingxi/v1/preferences/autolearn","method":"GET","status":200},{"path":"/lingxi/v1/skills","method":"GET","status":200},{"path":"/lingxi/v1/skills/bundles","method":"GET","status":200},{"path":"/lingxi/v1/skills/external-paths","method":"GET","status":200}]}
+
+ ✓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面（without-model） 403ms
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面（without-agent）
+R07_SETTINGS_ENTRY_RESULT {"blocked":[],"requests":[{"path":"/lingxi/v1/access/summary","method":"GET","status":200},{"path":"/lingxi/v1/server/identity","method":"GET","status":200},{"path":"/lingxi/v1/settings/config","method":"GET","status":200},{"path":"/lingxi/v1/agents","method":"GET","status":200},{"path":"/lingxi/v1/settings/avatar-health","method":"GET","status":200},{"path":"/lingxi/v1/models","method":"GET","status":200},{"path":"/lingxi/v1/providers/summary","method":"GET","status":200},{"path":"/lingxi/v1/preferences/quick-chat","method":"GET","status":200},{"path":"/lingxi/v1/preferences/notifications","method":"GET","status":200},{"path":"/lingxi/v1/preferences/goal","method":"GET","status":200},{"path":"/lingxi/v1/skills/external-paths","method":"GET","status":200},{"path":"/lingxi/v1/preferences/autolearn","method":"GET","status":200}]}
+
+ ✓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面（without-agent） 346ms
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面（restart）
+R07_SETTINGS_ENTRY_RESULT {"blocked":[],"requests":[{"path":"/lingxi/v1/access/summary","method":"GET","status":200},{"path":"/lingxi/v1/server/identity","method":"GET","status":200},{"path":"/lingxi/v1/settings/config","method":"GET","status":200},{"path":"/lingxi/v1/agents","method":"GET","status":200},{"path":"/lingxi/v1/models","method":"GET","status":200},{"path":"/lingxi/v1/settings/snapshot","method":"GET","status":200},{"path":"/lingxi/v1/settings/avatar-health","method":"GET","status":200},{"path":"/lingxi/v1/providers/summary","method":"GET","status":200},{"path":"/lingxi/v1/preferences/quick-chat","method":"GET","status":200},{"path":"/lingxi/v1/preferences/notifications","method":"GET","status":200},{"path":"/lingxi/v1/preferences/goal","method":"GET","status":200},{"path":"/lingxi/v1/preferences/autolearn","method":"GET","status":200},{"path":"/lingxi/v1/skills/bundles","method":"GET","status":200},{"path":"/lingxi/v1/skills","method":"GET","status":200},{"path":"/lingxi/v1/skills/external-paths","method":"GET","status":200}]}
+
+ ✓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面（restart） 590ms
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面（rejected-restart）
+R07_SETTINGS_ENTRY_RESULT {"blocked":[],"requests":[{"path":"/lingxi/v1/access/summary","method":"GET","status":200},{"path":"/lingxi/v1/server/identity","method":"GET","status":200},{"path":"/lingxi/v1/settings/config","method":"GET","status":200},{"path":"/lingxi/v1/agents","method":"GET","status":200},{"path":"/lingxi/v1/models","method":"GET","status":200},{"path":"/lingxi/v1/settings/snapshot","method":"GET","status":200},{"path":"/lingxi/v1/settings/avatar-health","method":"GET","status":200},{"path":"/lingxi/v1/providers/summary","method":"GET","status":200},{"path":"/lingxi/v1/preferences/quick-chat","method":"GET","status":200},{"path":"/lingxi/v1/preferences/notifications","method":"GET","status":200},{"path":"/lingxi/v1/preferences/goal","method":"GET","status":200},{"path":"/lingxi/v1/preferences/autolearn","method":"GET","status":200},{"path":"/lingxi/v1/skills/bundles","method":"GET","status":200},{"path":"/lingxi/v1/skills","method":"GET","status":200},{"path":"/lingxi/v1/skills/external-paths","method":"GET","status":200}]}
+
+ × desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面（rejected-restart） 439ms
+   → expected <div class="_page_c3cd25" …(2)>…(1)</div> to be null
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 从真实设置容器初始化并点击导航能进入通用、供应商和技能页面（rejected-restart）
+AssertionError: expected <div class="_page_c3cd25" …(2)>…(1)</div> to be null
+
+- Expected:
+null
+
++ Received:
+<div
+  class="_page_c3cd25"
+  data-settings-page="general"
+  data-tab="general"
+>
+  <div
+    role="alert"
+  >
+    settings.rustCoreUnavailable
+  </div>
+</div>
+
+ ❯ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx:128:67
+    126|         expect(useSettingsStore.getState().rustSettingsUnavailable).to…
+    127|         fireEvent.click(screen.getByRole('button', { name: 'settings.t…
+    128|         expect(document.querySelector('div[data-tab="general"]')).toBe…
+       |                                                                   ^
+    129|         expect(screen.getAllByRole('alert').some(alert => alert.textCo…
+    130|       } else {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  18:05:42
+   Duration  6.78s (transform 1.10s, setup 17ms, import 1.38s, tests 5.08s, environment 241ms)
+

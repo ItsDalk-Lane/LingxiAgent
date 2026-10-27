@@ -1,0 +1,36 @@
+{
+  "label": "settings-affected-ui1",
+  "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "desktop/src/react/__tests__/services/rust-settings.test.ts",
+    "desktop/src/react/__tests__/settings/api.test.ts",
+    "desktop/src/react/__tests__/settings/ProvidersTab.test.tsx",
+    "desktop/src/react/__tests__/settings/ModelWidget.test.tsx",
+    "desktop/src/react/__tests__/settings/ApiKeyCredentials.test.tsx",
+    "desktop/src/react/__tests__/settings/OAuthCredentials.test.tsx",
+    "desktop/src/react/__tests__/components/thinking-level-button.test.tsx",
+    "desktop/src/react/__tests__/services/chat-client.test.ts",
+    "--maxWorkers=2"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "PATH": "/Users/study_superior/.cargo/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/share/dotnet:/Users/study_superior/.codex/tmp/arg0-macos/codex-arg0vSRIw5:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/Users/study_superior/.lmstudio/bin:/Users/study_superior/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/study_superior/.lmstudio/bin",
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-18T06:04:57.879734+00:00",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "161b4c36b3f81de5e49aa6ace79a10cd9b0b043b413b9c455561901de7115f51",
+  "finalAcceptance": false,
+  "exitCode": 0,
+  "endedAt": "2026-10-18T06:05:04.658460+00:00",
+  "sourceFingerprintAfter": "161b4c36b3f81de5e49aa6ace79a10cd9b0b043b413b9c455561901de7115f51",
+  "log": "artifacts/rust-tauri/R07/T08/settings-affected-ui1.log",
+  "logSha256": "2594cc376fc1196389e12bc7e35df94c8ea31b55d2dab2e9bc547fcd8cc9149c",
+  "sourceUnchanged": true
+}

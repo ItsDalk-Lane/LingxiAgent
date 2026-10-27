@@ -1459,6 +1459,10 @@
     border-left: 3px solid var(--red, #b24a3b);
 }
 
+.settingsUpdateCardUnchanged {
+    border-left: 3px solid var(--text-secondary);
+}
+
 .settingsUpdateHeader {
     display: flex;
     align-items: center;

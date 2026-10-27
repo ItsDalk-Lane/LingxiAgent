@@ -1,0 +1,33 @@
+{
+  "reviewer": "r07_t08_final_review",
+  "reviewedAt": "2026-10-18T10:50:32.570038+00:00",
+  "finalAcceptance": "pending",
+  "scope": "原672564只读源审，不Cargo/改源；6个mock UI不代Rust通过。",
+  "readyManifestSha256": "f88e1edcbfb7b73d2cce6a8339ef660380cff7345afc7725f09a204573727c95",
+  "sourceBinding": "独立最初读取16个owned SHA全匹配；之后root已委派追加WS反例，当前只有r07_t08_mcp_session_permissions.rs已变化，不误报为冻结漂移。",
+  "sourcePositiveFindings": [
+    "完整原Principal/session/agent/unique target/exact capability/generation/review绑定；不是digest单次预算，不持久化。",
+    "仅UserSession Ask/UserRun/foreground的MCP Execute NeedsApproval可被grant放行；Denied/ReadOnly/Bridge/Subagent/Workflow不扩。",
+    "真实HTTP签发核sessions.write与owner/active/capability目录；桌面真实配对scope链同步，旧凭证和mobile默认不自动扩。",
+    "准备冻结grant id；派发前DB/凭证/生命周期复验，DB await后再核目录generation/callability/review。",
+    "归档/恢复/删除reclaim清表，shutdown封闭清空；weak auth/storage/management无恢复持久化。",
+    "UI真实approval capability与owner/selection绑定、先grant后单次approval，确认失败保留已授权事实。"
+  ],
+  "issues": [
+    {
+      "id": "MCP-SESSION-WS-FOREGROUND-NOT-WIRED",
+      "kind": "确定静态生产入口遗漏，待真实WS反例；root已确认安排复现。",
+      "cause": "flag仅execute_submission_with_parent置true；真实chat_wire WS prompt→execute_background_chat_for→execute_background_authorized_for默认false。后台任务实现不代表用户语义的后台来源。",
+      "impact": "HTTP execute正例不代ChatPage/Web/mobile的WS用户入口；其后续同会话不同参数不能消费grant。",
+      "minimum": "可信真实WS用户入口单独置前台标记，显式background_for/自动化/bridge/subagent保持false，实际WS第二次不同args无需待批。"
+    },
+    {
+      "id": "MCP-SESSION-GRANT-VS-RECLAIM-RACE",
+      "kind": "静态可行时序，未实跑未定影响。",
+      "cause": "grant_route await读取active row后才插入grant；reclaim只清现有项。若archive+restore在row读取后、插入前，旧在途grant可能越过两次清理再插入，created_at同值且后来active。",
+      "minimum": "实际签发时点与真实archive/restore交错核旧请求不能越代；考虑复用会话变更代次/串行门，不只清已存在条目。"
+    }
+  ],
+  "runtimeStatus": "原3个新Rust用例仍NOT_RUN；UI6只mock机制；没有本轮Rust通过声明。",
+  "scopeBoundary": "原app-tools15AD只R04不属408/35，不扩新session应用入口；原一次ApprovalService机制分离保留。"
+}

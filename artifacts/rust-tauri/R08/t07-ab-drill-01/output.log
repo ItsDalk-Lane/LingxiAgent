@@ -1,0 +1,24 @@
+PASS fixture gen
+PASS root-a prepared (knowledge integrity ok) :: ok
+PASS root-b migrated (T05 path)
+PASS kernel A (node) ready :: port=58859
+PASS kernel B (rust) ready :: 127.0.0.1:58873
+PASS suite ran on A (observations present) :: vitest exit=1
+PASS suite ran on B (observations present) :: vitest exit=1
+PASS [identity] parity
+FAIL [sessions.list] differs :: {"A":{"count":0,"titles":[],"pinned":0},"B":{"count":5,"titles":["子会话（fork）","损坏尾行会话","无边界会话","未知块会话","父会话"],"pinned":0}}
+FAIL [sessions.switch] A-failed :: {"A":"Cannot read properties of undefined (reading 'path')","B":{"switched":true,"messages":null}}
+FAIL [sessions.rename] A-failed :: {"A":"Cannot read properties of undefined (reading 'path')","B":{"ok":false,"persisted":false}}
+FAIL [sessions.pin] A-failed :: {"A":"Cannot read properties of undefined (reading 'path')","B":{"pinA":false,"pinB":false,"pinnedCount":0,"reorder":false,"reorderedReversed":true,"unpinA":false,"unpinB":false,"pinnedFinal":0}}
+FAIL [sessions.create] differs :: {"A":{"created":false,"delta":0},"B":{"created":false,"delta":0}}
+FAIL [sessions.archive] A-failed :: {"A":"Cannot read properties of undefined (reading 'path')","B":"Cannot read properties of undefined (reading 'path')"}
+PASS [sessions.maintenance] parity
+FAIL [sessions.capabilities] A-failed :: {"A":"Cannot read properties of undefined (reading 'path')","B":{"ok":false}}
+FAIL [sessions.todos] A-failed :: {"A":"Cannot read properties of undefined (reading 'path')","B":{"complete":false,"cancel":false,"dismiss":false}}
+PASS [permissions.default] parity
+PASS [preferences.appearance] parity
+PASS [error-path.unauthorized] parity
+PASS [error-path.not-found] parity
+FAIL [drift-guard] differs :: {"A":{"count":0,"titles":[]},"B":{"count":5,"titles":["子会话（fork）","损坏尾行会话","无边界会话","未知块会话","父会话"]}}
+AB_RESULT tasks=15 parity=6 differs=3 failedA=6 failedB=0 out=/private/tmp/t07-ab-drill-01/out
+T07 AB FAILURES: 9

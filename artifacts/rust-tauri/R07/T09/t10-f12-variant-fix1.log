@@ -1,0 +1,35 @@
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.94s
+     Running tests/r06_ar_f12_cache_consumers.rs (rust/target-r07/debug/deps/r06_ar_f12_cache_consumers-5a366210fbb47144)
+
+running 6 tests
+test deletion_cache_error_is_reported_and_source_original_remains ... ok
+test deletion_of_a_keeps_b_and_removes_all_a_versions ... ok
+test ingestion_future_schema_failure_keeps_new_index_status_and_reports_rejection ... ok
+test ingestion_normal_positive_keeps_pending_embedding_and_ready_fulltext ... ok
+test vector_ingestion_provider_failure_records_cleanup_version_rejection ... ok
+test vector_ingestion_future_write_rejection_retains_paid_batch_and_error_code ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.16s
+

@@ -1,0 +1,17 @@
+stderr | desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx > InterfaceTab appearance state > shows the first sidebar read failure and retries before enabling the control
+[settings] sidebar UI preferences load failed: Error: sidebar denied
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx:67:27
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx:15:40)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/InterfaceTab.tsx:181:5
+    at Object.react_stack_bottom_frame (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+    at runWithFiberInDEV (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+    at commitHookEffectListMount (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+    at commitHookPassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13336:11)
+    at commitPassiveMountOnFiber (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:15484:13)
+    at recursivelyTraversePassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:15439:11)
+
+stderr | desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx > InterfaceTab appearance state > loads and saves the undo-file-changes-on-rollback preference
+[settings] sidebar UI preferences load failed: Error: invalid sidebar preferences
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/InterfaceTab.tsx:185:123
+

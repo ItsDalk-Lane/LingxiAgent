@@ -9,7 +9,7 @@
  * - 其余历史目录 → applyFolder（cwd 形态）。
  */
 
-import { lingxiFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../services/service-client';
 import { useStore } from '../stores';
 import { applyFolder, applyStudioWorkspace, createLocalStudioWorkspaceFromFolder, removeRecentWorkspace, removeStudioWorkspace } from '../stores/desk-actions';
 import { countArchivedSessionsForWorkspace, disposeWorkspaceSessions } from '../stores/session-actions';
@@ -17,6 +17,7 @@ import { loadModels } from './ui-helpers';
 import type { Agent } from '../types';
 import { isSameWorkspacePath as isSamePath } from './agent-workspace';
 import { normalizeWorkspacePath } from '../../../../shared/workspace-history.ts';
+import { usePlatform } from '../hooks/use-platform';
 
 export function collectAgentHomeFolders(agents: Agent[]): string[] {
   const folders: string[] = [];
@@ -74,7 +75,7 @@ export async function applyWorkspaceHistoryFolder(agents: Agent[], currentAgentI
  * 同路径下若有被归档的对话，提示可在归档记录中找回（移除工作台即归档的恢复闭环）。
  */
 export async function browseAndApplyLocalWorkspace(): Promise<void> {
-  const folder = await window.platform?.selectFolder?.();
+  const folder = await usePlatform()?.selectFolder?.();
   if (!folder) return;
   const workspace = await createLocalStudioWorkspaceFromFolder(folder);
   if (!workspace) return;

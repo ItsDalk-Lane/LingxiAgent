@@ -1,0 +1,34 @@
+{
+ "label": "s1",
+ "unixMs": 1793032585686,
+ "app": [
+  {
+   "pid": 84242,
+   "ppid": 84237,
+   "pgid": 84237,
+   "command": "/private/tmp/lingxi-r09-t07/evidence-app-gate-v33-20261027-002322/Lingxi.app/Contents/MacOS/lingxi-resource-desktop"
+  }
+ ],
+ "services": [
+  {
+   "pid": 84243,
+   "ppid": 84242,
+   "pgid": 84243,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-84237-1793032583342/home-own-local"
+  }
+ ],
+ "allServices": [
+  {
+   "pid": 84240,
+   "ppid": 84237,
+   "pgid": 84237,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-84237-1793032583342/home-remote"
+  },
+  {
+   "pid": 84243,
+   "ppid": 84242,
+   "pgid": 84243,
+   "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/tmp/lingxi-r09-runtime/r09_t02_process_ownership-84237-1793032583342/home-own-local"
+  }
+ ]
+}

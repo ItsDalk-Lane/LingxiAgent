@@ -1,0 +1,38 @@
+{
+ "schema": "lingxi.r09.release-artifact-baseline.v1",
+ "app": "desktop/src-tauri/target/release/bundle/macos/Lingxi.app",
+ "capturedAtUnixMs": 1793024997853,
+ "treeSha256": "90a859549d153e0609cb948db441c2e619b08ea5df1a90f2b68d93c8bc1a7e03",
+ "files": {
+  "Contents/Info.plist": {
+   "sha256": "abaea266c11e4d1b3c723746c9166d9f617c424b42c5bedc1b7afb71f42f6b42",
+   "size": 975,
+   "mtimeNs": 1793024935210870061
+  },
+  "Contents/MacOS/lingxi-resource-desktop": {
+   "sha256": "80ba4742446e33166ec0c4d2719477fd79f528eddd39b8995d0ffce61fa6dbbb",
+   "size": 57356992,
+   "mtimeNs": 1793024935566551646
+  },
+  "Contents/MacOS/lingxi-service": {
+   "sha256": "55d6edb15cb9e7e075c2845c75a2eaabdd8de463992afdbde2959361cc88a26d",
+   "size": 98056496,
+   "mtimeNs": 1793024935399437014
+  },
+  "Contents/Resources/Lingxi.icns": {
+   "sha256": "0951f493d51b3537f2b5826d45e117bba1ead1802c38658e2c0ebb1d7706b4d3",
+   "size": 8709,
+   "mtimeNs": 1793024935210725394
+  },
+  "Contents/Resources/rust-service/build.json": {
+   "sha256": "bb73f7f2df49f0bd6b1f776db6dfe7e60a9c6276f13a5eaa0bc3d15d33eca8d3",
+   "size": 738,
+   "mtimeNs": 1793024914422643218
+  },
+  "Contents/_CodeSignature/CodeResources": {
+   "sha256": "c6c18b9822f317945788dac862d7c3f70cbceab1cfcafa918943fc85fff505ec",
+   "size": 2920,
+   "mtimeNs": 1793024935525736180
+  }
+ }
+}

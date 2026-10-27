@@ -1,0 +1,70 @@
+{
+  "models": {},
+  "network": {
+    "proxy": {
+      "mode": "direct"
+    }
+  },
+  "providers": {
+    "fixture": {
+      "auth": {
+        "kind": "none"
+      },
+      "endpoint": "http://127.0.0.1:9/v1",
+      "metadata": {
+        "ordinaryProvider": {
+          "keep": true
+        }
+      },
+      "models": [
+        {
+          "extension": {
+            "access_token": "********",
+            "access_tokenLabel": "普通显示字段",
+            "api_key": "********",
+            "api_keys": {
+              "nested": "********"
+            },
+            "headers": {
+              "X-Synthetic": "********"
+            },
+            "ordinary": {
+              "keep": true,
+              "label": "alpha"
+            },
+            "refresh_token": "********",
+            "threshold": 19
+          },
+          "id": "alpha",
+          "inputs": [
+            "text"
+          ]
+        },
+        {
+          "extension": {
+            "access_token": "********",
+            "access_tokenLabel": "普通显示字段",
+            "api_key": "********",
+            "api_keys": {
+              "nested": "********"
+            },
+            "headers": {
+              "X-Synthetic": "********"
+            },
+            "ordinary": {
+              "keep": true,
+              "label": "beta"
+            },
+            "refresh_token": "********",
+            "threshold": 19
+          },
+          "id": "beta",
+          "inputs": [
+            "text"
+          ]
+        }
+      ],
+      "protocol": "openai-completions"
+    }
+  }
+}

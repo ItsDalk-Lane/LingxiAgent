@@ -1,0 +1,12 @@
+Executable=/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/release/bundle/macos/Lingxi.app/Contents/MacOS/lingxi-resource-desktop
+Identifier=com.lingxi.app
+Format=app bundle with Mach-O thin (arm64)
+CodeDirectory v=20500 size=116495 flags=0x10002(adhoc,runtime) hashes=3634+3 location=embedded
+Signature=adhoc
+Info.plist entries=16
+TeamIdentifier=not set
+Runtime Version=27.0.0
+Sealed Resources version=2 rules=13 files=3
+Internal requirements count=0 size=12
+Total signatures=1
+Chosen signature=1

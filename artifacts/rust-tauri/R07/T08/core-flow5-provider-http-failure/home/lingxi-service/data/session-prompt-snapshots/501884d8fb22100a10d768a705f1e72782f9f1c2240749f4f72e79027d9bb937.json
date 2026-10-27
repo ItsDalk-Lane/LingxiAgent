@@ -1,0 +1,24 @@
+{
+  "promptSnapshot": null,
+  "runId": "run_000001a14d89276a_000010",
+  "sessionId": "settings-default-model-consumer",
+  "stage": "prepared_model_call",
+  "toolNames": [
+    "automation",
+    "browser",
+    "channel",
+    "dm",
+    "jian_update_status",
+    "mcp_call",
+    "mcp_describe_tool",
+    "mcp_search_tools",
+    "notify",
+    "patrol_update_log",
+    "read",
+    "update_settings",
+    "web_fetch",
+    "web_search"
+  ],
+  "turn": 2,
+  "version": 1
+}

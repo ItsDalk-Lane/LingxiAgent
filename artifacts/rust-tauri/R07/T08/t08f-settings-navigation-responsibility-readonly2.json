@@ -1,0 +1,607 @@
+{
+  "schema": "r07-t08-settings-navigation-responsibility-readonly-v2",
+  "createdAt": "2026-10-18T09:39:14.248134+00:00",
+  "scope": "冻结f只读后续方案；未实施、无Cargo、原账未改",
+  "supersedesRecommendationsOf": "t08f-settings-navigation-readonly1.json（保留其源码事实；撤回仅因未接就建议把defer/bulk/检查点控件禁用递延的建议）",
+  "source35": {
+    "path": "artifacts/rust-tauri/R07/T12/35-handoff-source-resolved-20261018.json",
+    "sha256": "a30b97a2dbeb1b3012632abbf725ee65c9e67ef0e212502077b5dcb3d6a83317",
+    "selectedItems": 20,
+    "originalAssertionsCopied": 47
+  },
+  "responsibilityCorrection": [
+    "35继承项已包含R07全部408内。相关MCP19叶/43断言及Security1叶/4断言的原文在下方镜像，不另立可自动延期范围。",
+    "T08的D10/D21共109叶之外，设置容器和MCP九动作仍需核对应继承责任；不能只因九枚举没有某动作就宣称非T08。",
+    "MCP state按Agent+内置defer、全局defer三字段单项合并、批量全输入预校验与逐项实际启动结果，均有明确原责任，不允许仅禁用后推T11。",
+    "Security真实备份列表同属35明确动作；仅保留proxy并隐藏列表不能当整个设置页完成。",
+    "OAuth启动/轮询/取消/登出及资源/apps/session授权也在35原文中。已明确账号/未实现transport边界仍应单列未验/受限，不能把原正例要求改为拒绝即通过；本地自有外端能实现验证的须继续执行。",
+    "后续T11可复核插件生命周期，但不自动免除上述R07当前到期责任。"
+  ],
+  "originalItems": [
+    {
+      "id": "R00-T02-LA-2D194C1684BC",
+      "featureId": "F-D03-ROUTE_BEHAVIOR-BEHAVIOR-MCP-CONNECTORS-ID-DELETE-2D194C",
+      "featureStageIds": [
+        "R04"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "originalTaskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "given": "该入口所需目标、身份和数据已准备",
+      "when": "用户删除 MCP 连接器",
+      "then": "连接器配置及运行状态移除，返回删除结果或错误",
+      "assertions": [
+        "执行“删除 MCP 连接器”后核对：连接器配置及运行状态移除，返回删除结果或错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+      "r07MapExactMirror": true,
+      "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+    },
+    {
+      "id": "R00-T02-LA-E1FBE1A59BC6",
+      "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-APPS-MCP-E1FBE1",
+      "featureStageIds": [
+        "R04"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "originalTaskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+      "when": "用户查看 MCP 应用列表",
+      "then": "返回 MCP 应用及连接器状态；未初始化返回 503",
+      "assertions": [
+        "给定目标与相应权限，执行“查看 MCP 应用列表”后核对：返回 MCP 应用及连接器状态；未初始化返回 503",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+      "r07MapExactMirror": true,
+      "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+    },
+    {
+      "id": "R00-T02-LA-04A6A2BD1547",
+      "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-RESOURCES-04A6A2",
+      "featureStageIds": [
+        "R04"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "originalTaskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+      "when": "用户读取连接器资源",
+      "then": "按 uri 返回连接器资源内容；缺 uri 或无内容拒绝",
+      "assertions": [
+        "给定目标与相应权限，执行“读取连接器资源”后核对：按 uri 返回连接器资源内容；缺 uri 或无内容拒绝",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+      "r07MapExactMirror": true,
+      "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+    },
+    {
+      "id": "R00-T02-LA-DD47275AC5AE",
+      "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-STATE-MCP-DD4727",
+      "featureStageIds": [
+        "R04"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "originalTaskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+      "when": "用户查看 MCP 连接状态",
+      "then": "按 agent 配置返回连接器状态并合入内置工具延迟加载开关",
+      "assertions": [
+        "给定目标与相应权限，执行“查看 MCP 连接状态”后核对：按 agent 配置返回连接器状态并合入内置工具延迟加载开关",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+      "r07MapExactMirror": true,
+      "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+    },
+    {
+      "id": "R00-T02-LA-0199B843D759",
+      "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-MCP-0199B8",
+      "featureStageIds": [
+        "R04"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "originalTaskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+      "when": "用户添加 MCP 连接器",
+      "then": "保存一个连接器并异步启动，返回公开配置与当下状态；启动失败留在连接器错误状态",
+      "assertions": [
+        "给定目标与相应权限，执行“添加 MCP 连接器”后核对：保存一个连接器并异步启动，返回公开配置与当下状态；启动失败留在连接器错误状态",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+      "r07MapExactMirror": true,
+      "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+    },
+    {
+      "id": "R00-T02-LA-7FF8D4E48BC9",
+      "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-APPS-TOOLNAME--7FF8D4",
+      "featureStageIds": [
+        "R04"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "originalTaskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+      "when": "用户启动连接器应用",
+      "then": "把 launchInput 交给指定连接器工具，返回启动结果或错误",
+      "assertions": [
+        "给定目标与相应权限，执行“启动连接器应用”后核对：把 launchInput 交给指定连接器工具，返回启动结果或错误",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+      "r07MapExactMirror": true,
+      "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+    },
+    {
+      "id": "R00-T02-LA-E7F852F9BF60",
+      "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-OAUTH-CANCEL-O-E7F852",
+      "featureStageIds": [
+        "R04"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "originalTaskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+      "when": "用户取消连接器 OAuth 等待",
+      "then": "结束尚在等待的浏览器往返，已保存凭证不变",
+      "assertions": [
+        "给定目标与相应权限，执行“取消连接器 OAuth 等待”后核对：结束尚在等待的浏览器往返，已保存凭证不变",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+      "r07MapExactMirror": true,
+      "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+    },
+    {
+      "id": "R00-T02-LA-C70E819F8DA4",
+      "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-OAUTH-LOGOUT-O-C70E81",
+      "featureStageIds": [
+        "R04"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "originalTaskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+      "when": "用户退出连接器 OAuth",
+      "then": "清除连接器 OAuth 凭证并返回公开状态",
+      "assertions": [
+        "给定目标与相应权限，执行“退出连接器 OAuth”后核对：清除连接器 OAuth 凭证并返回公开状态",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+      "r07MapExactMirror": true,
+      "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+    },
+    {
+      "id": "R00-T02-LA-2DA782C5C7B9",
+      "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-OAUTH-START-OA-2DA782",
+      "featureStageIds": [
+        "R04"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "originalTaskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+      "when": "用户启动连接器 OAuth 登录",
+      "then": "生成授权流程并返回浏览器所需资料，后续回调及轮询作内部步骤",
+      "assertions": [
+        "给定目标与相应权限，执行“启动连接器 OAuth 登录”后核对：生成授权流程并返回浏览器所需资料，后续回调及轮询作内部步骤",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+      "r07MapExactMirror": true,
+      "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+    },
+    {
+      "id": "R00-T02-LA-21B3F4DC9140",
+      "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-REFRESH-TOOLS-21B3F4",
+      "featureStageIds": [
+        "R04"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "originalTaskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+      "when": "用户刷新连接器工具",
+      "then": "重新读取指定连接器工具目录并返回状态",
+      "assertions": [
+        "给定目标与相应权限，执行“刷新连接器工具”后核对：重新读取指定连接器工具目录并返回状态",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+      "r07MapExactMirror": true,
+      "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+    },
+    {
+      "id": "R00-T02-LA-18EFB2D9D5FD",
+      "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-START-18EFB2",
+      "featureStageIds": [
+        "R04"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "originalTaskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+      "when": "用户启动连接器",
+      "then": "启动指定连接器，返回新运行状态或错误",
+      "assertions": [
+        "给定目标与相应权限，执行“启动连接器”后核对：启动指定连接器，返回新运行状态或错误",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+      "r07MapExactMirror": true,
+      "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+    },
+    {
+      "id": "R00-T02-LA-E9C7A48CADC4",
+      "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-ID-STOP-E9C7A4",
+      "featureStageIds": [
+        "R04"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "originalTaskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+      "when": "用户停止连接器",
+      "then": "停止指定连接器，返回新运行状态或错误",
+      "assertions": [
+        "给定目标与相应权限，执行“停止连接器”后核对：停止指定连接器，返回新运行状态或错误",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+      "r07MapExactMirror": true,
+      "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+    },
+    {
+      "id": "R00-T02-LA-48B0C7A7453E",
+      "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-CONNECTORS-BULK-48B0C7",
+      "featureStageIds": [
+        "R04"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "originalTaskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+      "when": "用户批量导入连接器",
+      "then": "先校验全部输入再写入；坏行拒绝整批，成功项异步启动并逐项回报",
+      "assertions": [
+        "给定目标与相应权限，执行“批量导入连接器”后核对：先校验全部输入再写入；坏行拒绝整批，成功项异步启动并逐项回报",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+      "r07MapExactMirror": true,
+      "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+    },
+    {
+      "id": "R00-T02-LA-67256417FB2B",
+      "featureId": "F-D03-ROUTE_BEHAVIOR-BEHAVIOR-MCP-SESSION-PERMISSIONS-POST-672564",
+      "featureStageIds": [
+        "R04"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "originalTaskIds": [
+        "R04-T03"
+      ],
+      "given": "该入口所需目标、身份和数据已准备",
+      "when": "用户批准当前会话的一次 MCP 工具能力",
+      "then": "校验会话与 sessions.write 范围后，仅在本次会话内放行指定 capability；不持久化",
+      "assertions": [
+        "执行“批准当前会话的一次 MCP 工具能力”后核对：校验会话与 sessions.write 范围后，仅在本次会话内放行指定 capability；不持久化",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+      "r07MapExactMirror": true,
+      "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+    },
+    {
+      "id": "R00-T02-LA-240E200EF440",
+      "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-AGENTS-AGENTID-CONNECTORS-ID-240E20",
+      "featureStageIds": [
+        "R04"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "originalTaskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+      "when": "用户设置指定 Agent 的连接器",
+      "then": "更新该 Agent 对连接器的配置并返回配置",
+      "assertions": [
+        "给定目标与相应权限，执行“设置指定 Agent 的连接器”后核对：更新该 Agent 对连接器的配置并返回配置",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+      "r07MapExactMirror": true,
+      "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+    },
+    {
+      "id": "R00-T02-LA-F4DA2AFCB72B",
+      "featureId": "F-D03-ROUTE_BEHAVIOR-BEHAVIOR-MCP-CONNECTORS-ID-PUT-F4DA2A",
+      "featureStageIds": [
+        "R04"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "originalTaskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "given": "该入口所需目标、身份和数据已准备",
+      "when": "用户修改 MCP 连接器",
+      "then": "连接器配置更新，返回更新结果或错误",
+      "assertions": [
+        "执行“修改 MCP 连接器”后核对：连接器配置更新，返回更新结果或错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+      "r07MapExactMirror": true,
+      "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+    },
+    {
+      "id": "R00-T02-LA-FAE7503D0D0F",
+      "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-ENABLED-MCP-FAE750",
+      "featureStageIds": [
+        "R04"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "originalTaskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+      "when": "用户开关 MCP 全局连接",
+      "then": "enabled true 启用、其他值停用，返回合并后的连接状态",
+      "assertions": [
+        "给定目标与相应权限，执行“开关 MCP 全局连接”后核对：enabled true 启用、其他值停用，返回合并后的连接状态",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+      "r07MapExactMirror": true,
+      "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+    },
+    {
+      "id": "R00-T02-LA-BB1BB3A9C5F4",
+      "featureId": "F-D03-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MCP-SETTINGS-DEFER-MCP-BB1BB3",
+      "featureStageIds": [
+        "R04"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "originalTaskIds": [
+        "R04-T02",
+        "R04-T07"
+      ],
+      "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+      "when": "用户设置 MCP 工具延迟加载",
+      "then": "独立更新 deferEnabled、deferThreshold、builtinDeferEnabled 中实际提供的字段，返回新状态",
+      "assertions": [
+        "给定目标与相应权限，执行“设置 MCP 工具延迟加载”后核对：独立更新 deferEnabled、deferThreshold、builtinDeferEnabled 中实际提供的字段，返回新状态",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+      "r07MapExactMirror": true,
+      "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+    },
+    {
+      "id": "R00-T02-LA-B4BB2438E855",
+      "featureId": "F-D03-UI-UI-SETTINGS-MCP-B4BB24",
+      "featureStageIds": [
+        "R04"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "originalTaskIds": [
+        "R04-T01",
+        "R04-T02"
+      ],
+      "given": "打开 ui:settings:mcp，准备成功、空态或未初始化、失败或无权限样本",
+      "when": "逐一执行 UI 动作矩阵记录的自动加载与可见控件",
+      "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+      "assertions": [
+        "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+        "自动读取连接器状态与工具权限：成功核对 连接器列表、状态、工具与权限显示；空态/未初始化核对 无连接器显示添加入口；错误/无权限核对 连接器或权限读取失败仅 console.error，保留旧状态，无专门错误态或 toast。",
+        "全局启停与延迟工具加载：成功核对 总开关及延迟阈值保存；成功后有 agentId 时重读连接器状态与工具权限。；空态/未初始化核对 无连接器时仍可切总开关；无 agentId 时不发 state GET。；错误/无权限核对 失败恢复旧配置",
+        "添加连接器、批量导入：成功核对 新连接器出现，批量结果逐项反馈；成功后有 agentId 时重读连接器状态与工具权限。；空态/未初始化核对 空表单不可提交；无 agentId 时不发 state GET。；错误/无权限核对 批量可部分成功，不能用全成功 toast",
+        "编辑/删除连接器与启动/停止/刷新工具：成功核对 连接状态和目录更新；成功后有 agentId 时重读连接器状态与工具权限。；空态/未初始化核对 删除需确认；停用不清凭据；无 agentId 时不发 state GET。；错误/无权限核对 失败显示错误且保留连接器",
+        "按助手启停连接器、设置工具权限/置顶：成功核对 当前助手允许工具和排序更新；成功后有 agentId 时重读连接器状态与工具权限。；空态/未初始化核对 无工具显示空目录；无 agentId 时不发 state GET。；错误/无权限核对 保存失败不伪造授权",
+        "OAuth 登录、取消、退出：成功核对 登录轮询返回 done 后刷新连接器并显示保存成功；退出接口成功后经统一 run 刷新并显示成功。；成功后有 agentId 时重读连接器状态与工具权限。；OAuth 授权 URL 成功返回后打开外链并轮询，完成/退出后重读状态；取消仅 POST cancel。；桌面 platform.openExternal 走 IPC，Web/mobile 使用浏览器 window.open。；空态/未初始化核对 未登录显示登录入口；等待中可点击取消，取消请求后关闭等待卡。；无 agentId 时不发 state GET。；错误/无权限核对 启动、轮询 error/超时或取消请求失败按各自 catch 显示错误；外链打开未等待，拒绝不会进入登录 catch，仍继续轮询；轮询 cancelled 直接返回，connectOAuth 随后仍刷新并可能显示保存成功，不能将取消断言为安静退出。；启动失败不打开外链；取消分支不因取消本身重读 state。；取消本身不直接重读，但在途轮询若回到 cancelled 并正常结束，登录回调仍可能间接 loadState，需按并发结果验。"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+      "r07MapExactMirror": true,
+      "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+    },
+    {
+      "id": "R00-T02-LA-DA5AD5C40098",
+      "featureId": "F-D04-UI-UI-SETTINGS-SECURITY-DA5AD5",
+      "featureStageIds": [
+        "R04"
+      ],
+      "executionStageIds": [
+        "R04",
+        "R07",
+        "R08"
+      ],
+      "originalTaskIds": [
+        "R04-T03",
+        "R04-T06"
+      ],
+      "given": "打开 ui:settings:security，准备成功、空态或未初始化、失败或无权限样本",
+      "when": "逐一执行 UI 动作矩阵记录的自动加载与可见控件",
+      "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+      "assertions": [
+        "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+        "沙箱及沙箱网络开关：成功核对 两个开关通过每助手配置接口写入全局 preferences；适用保存路径后重读当前助手合成配置视图。；经 autoSaveConfig 的保存成功后立即重读助手 config 快照。；空态/未初始化核对 sandbox 状态尚未初始化时为 undefined/loading；只有显式 false 时显示关闭警告，不把未加载当关闭。；无 agentId/resourceKey 时 loadSettingsConfig 不请求；经验未启用时不 GET experience。；错误/无权限核对 保存失败恢复开关；各项 GET 失败应与前序保存结果分开判断。；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；该控件请求每助手 config 接口，但所涉字段由服务端归入全局 preferences；PUT 成功但后续 config GET 失败时可能显示保存失败，实际写入可能已生效。",
+        "检查点保留策略、展开备份列表：成功核对 保留天数与检查点列表显示；适用保存路径后重读当前助手合成配置视图。；经 autoSaveConfig 的保存成功后立即重读助手 config 快照。；空态/未初始化核对 无检查点显示空列表；无 agentId/resourceKey 时 loadSettingsConfig 不请求；经验未启用时不 GET experience。；错误/无权限核对 检查点列表 GET 失败直接设为空数组且无警告；页面可能呈假空态，不能要求显示读取错误。；各项 GET 失败应与前序保存结果分开判断。；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；该控件请求每助手 config 接口，但所涉字段由服务端归入全局 preferences；PUT 成功但后续 config GET 失败时可能显示保存失败，实际写入可能已生效。",
+        "网络代理模式及 HTTP/HTTPS/WS/WSS/noProxy 字段保存：成功核对 proxy 模式和 HTTP/HTTPS/WS/WSS/noProxy 通过每助手配置接口写入全局 preferences并通知运行时。；代理配置保存成功后广播 network-proxy-changed，IPC 应用失败仅记录日志，桌面壳据事件更新对应状态。；适用保存路径后重读当前助手合成配置视图。；经 autoSaveConfig 的保存成功后立即重读助手 config 快照。；空态/未初始化核对 系统代理或直连模式字段禁用；无 agentId/resourceKey 时 loadSettingsConfig 不请求；经验未启用时不 GET experience。；错误/无权限核对 失败提示并保留草稿；通知失败或保存失败不能冒充目标配置已完成。；各项 GET 失败应与前序保存结果分开判断。；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；该控件请求每助手 config 接口，但所涉字段由服务端归入全局 preferences；PUT 成功但后续 config GET 失败时可能显示保存失败，实际写入可能已生效。"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "originalSpecStatus": "SPECIFIED_NOT_EXECUTED",
+      "r07MapExactMirror": true,
+      "traceVerification": "NOT_EVALUATED_BY_THIS_TRACE"
+    }
+  ],
+  "minimumImplementationAfterFreezeClosure": {
+    "routes": [
+      "在rustSettingsRoute增加已注册HTTP精确映射：quick-chat/notifications、media与speech-recognition、sessions/workspace-rollback。",
+      "sidebar-ui/keybindings缺Rust端点，应沿既有MemoryService/全局唯一写锁与消费者事件补实际GET/PUT；不映射到不存在地址。",
+      "MCP现mcp-api按Rust连接分支使用正式McpSettingsRequest；backend同manager接窄动作，不保留能绕管理者的旧写链。"
+    ],
+    "mcp": [
+      "补安全公开state：显式Agent读取并返回agentConfig；状态和工具从真实SDK registry，必要非秘密配置保留可编辑字段；env/headers/OAuth材料按既有秘密规则遮盖。",
+      "原九动作调用与真实settingsUpdate状态消费；添加返回真实新ID，后续不能按UI猜ID。",
+      "新增必要的defer/原子batch请求DTO与manager同锁写发布，未知字段保留/撤权重核/错误saved-runtimeApplied事实延续；定义及生成golden/使用方同步。",
+      "OAuth及remote身份按既有真实能力核查复用；不得把未知provider目录或任意Origin作为可借凭证通路；原边界未实现需明确剩余正例责任，不领通过。"
+    ],
+    "containerRoot": [
+      "明确已接tab清单与真实连接失败状态分离；首次真实身份/快照成功后开放，restart重新验证；不能只清false启用所有页。",
+      "所有导航正例从SettingsContent真实点击；冷启/重启/断开/身份错/无权负例保留拒绝。",
+      "纯本地sharing/about不被错误总闸永久遮挡，宿主能力不存在时真实禁用，不假成功。"
+    ],
+    "futureStageSpecific": [
+      "usage现役ModelObservatory确属R07-T10，不能因开放Settings根就声称现代观测API可用。",
+      "envdeps未发现对应Rust API，外围清账归属需按原叶逐项核实；不在本次只读报告中擅自修改责任阶段。",
+      "CLI/手机/LAN能力T09、插件更替生命周期T11、其它OS/账号R10及最终清账T12的原边界保持。"
+    ]
+  },
+  "suggestedIndependentEditBoundaries": {
+    "thisAgentAfterRootAuthorization": [
+      "desktop/src/react/services/rust-settings.ts（精确已接路由）",
+      "desktop/src/react/settings/tabs/mcp/mcp-api.ts及必要相关类型/窄功能显示",
+      "rust/crates/lingxi-service/src/mcp_settings.rs（同管理者state/必要已有语义动作）",
+      "rust/crates/lingxi-protocol/src/mcp_settings.rs（必要统一DTO；生成由root唯一执行）"
+    ],
+    "root": [
+      "SettingsContent容器/冷启重启/完整导航实链测试",
+      "global prefs新的必要专用端点与lib/Auth注册协调"
+    ],
+    "planning": [
+      "Skills两个旧错误/部分失败页面及真实验证"
+    ]
+  },
+  "status": "READ_ONLY_DESIGN_NOT_IMPLEMENTED"
+}

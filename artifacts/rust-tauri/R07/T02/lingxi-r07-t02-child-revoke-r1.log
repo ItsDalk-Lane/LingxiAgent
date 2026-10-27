@@ -1,0 +1,28 @@
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0308]: mismatched types
+   --> crates/lingxi-service/src/bridge.rs:370:225
+    |
+370 | ...lf.status(state,connector,match status {BridgeConnectionStatus::Connecting=>"connecting",BridgeConnectionStatus::Connected=>"connected",BridgeConnectionStatus::Disconnected=>"disconnected"},error.as_deref());
+    |       ------ arguments to this method are incorrect                                                                                                                                              ^^^^^^^^^^^^^^^^ expected `Option<String>`, found `Option<&str>`
+    |
+    = note: expected enum `std::option::Option<std::string::String>`
+               found enum `std::option::Option<&str>`
+note: method defined here
+   --> crates/lingxi-service/src/bridge.rs:62:8
+    |
+ 62 |     fn status(
+    |        ^^^^^^
+...
+ 67 |         error: Option<String>,
+    |         ---------------------
+help: try removing the method call
+    |
+370 -                                 self.status(state,connector,match status {BridgeConnectionStatus::Connecting=>"connecting",BridgeConnectionStatus::Connected=>"connected",BridgeConnectionStatus::Disconnected=>"disconnected"},error.as_deref());
+370 +                                 self.status(state,connector,match status {BridgeConnectionStatus::Connecting=>"connecting",BridgeConnectionStatus::Connected=>"connected",BridgeConnectionStatus::Disconnected=>"disconnected"},error);
+    |
+
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `lingxi-service` (lib test) due to 1 previous error

@@ -1,0 +1,17 @@
+{
+ "schema": "lingxi.r08.ab-cases.v1",
+ "cases": {
+  "ab::sessions.list.count": 1,
+  "ab::sessions.list.parity": 1,
+  "ab::sessions.rename.ok": 1,
+  "ab::sessions.rename.persisted": 1,
+  "ab::sessions.pin.pin": 1,
+  "ab::sessions.pin.unpin": 1,
+  "ab::sessions.todos.complete": 1,
+  "ab::sessions.todos.cancel": 1,
+  "ab::sessions.todos.dismiss": 1,
+  "ab::sessions.maintenance.cleanup": 1,
+  "ab::sessions.maintenance.sweep": 1,
+  "ab::permissions.default.parity": 1
+ }
+}

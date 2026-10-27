@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "candidate": "t07d",
+  "status": "TARGETED_CHECKS_FAILED_ADAPTER_NOT_FINAL_ACCEPTANCE",
+  "stageStatus": "T07_IN_PROGRESS_T08_IMPLEMENTING_WITH_T12_HANDOFF",
+  "sourceFiles": 543,
+  "sourceFingerprint": "634e0efbe15e772f31be34b61d79bfbefa2957b1b3572af1b63e28a10f95c804",
+  "archiveSha256": "f16fcf9f9998b64ac31978e747838b03043050a347b93a6b97f80606c228c31b",
+  "gateSummary": {
+    "scope": "6 targeted checks plus UI, not whole R07/T07 full gate rerun",
+    "total": 7,
+    "exitZero": 6,
+    "adapterExitCode": 101
+  },
+  "gates": [
+    {
+      "name": "fmt",
+      "record": "artifacts/rust-tauri/R07/T07/t07d-fmt.json",
+      "exitCode": 0,
+      "sourceFingerprint": "634e0efbe15e772f31be34b61d79bfbefa2957b1b3572af1b63e28a10f95c804",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07d-fmt.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "finalAcceptance": false
+    },
+    {
+      "name": "clippy",
+      "record": "artifacts/rust-tauri/R07/T07/t07d-clippy.json",
+      "exitCode": 0,
+      "sourceFingerprint": "634e0efbe15e772f31be34b61d79bfbefa2957b1b3572af1b63e28a10f95c804",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07d-clippy.log",
+      "logSha256": "601835bf38301ab4e03cc30ee9199cd84c5d41a00ce4894d1c629e9746f1022d",
+      "finalAcceptance": false
+    },
+    {
+      "name": "adapter",
+      "record": "artifacts/rust-tauri/R07/T07/t07d-adapter.json",
+      "exitCode": 101,
+      "sourceFingerprint": "634e0efbe15e772f31be34b61d79bfbefa2957b1b3572af1b63e28a10f95c804",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07d-adapter.log",
+      "logSha256": "3e7bcba0459ca48c19267a3386f0114edaeecea8af636c2474d9aaf5b9bd25d3",
+      "finalAcceptance": false
+    },
+    {
+      "name": "affected-service",
+      "record": "artifacts/rust-tauri/R07/T07/t07d-affected-service.json",
+      "exitCode": 0,
+      "sourceFingerprint": "634e0efbe15e772f31be34b61d79bfbefa2957b1b3572af1b63e28a10f95c804",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07d-affected-service.log",
+      "logSha256": "7dface6df82bd7ec257f548ca50fe0c76bcec8dc5b21b67d4ea2c7b6df690e34",
+      "finalAcceptance": false
+    },
+    {
+      "name": "browser-headless",
+      "record": "artifacts/rust-tauri/R07/T07/t07d-browser-headless.json",
+      "exitCode": 0,
+      "sourceFingerprint": "634e0efbe15e772f31be34b61d79bfbefa2957b1b3572af1b63e28a10f95c804",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07d-browser-headless.log",
+      "logSha256": "7231f270cd7b5ccabe39cd170d5fdee14e9ce52ba92610c520cfe027862e8419",
+      "finalAcceptance": false
+    },
+    {
+      "name": "build",
+      "record": "artifacts/rust-tauri/R07/T07/t07d-build.json",
+      "exitCode": 0,
+      "sourceFingerprint": "634e0efbe15e772f31be34b61d79bfbefa2957b1b3572af1b63e28a10f95c804",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07d-build.log",
+      "logSha256": "2c7435ea3b4477a1f0f4e5ed2af932dec5c23e49bb5833ba9b70ddee2c7e205b",
+      "finalAcceptance": false
+    },
+    {
+      "name": "ui",
+      "record": "artifacts/rust-tauri/R07/T07/t07d-ui.json",
+      "exitCode": 0,
+      "sourceFingerprint": "634e0efbe15e772f31be34b61d79bfbefa2957b1b3572af1b63e28a10f95c804",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07d-ui.log",
+      "logSha256": "7baac0397b74cbb85d84de351063856b9bb8530713cd3e7cf118b6920f00cdfd",
+      "finalAcceptance": false
+    }
+  ],
+  "ui": {
+    "passed": 495,
+    "suites": 21,
+    "exitCode": 0,
+    "binaryBinding": "artifacts/rust-tauri/R07/T07/t07d-ui-binary-binding.json",
+    "binarySha256": "b9f4967953ebac9948bd2eadb0365a793534022134455ebf04b4a49115d294ac",
+    "binaryUnchanged": true,
+    "buildAndUiReceiptHashesMatch": true
+  },
+  "failure": {
+    "testId": "independent_persistent_profiles_auxiliary_locale_and_site_data_cleanup",
+    "action": "Resume after accept_cookies=false",
+    "code": "browser_navigation",
+    "effectUnknown": false,
+    "specificErrorText": "LOST_BY_EXISTING_ERROR_MAPPING",
+    "cause": "UNDETERMINED",
+    "diagnosis": "artifacts/rust-tauri/R07/T07/independent-t07d-resume-cookie-diagnosis.json",
+    "diagnosisSha256": "21ca3c8c8491a784523c52791589fcb522e99468e08623b22ca1cc6120285fa1",
+    "retainedOriginalScene": {
+      "directory": "artifacts/rust-tauri/R07/T07/resume-cookie-diagnosis-t07d",
+      "adapterLogSha256": "3e7bcba0459ca48c19267a3386f0114edaeecea8af636c2474d9aaf5b9bd25d3",
+      "profileArchiveSha256": "d0cea619711194c8feccc10da0e56789d6763b0af75b01b8ad27d6a1de111158",
+      "manifestSha256": "8791ea9c37c21acd2948caa4b489612ac83f8dd0f7488a70694dd0c526af407c"
+    },
+    "boundary": "D失败与C popup browser_closed不能断言同源；历史失败不改，不用后续部分通过领整项通过。"
+  },
+  "diagnosticBoundary": "最新独立诊断文件属于冻结后取证说明，不属于D源码候选或门禁；不把它们作为候选运行代码。",
+  "t07Disposition": {
+    "serviceC": {
+      "passed": 1080,
+      "failed": 0
+    },
+    "uiCAndD": {
+      "passed": 495,
+      "suites": 21
+    },
+    "fullGateAcceptance": "NOT_PASSED",
+    "current65Leaves": "NOT_RUN",
+    "inherited22Leaves": "PASS_LOCAL_T03_SEPARATE",
+    "remainingBrowser": "交T12复查，保留原失败；进入T08不表示T07整项通过。"
+  },
+  "next": "T08按授权开始IMPLEMENTING，浏览器C/D尚未定位的失败与错误保真取证作为T12明确交接；不更改任何原回执。",
+  "recordedAt": "2026-10-18T03:45:47.001999+00:00"
+}

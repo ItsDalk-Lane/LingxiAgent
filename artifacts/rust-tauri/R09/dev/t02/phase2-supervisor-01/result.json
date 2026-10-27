@@ -1,0 +1,94 @@
+{
+ "schema": "lingxi.r09.suite-receipt.v1",
+ "suite": "r09_t02_supervisor_ready",
+ "status": "FAIL",
+ "exitCode": 2,
+ "durationSecs": 38.487,
+ "caseCount": 11,
+ "casesSha256": "4aae38fc6147b4c70711266a91490aa1cde83fcd7d68ecc77a8e7faddd9de681",
+ "commands": [
+  {
+   "id": "debug-renderer-build",
+   "argv": [
+    "npm",
+    "run",
+    "build:renderer"
+   ],
+   "exitCode": 0,
+   "durationSecs": 7.297,
+   "logSha256": "0e5e8407a783323799fd97cb2d9846b24feb9e899dbef291e7b4424a589c0639"
+  },
+  {
+   "id": "debug-theme-build",
+   "argv": [
+    "npm",
+    "run",
+    "build:theme"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.23,
+   "logSha256": "1a4127801c2f125703aac2b731b9be08fd8db6edc7b28cd73b31a76b28eebdf3"
+  },
+  {
+   "id": "tauri-build-debug",
+   "argv": [
+    "node",
+    "scripts/tauri-build.mjs",
+    "--debug",
+    "--receipt",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t02/phase2-supervisor-01/tauri-build-debug.json"
+   ],
+   "exitCode": 0,
+   "durationSecs": 15.214,
+   "logSha256": "322a8f8d5101acca86337e6a591c385c4ddb48b540af43b8831974aee4929058"
+  },
+  {
+   "id": "release-renderer-build",
+   "argv": [
+    "npm",
+    "run",
+    "build:renderer"
+   ],
+   "exitCode": 0,
+   "durationSecs": 7.277,
+   "logSha256": "c391fcbdad9fe01dbb4a0eb900fa91aabe09a2c140493195fff1f46211a6d5db"
+  },
+  {
+   "id": "release-theme-build",
+   "argv": [
+    "npm",
+    "run",
+    "build:theme"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.236,
+   "logSha256": "8b9b7ae3076b9d212b185c69daf6f823d544bc1ffc21eb802d3ec74b792f5200"
+  },
+  {
+   "id": "service-stage-verify-1",
+   "argv": [
+    "node",
+    "scripts/build-rust-desktop-service.mjs",
+    "--verify"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.159,
+   "logSha256": "6ec1f2ad407f3c6aade5410416fb534e7e4e03c92e7dc4e2829802be6eb9e9b8"
+  },
+  {
+   "id": "tauri-build-release",
+   "argv": [
+    "node",
+    "scripts/tauri-build.mjs",
+    "--receipt",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R09/dev/t02/phase2-supervisor-01/tauri-build-release.json"
+   ],
+   "exitCode": 0,
+   "durationSecs": 0.447,
+   "logSha256": "e7943869d859fc2aa56d2c4e38f5c8bfbc82fe95e7501ffb8181ea4b163fe0dd"
+  }
+ ],
+ "logSha256": "4af5fe6e9ec6ce95165f89f75abe071bebf1a6f70bd941e2ed668118d6e40521",
+ "finishedAtUnixMs": 1793024983020,
+ "failureDetail": "NameError: name 'suppressed_dialog' is not defined"
+}

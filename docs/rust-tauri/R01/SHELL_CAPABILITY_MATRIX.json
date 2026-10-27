@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "task_id": "R01-T06",
+  "generated_by": "ZCode:R01-T06-exec-r1",
+  "date": "2026-09-25",
+  "baseline_head": "76bd42c439e180163b150a0058bd6c9e4875c940",
+  "branch": "codex/rust-tauri-migration",
+  "spike": {
+    "path": "spike/tauri-shell/",
+    "isolation": "独立 manifest（两个 spike Cargo.toml 均无显式 [workspace] 段；仓库根及 spike 祖先目录均无 Cargo.toml，无祖先 workspace 可归入，隔离实效成立），不是 rust/ workspace 成员；DEP-07 headless 禁令不受影响；不接入任何生产入口",
+    "stack": "Tauri 2.11.6 + wry 0.55.1/tao 0.35.3（WKWebView），全部版本见 spike/tauri-shell/app/src-tauri/Cargo.lock（603 crates）与 DEPENDENCY_DECISIONS.md D-11"
+  },
+  "machine": "Mac15,14 macOS 27.0 arm64（BuildVersion 26A428），rustc 1.98.1（rustup 锁定）",
+  "evidence_dir": "artifacts/rust-tauri/R01/T06/",
+  "platform_scope_note": "所有 VERIFIED 仅覆盖 macOS arm64 单机实测；Windows/Linux/macOS x64 全部 UNVERIFIED，owner=R09/R10 平台验收负责人（总控指派），verify_by_stage=R09（宿主集成）最迟 R10（跨平台产物）",
+  "capabilities": [
+    {
+      "capability": "window（创建/显隐/最大化/置顶/尺寸/显示器信息）",
+      "electron_current": "desktop/main.cjs（BrowserWindow/WebContentsView，窗口状态 2889 行 sanitizeWindowState，screen.getAllDisplays 2600 行）",
+      "tauri_spike": "WebviewWindowBuilder（main+untrusted+remote 三窗 hidden）+ maximize/unmaximize/set_always_on_top/inner_size/scale_factor/current_monitor 全 Ok",
+      "status": "VERIFIED",
+      "evidence": "run-test/host-report.ndjson: window.untrusted_created / window.remote_created / window.ops（全 Ok，monitor=2560x1440@1.0）",
+      "limits": "多窗口 WebContentsView 等价的视图层级合成未逐项对比（R09 设计输入）；窗口持久化语义未迁移"
+    },
+    {
+      "capability": "tray（托盘图标+菜单+事件）",
+      "electron_current": "desktop/main.cjs:2151 createTray / 2164 new Tray",
+      "tauri_spike": "tauri::tray::TrayIconBuilder + MenuBuilder，menu id t06.quit 回调注册（tauri feature tray-icon）",
+      "status": "VERIFIED",
+      "evidence": "run-test/host-report.ndjson: tray.created ok=true",
+      "limits": "菜单点击回调未做人工点击实测（代码路径与事件注册已构建成功）；模板图标/多分辨率未测"
+    },
+    {
+      "capability": "shortcut（全局快捷键注册/触发）",
+      "electron_current": "desktop/main.cjs:210-266 globalShortcut 多组键位注册/冲突检测",
+      "tauri_spike": "tauri-plugin-global-shortcut 2.3.2 注册 CmdOrControl+Alt+Shift+9；is_registered=true；用合成 CGEvent（post_shortcut.swift，需注入端辅助功能权限）真实触发，handler 上报 shortcut.fired",
+      "status": "VERIFIED",
+      "evidence": "run-test/host-report.ndjson: shortcut.register registered=true + shortcut.fired；run-test/post-shortcut.log exit=0",
+      "limits": "多组键位/冲突抢占语义未迁移；触发验证依赖运行终端已持有辅助功能授权（TCC 实测 trusted）"
+    },
+    {
+      "capability": "notification（系统通知）",
+      "electron_current": "desktop/main.cjs:1577 new Notification",
+      "tauri_spike": "tauri-plugin-notification 2.4.0 request_permission=Granted + 单次真实 show（最小真实调用，无轰炸）",
+      "status": "VERIFIED",
+      "evidence": "run-test/host-report.ndjson: notification.probe permission=Granted shown=true",
+      "limits": "action/附件/持久通知未测；未打包二进制下通知归属终端宿主，打包 .app 行为归 R09 复测"
+    },
+    {
+      "capability": "clipboard（读写+往返+恢复）",
+      "electron_current": "renderer navigator.clipboard（desktop/src/react/components/InputArea.tsx 等）",
+      "tauri_spike": "tauri-plugin-clipboard-manager 2.3.3 宿主侧写 marker→读回一致→恢复用户原剪贴板；前端 plugin:clipboard-manager|read_text 在授权窗 OK",
+      "status": "VERIFIED",
+      "evidence": "run-test/host-report.ndjson: clipboard.roundtrip roundtrip_ok=true restored=true；page-reports main plugin_clipboard_read_text OK（含中文）",
+      "limits": "图片/富文本剪贴板未测"
+    },
+    {
+      "capability": "file-dialog（打开文件对话框）",
+      "electron_current": "desktop/main.cjs:5745/5758 dialog.showOpenDialog，1776 showMessageBox",
+      "tauri_spike": "tauri-plugin-dialog 2.7.3 pick_file callback API：原生 NSOpenPanel 真实弹出（CGWindowList 实测 owner=app 进程），合成 Cmd+period（cancel: 等价物，postToPid 投递）取消，callback 以 picked=null 兑现",
+      "status": "VERIFIED",
+      "evidence": "run-test/host-report.ndjson: dialog.open_presenting + dialog.open picked=null；run-test/dialog-dismiss.log post_cmd_period_exit=0",
+      "limits": "重要实测缺陷（TAURI_SPIKE_REPORT §7-R1）：blocking_pick_file 外部取消后永不返回；callback API 下合成 Escape 走 performClose: 也不触发回调——自动化取消必须用 cancel: 等价物（Cmd+. postToPid）；生产禁用阻塞变体；save/message 对话框未逐项实测"
+    },
+    {
+      "capability": "recording（麦克风采集）",
+      "electron_current": "renderer getUserMedia/MediaRecorder（desktop/src/react/components/InputArea.tsx）+ desktop/speech-permissions.cjs 权限门",
+      "tauri_spike": "WKWebView 内 getUserMedia({audio})：TCC 未授权（not_determined）时 WKWebView 真实拒绝（NotAllowedError），不伪造授权；enumerateDevices 返回 audioinput:unlabeled（未授权态不泄露标签）；Info.plist 已配 NSMicrophoneUsageDescription",
+      "status": "VERIFIED（拒绝路径）/ UNVERIFIED（授权后采集路径）",
+      "evidence": "run-test page-reports: mic_getUserMedia error=not allowed by user agent；media_enumerate_devices OK；tcc.status microphone=not_determined",
+      "limits": "授权态采集需要真实用户点授权弹窗，本任务红线禁止伪造授权——授权后正链路留给 R09 人工/交互验收"
+    },
+    {
+      "capability": "speech（语音识别/听写权限）",
+      "electron_current": "desktop/speech-permissions.cjs + main.cjs:5449-5460 speech-permission-status/request（用户手势才弹窗）",
+      "tauri_spike": "tcc_probe.swift 只读查询 SFSpeechRecognizer.authorizationStatus=not_determined（不触发弹窗）；NSSpeechRecognitionUsageDescription 已配",
+      "status": "VERIFIED（查询路径）/ UNVERIFIED（授权与识别链路）",
+      "evidence": "run-test/host-report.ndjson: tcc.status speech_recognition=not_determined",
+      "limits": "Tauri 无官方 speech 插件；识别链路需自定义 Swift 桥或走服务端，归 R09 选型；禁止伪造授权"
+    },
+    {
+      "capability": "screen（屏幕/窗口捕获与录屏权限）",
+      "electron_current": "desktop/main.cjs:4304/4312 webContents.capturePage（内置浏览器截图），screen.getDisplayNearestPoint 2561/2577",
+      "tauri_spike": "CGPreflightScreenCaptureAccess=granted（tcc_probe 实测）；getDisplayMedia 需用户手势（WKWebView 约束，与 Chromium 一致）",
+      "status": "VERIFIED（权限查询与手势约束）/ UNVERIFIED（真实屏幕采集）",
+      "evidence": "tcc.status screen_recording_preflight=granted；page-reports getDisplayMedia error=must be called from a user gesture handler",
+      "limits": "capturePage 等价物在 Tauri 需 webview 截图 API 或 ScreenCaptureKit 自定义桥，归 R09"
+    },
+    {
+      "capability": "accessibility（辅助功能权限/合成输入）",
+      "electron_current": "现役未直接使用（无 systemPreferences.isTrustedAccessibilityClient 调用）",
+      "tauri_spike": "AXIsProcessTrusted 只读查询：运行终端 trusted=true；合成 CGEvent 注入（快捷键触发/Escape 取消对话框）真实生效",
+      "status": "VERIFIED",
+      "evidence": "tcc.status accessibility_trusted=trusted；shortcut.fired 与 dialog.open picked=null 均为合成事件驱动",
+      "limits": "未授权进程的注入失败路径未测（本机终端已授权）；不伪造授权"
+    },
+    {
+      "capability": "proxy（网络代理）",
+      "electron_current": "desktop/main.cjs:296-305 session.setProxy direct/自定义/system",
+      "tauri_spike": "本任务全部流量限 loopback（证据服务器 127.0.0.1:19274 + updater endpoint loopback），代理剥离前缀 env -u 全runner使用；WebView 级 setProxy 等价物未实测",
+      "status": "UNVERIFIED",
+      "evidence": "preflight.log 记录死代理环境；runner 全程 --noproxy/env -u",
+      "limits": "Tauri 侧代理控制需按 reqwest system-proxy（service 侧，D-03 已锁）+ WebView 网络栈分别验证，归 R09；本任务不触真实外网"
+    },
+    {
+      "capability": "updater（自动更新检查/下载/验签）",
+      "electron_current": "desktop/auto-updater.cjs + desktop/src/shared/github-release-check.cjs（GitHub Releases 主检测源）",
+      "tauri_spike": "tauri-plugin-updater 2.12.0 + minisign 签名：loopback 夹具（测试私钥在 /tmp，pubkey 入配置）正向=发现 0.2.0、下载 406/408B 验签通过、未 install；负向=字节篡改包验签失败 'The signature verification failed'；createUpdaterArtifacts 真实产出 .app.tar.gz+.sig（打包冒烟在 .app 内复测通过）",
+      "status": "VERIFIED",
+      "evidence": "run-test/updater.probe update_found=0.2.0 downloaded=406 installed=false；run-release/updater.probe error=download: The signature verification failed；run-bundle/updater.probe ok；bundle/bundle-artifacts.txt",
+      "limits": "release 产物要求 https endpoint，spike 用 dangerousInsecureTransportProtocol:true（仅 loopback 夹具，明文传输但 minisign 验签仍强制执行）——生产必须 https，禁止带入；install/重启应用更新未执行（红线：不触发真实系统更新）"
+    },
+    {
+      "capability": "login-startup（登录自启动）",
+      "electron_current": "desktop/login-item-settings.cjs（getLoginItemOptions/wasLaunchedAtLogin）",
+      "tauri_spike": "tauri-plugin-autostart 2.5.1 enable→is_enabled=true→disable→is_enabled=false 全真实往返（未打包二进制亦生效）",
+      "status": "VERIFIED",
+      "evidence": "run-test/host-report.ndjson: autostart.probe enabled_after_enable=true enabled_after_disable=false",
+      "limits": "SMAppService 打包形态（.app helper 注册）在打包冒烟中随探针再次往返，macOS 14+ 系统设置的可见条目未人工核对"
+    },
+    {
+      "capability": "app-restart（应用自我重启）",
+      "electron_current": "desktop/main.cjs app:restart 对应物（relaunch）",
+      "tauri_spike": "tauri::process::restart(&env)：首发写 marker 并 relaunch，第二实例见 marker 上报后退出",
+      "status": "VERIFIED",
+      "evidence": "run-relaunch/host-report.ndjson: relaunch.first_instance + relaunch.second_instance_observed ok=true",
+      "limits": "仅 release 产物实跑；打包 .app 内重启未测"
+    }
+  ],
+  "sidecar_lifecycle": {
+    "status": "VERIFIED",
+    "scenarios": [
+      {"scenario": "随宿主启动+就绪握手", "command": "spawn_and_handshake (tauri-plugin-shell sidecar API)", "expected": "hello 校验通过", "actual": "sidecar.handshake_ok hello{version 1.0.0, protocol 1}", "exit": 0, "evidence": "run-test/host-report.ndjson + run-bundle（打包 .app 内同样握手成功）"},
+      {"scenario": "版本不匹配拒绝", "command": "sidecar --report-version 9.9.9（集成测试）", "expected": "拒绝并 kill", "actual": "validate_hello 拒绝，进程被终止", "exit": 0, "evidence": "sidecar-it/cargo-test.log 8/8 pass"},
+      {"scenario": "垃圾 hello 拒绝", "command": "garbage stdout 注入（测试替身）", "expected": "拒绝", "actual": "拒绝", "exit": 0, "evidence": "sidecar-it/cargo-test.log"},
+      {"scenario": "崩溃检测与恢复", "command": "kill -9 <sidecar pid> 后侧向 restart+ping", "expected": "dead 检测 + 重启 1 次预算内恢复", "actual": "terminated signal=9 → alive=false → restart ok → ping pong seq=2 → restarts=1", "exit": 0, "evidence": "run-test/sidecar-crash.log + sidecar-recovery.json"},
+      {"scenario": "有序退出", "command": "finish_e2e → shutdown → bye → exit 0", "expected": "sidecar code 0 无 signal", "actual": "e2e.sidecar_shutdown bye=true orderly=true；terminated code=0", "exit": 0, "evidence": "run-test/host-report.ndjson 尾部"},
+      {"scenario": "宿主 SIGKILL 孤儿检查", "command": "kill -9 宿主（Run B）", "expected": "sidecar 靠 stdin EOF 自行退出", "actual": "no sidecar process after host SIGKILL", "exit": 0, "evidence": "run-release/sidecar-after-sigkill.txt"},
+      {"scenario": "受限参数", "command": "sidecar --evil", "expected": "exit 64", "actual": "exit 64", "exit": 0, "evidence": "sidecar-it/cargo-test.log"},
+      {"scenario": "stdin EOF 自退出", "command": "关闭 stdin", "expected": "exit 0 不留孤儿", "actual": "exit 0", "exit": 0, "evidence": "sidecar-it/cargo-test.log"}
+    ],
+    "note": "sidecar 运行时解析路径 = current_exe() 同级目录/lingxi-t06-sidecar（无 triple 后缀，后缀是打包期约定）；macOS /tmp→/private/tmp 符号链接会触发 Tauri StartingBinary symlink 拒绝，打包冒烟须从 realpath 目录运行（已修入 run_e2e.sh 并复测通过）"
+  },
+  "acl_security": {
+    "status": "VERIFIED",
+    "custom_commands": ["shell_public_info", "shell_sensitive_probe", "shell_secondary_probe", "sidecar_status", "sidecar_ping", "sidecar_restart", "finish_e2e"],
+    "capabilities_files": ["app/src-tauri/capabilities/main.json（窗口 main）", "app/src-tauri/capabilities/main-secondary.json（窗口 main，仅 allow-shell-secondary-probe，证明多 capability 并集合并）"],
+    "shell_plugin_frontend": "tauri-plugin-shell 仅注册于 Rust 宿主侧；capabilities 中零 shell 插件权限——前端无任意 shell 执行面",
+    "negative_cases": [
+      {"case": "untrusted 打包页（不在任何 capability windows 列表）调全部自定义命令+插件命令", "actual": "全部 'not allowed by ACL'（页面自报 11 拒）", "evidence": "run-test/page-reports.jsonl label=untrusted"},
+      {"case": "remote 窗口（loopback http 源=远程 URL 等价）调全部命令", "actual": "全部 'not allowed by ACL'（11 拒）——远程 URL 默认零 native 权限", "evidence": "run-test/page-reports.jsonl label=remote"},
+      {"case": "WebDriver 驱动端主动在 untrusted/remote 上下文 invoke shell_sensitive_probe", "actual": "两窗均 'not allowed by ACL'；main 窗同调用 OK——页面自报与驱动端互证", "evidence": "run-test/webdriver-evidence.json driverSensitiveProbe"},
+      {"case": "main 窗调 plugin:shell|execute 与未知命令 shell_exec_arbitrary", "actual": "均 'not allowed by ACL'（授权窗也无任意 shell）", "evidence": "run-test/page-reports.jsonl label=main"},
+      {"case": "release 产物 ACL 同判", "actual": "untrusted/remote 各 11 拒，main 10 通", "evidence": "run-release/page-reports.jsonl"}
+    ]
+  },
+  "test_path_W03": {
+    "status": "VERIFIED",
+    "findings": [
+      "tauri-driver 官方路径仅 Windows/Linux（macOS 无 WKWebView WebDriver 驱动）——macOS 上不可用，如实记录",
+      "macOS 可用路径 = tauri-plugin-wdio-webdriver 1.4.0 嵌入式 W3C WebDriver 服务（TAURI_WEBDRIVER_PORT 指定端口），session/handles/execute sync+async 全实跑",
+      "A12 双产物探测：test 构建（--features e2e-test）webdriver 端口监听且会话可用；release 构建端口 ECONNREFUSED + 二进制 strings wdio/webdriver 计数 0（test 产物 40/41）——测试入口仅存在于测试构建，发布构建无可达入口"
+    ],
+    "evidence": "run-test/webdriver-evidence.json / run-release/webdriver-closed.json / run-release/binary-strings-probe.txt"
+  },
+  "tcc_snapshot_macos": {
+    "accessibility": "trusted（运行终端）",
+    "screen_recording": "granted",
+    "microphone": "not_determined",
+    "camera": "not_determined",
+    "speech_recognition": "not_determined",
+    "note": "全部只读查询（tcc_probe.swift），未触发任何授权弹窗；未伪造任何授权"
+  }
+}

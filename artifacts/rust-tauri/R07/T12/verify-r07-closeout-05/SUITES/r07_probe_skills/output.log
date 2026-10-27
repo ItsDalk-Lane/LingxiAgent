@@ -1,0 +1,39 @@
+
+running 19 tests
+test skills_list_full_and_runtime_views_and_agent_required ... ok
+test desk_skills_read_returns_scan_and_policy ... ok
+test agent_skills_cleanup_preview_lists_only_agent_deletables ... ok
+test bundle_delete_removes_and_missing_is_404 ... ok
+test bundles_create_persists_and_unknown_skill_rejected ... ok
+test bundle_member_enable_and_disable_via_agent_patch ... ok
+test bundle_export_builds_download_package ... ok
+test desk_install_skill_creates_under_agents_skills ... ok
+test skills_install_with_agent_enables_for_that_agent_only ... ok
+test bundles_order_saves_and_rejects_bad_input ... ok
+test agent_skill_disable_removes_from_config_enabled ... ok
+test skills_install_global_keeps_agent_enabled_untouched ... ok
+test skills_reload_rescans_and_reports_count ... ok
+test skills_delete_removes_references_and_rejects_readonly_or_missing ... ok
+test bundle_update_changes_name_or_members ... ok
+test agent_skills_put_sets_enabled_and_empty_disables_visible ... ok
+test desk_delete_skill_only_known_dirs_and_fails_loud ... ok
+test bundles_read_lists_agent_view_and_agent_required ... ok
+test agent_skill_enable_adds_to_config_enabled ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.59s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: method `first_visible_skill` is never used
+   --> crates/lingxi-service/tests/r07_probe_skills.rs:156:14
+    |
+ 93 | impl Server {
+    | ----------- method in this implementation
+...
+156 |     async fn first_visible_skill(&self) -> String {
+    |              ^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (test "r07_probe_skills") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.68s
+     Running tests/r07_probe_skills.rs (rust/target/debug/deps/r07_probe_skills-f74f622bc3f3ebf2)

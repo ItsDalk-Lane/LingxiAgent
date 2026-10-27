@@ -1,0 +1,41 @@
+stderr | desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx > InterfaceTab appearance state > shows the first sidebar read failure and retries before enabling the control
+[settings] sidebar UI preferences load failed: Error: sidebar denied
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx:67:27
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx:15:40)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/InterfaceTab.tsx:177:5
+    at Object.react_stack_bottom_frame (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+    at runWithFiberInDEV (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+    at commitHookEffectListMount (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+    at commitHookPassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13336:11)
+    at commitPassiveMountOnFiber (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:15484:13)
+    at recursivelyTraversePassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:15439:11)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx > InterfaceTab appearance state > shows the first sidebar read failure and retries before enabling the control
+TestingLibraryElementError: Unable to find an accessible element with the role "switch"
+
+There are no accessible roles. But there might be some inaccessible roles. If you wish to access them, then set the `hidden` option to `true`. Learn more about this here: https://testing-library.com/docs/dom-testing-library/api-queries#byrole
+
+Ignored nodes: comments, script, style
+[36m<div[39m
+  [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+[36m>[39m
+  [0msettings.interface.sessionListSingleLine[0m
+[36m</div>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx:75:39
+     73|     await screen.findByRole('alert');
+     74|     const row = screen.getByText('settings.interface.sessionListSingle…
+     75|     expect(within(row as HTMLElement).getByRole('switch').hasAttribute…
+       |                                       ^
+     76|     denied = false;
+     77|     fireEvent.click(screen.getByRole('button', { name: 'action.retry' …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

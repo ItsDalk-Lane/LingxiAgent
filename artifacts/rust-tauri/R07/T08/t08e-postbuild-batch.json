@@ -1,0 +1,17 @@
+{
+  "results": [
+    {
+      "gate": "metadata-redaction-binary",
+      "wrapperExitCode": 0
+    },
+    {
+      "gate": "card-navigation-desktop",
+      "wrapperExitCode": 0
+    },
+    {
+      "gate": "card-navigation-mobile",
+      "wrapperExitCode": 0
+    }
+  ],
+  "fullStagePassClaimed": false
+}

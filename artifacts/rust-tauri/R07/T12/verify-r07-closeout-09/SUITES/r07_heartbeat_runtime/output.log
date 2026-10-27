@@ -1,0 +1,13 @@
+
+running 6 tests
+test create_if_absent_never_overwrites_a_competing_resource ... ok
+test missing_agent_cannot_receive_a_workspace_scope_or_background_run ... ok
+test ordinary_chat_cannot_borrow_heartbeat_program_log_target ... ok
+test config_switch_off_cancels_real_inflight_patrol_and_does_not_write_log ... ok
+test real_patrol_and_root_first_level_jian_use_gateway_fixed_logs ... ok
+test separate_agents_run_together_but_same_agent_overlap_is_discarded ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.37s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/r07_heartbeat_runtime.rs (rust/target/debug/deps/r07_heartbeat_runtime-7404258a777689ab)

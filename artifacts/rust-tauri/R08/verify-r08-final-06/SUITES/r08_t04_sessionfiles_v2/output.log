@@ -1,0 +1,16 @@
+
+running 9 tests
+test v1_report_shape_byte_identical ... ok
+test v2_missing_payload_reports_payload_missing ... ok
+test v2_top_level_version_mismatch_is_hard_error ... ok
+test v2_rerun_is_idempotent_skipped_existing ... ok
+test v2_corrupt_descriptor_reports_sidecar_row_invalid ... ok
+test v2_row_level_version_mismatch_reports_unsupported_version ... ok
+test v2_sha_mismatch_reports_payload_truncated ... ok
+test v2_good_payload_imports_available_and_readable ... ok
+test v2_size_mismatch_reports_payload_truncated ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.61s
+     Running tests/r08_t04_sessionfiles_v2.rs (rust/target/debug/deps/r08_t04_sessionfiles_v2-b1e66f9f2986ed73)

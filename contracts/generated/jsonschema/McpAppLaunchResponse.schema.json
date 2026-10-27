@@ -1,0 +1,98 @@
+{
+  "$defs": {
+    "McpAppDescriptor": {
+      "properties": {
+        "_meta": true,
+        "connectorId": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "inputSchema": true,
+        "outputSchema": true,
+        "resourceUri": {
+          "type": "string"
+        },
+        "serverId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "toolName": {
+          "type": "string"
+        },
+        "visibility": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "connectorId",
+        "serverId",
+        "toolName",
+        "title",
+        "description",
+        "resourceUri",
+        "visibility",
+        "inputSchema"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "launch 只返回现役描述与输入绑定，不表示已执行工具。",
+  "properties": {
+    "app": {
+      "$ref": "#/$defs/McpAppDescriptor"
+    },
+    "binding": true,
+    "connectorId": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "launchInput": true,
+    "resourceUri": {
+      "type": "string"
+    },
+    "serverId": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "toolName": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "visibility": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "type",
+    "connectorId",
+    "serverId",
+    "toolName",
+    "title",
+    "description",
+    "resourceUri",
+    "visibility",
+    "launchInput",
+    "binding",
+    "app"
+  ],
+  "title": "McpAppLaunchResponse",
+  "type": "object"
+}

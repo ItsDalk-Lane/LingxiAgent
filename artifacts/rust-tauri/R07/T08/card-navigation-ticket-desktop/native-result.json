@@ -1,0 +1,36 @@
+{
+  "checks": [
+    "actual-frame-no-owner-token",
+    "actual-component-put-and-get",
+    "actual-script-executed",
+    "actual-self-navigation-blocked"
+  ],
+  "requests": [
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/cards/navigation-probe",
+      "status": 204
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/cards/navigation-probe",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/cards/navigation-probe/frame/3f1d95857fbf4a7163e7c8fa8333f1722f206dee69b99b77d601e12ccf7560ec",
+      "status": 200
+    }
+  ],
+  "outcome": {
+    "count": 0,
+    "observed": []
+  },
+  "blockedNavigations": [
+    {
+      "reason": "interactive_card_navigation_blocked"
+    }
+  ],
+  "cspMessages": [],
+  "navigationFailures": []
+}

@@ -1,0 +1,20 @@
+{
+  "recordedAt": "2026-10-18T10:57:10.417976+00:00",
+  "status": "MINIMAL_COMPILE_PREREQUISITE_ONLY_NOT_RUN",
+  "priorFailure": "root sdk-check1 exit101: Arc::downgrade expected &Arc<AuthService>, got &AuthService",
+  "change": "复用ServiceState现有auth Arc字段，与同模块management/storage弱引用一致；不新建认证服务或改变权限逻辑。",
+  "sourceSha256": {
+    "rust/crates/lingxi-service/src/mcp_session_permissions.rs": "75abce691dceadeb93c9239bf2aea5c29b854e29daac1a595a2212ae7ee840ee"
+  },
+  "retainedOpen": [
+    "WS前台flag未修",
+    "inflight grant lifecycle epoch未修"
+  ],
+  "checks": [
+    {
+      "command": "rustfmt --edition 2024 --config skip_children=true mcp_session_permissions.rs",
+      "exitCode": 0
+    }
+  ],
+  "cargo": "NOT_RUN"
+}

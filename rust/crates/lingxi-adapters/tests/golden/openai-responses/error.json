@@ -1,0 +1,27 @@
+{
+  "family": "openai-responses",
+  "case": "error",
+  "route": {"provider": "responses-golden", "model": "gpt-responses-golden"},
+  "auth": {"kind": "bearer", "token": "sk-golden-responses-secret"},
+  "input": {
+    "submission": "ping",
+    "tools": [],
+    "prior": []
+  },
+  "http_error": {
+    "status": 401,
+    "body": "{\"error\":{\"message\":\"invalid bearer sk-golden-responses-secret\"}}"
+  },
+  "expected_transport": {
+    "path": "/v1/responses",
+    "headers": [
+      ["authorization", "Bearer sk-golden-responses-secret"],
+      ["content-type", "application/json"]
+    ]
+  },
+  "expected_failure": {
+    "code": "unauthorized",
+    "retryable": false,
+    "message": "provider returned HTTP 401 Unauthorized: {\"error\":{\"message\":\"invalid bearer [redacted]\"}}"
+  }
+}

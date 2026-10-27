@@ -1,0 +1,64 @@
+{
+  "candidate": "t07c",
+  "recordedAt": "2026-10-18T03:20:10.744560+00:00",
+  "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+  "python": "3.14.3 (v3.14.3:323c59a5e34, Feb  3 2026, 11:41:37) [Clang 16.0.0 (clang-1600.0.26.6)]",
+  "commands": [
+    {
+      "command": [
+        "node",
+        "--version"
+      ],
+      "exitCode": 0,
+      "output": "v24.16.0"
+    },
+    {
+      "command": [
+        "npm",
+        "--version"
+      ],
+      "exitCode": 0,
+      "output": "11.13.0"
+    },
+    {
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "--version"
+      ],
+      "exitCode": 0,
+      "output": "cargo 1.98.1 (797e8a9bc 2026-08-05)"
+    },
+    {
+      "command": [
+        "/Users/study_superior/.cargo/bin/rustc",
+        "--version"
+      ],
+      "exitCode": 0,
+      "output": "rustc 1.98.1 (48a229cea 2026-09-01)"
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0,
+      "output": "0c86675d49442fe0e38259bd3097423fb340eecc"
+    },
+    {
+      "command": [
+        "git",
+        "branch",
+        "--show-current"
+      ],
+      "exitCode": 0,
+      "output": "codex/rust-tauri-migration"
+    }
+  ],
+  "installedPackages": {
+    "typescript": "5.9.3",
+    "vitest": "4.1.10",
+    "vite": "7.3.6",
+    "react": "19.2.4"
+  }
+}

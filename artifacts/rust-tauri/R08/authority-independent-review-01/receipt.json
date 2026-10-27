@@ -1,0 +1,18 @@
+{
+  "schema": "lingxi.r08.authority-independent-review-receipt.v1",
+  "generatedAt": "2026-10-21T16:44:41.246904+00:00",
+  "status": "FAIL_NOT_CLOSED",
+  "reviewArtifactVerification": "PASS",
+  "independentBusinessTests": "NOT_EXECUTED_WAITING_CARGO_WINDOW",
+  "snapshotFiles": 13,
+  "snapshotHashOrLinkErrors": [],
+  "currentSourceChangesSinceSnapshot": [
+    "rust/crates/lingxi-service/src/runs.rs"
+  ],
+  "files": {
+    "docs/rust-tauri/R08/ADMISSION_AUTHORITY_INDEPENDENT_REVIEW.md": "e53af7ecf4b9113d5f13e0f360b8307fab67256e83f8d64f61437a9cebc2000a",
+    "docs/rust-tauri/R08/ADMISSION_AUTHORITY_INDEPENDENT_REVIEW.json": "651ab6f470b89552b3f0cf7c41d370ef1179c289d1e99d5eaf064f11fb5279a6",
+    "artifacts/rust-tauri/R08/authority-independent-review-01/inputs.json": "a948046183a04c87caf2d1f5d6b8dd313b0504ce526a329f533fc0775aad1d20",
+    "artifacts/rust-tauri/R08/authority-independent-review-01/findings.json": "651ab6f470b89552b3f0cf7c41d370ef1179c289d1e99d5eaf064f11fb5279a6"
+  }
+}

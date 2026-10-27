@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useSettingsStore, type SkillInfo } from '../store';
 import { lingxiFetch } from '../api';
+import { captureSettingsConnection, ownsSettingsConnection, settingsConnectionRevision, type SettingsConnectionOwner } from '../connection-owner';
 import { t } from '../helpers';
 import { SkillBundleTree, type SkillBundleInfo } from './skills/SkillBundleTree';
 import { SkillCapabilities } from './skills/SkillCapabilities';
@@ -8,6 +9,7 @@ import { CompatPathDrawer } from './skills/CompatPathDrawer';
 import { AgentSelect } from './bridge/AgentSelect';
 import { SettingsSection } from '../components/SettingsSection';
 import styles from '../Settings.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 type BundleDialogState =
   | { type: 'create'; name: string }
@@ -41,12 +43,19 @@ export function SkillsTab() {
   const skillsViewAgentIdRef = useRef(skillsViewAgentId);
   skillsViewAgentIdRef.current = skillsViewAgentId;
 
-  const [skillsList, setSkillsList] = useState<SkillInfo[]>([]);
-  const [skillBundles, setSkillBundles] = useState<SkillBundleInfo[]>([]);
+  const [storedSkills, setSkillsList] = useState<SkillInfo[]>([]);
+  const [storedBundles, setSkillBundles] = useState<SkillBundleInfo[]>([]);
   const [skillsLoading, setSkillsLoading] = useState(false);
+  const [skillsLoadError, setSkillsLoadError] = useState(false);
+  const connectionRevision = useSettingsStore(() => settingsConnectionRevision());
+  const listConnectionRef = useRef<SettingsConnectionOwner | null>(null);
   const skillsListOwnerIdRef = useRef<string | null>(null);
   const [bundleDialog, setBundleDialog] = useState<BundleDialogState | null>(null);
   const skillFileInputRef = useRef<HTMLInputElement | null>(null);
+  // 同一资料所有者读取失败时保留旧表，切换连接或助手时绝不展示上一个所有者的资料。
+  const ownsList = ownsSettingsConnection(listConnectionRef.current) && skillsListOwnerIdRef.current === skillsViewAgentId;
+  const skillsList = ownsList ? storedSkills : [];
+  const skillBundles = ownsList ? storedBundles : [];
 
   useEffect(() => {
     if (skillsViewAgentId) return;
@@ -58,16 +67,21 @@ export function SkillsTab() {
     discovered: [],
   });
 
-  const loadSkills = useCallback(async () => {
+  const loadSkills = useCallback(async (propagateError = false) => {
     const agentId = skillsViewAgentIdRef.current;
     if (!agentId) {
       skillsListOwnerIdRef.current = null;
+      listConnectionRef.current = null;
+      setSkillsLoadError(false);
       setSkillsList([]);
       setSkillBundles([]);
       setSkillsLoading(false);
       return;
     }
-    const ownerChanged = skillsListOwnerIdRef.current !== agentId;
+    const requestOwner = captureSettingsConnection();
+    const isCurrent = () => ownsSettingsConnection(requestOwner) && skillsViewAgentIdRef.current === agentId;
+    const ownerChanged = !ownsSettingsConnection(listConnectionRef.current) || skillsListOwnerIdRef.current !== agentId;
+    setSkillsLoadError(false);
     if (ownerChanged) {
       setSkillsLoading(true);
       setSkillsList([]);
@@ -81,22 +95,26 @@ export function SkillsTab() {
       ]);
       const data = await skillsRes.json();
       const bundleData = await bundlesRes.json();
-      if (data.error) throw new Error(data.error);
-      if (bundleData.error) throw new Error(bundleData.error);
-      if (skillsViewAgentIdRef.current !== snapshotAgentId) return;
-      setSkillsList(data.skills || []);
-      setSkillBundles(bundleData.bundles || []);
+      if (data?.error) throw new Error(data.error);
+      if (bundleData?.error) throw new Error(bundleData.error);
+      if (!Array.isArray(data?.skills) || !Array.isArray(bundleData?.bundles)) throw new Error(t('settings.skills.loadFailed'));
+      if (!isCurrent()) return;
+      listConnectionRef.current = requestOwner;
       skillsListOwnerIdRef.current = snapshotAgentId;
+      setSkillsList(data.skills);
+      setSkillBundles(bundleData.bundles);
     } catch (err) {
       console.error('[skills] load failed:', err);
+      if (isCurrent()) setSkillsLoadError(true);
+      if (propagateError) throw err;
     } finally {
-      if (skillsViewAgentIdRef.current === agentId && ownerChanged) {
+      if (isCurrent() && ownerChanged) {
         setSkillsLoading(false);
       }
     }
-  }, []);
+  }, [connectionRevision]);
 
-  const loadExternalPaths = useCallback(async () => {
+  const loadExternalPaths = useCallback(async (propagateError = false) => {
     try {
       const res = await lingxiFetch('/api/skills/external-paths');
       const data = await res.json();
@@ -106,6 +124,7 @@ export function SkillsTab() {
       });
     } catch (err) {
       console.error('[skills] load external paths failed:', err);
+      if (propagateError) throw err;
     }
   }, []);
 
@@ -168,7 +187,7 @@ export function SkillsTab() {
   };
 
   const installSkillFromFile = async (file: File) => {
-    const filePath = window.platform?.getFilePath?.(file) || (file as File & { path?: string })?.path;
+    const filePath = usePlatform()?.getFilePath?.(file) || (file as File & { path?: string })?.path;
     if (filePath) {
       await installSkillFromPath(filePath);
       return;
@@ -195,8 +214,8 @@ export function SkillsTab() {
   };
 
   const installSkill = async () => {
-    if (typeof window.platform?.selectSkill === 'function') {
-      const selectedPath = await window.platform.selectSkill();
+    if (typeof usePlatform()?.selectSkill === 'function') {
+      const selectedPath = await usePlatform().selectSkill();
       if (!selectedPath) return;
       await installSkillFromPath(selectedPath);
       return;
@@ -291,7 +310,7 @@ export function SkillsTab() {
         : t('settings.skills.exported', { fileName });
       showToast(msg, 'success');
       if (data.filePath) {
-        window.platform?.showInFinder?.(data.filePath);
+        usePlatform()?.showInFinder?.(data.filePath);
       }
     } catch (err: unknown) {
       showToast(t('settings.saveFailed') + ': ' + (err instanceof Error ? err.message : String(err)), 'error');
@@ -480,7 +499,7 @@ export function SkillsTab() {
   };
 
   const addExternalPath = async () => {
-    const folder = await window.platform?.selectFolder?.();
+    const folder = await usePlatform()?.selectFolder?.();
     if (!folder) return;
     const newPaths = [...externalPathsData.configured, folder];
     try {
@@ -489,8 +508,8 @@ export function SkillsTab() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paths: newPaths }),
       });
-      await loadExternalPaths();
-      await loadSkills();
+      await loadExternalPaths(true);
+      await loadSkills(true);
       showToast(t('settings.autoSaved'), 'success');
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : String(err), 'error');
@@ -505,8 +524,8 @@ export function SkillsTab() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paths: newPaths }),
       });
-      await loadExternalPaths();
-      await loadSkills();
+      await loadExternalPaths(true);
+      await loadSkills(true);
       showToast(t('settings.autoSaved'), 'success');
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : String(err), 'error');
@@ -550,9 +569,11 @@ export function SkillsTab() {
           }}
         />
 
+        {skillsLoadError && <p role="alert">{t('settings.skills.loadFailed')}</p>}
         {skillsLoading ? (
           <p className={`${styles['settings-muted-note']} ${styles['skills-empty']}`}>{t('status.loading')}</p>
         ) : manageableSkills.length === 0 && skillBundles.length === 0 ? (
+          skillsLoadError ? null :
           <p className={`${styles['settings-muted-note']} ${styles['skills-empty']}`}>{t('settings.skills.noUser')}</p>
         ) : (
           <SkillBundleTree
@@ -593,7 +614,7 @@ export function SkillsTab() {
             {t('status.loading')}
           </p>
         ) : userSkills.length === 0 && skillBundles.length === 0 ? (
-          <p className={`${styles['agent-skill-empty']} ${styles['settings-empty-inset']}`}>
+          skillsLoadError ? null : <p className={`${styles['agent-skill-empty']} ${styles['settings-empty-inset']}`}>
             {t('settings.skills.noUser')}
           </p>
         ) : (

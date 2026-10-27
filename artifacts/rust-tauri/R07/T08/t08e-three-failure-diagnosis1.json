@@ -1,0 +1,230 @@
+{
+  "schema": "r07-t08-failure-diagnosis-v1",
+  "candidate": "t08e",
+  "createdAt": "2026-10-18T09:17:56.966351+00:00",
+  "scope": "只读诊断；不是修复、重跑或验收通过；e后继门禁未结束",
+  "candidateFingerprint": "f8b3924db2d194834f38efcdbbf231762a9f057d0b8c2f70361b37dd6ddb5a1e",
+  "frozenPlanSha256": "44f6d6007d5de63f1058363b788aeda7154dfb071c3722b6ef69366991d80ba1",
+  "sourceUnmodifiedByThisTask": true,
+  "noCargoExecuted": true,
+  "preservation": {
+    "manifest": "artifacts/rust-tauri/R07/T08/t08e-three-failure-preserved1/manifest.json",
+    "sha256": "218742c971eabaec72908f3fde408827101f4a2d37189c5abb0ec1890f432d19",
+    "allSceneReportsExactCopies": true,
+    "noCredentialsDatabaseOrBrowserProfileCopied": true
+  },
+  "sourceChecks": [
+    {
+      "path": "desktop/src/react/settings/__tests__/R06AgentDeleteConnectionReview.test.tsx",
+      "sha256": "78d970d3ad50b489645f1b794e768cb7877090df4843276c456f44fcad7e0717",
+      "expectedSha256": "78d970d3ad50b489645f1b794e768cb7877090df4843276c456f44fcad7e0717",
+      "frozenSourceMatches": true,
+      "expectedFrom": "manifest baseCommit (unchanged tracked source)"
+    },
+    {
+      "path": "desktop/src/react/settings/__tests__/R06AgentDeleteRustLive.test.tsx",
+      "sha256": "1ced91cf7dd647a3323700fffdfc3463f3aaa9d7d255e49132171337fb8449ea",
+      "expectedSha256": "1ced91cf7dd647a3323700fffdfc3463f3aaa9d7d255e49132171337fb8449ea",
+      "frozenSourceMatches": true,
+      "expectedFrom": "manifest baseCommit (unchanged tracked source)"
+    },
+    {
+      "path": "desktop/src/react/settings/__tests__/R06AgentDeleteRegistryReview.test.tsx",
+      "sha256": "4440953d51e52454db5977a88ae004d62ed7372389f8a6f9c24a14a7c515774e",
+      "expectedSha256": "4440953d51e52454db5977a88ae004d62ed7372389f8a6f9c24a14a7c515774e",
+      "frozenSourceMatches": true,
+      "expectedFrom": "manifest baseCommit (unchanged tracked source)"
+    },
+    {
+      "path": "desktop/src/react/settings/SettingsContent.tsx",
+      "sha256": "8a6c39bdbf0abed26dc458c07ec70cbfd394afd70a412c3c8bd312d6e8d1df2d",
+      "expectedSha256": "8a6c39bdbf0abed26dc458c07ec70cbfd394afd70a412c3c8bd312d6e8d1df2d",
+      "frozenSourceMatches": true,
+      "expectedFrom": "SOURCE_MANIFEST_t08e.json"
+    },
+    {
+      "path": "desktop/src/react/__tests__/chat-live/main.cjs",
+      "sha256": "147cc772700ec9075d553304eca7816285b499172d9e90fe9fb6060833e95958",
+      "expectedSha256": "147cc772700ec9075d553304eca7816285b499172d9e90fe9fb6060833e95958",
+      "frozenSourceMatches": true,
+      "expectedFrom": "manifest baseCommit (unchanged tracked source)"
+    },
+    {
+      "path": "desktop/src/react/__tests__/chat-app-live/main.cjs",
+      "sha256": "9788cab2fc59639c313902aec30f74c69a938d5e57a722898d82ce28d9fa3042",
+      "expectedSha256": "9788cab2fc59639c313902aec30f74c69a938d5e57a722898d82ce28d9fa3042",
+      "frozenSourceMatches": true,
+      "expectedFrom": "SOURCE_MANIFEST_t08e.json"
+    },
+    {
+      "path": "desktop/src/react/components/app/ChatPage.tsx",
+      "sha256": "f454e462c67a10c92f7b46db2bb73c7719d2e3c19410f1335a4cb802ed096383",
+      "expectedSha256": "f454e462c67a10c92f7b46db2bb73c7719d2e3c19410f1335a4cb802ed096383",
+      "frozenSourceMatches": true,
+      "expectedFrom": "manifest baseCommit (unchanged tracked source)"
+    },
+    {
+      "path": "desktop/src/react/components/runtime/RuntimeInfoCapsule.tsx",
+      "sha256": "243b4634766c15752975cf93229d9f63abdd1c61f3410a3786a834ac10fb54d3",
+      "expectedSha256": "243b4634766c15752975cf93229d9f63abdd1c61f3410a3786a834ac10fb54d3",
+      "frozenSourceMatches": true,
+      "expectedFrom": "manifest baseCommit (unchanged tracked source)"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_agent_delete_skills_live.rs",
+      "sha256": "0f98cbbfd37c1d7f0cc2c246353db84b0bed91dd354569562024747f2fbd4126",
+      "expectedSha256": "0f98cbbfd37c1d7f0cc2c246353db84b0bed91dd354569562024747f2fbd4126",
+      "frozenSourceMatches": true,
+      "expectedFrom": "manifest baseCommit (unchanged tracked source)"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+      "sha256": "86dc541f05da02c095e476e1b3055a1b498bdfe3dae8ba144bad13ad25e1f482",
+      "expectedSha256": "86dc541f05da02c095e476e1b3055a1b498bdfe3dae8ba144bad13ad25e1f482",
+      "frozenSourceMatches": true,
+      "expectedFrom": "SOURCE_MANIFEST_t08e.json"
+    },
+    {
+      "path": "vitest.config.js",
+      "sha256": "107f80b09f0a0c91959ea246a71b0c32c8978361e37df3df0f71bfb273ca2bf1",
+      "expectedSha256": "107f80b09f0a0c91959ea246a71b0c32c8978361e37df3df0f71bfb273ca2bf1",
+      "frozenSourceMatches": true,
+      "expectedFrom": "manifest baseCommit (unchanged tracked source)"
+    }
+  ],
+  "agentDelete": {
+    "cases": [
+      {
+        "scene": "agent-guard-original",
+        "childCase": "rust_agent_delete_connection_change_counterexample",
+        "status": "FAILED",
+        "durationMs": 1064.4302079999998,
+        "actual": false,
+        "expected": true,
+        "failureAt": {
+          "file": "desktop/src/react/settings/__tests__/R06AgentDeleteConnectionReview.test.tsx",
+          "line": 48,
+          "expression": "useSettingsStore.getState().ready === true"
+        },
+        "failedBefore": [
+          "click 助手",
+          "select victim",
+          "preview orphan skills",
+          "connection switch",
+          "DELETE agent/skills"
+        ],
+        "capturedChildHttpReceipts": false,
+        "securityAuditBytes": 0,
+        "uiResultSha256": "7b53ee18ed7142186b63ae402e53ae5a9123ffbf4cb04502fea3a48480a1a0ac"
+      },
+      {
+        "scene": "agent-complete",
+        "childCase": "rust_agent_delete_current_settings_real_service",
+        "status": "FAILED",
+        "durationMs": 1066.7361250000001,
+        "actual": false,
+        "expected": true,
+        "failureAt": {
+          "file": "desktop/src/react/settings/__tests__/R06AgentDeleteRustLive.test.tsx",
+          "line": 50,
+          "expression": "useSettingsStore.getState().ready === true"
+        },
+        "failedBefore": [
+          "click 助手",
+          "select victim",
+          "preview orphan skills",
+          "connection switch",
+          "DELETE agent/skills"
+        ],
+        "capturedChildHttpReceipts": false,
+        "securityAuditBytes": 0,
+        "uiResultSha256": "9b9453f6d05b03d1c4bcc4b1b6518f7d7ee383f09aad9e8d40c576e3315bab9b"
+      }
+    ],
+    "confirmedFacts": [
+      "两个子进程分别约1064ms/1067ms在第一个默认waitFor ready断言失败；不是删除接口结果断言失败。",
+      "父Rust两项各自循环首场失败即panic，后续删除故障、连接变体和登记表变体未由本次实跑覆盖。",
+      "SettingsContent真实冷启动串联身份/config及agents，再并行snapshot/avatars/models后才ready；错误catch会ready并保留错误；另有原15秒兜底。",
+      "Vitest父测试预算原60秒；这些helper首ready等待隐用Testing Library约1秒默认。",
+      "失败输出没有保存receipts/attempts；security-audit为空不能代替HTTP收发记录。"
+    ],
+    "rootCauseAssessment": "已确定失败发生在初始化就绪前且检查只给约1秒；尚无实际请求时间或错误流水，不能证明是哪一请求未完成、也不能排除真实初始化阻塞。不得把本次0/2改判删除功能通过。",
+    "samePatternAudit": [
+      {
+        "file": "desktop/src/react/settings/__tests__/R06AgentDeleteConnectionReview.test.tsx",
+        "line": 48,
+        "pattern": "初次ready默认waitFor，未显式绑定现有初始化完成/错误事实"
+      },
+      {
+        "file": "desktop/src/react/settings/__tests__/R06AgentDeleteRustLive.test.tsx",
+        "line": 50,
+        "pattern": "初次ready默认waitFor，未显式绑定现有初始化完成/错误事实"
+      },
+      {
+        "file": "desktop/src/react/settings/__tests__/R06AgentDeleteRegistryReview.test.tsx",
+        "line": 48,
+        "pattern": "初次ready默认waitFor，未显式绑定现有初始化完成/错误事实"
+      }
+    ],
+    "minimalNextStepAfterAuthorization": [
+      "先补安全的初始化请求开始/响应/失败时间与最后store状态收据，不记录token/headers/完整配置。",
+      "让删除检查只在真实配置/助手列表完成且无初始化错误后继续；使用原有父测试总预算和产品现有初始化边界，不新增任意sleep，不手动set ready、不放宽/删除删除与连接守卫断言。",
+      "若仍触发产品15秒兜底或错误，保留失败并按实际请求定位产品；不能单凭ready兜底视成功。"
+    ],
+    "uncertainty": "仅凭现有失败报告不能确认慢I/O、事件循环负载或具体HTTP阶段；需下一轮受授权取证。"
+  },
+  "chatLive": {
+    "case": "native_current_chat_page_inputarea_tiptap_true_network_and_queue_interject",
+    "status": "FAILED",
+    "helper": {
+      "file": "desktop/src/react/__tests__/chat-live/main.cjs",
+      "line": 18
+    },
+    "failedAssertion": "runtime-capsule-mounted",
+    "actual": false,
+    "expected": true,
+    "checksAlreadyPassed": [
+      "real-wire-hello",
+      "no-session-welcome",
+      "empty-input-zero-prompt",
+      "actual-prompt-identity",
+      "tool-stage-and-final-visible",
+      "welcome-current-exclusive"
+    ],
+    "actualTerminalStatusObserved": true,
+    "capturedRendererErrors": [
+      "[InputArea] load thinking level failed Error: 连接已切换，本次旧连接结果已丢弃"
+    ],
+    "runtimeCssRequestObserved": true,
+    "confirmedFacts": [
+      "聊天真实最终正文、工具成功、welcome隐藏均已通过；胶囊DOM即时检查为false。",
+      "当前helper第16行until只等CHAT-FINAL，不等独立lazy组件挂载。",
+      "ChatPage第12行React.lazy导入胶囊、40行Suspense fallback=null；胶囊自身无整组件条件return null。",
+      "现有现场只记录requestWillBeSent，不能声称已观察胶囊所有模块加载完成或确切完成耗时。",
+      "未见胶囊异常日志；唯一错误是InputArea旧连接thinking结果被丢弃，不足以证明或解释胶囊加载失败。"
+    ],
+    "rootCauseAssessment": "检查就绪屏障遗漏已经确定；lazy模块是否稍后成功挂载未被现有失败现场观察，不能把缺少等待本身当作胶囊产品最终成功证据。",
+    "minimalRepairAfterAuthorization": "把胶囊DOM存在并入第16行原 real model final visible 的同一until表达式，继续沿原20秒deadline；保留第18行check及全部后续真实操作，不增加第二段20秒，不加任意sleep。",
+    "samePatternAudit": [
+      {
+        "file": "desktop/src/react/__tests__/chat-live/main.cjs",
+        "line": 16,
+        "finding": "遗漏胶囊就绪谓词；本轮失败位置"
+      },
+      {
+        "file": "desktop/src/react/__tests__/chat-app-live/main.cjs",
+        "line": 18,
+        "finding": "d修复已将welcome及胶囊并入原main real Run同一until；e对应Rust case实际通过"
+      },
+      {
+        "scope": "RuntimeInfoCapsule组件直接渲染单测",
+        "finding": "直接import/render，不经过ChatPage lazy，不能视同一遗漏，也不作为本次原生成功证据"
+      }
+    ]
+  },
+  "historicalIntegrity": [
+    "原t08e日志、ui-result和隔离home未改。",
+    "没有覆写d失败或借d/dev通过消除e失败。",
+    "仅创建本诊断和白名单保全artifact；当前source及计划无改动。"
+  ]
+}

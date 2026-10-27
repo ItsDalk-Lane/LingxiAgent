@@ -5,6 +5,7 @@ import { AutomationPanel } from '../AutomationPanel';
 import { BridgePanel } from '../BridgePanel';
 import { SkillsPanel } from '../SkillsPanel';
 import { PreviewPanel } from '../PreviewPanel';
+import { RegionalErrorBoundary } from '../RegionalErrorBoundary';
 import { SideChatPanel } from '../side-chat/SideChatPanel';
 import { ChannelMessages, ChannelMembers, ChannelInput, ChannelReadonly, ChannelAgentActivityPanel, ChannelAgentSettingsPanel, ChannelExportPanel } from '../ChannelsPanel';
 import { ChannelHeader } from '../channels/ChannelHeader';
@@ -122,6 +123,7 @@ function ChannelPage() {
 export function AppPages() {
   const currentTab = useStore(s => s.currentTab);
   const sideChatOpen = useStore(s => s.sideChat.open);
+  const activePreviewTab = useStore(s => s.activeTabId);
 
   return (
     <>
@@ -129,7 +131,9 @@ export function AppPages() {
           保证右侧栏与主对话的输入区始终可见。 */}
       {currentTab === 'chat' && (
         <div className={sideChatOpen ? 'preview-panel-slot preview-panel-slot-yield' : 'preview-panel-slot'}>
-          <PreviewPanel />
+          <RegionalErrorBoundary region="chat-preview" resetKeys={[currentTab, activePreviewTab]}>
+            <PreviewPanel />
+          </RegionalErrorBoundary>
         </div>
       )}
 

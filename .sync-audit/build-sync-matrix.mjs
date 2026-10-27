@@ -40,7 +40,7 @@ const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source
 // tree sha，导致 seal guard 在 HEAD 长期红色——Phase 10 F-4 修复）。
 // 该 commit 早于记录它的审计提交落地，无自引用（SHA = hash(contents)）问题。
 // 当前 branch HEAD 可能在其后存在纯审计 seal 提交，HEAD 由 Git ref 自身标识。
-const VERIFIED_SOURCE_SHA = "46f12ab1c5bc00f02a685346a3efc1b473590393";
+const VERIFIED_SOURCE_SHA = "ab4f228155dd4246734e6c4c45d7288072361f3c";
 
 const ALLOWED_DISPOSITIONS = ["ADOPTED", "ADAPTED", "REGENERATED", "INTENTIONAL_DIVERGENCE"];
 
@@ -1057,6 +1057,19 @@ function main() {
     }
     if (!/^[0-9a-f]{40}$/.test(verifiedSourceSha)) {
       console.error(`✗ VERIFIED_SOURCE_SHA 非 40 位十六进制: ${verifiedSourceSha}`);
+      process.exit(1);
+    }
+    // 坐标必须精确指向 commit 对象：tree/tag 同样被 git diff/ls-tree 接受，
+    // 40 位格式与六处字符串一致性检查不足以证明坐标是真实源码提交（C3 独立复核 F1）。
+    let verifiedObjectType;
+    try {
+      verifiedObjectType = execSync(`git cat-file -t ${verifiedSourceSha}`, { cwd: ROOT, encoding: "utf-8" }).trim();
+    } catch {
+      console.error(`✗ VERIFIED_SOURCE_SHA 必须指向真实 commit 对象（对象不存在或不可读）: ${verifiedSourceSha}`);
+      process.exit(1);
+    }
+    if (verifiedObjectType !== "commit") {
+      console.error(`✗ VERIFIED_SOURCE_SHA 必须指向真实 commit 对象（git cat-file -t 实际返回 ${verifiedObjectType}）: ${verifiedSourceSha}`);
       process.exit(1);
     }
   } else {

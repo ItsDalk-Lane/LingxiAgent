@@ -17,6 +17,7 @@ import type { AutoUpdateState, UpdateDigestHistoryResult } from '../../types';
 import appIconUrl from '../../../icon.png';
 import styles from '../Settings.module.css';
 import updateStyles from '../../components/AutoUpdateStatus.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 const EMPTY_HISTORY: UpdateDigestHistoryResult = { entries: [], source: 'none', complete: false };
 
@@ -322,7 +323,7 @@ function ReleaseUpdateArea({
 }
 
 export function AboutTab() {
-  const hana = window.hana;
+  const hana = usePlatform();
   const settingsConfig = useSettingsStore(s => s.settingsConfig);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);

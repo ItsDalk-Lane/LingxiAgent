@@ -70,7 +70,7 @@ export const createSideChatSlice = (
         status: 'creating',
         error: null,
         seedQuote: seedQuote ? { ...seedQuote } : null,
-        createdAt: Date.now(),
+        createdAt: Math.max(Date.now(), s.sideChat.createdAt + 1),
       },
     })),
   setSideChatSession: ({ sessionPath, sessionId, agentId }) =>
@@ -84,6 +84,6 @@ export const createSideChatSlice = (
   closeSideChat: () => {
     // 关闭侧栏即作废该会话的记忆开关缓存：下次打开重新向服务端确认。
     resetSessionMemoryCache();
-    set({ sideChat: { ...SIDE_CHAT_INITIAL_STATE, createdAt: Date.now() } });
+    set(s => ({ sideChat: { ...SIDE_CHAT_INITIAL_STATE, createdAt: Math.max(Date.now(), s.sideChat.createdAt + 1) } }));
   },
 });

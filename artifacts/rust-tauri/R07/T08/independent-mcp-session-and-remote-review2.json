@@ -1,0 +1,111 @@
+{
+  "schema": "r07-t08-independent-mcp-session-remote-review-v2",
+  "reviewedAt": "2026-10-18T11:18:44.619185+00:00",
+  "reviewMode": "PRODUCT_TEST_PROTOCOL_PLAN_RUNNER_READ_ONLY; NEW_INDEPENDENT_ARTIFACT_ONLY",
+  "finalAcceptance": "pending",
+  "testsRunByReviewer": [],
+  "sourceObservation": {
+    "kind": "development-current-files-not-a-frozen-candidate",
+    "files": {
+      "rust/crates/lingxi-service/src/mcp_oauth.rs": "7ced2f904a7de25ef4542cadbb9c9c1539a4deb206134f75b0635f3d42fcfd9f",
+      "rust/crates/lingxi-service/src/mcp_apps.rs": "7c2dd97194e4598586f9c830fbf42666b1e3c611ae223f994eb78fd28631e57b",
+      "rust/crates/lingxi-service/src/mcpbridge.rs": "8222bc77499c4e7615647f53b00d5b9ecf602e1effa56e425ad391886af0f237",
+      "rust/crates/lingxi-service/src/mcp_http.rs": "84e571e194ea1636c93419b919d17dddd66e1835398167e73b59df3ccdce5c42",
+      "rust/crates/lingxi-service/src/mcp_settings.rs": "8765ce13870df5faacce33b7879c7c281174bdf5dc711c9653cd5e41b34d18a3",
+      "rust/crates/lingxi-service/src/mcp_session_permissions.rs": "b6b98a598e921d367f5074e3dd9cbe1df848dd1707a18d60f4733f6deb37b899",
+      "rust/crates/lingxi-service/src/sessions.rs": "6d4b34690362f5b9edcfec4acf4b127740a32e48f8b6a08e43fef47bf5f0e7b2",
+      "rust/crates/lingxi-service/src/chat_wire.rs": "0a027b4a21e9fb8f941da0a4eed95cc65a434443ecb1f0263668b71df9d52f33",
+      "rust/crates/lingxi-service/src/session_admin.rs": "d2e7cb8b33f4c794f5b1a9a6751678af03737353ca9588c3f84270a1f8292868",
+      "rust/crates/lingxi-service/tests/r07_t08_mcp_session_permissions.rs": "a6d4e038e96581f3baed2381d9a731107c78e8fd26de954dc391f9e13670ddee",
+      "rust/crates/lingxi-service/tests/r07_t08_mcp_remote.rs": "8ebeab021d4a678cee4f03fd57b468c07605e36cadf0150d0a5faa9eacfa0162",
+      "desktop/src/react/settings/tabs/McpTab.tsx": "dc493feb2de09f59a7c819ee949693035d523e5aa285f3f56939105001e7893d",
+      "desktop/src/react/settings/tabs/mcp/mcp-api.ts": "95015aa1a32781f34c88aee21fa5455ecca1422ebf5c5dc14d38f7702fe157f1",
+      "rust/Cargo.lock": "ae9ac557310fcaba768ebc55973c97cfcf18bf57b20d78e665e8fc65aac1b4a3"
+    }
+  },
+  "actualEvidence": [
+    {
+      "receipt": "artifacts/rust-tauri/R07/T08/mcp-session-permission-reproduce3.json",
+      "receiptSha256": "e3573e238fdb0c82febea0333c76bd49f03c6a2458cd73df7c9a8bb69f483b57",
+      "log": "artifacts/rust-tauri/R07/T08/mcp-session-permission-reproduce3.log",
+      "logSha256Verified": "8f1b7cae564ec4533be2f63e8470b1e35e74863322b238ed4854db72027aa6eb",
+      "exitCode": 101,
+      "sourceUnchanged": true,
+      "sourceFingerprint": "f61aff27a1c152e297b358e450120218d94d80c67fd5cc0bb2d2df840ccbfb1b",
+      "passed": 2,
+      "failed": 3,
+      "cases": [
+        {
+          "name": "actual_ws_prompt_reuses_session_capability_for_second_different_arguments_without_approval",
+          "status": "PASS",
+          "scope": "actual Rust WS and MCP SDK tool dispatch; cannot extrapolate whole 5-case target acceptance"
+        },
+        {
+          "name": "missing_scope_foreign_session_and_damaged_payload_never_grant_and_connector_restart_invalidates",
+          "status": "PASS"
+        },
+        {
+          "name": "in_flight_grant_cannot_land_after_real_archive_restore_completed",
+          "status": "FAILED",
+          "causeEvidence": "Observer held real grant after active-row read. Actual archive and restore returned 200 before release; original request still returned 200 instead of expected 409. No model/tool invocation in this counterexample.",
+          "classification": "confirmed lifecycle stale-grant insertion defect"
+        },
+        {
+          "name": "paired_scope_grants_same_session_exact_capability_across_arguments_without_persisting",
+          "status": "FAILED",
+          "causeEvidence": "other-capability-beta pending approval polling exceeded its original 5-second budget; diagnostic actual Run was waiting_approval.",
+          "classification": "real failed observation; do not assert cross-capability grant inheritance from this log"
+        },
+        {
+          "name": "credential_revocation_and_same_home_real_restart_do_not_restore_temporary_grants",
+          "status": "FAILED",
+          "causeEvidence": "shutdown returned mcp_cleanup_unconfirmed; owned process-group cleanup reported EPERM with actual_pgid=-1.",
+          "classification": "real cleanup failure; root cause not established in this review"
+        }
+      ]
+    }
+  ],
+  "staticConclusions": [
+    {
+      "status": "static-supported",
+      "subject": "WS foreground binding",
+      "finding": "chat_wire now invokes crate-private execute_foreground_chat_for with the original Principal; background/Bridge/scheduled wrappers still default false; only User origin with Full grant receives session capability permission. This is consistent with real foreground initiation while retaining background transport lifecycle."
+    },
+    {
+      "status": "static-supported",
+      "subject": "MCP apps/resources",
+      "finding": "Catalog derives from actual accepted SDK tools, validates app visibility/ui://, keeps first duplicate metadata, binds live server Arc and metadata epoch. Resources use SDK read_resource with bounded body, original local settings authority revalidation, per-request cancellation and sandbox/no-store/nosniff. Launch returns descriptor/input binding and does not prove tool execution."
+    },
+    {
+      "status": "static-supported",
+      "subject": "OAuth ownership and saved facts",
+      "finding": "Start/callback retain original SettingsAuthority, flow epoch, credential epoch and connector identity; writes use existing Source/FileSafety and precommit validation. Logout bumps lifecycle counters and clears Source before cleanup; callback poll distinguishes confirmed credentials from unconfirmed finalization. These are not actual new remote function test passes."
+    }
+  ],
+  "newStaticRisks": [
+    {
+      "id": "oauth-late-credential-writer",
+      "status": "STATIC_RISK_NOT_RUNTIME_REPRODUCED",
+      "location": "mcp_oauth.rs credential_identity, ConnectorStore::checked/write, start and complete",
+      "finding": "Credential identity excludes oauth.sdk. A new login writes replacement SDK credentials without advancing oauth_credential_epochs. Existing runtime refresh store and another already-created flow can therefore retain the same epoch and connector identity. complete stops the prior runtime only after the credential write, leaving a late old credential writer path that needs a real interleaving check.",
+      "sdkSupport": "Locked rmcp 3.4.1 refresh_token loads credentials, awaits actual token response, then saves through CredentialStore. The refresh mutex is per StoreInner, not shared by a different login flow.",
+      "minimalCheck": "Hold an old real refresh response while a new actual OAuth login saves distinguishable credentials, release old refresh, and assert new Source credentials do not revert/clear. Alternatively two preregistered-client login callbacks B then A demonstrate whether stale login intent is rejected; define that intended ordering explicitly.",
+      "minimalFixDirection": "Bind saved credentials to an issuance generation or coordinate refresh/login writers; do not reject ordinary valid SDK refreshes or erase saved/unknown facts."
+    },
+    {
+      "id": "oauth-cancel-capacity",
+      "status": "STATIC_RISK_NOT_RUNTIME_REPRODUCED",
+      "location": "mcp_oauth.rs start flow retention/FLOW_LIMIT and cancel_flow",
+      "finding": "The 32-item waiting limit counts done/error/cancelled entries retained for 300 seconds. Cancellation does not release a waiting slot although the limit error instructs the user to cancel.",
+      "minimalCheck": "Create/cancel 32 real flows against the owned OAuth endpoint, then verify the 33rd start can proceed without waiting 300 seconds.",
+      "minimalFixDirection": "Count active/pending work separately from retained final receipts, or otherwise release waiting capacity without losing truthful poll history."
+    }
+  ],
+  "boundaries": [
+    "Reviewer ran no Cargo, Node, GUI, external accounts, paid requests or outbound messages.",
+    "No product, tests, protocol, plan, frozen runner, prior receipts or f records changed by this review.",
+    "New r07_t08_mcp_remote cases were read but not independently executed; not claimed passed.",
+    "Distinct SSE transport still intentionally unsupported; HTTP SSE response streaming is a different mechanism.",
+    "The whole T08 stage is pending; earlier f gate green does not supersede newly confirmed lifecycle defect or unexecuted new remote tests."
+  ]
+}

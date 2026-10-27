@@ -1,0 +1,258 @@
+{
+  "schema_version": "1.0",
+  "task_id": "R02-T04",
+  "stage_id": "R02",
+  "generated_by": "ZCode:R02-T04 (EXECUTOR-R02-T04, 2026-09-26); fingerprints = sha256 over the migration SQL text, cross-checked against the on-disk receipt produced by lingxi-storage-inspect in artifacts/rust-tauri/R02/T04/s4-migrations-round1.json; V2/V3/V4 fingerprints registered by ZCode:EXECUTOR-R03-T08-E01 (2026-09-29), independently recomputed on disk via lingxi-storage-inspect over a fresh service-created runs.db (userVersion=4, receipts==compiledIn), matching the T04/T05/T06 report prefixes; V1 kept byte-for-byte; V6/V7 registered by ZCode:RR2-WP-A (2026-10-06, F41 repair, branch codex/rust-tauri-migration @ ad5ec4e98): fingerprints taken verbatim from the lingxi-storage-inspect `migrations` output over a fresh service-created runs.db built from this candidate (userVersion=7; receipts and compiledIn agree exactly on version/name/fingerprint; V1–V5 receipts reproduced the previously registered values byte-for-byte), evidence artifacts/rust-tauri/R05/RR2/A-R2/fingerprint-extraction/.; R06-AR-F14 (2026-10-12): V8–V11 appended from current MIGRATIONS SQL bytes via the existing registry parser; this repair did not execute a database upgrade or inspector acceptance.; R06 收口（2026-10-13）：V12 appended from current MIGRATIONS SQL bytes via the same parser path, receipts/compiledIn equality enforced by tests/r06_ar_f14_migration_receipts.rs.; R08-T04 收口（2026-10-23, t02-core per Lead adjudication）：V27/V28 appended from current MIGRATIONS SQL bytes via the same parser path; fingerprints cross-checked on disk via lingxi-storage-inspect over the real import-product runs.db (userVersion=28, receipts==compiledIn), evidence artifacts/rust-tauri/R08/t05-registry-sync-01..04.; R08-T06（2026-10-23, t02-core per Lead adjudication ②，T05 评审后注册表修正）：storage 分类表修正——provider-state 类增补 pattern `models-store.json`（实现于 rust/crates/lingxi-adapters/src/storage/legacy_import/classes.rs）。定性：R00 STORES.json/R01 DATA_COMPATIBILITY_MATRIX 与 R08 STORAGE_READINESS.md 均未列该文件=审计漏网（三方 SDK @earendil-works/pi-coding-agent 的 FileModelsStore 经 ModelRuntime.create({modelsPath: <lingxiHome>/models.json}) 写到数据根顶层 dirname(modelsPath)/models-store.json，生产冷启动同写）；不修则 T07 真实旧根 legacy-import 必撞 Unclassified 响亮拒。本条不触 migrations 指纹区（28 条零改动）；夹具 v3 无此文件，封存锚 80a8d2c2… 经 t06-registry-amend-* 确定性双跑重证不变；R00/R01 原文件不动（保 STORAGE_READINESS 输入摘要表）。",
+  "deterministic": "no timestamps/randomness; identical migration SQL produces identical fingerprints",
+  "new_persistence_points": [
+    {
+      "store_id": "rust-runs-db",
+      "kind": "sqlite-database",
+      "path_pattern": "{LINGXI_HOME}/lingxi-service/data/runs.db (+-wal/-shm siblings)",
+      "created_by_task": "R02-T04",
+      "owner": "adapters.storage (module lingxi-adapters; port contract in lingxi-kernel::ports::StoragePort)",
+      "writer_process": "rust-service (lingxi-service 组合根进程，唯一业务数据写者)",
+      "tables": {
+        "sessions": "kernel.session",
+        "runs": "kernel.run-supervisor",
+        "run_attempts": "kernel.run-supervisor",
+        "invocations": "kernel.tool-gateway (rows arrive R04; schema present)",
+        "messages": "kernel.session (normalized messages; rows arrive R05+; schema present)",
+        "key_events": "kernel.run-supervisor / kernel.session (key events for recovery; consumed by R02-T05)",
+        "schema_migrations": "adapters.storage (migration receipts)",
+        "stale_result_audit": "kernel.run-supervisor (R03-T04 fence audit; audit-only, never key_events/status)",
+        "invocation_journal": "kernel.tool-gateway semantics via R03-T05 InvocationJournal (prepared→authorized→started→succeeded/failed/unknown receipts)",
+        "run_lineage": "kernel.run-supervisor (R03-T06 RunLineage: parentRunId/origin/sourceMessageId/causeId)",
+        "model_call_usage": "kernel.usage ledger via R05-T07 (per-model-call usage rows; owner-scoped queries)",
+        "run_history_anchors": "adapters.storage.session_tree（R06-AR-F04 运行历史锚点）",
+        "session_operations": "adapters.storage.session_tree（R06-AR-F03 操作回执）",
+        "session_branch_heads": "adapters.storage.session_tree（R06-T03 分支头）",
+        "checkpoints": "adapters.storage.session_tree（R06-T03 检查点）",
+        "checkpoint_file_versions": "adapters.storage.session_tree（R06-T03 文件版本）",
+        "file_checkpoints": "adapters.storage.session_tree（R06-T03 文件恢复内容）",
+        "session_files": "adapters.storage.session_files（R06-T05 文件身份）",
+        "session_file_aliases": "adapters.storage.session_files（R06-T05 旧身份别名）",
+        "session_file_refs": "adapters.storage.session_files（R06-T05 文件引用）",
+        "file_history_snapshots": "adapters.storage.file_history（R06-T05 文件历史）",
+        "automation_jobs_v1": "service.automation（R07-T01 持久计划与配置代次）",
+        "automation_triggers_v1": "service.automation（R07-T01 触发去重与真实运行绑定）",
+        "automation_notifications_v1": "service.automation（R07-T01 排队、投递领取与真实回执）",
+        "automation_daily_receipts_v1": "service.automation（R07-T01 每日维护独立尝试收据）",
+        "automation_suggestions_v1": "service.automation（R07-T01 待用户应用的冻结建议）",
+        "automation_activity_promotions_v1": "service.session-admin（R07-T01 同会话活动升格事实）",
+        "automation_internal_sessions_v1": "service.automation（R07-T01 经真实入口登记的内部会话身份）",
+        "bridge_connectors_v1": "service.bridge（R07-T02 宿主平台身份与配置代次）",
+        "bridge_inbox_v1": "service.bridge（R07-T02 消息去重、附件就绪与真实运行关联）",
+        "bridge_outbox_v1": "service.bridge（R07-T02 目标冻结、发送领取与真实平台回执）",
+        "bridge_conversations_v1": "service.bridge（R07-T02 会话上下文代次与显示资料）",
+        "bridge_command_receipts_v1": "service.bridge（R07-T02 无模型命令一次执行及回发来源事实）",
+        "bridge_manual_actions_v1": "service.bridge（R07-T02 本机用户主动发文件的真实操作来源）",
+        "bridge_notice_receipts_v1": "service.bridge_notice（R07-T02 确认投递后追加独立上下文的幂等回执）",
+        "bridge_effect_streams_v1": "service.bridge_effects（R07-T02 等待与草稿冻结来源、未知窗口及原生模式）",
+        "bridge_effects_v1": "service.bridge_effects（R07-T02 外部效果序列、一次执行与真实平台回执）",
+        "conversation_file_operations_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "conversation_file_targets_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "conversation_file_sources_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "conversation_message_dispatch_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "phone_chains_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "phone_deliveries_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "phone_dm_directions_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "phone_discovery_cursors_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "phone_binding_epochs_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "phone_bindings_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "session_collab_drafts_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "session_collab_decisions_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "browser_workspaces_v1": "service.browser（R07-T04 授权代次、恢复与真实操作收据，Rust单写队列）",
+        "browser_downloads_v1": "service.browser（R07-T04 授权代次、恢复与真实操作收据，Rust单写队列）",
+        "browser_commands_v1": "service.browser（R07-T04 授权代次、恢复与真实操作收据，Rust单写队列）",
+        "media_jobs_v1": "service.media（R07-T05/T06 真实提交、执行、下载、取消及重启核对；Rust单写队列）",
+        "beautify_jobs_v1": "service.beautify_generation（R07-T05 用户封面动作、原版本冻结与付费阶段真实回执）",
+        "beautify_authorizations_v1": "service.toolgateway（R07-T05 真实用户动作绑定的窄工具批准收据）"
+      },
+      "pragmas": {
+        "journal_mode": "WAL (verified at open; refusal if not negotiated)",
+        "busy_timeout_ms": 5000,
+        "wal_autocheckpoint_pages": 1000,
+        "foreign_keys": "ON",
+        "synchronous": "FULL"
+      },
+      "migrations": [
+        {
+          "version": 1,
+          "name": "initial_run_message_schema",
+          "fingerprint_sha256": "479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8"
+        },
+        {
+          "version": 2,
+          "name": "stale_result_audit",
+          "fingerprint_sha256": "64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c",
+          "registered_by_task": "R03-T04 (late-result fence audit table; registered by R03-T08 per the T04-R1-F1/T05/T06 deferred item)"
+        },
+        {
+          "version": 3,
+          "name": "invocation_journal",
+          "fingerprint_sha256": "3bd5388f090ab0ae0e137d91d59a8e48f82f409bbd0de657abf29b897a4252c1",
+          "registered_by_task": "R03-T05 (side-effect invocation journal; registered by R03-T08 per the same deferred item)"
+        },
+        {
+          "version": 4,
+          "name": "run_lineage",
+          "fingerprint_sha256": "371d415462b7e8d698693f50a7b9c9f493fbb4e653ee30e5d3e8930f77e161b5",
+          "registered_by_task": "R03-T06 (run lineage four-part identity; registered by R03-T08 per the same deferred item)"
+        },
+        {
+          "version": 5,
+          "name": "model_call_usage_ledger",
+          "fingerprint_sha256": "16dce1c9d5106b74ef00df7348591f5fad11bf8a7bc0244effba804dfde7606d",
+          "registered_by": "R05-T07 (model_call_usage table; fingerprint recomputed from V5_SQL with the registry's own sha256-of-SQL method, verified by reproducing v4's registered fingerprint)"
+        },
+        {
+          "version": 6,
+          "name": "model_call_usage_rr1_f21",
+          "fingerprint_sha256": "cd875eae835e6a5ecdee8480b7c7c223eea5a180eaf8ee3c2b43416a7deadb86",
+          "registered_by": "R05 RR1 F21 (usage-ledger extension: outcome/started_at_unix_ms/settled_at_unix_ms/parent_tool_call_id/emitted_tool_calls via V6_SQL ALTERs + three indexes; migration fn V6_NAME/V6_SQL in rust/crates/lingxi-adapters/src/storage/migrations.rs; registered by RR2 WP-A per the first-round v5 precedent)"
+        },
+        {
+          "version": 7,
+          "name": "model_call_usage_rr1_f38_attempts_nullable",
+          "fingerprint_sha256": "b3189ef9c77630918436df07291bccd8f5a6a55f21109153ff73841cef58e3fb",
+          "registered_by": "R05 RR1 F38 (transport_attempts NULLABLE: table rebuild preserving every pre-existing row verbatim, indexes recreated identically; NULL = attempts unknown after a drop, never 0; migration fn V7_NAME/V7_SQL in rust/crates/lingxi-adapters/src/storage/migrations.rs; registered by RR2 WP-A per the first-round v5 precedent)"
+        },
+        {
+          "version": 8,
+          "name": "r06_t03_session_tree",
+          "registered_by": "R06-AR-F14：按当前实际 MIGRATIONS 的 SQL 字节登记；本轮仅实现修复，真实数据库升级与 inspector 验收尚未执行。",
+          "fingerprint_sha256": "7bd00e017f81fb225d8de3aa75efb6a9080f5a452674a8e2156b2360367150d7"
+        },
+        {
+          "version": 9,
+          "name": "r06_t05_session_files_resources",
+          "registered_by": "R06-AR-F14：按当前实际 MIGRATIONS 的 SQL 字节登记；本轮仅实现修复，真实数据库升级与 inspector 验收尚未执行。",
+          "fingerprint_sha256": "a690bb5f33adb924d58adaecbf38c1ada6875768f1e1884150cef1cea8de4397"
+        },
+        {
+          "version": 10,
+          "name": "session_operation_receipts",
+          "registered_by": "R06-AR-F14：按当前实际 MIGRATIONS 的 SQL 字节登记；本轮仅实现修复，真实数据库升级与 inspector 验收尚未执行。",
+          "fingerprint_sha256": "508bd3d05fdee521df6de273bf0d6958ba9851490a09d50554954b397c0e2849"
+        },
+        {
+          "version": 11,
+          "name": "r06_ar_f04_run_history_anchors",
+          "registered_by": "R06-AR-F14：按当前实际 MIGRATIONS 的 SQL 字节登记；本轮仅实现修复，真实数据库升级与 inspector 验收尚未执行。",
+          "fingerprint_sha256": "b2703d86026435bd3bdef3e2d5bc551f0e90083217c7403d88f7c0327718f593"
+        },
+        {
+          "version": 12,
+          "name": "r06_session_project_assignment",
+          "registered_by": "R06 收口 C1 批二：新增 sessions.project_id 可空列（会话项目归属端点共用）。按当前实际 MIGRATIONS 的 SQL 字节登记，与 v11 登记口径一致。",
+          "fingerprint_sha256": "2acdb34c6f2c5d060185979973f07b5824d329da5ba762d90e5d6cd4c4c04ca1"
+        },
+        {
+          "version": 13,
+          "name": "r06_session_workspace_identity",
+          "registered_by": "R06 C1 收尾：新增 sessions.workspace_mount_id / cwd 两个可空列（工作台处置与孤儿清扫叶面共用；现役锚点 server/routes/sessions.ts:2670 workspace-disposal 与 :2762 sweep-orphaned-workspaces；一条迁移两个 ALTER）。按当前实际 MIGRATIONS 的 SQL 字节登记（sha256 经 python hashlib 复算，v12 登记口径同法复验一致），契约测试 r06_ar_f14_migration_receipts 自动核对。",
+          "fingerprint_sha256": "ffae0eb452ebb94df83667e22c4788f7f17b072f4190f4dc35e7419a27c38bd0"
+        },
+        {
+          "version": 14,
+          "name": "session_proactive_delegation_at_creation",
+          "registered_by": "R06 主动委派：仅追加 sessions.proactive_delegation 默认false列。按现有解析器读取当前实际SQL字节计算SHA256，旧版本指纹不变；迁移与真实数据库回执按原契约核对。",
+          "fingerprint_sha256": "4c3c36afd3f7f84e0168bdd12fcd3ebea38de6b12b1c566dac1407a1374712c6"
+        },
+        {
+          "version": 15,
+          "name": "r07_automation_receipts",
+          "registered_by": "R07-T01：从实际迁移SQL字节计算，旧V1–V14保持不变；真实新库/旧库升级验证结果另行记录。",
+          "fingerprint_sha256": "0d18730f33d5aafb4fb302ed969025d2e71cba0cd5fd3ed63c5d7d597d89ec37"
+        },
+        {
+          "version": 16,
+          "name": "r07_bridge_inbox_outbox",
+          "registered_by": "R07-T02：从实际迁移SQL字节计算；V1–V15保持不变，V15仍等于T01冻结指纹。",
+          "fingerprint_sha256": "e4b910009a7a1c21599b43c918fb53900ba7ee58bda3ae6093ae1a6bccf27869"
+        },
+        {
+          "version": 17,
+          "name": "r07_bridge_effect_receipts",
+          "registered_by": "R07-T02：独立追加等待与原生草稿回执；V1–V16指纹保持不变。",
+          "fingerprint_sha256": "3acf38748a3921ff99ef809ad95aecd56e57a39dd83b5484af1f91ef6edc0773"
+        },
+        {
+          "version": 18,
+          "name": "r07_bridge_independent_receipt",
+          "registered_by": "R07-T02：独立输入状态能力由宿主冻结；追加列默认false，V1–V17已应用SQL与指纹均保留。",
+          "fingerprint_sha256": "ff916d2332e1e35b9fcfad0a8bed46973639b645ed15e58c7e9b3dffeb2e31f4"
+        },
+        {
+          "version": 19,
+          "name": "r07_conversation_phone_collab_receipts",
+          "registered_by": "R07-T03：仅追加真实频道/私信文件两阶段收据、手机因果预算与协作草稿；V1–V18已应用SQL及指纹均保留。",
+          "fingerprint_sha256": "ad7496e374aeae2f6faeebaf46ee35e29013af39e95dfcc1c8303de5d477f20e"
+        },
+        {
+          "version": 20,
+          "name": "r07_browser_authority",
+          "registered_by": "R07-T04：追加受控浏览器授权、冷恢复、命令与下载收据；V1–V19 SQL不变。",
+          "fingerprint_sha256": "6379466e6c3d1d60c13cca6d314e172f95316f0d56da85fdb8433adc3a4d88fa"
+        },
+        {
+          "version": 21,
+          "name": "r07_media_jobs",
+          "registered_by": "R07-T05/T06：追加媒体作业真实回执；V1–V20 SQL与指纹保持不变。",
+          "fingerprint_sha256": "9eee2a9b7ba1ec2ee5a02065919b856637464357c9d03ed7b8cb6cb95fde3e70"
+        },
+        {
+          "version": 22,
+          "name": "r07_beautify_jobs",
+          "registered_by": "R07-T05：仅追加封面后台作业和明确用户动作批准收据；V1–V21 SQL与指纹保持不变，验证另记。",
+          "fingerprint_sha256": "66623eb4489e9f8ce343af5ba2c6bd046ef7a582d0424be42a91e09ceb50820c"
+        },
+        {
+          "version": 23,
+          "name": "r07_media_gallery",
+          "registered_by": "R07-T06：追加工作台媒体任务投影表（与媒体作业一一对应，运行时作业仍是唯一事实来源）；V1–V22 SQL与指纹保持不变，验证另记。",
+          "fingerprint_sha256": "e2f684b93d2e3b373709345f74a088ce331464fd73dc8169778e3ad780d8de0d"
+        },
+        {
+          "version": 24,
+          "name": "r07_observability_legacy_trace",
+          "registered_by": "R07-T10：旧观测库导入映射表（原 trace/parent id 保留，多轮不分裂）；V1–V23 SQL与指纹不变。",
+          "fingerprint_sha256": "36e3c7502d6d09b78cad4a23f88050a101b82631126953100670fe7d58c073c9"
+        },
+        {
+          "version": 25,
+          "name": "r07_bridge_loop_deliveries",
+          "registered_by": "R07 收口 B：桥循环投递台账（/loop 作用于桥会话时回执/通知先落账，重启接力不丢、delivery_id 幂等）。",
+          "fingerprint_sha256": "a0ab64ddaa44db7ecefb0b78b284043d7b5e498b6c9d30bd1be2d18be7d252f1"
+        },
+        {
+          "version": 26,
+          "name": "r07_bridge_outbox_loop_source",
+          "registered_by": "R07 收口 B：outbox 重建增加 loop_delivery_id 来源列（循环通知第四种可审计来源；存量行走迁移拷贝，约束与索引保持）。",
+          "fingerprint_sha256": "8923899f64cb03d226344bfd08dcd40c2c3a9b8734c0ff4d367ffe4e225cafdb"
+        },
+        {
+          "version": 27,
+          "name": "r08_legacy_import_bookkeeping",
+          "registered_by": "R08-T04 收口：LegacyImporter 簿记（A07/A08）——导入 run、批次与问题清单三表，纯追加新表，不改写任何既有表。",
+          "fingerprint_sha256": "1c317b4249efb63ceca729a9dd27050dc101c83d7d83b69f30dd2fd7b04cd654"
+        },
+        {
+          "version": 28,
+          "name": "r08_legacy_import_extensions_registry",
+          "registered_by": "R08-T04 收口 B3：legacy-import 扩展收据载体 import_run_extensions + 8 个运行态类键登记面 legacy_runtime_state_registry（登记≠消费）。",
+          "fingerprint_sha256": "a82dacc2305bdffbfc4d339aceb2673cea84e07de226cd7e0d6a186d9ac1eaf4"
+        }
+      ],
+      "cutover_strategy": "switch-to-new-authority (new isolated database under the new rust data root; no incumbent store is written by this task)",
+      "notes": "Bounded single-writer work queue (capacity 64) fronts all SQLite access; QueueFull is explicit backpressure; terminal status + key events commit in one BEGIN IMMEDIATE transaction; event publication happens only after commit returns Ok."
+    }
+  ],
+  "incumbent_stores_untouched": {
+    "authority": "docs/rust-tauri/R01/DATA_COMPATIBILITY_MATRIX.json (69 stores, per-store strategy)",
+    "summary": "35 preserve-format + 13 regenerable + 11 switch-to-new-authority + 6 shell-local + 4 epoch-mechanism",
+    "statement": "R02-T04 does not merge, migrate or rewrite ANY incumbent store. The 11 switch-to-new-authority stores remain the old JSONL/SQLite formats until the R08 cutover drills (read-only import + receipts + verification + switch per ADR-004). The other 58 stores keep their formats and owners.",
+    "rust_readers_writers_in_this_task": "none (no preserve-format store is read or written by R02-T04 code)"
+  }
+}

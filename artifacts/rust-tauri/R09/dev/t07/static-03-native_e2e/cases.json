@@ -1,0 +1,120 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t07_native_e2e",
+ "cases": [
+  {
+   "case": "t07::platform.macos-arm64-recorded",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "os": "27.0.1",
+    "osBuild": "26A434",
+    "arch": "arm64",
+    "kernel": "27.0.0",
+    "hostPlatform": "macos-arm64",
+    "webkit": "22625.1.29.11.28",
+    "display": "Chipset Model: Apple M3 Ultra\n          Resolution: 2560 x 1440 (QHD/WQHD - Wide Quad High Definition)"
+   }
+  },
+  {
+   "case": "t07::fixtures.deterministic-v3-anchor",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "first": "80a8d2c2640e2b2974b299a10f36679bc19daf0911e51f82f0c43399cb32feaa",
+    "second": "80a8d2c2640e2b2974b299a10f36679bc19daf0911e51f82f0c43399cb32feaa",
+    "anchor": "80a8d2c2640e2b2974b299a10f36679bc19daf0911e51f82f0c43399cb32feaa"
+   }
+  },
+  {
+   "case": "t07::fixtures.long-session-1000",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "staged": {
+     "path": "/private/tmp/lingxi-r09-runtime/r09_t07_native_e2e-11200-1793026187309/home-t07-fixtures/t07-fixtures/v3",
+     "treeDigest": "3bbb5d4bacb8af51dbcf46f5d947b9a6480e963252afac4b93a14b9cee996f8a",
+     "fileCount": 36
+    },
+    "sessions": [
+     "sess-t07-long-1000",
+     "sess-t07-tools-ok",
+     "sess-t07-tools-fail",
+     "sess-t07-tools-nofinal"
+    ]
+   }
+  },
+  {
+   "case": "t07::fixtures.tool-cards-candidate-schema",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "schemaStatus": "candidate-unverified",
+    "boundary": "legacy 夹具进入 Rust home 需 R08-T04i cutover 导入 CLI；且 rust-mode app-init 停在 status.rustCoreUnavailable，不加载会话列表（native-caps §9 非宿主面）。A13 长会话/工具卡 UI 断言依赖服务侧读取接线后的 cleared E2E 批次，不在 UI 上伪造。"
+   }
+  },
+  {
+   "case": "t07::platform.macos-arm64",
+   "ok": false,
+   "actual": 0,
+   "detail": {
+    "status": "NOT_EXECUTED",
+    "note": "静态前半（无 GUI）已完成；本机 E2E 断言待 Lead cleared 的 GUI 批次"
+   }
+  },
+  {
+   "case": "t07::platform.macos-x64.blocked",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": "BLOCKED_PLATFORM",
+    "reason": "无可用真机/受控 VM；不用交叉编译或 Linux/macOS 截图替代原生验收（BLOCKED.md）"
+   }
+  },
+  {
+   "case": "t07::platform.windows-x64.blocked",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": "BLOCKED_PLATFORM",
+    "reason": "无可用真机/受控 VM；不用交叉编译或 Linux/macOS 截图替代原生验收（BLOCKED.md）"
+   }
+  },
+  {
+   "case": "t07::platform.linux-x64.blocked",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "status": "BLOCKED_PLATFORM",
+    "reason": "无可用真机/受控 VM；不用交叉编译或 Linux/macOS 截图替代原生验收（BLOCKED.md）"
+   }
+  },
+  {
+   "case": "isolation::no-residual-processes",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "killed": [],
+    "residual": [],
+    "marker": "/private/tmp/lingxi-r09-runtime/r09_t07_native_e2e-11200-1793026187309"
+   }
+  },
+  {
+   "case": "isolation::real-home-untouched",
+   "ok": true,
+   "actual": 1,
+   "detail": {
+    "before": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    },
+    "after": {
+     "exists": true,
+     "digest": "ca3883bfce29c45deabc00a7bc5b3d68a013c3bb93d8b2953910225fed8ed044",
+     "fileCount": 41706
+    }
+   }
+  }
+ ]
+}

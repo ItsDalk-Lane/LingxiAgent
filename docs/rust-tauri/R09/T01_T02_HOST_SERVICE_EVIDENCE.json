@@ -1,0 +1,844 @@
+{
+  "schema": "lingxi.r09.t01t02-design.v1",
+  "stage": "R09",
+  "taskIds": ["R09-T01", "R09-T02"],
+  "acceptanceIds": ["R09-A01", "R09-A02", "R09-A03", "R09-A04"],
+  "artifactKind": "READ_ONLY_DESIGN_INVESTIGATION",
+  "generatedAt": "2026-10-26T13:25:00Z",
+  "gitHead": "aac8cb9fe6bb7bfa7a41d75528221136bfe55e50",
+  "branch": "codex/rust-tauri-migration",
+  "readOnly": {
+    "wroteOnly": [
+      "docs/rust-tauri/R09/T01_T02_HOST_SERVICE_DESIGN.md",
+      "docs/rust-tauri/R09/T01_T02_HOST_SERVICE_EVIDENCE.json"
+    ],
+    "didNotTouch": [
+      "AGENTS.md",
+      "package.json",
+      "package-lock.json",
+      "rust/**",
+      "scripts/**",
+      "docs/rust-tauri/R00/**",
+      "docs/rust-tauri/R01/**",
+      "docs/rust-tauri/R08/**",
+      "rust/crates/xtask/src/stage_maps/**",
+      "desktop/**"
+    ],
+    "notExecuted": [
+      "npm run build:renderer",
+      "npm run build:rust-service",
+      "npx tauri build",
+      "any app launch / WebDriver / CDP session",
+      "any installer / codesign / notarization flow",
+      "any vitest or cargo test"
+    ]
+  },
+  "environmentFacts": {
+    "observedAt": "2026-10-26T21:09:00+08:00..21:20:00+08:00",
+    "os": "macOS 27.0.1 (Build 26A434), aarch64",
+    "developerDir": "/Library/Developer/CommandLineTools (CLT only; xcodebuild -version errors with 'requires Xcode')",
+    "codesigningIdentities": 0,
+    "toolsPresent": ["/usr/bin/codesign", "/usr/bin/hdiutil", "/usr/bin/osascript", "/usr/bin/SetFile", "/usr/bin/xcrun"],
+    "rust": {
+      "rustup": "1.29.1 at ~/.cargo/bin/rustup",
+      "activeToolchain": "1.98.1 (rust-toolchain.toml overrides)",
+      "pathCaveat": "/opt/homebrew/bin/cargo is 1.93.0 and does not read rust-toolchain.toml; all Rust commands must go through rustup run 1.98.1"
+    },
+    "node": "v24.16.0",
+    "npmRegistryReachable": true,
+    "tauriCli": {
+      "version": "2.12.4",
+      "status": "installed in working tree during investigation (Lead R09 infra); package.json:139 exact pin, package-lock updated, node_modules/.bin/tauri present",
+      "note": "docs/rust-tauri/R09/BLOCKED.md:13 lists BLOCKED-TAURI-CLI-OFFLINE as RESOLVED; earlier read-only snapshot before 21:14 showed no tauri entry in package.json/package-lock — current working-tree state is the one relied on here"
+    },
+    "artifacts": {
+      "desktop/dist-renderer": {
+        "treeSha256": "3e5339cc92f9f29a30846a101b3e4636d3b4e2d7f896980c57b8f31b129a89ef",
+        "equalsR08A16Baseline": true,
+        "sizeApprox": "84MB / 453 assets"
+      },
+      "rust/target/debug/lingxi-service": {
+        "sha256": "b855e5d638aea6605c1b2d634377f230e1b6118e71522eb98a8be841ed10faa0",
+        "equalsR08A16Baseline": true
+      },
+      "shared/contract-versions.json": {
+        "sha256": "6d86934755a23e4f35a6dbd68957ff3d302a3ce5f6d61d40066efd68f33a6f96",
+        "equalsR08A16Baseline": true
+      },
+      "desktop/dist-tauri-resources": {
+        "treeSha256": "6234f73efa13e93ef71ec6e09fd60279bace8e7263be82a160811882a4cd75f6",
+        "role": "R06 resource-host UI only; must not be used as the R09 product React artifact"
+      },
+      "dist-rust-service": "absent at investigation time; produced by npm run build:rust-service (package.json:52)",
+      "dist/mac-arm64/Lingxi.app": "absent",
+      "desktop/src-tauri/target/debug/lingxi-resource-desktop": "present (R06 host, built 2026-10-19; target/ gitignored)"
+    },
+    "baselineReference": "artifacts/rust-tauri/R08/verify-r08-closeout-08/SUITES/r08_a16_versions/a16-versions.json",
+    "concurrentWorkspaceChangesByLead": [
+      "package.json + package-lock.json (@tauri-apps/cli 2.12.4)",
+      "rust/crates/xtask/src/main.rs / runner_identity.rs / verify.rs (R09 registration)",
+      "rust/crates/xtask/src/stage_maps/R09.json + R09_INPUTS.json (untracked)",
+      "scripts/rust-tauri/r09_suites.py / r09_producer.py / r09_stage_inputs.py / r09_map_integrity.py (untracked)"
+    ]
+  },
+  "executiveSummary": [
+    "Electron's Rust-preview path is the complete behavioral template for R09-T02: explicit env gate -> dev/packaged binary resolution -> spawn --home -> stdout LINGXI_SERVICE_READY handshake -> private instance/token read + authenticated identity -> crash restart at most once -> owned-tree-only shutdown with structurally zero-touch remote/reused paths.",
+    "lingxi-service has no --port/--token CLI flags: it binds --bind (default 127.0.0.1:0), writes a per-start owner-only token to {home}/lingxi-service/local-token.json and publishes instance.json after bind; the host must consume --home + READY addr + private records + identity.",
+    "The protocol/data-version gate must use Rust constants (lingxi_protocol handshake wire 1..=1, ContractVersions::R08_CUTOVER data_epoch=2), NOT shared/contract-versions.json (DATA_EPOCH=1, legacy Node axis; renderer tolerates [1,2]); build.json currently has no protocol fields, so A03 requires extending the build identity first.",
+    "T01 same artifact = desktop/dist-renderer (currently byte-identical tree digest to R08-A16 baseline); desktop/dist-tauri-resources is the R06-only resource UI and must not be reused; Tauri release overlay points frontendDist at ../dist-renderer and embeds it into the app binary.",
+    "DesktopHost-Tauri registers as a new desktop/src/react/host/tauri-desktop-host.ts with kind 'tauri', detected via window.__TAURI__ (withGlobalTauri already true in tauri.conf.json:8), resolution order hana > tauri > platform-alias > web; platform.js data-platform and session-actions isDesktopShell must be updated in the same change.",
+    "Lowest-risk config separation: keep desktop/src-tauri/tauri.conf.json unchanged as the R06 base (so R06 WebDriver E2E remains reproducible) and add tauri.dev.conf.json + tauri.release.conf.json overlays driven by a Node build wrapper; overlay merge semantics must be proven by probe before relying on it.",
+    "Service binary distribution recommendation: Tauri externalBin sidecar for the executable plus bundle.resources for build.json, because R01-T06 already verified npx tauri build --bundles app and packaged .app sidecar handshake on this host; resources-only layout is a fallback pending nested-executable signing verification.",
+    "A01-A04 evidence must align with the Lead's already-landed R09 gate contract: four suites r09_t01_react_parity / r09_t01_release_offline / r09_t02_supervisor_ready / r09_t02_process_ownership, evidence under {EVIDENCE}/SUITES/<suite>/, per-case results via r09_producer.Producer (cases.json, lingxi.leaf-case-results.v1); r09_t01.py and r09_t02.py do not yet exist and currently fail honestly as NOT_IMPLEMENTED."
+  ],
+  "gateAlignment": {
+    "stageMap": "rust/crates/xtask/src/stage_maps/R09.json:36-97",
+    "commands": [
+      "r09_map_integrity",
+      "r09_inputs_check",
+      "r09_t01_react_parity",
+      "r09_t01_release_offline",
+      "r09_t02_supervisor_ready",
+      "r09_t02_process_ownership"
+    ],
+    "taskSuites": "scripts/rust-tauri/r09_stage_inputs.py:44-45",
+    "dispatcher": "scripts/rust-tauri/r09_suites.py:24-33,80-96 (missing task module => result.json status=NOT_IMPLEMENTED, exit 2, gate red)",
+    "producer": "scripts/rust-tauri/r09_producer.py:112-245 (isolated LINGXI_HOME/TMPDIR under /private/tmp/lingxi-r09-runtime, real ~/.lingxi before/after digest, run_step receipts, check/require, finish writes cases.json + result.json + output.log)",
+    "evidencePathConvention": "{EVIDENCE}/SUITES/<suite>/{result.json,output.log,cases.json,...}",
+    "caseSchema": "lingxi.leaf-case-results.v1",
+    "receiptSchema": "lingxi.r09.suite-receipt.v1",
+    "scenarioBindings": {
+      "R09-A01": ["r09_inputs_check", "r09_t01_react_parity", "r09_t01_release_offline"],
+      "R09-A02": ["r09_t01_react_parity", "r09_t01_release_offline"],
+      "R09-A03": ["r09_t02_supervisor_ready", "r09_t02_process_ownership"],
+      "R09-A04": ["r09_t02_supervisor_ready", "r09_t02_process_ownership"]
+    },
+    "honestyNote": "R09.json scenario notes state that all-green commands only prove the suite passes; without a per-assertion contract the scenario must not be recorded as formally complete."
+  },
+  "contracts": [
+    {
+      "id": "C01",
+      "area": "runtime-selection",
+      "behavior": "Electron Rust desktop mode is explicit env opt-in; default remains node",
+      "electronAnchors": ["desktop/src/shared/rust-local-service.cjs:186-192", "desktop/main.cjs:1510-1514"],
+      "electronBehavior": "LINGXI_DESKTOP_SERVER_RUNTIME: node(default) | rust(enabled) | other value throws",
+      "tauriMinimumDesign": "Tauri host is always rust service; it does not read this env. This makes 'no Node fallback' structural rather than branch discipline (A03).",
+      "module": "desktop/src-tauri/src/service/resolve.rs"
+    },
+    {
+      "id": "C02",
+      "area": "data-root",
+      "behavior": "LINGXI_HOME resolution and propagation",
+      "electronAnchors": ["shared/hana-runtime-paths.cjs:4-17", "desktop/main.cjs:176-177"],
+      "electronBehavior": "env override else ~/.lingxi; resolved absolute and written back to process.env.LINGXI_HOME",
+      "tauriMinimumDesign": "Resolve once at startup (env or $HOME/.lingxi, canonicalized); same value used for spawn env and private-record reads; no re-resolution at call sites.",
+      "module": "desktop/src-tauri/src/service/resolve.rs"
+    },
+    {
+      "id": "C03",
+      "area": "service-cli",
+      "behavior": "lingxi-service CLI surface",
+      "electronAnchors": ["rust/crates/lingxi-service/src/main.rs:41-222", "rust/crates/lingxi-service/src/main.rs:236-260"],
+      "electronBehavior": "--home is one of the required data-root sources; --bind defaults to 127.0.0.1:0; --network-mode loopback|lan; --shutdown-timeout-ms default 10000; there is NO --port and NO --token flag",
+      "tauriMinimumDesign": "spawn `lingxi-service --home <home>` exactly like Electron main.cjs:1437; never pass port/token; rely on READY addr + local-token.json + instance.json.",
+      "module": "desktop/src-tauri/src/service/supervisor.rs"
+    },
+    {
+      "id": "C04",
+      "area": "binary-resolution",
+      "behavior": "dev vs packaged service binary resolution",
+      "electronAnchors": ["desktop/src/shared/rust-local-service.cjs:194-215", "desktop/main.cjs:1374-1380"],
+      "electronBehavior": "dev: LINGXI_SERVICE_BIN (absolute) or <repo>/rust/target/debug/lingxi-service; packaged: resources/rust-service directory verification, env cannot replace the bundled binary",
+      "tauriMinimumDesign": "same env semantics in dev (absolute path; default repo-relative debug binary canonicalized to absolute); packaged resolves current_exe-relative sidecar + build.json and refuses env replacement.",
+      "module": "desktop/src-tauri/src/service/resolve.rs"
+    },
+    {
+      "id": "C05",
+      "area": "build-identity",
+      "behavior": "Pre-spawn packaged build identity verification",
+      "electronAnchors": ["desktop/src/shared/rust-local-service.cjs:134-184", "desktop/src/shared/rust-local-service.cjs:43-117"],
+      "electronBehavior": "validate build.json schema/fields (schemaVersion, platform, arch, target, toolchain, appVersion, binary, sha256, contentSha256, sourceSha256); on macOS signed mutation require contentSha equality + codesign --verify --strict + --deep app; on Windows allow checksum/cert-table mutation with same signer",
+      "tauriMinimumDesign": "port service/manifest.rs + service/digest.rs including Mach-O/PE content digest logic; otherwise ad-hoc signing always breaks sha256 and packaged launches would be rejected. Add protocol field to this gate.",
+      "module": "desktop/src-tauri/src/service/manifest.rs + digest.rs"
+    },
+    {
+      "id": "C06",
+      "area": "build-identity-generation",
+      "behavior": "Build identity is produced by the Node packaging script",
+      "electronAnchors": ["scripts/build-rust-desktop-service.mjs:16-21,71-73,90-155", "package.json:52-53"],
+      "electronBehavior": "pinned rustup toolchain, rust source digest, appVersion from package.json, sha256/contentSha256, staged at dist-rust-service/<mac|win|linux>-<arch>/",
+      "tauriMinimumDesign": "reuse the same stage; extend build.json with protocol {serverKind, wireProtocolMin, wireProtocolMax, dataEpoch} sourced from `lingxi-service --version`; add stage-tauri-service script mapping to binaries/lingxi-service-<triple> + resources/rust-service/build.json.",
+      "module": "scripts/build-rust-desktop-service.mjs (implementation phase) + scripts/stage-tauri-service.mjs"
+    },
+    {
+      "id": "C07",
+      "area": "legacy-node-mutex",
+      "behavior": "Refuse to start Rust service when an old Node server record exists for the same home",
+      "electronAnchors": ["desktop/main.cjs:1349-1353"],
+      "electronBehavior": "throws RUST_DESKTOP_NODE_SERVER_INFO_PRESENT; does not delete another process's clue",
+      "tauriMinimumDesign": "same check and refusal before spawn; Tauri has no Node path but must not silently attach to an old kernel.",
+      "module": "desktop/src-tauri/src/service/resolve.rs"
+    },
+    {
+      "id": "C08",
+      "area": "data-downgrade",
+      "behavior": "Refuse LINGXI_ALLOW_DATA_DOWNGRADE in Rust desktop",
+      "electronAnchors": ["desktop/main.cjs:1346-1348"],
+      "electronBehavior": "throws requiring explicit recovery workflow",
+      "tauriMinimumDesign": "same refusal with same wording intent; recorded as failure record.",
+      "module": "desktop/src-tauri/src/service/resolve.rs"
+    },
+    {
+      "id": "C09",
+      "area": "renderer-version",
+      "behavior": "Packaged renderer content version must match shell app version",
+      "electronAnchors": ["desktop/main.cjs:1381-1389"],
+      "electronBehavior": "artifact-boot resolves activated renderer; requires _currentContentVersion === app.getVersion() else refuse",
+      "tauriMinimumDesign": "T01/T02 renderer is embedded via frontendDist (no artifact-boot). Equivalent gate is build-time: record frontendDist tree digest + app version into build output metadata and verify at build stage; runtime OTA gate is out of T01/T02 scope (Q-10).",
+      "module": "scripts/build-tauri-host.mjs + desktop/src-tauri/src/service/manifest.rs"
+    },
+    {
+      "id": "C10",
+      "area": "instance-reuse",
+      "behavior": "Existing instance reuse policy",
+      "electronAnchors": ["desktop/main.cjs:1390-1405", "desktop/src/shared/rust-local-service.cjs:298-317"],
+      "electronBehavior": "read instance.json; dead pid ignored; live pid gathered via token+identity; dev allows local-reused (no ownership); packaged refuses RUST_DESKTOP_EXISTING_INSTANCE_UNVERIFIED",
+      "tauriMinimumDesign": "same mode machine LocalOwned | LocalReused | Remote; packaged refuses reuse; reused tracks pid without Child handle so exit is zero-touch.",
+      "module": "desktop/src-tauri/src/service/supervisor.rs"
+    },
+    {
+      "id": "C11",
+      "area": "spawn",
+      "behavior": "Spawn arguments, environment and detachment",
+      "electronAnchors": ["desktop/main.cjs:1437-1443", "desktop/main.cjs:1406-1436"],
+      "electronBehavior": "spawn(binary, ['--home', home], {cwd: dirname(binary), env:{...process.env, LINGXI_HOME, ...bridgeRuntimeEnv}, detached: platform!=='win32', stdio:['ignore','pipe','pipe']}); unref after ready",
+      "tauriMinimumDesign": "std::process::Command with --home/env/cwd, piped stdout/stderr with bounded buffers; on Unix process_group(0)/setsid so the owned tree can be converged. bridgeRuntimeEnv is Electron artifact-only and is an explicit T01/T02 gap (later T03/T05).",
+      "module": "desktop/src-tauri/src/service/supervisor.rs"
+    },
+    {
+      "id": "C12",
+      "area": "ready-handshake",
+      "behavior": "READY line handshake instead of fixed sleep",
+      "electronAnchors": ["desktop/main.cjs:1447-1486", "desktop/main.cjs:1471", "desktop/main.cjs:1465", "desktop/main.cjs:1477", "desktop/src/shared/server-readiness.cjs:34", "rust/crates/lingxi-service/src/main.rs:1149-1160"],
+      "electronBehavior": "line regex ^LINGXI_SERVICE_READY addr=(\\S+) home=; stdout only; 64KiB bound; timeout SERVER_INFO_FIRST_WAIT_MS=90000; child exit before ready rejects with code/signal",
+      "tauriMinimumDesign": "async BufReader stdout, same regex, tokio timeout 90s, early-exit rejection, kill+confirm on failure, diagnostics record of spawn->ready timestamps (A03 proves not a fixed sleep).",
+      "module": "desktop/src-tauri/src/service/supervisor.rs"
+    },
+    {
+      "id": "C13",
+      "area": "instance-token",
+      "behavior": "Owned instance/token private records",
+      "electronAnchors": ["desktop/src/shared/rust-local-service.cjs:217-266", "desktop/src/shared/rust-local-service.cjs:279-296", "rust/crates/lingxi-service/src/instance.rs:157-177", "rust/crates/lingxi-service/src/auth.rs:76,2110-2133"],
+      "electronBehavior": "read instance.json (non-secret) and local-token.json (owner-only 0600, uid, O_NOFOLLOW); validate serverKind, pid===child.pid, homePath===realpath(home), 32-hex instanceId, token record kind/instanceId match, 32-hex token, bindAddr===READY addr",
+      "tauriMinimumDesign": "Rust mirror structs for the same JSON; owner-only checks on Unix; Windows private read via `lingxi-service --read-private-runtime-json` (main.rs:240-260) registered as platform-blocked in T01/T02.",
+      "module": "desktop/src-tauri/src/service/instance.rs"
+    },
+    {
+      "id": "C14",
+      "area": "identity",
+      "behavior": "Authenticated identity verification",
+      "electronAnchors": ["desktop/main.cjs:1310-1334", "rust/crates/lingxi-service/src/management.rs:647,1240-1275"],
+      "electronBehavior": "GET {baseUrl}/lingxi/v1/server/identity with Bearer; 5s per request; retry only ECONNREFUSED/ECONNRESET 20x100ms; require serverNodeKind==='lingxi-service', transport match, non-empty serverId and studioId",
+      "tauriMinimumDesign": "same URL/header/timeout/retry/field assertions; additionally gate instance/health wire protocol and data epoch against compiled lingxi-protocol constants (C24).",
+      "module": "desktop/src-tauri/src/service/client.rs"
+    },
+    {
+      "id": "C15",
+      "area": "renderer-publish",
+      "behavior": "Publish connection to renderer",
+      "electronAnchors": ["desktop/main.cjs:1336-1343", "desktop/main.cjs:5646-5655", "desktop/src/react/app-init.ts:177-206", "desktop/main.cjs:2324-2328"],
+      "electronBehavior": "global serverPort/serverToken/serverNodeKind/serverNodeTransport/serverHost; IPC get-server-connection-info returns {port,token,serverNodeKind,serverNodeTransport,host}; server-restarted event carries same payload",
+      "tauriMinimumDesign": "Tauri state + commands get_server_connection_info/get_server_port/get_server_token returning identical fields (host null locally) + server-restarted event with identical payload so the R08 renderer boot path needs no business change.",
+      "module": "desktop/src-tauri/src/commands.rs + lib.rs"
+    },
+    {
+      "id": "C16",
+      "area": "record-liveness",
+      "behavior": "Instance record is diagnostics/identity, never liveness authority",
+      "electronAnchors": ["rust/crates/lingxi-service/src/instance.rs:19", "desktop/src/shared/rust-local-service.cjs:298-317"],
+      "electronBehavior": "service OS file lock is the liveness authority; host uses record only to locate and then proves identity with token-authenticated HTTP; host must not delete/rewrite another instance's records",
+      "tauriMinimumDesign": "same division: host reads records only; PID reuse handled by record pid + token identity double check (A04 negative case).",
+      "module": "desktop/src-tauri/src/service/instance.rs"
+    },
+    {
+      "id": "C17",
+      "area": "crash-policy",
+      "behavior": "Crash monitoring with at most one automatic restart",
+      "electronAnchors": ["desktop/main.cjs:2298-2349", "desktop/main.cjs:2315"],
+      "electronBehavior": "unexpected exit -> one automatic restart; success re-monitors and broadcasts server-restarted to main/settings; second failure writes crash log + error dialog",
+      "tauriMinimumDesign": "watch child exit; restart only if not quitting/intentional and attempts<1; emit server-restarted; otherwise failure record + native dialog; no infinite restart loop.",
+      "module": "desktop/src-tauri/src/service/supervisor.rs"
+    },
+    {
+      "id": "C18",
+      "area": "shutdown-owned",
+      "behavior": "Owned process tree shutdown with explicit residual reporting",
+      "electronAnchors": ["desktop/main.cjs:6854-6940", "desktop/main.cjs:725-728"],
+      "electronBehavior": "SIGTERM -> wait 17000ms -> SIGKILL -> wait 5000ms; unconfirmed exit keeps clues and reports PID instead of claiming clean",
+      "tauriMinimumDesign": "service/shutdown.rs with exact same budget constants; Unix libc::kill SIGTERM then SIGKILL; structured shutdown report {ownedPids, residual, graceMs, confirmed}; residual pids reported explicitly.",
+      "module": "desktop/src-tauri/src/service/shutdown.rs"
+    },
+    {
+      "id": "C19",
+      "area": "shutdown-external",
+      "behavior": "Reused and remote servers are never killed",
+      "electronAnchors": ["desktop/main.cjs:6900-6930", "docs/rust-tauri/R08/T03_FREEZE_MATRIX.md:17,73-74,84"],
+      "electronBehavior": "reused non-owned -> 'detached from external server' {confirmed:false}; remote branch never sets serverProcess/reusedServerPid so before-quit allows exit with zero contact",
+      "tauriMinimumDesign": "structural: only LocalOwned holds a Child handle; reused/remote shutdown path contains no kill code; report mode + touchedRemote=false.",
+      "module": "desktop/src-tauri/src/service/shutdown.rs"
+    },
+    {
+      "id": "C20",
+      "area": "quit-trigger",
+      "behavior": "Quit trigger surfaces and re-entrancy guard",
+      "electronAnchors": ["desktop/main.cjs:6942-6988", "desktop/main.cjs:6966-6975"],
+      "electronBehavior": "before-quit sets isQuitting, hides windows, computes hasActiveOwnedServer, resolveBeforeQuitServerAction allow/wait/run; second quit allowed after shutdown; _isUpdating skips",
+      "tauriMinimumDesign": "RunEvent::ExitRequested intercept + SIGINT/SIGTERM/SIGHUP handler that calls app.quit(); prevent_exit + async shutdown + app.exit(); QuitState mutex prevents re-entry. Without a signal handler SIGTERM kills the host immediately and skips cleanup (A04 would fail).",
+      "module": "desktop/src-tauri/src/lib.rs + service/shutdown.rs"
+    },
+    {
+      "id": "C21",
+      "area": "remote-mode",
+      "behavior": "Remote mode shape and red lines",
+      "electronAnchors": ["desktop/src/shared/rust-local-service.cjs:319-375", "desktop/main.cjs:1354-1373"],
+      "electronBehavior": "LINGXI_DESKTOP_RUST_REMOTE_URL (http(s), explicit port, no userinfo/path/query/hash) + absolute LINGXI_DESKTOP_RUST_REMOTE_TOKEN_FILE (owner-only, 32-hex token); non-loopback cleartext requires LINGXI_DESKTOP_RUST_REMOTE_ALLOW_CLEARTEXT=1; REMOTE_URL requires runtime=rust; packaged builds refuse remote; remote does not read local instance pid and never spawns",
+      "tauriMinimumDesign": "reuse the same env contract for R08 fixture portability; allow only in dev builds (tauri::is_dev()/debug_assertions) and refuse packaged with REMOTE_REQUIRES_DEV_BUILD; token file owner-only; zero-touch exit.",
+      "module": "desktop/src-tauri/src/service/remote.rs"
+    },
+    {
+      "id": "C22",
+      "area": "diagnostics",
+      "behavior": "Launch diagnostics and crash log",
+      "electronAnchors": ["desktop/main.cjs:444", "desktop/main.cjs:2425-2480", "desktop/main.cjs:2624", "desktop/src/shared/desktop-launch-diagnostics.cjs:1-50"],
+      "electronBehavior": "{LINGXI_HOME}/diagnostics/desktop-launch/renderer.log JSONL + {LINGXI_HOME}/crash.log; diagnostics include HOME/runtime/connection mode/spawn/exit",
+      "tauriMinimumDesign": "diagnostics.rs writing {LINGXI_HOME}/diagnostics/tauri-launch/events.jsonl (resolve/spawn/ready/identity/reject/shutdown/page-load) plus a Tauri crash log; name collision with Electron crash.log requires decision (Q-09). A02/A03 consume this JSONL.",
+      "module": "desktop/src-tauri/src/diagnostics.rs"
+    },
+    {
+      "id": "C23",
+      "area": "node-stale-record",
+      "behavior": "Node server-info stale record and foreign-home probe",
+      "electronAnchors": ["desktop/main.cjs:1516-1604", "desktop/src/shared/stale-server-info.cjs:14-19", "shared/server-info-probe.cjs:82-139"],
+      "electronBehavior": "Node path only: live PID + token probe classifies alive-same-home/alive-unauthorized (blocking) vs not-hana/dead (cleanable); Rust path never reuses server-info, only refuses when it exists",
+      "tauriMinimumDesign": "Tauri has no Node path; implement only C07 refusal. Do NOT port stale-server-info/server-info-probe PID-reuse heuristics into Rust service lock semantics; record 'not applicable' rationale in evidence.",
+      "module": "desktop/src-tauri/src/service/resolve.rs"
+    },
+    {
+      "id": "C24",
+      "area": "protocol-version",
+      "behavior": "Protocol/data version axes and health surface",
+      "electronAnchors": ["rust/crates/lingxi-service/src/lib.rs:536-543", "rust/crates/lingxi-service/src/lib.rs:3646-3657", "rust/crates/lingxi-service/src/lib.rs:8251", "rust/crates/lingxi-service/src/auth.rs:752", "rust/crates/lingxi-service/src/management.rs:1240-1275", "rust/crates/lingxi-protocol/src/handshake.rs:21-23,99-112", "rust/crates/lingxi-protocol/src/lib.rs:408-438", "shared/contract-versions.json", "desktop/main.cjs:1095"],
+      "electronBehavior": "public GET /lingxi/v1/health returns status/serverKind/serverVersion/wireProtocolMin/wireProtocolMax/dataEpoch; identity returns kind/transport/serverId/studioId/version; instance.json also carries wire/epoch; serverVersion() is still the 0.0.0 placeholder",
+      "tauriMinimumDesign": "three-layer gate: (1) build.json.protocol equals compiled lingxi-protocol constants (host may depend on lingxi-protocol per DEP-05), (2) pre-spawn manifest check, (3) post-READY instance/health/identity check. Do NOT use shared/contract-versions.json (DATA_EPOCH=1 legacy Node axis) and do NOT gate on serverVersion (0.0.0 has no discriminative power). appVersion goes through build identity.",
+      "module": "desktop/src-tauri/src/service/{manifest,client,supervisor}.rs"
+    },
+    {
+      "id": "C25",
+      "area": "single-writer",
+      "behavior": "Single-writer per home; host does not implement its own lock",
+      "electronAnchors": ["rust/crates/lingxi-service/src/main.rs:6-23", "rust/crates/lingxi-service/src/instance.rs:432+"],
+      "electronBehavior": "second instance on same home exits 3 with LINGXI_SERVICE_SINGLE_WRITER_BLOCKED stderr marker; stale record archived as instance.stale.json and taken over; OS lock is the liveness authority",
+      "tauriMinimumDesign": "host delegates to service; parses stderr marker and surfaces a precise error (home, recordedPid, instanceId, addr); never deletes the record and never force-kills another instance.",
+      "module": "desktop/src-tauri/src/service/supervisor.rs"
+    },
+    {
+      "id": "C26",
+      "area": "windows-guardian",
+      "behavior": "Windows guardian is only used by the Node path",
+      "electronAnchors": ["desktop/main.cjs:6858", "desktop/main.cjs:6870", "desktop/main.cjs:6878", "desktop/main.cjs:97-103"],
+      "electronBehavior": "guardian checks are guarded by serverNodeKind !== 'lingxi-service'; Rust owned path uses plain child.kill()",
+      "tauriMinimumDesign": "Tauri Windows should use a Job Object (KILL_ON_JOB_CLOSE) to bound the owned tree; no Windows machine available (BLOCKED-PLATFORM-WINDOWS-X64) so this is a registered unverified branch.",
+      "module": "desktop/src-tauri/src/service/shutdown.rs"
+    },
+    {
+      "id": "C27",
+      "area": "r06-host-reuse",
+      "behavior": "Existing R06 Tauri host assets reusable by R09",
+      "electronAnchors": ["desktop/src-tauri/tauri.conf.json:1-15", "desktop/src-tauri/Cargo.toml:14-33", "desktop/src-tauri/build.rs:2-3", "desktop/src-tauri/src/lib.rs:530-596", "desktop/src-tauri/tests/desktop_host.rs:137-160", "desktop/src-tauri/README.md:23-26"],
+      "electronBehavior": "independent manifest/lockfile; tauri 2.12.1 / tauri-build 2.7.2; withGlobalTauri true; commands registered in build.rs AppManifest::commands; e2e-test feature injects wdio WebDriver (optional dependency); E2E spawns CARGO_BIN_EXE and connects to http://127.0.0.1:$TAURI_WEBDRIVER_PORT/session",
+      "tauriMinimumDesign": "extend this crate: new commands must be added to build.rs command table AND capabilities/*.json allow lists; reuse wdio WebDriver E2E; keep base config so R06 tests remain reproducible.",
+      "module": "desktop/src-tauri/**"
+    },
+    {
+      "id": "C28",
+      "area": "renderer-boundary",
+      "behavior": "Renderer host boundary contract that T01 must satisfy",
+      "electronAnchors": ["desktop/src/react/types.ts:547-701", "desktop/src/react/app-init.ts:110-247", "desktop/src/react/host/desktop-host.ts:18,85-107"],
+      "electronBehavior": "business code uses getDesktopHost()/usePlatform() + ServiceClient; most bridge members optional; boot hard-requires getServerConnectionInfo|getServerPort|getServerToken + appReady + onServerRestarted",
+      "tauriMinimumDesign": "implement the boot baseline first; every other member gets an explicit capabilityReason + HostCapabilityError (no silent no-op); T03 completes the matrix and A05 verifies it.",
+      "module": "desktop/src/react/host/tauri-desktop-host.ts"
+    }
+  ],
+  "hostDesign": {
+    "scope": "R09-T02 supervisor, startup/ready/identity/publish/crash/shutdown/remote; window/splash/tray behavior deferred to T03 except the single main window created after service readiness",
+    "moduleLayout": [
+      "desktop/src-tauri/src/lib.rs — run(): manage(ServiceRuntime), invoke_handler, RunEvent exit hook, signal handlers",
+      "desktop/src-tauri/src/service/mod.rs — public start_and_wait / shutdown / status / republish",
+      "desktop/src-tauri/src/service/resolve.rs — LINGXI_HOME, dev/packaged binary, remote env shape/red lines, old server-info guard",
+      "desktop/src-tauri/src/service/manifest.rs — build.json validation (port of desktop/src/shared/rust-local-service.cjs:134-184)",
+      "desktop/src-tauri/src/service/digest.rs — Mach-O/PE content digest (port of rust-local-service.cjs:43-117; mandatory because ad-hoc signing mutates the executable)",
+      "desktop/src-tauri/src/service/instance.rs — instance.json/local-token.json private read + field checks (semantics of rust-local-service.cjs:217-317)",
+      "desktop/src-tauri/src/service/client.rs — identity/health HTTP (reqwest, 5s timeout, 20x100ms ECONNREFUSED/ECONNRESET retry, field assertions)",
+      "desktop/src-tauri/src/service/supervisor.rs — state machine spawn->READY->identity->publish, crash monitor, single restart",
+      "desktop/src-tauri/src/service/shutdown.rs — SIGTERM/SIGKILL ladder, residual report, reused/remote zero-touch",
+      "desktop/src-tauri/src/service/remote.rs — R08-T03 remote rules (token file, cleartext gate, dev-only)",
+      "desktop/src-tauri/src/diagnostics.rs — tauri-launch events.jsonl + crash log",
+      "desktop/src-tauri/src/commands.rs — Tauri commands to state/DTO"
+    ],
+    "dependencyPolicy": {
+      "allowed": ["tauri 2.12.1 (existing)", "tauri-plugin-dialog 2.7.3 (existing)", "serde/serde_json/sha2/base64/reqwest/tokio (existing)", "lingxi-protocol (allowed by DEP-05; only version constants consumed)"],
+      "notNeeded": ["tauri-plugin-shell for frontend (host-internal std::process::Command + path resolution keeps the frontend shell ACL surface at zero, per R01 §3)", "lingxi-service library embedding (host stays thin; do not embed business kernel)"],
+      "newIfApproved": ["libc (Unix signals/process groups; reuse an already-locked transitive version if present, otherwise needs Lead approval)"]
+    },
+    "stateMachine": {
+      "states": ["Idle", "Resolving", "VerifyingBinary", "Reusing", "Remote", "Spawning", "WaitingReady", "VerifyingIdentity", "Ready", "Crashed", "ShuttingDown", "Stopped", "Failed"],
+      "transitions": [
+        "Idle -> Resolving (start)",
+        "Resolving -> VerifyingBinary (local mode)",
+        "Resolving -> Remote (remote env present; dev-only)",
+        "Resolving -> Failed (old server-info present / downgrade env / remote contradiction)",
+        "VerifyingBinary -> Reusing (instance.json pid alive)",
+        "Reusing -> Ready (dev: LocalReused, publish, owned=false)",
+        "Reusing -> Failed (packaged: RUST_DESKTOP_EXISTING_INSTANCE_UNVERIFIED)",
+        "VerifyingBinary -> Spawning (no reusable instance)",
+        "Spawning -> WaitingReady (READY line)",
+        "Spawning -> Failed (spawn error / child exit before READY)",
+        "WaitingReady -> VerifyingIdentity (READY parsed)",
+        "WaitingReady -> Failed (90s timeout; kill child + confirm)",
+        "VerifyingIdentity -> Ready (records + identity + version gate pass)",
+        "VerifyingIdentity -> Failed (RUNTIME_IDENTITY_MISMATCH; SIGTERM/SIGKILL this child)",
+        "Remote -> Ready (identity verified, no local records/spawn)",
+        "Ready -> Crashed (unexpected child exit)",
+        "Crashed -> Spawning (attempts<1)",
+        "Crashed -> Failed (attempts==1 or intentional stop)",
+        "any -> ShuttingDown (quit/SIGTERM/exit-request)",
+        "ShuttingDown -> Stopped (owned tree confirmed gone or residual recorded)"
+      ]
+    },
+    "startupSequence": [
+      "resolve LINGXI_HOME (env or ~/.lingxi, canonicalized)",
+      "resolve mode: remote env (dev-only) else local",
+      "local: refuse if {home}/server-info.json exists; refuse LINGXI_ALLOW_DATA_DOWNGRADE=1",
+      "local packaged: verify build.json (schema/platform/arch/target/toolchain/appVersion/sha256/contentSha256/protocol) + signature-mutation policy",
+      "local dev: LINGXI_SERVICE_BIN absolute else <repo>/rust/target/debug/lingxi-service",
+      "local: read instance.json/local-token.json if present; dead pid => proceed; live pid => verify identity (dev reuse / packaged refuse)",
+      "spawn `lingxi-service --home <home>` with piped stdio and detached/process-group on Unix",
+      "parse stdout LINGXI_SERVICE_READY addr=... home=... within 90s; reject on early exit/timeout",
+      "read instance.json + local-token.json (owner-only) and assert pid/home/instanceId/bindAddr/transport",
+      "GET /lingxi/v1/server/identity with Bearer (5s, retry ECONNREFUSED/ECONNRESET) and assert kind/transport/serverId/studioId",
+      "assert instance + /lingxi/v1/health wireProtocolMin/Max and dataEpoch equal compiled lingxi-protocol constants",
+      "publish ConnectionInfo into Tauri state; create main window (visible=false); renderer app_ready shows it",
+      "monitor child exit; single restart; emit server-restarted"
+    ],
+    "commands": [
+      {"name": "get_server_connection_info", "returns": "{port,token,serverNodeKind,serverNodeTransport,host}", "parity": "desktop/main.cjs:5646-5655", "windowScope": "main (T06 finalizes)"},
+      {"name": "get_server_port", "returns": "number|null", "parity": "desktop/main.cjs:5646", "windowScope": "main"},
+      {"name": "get_server_token", "returns": "string|null", "parity": "desktop/main.cjs:5647", "windowScope": "main only"},
+      {"name": "get_service_status", "returns": "{mode,pid,readyAddr,manifest{protocol,appVersion,sha256},lastError}", "parity": "new diagnostics surface (token never included)", "windowScope": "main"},
+      {"name": "app_ready", "returns": "void", "parity": "desktop/main.cjs:6620-6658", "windowScope": "main"},
+      {"name": "get_platform", "returns": "string", "parity": "desktop/main.cjs:6604", "windowScope": "all host windows"}
+    ],
+    "events": [
+      {"name": "server-restarted", "payload": "{port,token,serverNodeKind,serverNodeTransport,host}", "parity": "desktop/main.cjs:2324-2328", "consumer": "desktop/src/react/app-init.ts:110-174"},
+      {"name": "server-crashed", "payload": "{reason,willRetry,crashLog}", "consumer": "T01 records; UI presentation T03/T07"},
+      {"name": "settings-changed", "payload": "{event,payload}", "consumer": "T03 completes"}
+    ],
+    "versionGate": {
+      "authority": ["rust/crates/lingxi-protocol/src/handshake.rs:21-23 (wire 1..=1)", "rust/crates/lingxi-protocol/src/lib.rs:408-438 (ContractVersions::R08_CUTOVER.data_epoch=2)"],
+      "layers": [
+        "build.json.protocol equals compiled constants (added by R09-T01/T02 build script)",
+        "pre-spawn manifest protocol equality (no spawn on mismatch)",
+        "post-READY instance.json + /lingxi/v1/health + identity field checks (RUNTIME_IDENTITY_MISMATCH + kill this child)"
+      ],
+      "excludedInputs": ["shared/contract-versions.json (DATA_EPOCH=1 legacy Node axis; renderer tolerates [1,2] per desktop/src/react/services/websocket.ts:58,132,142-153)", "serverVersion() (0.0.0 placeholder, no discriminative power)"],
+      "failureReasons": ["RUST_SERVICE_PROTOCOL_INCOMPATIBLE", "RUST_SERVICE_DIGEST_MISMATCH", "RUNTIME_IDENTITY_MISMATCH", "READY_TIMEOUT"],
+      "noFallback": "Tauri release binary contains no Node runtime and no hana-server/bootstrap path; host code has no other-service binary branch; evidence asserts process table has no node/hana and home has no server-info.json"
+    },
+    "timeouts": [
+      {"name": "READY first wait", "valueMs": 90000, "anchor": "desktop/src/shared/server-readiness.cjs:34; desktop/main.cjs:1477"},
+      {"name": "identity request", "valueMs": 5000, "anchor": "desktop/main.cjs:1316"},
+      {"name": "identity ECONNREFUSED/ECONNRESET retry", "value": "20 attempts x 100ms", "anchor": "desktop/main.cjs:1312-1325"},
+      {"name": "shutdown grace before SIGKILL", "valueMs": 17000, "anchor": "desktop/main.cjs:725"},
+      {"name": "force-kill confirmation wait", "valueMs": 5000, "anchor": "desktop/main.cjs:726"},
+      {"name": "wait poll interval", "valueMs": 200, "anchor": "desktop/main.cjs:728"},
+      {"name": "crash auto-restart budget", "value": "<=1", "anchor": "desktop/main.cjs:2315"},
+      {"name": "service graceful shutdown default", "valueMs": 10000, "anchor": "rust/crates/lingxi-service/src/main.rs:86-95"}
+    ],
+    "crashPolicy": {
+      "unexpectedExit": "record diagnostics; if attempts<1 restart once and re-monitor + emit server-restarted; otherwise write crash log + native dialog (host version/reason/log path) and stop",
+      "intentionalStopSet": ["quit in progress", "update/apply in progress", "shutdown already initiated"],
+      "singleWriterConflict": "exit code 3 / LINGXI_SERVICE_SINGLE_WRITER_BLOCKED is an error, not a crash restart (C25)"
+    },
+    "shutdown": {
+      "owned": "SIGTERM -> wait 17000ms -> SIGKILL -> wait 5000ms; unconfirmed => residual reported; write shutdown event",
+      "reused": "detached from external server; no kill; report {confirmed:false, reason:'external server is still running'}",
+      "remote": "structurally zero-touch (no Child handle); report {mode:'remote', touchedRemote:false}",
+      "reportPath": "{LINGXI_HOME}/diagnostics/tauri-launch/events.jsonl",
+      "reportFields": ["mode", "ownedPids", "signaled", "residual", "graceMs", "confirmed"],
+      "triggerSurfaces": ["RunEvent::ExitRequested", "SIGINT/SIGTERM/SIGHUP handler -> app.quit()", "OS logout (ExitRequested)"],
+      "windowCloseBeforeTray": "no tray in T01/T02 => window-all-closed quits (T03 adds tray/hide semantics)"
+    },
+    "remoteMode": {
+      "envContract": ["LINGXI_DESKTOP_RUST_REMOTE_URL", "LINGXI_DESKTOP_RUST_REMOTE_TOKEN_FILE", "LINGXI_DESKTOP_RUST_REMOTE_ALLOW_CLEARTEXT"],
+      "shapeRules": "http(s), explicit port, no userinfo/path/query/hash; token file absolute, owner-only, {\"token\":\"^[0-9a-f]{32}$\"}; non-loopback cleartext requires explicit drill flag",
+      "devOnly": "allowed only when tauri::is_dev()/debug_assertions; packaged refuses REMOTE_REQUIRES_DEV_BUILD (parity with desktop/main.cjs:1359-1361 and R08-T03 preview boundary)",
+      "zeroTouch": "no local instance read, no binary resolve, no spawn, no kill; renderer receives real host via get_server_connection_info and the R08 host propagation chain already supports it"
+    },
+    "diagnostics": {
+      "events": ["host-start", "resolve", "manifest-verified", "spawn", "ready", "identity-verified", "published", "webview-page-load(url)", "app-ready", "server-restarted", "service-launch-failed", "shutdown"],
+      "path": "{LINGXI_HOME}/diagnostics/tauri-launch/events.jsonl",
+      "crashLog": "{LINGXI_HOME}/tauri-crash.log (proposed to avoid clobbering Electron crash.log; Q-09)",
+      "redaction": "token never written; paths under LINGXI_HOME may appear (Electron redacts via redactLogText)"
+    },
+    "security": {
+      "ipc": "commands validate sender window label; token-bearing commands main-window only; capabilities/*.json allow-list additive",
+      "noShellGrant": "no tauri-plugin-shell; frontend cannot spawn arbitrary commands; host-internal spawn only",
+      "bridge": "window.__TAURI__ via existing withGlobalTauri:true; ACL still gates every invoke (R01 §3 negative matrix)",
+      "manifest": "packaged binary + manifest digest/protocol verified before spawn; app signature verification deferred policy by platform"
+    },
+    "crossPlatform": {
+      "macos-arm64": "only locally verifiable platform; signals/process groups/codesign available",
+      "macos-x64": "BLOCKED-PLATFORM-MACOS-X64; rustup only has aarch64 + windows-gnu installed",
+      "windows-x64": "BLOCKED-PLATFORM-WINDOWS-X64; needs Job Object tree convergence, sidecar .exe layout, --read-private-runtime-json, PE signature verification",
+      "linux-x64": "BLOCKED-PLATFORM-LINUX-X64; AppImage/deb sidecar layout, WebKitGTK dependency, no codesign equivalent"
+    },
+    "leadPlanAlignment": {
+      "anchor": "docs/rust-tauri/R09/PROGRESS.md:12-58,59-78",
+      "note": "Lead R09 plan keeps stage maps/package.json/lockfiles/shared entrypoints under Lead-only ownership and assigns T01/T02 implementers only their task files and scripts/rust-tauri/r09_t0X.py; PROGRESS §6 names this design as one of three design investigations to be reviewed into implementation specs and places T02 supervisor at desktop/src-tauri/src/supervisor.rs. The service/* split above is a proposal that can be flattened into supervisor.rs (+ small helpers) with identical semantics/constants/commands/events."
+    }
+  },
+  "t01Frontend": {
+    "artifact": {
+      "product": "desktop/dist-renderer",
+      "producer": "vite.config.ts:299 (base './'), :339 (outDir ../dist-renderer), :342-357 (six html entries + copyLegacyFiles at :267-292)",
+      "entryHtml": "desktop/src/index.html:6,14-17 (connection-csp.js -> i18n/theme/platform -> main.tsx)",
+      "currentDigest": "3e5339cc92f9f29a30846a101b3e4636d3b4e2d7f896980c57b8f31b129a89ef (equals R08-A16 baseline)",
+      "r06ResourceUiMustNotBeUsed": "desktop/vite.tauri-resources.config.ts:5-11 -> desktop/dist-tauri-resources (R06 resource host only; 1.7MB vs 84MB)",
+      "tauriEmbedding": "release overlay build.frontendDist=../dist-renderer; Tauri embeds assets into the app binary; no runtime directory dependency"
+    },
+    "productionNoDevServer": [
+      "release overlay has no devUrl; base R06 config also has no devUrl; frontendDist is the only page source",
+      "Tauri host reads no VITE_DEV_URL (Electron dev branch is desktop/main.cjs:543,615-631 + scripts/launch.js:27); evidence injects VITE_DEV_URL and proves it is ignored",
+      "host diagnostics record webview page-load URL => assert tauri://localhost/index.html (macOS) not http(s)://localhost:5173",
+      "canary listener on 5173 records 0 connections; lsof -a -p <app-pid> -iTCP shows no 5173 socket",
+      "strings <release-binary> scan: devUrl=0, localhost:5173=0, 127.0.0.1:5173=0 (and optional dist-tauri-resources=0)",
+      "release build excludes e2e-test WebDriver plugin (feature-gated Cargo.toml:27,33); A01 evidence build may include it, A02 uses clean release"
+    ],
+    "configs": [
+      {"file": "desktop/src-tauri/tauri.conf.json", "action": "keep unchanged (R06 base: frontendDist ../dist-tauri-resources, productName 'Lingxi Resources', bundle.active=false) so cargo test --test desktop_host stays reproducible"},
+      {"file": "desktop/src-tauri/tauri.dev.conf.json", "action": "new: build.devUrl http://localhost:5173, no beforeDevCommand (wrapper starts Vite), app.windows override to R09 main window, dev CSP adds ws://localhost:5173/http://localhost:5173"},
+      {"file": "desktop/src-tauri/tauri.release.conf.json", "action": "new: frontendDist ../dist-renderer, productName Lingxi, identifier com.lingxi.app (Q-06), bundle.active=true targets=[app], externalBin, resources, main window, release CSP, no signingIdentity (ad-hoc, Q-02)"},
+      {"file": "desktop/src-tauri/.tauri-build/", "action": "generated overlays with package.json version, stage absolute paths and target triple; gitignored"}
+    ],
+    "configSeparationRisk": "Tauri --config overlay merge semantics (arrays: app.windows/bundle.externalBin/resources) and which merged config is embedded at compile time must be proven (Q-05); probe via built binary strings + host diagnostics config summary + re-running R06 E2E.",
+    "desktopHostTauri": {
+      "newFile": "desktop/src/react/host/tauri-desktop-host.ts",
+      "modifyFiles": ["desktop/src/react/host/desktop-host.ts", "desktop/src/react/types.ts (ambient window.__TAURI__ types)", "desktop/src/modules/platform.js", "desktop/src/react/stores/session-actions.ts", "desktop/src/modules/connection-csp.js only if CSP probe requires"],
+      "kindUnion": "DesktopHostKind = 'electron' | 'web' | 'mobile' | 'tauri'",
+      "resolutionOrder": "window.hana (electron) > window.__TAURI__ (tauri) > window.platform alias (adopted as web) > lazy web host",
+      "identitySnapshot": "extend lastHana/lastPlatform snapshot with window.__TAURI__ identity so tests that swap globals re-resolve (same mechanism as desktop-host.ts:27-33,46-54)",
+      "bridgeMechanism": "window.__TAURI__.core.invoke (withGlobalTauri already true at tauri.conf.json:8); no @tauri-apps/api dependency to keep the single Electron/Tauri bundle clean",
+      "t01ImplementedMembers": ["getServerConnectionInfo", "getServerPort", "getServerToken", "appReady", "getPlatform", "onServerRestarted"],
+      "deferredPolicy": "all other PlatformApi members register capabilityReason and throw HostCapabilityError (host-capability-error.ts:5-21); no silent no-op; T03 completes matrix and A05 verifies",
+      "openSettings": "non-optional void member may throw HostCapabilityError in T01; T03 implements window",
+      "tests": "new desktop/src/react/__tests__/host/r09-tauri-desktop-host.test.tsx (jsdom fake window.__TAURI__): resolution order, payload passthrough, capability reasons, reset behavior"
+    },
+    "mustTouchProbes": [
+      {"file": "desktop/src/modules/platform.js:13-22", "change": "add window.__TAURI__ branch to set data-platform synchronously (darwin/win32/linux) while preserving Electron alias and win32 scroll behavior"},
+      {"file": "desktop/src/react/stores/session-actions.ts:276-279", "change": "isDesktopShell includes kind==='tauri'"},
+      {"file": "desktop/src/react/host/desktop-host.ts:113-120", "change": "keep Electron full-capability exception unchanged; Tauri must surface capabilityReason"},
+      {"file": "desktop/src/modules/connection-csp.js:1-68", "change": "conditional additive: connect-src ipc: http://ipc.localhost if Tauri IPC is blocked by the runtime meta CSP (Electron unaffected)"}
+    ],
+    "csp": {
+      "bridgeChoice": "withGlobalTauri:true + window.__TAURI__ (no new npm dep); T06 reviews global surface and capability allow-list",
+      "releaseCspDraft": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' ipc: http://ipc.localhost http://127.0.0.1:* ws://127.0.0.1:*; img-src 'self' data: file: http://127.0.0.1:*; media-src 'self' data: blob: file: http://127.0.0.1:*; font-src 'self' data:; frame-src 'self' blob: data: file: http://127.0.0.1:* http://localhost:*; object-src 'none'",
+      "cspReference": "vite.csp-profiles.ts:15-18 (Electron index profile)",
+      "risk": "Tauri response-header CSP intersects with the page's connection-csp.js meta CSP; prove invoke + WS under both via WebDriver (Q-07)"
+    },
+    "buildCommands": [
+      {"name": "build:tauri:renderer", "argv": "npm run build:renderer", "note": "identical product artifact as Electron"},
+      {"name": "build:tauri:service", "argv": "npm run build:rust-service", "note": "same dist-rust-service identity"},
+      {"name": "stage:tauri:service", "argv": "node scripts/stage-tauri-service.mjs", "note": "dist-rust-service/<tag>-<arch> -> binaries/lingxi-service-<triple> + resources/rust-service/build.json; triple from rustup run 1.98.1 rustc -vV host"},
+      {"name": "build:tauri", "argv": "node scripts/build-tauri-host.mjs", "note": "verify dist digest -> stage -> generate release overlay (version/paths) -> tauri build --bundles app"},
+      {"name": "build:tauri:e2e", "argv": "node scripts/build-tauri-host.mjs --features e2e-test --out desktop/src-tauri/target/e2e", "note": "A01 evidence build only"},
+      {"name": "dev:tauri", "argv": "node scripts/dev-tauri.mjs", "note": "Vite 5173 + tauri dev --config tauri.dev.conf.json; never part of release"},
+      {"name": "verify:tauri:service", "argv": "python3 -B scripts/rust-tauri/r09_suites.py --suite r09_t02_supervisor_ready --evidence {EVIDENCE}/SUITES/r09_t02_supervisor_ready", "note": "gate-integrated verification (existing R09.json command)"}
+    ],
+    "serviceLayout": {
+      "candidates": [
+        {"id": "L1", "name": "externalBin sidecar + resources manifest", "layout": "bundle.externalBin=[binaries/lingxi-service] staged as binaries/lingxi-service-<triple>; Tauri installs Contents/MacOS/lingxi-service; bundle.resources places build.json at Resources/rust-service/build.json", "pros": ["R01-T06 verified npx tauri build --bundles app and packaged .app sidecar handshake on this host", "Tauri handles sidecar placement/signing", "no frontend shell permission needed"], "cons": ["needs triple-suffixed staging", "executable and manifest in two directories", "Windows/Linux packaging unverified (blocked)"], "recommended": true},
+        {"id": "L2", "name": "resources-only directory", "layout": "bundle.resources maps dist-rust-service/<tag>-<arch> -> rust-service/ under Contents/Resources", "pros": ["single directory", "simple path resolution via resource_dir()"], "cons": ["nested executable signing inside Resources not verified", "ad-hoc signature mutation/digest handbook must be built", "R01 did not verify"], "recommended": false},
+        {"id": "L3", "name": "embed service in host binary", "layout": "single process", "pros": [], "cons": ["violates ADR-001/DEP-05/TB-01-02 separation and host-thinness"], "recommended": false}
+      ],
+      "recommendation": "L1 (externalBin + resources build.json); verify Q-03/Q-02 probes first; keep L2 as fallback if signing-of-resources proves simpler after artifacts/rust-tauri/R09 probe",
+      "electronParity": "Electron copies the whole dist-rust-service/<os>-<arch>/ to Resources/rust-service/ and lists Contents/Resources/rust-service/lingxi-service in mac binaries for signing (package.json:191-199 and mac binaries section)"
+    },
+    "deliverables": ["Tauri overlay project config (dev/release)", "DesktopHost-Tauri boot baseline + explicit restricted members", "same dist-renderer embedded", "minimal service supervisor skeleton (real start/handshake lands in T02)", "build wrapper + A01/A02 evidence suites"],
+    "nonGoals": ["tray/shortcuts/notifications/dialogs/clipboard/deeplink (T03)", "settings/quick-chat/onboarding multi-window (T03)", "file/preview capabilities (T03/T05)", "permission matrix (T04)", "Windows/Linux packaging (blocked)", "signing/notarization (blocked)", "renderer OTA/seed pipeline (T06/T08 scope; Q-10)"]
+  },
+  "a01a02Evidence": [
+    {
+      "id": "R09-A01",
+      "name": "同一React产物可运行",
+      "suite": "r09_t01_react_parity",
+      "taskModule": "scripts/rust-tauri/r09_t01.py (to be created in implementation; currently NOT_IMPLEMENTED red via r09_suites.py:80-96)",
+      "evidencePath": "{EVIDENCE}/SUITES/r09_t01_react_parity/",
+      "buildRequirement": "Tauri evidence build MUST be real: e2e-test feature build (wdio WebDriver) + release overlay; Electron runs `electron .` which loads desktop/bootstrap.cjs -> desktop/main.cjs in dev mode (no packaged bundle needed; bootstrap.cjs:187-195) and desktop/preload.bundle.cjs must exist (main.cjs:134-142; run npm run build:preload if absent); Rust service uses existing rust/target/debug/lingxi-service (sha b855... recorded) or release stage",
+      "fixture": "two isolated homes (iso1 for Electron, iso2 for Tauri), each with its own lingxi-service; no external model needed for core-page parity (rust preview path)",
+      "steps": [
+        "record git HEAD + renderer dist tree digest + diff whitelist (business components must be untouched)",
+        "launch Electron: require('electron'), cwd repo root, args ['.', '--remote-debugging-port=<port>'], env LINGXI_HOME=iso1, LINGXI_DESKTOP_SERVER_RUNTIME=rust, LINGXI_SERVICE_BIN=abs debug binary, delete ELECTRON_RUN_AS_NODE",
+        "read Electron targets via CDP /json; evaluate document.title, #react-root mount, data-platform, window.hana presence, console errors; window.hana.getServerConnectionInfo()",
+        "launch Tauri evidence binary with env LINGXI_HOME=iso2, LINGXI_SERVICE_BIN=abs; connect WebDriver http://127.0.0.1:$TAURI_WEBDRIVER_PORT/session (R06 pattern desktop/src-tauri/tests/desktop_host.rs:137-160)",
+        "evaluate same DOM snapshot + window.__TAURI__ presence + invoke('get_server_connection_info')",
+        "query each service /lingxi/v1/health + identity (using isolated-home token) and compare normalized identity/health",
+        "normalize and diff snapshots; assert no dist-tauri-resources UI is loaded by either shell",
+        "quit both; assert isolated homes cleaned, real ~/.lingxi untouched"
+      ],
+      "cases": [
+        "a01::renderer-dist-digest-recorded",
+        "a01::same-artifact-both-shells",
+        "a01::electron-boots",
+        "a01::tauri-boots",
+        "a01::dom-snapshot-parity",
+        "a01::service-identity-parity",
+        "a01::no-second-react-entry",
+        "a01::console-clean",
+        "a01::isolated-homes"
+      ],
+      "artifacts": ["result.json", "output.log", "cases.json", "dom-electron.json", "dom-tauri.json", "renderer-digest.json", "console-electron.json", "console-tauri.json"],
+      "notes": "The R08-A16 renderer digest 3e5339cc... is the pre-change anchor; T01 host wiring changes bundle content, so A01 binds both shells to the NEW digest and uses a source-diff whitelist to prove no second business component set. Do not claim digest equality with R08 after the rebuild."
+    },
+    {
+      "id": "R09-A02",
+      "name": "生产不依赖开发服务器",
+      "suite": "r09_t01_release_offline",
+      "taskModule": "scripts/rust-tauri/r09_t01.py",
+      "evidencePath": "{EVIDENCE}/SUITES/r09_t01_release_offline/",
+      "buildRequirement": "MUST be a real release build: tauri build --config tauri.release.conf.json --bundles app WITHOUT e2e-test feature; .app must be copied to a realpath directory before launch (R01 sidecar/current_exe symlink caveat)",
+      "fixture": "port 5173 free; canary TCP listener on 5173; isolated LINGXI_HOME; no Vite process",
+      "steps": [
+        "record tauri --version, overlay hash, built app sha256, codesign -dv (ad-hoc evidence only)",
+        "strings scan release binary for devUrl/localhost:5173/127.0.0.1:5173 => expect 0",
+        "ensure no listener on 5173, then start canary listener counting connections",
+        "launch .app/Contents/MacOS/Lingxi with isolated LINGXI_HOME and injected VITE_DEV_URL=http://127.0.0.1:5173",
+        "wait for diagnostics page-load + app-ready events; assert URL is tauri://localhost/index.html (macOS) not dev server",
+        "assert canary connection count == 0 and lsof -a -p <app-pid> -iTCP shows no 5173 socket",
+        "graceful quit; assert exit 0 + shutdown event; assert no stray Lingxi/helper/lingxi-service processes",
+        "assert real ~/.lingxi untouched"
+      ],
+      "cases": [
+        "a02::release-binary-built",
+        "a02::no-devurl-in-release-binary",
+        "a02::no-vite",
+        "a02::webview-loads-embedded",
+        "a02::ui-boots",
+        "a02::env-cannot-redirect",
+        "a02::no-5173-sockets",
+        "a02::graceful-exit",
+        "a02::isolated-homes"
+      ],
+      "artifacts": ["result.json", "output.log", "cases.json", "strings-scan.txt", "lsof-before.txt", "lsof-after.txt", "canary.log", "diagnostics.jsonl", "codesign.txt"],
+      "notes": "DMG/notarized installer is NOT claimed (BLOCKED-SIGNING-IDENTITY); 'release installation artifact' is interpreted as the built .app bundle placed in an isolated directory. UI-loaded proof comes from host page-load diagnostics rather than WebDriver because the clean release binary must not embed the test plugin."
+    }
+  ],
+  "a03a04Evidence": [
+    {
+      "id": "R09-A03",
+      "name": "错误二进制明确拒绝",
+      "suite": "r09_t02_supervisor_ready",
+      "taskModule": "scripts/rust-tauri/r09_t02.py (to be created; currently NOT_IMPLEMENTED red)",
+      "evidencePath": "{EVIDENCE}/SUITES/r09_t02_supervisor_ready/",
+      "buildRequirement": "real release .app build with staged sidecar + build.json; negative injections performed in staging BEFORE tauri build (bundle signature covers injected content, avoiding the 'modified signed bundle refused by OS' confounder); all injection work in /private/tmp, never touching workspace outputs; post-build tamper only as optional secondary form with codesign failure status recorded; deterministic stub service binary/script for runtime-mismatch case (scenario environment allows deterministic external-protocol stand-ins)",
+      "preconditions": [
+        "build.json extended with protocol {serverKind, wireProtocolMin, wireProtocolMax, dataEpoch} derived from lingxi-service --version",
+        "supervisor implements three-layer version gate (build manifest -> instance/health/identity)",
+        "failure path writes failure record before native dialog; automation dismisses dialog via osascript (R01 precedent)"
+      ],
+      "cases": [
+        {"id": "a03::manifest-protocol-match", "expect": "correct package boots; diagnostics show spawn -> READY addr -> instance/token -> identity 200 -> published"},
+        {"id": "a03::no-fixed-sleep-handshake", "expect": "event ordering proves READY line drives readiness; timestamps recorded; instance.json absent before READY"},
+        {"id": "a03::manifest-protocol-mismatch-rejected", "expect": "staging-time tampered build.json protocol (e.g. wireProtocolMax=2) => pre-spawn failure record RUST_SERVICE_PROTOCOL_INCOMPATIBLE with expected/actual; no lingxi-service spawned; non-zero exit"},
+        {"id": "a03::manifest-digest-mismatch-rejected", "expect": "staging-time sidecar/manifest digest mismatch => RUST_SERVICE_DIGEST_MISMATCH pre-spawn; hashes recorded"},
+        {"id": "a03::runtime-identity-mismatch-rejected", "expect": "stub service with correct READY but wrong instance wire/epoch or wrong identity => RUNTIME_IDENTITY_MISMATCH; host reaps spawned stub (pid dead); no publish"},
+        {"id": "a03::no-node-fallback", "expect": "no hana-server/node server process, no server-info.json, release binary has no node-service entry strings, failure record fallbackAttempts=0"},
+        {"id": "a03::error-surfaced", "expect": "tauri-launch events + crash log contain reason/expected/actual; native dialog observed and dismissed via osascript"},
+        {"id": "a03::timeout-is-bounded", "expect": "Rust unit test with injected short READY timeout proves timeout -> failure -> kill; avoids 90s wait in E2E"}
+      ],
+      "artifacts": ["result.json", "output.log", "cases.json", "injected/build-manifest-*.json", "process-tree-*.txt", "failure-record-*.json", "dialog-*.png"],
+      "mustBeRealBuild": true,
+      "platform": "macos-arm64 only; other platforms BLOCKED-PLATFORM-*",
+      "notes": "A03's 'wrong binary' is modeled as (i) staged manifest/protocol mismatch and (ii) runtime identity/version mismatch via a deterministic stub; both must be rejected before publish and must never start a second older service. Staging-time injection keeps the built .app internally signature-consistent and isolates the host's own protocol gate as the variable under test. The absence of Node in the Tauri release is additionally proven by process table + strings scan."
+    },
+    {
+      "id": "R09-A04",
+      "name": "退出清理只影响自有进程",
+      "suite": "r09_t02_process_ownership",
+      "taskModule": "scripts/rust-tauri/r09_t02.py",
+      "evidencePath": "{EVIDENCE}/SUITES/r09_t02_process_ownership/",
+      "buildRequirement": "real Tauri build (release for owned path; debug build for remote-mode/reused cases) + real lingxi-service binaries; remote fixture service is a real local process owned by the harness",
+      "fixture": "remote service on remoteHome (loopback + explicit port, harness-owned); local Tauri client on localHome with its own owned service; process tree recorder adapted from scripts/rust-tauri/r08_t03_process_tree.mjs:77,79-86 plus tauri-host classification",
+      "cases": [
+        {"id": "a04::two-services-coexist", "expect": "S1 snapshot: exactly 2 lingxi-service processes (remoteHome/localHome); remote not child of host; local owned service inside host subtree"},
+        {"id": "a04::graceful-trigger", "expect": "quit via SIGTERM to host (host installs signal handler -> app.quit -> graceful shutdown); if implementation lacks handler the suite records fallback AppleScript Cmd+Q and the gap is a real red until fixed"},
+        {"id": "a04::owned-tree-cleaned", "expect": "S3: local service pid gone, its workers gone, host exit 0, shutdown event {mode:'local-owned',ownedPids,residual:[]}"},
+        {"id": "a04::remote-untouched", "expect": "remote pid alive, /lingxi/v1/health + identity 200, instance.json sha unchanged, remote log has no shutdown marker, ppid unchanged"},
+        {"id": "a04::no-stray-spawn", "expect": "no second lingxi-service appears during/after quit; localHome has no residual instance.json (graceful service self-deletes)"},
+        {"id": "a04::reused-is-detached", "expect": "dev with pre-existing service on localHome: host reports mode=local-reused + detached, service survives host exit (parity with desktop/main.cjs:6900-6908); harness cleans it afterwards"},
+        {"id": "a04::remote-mode-zero-touch", "expect": "debug build + remote env: no local instance.json created, remote service untouched after client exit, host reports mode=remote,touchedRemote=false"},
+        {"id": "a04::packaged-refuses-remote", "expect": "release build with same remote env => REMOTE_REQUIRES_DEV_BUILD; no connect/spawn; boundary recorded"},
+        {"id": "a04::pid-reuse-safe", "expect": "forged instance.json pointing at an unrelated live process (e.g. sleep): packaged refuses reuse without killing it; process still alive after test (harness cleans)"}
+      ],
+      "artifacts": ["result.json", "output.log", "cases.json", "tree-s1.json", "tree-s2.json", "tree-s3.json", "remote-health-before-after.json", "shutdown-report.json"],
+      "mustBeRealBuild": true,
+      "platform": "macos-arm64 only; Windows/Linux/mac x64 BLOCKED-PLATFORM-*",
+      "notes": "A04 is the process-ownership probe: the only kill authority is the OwnedChild handle; remote/reused paths have no kill code. ACCOUNT: remote fixture is owned by the harness (explicitly allowed to clean up), not by the client under test."
+    }
+  ],
+  "openQuestions": [
+    {
+      "id": "Q-01",
+      "question": "Can tauri build (2.12.4 CLI / 2.12.1 crate) run with CLT 27.0 and no Xcode.app, and can it produce a launchable .app?",
+      "verifiedBasis": ["docs/rust-tauri/R01/R01-T06_REPORT.md:37-38 (npx tauri build --bundles app exit 0 with Tauri 2.11.6)", "docs/rust-tauri/R01/TAURI_SPIKE_REPORT.md:59-77,79-87,97-102", "local: xcode-select = CLT; xcodebuild -version errors; codesign/hdiutil/osascript present"],
+      "probeSteps": ["record xcode-select -p, xcodebuild -version failure, tool versions", "build minimal overlay: npx tauri build --config tauri.release.conf.json --bundles app", "codesign --verify --deep --strict <app>; spctl -a -vv (expect ad-hoc rejection notice)", "separately try --bundles dmg and record osascript/Finder automation failure if any"],
+      "impact": "A02/A03/A04 'release installation artifact' scope; DMG/installer claim boundaries"
+    },
+    {
+      "id": "Q-02",
+      "question": "Does ad-hoc signing mutate the service binary such that build.json sha256 must be compared via contentSha256 + codesign verification?",
+      "verifiedBasis": ["desktop/src/shared/rust-local-service.cjs:43-117 (Mach-O/PE content digest)", "scripts/build-rust-desktop-service.mjs:132 (contentSha256)", "local: 0 codesigning identities => ad-hoc only"],
+      "probeSteps": ["build stage; compare sha256(binary) vs build.json.sha256 after app signing", "recompute content digest and compare contentSha256", "codesign --verify --strict <binary> and --deep --strict <app>"],
+      "impact": "T02 must port service/digest.rs; otherwise packaged launches always reject"
+    },
+    {
+      "id": "Q-03",
+      "question": "Does externalBin sidecar layout + current_exe() resolution work for lingxi-service, and is the sidecar included in app signing?",
+      "verifiedBasis": ["docs/rust-tauri/R01/TAURI_SPIKE_REPORT.md:59-77 (packaged .app sidecar handshake VERIFIED; current_exe sibling un-suffixed name; symlink caveat)", "Tauri docs: externalBin requires -$TARGET_TRIPLE suffix; runtime resolves un-suffixed name beside executable"],
+      "probeSteps": ["stage binaries/lingxi-service-$(rustup run 1.98.1 rustc --print host-tuple)", "tauri build --bundles app; inspect Contents/MacOS/", "codesign -dvvv on sidecar; launch packaged app and assert supervisor finds+verifies it", "run from realpath directory (not /tmp symlink)"],
+      "impact": "recommended layout L1; Windows/Linux remain blocked"
+    },
+    {
+      "id": "Q-04",
+      "question": "What is the single authority for protocol/data versions and how is build.json extended without breaking Electron?",
+      "verifiedBasis": ["rust/crates/lingxi-protocol/src/handshake.rs:21-23 (wire 1..=1)", "rust/crates/lingxi-protocol/src/lib.rs:408-438 (data_epoch 2)", "shared/contract-versions.json DATA_EPOCH=1 (legacy Node axis)", "desktop/src/react/services/websocket.ts:58,132,142-153 (renderer accepts [1,2])", "scripts/build-rust-desktop-service.mjs:133-137 (no protocol fields today)", "docs/rust-tauri/R08/API_READINESS.md:42 (version/epoch must be unified with T03 readiness chain)"],
+      "probeSteps": ["derive protocol block from `lingxi-service --version` output (main.rs:224-233)", "add protocol to build.json (Node verifier tolerates extra fields)", "add consistency gate mapping Node contract-versions axes to Rust constants (explicit mapping, not forced equality)", "A03 tampering proves the gate is load-bearing"],
+      "impact": "T02 gate / A03; cross-stage contract consistency"
+    },
+    {
+      "id": "Q-05",
+      "question": "Do tauri --config overlays merge as expected (arrays replaced?) and which merged config is embedded at compile time? Will base R06 config still serve cargo test?",
+      "verifiedBasis": ["desktop/src-tauri/tauri.conf.json:1-15 (R06 base)", "Tauri 2 CLI --config overlay support", "no local probe yet"],
+      "probeSteps": ["build with release overlay; strings binary for dist-renderer vs dist-tauri-resources and 5173; host diagnostics config summary", "cargo test --manifest-path desktop/src-tauri/Cargo.toml --features e2e-test --test desktop_host (expect base config unchanged)", "if arrays merge unexpectedly, write full arrays in overlay or switch to base=R09 + separate R06 overlay with recorded migration"],
+      "impact": "T01 config separation design; R06 regression (Q-14)"
+    },
+    {
+      "id": "Q-06",
+      "question": "Which identifier should the Tauri release app use, and does it conflict with the Electron app id for parallel installation/LaunchServices/single-instance?",
+      "verifiedBasis": ["package.json build.appId = com.lingxi.app", "desktop/src-tauri/tauri.conf.json:5 identifier dev.lingxi.resources (R06)", "single-instance behavior is T03 scope"],
+      "probeSteps": ["build two .app copies with same vs different identifiers; observe LaunchServices registration/default handlers", "record evidence for T03 single-instance plugin design"],
+      "impact": "A01 parallel launch; T03 single instance/default app"
+    },
+    {
+      "id": "Q-07",
+      "question": "Does the runtime connection-csp.js meta CSP block Tauri invoke or WS to 127.0.0.1 service ports?",
+      "verifiedBasis": ["desktop/src/modules/connection-csp.js:1-68 (connect-src lacks ipc:/http://ipc.localhost)", "tauri.conf.json:11 already lists ipc: http://ipc.localhost", "two CSP sources intersect"],
+      "probeSteps": ["WebDriver execute __TAURI__.core.invoke('get_platform') and new WebSocket(wsUrl); collect console CSP violations", "if blocked, additively extend connect-src in connection-csp.js and re-run Electron-side check"],
+      "impact": "T01 bridge usability; T06 CSP consolidation input"
+    },
+    {
+      "id": "Q-08",
+      "question": "Should remote mode stay dev-preview-only in Tauri (parity with Electron), or become a packaged feature in R09?",
+      "verifiedBasis": ["desktop/main.cjs:1359-1361 packaged refuses remote", "docs/rust-tauri/R08/T03_DESIGN.md:65-120 (remote = dev drill; TLS/credential UX not built)", "R09-T02 task book requires 'local/remote mode' but not production remote"],
+      "probeSteps": ["implement dev-only remote and A04 debug-build evidence; register formalization (TLS/credential UI/scope) as T04/T05/T06 decision"],
+      "impact": "A04 evidence form; security posture"
+    },
+    {
+      "id": "Q-09",
+      "question": "Where should Tauri diagnostics and crash logs live to avoid clobbering Electron's LINGXI_HOME/crash.log during migration?",
+      "verifiedBasis": ["desktop/main.cjs:2624 writes {home}/crash.log", "desktop/src/shared/desktop-launch-diagnostics.cjs:14-17 writes {home}/diagnostics/desktop-launch/"],
+      "probeSteps": ["choose {home}/diagnostics/tauri-launch/events.jsonl + {home}/tauri-crash.log; ensure A02/A03 read them; document Electron coexistence"],
+      "impact": "T02 diagnostics, A02/A03 evidence"
+    },
+    {
+      "id": "Q-10",
+      "question": "Are renderer OTA / signed seed artifact activation required in R09-T01/T02, or is the embedded dist-renderer sufficient?",
+      "verifiedBasis": ["desktop/main.cjs:1661-1761 artifact-boot seed pipeline (Electron production)", "R09 task book T01 only requires same React artifact + no dev server"],
+      "probeSteps": ["T01/T02 implement embedded dist-renderer; register OTA/seed compatibility as T06/T08 or later work in R09_HANDOFF, not claimed by T01/T02"],
+      "impact": "production upgrade chain completeness; scope control"
+    },
+    {
+      "id": "Q-11",
+      "question": "How to guarantee Windows owned-tree convergence and private record reading without a Windows machine?",
+      "verifiedBasis": ["BLOCKED-PLATFORM-WINDOWS-X64", "desktop/main.cjs:6858,6870,6878 (guardian only for node path)", "rust/crates/lingxi-service/src/main.rs:240-260 (--read-private-runtime-json)"],
+      "probeSteps": ["design Job Object (KILL_ON_JOB_CLOSE) + PE signature verification + private read; keep as registered unverified branch until Windows host available"],
+      "impact": "T02 cross-platform completeness claim"
+    },
+    {
+      "id": "Q-12",
+      "question": "Should get_server_token remain renderer-accessible in Tauri, or should the host proxy HTTP/WS to keep the token inside Rust?",
+      "verifiedBasis": ["desktop/main.cjs:5647 exposes token to renderer; renderer uses it for HTTP/WS", "R09-T06 owns production attack-surface scan"],
+      "probeSteps": ["T01/T02 keep parity (main-window-only command); T06 decides whether to restructure to host-side HTTP proxy (large renderer change, not T01/T02)"],
+      "impact": "security surface; T06"
+    },
+    {
+      "id": "Q-13",
+      "question": "Should the main window be created only after service readiness (this design) or pre-created hidden with a boot gate in the renderer?",
+      "verifiedBasis": ["desktop/main.cjs:6676-6734 (Electron: splash -> startServer -> main window)", "T01/T02 have no splash (T03 adds)"],
+      "probeSteps": ["implement ready-then-create; measure cold start UX; if review requires earlier window, add boot-gate command + renderer retry (changes shared React; re-evaluate A01 scope)"],
+      "impact": "startup UX; T03 splash"
+    },
+    {
+      "id": "Q-14",
+      "question": "Does extending R09 host code in the same crate keep the R06 WebDriver E2E green?",
+      "verifiedBasis": ["desktop/src-tauri/tests/desktop_host.rs:137-160 spawns CARGO_BIN_EXE_lingxi-resource-desktop", "base config embeds dist-tauri-resources (tauri.conf.json:6)", "R06 README:23-26 documents real GUI E2E conditions"],
+      "probeSteps": ["cargo test --manifest-path desktop/src-tauri/Cargo.toml --features e2e-test --test desktop_host (real GUI; may be environment-limited)", "keep base config unchanged; new commands/capabilities additive"],
+      "impact": "R09 must not silently break R06"
+    }
+  ],
+  "risks": [
+    {"id": "R-01", "risk": "A02/A03 depend on real tauri build; CLT-only + new CLI/crate combination unverified; build may fail", "level": "high", "mitigation": "execute Q-01 probe first; record build logs; if blocked register R09_BLOCKED, never reuse stale evidence"},
+    {"id": "R-02", "risk": "ad-hoc signing mutates service binary; without content-digest port every packaged launch rejects", "level": "high", "mitigation": "Q-02 + make service/digest.rs a T02 deliverable"},
+    {"id": "R-03", "risk": "T01 React host wiring changes dist-renderer digest; A01 could become fake if it still cites R08 baseline digest", "level": "high", "mitigation": "A01 binds both shells to the NEW digest; R08 digest is only a pre-change anchor + diff whitelist proves business components untouched"},
+    {"id": "R-04", "risk": "Overlay merge semantics misconfigured => release embeds dist-tauri-resources or devUrl residue", "level": "high", "mitigation": "Q-05 probe + A02 strings/URL assertions"},
+    {"id": "R-05", "risk": "Using shared/contract-versions.json as Rust gate falsely rejects epoch-2 service (1 vs 2) or misses real mismatch", "level": "high", "mitigation": "§versionGate authority list; A03 negative coverage"},
+    {"id": "R-06", "risk": "Native error dialog blocks automated evidence", "level": "medium", "mitigation": "write failure record before dialog; dismiss via osascript (R01 precedent); evidence keyed on record + observed dialog"},
+    {"id": "R-07", "risk": "Double CSP blocks Tauri IPC or service WS", "level": "medium", "mitigation": "Q-07 WebDriver probe; additive connection-csp.js change with Electron regression"},
+    {"id": "R-08", "risk": "Missing SIGTERM handler makes host die without cleanup; A04 proves the defect, not the design", "level": "high", "mitigation": "T02 installs signal handlers -> app.quit -> graceful shutdown; A04 asserts shutdown event"},
+    {"id": "R-09", "risk": "Evidence directory bloat (R08 artifacts already 69GB)", "level": "medium", "mitigation": "large artifacts stay in /private/tmp (LINGXI_R09_RAW); artifacts only hold hashes/manifests/small logs"},
+    {"id": "R-10", "risk": "Concurrent Lead/teammate edits to R09 infrastructure change referenced contracts", "level": "medium", "mitigation": "all gate anchors dated 21:14 snapshot; implementation reads live R09.json/r09_stage_inputs.py; no writes outside two deliverables"},
+    {"id": "R-11", "risk": "R06 E2E/resource UI regresses due to base config or capability changes", "level": "medium", "mitigation": "Q-14; keep base config; additive commands/capability entries; include R06 check in T01 closeout"},
+    {"id": "R-12", "risk": "Platform claims inflated (no Windows/Linux/mac-x64 machines)", "level": "high", "mitigation": "every evidence item tagged macos-arm64; others registered BLOCKED-PLATFORM-*, never described as unsupported"},
+    {"id": "R-13", "risk": "90s READY timeout makes failure evidence slow/blocking", "level": "low", "mitigation": "timeout covered by Rust unit test with injected short duration; E2E only covers immediate rejection paths"}
+  ],
+  "immediateImplementationTodo": [
+    "create scripts/rust-tauri/r09_t01.py and r09_t02.py exporting run_suite(suite, evidence) using r09_producer.Producer",
+    "extend scripts/build-rust-desktop-service.mjs build.json with protocol block sourced from lingxi-service --version",
+    "add scripts/stage-tauri-service.mjs and scripts/build-tauri-host.mjs (release/dev overlay generation, real build)",
+    "add desktop/src-tauri overlays tauri.dev.conf.json / tauri.release.conf.json without touching the R06 base config",
+    "implement desktop/src-tauri/src/service/{resolve,manifest,digest,instance,client,supervisor,shutdown,remote}.rs + diagnostics/commands",
+    "implement desktop/src/react/host/tauri-desktop-host.ts + registry/kind/platform.js/session-actions wiring + jsdom host test",
+    "add Tauri commands to build.rs AppManifest::commands and capabilities allow-lists",
+    "probe Q-01/Q-02/Q-03/Q-05/Q-07 before claiming any A01-A04 result; assemble evidence under artifacts/rust-tauri/R09/verify-r09-closeout-NN/SUITES/<suite>/"
+  ],
+  "references": [
+    "docs/rust-tauri/R09/T01_T02_HOST_SERVICE_DESIGN.md (narrative companion with full file:line index)",
+    "docs/rust-tauri/R09/START_RECEIPT.md:3-8",
+    "docs/rust-tauri/R09/BLOCKED.md:8-14",
+    "docs/rust-tauri/R09/PROGRESS.md:12-58,59-78",
+    "docs/rust-tauri/R00/ACCEPTANCE_MAP.json:6921-7020,25041-25044",
+    "docs/rust-tauri/R08/R08_HANDOFF.json:134-138,165-168",
+    "docs/rust-tauri/R08/API_READINESS.md:16,40-46",
+    "docs/rust-tauri/R08/T03_DESIGN.md:14,24,65-120,128-145",
+    "docs/rust-tauri/R08/T03_FREEZE_MATRIX.md:17,33,73-84",
+    "docs/rust-tauri/R01/ADR-001-ownership.md:77",
+    "docs/rust-tauri/R01/DEPENDENCY_DECISIONS.md:234-260,294+",
+    "docs/rust-tauri/R01/DEPENDENCY_RULES.json:86-96,180-190",
+    "docs/rust-tauri/R01/TAURI_SPIKE_REPORT.md:59-77,79-87,97-102,121-123",
+    "docs/rust-tauri/R01/R01-T06_REPORT.md:37-38",
+    "Lingxi_Rust_Tauri_Taskbooks_2026-09-23/R09_Tauri桌面宿主、原生能力与跨平台集成.md:42-122",
+    "scripts/rust-tauri/r09_suites.py:24-33,80-96",
+    "scripts/rust-tauri/r09_producer.py:112-245",
+    "scripts/rust-tauri/r09_stage_inputs.py:34-46",
+    "rust/crates/xtask/src/stage_maps/R09.json:36-97"
+  ]
+}

@@ -1,0 +1,128 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "suite": "r09_t02_supervisor_ready",
+ "cases": [
+  {
+   "case": "t02::candidate.debug-consume-only",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "source": "env",
+    "mode": "debug",
+    "executableSha256": "45d8987b896ec1c145a1c6d21a01fc3c539f8e9c837aa34816613ff5e32ffca5"
+   }
+  },
+  {
+   "case": "t02::candidate.debug-features",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "features": [
+     "e2e-test",
+     "r09-host",
+     "r09-test-hooks"
+    ]
+   }
+  },
+  {
+   "case": "t02::ready-handshake-real",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "events": [
+     "host-start",
+     "resolve",
+     "binary",
+     "spawn",
+     "ready",
+     "instance",
+     "identity",
+     "service-ready",
+     "host-service-ready",
+     "window-created",
+     "page-load",
+     "page-load",
+     "app-ready-window-suppressed",
+     "app-ready"
+    ],
+    "readyMsSinceSpawn": 119,
+    "ordered": true,
+    "readyAddr": "127.0.0.1:57323"
+   }
+  },
+  {
+   "case": "t02::no-fixed-sleep-handshake",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "readyMsSinceSpawn": 119,
+    "mode": "local-owned"
+   }
+  },
+  {
+   "case": "t02::debug-exit-graceful",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "exit": 0,
+    "timedOut": false,
+    "service_residual": []
+   }
+  },
+  {
+   "case": "isolation::ps-clean-supervisor-debug-positive",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "label": "supervisor-debug-positive",
+    "aliveAppPids": [],
+    "residualServices": []
+   }
+  },
+  {
+   "case": "t02::automation-no-modal-positive",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "dialogSink": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56570-1793066803772/raw/dialog-tauri-home-debug-owned.json",
+    "automation": true
+   }
+  },
+  {
+   "case": "isolation::no-residual-processes",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "killed": [],
+    "residual": [],
+    "marker": "/private/tmp/lingxi-r09-runtime/r09_t02_supervisor_ready-56570-1793066803772"
+   }
+  },
+  {
+   "case": "isolation::real-home-untouched",
+   "ok": true,
+   "actual": 1,
+   "expect": 1,
+   "detail": {
+    "before": {
+     "exists": true,
+     "digest": "b790f44972ac7340cef25fda0b803585347ef8fb8d05c500c4db6cbdf68daacc",
+     "fileCount": 41711
+    },
+    "after": {
+     "exists": true,
+     "digest": "b790f44972ac7340cef25fda0b803585347ef8fb8d05c500c4db6cbdf68daacc",
+     "fileCount": 41711
+    }
+   }
+  }
+ ]
+}
